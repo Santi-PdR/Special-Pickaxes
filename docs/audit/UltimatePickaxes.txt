@@ -1,0 +1,996 @@
+# referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar
+SHA256 fb0ccf0a08aaa4f9a98a912551d098eb22b651664757e6cb6afd04023e91e98b
+
+## META-INF/mods.toml
+# This is an example mods.toml file. It contains the data relating to the loading mods.
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+# The overall format is standard TOML format, v0.5.0.
+# Note that there are a couple of TOML lists in this file.
+# Find more information on toml format here:  https://github.com/toml-lang/toml
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml" #mandatory
+# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
+loaderVersion="[47,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+# Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
+license="All-Rights-Reserved"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]] #mandatory
+# The modid of the mod
+modId="ultimatepickaxes" #mandatory
+# The version number of the mod
+version="1.0.17-1.20.1" #mandatory
+# A display name for the mod
+displayName="ultimatepickaxes" #mandatory
+# A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+# A file name (in the root of the mod JAR) containing a logo for display
+#logoFile="ultimatepickaxes.png" #optional
+# A text field displayed in the mod UI
+#credits="Thanks for this example mod goes to Java" #optional
+# A text field displayed in the mod UI
+authors="TheMartinfer22" #optional
+# Display Test controls the display for your mod in the server connection screen
+# MATCH_VERSION means that your mod will cause a red X if the versions on client and server differ. This is the default behaviour and should be what you choose if you have server and client elements to your mod.
+# IGNORE_SERVER_VERSION means that your mod will not cause a red X if it's present on the server but not on the client. This is what you should use if you're a server only mod.
+# IGNORE_ALL_VERSION means that your mod will not cause a red X if it's present on the client or the server. This is a special case and should only be used if your mod has no server component.
+# NONE means that no display test is set on your mod. You need to do this yourself, see IExtensionPoint.DisplayTest for more information. You can define any scheme you wish with this value.
+# IMPORTANT NOTE: this is NOT an instruction as to which environments (CLIENT or DEDICATED SERVER) your mod loads on. Your mod should load (and maybe do nothing!) whereever it finds itself.
+#displayTest="MATCH_VERSION" # MATCH_VERSION is the default if nothing is specified (#optional)
+
+# The description text for the mod (multi line!) (#mandatory)
+description=''''''
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies."ultimatepickaxes"]] #optional
+   # the modid of the dependency
+   modId="forge" #mandatory
+   # Does this dependency have to exist - if not, ordering below must be specified
+   mandatory=true #mandatory
+   # The version range of the dependency
+   versionRange="[47,)" #mandatory
+   # An ordering relationship for the dependency - BEFORE or AFTER required if the dependency is not mandatory
+   # BEFORE - This mod is loaded BEFORE the dependency
+   # AFTER - This mod is loaded AFTER the dependency
+   ordering="NONE"
+   # Side this dependency is applied on - BOTH, CLIENT, or SERVER
+   side="BOTH"# Here's another dependency
+[[dependencies."ultimatepickaxes"]]
+   modId="minecraft"
+   mandatory=true
+   # This version range declares a minimum of the current minecraft version up to but not including the next major version
+   versionRange="[1.20.1,1.21)"
+   ordering="NONE"
+   side="BOTH"
+
+
+## assets/ultimatepickaxes/lang/en_us.json
+{
+  "item.ultimatepickaxes.coal_pickaxe": "Coal Pickaxe",
+  "item.ultimatepickaxes.tnt_pickaxe": "TNT Pickaxe",
+  "item.ultimatepickaxes.fire_pickaxe": "Fire Pickaxe",
+  "item.ultimatepickaxes.natural_pickaxe": "Natural Pickaxe",
+  "item.ultimatepickaxes.bone_pickaxe": "Bone Pickaxe",
+  "item.ultimatepickaxes.laser_pickaxe": "Laser Pickaxe",
+  "item.ultimatepickaxes.shadow_pickaxe": "Shadow Pickaxe",
+  "itemGroup.ultimatepickaxes": "Ultimate Pickaxes"
+}
+
+
+## assets/ultimatepickaxes/lang/pt_BR.json
+{
+  "item.ultimatepickaxes.coal_pickaxe": "Picareta de Carvão",
+  "item.ultimatepickaxes.tnt_pickaxe": "Picareta de TNT",
+  "item.ultimatepickaxes.fire_pickaxe": "Picareta de Fogo",
+  "item.ultimatepickaxes.natural_pickaxe": "Picareta Natural",
+  "item.ultimatepickaxes.bone_pickaxe": "Picareta de Ossos",
+  "item.ultimatepickaxes.laser_pickaxe": "Picareta de Laser",
+  "item.ultimatepickaxes.shadow_pickaxe": "Picareta das Sombras",
+  "itemGroup.ultimatepickaxes": "Ultimate Pickaxes"
+}
+
+
+## assets/ultimatepickaxes/models/item/bone_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/bone_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/coal_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/coal_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/fire_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/fire_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/laser_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/laser_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/natural_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/natural_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/shadow_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/shadow_pickaxe"
+  }
+}
+
+
+## assets/ultimatepickaxes/models/item/tnt_pickaxe.json
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "ultimatepickaxes:item/tnt_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/bone_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BPB",
+    " B ",
+    " B "
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bone"
+    },
+    "P": {
+      "item": "minecraft:phantom_membrane"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:bone_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/coal_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:coal_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/fire_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    " I ",
+    " I "
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:lava_bucket"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:fire_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/laser_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RIR",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:laser_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/natural_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "VVV",
+    "VPV",
+    "VVV"
+  ],
+  "key": {
+    "V": {
+      "item": "minecraft:vine"
+    },
+    "P": {
+      "item": "minecraft:wooden_pickaxe"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:natural_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/shadow_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "NWN",
+    "ENE",
+    "ENE"
+  ],
+  "key": {
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "W": {
+      "item": "minecraft:wither_skeleton_skull"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:shadow_pickaxe"
+  }
+}
+
+
+## data/ultimatepickaxes/recipes/tnt_pickaxe.json
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TTT",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:tnt"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "ultimatepickaxes:tnt_pickaxe"
+  }
+}
+
+
+## dev/nanosync/ultimatepickaxes/Application.class
+FIELD MOD_ID Ljava/lang/String;
+METHOD <init> ()V
+  bytecode 2ab70014b8001ab6001e4cb200242ab9002a0200b8002fb20033b20039b6003db20043b8001ab6001eb60048b2004d2bb60048b1
+  0001 op=b7 java/lang/Object <init> ()V
+  0004 op=b8 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext get ()Lnet/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext;
+  0007 op=b6 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext getModEventBus ()Lnet/minecraftforge/eventbus/api/IEventBus;
+  000b op=b2 net/minecraftforge/common/MinecraftForge EVENT_BUS Lnet/minecraftforge/eventbus/api/IEventBus;
+  000f op=b9 net/minecraftforge/eventbus/api/IEventBus register (Ljava/lang/Object;)V
+  0014 op=b8 net/minecraftforge/fml/ModLoadingContext get ()Lnet/minecraftforge/fml/ModLoadingContext;
+  0017 op=b2 net/minecraftforge/fml/config/ModConfig$Type COMMON Lnet/minecraftforge/fml/config/ModConfig$Type;
+  001a op=b2 dev/nanosync/ultimatepickaxes/config/Config SPEC Lnet/minecraftforge/common/ForgeConfigSpec;
+  001d op=b6 net/minecraftforge/fml/ModLoadingContext registerConfig (Lnet/minecraftforge/fml/config/ModConfig$Type;Lnet/minecraftforge/fml/config/IConfigSpec;)V
+  0020 op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  0023 op=b8 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext get ()Lnet/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext;
+  0026 op=b6 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext getModEventBus ()Lnet/minecraftforge/eventbus/api/IEventBus;
+  0029 op=b6 net/minecraftforge/registries/DeferredRegister register (Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  002c op=b2 dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  0030 op=b6 net/minecraftforge/registries/DeferredRegister register (Lnet/minecraftforge/eventbus/api/IEventBus;)V
+
+## dev/nanosync/ultimatepickaxes/config/Config.class
+FIELD enablePickaxeTNTExplosions Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+FIELD enableFirePickaxeSmeltOres Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+FIELD bonePickaxeDropBoneRate Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+FIELD laserPickaxeBlocksBreak Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+FIELD laserPickaxeExtraBlocks Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+FIELD SPEC Lnet/minecraftforge/common/ForgeConfigSpec;
+METHOD <init> ()V
+  bytecode 2ab70033b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD lambda$static$0 (Ljava/lang/Object;)Z
+  bytecode 2ac10039ac
+  0001 op=c1 java/lang/String
+METHOD <clinit> ()V
+  bytecode bb000d59b7003d4b2a123fb60043124504b60049b3004b2a124db60043124f04b60049b300512a1253b600431255140056b8005db60060b300622a1264b6004312661006b8006bb60060b3006d2a126fb60043127105bd003959031273535904127553b8007bba008a0000b6008eb300902ab60094b30096b1
+  0000 op=bb net/minecraftforge/common/ForgeConfigSpec$Builder
+  0004 op=b7 net/minecraftforge/common/ForgeConfigSpec$Builder <init> ()V
+  0009 op=12 Set to true to enable pickaxe TNT Explosions
+  000b op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder comment (Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+  000e op=12 powers.enablePickaxeTNTExplosions
+  0011 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder define (Ljava/lang/String;Z)Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0014 op=b3 dev/nanosync/ultimatepickaxes/config/Config enablePickaxeTNTExplosions Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0018 op=12 Set to true to enable Fire Pickaxe Smelt Ores
+  001a op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder comment (Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+  001d op=12 powers.enableFirePickaxeSmeltOres
+  0020 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder define (Ljava/lang/String;Z)Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0023 op=b3 dev/nanosync/ultimatepickaxes/config/Config enableFirePickaxeSmeltOres Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0027 op=12 Bone Pickaxe drop bone rate, 0.6 is 60%
+  0029 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder comment (Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+  002c op=12 powers.bonePickaxeDropBoneRate
+  002e op=14 0.6
+  0031 op=b8 java/lang/Double valueOf (D)Ljava/lang/Double;
+  0034 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder define (Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  0037 op=b3 dev/nanosync/ultimatepickaxes/config/Config bonePickaxeDropBoneRate Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  003b op=12 Laser Pickaxe Blocks to break
+  003d op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder comment (Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+  0040 op=12 powers.laserPickaxeBlocksBreak
+  0044 op=b8 java/lang/Integer valueOf (I)Ljava/lang/Integer;
+  0047 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder define (Ljava/lang/String;Ljava/lang/Object;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  004a op=b3 dev/nanosync/ultimatepickaxes/config/Config laserPickaxeBlocksBreak Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  004e op=12 Extra blocks that the Laser Pickaxe can break. Use namespace:block_id
+  0050 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder comment (Ljava/lang/String;)Lnet/minecraftforge/common/ForgeConfigSpec$Builder;
+  0053 op=12 powers.laserPickaxeExtraBlocks
+  0056 op=bd java/lang/String
+  005b op=12 minecraft:coal_ore
+  0060 op=12 minecraft:iron_ore
+  0063 op=b8 java/util/Arrays asList ([Ljava/lang/Object;)Ljava/util/List;
+  0066 op=ba bootstrap:0 test ()Ljava/util/function/Predicate;
+  006b op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder defineList (Ljava/lang/String;Ljava/util/List;Ljava/util/function/Predicate;)Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  006e op=b3 dev/nanosync/ultimatepickaxes/config/Config laserPickaxeExtraBlocks Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  0072 op=b6 net/minecraftforge/common/ForgeConfigSpec$Builder build ()Lnet/minecraftforge/common/ForgeConfigSpec;
+  0075 op=b3 dev/nanosync/ultimatepickaxes/config/Config SPEC Lnet/minecraftforge/common/ForgeConfigSpec;
+
+## dev/nanosync/ultimatepickaxes/item/BonePickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70013b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode b20025b60029c0002b3a062cb600319a005d2cc100339900562cc000333a072db80039b6003f9900461907b40043b9004901008d1906b6004d989c0032bb004f5919071904b60055871904b60058871904b6005b87bb005d59b20063b70066b700693a0819071908b6006d572a2b2c2d19041905b7006fac
+  0000 op=b2 dev/nanosync/ultimatepickaxes/config/Config bonePickaxeDropBoneRate Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  0003 op=b6 net/minecraftforge/common/ForgeConfigSpec$ConfigValue get ()Ljava/lang/Object;
+  0006 op=c0 java/lang/Double
+  000c op=b6 net/minecraft/world/level/Level m_5776_ ()Z
+  0013 op=c1 net/minecraft/server/level/ServerLevel
+  001a op=c0 net/minecraft/server/level/ServerLevel
+  0020 op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0023 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  002b op=b4 net/minecraft/server/level/ServerLevel f_46441_ Lnet/minecraft/util/RandomSource;
+  002e op=b9 net/minecraft/util/RandomSource m_188501_ ()F
+  0036 op=b6 java/lang/Double doubleValue ()D
+  003d op=bb net/minecraft/world/entity/item/ItemEntity
+  0045 op=b6 net/minecraft/core/BlockPos m_123341_ ()I
+  004b op=b6 net/minecraft/core/BlockPos m_123342_ ()I
+  0051 op=b6 net/minecraft/core/BlockPos m_123343_ ()I
+  0055 op=bb net/minecraft/world/item/ItemStack
+  0059 op=b2 net/minecraft/world/item/Items f_42500_ Lnet/minecraft/world/item/Item;
+  005c op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  005f op=b7 net/minecraft/world/entity/item/ItemEntity <init> (Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/item/ItemStack;)V
+  0068 op=b6 net/minecraft/server/level/ServerLevel m_7967_ (Lnet/minecraft/world/entity/Entity;)Z
+  0074 op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 1285b8008b3a052d1905b90091020057b1
+  0000 op=12 §6You have a chance to drop bones when mining ores.
+  0002 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000a op=b9 java/util/List add (Ljava/lang/Object;)Z
+
+## dev/nanosync/ultimatepickaxes/item/CoalPickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b7000eb1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+  bytecode 2cb20020b600269900061227ae2cb8002db600319900061232ae2a2b2cb70034ae
+  0001 op=b2 net/minecraft/world/level/block/Blocks f_49997_ Lnet/minecraft/world/level/block/Block;
+  0004 op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+  000a op=12 50.0
+  000e op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0011 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  0017 op=12 5.0
+  001d op=b7 net/minecraft/world/item/PickaxeItem m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 123eb800443a052d1905b9004a020057b1
+  0000 op=12 §6You can mine coal faster.
+  0002 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000a op=b9 java/util/List add (Ljava/lang/Object;)Z
+
+## dev/nanosync/ultimatepickaxes/item/FirePickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70018b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode b2002ab6002ec00030b6003436062cb600399a006715069900622db8003fb600459900582a2c2db600493a071907b6004e9a0048b200542bb8005a36081907b6005e2cb4006215080460b90068020060360919071509b6006c2c190403b60070572c19041907b800762b0419051905ba008a0000b6008e04ac2a2b2c2d19041905b70090ac
+  0000 op=b2 dev/nanosync/ultimatepickaxes/config/Config enableFirePickaxeSmeltOres Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0003 op=b6 net/minecraftforge/common/ForgeConfigSpec$BooleanValue get ()Ljava/lang/Object;
+  0006 op=c0 java/lang/Boolean
+  0009 op=b6 java/lang/Boolean booleanValue ()Z
+  000f op=b6 net/minecraft/world/level/Level m_5776_ ()Z
+  001b op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  001e op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  0027 op=b6 dev/nanosync/ultimatepickaxes/item/FirePickaxe getSmeltedResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;
+  002e op=b6 net/minecraft/world/item/ItemStack m_41619_ ()Z
+  0034 op=b2 net/minecraft/world/item/enchantment/Enchantments f_44987_ Lnet/minecraft/world/item/enchantment/Enchantment;
+  0038 op=b8 net/minecraft/world/item/enchantment/EnchantmentHelper getTagEnchantmentLevel (Lnet/minecraft/world/item/enchantment/Enchantment;Lnet/minecraft/world/item/ItemStack;)I
+  003f op=b6 net/minecraft/world/item/ItemStack m_41613_ ()I
+  0043 op=b4 net/minecraft/world/level/Level f_46441_ Lnet/minecraft/util/RandomSource;
+  004a op=b9 net/minecraft/util/RandomSource m_188503_ (I)I
+  0056 op=b6 net/minecraft/world/item/ItemStack m_41764_ (I)V
+  005d op=b6 net/minecraft/world/level/Level m_46961_ (Lnet/minecraft/core/BlockPos;Z)Z
+  0066 op=b8 net/minecraft/world/level/block/Block m_49840_ (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V
+  006f op=ba bootstrap:0 accept (Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/function/Consumer;
+  0074 op=b6 net/minecraft/world/item/ItemStack m_41622_ (ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V
+  0081 op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD getSmeltedResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;
+  bytecode 2bb600a24ebb004b592cb600a6b600aab700ad3a04bb00af5904bd004b5903190453b700b23a052db200b819052bb600be3a0619062bba00cb0000b600d1b200d4b600d7c0004bb0
+  0001 op=b6 net/minecraft/world/level/Level m_7465_ ()Lnet/minecraft/world/item/crafting/RecipeManager;
+  0005 op=bb net/minecraft/world/item/ItemStack
+  000a op=b6 net/minecraft/world/level/block/state/BlockState m_60734_ ()Lnet/minecraft/world/level/block/Block;
+  000d op=b6 net/minecraft/world/level/block/Block m_5456_ ()Lnet/minecraft/world/item/Item;
+  0010 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  0015 op=bb net/minecraft/world/SimpleContainer
+  001a op=bd net/minecraft/world/item/ItemStack
+  0022 op=b7 net/minecraft/world/SimpleContainer <init> ([Lnet/minecraft/world/item/ItemStack;)V
+  0028 op=b2 net/minecraft/world/item/crafting/RecipeType f_44108_ Lnet/minecraft/world/item/crafting/RecipeType;
+  002e op=b6 net/minecraft/world/item/crafting/RecipeManager m_44015_ (Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/Container;Lnet/minecraft/world/level/Level;)Ljava/util/Optional;
+  0036 op=ba bootstrap:1 apply (Lnet/minecraft/world/level/Level;)Ljava/util/function/Function;
+  003b op=b6 java/util/Optional map (Ljava/util/function/Function;)Ljava/util/Optional;
+  003e op=b2 net/minecraft/world/item/ItemStack f_41583_ Lnet/minecraft/world/item/ItemStack;
+  0041 op=b6 java/util/Optional orElse (Ljava/lang/Object;)Ljava/lang/Object;
+  0044 op=c0 net/minecraft/world/item/ItemStack
+METHOD m_7579_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2c100ab600e62a2b2c2db700e8ac
+  0003 op=b6 net/minecraft/world/entity/LivingEntity m_20254_ (I)V
+  000a op=b7 net/minecraft/world/item/PickaxeItem m_7579_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD onBlockStartBreak (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z
+  bytecode 2db600f23a041904b6003999009a19042cb600f6b8003fb6004599008b2cb600fb871400fc6339052cb60100871400fc6339072cb60103871400fc63390903360b150b08a200611904b40062b9010701001400fc671401086b390c1904b40062b9010701001400fc671401086b390e1904b40062b9010701001400fc671401086b39101904b2010f1805180c631807180e6318091810630e1401100eb60115840b01a7ff9f2a2b2c2db70117ac
+  0001 op=b6 net/minecraft/world/entity/player/Player m_9236_ ()Lnet/minecraft/world/level/Level;
+  0008 op=b6 net/minecraft/world/level/Level m_5776_ ()Z
+  0011 op=b6 net/minecraft/world/level/Level m_8055_ (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+  0014 op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0017 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  001e op=b6 net/minecraft/core/BlockPos m_123341_ ()I
+  0022 op=14 0.5
+  0029 op=b6 net/minecraft/core/BlockPos m_123342_ ()I
+  002d op=14 0.5
+  0034 op=b6 net/minecraft/core/BlockPos m_123343_ ()I
+  0038 op=14 0.5
+  0049 op=b4 net/minecraft/world/level/Level f_46441_ Lnet/minecraft/util/RandomSource;
+  004c op=b9 net/minecraft/util/RandomSource m_188500_ ()D
+  0051 op=14 0.5
+  0055 op=14 0.1
+  005d op=b4 net/minecraft/world/level/Level f_46441_ Lnet/minecraft/util/RandomSource;
+  0060 op=b9 net/minecraft/util/RandomSource m_188500_ ()D
+  0065 op=14 0.5
+  0069 op=14 0.1
+  0071 op=b4 net/minecraft/world/level/Level f_46441_ Lnet/minecraft/util/RandomSource;
+  0074 op=b9 net/minecraft/util/RandomSource m_188500_ ()D
+  0079 op=14 0.5
+  007d op=14 0.1
+  0085 op=b2 net/minecraft/core/particles/ParticleTypes f_123756_ Lnet/minecraft/core/particles/SimpleParticleType;
+  0098 op=14 0.05
+  009c op=b6 net/minecraft/world/level/Level m_7106_ (Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V
+  00a9 op=b7 net/minecraft/world/item/PickaxeItem onBlockStartBreak (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z
+METHOD m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+  bytecode 2cb2012ab6012e99000713012fae2a2b2cb70131ae
+  0001 op=b2 net/minecraft/world/level/block/Blocks f_50134_ Lnet/minecraft/world/level/block/Block;
+  0004 op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+  000a op=13 50.0
+  0011 op=b7 net/minecraft/world/item/PickaxeItem m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 130137b8013d3a052d1905b90143020057b1
+  0000 op=13 §6Automatically smelts ores.
+  0003 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000b op=b9 java/util/List add (Ljava/lang/Object;)Z
+METHOD lambda$getSmeltedResult$1 (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/crafting/SmeltingRecipe;)Lnet/minecraft/world/item/ItemStack;
+  bytecode 2b2ab6014fb60155b60159b0
+  0002 op=b6 net/minecraft/world/level/Level m_9598_ ()Lnet/minecraft/core/RegistryAccess;
+  0005 op=b6 net/minecraft/world/item/crafting/SmeltingRecipe m_8043_ (Lnet/minecraft/core/RegistryAccess;)Lnet/minecraft/world/item/ItemStack;
+  0008 op=b6 net/minecraft/world/item/ItemStack m_41777_ ()Lnet/minecraft/world/item/ItemStack;
+METHOD lambda$mineBlock$0 (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)V
+  bytecode 2b2ab6015fb60163b1
+  0002 op=b6 net/minecraft/world/entity/LivingEntity m_7655_ ()Lnet/minecraft/world/InteractionHand;
+  0005 op=b6 net/minecraft/world/entity/LivingEntity m_21190_ (Lnet/minecraft/world/InteractionHand;)V
+
+## dev/nanosync/ultimatepickaxes/item/LaserPickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70018b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 1905c100269900a61905c000263a062a2db6002a9a000f2a2b2c2d19041905b7002cac1906b600303a07b20036b6003ac0003c3a081906123db600411242969c000bb200483a07a700151906123db600411249959e0008b2004c3a0704360915091908b60050a30045190419071509b600563a0a2c190ab6005c3a0b190bb600629a00242a190bb6002a99001b2c190a041906b60066572b0419061906ba007a0000b60080840901a7ffb72a2b2c2d19041905b7002cac
+  0002 op=c1 net/minecraft/world/entity/player/Player
+  000a op=c0 net/minecraft/world/entity/player/Player
+  0011 op=b6 dev/nanosync/ultimatepickaxes/item/LaserPickaxe isLaserAvailable (Lnet/minecraft/world/level/block/state/BlockState;)Z
+  001f op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  0025 op=b6 net/minecraft/world/entity/player/Player m_6350_ ()Lnet/minecraft/core/Direction;
+  002a op=b2 dev/nanosync/ultimatepickaxes/config/Config laserPickaxeBlocksBreak Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  002d op=b6 net/minecraftforge/common/ForgeConfigSpec$ConfigValue get ()Ljava/lang/Object;
+  0030 op=c0 java/lang/Integer
+  0037 op=12 0.5
+  0039 op=b6 net/minecraft/world/entity/player/Player m_5686_ (F)F
+  003c op=12 -45.0
+  0042 op=b2 net/minecraft/core/Direction UP Lnet/minecraft/core/Direction;
+  004c op=12 0.5
+  004e op=b6 net/minecraft/world/entity/player/Player m_5686_ (F)F
+  0051 op=12 45.0
+  0057 op=b2 net/minecraft/core/Direction DOWN Lnet/minecraft/core/Direction;
+  0063 op=b6 java/lang/Integer intValue ()I
+  006f op=b6 net/minecraft/core/BlockPos m_5484_ (Lnet/minecraft/core/Direction;I)Lnet/minecraft/core/BlockPos;
+  0077 op=b6 net/minecraft/world/level/Level m_8055_ (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+  007e op=b6 net/minecraft/world/level/block/state/BlockState m_60795_ ()Z
+  0087 op=b6 dev/nanosync/ultimatepickaxes/item/LaserPickaxe isLaserAvailable (Lnet/minecraft/world/level/block/state/BlockState;)Z
+  0093 op=b6 net/minecraft/world/level/Level m_46953_ (Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z
+  009d op=ba bootstrap:0 accept (Lnet/minecraft/world/entity/player/Player;)Ljava/util/function/Consumer;
+  00a2 op=b6 net/minecraft/world/item/ItemStack m_41622_ (ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V
+  00b3 op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode b20036b6003ac0003c3a051905ba00a40000b800aa3a062d1906b900b0020057b1
+  0000 op=b2 dev/nanosync/ultimatepickaxes/config/Config laserPickaxeBlocksBreak Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  0003 op=b6 net/minecraftforge/common/ForgeConfigSpec$ConfigValue get ()Ljava/lang/Object;
+  0006 op=c0 java/lang/Integer
+  000d op=ba bootstrap:1 makeConcatWithConstants (Ljava/lang/Integer;)Ljava/lang/String;
+  0012 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  001a op=b9 java/util/List add (Ljava/lang/Object;)Z
+METHOD isLaserAvailable (Lnet/minecraft/world/level/block/state/BlockState;)Z
+  bytecode 2bb800beb600c29a00172bb200c8b600cc9a000d2bb200cfb600cc99000704a70004033db200d2b6003ac000ac4e2dc600582db900d501009a004f2db900d901003a041904b900de010099003d1904b900e10100c000e33a051905b800e93a061906c60022b200ef1906b900f50200c000f73a071907c6000e2b1907b600cc99000504aca7ffbf1cac
+  0001 op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0004 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  000b op=b2 net/minecraft/world/level/block/Blocks f_50652_ Lnet/minecraft/world/level/block/Block;
+  000e op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+  0015 op=b2 net/minecraft/world/level/block/Blocks f_50069_ Lnet/minecraft/world/level/block/Block;
+  0018 op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+  0024 op=b2 dev/nanosync/ultimatepickaxes/config/Config laserPickaxeExtraBlocks Lnet/minecraftforge/common/ForgeConfigSpec$ConfigValue;
+  0027 op=b6 net/minecraftforge/common/ForgeConfigSpec$ConfigValue get ()Ljava/lang/Object;
+  002a op=c0 java/util/List
+  0033 op=b9 java/util/List isEmpty ()Z
+  003c op=b9 java/util/List iterator ()Ljava/util/Iterator;
+  0045 op=b9 java/util/Iterator hasNext ()Z
+  004f op=b9 java/util/Iterator next ()Ljava/lang/Object;
+  0054 op=c0 java/lang/String
+  005b op=b8 net/minecraft/resources/ResourceLocation m_135820_ (Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
+  0065 op=b2 net/minecraftforge/registries/ForgeRegistries BLOCKS Lnet/minecraftforge/registries/IForgeRegistry;
+  006a op=b9 net/minecraftforge/registries/IForgeRegistry getValue (Lnet/minecraft/resources/ResourceLocation;)Ljava/lang/Object;
+  006f op=c0 net/minecraft/world/level/block/Block
+  007c op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+METHOD lambda$mineBlock$0 (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/player/Player;)V
+  bytecode 2b2ab60104b60108b1
+  0002 op=b6 net/minecraft/world/entity/player/Player m_7655_ ()Lnet/minecraft/world/InteractionHand;
+  0005 op=b6 net/minecraft/world/entity/player/Player m_21190_ (Lnet/minecraft/world/InteractionHand;)V
+
+## dev/nanosync/ultimatepickaxes/item/NaturalPickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70013b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2cb600259a00d42db6002b3a06b200313a071906b20037a60012bb002d59b2003db700403a07a7008a1906b20045a60012bb002d59b20048b700403a07a700731906b2004ba60012bb002d59b2004eb700403a07a7005c1906b20051a60012bb002d59b20054b700403a07a700451906b20057a60012bb002d59b2005ab700403a07a7002e1906b2005da60012bb002d59b20060b700403a07a700171906b20063a6000fbb002d59b2003db700403a071907b600669a00232c190403b6006a572c19041907b8006e2b0419051905ba00820000b6008604ac2a2b2c2d19041905b70088ac
+  0001 op=b6 net/minecraft/world/level/Level m_5776_ ()Z
+  0008 op=b6 net/minecraft/world/level/block/state/BlockState m_60734_ ()Lnet/minecraft/world/level/block/Block;
+  000d op=b2 net/minecraft/world/item/ItemStack f_41583_ Lnet/minecraft/world/item/ItemStack;
+  0014 op=b2 net/minecraft/world/level/block/Blocks f_50652_ Lnet/minecraft/world/level/block/Block;
+  001a op=bb net/minecraft/world/item/ItemStack
+  001e op=b2 net/minecraft/world/item/Items f_41998_ Lnet/minecraft/world/item/Item;
+  0021 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  002b op=b2 net/minecraft/world/level/block/Blocks f_50222_ Lnet/minecraft/world/level/block/Block;
+  0031 op=bb net/minecraft/world/item/ItemStack
+  0035 op=b2 net/minecraft/world/item/Items f_42019_ Lnet/minecraft/world/item/Item;
+  0038 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  0042 op=b2 net/minecraft/world/level/block/Blocks f_50157_ Lnet/minecraft/world/level/block/Block;
+  0048 op=bb net/minecraft/world/item/ItemStack
+  004c op=b2 net/minecraft/world/item/Items f_42369_ Lnet/minecraft/world/item/Item;
+  004f op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  0059 op=b2 net/minecraft/world/level/block/Blocks f_50409_ Lnet/minecraft/world/level/block/Block;
+  005f op=bb net/minecraft/world/item/ItemStack
+  0063 op=b2 net/minecraft/world/item/Items f_42331_ Lnet/minecraft/world/item/Item;
+  0066 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  0070 op=b2 net/minecraft/world/level/block/Blocks f_50274_ Lnet/minecraft/world/level/block/Block;
+  0076 op=bb net/minecraft/world/item/ItemStack
+  007a op=b2 net/minecraft/world/item/Items f_42067_ Lnet/minecraft/world/item/Item;
+  007d op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  0087 op=b2 net/minecraft/world/level/block/Blocks f_50440_ Lnet/minecraft/world/level/block/Block;
+  008d op=bb net/minecraft/world/item/ItemStack
+  0091 op=b2 net/minecraft/world/item/Items f_42276_ Lnet/minecraft/world/item/Item;
+  0094 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  009e op=b2 net/minecraft/world/level/block/Blocks f_50069_ Lnet/minecraft/world/level/block/Block;
+  00a4 op=bb net/minecraft/world/item/ItemStack
+  00a8 op=b2 net/minecraft/world/item/Items f_41998_ Lnet/minecraft/world/item/Item;
+  00ab op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  00b2 op=b6 net/minecraft/world/item/ItemStack m_41619_ ()Z
+  00bc op=b6 net/minecraft/world/level/Level m_46961_ (Lnet/minecraft/core/BlockPos;Z)Z
+  00c5 op=b8 net/minecraft/world/level/block/Block m_49840_ (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V
+  00ce op=ba bootstrap:0 accept (Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/function/Consumer;
+  00d3 op=b6 net/minecraft/world/item/ItemStack m_41622_ (ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V
+  00e0 op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 1299b8009f3a052d1905b900a5020057b1
+  0000 op=12 §6Has low durability but transforms blocks into mossy versions if applicable.
+  0002 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000a op=b9 java/util/List add (Ljava/lang/Object;)Z
+METHOD lambda$mineBlock$0 (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)V
+  bytecode 2b2ab600b3b600b7b1
+  0002 op=b6 net/minecraft/world/entity/LivingEntity m_7655_ ()Lnet/minecraft/world/InteractionHand;
+  0005 op=b6 net/minecraft/world/entity/LivingEntity m_21190_ (Lnet/minecraft/world/InteractionHand;)V
+
+## dev/nanosync/ultimatepickaxes/item/ShadowPickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70014b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 1905c1002299004d1905c000223a061906bb002459b2002a1104b0b7002db60031571906bb002459b200341104b0b7002db60031572db8003ab600409900161906bb002459b20043110258b7002db60031572a2b2c2d19041905b70045ac
+  0002 op=c1 net/minecraft/world/entity/player/Player
+  000a op=c0 net/minecraft/world/entity/player/Player
+  0011 op=bb net/minecraft/world/effect/MobEffectInstance
+  0015 op=b2 net/minecraft/world/effect/MobEffects f_19596_ Lnet/minecraft/world/effect/MobEffect;
+  001b op=b7 net/minecraft/world/effect/MobEffectInstance <init> (Lnet/minecraft/world/effect/MobEffect;I)V
+  001e op=b6 net/minecraft/world/entity/player/Player m_7292_ (Lnet/minecraft/world/effect/MobEffectInstance;)Z
+  0024 op=bb net/minecraft/world/effect/MobEffectInstance
+  0028 op=b2 net/minecraft/world/effect/MobEffects f_19598_ Lnet/minecraft/world/effect/MobEffect;
+  002e op=b7 net/minecraft/world/effect/MobEffectInstance <init> (Lnet/minecraft/world/effect/MobEffect;I)V
+  0031 op=b6 net/minecraft/world/entity/player/Player m_7292_ (Lnet/minecraft/world/effect/MobEffectInstance;)Z
+  0036 op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0039 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  0041 op=bb net/minecraft/world/effect/MobEffectInstance
+  0045 op=b2 net/minecraft/world/effect/MobEffects f_19609_ Lnet/minecraft/world/effect/MobEffect;
+  004b op=b7 net/minecraft/world/effect/MobEffectInstance <init> (Lnet/minecraft/world/effect/MobEffect;I)V
+  004e op=b6 net/minecraft/world/entity/player/Player m_7292_ (Lnet/minecraft/world/effect/MobEffectInstance;)Z
+  005a op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD onLivingAttack (Lnet/minecraftforge/event/entity/living/LivingAttackEvent;)V
+  bytecode 2ab6005a4c2ab6005a4d2bc1002299002c2bc000224e2db6005e3a041904b60064c100029900162cc1006699000f2cc000663a05190501b6006ab1
+  0001 op=b6 net/minecraftforge/event/entity/living/LivingAttackEvent getEntity ()Lnet/minecraft/world/entity/LivingEntity;
+  0006 op=b6 net/minecraftforge/event/entity/living/LivingAttackEvent getEntity ()Lnet/minecraft/world/entity/LivingEntity;
+  000b op=c1 net/minecraft/world/entity/player/Player
+  0012 op=c0 net/minecraft/world/entity/player/Player
+  0017 op=b6 net/minecraft/world/entity/player/Player m_21205_ ()Lnet/minecraft/world/item/ItemStack;
+  001e op=b6 net/minecraft/world/item/ItemStack m_41720_ ()Lnet/minecraft/world/item/Item;
+  0021 op=c1 dev/nanosync/ultimatepickaxes/item/ShadowPickaxe
+  0028 op=c1 net/minecraft/world/entity/Mob
+  002f op=c0 net/minecraft/world/entity/Mob
+  0037 op=b6 net/minecraft/world/entity/Mob m_6710_ (Lnet/minecraft/world/entity/LivingEntity;)V
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 1279b8007f3a052d1905b90085020057b1
+  0000 op=12 §6You become invisible to mobs and gain abilities when mining.
+  0002 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000a op=b9 java/util/List add (Ljava/lang/Object;)Z
+
+## dev/nanosync/ultimatepickaxes/item/TNTPickaxe.class
+METHOD <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+  bytecode 2a2b1c251904b70018b1
+  0006 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode b2002ab6002ec000303a062db80036b6003c9900391906b600409900312db20046b6004a9900172a19052cc0004c1904100ab80052b60056a700132a19052cc0004c190408b80052b600562a2b2c2d19041905b70058ac
+  0000 op=b2 dev/nanosync/ultimatepickaxes/config/Config enablePickaxeTNTExplosions Lnet/minecraftforge/common/ForgeConfigSpec$BooleanValue;
+  0003 op=b6 net/minecraftforge/common/ForgeConfigSpec$BooleanValue get ()Ljava/lang/Object;
+  0006 op=c0 java/lang/Boolean
+  000c op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  000f op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  0017 op=b6 java/lang/Boolean booleanValue ()Z
+  001e op=b2 net/minecraft/world/level/block/Blocks f_50353_ Lnet/minecraft/world/level/block/Block;
+  0021 op=b6 net/minecraft/world/level/block/state/BlockState m_60713_ (Lnet/minecraft/world/level/block/Block;)Z
+  002b op=c0 net/minecraft/server/level/ServerLevel
+  0032 op=b8 java/lang/Integer valueOf (I)Ljava/lang/Integer;
+  0035 op=b6 dev/nanosync/ultimatepickaxes/item/TNTPickaxe explodeBlocks (Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/lang/Integer;)V
+  003f op=c0 net/minecraft/server/level/ServerLevel
+  0045 op=b8 java/lang/Integer valueOf (I)Ljava/lang/Integer;
+  0048 op=b6 dev/nanosync/ultimatepickaxes/item/TNTPickaxe explodeBlocks (Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/lang/Integer;)V
+  0053 op=b7 net/minecraft/world/item/PickaxeItem m_6813_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+  bytecode 2cb80036b6003c9900061267ae2a2b2cb70069ae
+  0001 op=b8 dev/nanosync/ultimatepickaxes/util/BlockUtil getForgeOres ()Lnet/minecraft/tags/TagKey;
+  0004 op=b6 net/minecraft/world/level/block/state/BlockState m_204336_ (Lnet/minecraft/tags/TagKey;)Z
+  000a op=12 5.0
+  0010 op=b7 net/minecraft/world/item/PickaxeItem m_8102_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)F
+METHOD explodeBlocks (Lnet/minecraft/world/entity/Entity;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/lang/Integer;)V
+  bytecode 2c2b2db60071872db60074872db60077871904b6007a8603b2007eb6008257b1
+  0003 op=b6 net/minecraft/core/BlockPos m_123341_ ()I
+  0008 op=b6 net/minecraft/core/BlockPos m_123342_ ()I
+  000d op=b6 net/minecraft/core/BlockPos m_123343_ ()I
+  0013 op=b6 java/lang/Integer intValue ()I
+  0018 op=b2 net/minecraft/world/level/Level$ExplosionInteraction BLOCK Lnet/minecraft/world/level/Level$ExplosionInteraction;
+  001b op=b6 net/minecraft/server/level/ServerLevel m_255391_ (Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/Explosion;
+METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 128db800933a052d1905b90099020057b1
+  0000 op=12 §6Causes an explosion when mining any ore, breaking everything around it.
+  0002 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  000a op=b9 java/util/List add (Ljava/lang/Object;)Z
+
+## dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister.class
+FIELD ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+FIELD COAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD TNT_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD FIRE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD BONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD NATURAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD LASER_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD SHADOW_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+METHOD <init> ()V
+  bytecode 2ab7001fb1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD lambda$static$6 ()Lnet/minecraft/world/item/Item;
+  bytecode bb002559b2002b04122cbb000759b7002d1104b0b60031b70034b0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/ShadowPickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers DIAMOND Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0014 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=b7 dev/nanosync/ultimatepickaxes/item/ShadowPickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$5 ()Lnet/minecraft/world/item/Item;
+  bytecode bb003759b2003a04122cbb000759b7002d1102eeb60031b7003bb0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/LaserPickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers IRON Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0014 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=b7 dev/nanosync/ultimatepickaxes/item/LaserPickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$4 ()Lnet/minecraft/world/item/Item;
+  bytecode bb003e59b2004104122cbb000759b7002d100ab6003103bd0043b60047b70048b0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/NaturalPickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers WOOD Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0013 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=bd net/minecraft/world/flag/FeatureFlag
+  001a op=b6 net/minecraft/world/item/Item$Properties m_246768_ ([Lnet/minecraft/world/flag/FeatureFlag;)Lnet/minecraft/world/item/Item$Properties;
+  001d op=b7 dev/nanosync/ultimatepickaxes/item/NaturalPickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$3 ()Lnet/minecraft/world/item/Item;
+  bytecode bb004b59b2004e04122cbb000759b7002d1101f4b60031b7004fb0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/BonePickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers STONE Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0014 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=b7 dev/nanosync/ultimatepickaxes/item/BonePickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$2 ()Lnet/minecraft/world/item/Item;
+  bytecode bb005259b2003a04122cbb000759b7002d110190b60031b70053b0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/FirePickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers IRON Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0014 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=b7 dev/nanosync/ultimatepickaxes/item/FirePickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$1 ()Lnet/minecraft/world/item/Item;
+  bytecode bb005659b2003a04122cbb000759b7002d101eb60031b70057b0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/TNTPickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers IRON Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0013 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0016 op=b7 dev/nanosync/ultimatepickaxes/item/TNTPickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$0 ()Lnet/minecraft/world/item/Item;
+  bytecode bb005a59b2004104122cbb000759b7002d1100fab60031b7005bb0
+  0000 op=bb dev/nanosync/ultimatepickaxes/item/CoalPickaxe
+  0004 op=b2 net/minecraft/world/item/Tiers WOOD Lnet/minecraft/world/item/Tiers;
+  0008 op=12 -1.0
+  000a op=bb net/minecraft/world/item/Item$Properties
+  000e op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0014 op=b6 net/minecraft/world/item/Item$Properties m_41503_ (I)Lnet/minecraft/world/item/Item$Properties;
+  0017 op=b7 dev/nanosync/ultimatepickaxes/item/CoalPickaxe <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD <clinit> ()V
+  bytecode b200611263b80069b3006bb2006b126dba007e0000b60082b30084b2006b1286ba008a0000b60082b3008cb2006b128eba00920000b60082b30094b2006b1296ba009a0000b60082b3009cb2006b129eba00a20000b60082b300a4b2006b12a6ba00aa0000b60082b300acb2006b12aeba00b20000b60082b300b4b1
+  0000 op=b2 net/minecraftforge/registries/ForgeRegistries ITEMS Lnet/minecraftforge/registries/IForgeRegistry;
+  0003 op=12 ultimatepickaxes
+  0005 op=b8 net/minecraftforge/registries/DeferredRegister create (Lnet/minecraftforge/registries/IForgeRegistry;Ljava/lang/String;)Lnet/minecraftforge/registries/DeferredRegister;
+  0008 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  000b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  000e op=12 coal_pickaxe
+  0010 op=ba bootstrap:0 get ()Ljava/util/function/Supplier;
+  0015 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0018 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister COAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  001b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  001e op=12 tnt_pickaxe
+  0020 op=ba bootstrap:1 get ()Ljava/util/function/Supplier;
+  0025 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0028 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister TNT_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  002b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  002e op=12 fire_pickaxe
+  0030 op=ba bootstrap:2 get ()Ljava/util/function/Supplier;
+  0035 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0038 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister FIRE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  003b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  003e op=12 bone_pickaxe
+  0040 op=ba bootstrap:3 get ()Ljava/util/function/Supplier;
+  0045 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0048 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister BONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  004b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  004e op=12 natural_pickaxe
+  0050 op=ba bootstrap:4 get ()Ljava/util/function/Supplier;
+  0055 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0058 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister NATURAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  005b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  005e op=12 laser_pickaxe
+  0060 op=ba bootstrap:5 get ()Ljava/util/function/Supplier;
+  0065 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0068 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister LASER_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  006b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  006e op=12 shadow_pickaxe
+  0070 op=ba bootstrap:6 get ()Ljava/util/function/Supplier;
+  0075 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0078 op=b3 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister SHADOW_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+
+## dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab.class
+FIELD CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+FIELD ULTIMATE_PICKAXES_TAB Lnet/minecraftforge/registries/RegistryObject;
+METHOD <init> ()V
+  bytecode 2ab70022b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD createTabIcon ()Lnet/minecraft/world/item/ItemStack;
+  bytecode bb002859b2002eb700314b2ab2003704b6003b2ab0
+  0000 op=bb net/minecraft/world/item/ItemStack
+  0004 op=b2 net/minecraft/world/item/Items f_42395_ Lnet/minecraft/world/item/Item;
+  0007 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+  000c op=b2 net/minecraft/world/item/enchantment/Enchantments f_44977_ Lnet/minecraft/world/item/enchantment/Enchantment;
+  0010 op=b6 net/minecraft/world/item/ItemStack m_41663_ (Lnet/minecraft/world/item/enchantment/Enchantment;I)V
+METHOD displayItems (Lnet/minecraft/world/item/CreativeModeTab$ItemDisplayParameters;Lnet/minecraft/world/item/CreativeModeTab$Output;)V
+  bytecode 2bb20044b6004ac0004cb9004f02002bb20052b6004ac0004cb9004f02002bb20055b6004ac0004cb9004f02002bb20058b6004ac0004cb9004f02002bb2005bb6004ac0004cb9004f02002bb2005eb6004ac0004cb9004f02002bb20061b6004ac0004cb9004f0200b1
+  0001 op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister COAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0004 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0007 op=c0 net/minecraft/world/level/ItemLike
+  000a op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  0010 op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister FIRE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0013 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0016 op=c0 net/minecraft/world/level/ItemLike
+  0019 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  001f op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister TNT_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0022 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0025 op=c0 net/minecraft/world/level/ItemLike
+  0028 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  002e op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister NATURAL_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0031 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0034 op=c0 net/minecraft/world/level/ItemLike
+  0037 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  003d op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister BONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0040 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0043 op=c0 net/minecraft/world/level/ItemLike
+  0046 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  004c op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister LASER_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  004f op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0052 op=c0 net/minecraft/world/level/ItemLike
+  0055 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+  005b op=b2 dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister SHADOW_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  005e op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0061 op=c0 net/minecraft/world/level/ItemLike
+  0064 op=b9 net/minecraft/world/item/CreativeModeTab$Output m_246326_ (Lnet/minecraft/world/level/ItemLike;)V
+METHOD lambda$static$0 ()Lnet/minecraft/world/item/CreativeModeTab;
+  bytecode b8006bba007a0000b6007e1280b80086b6008aba00920000b60096b60099b0
+  0000 op=b8 net/minecraft/world/item/CreativeModeTab builder ()Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  0003 op=ba bootstrap:0 get ()Ljava/util/function/Supplier;
+  0008 op=b6 net/minecraft/world/item/CreativeModeTab$Builder m_257737_ (Ljava/util/function/Supplier;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  000b op=12 itemGroup.ultimatepickaxes
+  000d op=b8 net/minecraft/network/chat/Component m_237115_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0010 op=b6 net/minecraft/world/item/CreativeModeTab$Builder m_257941_ (Lnet/minecraft/network/chat/Component;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  0013 op=ba bootstrap:1 m_257865_ ()Lnet/minecraft/world/item/CreativeModeTab$DisplayItemsGenerator;
+  0018 op=b6 net/minecraft/world/item/CreativeModeTab$Builder m_257501_ (Lnet/minecraft/world/item/CreativeModeTab$DisplayItemsGenerator;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  001b op=b6 net/minecraft/world/item/CreativeModeTab$Builder m_257652_ ()Lnet/minecraft/world/item/CreativeModeTab;
+METHOD <clinit> ()V
+  bytecode b200a012a2b800a8b300aab200aa12a2ba00af0000b600b3b300b5b1
+  0000 op=b2 net/minecraft/core/registries/Registries f_279569_ Lnet/minecraft/resources/ResourceKey;
+  0003 op=12 ultimatepickaxes
+  0005 op=b8 net/minecraftforge/registries/DeferredRegister create (Lnet/minecraft/resources/ResourceKey;Ljava/lang/String;)Lnet/minecraftforge/registries/DeferredRegister;
+  0008 op=b3 dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  000b op=b2 dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  000e op=12 ultimatepickaxes
+  0010 op=ba bootstrap:2 get ()Ljava/util/function/Supplier;
+  0015 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0018 op=b3 dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab ULTIMATE_PICKAXES_TAB Lnet/minecraftforge/registries/RegistryObject;
+
+## dev/nanosync/ultimatepickaxes/util/BlockUtil.class
+METHOD <init> ()V
+  bytecode 2ab70009b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD getForgeOres ()Lnet/minecraft/tags/TagKey;
+  bytecode b20014bb0016591218121ab7001db80023b0
+  0000 op=b2 net/minecraft/core/registries/Registries f_256747_ Lnet/minecraft/resources/ResourceKey;
+  0003 op=bb net/minecraft/resources/ResourceLocation
+  0007 op=12 forge
+  0009 op=12 ores
+  000b op=b7 net/minecraft/resources/ResourceLocation <init> (Ljava/lang/String;Ljava/lang/String;)V
+  000e op=b8 net/minecraft/tags/TagKey m_203882_ (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/tags/TagKey;
+
+## All entries
+META-INF/
+META-INF/MANIFEST.MF
+META-INF/mods.toml
+assets/
+assets/ultimatepickaxes/
+assets/ultimatepickaxes/lang/
+assets/ultimatepickaxes/lang/en_us.json
+assets/ultimatepickaxes/lang/pt_BR.json
+assets/ultimatepickaxes/models/
+assets/ultimatepickaxes/models/item/
+assets/ultimatepickaxes/models/item/bone_pickaxe.json
+assets/ultimatepickaxes/models/item/coal_pickaxe.json
+assets/ultimatepickaxes/models/item/fire_pickaxe.json
+assets/ultimatepickaxes/models/item/laser_pickaxe.json
+assets/ultimatepickaxes/models/item/natural_pickaxe.json
+assets/ultimatepickaxes/models/item/shadow_pickaxe.json
+assets/ultimatepickaxes/models/item/tnt_pickaxe.json
+assets/ultimatepickaxes/textures/
+assets/ultimatepickaxes/textures/item/
+assets/ultimatepickaxes/textures/item/bone_pickaxe.png
+assets/ultimatepickaxes/textures/item/coal_pickaxe.png
+assets/ultimatepickaxes/textures/item/fire_pickaxe.png
+assets/ultimatepickaxes/textures/item/laser_pickaxe.png
+assets/ultimatepickaxes/textures/item/natural_pickaxe.png
+assets/ultimatepickaxes/textures/item/shadow_pickaxe.png
+assets/ultimatepickaxes/textures/item/tnt_pickaxe.png
+data/
+data/ultimatepickaxes/
+data/ultimatepickaxes/recipes/
+data/ultimatepickaxes/recipes/bone_pickaxe.json
+data/ultimatepickaxes/recipes/coal_pickaxe.json
+data/ultimatepickaxes/recipes/fire_pickaxe.json
+data/ultimatepickaxes/recipes/laser_pickaxe.json
+data/ultimatepickaxes/recipes/natural_pickaxe.json
+data/ultimatepickaxes/recipes/shadow_pickaxe.json
+data/ultimatepickaxes/recipes/tnt_pickaxe.json
+dev/
+dev/nanosync/
+dev/nanosync/ultimatepickaxes/
+dev/nanosync/ultimatepickaxes/Application.class
+dev/nanosync/ultimatepickaxes/config/
+dev/nanosync/ultimatepickaxes/config/Config.class
+dev/nanosync/ultimatepickaxes/item/
+dev/nanosync/ultimatepickaxes/item/BonePickaxe.class
+dev/nanosync/ultimatepickaxes/item/CoalPickaxe.class
+dev/nanosync/ultimatepickaxes/item/FirePickaxe.class
+dev/nanosync/ultimatepickaxes/item/LaserPickaxe.class
+dev/nanosync/ultimatepickaxes/item/NaturalPickaxe.class
+dev/nanosync/ultimatepickaxes/item/ShadowPickaxe.class
+dev/nanosync/ultimatepickaxes/item/TNTPickaxe.class
+dev/nanosync/ultimatepickaxes/register/
+dev/nanosync/ultimatepickaxes/register/PickaxeItemRegister.class
+dev/nanosync/ultimatepickaxes/tab/
+dev/nanosync/ultimatepickaxes/tab/UltimatePickaxesTab.class
+dev/nanosync/ultimatepickaxes/util/
+dev/nanosync/ultimatepickaxes/util/BlockUtil.class
+pack.mcmeta
