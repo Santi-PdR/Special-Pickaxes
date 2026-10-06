@@ -91,7 +91,9 @@ public final class ArtifactInteraction {
         tag.putString("artifactModeName",modeKey(k,ArtifactState.mode(p,k)));
         tag.remove("artifactSource");tag.remove("artifactTarget");tag.remove("artifactTransform");
         if(s!=null&&corners(p,k)==4){tag.putString("artifactTransform",modes(ArtifactKind.ATLAS)[s.transform]);if(k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR)tag.putInt("artifactMode",s.transform);}
+        for(int i=0;i<4;i++)tag.remove("selection"+i);tag.remove("selectionDimension");
         if(s!=null){
+            tag.putString("selectionDimension",s.dimension);for(int i=0;i<s.points.size();i++)tag.putLong("selection"+i,s.points.get(i).asLong());
             for(var point:s.points)ArtifactFeedback.burst(p,k,point,2);
             if(s.points.size()>=2){var a=new SelectionVolume(s.points.get(0),s.points.get(1));ArtifactFeedback.box(p,k,a,false);ArtifactFeedback.shape(p,k,a,ArtifactState.mode(p,k));tag.putString("artifactSource",a.dimensions());
                 if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);tag.putString("artifactTarget",b.dimensions());if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}

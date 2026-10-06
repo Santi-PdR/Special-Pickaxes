@@ -6,7 +6,7 @@ No recetas, minerales ni worldgen. Obtención administrativa: `/specialpickaxes 
 ## Controles sin sorpresas
 
 - **Herramientas regionales:** Usar arma la selección. Clic izquierdo elige las esquinas; no mina mientras seleccionas. Dos esquinas para un volumen; cuatro para Atlas/Teselador/TRANSPOSE. Usar inicia el **análisis sin modificar el mundo**. Cuando termina y aparece LISTO, usar confirma la ejecución.
-- **Transformación:** agachado + clic izquierdo durante una selección doble alterna directa, espejo X, espejo Z, 90°, 180°, 270°. La línea conecta una esquina del origen con su correspondencia en destino. Para 90/270 se intercambian ancho y profundidad.
+- **Transformación:** agachado + clic izquierdo durante una selección doble alterna directa, espejo X, espejo Z, 90°, 180°, 270°. El cliente dibuja aristas continuas sin tapar los bloques. La línea conecta una esquina del origen con su correspondencia en destino. Para 90/270 se intercambian ancho y profundidad.
 - **Modo:** sin selección ni trabajo, agachado + usar alterna el modo con su nombre. Durante una selección simple, agachado + clic izquierdo cambia modo y reinicia sus esquinas.
 - **Cancelar:** agachado + usar cancela selección/trabajo. No borra automáticamente la memoria. Cambiar de herramienta, morir, salir o cambiar de dimensión cancela el trabajo.
 - **Pausa:** durante un trabajo, usar pausa/reanuda. Si se descarga el próximo chunk, se pausa sin avanzar el cursor; vuelve a cargarlo y usa para continuar. No se fuerzan cargas.

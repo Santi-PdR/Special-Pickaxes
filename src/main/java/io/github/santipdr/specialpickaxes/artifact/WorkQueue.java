@@ -59,7 +59,7 @@ public final class WorkQueue {
             visited++;UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;
             var p=job.player;
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=job.tool || job.tool.isEmpty()
-                    || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);continue; }
+                    || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
             if(job.kind==ArtifactKind.ICARUS) p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,10,0,false,false,true));
