@@ -54,9 +54,9 @@ public final class WorkQueue {
     public static void cancel(ServerPlayer p) { JOBS.remove(p.getUUID());ORDER.remove(p.getUUID()); }
     public static void clear() { JOBS.clear();ORDER.clear();running=false;lastAttempts=0; }
     public static void tick() {
-        int budget=ArtifactConfig.GLOBAL.get();lastAttempts=0;int turns=ORDER.size();
+        int budget=ArtifactConfig.GLOBAL.get();lastAttempts=0;int turns=ORDER.size(),initial=turns,visited=0;
         while(turns-->0 && budget>0 && !ORDER.isEmpty()) {
-            UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;
+            visited++;UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;
             var p=job.player;
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=job.tool || job.tool.isEmpty()
                     || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);continue; }
@@ -78,9 +78,11 @@ public final class WorkQueue {
                 if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) { job.steps.clear();job.paused=true;break; }
             }
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
+            if(feedback!=null&&p.tickCount%20==0)p.playNotifySound(job.kind.sound,net.minecraft.sounds.SoundSource.PLAYERS,0.12F,1.4F);
             if(job.region==null?job.steps.isEmpty():job.region.done()) {
                 ArtifactFeedback.message(p,"complete",job.succeeded,job.completed-job.succeeded);ArtifactFeedback.cue(p,"complete");JOBS.remove(id);
             } else ORDER.addLast(id);
         }
+        if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
     }
 }

@@ -16,6 +16,7 @@ minecraft {
         }
         client {
             if (project.hasProperty('clientSmoke')) {
+                property 'specialpickaxes.clientSmoke', 'true'
                 args '--username', 'ArtifactTester', '--quickPlaySingleplayer', 'ArtifactSmoke', '--width', '1280', '--height', '720'
                 jvmArgs '-Xmx2G'
             }

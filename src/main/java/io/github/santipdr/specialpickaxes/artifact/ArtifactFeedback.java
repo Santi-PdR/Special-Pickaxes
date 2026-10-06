@@ -18,6 +18,18 @@ public final class ArtifactFeedback {
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
         int rgb=kind.color;
         var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.3F);
+        net.minecraft.core.particles.ParticleOptions accent=switch(kind){
+            case PALIMPSEST,CHRONICLE->net.minecraft.core.particles.ParticleTypes.ENCHANT;
+            case CHOIR,MERIDIAN->net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK;
+            case EVENTIDE->net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL;
+            case CRUCIBLE->net.minecraft.core.particles.ParticleTypes.WAX_ON;
+            case INTERREGNUM->net.minecraft.core.particles.ParticleTypes.END_ROD;
+            case WORLDLOOM,KEYSTONE->net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER;
+            case ICARUS->net.minecraft.core.particles.ParticleTypes.CRIT;
+            case AXIOM->net.minecraft.core.particles.ParticleTypes.SCULK_SOUL;
+            case ATLAS,TESSELLATOR->net.minecraft.core.particles.ParticleTypes.PORTAL;
+            case WORLDBREAKER->net.minecraft.core.particles.ParticleTypes.GLOW;};
+        if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
         p.serverLevel().sendParticles(dust,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
@@ -45,6 +57,7 @@ public final class ArtifactFeedback {
 
     public static void cue(ServerPlayer p,String phase){
         var sound=switch(phase){case "error"->net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BASS.value();case "cancel"->net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH;case "complete"->net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP;case "confirm"->net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT;default->net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value();};
+        if((phase.equals("select")||phase.equals("confirm")) && p.getMainHandItem().getItem() instanceof ArtifactItem item)sound=item.kind.sound;
         p.playNotifySound(sound,SoundSource.PLAYERS,0.45F,phase.equals("error")?0.6F:1.2F);
     }
     public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){

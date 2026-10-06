@@ -4,7 +4,7 @@ Only explicit build products are exported. No environment, credentials or world 
 """
 import base64,hashlib,io,json,os,pathlib,subprocess,zipfile
 root=pathlib.Path('.'); files=[]
-for pattern in ['build/client-smoke/gallery-clean.png','build/client-smoke/gallery.png','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/libs/*.jar','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
+for pattern in ['build/client-smoke/ux-bifold_atlas.png','build/client-smoke/ux-worldbreaker.png','build/client-smoke/gallery-clean.png','build/client-smoke/gallery.png','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/libs/*.jar','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
 files=sorted(set(p for p in files if p.is_file()))
 manifest=[{'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]
@@ -14,7 +14,7 @@ with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:
  for p in files:z.write(p,str(p))
  z.writestr('manifest.json',json.dumps(manifest,indent=2))
 encoded=base64.b64encode(b.getvalue()).decode();chunks=[encoded[i:i+48000] for i in range(0,len(encoded),48000)]
-if len(chunks)>64:raise RuntimeError(f'Evidence exceeds bounded Checks export budget: {len(chunks)} chunks')
+if len(chunks)>96:raise RuntimeError(f'Evidence exceeds bounded Checks export budget: {len(chunks)} chunks')
 print(f'Exporting {len(files)} files, {len(b.getvalue())} compressed bytes in {len(chunks)} bounded chunks')
 for i,chunk in enumerate(chunks):
  payload={'name':f'Build evidence {i+1:02d}/{len(chunks):02d}', 'head_sha':os.environ['GITHUB_SHA'],

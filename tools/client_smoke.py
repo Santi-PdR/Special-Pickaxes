@@ -24,11 +24,11 @@ for i,id in enumerate(ids):
  commands.append(f'''summon minecraft:text_display {x} {y-1} 3 {{text:'{{"text":"{id}","color":"white"}}',billboard:"center",alignment:"center",background:0,line_width:200}}''')
 commands+=['item replace entity @s weapon.mainhand with specialpickaxes:worldbreaker{Enchantments:[{id:"minecraft:efficiency",lvl:1000},{id:"minecraft:unbreaking",lvl:1000}]}','tellraw @s {"text":"ARTIFACT_CLIENT_SMOKE_READY"}']
 (functions/'setup.mcfunction').write_text('\n'.join(commands)+'\n')
-(root/'run/options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nrenderDistance:4\nsimulationDistance:5\nmaxFps:30\nsoundCategory_music:0.0\nlang:es_es\n')
+(root/'run/options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nrenderDistance:4\nsimulationDistance:5\nmaxFps:30\nguiScale:2\nsoundCategory_music:0.0\nlang:es_es\n')
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
-proc=None;lines=queue.Queue();captured=[];ready=None;success=False
+proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
 try:
  for _ in range(100):
   if pathlib.Path('/tmp/.X11-unix/X99').exists():break
@@ -47,9 +47,19 @@ try:
   if line:
    captured.append(line);print(line,end='')
    if '[CHAT]' in line and 'ARTIFACT_CLIENT_SMOKE_READY' in line:ready=time.monotonic()
-  if ready and time.monotonic()-ready>8:
+  if ready and not gallery_done and time.monotonic()-ready>8:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery.png')],env=env,check=True)
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True)
+   # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True)
+   gallery_done=True
+  if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
+   id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
+   if id not in ids:raise RuntimeError('Unexpected client artifact')
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True)
+   ux.add(id)
+  if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
+   if ux!=set(ids):raise RuntimeError('Incomplete graphical artifact validation')
    success=True;break
 finally:
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
@@ -66,4 +76,4 @@ subprocess.run(['python3','tools/validate_runtime_logs.py',str(out/'client.log')
 text=(out/'client.log').read_text().lower()
 for issue in ['missing texture','unable to load model','unable to bake','using missing texture']:
  if issue in text:raise SystemExit('Client resource error: '+issue)
-print('GRAPHICAL_CLIENT_GALLERY_OK')
+print('GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS='+str(len(ux)))
