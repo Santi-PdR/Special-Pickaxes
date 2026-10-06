@@ -1,90 +1,109 @@
 package io.github.santipdr.specialpickaxes;
 
-import com.mojang.serialization.Codec;
-import io.github.santipdr.specialpickaxes.ability.*;
-import io.github.santipdr.specialpickaxes.loot.SmeltingLootModifier;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import io.github.santipdr.specialpickaxes.artifact.*;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.effect.*;
 import net.minecraft.world.item.*;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.common.*;
+import net.minecraftforge.event.*;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.*;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Mod(SpecialPickaxes.ID)
 public final class SpecialPickaxes {
-    public static final String ID = "specialpickaxes";
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
-    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ID);
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
-    public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> LOOT =
-        DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, ID);
-    public static final RegistryObject<MobEffect> OVERDRIVE = EFFECTS.register("overdrive", OverdriveEffect::new);
-    public static final Map<String, RegistryObject<Item>> PICKS = new LinkedHashMap<>();
+    public static final String ID="specialpickaxes";
+    public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(4,32768,64F,12F,40,
+        BlockTags.NEEDS_DIAMOND_TOOL,() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
+    public static final DeferredRegister<Item> ITEMS=DeferredRegister.create(ForgeRegistries.ITEMS,ID);
+    public static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,ID);
+    public static final DeferredRegister<MobEffect> EFFECTS=DeferredRegister.create(ForgeRegistries.MOB_EFFECTS,ID);
+    public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
+    public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
-        add("overdrive", Tiers.DIAMOND, new SpeedAbility());
-        add("excavator", Tiers.DIAMOND, new AreaMiningAbility());
-        add("vein_miner", Tiers.DIAMOND, new VeinMiningAbility());
-        add("inferno", Tiers.IRON, new AutoSmeltAbility());
-        add("magnetic", Tiers.IRON, new MagnetAbility());
-        add("scanner", Tiers.IRON, new OreScannerAbility());
-        add("storm", Tiers.DIAMOND, new StormAbility());
-        add("void", Tiers.NETHERITE, new VoidAnchorAbility());
-        add("ender", Tiers.DIAMOND, new TeleportAbility());
-        add("explosive", Tiers.DIAMOND, new ExplosiveMiningAbility());
-        TABS.register("pickaxes", () -> CreativeModeTab.builder().title(Component.translatable("itemGroup.specialpickaxes"))
-            .icon(() -> new ItemStack(PICKS.get("overdrive").get()))
-            .displayItems((parameters, output) -> PICKS.values().forEach(item -> output.accept(item.get()))).build());
-        LOOT.register("auto_smelt", () -> SmeltingLootModifier.CODEC);
-    }
-    private static void add(String id, Tier tier, PickaxeAbility... abilities) {
-        var definition = new PickaxeDefinition(id, tier, 1, -2.8F, List.of(abilities));
-        PICKS.put(id, ITEMS.register(id, () -> new SpecialPickaxeItem(definition)));
+        for(var kind:ArtifactKind.values()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
+        TABS.register("artifacts",() -> CreativeModeTab.builder().title(Component.translatable("itemGroup.specialpickaxes"))
+            .icon(() -> new ItemStack(PICKS.get(ArtifactKind.PALIMPSEST).get()))
+            .displayItems((parameters,output) -> PICKS.values().forEach(item -> output.accept(item.get()))).build());
     }
     public SpecialPickaxes() {
-        var bus = FMLJavaModLoadingContext.get().getModEventBus();
-        ITEMS.register(bus); EFFECTS.register(bus); TABS.register(bus); LOOT.register(bus);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PickaxeConfig.SPEC);
-        MinecraftForge.EVENT_BUS.addListener(this::breakSpeed);
-        MinecraftForge.EVENT_BUS.addListener(this::clonePlayer);
-        MinecraftForge.EVENT_BUS.addListener(this::login);
+        var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
+        var forge=MinecraftForge.EVENT_BUS;
+        forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
+        forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
+        forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
-    private void breakSpeed(PlayerEvent.BreakSpeed event) {
-        var player = event.getEntity();
-        var stack = player.getMainHandItem();
-        if (player.hasEffect(OVERDRIVE.get()) && stack.getItem() instanceof SpecialPickaxeItem pick
-                && pick.hasAbility("overdrive") && stack.isCorrectToolForDrops(event.getState())
-                && event.getNewSpeed() > 0 && !event.isCanceled())
-            event.setNewSpeed(event.getNewSpeed() * PickaxeConfig.SPEED.get().floatValue());
+    private void tick(TickEvent.ServerTickEvent e) {
+        if(e.phase==TickEvent.Phase.END) { WorkQueue.tick();DomainFields.tick(); }
     }
-    private void clonePlayer(PlayerEvent.Clone event) {
-        // No death/relog cooldown reset; anchors intentionally do not survive death.
-        var old = event.getOriginal().getPersistentData();
-        if (old.contains(AbilityRuntime.DATA)) {
-            var copy = old.getCompound(AbilityRuntime.DATA).copy();
-            copy.remove("anchor");
-            event.getEntity().getPersistentData().put(AbilityRuntime.DATA, copy);
+    private void stopped(ServerStoppedEvent e) { WorkQueue.clear();DomainFields.clear(); }
+    private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
+        if(e.getEntity() instanceof ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p); }
+    }
+    private void clonePlayer(PlayerEvent.Clone e) {
+        var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
+        var clean=new net.minecraft.nbt.CompoundTag();
+        for(var kind:ArtifactKind.values()) {
+            var state=new net.minecraft.nbt.CompoundTag();state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
+        }
+        e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
+        if(e.getOriginal() instanceof ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p); }
+    }
+    private void login(PlayerEvent.PlayerLoggedInEvent e) {
+        if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.values()) {
+            long ticks=ArtifactState.of(p,kind).getLong("ready")-ArtifactState.now(p);
+            if(ticks>0) p.getCooldowns().addCooldown(PICKS.get(kind).get(),(int)Math.min(ticks,12000));
         }
     }
-    private void login(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
-            var data = AbilityRuntime.data(player);
-            PICKS.forEach((id, item) -> {
-                long remaining = data.getLong(id + "_ready") - AbilityRuntime.now(player);
-                if (remaining > 0) player.getCooldowns().addCooldown(item.get(), (int) Math.min(72000, remaining));
-            });
-        }
+    private void speed(PlayerEvent.BreakSpeed e) {
+        var p=e.getEntity();
+        if(p.getMainHandItem().getItem() instanceof ArtifactItem item && item.kind==ArtifactKind.INTERREGNUM
+                && p.hasEffect(DOMINION.get()) && p.getMainHandItem().isCorrectToolForDrops(e.getState())
+                && e.getNewSpeed()>0 && (!(p instanceof ServerPlayer server) || DomainFields.contains(server,p.blockPosition())))
+            e.setNewSpeed(e.getNewSpeed()*8);
     }
-    private static final class OverdriveEffect extends MobEffect {
-        private OverdriveEffect() { super(MobEffectCategory.BENEFICIAL, 0xffc745); }
+    private void attack(LivingAttackEvent e) {
+        if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
     }
+    private void commands(RegisterCommandsEvent e) {
+        e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
+            .then(Commands.literal("grant").then(Commands.argument("player",EntityArgument.player())
+            .then(Commands.argument("artifact",StringArgumentType.word())
+                .suggests((context,builder) -> SharedSuggestionProvider.suggest(Arrays.stream(ArtifactKind.values()).map(k -> k.id),builder))
+                .executes(context -> {
+                    String id=StringArgumentType.getString(context,"artifact");ArtifactKind kind;
+                    try { kind=ArtifactKind.byId(id); } catch(IllegalArgumentException invalid) {
+                        context.getSource().sendFailure(Component.translatable("message.specialpickaxes.unknown"));return 0;
+                    }
+                    var player=EntityArgument.getPlayer(context,"player");var stack=new ItemStack(PICKS.get(kind).get());
+                    player.getInventory().add(stack);if(!stack.isEmpty()) player.drop(stack,false);
+                    context.getSource().sendSuccess(() -> Component.translatable("message.specialpickaxes.granted",id,player.getName()),true);
+                    return 1;
+                })))))
+            ;
+    }
+    private void missing(MissingMappingsEvent e) {
+        String[] old={"overdrive","excavator","vein_miner","inferno","magnetic","scanner","storm","void","ender","explosive"};
+        ArtifactKind[] kinds={ArtifactKind.ICARUS,ArtifactKind.WORLDLOOM,ArtifactKind.CHOIR,ArtifactKind.CRUCIBLE,
+            ArtifactKind.EVENTIDE,ArtifactKind.AXIOM,ArtifactKind.INTERREGNUM,ArtifactKind.PALIMPSEST,ArtifactKind.MERIDIAN,ArtifactKind.ATLAS};
+        for(var mapping:e.getMappings(ForgeRegistries.Keys.ITEMS,ID)) for(int i=0;i<old.length;i++)
+            if(mapping.getKey().getPath().equals(old[i])) mapping.remap(PICKS.get(kinds[i]).get());
+    }
+    private static final class DominionEffect extends MobEffect { private DominionEffect() { super(MobEffectCategory.BENEFICIAL,0x8ae5ff); } }
 }
