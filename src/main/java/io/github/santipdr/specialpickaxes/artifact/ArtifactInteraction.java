@@ -15,7 +15,8 @@ public final class ArtifactInteraction {
         Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;dimension=ArtifactState.dimension(p);expires=ArtifactState.now(p)+12000;}
     }
     private static final Map<UUID,Selection> SELECTED=new HashMap<>();
-    private static final Map<UUID,BlockPos> PREVIEW=new HashMap<>();
+    private record Prepared(ItemStack tool,String dimension,BlockPos pos,long expires) {}
+    private static final Map<UUID,Prepared> PREVIEW=new HashMap<>();
     private ArtifactInteraction(){}
     public static boolean regional(ArtifactKind k){return k==ArtifactKind.ATLAS||k==ArtifactKind.WORLDBREAKER||k==ArtifactKind.CHRONICLE||k==ArtifactKind.KEYSTONE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.PALIMPSEST;}
     public static String[] modes(ArtifactKind k){return switch(k){
@@ -77,7 +78,7 @@ public final class ArtifactInteraction {
         if(k==ArtifactKind.MERIDIAN)return ArtifactActions.use(p,tool,k,false);
         var target=ArtifactActions.target(p).orElse(p.blockPosition());
         var previous=PREVIEW.get(p.getUUID());
-        if(previous==null||!previous.equals(target)){PREVIEW.put(p.getUUID(),target);ArtifactFeedback.ring(p,k,target,ArtifactActions.radius(p,k));ArtifactFeedback.message(p,"confirm_again");ArtifactFeedback.cue(p,"select");return true;}
+        if(previous==null||previous.tool()!=tool||!previous.dimension().equals(ArtifactState.dimension(p))||previous.expires()<ArtifactState.now(p)||!previous.pos().equals(target)){PREVIEW.put(p.getUUID(),new Prepared(tool,ArtifactState.dimension(p),target,ArtifactState.now(p)+1200));ArtifactFeedback.ring(p,k,target,ArtifactActions.radius(p,k));ArtifactFeedback.message(p,"confirm_again");ArtifactFeedback.cue(p,"select");return true;}
         PREVIEW.remove(p.getUUID());return ArtifactActions.use(p,tool,k,false);
     }
     public static void display(ServerPlayer p,ItemStack tool,ArtifactKind k){
@@ -91,7 +92,7 @@ public final class ArtifactInteraction {
                 if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}
         }
         if(k==ArtifactKind.MERIDIAN){var a=ArtifactState.anchor(p,k,"a");var b=ArtifactState.anchor(p,k,"b");if(a.isPresent()){ArtifactFeedback.burst(p,k,a.get(),3);if(b.isPresent()){ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}}}
-        var preview=PREVIEW.get(p.getUUID());if(preview!=null)ArtifactFeedback.ring(p,k,preview,ArtifactActions.radius(p,k));
+        var preview=PREVIEW.get(p.getUUID());if(preview!=null){if(preview.tool()!=tool||!preview.dimension().equals(ArtifactState.dimension(p))||preview.expires()<ArtifactState.now(p))PREVIEW.remove(p.getUUID());else ArtifactFeedback.ring(p,k,preview.pos(),ArtifactActions.radius(p,k));}
         if(WorkQueue.busy(p))ArtifactFeedback.message(p,"progress",Component.translatable("status.specialpickaxes."+status),WorkQueue.completed(p),WorkQueue.completed(p)+WorkQueue.remaining(p),WorkQueue.succeeded(p));
         var memory=ArtifactState.of(p,k).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);
         tag.putLong("artifactOldest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(0))/1200);tag.putLong("artifactLatest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(memory.size()-1))/1200);

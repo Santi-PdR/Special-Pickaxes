@@ -17,6 +17,9 @@ import java.util.Set;
 public final class WorldSafety {
     private static final Set<Block> MATTER=Set.of(Blocks.STONE,Blocks.COBBLESTONE,Blocks.DEEPSLATE,
         Blocks.COBBLED_DEEPSLATE,Blocks.GRANITE,Blocks.DIORITE,Blocks.ANDESITE,Blocks.TUFF,
+        Blocks.STONE_BRICKS,Blocks.BRICKS,Blocks.DEEPSLATE_BRICKS,Blocks.DEEPSLATE_TILES,Blocks.BLACKSTONE,Blocks.POLISHED_BLACKSTONE,
+        Blocks.QUARTZ_BLOCK,Blocks.SMOOTH_QUARTZ,Blocks.TERRACOTTA,Blocks.GLASS,Blocks.OAK_PLANKS,Blocks.SPRUCE_PLANKS,Blocks.BIRCH_PLANKS,
+        Blocks.JUNGLE_PLANKS,Blocks.ACACIA_PLANKS,Blocks.DARK_OAK_PLANKS,Blocks.MANGROVE_PLANKS,Blocks.CHERRY_PLANKS,
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK);
     private WorldSafety() {}
     public static boolean inert(BlockState state) { return MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
@@ -92,9 +95,10 @@ public final class WorldSafety {
     }
     public static boolean vacant(BlockState s) { return s.is(Blocks.AIR) || s.is(Blocks.CAVE_AIR) || s.is(Blocks.VOID_AIR); }
     public static boolean exchange(ServerPlayer p,ItemStack tool,BlockPos a,BlockPos b,BlockState sa,BlockState sb) {
+        var kind=tool.getItem() instanceof ArtifactItem item?item.kind:ArtifactKind.ATLAS;
         if(a.equals(b) || sa==sb || vacant(sa) && vacant(sb) || !(inert(sa) || vacant(sa))
-                || !(inert(sb) || vacant(sb)) || !allowed(p,ArtifactKind.ATLAS,a)
-                || !allowed(p,ArtifactKind.ATLAS,b)) return false;
+                || !(inert(sb) || vacant(sb)) || !allowed(p,kind,a)
+                || !allowed(p,kind,b)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         if(!vacant(sa) && (!harvestable(p,tool,a) || !breakPermission(p,a))) return false;

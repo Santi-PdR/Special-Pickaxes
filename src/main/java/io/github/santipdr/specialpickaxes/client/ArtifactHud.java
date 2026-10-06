@@ -14,6 +14,18 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ArtifactHud {
     private ArtifactHud() {}
+    @SubscribeEvent public static void tooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.setMaxWidth(280);}
+    @SubscribeEvent public static void levels(net.minecraftforge.event.entity.player.ItemTooltipEvent e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.getToolTip().replaceAll(c->{
+        if(c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t)for(var ench:net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValues())if(ench.getDescriptionId().equals(t.getKey()))return numericLevels(ench.getFullname(io.github.santipdr.specialpickaxes.artifact.EnchantmentScaling.level(e.getItemStack(),ench)),0);
+        return numericLevels(c,0);
+    });}
+    private static Component numericLevels(Component c,int depth){
+        if(depth>16)return c;
+        if(c.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t && t.getKey().startsWith("enchantment.level.")){
+            String n=t.getKey().substring("enchantment.level.".length());try{if(Integer.parseInt(n)>10)return Component.literal(n).setStyle(c.getStyle());}catch(NumberFormatException ignored){}
+        }
+        var result=c.plainCopy().setStyle(c.getStyle());for(var child:c.getSiblings())result.append(numericLevels(child,depth+1));return result;
+    }
     @SubscribeEvent public static void render(RenderGuiOverlayEvent.Post event) {
         if(event.getOverlay()!=VanillaGuiOverlay.HOTBAR.type()) return;
         var mc=Minecraft.getInstance();

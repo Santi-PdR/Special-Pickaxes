@@ -13,6 +13,7 @@ public final class RegionWork {
     public final ArtifactKind kind;
     public final int mode;
     private long cursor;
+    private final int[] expectedSource,expectedTarget;
     private boolean executing;
     public long eligible,excluded;
     private final BlockState material;
@@ -20,6 +21,7 @@ public final class RegionWork {
         source=a;target=b;transform=t;kind=k;this.mode=mode;this.material=material;
         if(a.size()>ArtifactConfig.REGION_LIMIT.get() || a.size()<1)throw new IllegalArgumentException("volume limit");
         if(b!=null && (!t.compatible(a,b)||a.overlaps(b)))throw new IllegalArgumentException("incompatible/overlapping regions");
+        expectedSource=new int[(int)a.size()];expectedTarget=b==null?null:new int[(int)a.size()];
     }
     public long total(){return source.size();}
     public int remaining(){return (int)(total()-cursor);}
@@ -29,15 +31,17 @@ public final class RegionWork {
     public void confirm(){if(awaiting()){executing=true;cursor=0;}}
     public boolean loaded(ServerPlayer p){if(cursor==total())return true;var pos=source.at(cursor);return p.serverLevel().hasChunkAt(pos)&&(target==null||p.serverLevel().hasChunkAt(transform.map(source,target,pos)));}
     public WorkStep next(ServerPlayer p){
-        BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
+        int index=(int)cursor;BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
         BlockPos other=target==null?null:transform.map(source,target,pos);
         BlockState second=other==null?null:level.getBlockState(other);
+        if(!executing){expectedSource[index]=net.minecraft.world.level.block.Block.getId(old);if(second!=null)expectedTarget[index]=net.minecraft.world.level.block.Block.getId(second);}
+        if(executing&&(net.minecraft.world.level.block.Block.getId(old)!=expectedSource[index]||second!=null&&net.minecraft.world.level.block.Block.getId(second)!=expectedTarget[index]))return skip(pos);
         if(!executing)return new WorkStep(){
             public BlockPos pos(){return pos;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&eligible(old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok)eligible++;else excluded++;return ok;}
         };
         if(other!=null){
-            if(kind==ArtifactKind.TESSELLATOR)return new WorkStep.Place(other,old);
+            if(kind==ArtifactKind.TESSELLATOR)return new WorkStep(){public BlockPos pos(){return other;}public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){return WorldSafety.allowed(actor,k,pos)&&WorldSafety.placePaid(actor,tool,k,other,old);}};
             return new WorkStep.Exchange(pos,other,old,second);
         }
         if(kind==ArtifactKind.KEYSTONE)return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){return arch(pos)&&WorldSafety.placePaid(actor,tool,k,pos,material);}};
@@ -53,6 +57,7 @@ public final class RegionWork {
         if(kind==ArtifactKind.WORLDBREAKER&&mode==1&&!carve(pos))return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer a,ItemStack t,ArtifactKind k){return false;}};
         return new WorkStep.Mine(pos,old);
     }
+    private static WorkStep skip(BlockPos pos){return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return false;}};}
     private final java.util.Map<BlockPos,BlockState> restoration=new java.util.HashMap<>();
     public void loadMemories(ServerPlayer p){for(var m:ArtifactState.memories(p,kind))if(source.contains(m.pos()))restoration.put(m.pos(),m.state());}
     private boolean eligible(BlockState s,BlockPos pos){

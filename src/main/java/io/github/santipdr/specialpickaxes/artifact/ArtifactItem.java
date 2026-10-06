@@ -30,11 +30,15 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
     @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
     @Override public boolean canPerformAction(ItemStack stack,net.minecraftforge.common.ToolAction action) { return ArtifactTools.action(action); }
-    @Override public int getEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantment e,ItemStack stack) {
+    @Override public int getEnchantmentLevel(ItemStack stack,net.minecraft.world.item.enchantment.Enchantment e) {
         int raw=EnchantmentScaling.level(stack,e);
         if(e==net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY)return Math.min(46340,raw); // last safe vanilla int square
         if(e==net.minecraft.world.item.enchantment.Enchantments.BLOCK_FORTUNE)return EnchantmentScaling.fortune(raw);
         return Math.min(Integer.MAX_VALUE-1,raw); // vanilla Unbreaking adds one before nextInt
+    }
+    @Override public java.util.Map<net.minecraft.world.item.enchantment.Enchantment,Integer> getAllEnchantments(ItemStack stack){
+        var result=new java.util.HashMap<net.minecraft.world.item.enchantment.Enchantment,Integer>();
+        for(var e:net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValues()){int n=getEnchantmentLevel(stack,e);if(n>0)result.put(e,n);}return result;
     }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
         boolean result=super.mineBlock(tool,level,state,pos,actor);
