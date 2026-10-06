@@ -47,23 +47,26 @@ public final class SpecialPickaxes {
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
-        forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
+        forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
+    }
+    private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
+        if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.left(p,e.getPos(),p.isShiftKeyDown()))e.setCanceled(true);
     }
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick(); }
     }
-    private void stopped(ServerStoppedEvent e) { MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
+    private void stopped(ServerStoppedEvent e) { ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
-        var clean=new net.minecraft.nbt.CompoundTag();
+        var clean=old.copy();
         for(var kind:ArtifactKind.values()) {
-            var state=new net.minecraft.nbt.CompoundTag();state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
+            var state=clean.getCompound(kind.id);state.remove("a");state.remove("b");state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
         }
         e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
-        if(e.getOriginal() instanceof ServerPlayer p) { MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getOriginal() instanceof ServerPlayer p) { ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.values()) {
@@ -76,7 +79,7 @@ public final class SpecialPickaxes {
         if(p.getMainHandItem().getItem() instanceof ArtifactItem item && item.kind==ArtifactKind.INTERREGNUM
                 && p.hasEffect(DOMINION.get()) && p.getMainHandItem().isCorrectToolForDrops(e.getState())
                 && e.getNewSpeed()>0 && (!(p instanceof ServerPlayer server) || DomainFields.contains(server,p.blockPosition())))
-            e.setNewSpeed(e.getNewSpeed()*8);
+            e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*8));
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);

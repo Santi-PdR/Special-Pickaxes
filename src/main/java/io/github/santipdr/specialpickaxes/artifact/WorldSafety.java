@@ -31,7 +31,7 @@ public final class WorldSafety {
         var level=p.serverLevel();var s=level.getBlockState(pos);
         return !tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
             && s.getFluidState().isEmpty() && s.getDestroySpeed(level,pos)>=0
-            && s.is(BlockTags.MINEABLE_WITH_PICKAXE) && tool.isCorrectToolForDrops(s);
+            && ArtifactTools.effective(s) && tool.isCorrectToolForDrops(s);
     }
     public static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;

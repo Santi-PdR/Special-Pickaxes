@@ -43,4 +43,18 @@ public final class ArtifactFeedback {
         }
     }
 
+    public static void cue(ServerPlayer p,String phase){
+        var sound=switch(phase){case "error"->net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BASS.value();case "cancel"->net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH;case "complete"->net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP;case "confirm"->net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT;default->net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value();};
+        p.playNotifySound(sound,SoundSource.PLAYERS,0.45F,phase.equals("error")?0.6F:1.2F);
+    }
+    public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){
+        int rgb=target?0xffd783:kind.color;var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.8F);
+        // Fixed packet budget independent of volume. Only the selecting player receives wireframe particles.
+        for(int axis=0;axis<3;axis++)for(int a=0;a<2;a++)for(int b=0;b<2;b++)for(int j=0;j<=6;j++){
+            double[] low={v.min().getX(),v.min().getY(),v.min().getZ()},size={v.width(),v.height(),v.depth()},q=low.clone();
+            q[axis]+=size[axis]*j/6;q[(axis+1)%3]+=size[(axis+1)%3]*a;q[(axis+2)%3]+=size[(axis+2)%3]*b;
+            p.serverLevel().sendParticles(p,dust,false,q[0],q[1],q[2],1,0,0,0,0);
+        }
+    }
+
 }

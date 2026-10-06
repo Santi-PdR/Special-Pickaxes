@@ -18,7 +18,7 @@ public final class WorkQueue {
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;
-        int accepted;
+        int accepted,completed,succeeded; boolean paused; RegionWork region;
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();
@@ -27,10 +27,18 @@ public final class WorkQueue {
     private WorkQueue() {}
     public static boolean running() { return running; }
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
-    public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.steps.size(); }
+    public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
+    public static String status(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?"idle":j.region!=null&&j.region.awaiting()?"ready":j.paused?"paused":j.region!=null&&!j.region.executing()?"preparing":"executing";}
+    public static int completed(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.completed;}
+    public static int succeeded(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.succeeded;}
+    public static boolean togglePause(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j==null)return false;if(j.region!=null&&j.region.awaiting()){j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;}else j.paused=!j.paused;return true;}
+    public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,RegionWork region){
+        if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
+        var j=new Job(p,tool,kind,List.of());j.region=region;region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
+    }
     public static int lastAttempts() { return lastAttempts; }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,List<WorkStep> steps) {
-        if(busy(p) || steps.isEmpty() || tool.isEmpty()) return false;
+        if(busy(p) || steps.isEmpty() || tool.isEmpty() || JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get()) return false;
         var bounded=List.copyOf(steps.subList(0,Math.min(steps.size(),ArtifactConfig.JOB_LIMIT.get())));
         JOBS.put(p.getUUID(),new Job(p,tool,kind,bounded));ORDER.addLast(p.getUUID());return true;
     }
@@ -49,21 +57,27 @@ public final class WorkQueue {
             var p=job.player;
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=job.tool || job.tool.isEmpty()
                     || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);continue; }
+            if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
+            if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
             if(job.kind==ArtifactKind.ICARUS) p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,10,0,false,false,true));
-            int turn=Math.min(budget,ArtifactConfig.PER_PLAYER.get());BlockPos feedback=null;
-            while(turn-->0 && !job.steps.isEmpty()) {
-                WorkStep step=job.steps.removeFirst();budget--;lastAttempts++;
+            int turn=Math.min(budget,EnchantmentScaling.budget(job.tool));BlockPos feedback=null;
+            while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
+                if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
+                budget--;lastAttempts++;
+                WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);
-                    if(ok) feedback=step.pos();
-                    else if(step.stopOnFailure()) job.steps.clear();
+                    if(ok) { feedback=step.pos();job.succeeded++; }
+                    else if(step.stopOnFailure()) {job.steps.clear();break;}
                 } catch(RuntimeException error) {
-                    LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();
+                    LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.paused=true;
                 } finally { running=false; }
-                if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) job.steps.clear();
+                if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) { job.steps.clear();job.paused=true;break; }
             }
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
-            if(job.steps.isEmpty()) JOBS.remove(id);else ORDER.addLast(id);
+            if(job.region==null?job.steps.isEmpty():job.region.done()) {
+                ArtifactFeedback.message(p,"complete",job.succeeded,job.completed-job.succeeded);ArtifactFeedback.cue(p,"complete");JOBS.remove(id);
+            } else ORDER.addLast(id);
         }
     }
 }

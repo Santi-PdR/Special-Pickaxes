@@ -26,8 +26,8 @@ public final class ArtifactState {
     public static String dimension(ServerPlayer p) { return p.level().dimension().location().toString(); }
     public static int charge(ServerPlayer p, ArtifactKind kind) { return Math.max(0,Math.min(256,of(p,kind).getInt("charge"))); }
     public static void charge(ServerPlayer p, ArtifactKind kind, int amount) { of(p,kind).putInt("charge",Math.min(256,charge(p,kind)+amount)); }
-    public static int mode(ServerPlayer p, ArtifactKind kind) { return Math.floorMod(of(p,kind).getInt("mode"),4); }
-    public static int rotate(ServerPlayer p, ArtifactKind kind) { int m=(mode(p,kind)+1)%4;of(p,kind).putInt("mode",m);return m; }
+    public static int mode(ServerPlayer p, ArtifactKind kind) { return Math.floorMod(of(p,kind).getInt("mode"),ArtifactInteraction.modeCount(kind)); }
+    public static int rotate(ServerPlayer p, ArtifactKind kind) { int m=(mode(p,kind)+1)%ArtifactInteraction.modeCount(kind);of(p,kind).putInt("mode",m);return m; }
     public static void record(ServerPlayer p, ArtifactKind kind, BlockPos pos, BlockState state) {
         // Both memories use only default inert states; no NBT/powered/fluid/machine reconstruction.
         if (!WorldSafety.inert(state)) return;
@@ -35,25 +35,33 @@ public final class ArtifactState {
         ListTag list=data.getList("memory",Tag.TAG_COMPOUND);
         for (int i=list.size()-1;i>=0;i--) {
             var old=list.getCompound(i);
-            if (old.getLong("pos")==pos.asLong() || !old.getString("dim").equals(dimension(p))
-                    || now(p)-old.getLong("time")>ArtifactConfig.MEMORY_TTL.get()) list.remove(i);
+            if (old.getLong("pos")==pos.asLong() && old.getString("dim").equals(dimension(p))
+                    || expired(p,old)) list.remove(i);
         }
         while(list.size()>=ArtifactConfig.MEMORY.get()) list.remove(0);
         var entry=new CompoundTag();entry.putLong("pos",pos.asLong());
         entry.putString("block",Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(state.getBlock())).toString());
-        entry.putString("dim",dimension(p));entry.putLong("time",now(p));list.add(entry);data.put("memory",list);
+        entry.putString("dim",dimension(p));entry.putLong("time",now(p));entry.putLong("epoch",System.currentTimeMillis());list.add(entry);data.put("memory",list);
+    }
+    public static boolean snapshot(ServerPlayer p,ArtifactKind kind,BlockPos pos,BlockState state){
+        if(!WorldSafety.inert(state))return false;
+        var d=of(p,kind);var list=d.getList("memory",Tag.TAG_COMPOUND);if(list.size()>=ArtifactConfig.MEMORY.get())return false;
+        var tag=new CompoundTag();tag.putLong("pos",pos.asLong());tag.putString("dim",dimension(p));tag.putLong("time",now(p));tag.putLong("epoch",System.currentTimeMillis());
+        tag.putString("block",ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString());list.add(tag);d.put("memory",list);return true;
     }
     public static List<Memory> memories(ServerPlayer p, ArtifactKind kind) {
         var list=of(p,kind).getList("memory",Tag.TAG_COMPOUND);var result=new ArrayList<Memory>();
         for (int i=Math.max(0,list.size()-ArtifactConfig.MEMORY.get());i<list.size();i++) {
             var tag=list.getCompound(i);
-            if(!tag.getString("dim").equals(dimension(p)) || now(p)-tag.getLong("time")>ArtifactConfig.MEMORY_TTL.get()) continue;
+            if(!tag.getString("dim").equals(dimension(p)) || expired(p,tag)) continue;
             var id=ResourceLocation.tryParse(tag.getString("block"));
             var block=id==null?null:ForgeRegistries.BLOCKS.getValue(id);
             if(block!=null && WorldSafety.inert(block.defaultBlockState())) result.add(new Memory(BlockPos.of(tag.getLong("pos")),block.defaultBlockState()));
         }
         return List.copyOf(result);
     }
+    public static long age(ServerPlayer p,CompoundTag tag){return tag.contains("epoch")?Math.max(0,(System.currentTimeMillis()-tag.getLong("epoch"))/50):Math.max(0,now(p)-tag.getLong("time"));}
+    private static boolean expired(ServerPlayer p,CompoundTag tag){return age(p,tag)>ArtifactConfig.MEMORY_TTL.get();}
     public static void anchor(ServerPlayer p,ArtifactKind kind,String key,BlockPos pos) {
         var data=of(p,kind);
         if(!data.getString("dimension").equals(dimension(p)) || now(p)-data.getLong("anchorTime")>ArtifactConfig.MEMORY_TTL.get()) {

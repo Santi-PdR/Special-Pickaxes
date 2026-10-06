@@ -21,12 +21,15 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);
         if(hand!=InteractionHand.MAIN_HAND) return InteractionResultHolder.pass(tool);
-        if(player instanceof ServerPlayer p && !ArtifactActions.use(p,tool,kind,p.isShiftKeyDown())) return InteractionResultHolder.fail(tool);
+        if(player instanceof ServerPlayer p && !ArtifactInteraction.use(p,tool,kind,p.isShiftKeyDown())) return InteractionResultHolder.fail(tool);
         return InteractionResultHolder.sidedSuccess(tool,level.isClientSide);
     }
     @Override public InteractionResult useOn(UseOnContext context) {
         return context.getPlayer()==null?InteractionResult.PASS:use(context.getLevel(),context.getPlayer(),context.getHand()).getResult();
     }
+    @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
+    @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
+    @Override public boolean canPerformAction(ItemStack stack,net.minecraftforge.common.ToolAction action) { return ArtifactTools.action(action); }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
         boolean result=super.mineBlock(tool,level,state,pos,actor);
         if(actor instanceof ServerPlayer p && !tool.isEmpty()) MiningObservations.capture(p,tool,kind,pos,state);
@@ -39,7 +42,7 @@ public final class ArtifactItem extends PickaxeItem {
             var tag=tool.getOrCreateTag();tag.putInt("artifactCharge",ArtifactState.charge(p,kind));
             tag.putInt("artifactMode",ArtifactState.mode(p,kind));tag.putInt("artifactWork",WorkQueue.remaining(p));
             tag.putInt("artifactMemory",ArtifactState.memories(p,kind).size());
-            if(WorkQueue.busy(p)) ArtifactFeedback.message(p,"working",WorkQueue.remaining(p));
+            ArtifactInteraction.display(p,tool,kind);
         }
     }
     @Override public boolean isFoil(ItemStack stack) {
@@ -49,6 +52,9 @@ public final class ArtifactItem extends PickaxeItem {
         lines.add(Component.translatable("tooltip.specialpickaxes."+kind.id));
         lines.add(Component.translatable("tooltip.specialpickaxes.secondary."+kind.id));
         if(stack.hasTag()) lines.add(Component.translatable("tooltip.specialpickaxes.state",stack.getTag().getInt("artifactCharge"),stack.getTag().getInt("artifactMemory"),stack.getTag().getInt("artifactMode")+1));
-        lines.add(Component.translatable("tooltip.specialpickaxes.controls"));
+        lines.add(Component.translatable("ux.specialpickaxes.mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(kind,stack.hasTag()?stack.getTag().getInt("artifactMode"):0))));
+        lines.add(Component.translatable(ArtifactInteraction.regional(kind)?"ux.specialpickaxes.region_controls":"ux.specialpickaxes.controls"));
+        lines.add(Component.translatable("ux.specialpickaxes.cancel_help"));
+        lines.add(Component.translatable("ux.specialpickaxes.resources"));
     }
 }

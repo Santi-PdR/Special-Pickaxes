@@ -13,7 +13,11 @@ public enum ArtifactKind {
     WORLDLOOM("worldloom", 0x64ffa9, SoundEvents.STONE_PLACE),
     ICARUS("icarus", 0xffc057, SoundEvents.PISTON_EXTEND),
     AXIOM("hollow_axiom", 0xd9ffbd, SoundEvents.SCULK_CATALYST_BLOOM),
-    ATLAS("bifold_atlas", 0xff7b99, SoundEvents.ENCHANTMENT_TABLE_USE);
+    ATLAS("bifold_atlas", 0xff7b99, SoundEvents.ENCHANTMENT_TABLE_USE),
+    WORLDBREAKER("worldbreaker",0xf1bf65,SoundEvents.END_PORTAL_SPAWN),
+    CHRONICLE("chronicle",0xb6a1ed,SoundEvents.AMETHYST_BLOCK_RESONATE),
+    KEYSTONE("keystone",0x8fdac2,SoundEvents.ANVIL_PLACE),
+    TESSELLATOR("tessellator",0xe49abf,SoundEvents.NOTE_BLOCK_PLING.value());
     public final String id;
     public final int color;
     public final SoundEvent sound;

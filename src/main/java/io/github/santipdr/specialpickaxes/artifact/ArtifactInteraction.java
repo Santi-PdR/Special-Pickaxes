@@ -1,0 +1,99 @@
+package io.github.santipdr.specialpickaxes.artifact;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Blocks;
+import java.util.*;
+
+/** Server-owned UX state. Vanilla interaction packets carry intent, never trusted coordinates. */
+public final class ArtifactInteraction {
+    private static final class Selection {
+        final ItemStack tool;final ArtifactKind kind;final String dimension;final long expires;
+        final List<BlockPos> points=new ArrayList<>();int transform;
+        Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;dimension=ArtifactState.dimension(p);expires=ArtifactState.now(p)+12000;}
+    }
+    private static final Map<UUID,Selection> SELECTED=new HashMap<>();
+    private static final Map<UUID,BlockPos> PREVIEW=new HashMap<>();
+    private ArtifactInteraction(){}
+    public static boolean regional(ArtifactKind k){return k==ArtifactKind.ATLAS||k==ArtifactKind.WORLDBREAKER||k==ArtifactKind.CHRONICLE||k==ArtifactKind.KEYSTONE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.PALIMPSEST;}
+    public static String[] modes(ArtifactKind k){return switch(k){
+        case PALIMPSEST->new String[]{"restore"};case CHOIR->new String[]{"rotate0","rotate90","rotate180","rotate270"};
+        case EVENTIDE->new String[]{"attract","repel"};case MERIDIAN->new String[]{"link"};
+        case CRUCIBLE->new String[]{"stone","deepslate","basalt","obsidian"};case INTERREGNUM->new String[]{"stasis"};
+        case WORLDLOOM->new String[]{"shelter","bridge"};case ICARUS->new String[]{"forward","reverse"};case AXIOM->new String[]{"ribs","subtract"};
+        case ATLAS,TESSELLATOR->new String[]{"identity","mirror_x","mirror_z","rotate90","rotate180","rotate270"};
+        case WORLDBREAKER->new String[]{"world_break","world_carve","world_rephase","world_transpose","world_restore","world_record"};
+        case CHRONICLE->new String[]{"record","restore"};case KEYSTONE->new String[]{"vault","supported_vault"};};}
+    public static int modeCount(ArtifactKind k){return modes(k).length;}
+    public static String modeKey(ArtifactKind k,int m){return modes(k)[Math.floorMod(m,modeCount(k))];}
+    private static int corners(ServerPlayer p,ArtifactKind k){return k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,k)==3?4:2;}
+    public static void clear(ServerPlayer p){SELECTED.remove(p.getUUID());PREVIEW.remove(p.getUUID());}
+    public static void clear(){SELECTED.clear();PREVIEW.clear();}
+    public static boolean selecting(ServerPlayer p){return SELECTED.containsKey(p.getUUID());}
+    public static boolean left(ServerPlayer p,BlockPos pos,boolean shift){
+        var s=SELECTED.get(p.getUUID());
+        if(s==null)return false;
+        if(!valid(p,s)){clear(p);return false;}
+        if(shift){
+            if(corners(p,s.kind)==4){s.transform=(s.transform+1)%6;ArtifactFeedback.message(p,"transform",Component.translatable("mode.specialpickaxes."+modes(ArtifactKind.ATLAS)[s.transform]));}
+            else {ArtifactState.rotate(p,s.kind);s.points.clear();ArtifactFeedback.message(p,"named_mode",Component.translatable("mode.specialpickaxes."+modeKey(s.kind,ArtifactState.mode(p,s.kind))));}
+            ArtifactFeedback.cue(p,"select");return true;
+        }
+        if(!WorldSafety.allowed(p,s.kind,pos)||s.points.size()>=corners(p,s.kind)){ArtifactFeedback.cue(p,"error");ArtifactFeedback.message(p,"selection_invalid");return true;}
+        s.points.add(pos.immutable());ArtifactFeedback.cue(p,"select");ArtifactFeedback.burst(p,s.kind,pos,6);
+        ArtifactFeedback.message(p,s.points.size()==corners(p,s.kind)?"selection_ready":"corner",s.points.size());return true;
+    }
+    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.dimension(p).equals(s.dimension)&&ArtifactState.now(p)<=s.expires;}
+    public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind k,boolean shift){
+        if(!WorldSafety.allowed(p,k,p.blockPosition()))return false;
+        if(WorkQueue.busy(p)){
+            if(shift){WorkQueue.cancel(p);clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
+            else {WorkQueue.togglePause(p);ArtifactFeedback.cue(p,"confirm");}return true;
+        }
+        var s=SELECTED.get(p.getUUID());
+        if(s!=null&&!valid(p,s)){clear(p);s=null;}
+        if(shift){
+            if(s!=null||PREVIEW.containsKey(p.getUUID())){clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
+            if(k==ArtifactKind.MERIDIAN){ArtifactState.clearAnchors(p,k);ArtifactFeedback.message(p,"unlinked");}
+            else if(k==ArtifactKind.INTERREGNUM){DomainFields.stop(p);ArtifactFeedback.message(p,"released");}
+            else {ArtifactState.rotate(p,k);ArtifactFeedback.message(p,"named_mode",Component.translatable("mode.specialpickaxes."+modeKey(k,ArtifactState.mode(p,k))));}
+            ArtifactFeedback.cue(p,"select");return true;
+        }
+        if(!ArtifactState.of(p,k).getBoolean("helpSeen")){p.sendSystemMessage(Component.translatable(regional(k)?"ux.specialpickaxes.region_controls":"ux.specialpickaxes.controls"));ArtifactState.of(p,k).putBoolean("helpSeen",true);}
+        if(regional(k)){
+            if(s==null){s=new Selection(p,tool,k);if(k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR)s.transform=ArtifactState.mode(p,k);SELECTED.put(p.getUUID(),s);ArtifactFeedback.message(p,"armed");ArtifactFeedback.cue(p,"select");return true;}
+            if(s.points.size()!=corners(p,k)){ArtifactFeedback.message(p,"need_corners",s.points.size(),corners(p,k));ArtifactFeedback.cue(p,"error");return false;}
+            try {
+                var a=new SelectionVolume(s.points.get(0),s.points.get(1));var b=s.points.size()==4?new SelectionVolume(s.points.get(2),s.points.get(3)):null;
+                var material=p.getOffhandItem().getItem() instanceof BlockItem item?item.getBlock().defaultBlockState():Blocks.STONE.defaultBlockState();
+                var region=new RegionWork(a,b,SelectionVolume.Transform.values()[s.transform],k,ArtifactState.mode(p,k),material);
+                if(!WorkQueue.startRegion(p,tool,k,region))return false;
+                // Keep selection visible while analyzing/executing. No world edits until second confirmation after analysis.
+                ArtifactFeedback.cue(p,"confirm");return true;
+            }catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"selection_invalid");ArtifactFeedback.cue(p,"error");return false;}
+        }
+        if(k==ArtifactKind.MERIDIAN)return ArtifactActions.use(p,tool,k,false);
+        var target=ArtifactActions.target(p).orElse(p.blockPosition());
+        var previous=PREVIEW.get(p.getUUID());
+        if(previous==null||!previous.equals(target)){PREVIEW.put(p.getUUID(),target);ArtifactFeedback.ring(p,k,target,ArtifactActions.radius(p,k));ArtifactFeedback.message(p,"confirm_again");ArtifactFeedback.cue(p,"select");return true;}
+        PREVIEW.remove(p.getUUID());return ArtifactActions.use(p,tool,k,false);
+    }
+    public static void display(ServerPlayer p,ItemStack tool,ArtifactKind k){
+        var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);s=null;}
+        String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?(s.points.size()==corners(p,k)?"ready":"selecting"):"idle";
+        var tag=tool.getOrCreateTag();tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));
+        tag.putString("artifactModeName",modeKey(k,ArtifactState.mode(p,k)));
+        if(s!=null){
+            for(var point:s.points)ArtifactFeedback.burst(p,k,point,2);
+            if(s.points.size()>=2){var a=new SelectionVolume(s.points.get(0),s.points.get(1));ArtifactFeedback.box(p,k,a,false);tag.putString("artifactSource",a.dimensions());
+                if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}
+        }
+        if(k==ArtifactKind.MERIDIAN){var a=ArtifactState.anchor(p,k,"a");var b=ArtifactState.anchor(p,k,"b");if(a.isPresent()){ArtifactFeedback.burst(p,k,a.get(),3);if(b.isPresent()){ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}}}
+        var preview=PREVIEW.get(p.getUUID());if(preview!=null)ArtifactFeedback.ring(p,k,preview,ArtifactActions.radius(p,k));
+        if(WorkQueue.busy(p))ArtifactFeedback.message(p,"progress",Component.translatable("status.specialpickaxes."+status),WorkQueue.completed(p),WorkQueue.completed(p)+WorkQueue.remaining(p),WorkQueue.succeeded(p));
+        var memory=ArtifactState.of(p,k).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);
+        tag.putLong("artifactOldest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(0))/1200);tag.putLong("artifactLatest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(memory.size()-1))/1200);
+    }
+}

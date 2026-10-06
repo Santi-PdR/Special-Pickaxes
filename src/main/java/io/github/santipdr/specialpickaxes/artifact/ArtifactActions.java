@@ -147,11 +147,11 @@ public final class ArtifactActions {
     private static boolean link(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center) {
         var first=ArtifactState.anchor(p,kind,"a");
         if(first.isEmpty()) {
-            ArtifactState.anchor(p,kind,"a",center);ArtifactFeedback.burst(p,kind,center,8);ArtifactFeedback.message(p,"anchor_a");return true;
+            ArtifactState.of(p,kind).putInt("heading",p.getDirection().get2DDataValue());ArtifactState.anchor(p,kind,"a",center);ArtifactFeedback.burst(p,kind,center,8);ArtifactFeedback.message(p,"anchor_a");return true;
         }
         if(kind==ArtifactKind.MERIDIAN) {
             if(first.get().equals(center)) return false;
-            ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.trace(p,kind,first.get(),center);ArtifactFeedback.message(p,"linked");return true;
+            ArtifactState.of(p,kind).putInt("rotation",Math.floorMod(p.getDirection().get2DDataValue()-ArtifactState.of(p,kind).getInt("heading"),4));ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.trace(p,kind,first.get(),center);ArtifactFeedback.message(p,"linked");return true;
         }
         var delta=center.subtract(first.get());int r=Math.min(4,2+ArtifactState.charge(p,kind)/128);
         if(Math.abs(delta.getX())<=2*r && Math.abs(delta.getY())<=2*r && Math.abs(delta.getZ())<=2*r) return false;
@@ -173,8 +173,8 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.MERIDIAN) {
             var a=ArtifactState.anchor(p,kind,"a");var b=ArtifactState.anchor(p,kind,"b");
             if(a.isPresent() && b.isPresent() && pos.distSqr(a.get())<=8*8) {
-                var destination=b.get().offset(pos.subtract(a.get()));
-                WorkQueue.append(p,tool,kind,new WorkStep.Mine(destination,state));
+                var destination=b.get().offset(Geometry.rotate(pos.subtract(a.get()),ArtifactState.of(p,kind).getInt("rotation")));
+                if(WorkQueue.append(p,tool,kind,new WorkStep.Mine(destination,state))) ArtifactFeedback.trace(p,kind,pos,destination);
             }
         }
     }
