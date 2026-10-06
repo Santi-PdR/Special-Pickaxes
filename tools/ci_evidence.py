@@ -14,7 +14,8 @@ with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:
  for p in files:z.write(p,str(p))
  z.writestr('manifest.json',json.dumps(manifest,indent=2))
 encoded=base64.b64encode(b.getvalue()).decode();chunks=[encoded[i:i+48000] for i in range(0,len(encoded),48000)]
-if len(chunks)>16:raise RuntimeError('Evidence exceeds bounded Checks export budget')
+if len(chunks)>64:raise RuntimeError(f'Evidence exceeds bounded Checks export budget: {len(chunks)} chunks')
+print(f'Exporting {len(files)} files, {len(b.getvalue())} compressed bytes in {len(chunks)} bounded chunks')
 for i,chunk in enumerate(chunks):
  payload={'name':f'Build evidence {i+1:02d}/{len(chunks):02d}', 'head_sha':os.environ['GITHUB_SHA'],
   'status':'completed','conclusion':'neutral','output':{'title':'Downloadable build and verification evidence',
