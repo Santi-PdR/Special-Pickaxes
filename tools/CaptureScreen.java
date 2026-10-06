@@ -16,5 +16,6 @@ class CaptureScreen {
             Thread.sleep(1000);
         }
         ImageIO.write(robot.createScreenCapture(bounds), "png", new File(args[0]));
+        System.exit(0); // AWT/X11 event threads must not keep this one-shot helper alive.
     }
 }

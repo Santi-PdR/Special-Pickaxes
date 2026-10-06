@@ -20,6 +20,10 @@ public final class ClientValidation {
         var server=ServerLifecycleHooks.getCurrentServer();if(server==null)return;
         for(var p:server.getPlayerList().getPlayers()){
             if(!p.getTags().contains("artifact_gallery"))continue;
+            if(ticks>=240&&(ticks-240)%100==99){
+                try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
+                catch(java.io.IOException missing){return;}
+            }
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=ArtifactKind.values().length){if(index==ArtifactKind.values().length&&phase==0)p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));return;}

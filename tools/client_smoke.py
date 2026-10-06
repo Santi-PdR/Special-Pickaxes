@@ -2,6 +2,7 @@
 """Real Forge client + integrated-server gallery under Xvfb. Uses only a disposable copy of the smoke world."""
 import json,os,pathlib,queue,shutil,signal,subprocess,threading,time
 root=pathlib.Path.cwd();out=root/'build/client-smoke';out.mkdir(parents=True,exist_ok=True)
+ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
 world=root/'run/saves/ArtifactSmoke'
 if world.exists():shutil.rmtree(world)
 shutil.copytree(root/'build/packaged-smoke/smoke-world',world)
@@ -48,19 +49,20 @@ try:
    captured.append(line);print(line,end='')
    if '[CHAT]' in line and 'ARTIFACT_CLIENT_SMOKE_READY' in line:ready=time.monotonic()
   if ready and not gallery_done and time.monotonic()-ready>8:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery.png')],env=env,check=True)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery.png')],env=env,check=True,timeout=20)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True,timeout=20)
    # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True,timeout=20)
    gallery_done=True
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
    if id not in ids:raise RuntimeError('Unexpected client artifact')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True,timeout=20)
    ux.add(id)
+   pending=ack.with_suffix('.tmp');pending.write_text(str(ids.index(id)));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(ids):raise RuntimeError('Incomplete graphical artifact validation')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True,timeout=20)
    success=True;break
 finally:
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.

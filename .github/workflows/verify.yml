@@ -28,9 +28,14 @@ jobs:
           set -o pipefail
           python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log
       - run: python3 tools/validate_runtime_logs.py run/logs/latest.log build/packaged-smoke/console.log
-      - run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y xvfb libflite1
+      - name: Client runtime dependencies
+        timeout-minutes: 6
+        run: |
+          timeout 120s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -qq
+          timeout 180s sudo apt-get install -y xvfb libflite1
+      - name: Real client gallery and fourteen synchronized UX captures
+        timeout-minutes: 10
+        run: |
           set -o pipefail
           python3 tools/client_smoke.py 2>&1 | tee build/verification-client.log
       - if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
