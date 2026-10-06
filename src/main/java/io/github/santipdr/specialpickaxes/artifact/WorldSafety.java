@@ -35,6 +35,8 @@ public final class WorldSafety {
     }
     public static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
+        // Backpressure: do not destroy another block into a dense pile of uncollected drops.
+        if(p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256)return false;
         return p.gameMode.destroyBlock(pos);
     }
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {

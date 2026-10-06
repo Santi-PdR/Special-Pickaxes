@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json,pathlib,struct,hashlib,unittest
 ROOT=pathlib.Path('src/main/resources')
-IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas'.split()
+IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator'.split()
 class Resources(unittest.TestCase):
  def test_json(self):
   for pattern in ['*.json','*.mcmeta']:
@@ -14,7 +14,7 @@ class Resources(unittest.TestCase):
    self.assertEqual(b[:8],b'\x89PNG\r\n\x1a\n');self.assertEqual(struct.unpack('>II',b[16:24]),(64,256))
    self.assertEqual(json.loads(p.with_suffix('.png.mcmeta').read_text())['animation']['frametime'],6)
    hashes.add(hashlib.sha256(b).hexdigest())
-  self.assertEqual(len(hashes),10)
+  self.assertEqual(len(hashes),14)
  def test_languages(self):
   langs=[json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text()) for lang in ['en_us','es_es']]
   self.assertEqual(set(langs[0]),set(langs[1]))

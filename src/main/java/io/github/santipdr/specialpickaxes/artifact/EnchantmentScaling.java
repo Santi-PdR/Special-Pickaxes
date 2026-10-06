@@ -15,6 +15,9 @@ public final class EnchantmentScaling {
         return result;
     }
     public static int throughput(int base,int efficiency,int ceiling){return (int)Math.min(ceiling,base*(1+Math.log1p(Math.max(0,efficiency))/Math.log(2)/4));}
+    /** Exact ordinary and 1000+ Fortune; diminishing growth above 4096 avoids unbounded native loot expansion. */
+    public static int fortune(int raw){return raw<=4096?Math.max(0,raw):(int)(4096+128*Math.log((double)raw/4096));}
+    public static int activationCost(ItemStack stack,ArtifactKind k){int base=ArtifactConfig.COST.get();return k==ArtifactKind.PALIMPSEST||k==ArtifactKind.CHRONICLE||k==ArtifactKind.TESSELLATOR?(int)Math.ceil(base/(1+Math.log1p(level(stack,Enchantments.MENDING)))):base;}
     public static int budget(ItemStack stack){return throughput(ArtifactConfig.PER_PLAYER.get(),level(stack,Enchantments.BLOCK_EFFICIENCY),ArtifactConfig.ENCHANT_BUDGET.get());}
     public static float finiteSpeed(double speed){return (float)Math.max(0,Math.min(1_000_000_000D,Double.isFinite(speed)?speed:1_000_000_000D));}
 }

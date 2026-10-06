@@ -1,0 +1,20 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "specialpickaxes:item/keystone"
+  },
+  "display": {
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        8
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    }
+  }
+}

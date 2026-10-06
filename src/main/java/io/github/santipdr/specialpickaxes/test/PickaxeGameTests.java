@@ -41,7 +41,7 @@ public final class PickaxeGameTests {
     private static void finish(GameTestHelper h,ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
-        h.assertTrue(SpecialPickaxes.PICKS.size()==10,"ten artifacts only");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+        h.assertTrue(SpecialPickaxes.PICKS.size()==14,"fourteen artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
         for(var kind:ArtifactKind.values()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");
@@ -254,6 +254,49 @@ public final class PickaxeGameTests {
         h.assertTrue(WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.AIR.defaultBlockState()),"solid transported into empty space");
         h.assertTrue(h.getLevel().getBlockState(a).isAir() && h.getLevel().getBlockState(b).is(Blocks.STONE),"one block removed, exactly one block placed");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(a,b).inflate(1)).isEmpty(),"relocation emits no duplicated material");finish(h,p);
+    }
+
+    @GameTest(template="empty") public static void multiToolAndHighEnchantments(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();
+        for(var block:List.of(Blocks.STONE,Blocks.DEEPSLATE,Blocks.OAK_LOG,Blocks.OAK_PLANKS,Blocks.DIRT,Blocks.SAND,Blocks.GRAVEL,Blocks.CLAY,Blocks.SNOW_BLOCK)){
+            h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"combined harvest tool: "+block);h.assertTrue(tool.getDestroySpeed(block.defaultBlockState())==64,"combined mining speed");
+        }
+        for(int level:new int[]{100,255,1000,100000}){
+            tool.enchant(Enchantments.BLOCK_EFFICIENCY,level);h.assertTrue(EnchantmentScaling.level(tool,Enchantments.BLOCK_EFFICIENCY)>0,"raw enchantment survives");
+            h.assertTrue(EnchantmentScaling.budget(tool)<=ArtifactConfig.ENCHANT_BUDGET.get(),"bounded throughput");
+        }
+        tool.enchant(Enchantments.BLOCK_FORTUNE,1000);h.assertTrue(tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE)==1000,"Fortune 1000 not truncated to 255");finish(h,p);
+    }
+    @GameTest(template="empty") public static void regionSelectionAnalysisAndPause(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var b=a.offset(2,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"arm");
+        h.assertTrue(ArtifactInteraction.left(p,a,false)&&ArtifactInteraction.left(p,b,false),"select corners");
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"analyze");WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"analysis never mutates");h.assertTrue(WorkQueue.status(p).equals("ready"),"ready requires confirmation");
+        WorkQueue.togglePause(p);WorkQueue.togglePause(p);WorkQueue.tick();h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"paused operation untouched");
+        WorkQueue.togglePause(p);drain(p);h.assertTrue(h.getLevel().getBlockState(a).isAir(),"confirmed operation mines");ArtifactInteraction.clear(p);finish(h,p);
+    }
+    @GameTest(template="empty") public static void transformedRegionExchange(GameTestHelper h){
+        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(4,0,0);
+        h.getLevel().setBlockAndUpdate(a.offset(1,0,0),Blocks.OBSIDIAN.defaultBlockState());h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());h.getLevel().setBlockAndUpdate(b.offset(0,0,1),Blocks.BASALT.defaultBlockState());
+        var region=new RegionWork(new SelectionVolume(a,a.offset(1,0,0)),new SelectionVolume(b,b.offset(0,0,1)),SelectionVolume.Transform.ROTATE_90,ArtifactKind.ATLAS,0,Blocks.STONE.defaultBlockState());
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.ATLAS,region),"queue transformed volume");WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(b).is(Blocks.STONE)&&h.getLevel().getBlockState(b.offset(0,0,1)).is(Blocks.OBSIDIAN),"rotation maps every cell");finish(h,p);
+    }
+    @GameTest(template="empty") public static void checkpointPaidRestore(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHRONICLE);var a=target(h);var volume=new SelectionVolume(a,a);
+        var record=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,0,Blocks.STONE.defaultBlockState());
+        WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,record);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(ArtifactState.memories(p,ArtifactKind.CHRONICLE).size()==1,"checkpoint recorded");h.getLevel().setBlockAndUpdate(a,Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE));
+        var restore=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,1,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,restore);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid restoration conserves material");finish(h,p);
+    }
+    @GameTest(template="empty") public static void simultaneousLargeRegionsAreBounded(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var q=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a.offset(49,19,49));
+        h.assertTrue(v.size()==50000,"large selection");
+        for(var owner:List.of(p,q))h.assertTrue(WorkQueue.startRegion(owner,owner.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState())),"stream does not materialize/truncate large volume");
+        WorkQueue.tick();h.assertTrue(WorkQueue.lastAttempts()<=ArtifactConfig.GLOBAL.get(),"global fair budget");h.assertTrue(WorkQueue.remaining(p)>49000&&WorkQueue.remaining(q)>49000,"both cursors retained");
+        WorkQueue.cancel(q);h.assertTrue(!WorkQueue.busy(q)&&WorkQueue.busy(p),"independent cancellation");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p),"tool switch cancels large work");finish(h,p);
     }
 
 }

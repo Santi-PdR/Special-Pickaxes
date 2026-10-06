@@ -3,7 +3,7 @@ loaderVersion="[47,)"
 license="All Rights Reserved"
 [[mods]]
 modId="specialpickaxes"
-version="2.0.0"
+version="3.0.0"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
 description='''Ten Siege endgame artifacts. Memory, kinetic domains and protected matter manipulation. No recipes or world generation.'''

@@ -30,6 +30,12 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
     @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
     @Override public boolean canPerformAction(ItemStack stack,net.minecraftforge.common.ToolAction action) { return ArtifactTools.action(action); }
+    @Override public int getEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantment e,ItemStack stack) {
+        int raw=EnchantmentScaling.level(stack,e);
+        if(e==net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY)return Math.min(46340,raw); // last safe vanilla int square
+        if(e==net.minecraft.world.item.enchantment.Enchantments.BLOCK_FORTUNE)return EnchantmentScaling.fortune(raw);
+        return Math.min(Integer.MAX_VALUE-1,raw); // vanilla Unbreaking adds one before nextInt
+    }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
         boolean result=super.mineBlock(tool,level,state,pos,actor);
         if(actor instanceof ServerPlayer p && !tool.isEmpty()) MiningObservations.capture(p,tool,kind,pos,state);
@@ -56,5 +62,9 @@ public final class ArtifactItem extends PickaxeItem {
         lines.add(Component.translatable(ArtifactInteraction.regional(kind)?"ux.specialpickaxes.region_controls":"ux.specialpickaxes.controls"));
         lines.add(Component.translatable("ux.specialpickaxes.cancel_help"));
         lines.add(Component.translatable("ux.specialpickaxes.resources"));
+        if(stack.hasTag()) {
+            lines.add(Component.translatable("ux.specialpickaxes.history",stack.getTag().getInt("artifactMemory"),stack.getTag().getLong("artifactOldest"),stack.getTag().getLong("artifactLatest")));
+            lines.add(Component.translatable("status.specialpickaxes."+stack.getTag().getString("artifactStatus")));
+        }
     }
 }

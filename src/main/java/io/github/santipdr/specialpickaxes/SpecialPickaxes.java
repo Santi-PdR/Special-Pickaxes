@@ -76,6 +76,10 @@ public final class SpecialPickaxes {
     }
     private void speed(PlayerEvent.BreakSpeed e) {
         var p=e.getEntity();
+        if(p.getMainHandItem().getItem() instanceof ArtifactItem && ArtifactTools.effective(e.getState())) {
+            int raw=EnchantmentScaling.level(p.getMainHandItem(),net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY);
+            if(raw>46340){double nativeBase=64D+46340D*46340D+1;double environment=Math.max(0,e.getNewSpeed())/nativeBase;e.setNewSpeed(EnchantmentScaling.finiteSpeed((64D+(double)raw*raw+1)*environment));}
+        }
         if(p.getMainHandItem().getItem() instanceof ArtifactItem item && item.kind==ArtifactKind.INTERREGNUM
                 && p.hasEffect(DOMINION.get()) && p.getMainHandItem().isCorrectToolForDrops(e.getState())
                 && e.getNewSpeed()>0 && (!(p instanceof ServerPlayer server) || DomainFields.contains(server,p.blockPosition())))
