@@ -54,7 +54,7 @@ public final class PickaxeGameTests {
         h.assertTrue(AbilityRuntime.activate(p, tool, new SpeedAbility()), "first activation");
         h.assertTrue(p.hasEffect(SpecialPickaxes.OVERDRIVE.get()), "synced effect installed");
         var speed = new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,
-            Blocks.STONE.defaultBlockState(), 8, java.util.Optional.of(p.blockPosition()));
+            Blocks.STONE.defaultBlockState(), 8, p.blockPosition());
         MinecraftForge.EVENT_BUS.post(speed);
         h.assertTrue(speed.getNewSpeed() == 80, "actual BreakSpeed multiplier is ten");
         h.assertTrue(!AbilityRuntime.activate(p, tool, new SpeedAbility()), "cooldown blocks replay");
