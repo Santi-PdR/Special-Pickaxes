@@ -32,6 +32,9 @@ import java.util.function.Consumer;
 public final class PickaxeGameTests {
     private static ServerPlayer player(GameTestHelper h, String id) {
         var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "PickaxeTest"));
+        // FakePlayer's default handler deliberately makes teleport a no-op. Exercise the real handler.
+        player.connection = new net.minecraft.server.network.ServerGamePacketListenerImpl(h.getLevel().getServer(),
+            new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND), player);
         player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         var pos = h.absolutePos(new BlockPos(5, 2, 5));
         player.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
@@ -50,6 +53,10 @@ public final class PickaxeGameTests {
         var p = player(h, "overdrive"); var tool = p.getMainHandItem();
         h.assertTrue(AbilityRuntime.activate(p, tool, new SpeedAbility()), "first activation");
         h.assertTrue(p.hasEffect(SpecialPickaxes.OVERDRIVE.get()), "synced effect installed");
+        var speed = new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,
+            Blocks.STONE.defaultBlockState(), 8, java.util.Optional.of(p.blockPosition()));
+        MinecraftForge.EVENT_BUS.post(speed);
+        h.assertTrue(speed.getNewSpeed() == 80, "actual BreakSpeed multiplier is ten");
         h.assertTrue(!AbilityRuntime.activate(p, tool, new SpeedAbility()), "cooldown blocks replay");
         h.assertTrue(tool.getDamageValue() == PickaxeConfig.TIMINGS.get("overdrive").cost().get(), "activation durability");
         h.succeed();

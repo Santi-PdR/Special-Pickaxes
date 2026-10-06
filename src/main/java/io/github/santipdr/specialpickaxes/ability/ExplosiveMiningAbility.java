@@ -17,7 +17,7 @@ public final class ExplosiveMiningAbility implements PickaxeAbility {
     public boolean active() { return true; }
     public boolean activate(ServerPlayer player, ItemStack tool) {
         if (!PickaxeConfig.BLAST_ENABLED.get()) return false;
-        HitResult hit = player.pick(Math.min(5, player.getBlockReach()), 0, false);
+        HitResult hit = player.pick(Math.min(5, player.getBlockReach()), 1.0F, false);
         if (!(hit instanceof BlockHitResult block) || hit.getType() != HitResult.Type.BLOCK) return false;
         BlockPos center = block.getBlockPos();
         float hardness = player.serverLevel().getBlockState(center).getDestroySpeed(player.serverLevel(), center);

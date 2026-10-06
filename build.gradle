@@ -28,4 +28,17 @@ dependencies {
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 test { useJUnitPlatform() }
-jar { finalizedBy 'reobfJar' }
+jar {
+    exclude 'io/github/santipdr/specialpickaxes/test/**'
+    exclude 'data/specialpickaxes/structures/empty.nbt'
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    finalizedBy 'reobfJar'
+}
+tasks.named('runGameTestServer').configure {
+    doFirst {
+        def properties = file('run/server.properties')
+        properties.parentFile.mkdirs()
+        if (!properties.exists()) properties.text = 'spawn-protection=0\n'
+    }
+}
