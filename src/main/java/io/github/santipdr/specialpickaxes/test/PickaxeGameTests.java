@@ -262,7 +262,8 @@ public final class PickaxeGameTests {
             h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"combined harvest tool: "+block);h.assertTrue(tool.getDestroySpeed(block.defaultBlockState())==64,"combined mining speed");
         }
         for(int level:new int[]{100,255,1000,100000}){
-            tool.enchant(Enchantments.BLOCK_EFFICIENCY,level);h.assertTrue(EnchantmentScaling.level(tool,Enchantments.BLOCK_EFFICIENCY)>0,"raw enchantment survives");
+            var levels=new net.minecraft.nbt.ListTag();var entry=new net.minecraft.nbt.CompoundTag();entry.putString("id","minecraft:efficiency");entry.putInt("lvl",level);levels.add(entry);tool.getOrCreateTag().put("Enchantments",levels);
+            h.assertTrue(EnchantmentScaling.level(tool,Enchantments.BLOCK_EFFICIENCY)==level,"raw enchantment survives exactly");
             h.assertTrue(EnchantmentScaling.budget(tool)<=ArtifactConfig.ENCHANT_BUDGET.get(),"bounded throughput");
         }
         tool.enchant(Enchantments.BLOCK_FORTUNE,1000);h.assertTrue(tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE)==1000,"Fortune 1000 not truncated to 255");finish(h,p);

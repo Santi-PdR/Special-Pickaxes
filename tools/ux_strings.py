@@ -1,4 +1,9 @@
 PAIRS={
+'ux.specialpickaxes.volumes':('SOURCE %s · TARGET %s','ORIGEN %s · DESTINO %s'),
+'message.specialpickaxes.volume_limit':('Volume %s exceeds configured limit %s.','El volumen %s supera el límite configurado %s.'),
+'message.specialpickaxes.overlap':('INVALID · Source and target overlap. No operation queued.','INVÁLIDO · Origen y destino se solapan. No se encola la operación.'),
+'message.specialpickaxes.incompatible':('Incompatible dimensions: %s -> %s. A 90° turn swaps width and depth.','Dimensiones incompatibles: %s -> %s. Un giro de 90° intercambia ancho y profundidad.'),
+'message.specialpickaxes.backpressure':('Queue full. Wait for another operation to finish.','Cola llena. Espera que termine otra operación.'),
 'ux.specialpickaxes.mode':('MODE: %s','MODO: %s'),
 'ux.specialpickaxes.controls':('Use: preview; use again at the same target: confirm. Sneak-use: mode / cancel.','Usar: previsualizar; repetir sobre el mismo objetivo: confirmar. Agachado + usar: modo / cancelar.'),
 'ux.specialpickaxes.region_controls':('Use: arm selection. Left click: corners. Sneak-left: mode/transform. Use: analyze; use at READY: execute.','Usar: activar selección. Clic izquierdo: esquinas. Agachado + izquierdo: modo/transformación. Usar: analizar; usar en LISTO: ejecutar.'),

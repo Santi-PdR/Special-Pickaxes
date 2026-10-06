@@ -29,6 +29,7 @@ public final class ArtifactItem extends PickaxeItem {
     }
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
     @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
+    @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
     @Override public boolean canPerformAction(ItemStack stack,net.minecraftforge.common.ToolAction action) { return ArtifactTools.action(action); }
     @Override public int getEnchantmentLevel(ItemStack stack,net.minecraft.world.item.enchantment.Enchantment e) {
         int raw=EnchantmentScaling.level(stack,e);
@@ -69,6 +70,8 @@ public final class ArtifactItem extends PickaxeItem {
         if(stack.hasTag()) {
             lines.add(Component.translatable("ux.specialpickaxes.history",stack.getTag().getInt("artifactMemory"),stack.getTag().getLong("artifactOldest"),stack.getTag().getLong("artifactLatest")));
             lines.add(Component.translatable("status.specialpickaxes."+stack.getTag().getString("artifactStatus")));
+            if(stack.getTag().contains("artifactSource"))lines.add(Component.translatable("ux.specialpickaxes.volumes",stack.getTag().getString("artifactSource"),stack.getTag().getString("artifactTarget")));
+            if(stack.getTag().contains("artifactTransform"))lines.add(Component.translatable("message.specialpickaxes.transform",Component.translatable("mode.specialpickaxes."+stack.getTag().getString("artifactTransform"))));
         }
     }
 }

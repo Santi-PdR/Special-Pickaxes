@@ -68,9 +68,12 @@ public final class ArtifactInteraction {
             if(s.points.size()!=corners(p,k)){ArtifactFeedback.message(p,"need_corners",s.points.size(),corners(p,k));ArtifactFeedback.cue(p,"error");return false;}
             try {
                 var a=new SelectionVolume(s.points.get(0),s.points.get(1));var b=s.points.size()==4?new SelectionVolume(s.points.get(2),s.points.get(3)):null;
+                if(a.size()>ArtifactConfig.REGION_LIMIT.get()){ArtifactFeedback.message(p,"volume_limit",a.size(),ArtifactConfig.REGION_LIMIT.get());ArtifactFeedback.cue(p,"error");return false;}
+                if(b!=null&&a.overlaps(b)){ArtifactFeedback.message(p,"overlap");ArtifactFeedback.cue(p,"error");return false;}
+                if(b!=null&&!SelectionVolume.Transform.values()[s.transform].compatible(a,b)){ArtifactFeedback.message(p,"incompatible",a.dimensions(),b.dimensions());ArtifactFeedback.cue(p,"error");return false;}
                 var material=p.getOffhandItem().getItem() instanceof BlockItem item?item.getBlock().defaultBlockState():Blocks.STONE.defaultBlockState();
                 var region=new RegionWork(a,b,SelectionVolume.Transform.values()[s.transform],k,ArtifactState.mode(p,k),material);
-                if(!WorkQueue.startRegion(p,tool,k,region))return false;
+                if(!WorkQueue.startRegion(p,tool,k,region)){ArtifactFeedback.message(p,"backpressure");return false;}
                 // Keep selection visible while analyzing/executing. No world edits until second confirmation after analysis.
                 ArtifactFeedback.cue(p,"confirm");return true;
             }catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"selection_invalid");ArtifactFeedback.cue(p,"error");return false;}
@@ -86,10 +89,12 @@ public final class ArtifactInteraction {
         String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?(s.points.size()==corners(p,k)?"ready":"selecting"):"idle";
         var tag=tool.getOrCreateTag();tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));
         tag.putString("artifactModeName",modeKey(k,ArtifactState.mode(p,k)));
+        tag.remove("artifactSource");tag.remove("artifactTarget");tag.remove("artifactTransform");
+        if(s!=null&&corners(p,k)==4){tag.putString("artifactTransform",modes(ArtifactKind.ATLAS)[s.transform]);if(k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR)tag.putInt("artifactMode",s.transform);}
         if(s!=null){
             for(var point:s.points)ArtifactFeedback.burst(p,k,point,2);
             if(s.points.size()>=2){var a=new SelectionVolume(s.points.get(0),s.points.get(1));ArtifactFeedback.box(p,k,a,false);tag.putString("artifactSource",a.dimensions());
-                if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}
+                if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);tag.putString("artifactTarget",b.dimensions());if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}
         }
         if(k==ArtifactKind.MERIDIAN){var a=ArtifactState.anchor(p,k,"a");var b=ArtifactState.anchor(p,k,"b");if(a.isPresent()){ArtifactFeedback.burst(p,k,a.get(),3);if(b.isPresent()){ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}}}
         var preview=PREVIEW.get(p.getUUID());if(preview!=null){if(preview.tool()!=tool||!preview.dimension().equals(ArtifactState.dimension(p))||preview.expires()<ArtifactState.now(p))PREVIEW.remove(p.getUUID());else ArtifactFeedback.ring(p,k,preview.pos(),ArtifactActions.radius(p,k));}
