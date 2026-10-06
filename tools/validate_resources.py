@@ -1,29 +1,32 @@
 #!/usr/bin/env python3
-import json, pathlib, struct, unittest
+import json,pathlib,struct,hashlib,unittest
 ROOT=pathlib.Path('src/main/resources')
-IDS='overdrive excavator vein_miner inferno magnetic scanner storm void ender explosive'.split()
+IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas'.split()
 class Resources(unittest.TestCase):
- def test_all_json(self):
-  for p in ROOT.rglob('*.json'):json.loads(p.read_text())
- def test_models_textures_recipes_localization(self):
-  for name in IDS:
-   model=json.loads((ROOT/f'assets/specialpickaxes/models/item/{name}.json').read_text())
-   namespace,path=model['textures']['layer0'].split(':')
-   texture=(ROOT/f'assets/{namespace}/textures/{path}.png').read_bytes()
-   self.assertEqual(texture[:8],b'\x89PNG\r\n\x1a\n')
-   self.assertEqual(struct.unpack('>II',texture[16:24]),(16,16))
-   recipe=json.loads((ROOT/f'data/specialpickaxes/recipes/{name}.json').read_text())
-   self.assertEqual(recipe['result']['item'],'specialpickaxes:'+name)
-   self.assertEqual(set(''.join(recipe['pattern']))-{' '},set(recipe['key']))
-   for lang in ['en_us','es_es']:
-    data=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())
-    self.assertIn('item.specialpickaxes.'+name,data)
-    self.assertIn('tooltip.specialpickaxes.'+name,data)
- def test_languages_match(self):
+ def test_json(self):
+  for pattern in ['*.json','*.mcmeta']:
+   for p in ROOT.rglob(pattern):json.loads(p.read_text())
+ def test_models_unique_animated_textures(self):
+  hashes=set()
+  for id in IDS:
+   model=json.loads((ROOT/f'assets/specialpickaxes/models/item/{id}.json').read_text())
+   ns,path=model['textures']['layer0'].split(':');p=ROOT/f'assets/{ns}/textures/{path}.png';b=p.read_bytes()
+   self.assertEqual(b[:8],b'\x89PNG\r\n\x1a\n');self.assertEqual(struct.unpack('>II',b[16:24]),(64,256))
+   self.assertEqual(json.loads(p.with_suffix('.png.mcmeta').read_text())['animation']['frametime'],6)
+   hashes.add(hashlib.sha256(b).hexdigest())
+  self.assertEqual(len(hashes),10)
+ def test_languages(self):
   langs=[json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text()) for lang in ['en_us','es_es']]
   self.assertEqual(set(langs[0]),set(langs[1]))
- def test_loot_modifier(self):
-  data=json.loads((ROOT/'data/forge/loot_modifiers/global_loot_modifiers.json').read_text())
-  self.assertFalse(data['replace'])
-  self.assertEqual(data['entries'],['specialpickaxes:auto_smelt'])
+  for data in langs:
+   for id in IDS:
+    for key in ['item.specialpickaxes.','tooltip.specialpickaxes.','tooltip.specialpickaxes.secondary.']:self.assertIn(key+id,data)
+ def test_no_recipes_ores_worldgen(self):
+  self.assertFalse(list((ROOT/'data/specialpickaxes/recipes').glob('*.json')))
+  self.assertFalse(list((ROOT/'data/specialpickaxes/advancements/recipes').glob('*.json')))
+  self.assertFalse(list(ROOT.glob('data/*/worldgen/**/*.json')))
+  self.assertFalse(list(ROOT.glob('assets/specialpickaxes/blockstates/*.json')))
+ def test_pickaxe_tag(self):
+  tag=json.loads((ROOT/'data/minecraft/tags/items/pickaxes.json').read_text())
+  self.assertFalse(tag['replace']);self.assertEqual(set(tag['values']),{'specialpickaxes:'+id for id in IDS})
 if __name__=='__main__':unittest.main()

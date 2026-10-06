@@ -3,10 +3,10 @@ loaderVersion="[47,)"
 license="All Rights Reserved"
 [[mods]]
 modId="specialpickaxes"
-version="1.0.0"
+version="2.0.0"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
-description='''Ten specialised pickaxes. Composable abilities, bounded mining and server-authoritative activation.'''
+description='''Ten Siege endgame artifacts. Memory, kinetic domains and protected matter manipulation. No recipes or world generation.'''
 [[dependencies.specialpickaxes]]
 modId="forge"
 mandatory=true
