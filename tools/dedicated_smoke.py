@@ -4,7 +4,7 @@ import pathlib, subprocess, shutil, time, threading, queue, urllib.request, sys
 root=pathlib.Path.cwd(); server=root/'build/packaged-smoke'; server.mkdir(parents=True,exist_ok=True)
 installer=server/'forge-installer.jar'
 if not installer.exists():
- urllib.request.urlretrieve('https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.3.0/forge-1.20.1-47.3.0-installer.jar',installer)
+ subprocess.run(['curl','--fail','--location','--retry','3','https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.3.0/forge-1.20.1-47.3.0-installer.jar','--output',str(installer)],check=True)
 subprocess.run(['java','-jar',str(installer),'--installServer'],cwd=server,check=True)
 (server/'eula.txt').write_text('eula=true\n')
 (server/'server.properties').write_text('online-mode=false\nserver-port=25575\nlevel-name=smoke-world\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nmax-tick-time=60000\n')

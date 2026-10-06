@@ -22,7 +22,9 @@ jobs:
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
-      - run: python3 tools/dedicated_smoke.py
+      - run: |
+          set -o pipefail
+          python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log
       - run: python3 tools/validate_runtime_logs.py run/logs/latest.log build/packaged-smoke/console.log
       - if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         run: python3 tools/ci_evidence.py
