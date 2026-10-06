@@ -1129,8 +1129,8 @@ METHOD lambda$createShockwave$0 (Lnet/minecraft/world/level/Level;Lnet/minecraft
   0037 op=14 0.5
   003b op=b7 net/minecraft/world/phys/Vec3 <init> (DDD)V
   003e op=b2 net/minecraft/world/phys/Vec2 f_82462_ Lnet/minecraft/world/phys/Vec2;
-  0044 op=13 
-  0047 op=13 
+  0044 op=13
+  0047 op=13
   004a op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
   004f op=b6 net/minecraft/server/level/ServerLevel m_7654_ ()Lnet/minecraft/server/MinecraftServer;
   0053 op=b7 net/minecraft/commands/CommandSourceStack <init> (Lnet/minecraft/commands/CommandSource;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec2;Lnet/minecraft/server/level/ServerLevel;ILjava/lang/String;Lnet/minecraft/network/chat/Component;Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/entity/Entity;)V
@@ -1172,8 +1172,8 @@ METHOD lambda$createShockwave$0 (Lnet/minecraft/world/level/Level;Lnet/minecraft
   0106 op=14 0.5
   010a op=b7 net/minecraft/world/phys/Vec3 <init> (DDD)V
   010d op=b2 net/minecraft/world/phys/Vec2 f_82462_ Lnet/minecraft/world/phys/Vec2;
-  0113 op=13 
-  0116 op=13 
+  0113 op=13
+  0116 op=13
   0119 op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
   011e op=b6 net/minecraft/server/level/ServerLevel m_7654_ ()Lnet/minecraft/server/MinecraftServer;
   0122 op=b7 net/minecraft/commands/CommandSourceStack <init> (Lnet/minecraft/commands/CommandSource;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec2;Lnet/minecraft/server/level/ServerLevel;ILjava/lang/String;Lnet/minecraft/network/chat/Component;Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/entity/Entity;)V
@@ -1199,8 +1199,8 @@ METHOD lambda$createShockwave$0 (Lnet/minecraft/world/level/Level;Lnet/minecraft
   018c op=14 0.5
   0190 op=b7 net/minecraft/world/phys/Vec3 <init> (DDD)V
   0193 op=b2 net/minecraft/world/phys/Vec2 f_82462_ Lnet/minecraft/world/phys/Vec2;
-  0199 op=13 
-  019c op=13 
+  0199 op=13
+  019c op=13
   019f op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
   01a4 op=b6 net/minecraft/server/level/ServerLevel m_7654_ ()Lnet/minecraft/server/MinecraftServer;
   01a8 op=b7 net/minecraft/commands/CommandSourceStack <init> (Lnet/minecraft/commands/CommandSource;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec2;Lnet/minecraft/server/level/ServerLevel;ILjava/lang/String;Lnet/minecraft/network/chat/Component;Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/entity/Entity;)V
@@ -3817,7 +3817,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/BackpackaxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -3907,7 +3907,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/Item m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/CommandRemoteSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -3988,7 +3988,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/ElytraPickaxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -4116,7 +4116,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/EnderPickaxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -4191,7 +4191,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/InfernoReaverPickaxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -4251,7 +4251,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/PickitooxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -4354,7 +4354,7 @@ METHOD m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/L
   0006 op=b7 net/minecraft/world/item/PickaxeItem m_7373_ (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
   000a op=b6 net/minecraft/world/item/ItemStack m_41609_ ()Lnet/minecraft/world/entity/Entity;
   000f op=b8 com/marvvinekk/picksofpower/procedures/SeismicPickaxeSpecialInformationProcedure execute ()Ljava/lang/String;
-  001b op=12 
+  001b op=12
 
   001d op=b6 java/lang/String split (Ljava/lang/String;)[Ljava/lang/String;
   003b op=b8 net/minecraft/network/chat/Component m_237113_ (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
@@ -5198,15 +5198,15 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§3Right-Click §rto open the Backpackaxe.
 
-§6§l*§rUse the §5§lAuto-Pickup §rmode to §5automatically 
+§6§l*§rUse the §5§lAuto-Pickup §rmode to §5automatically
 add block drops right §rinto the bag!
 
-§6§l*§r§4Be careful! §rDropping the Backpackaxe 
+§6§l*§r§4Be careful! §rDropping the Backpackaxe
 causes its whole storage content to §cspill out§r!
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/BackpackaxeStorageThisGUIIsClosedProcedure.class
@@ -6375,7 +6375,7 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§*§5Sneak §r+ §3Right-Click §rto choose
 Pickito-o's §dmining §rdistance
 
@@ -6383,7 +6383,7 @@ Pickito-o's §dmining §rdistance
 you want Pickito-o to §astart digging §rinto!
 
 §6§l*§3Right-Click §rin §7air §rto §6command §rPickito-o §6back §rto you.
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/DismountElytraPickaxeOnKeyPressedProcedure.class
@@ -7007,7 +7007,7 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§2Passively §rreduces your §cFall Damage §rby 75% while in hand.
 
 §6§l*§5Sneak §r+ §3Right-Click §rto have the Divine Elytra §bcarry you through the skies§r!
@@ -7016,7 +7016,7 @@ METHOD execute ()Ljava/lang/String;
 §6§l*§3Right-Click §rto fire a destructive §eDivine Laser Beam§r!
 §8Cost: §a10 §8durability
 §8Cooldown: §b10 §8seconds
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/ElytraPickaxeToolInInventoryTickProcedure.class
@@ -7650,7 +7650,7 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§2Passively §d§lquadruples §ryour block reach.
 
 §6§l*§rTransfers mined blocks directly to your §7§linventory§r,
@@ -7661,7 +7661,7 @@ from as far as you can reach!
 up to 18 blocks away!
 §8Cost: §a0.4% §8of max. durability
 §8Cooldown: §b4 §8seconds
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/EnderPickaxeTeleportItemsProcedure$1.class
@@ -8460,7 +8460,7 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§2Passively §r§4§lscortches §ryour hands
 when held for too long. Seek §6fire resistance §ror §9water§r...
 
@@ -8473,7 +8473,7 @@ when held for too long. Seek §6fire resistance §ror §9water§r...
 §6§l*§3Right-Click §rto §6§lf§c§li§6§lr§c§le§r the charge!
 §8Cost: §a25 §8durability
 §8Cooldown: §b2 §8seconds
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/InfernoReaverPickaxeToolInInventoryTickProcedure.class
@@ -9085,7 +9085,7 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§rBy §2default §ra high-end pickaxe.
 
 §6§l*§3Right-Click §ron a §eblock §rto summon §5Pickito-o§r!
@@ -9097,7 +9097,7 @@ that can §cfight §rmobs back, §dmine §rtunnels, and §6follow you §reverywh
 but §6always comes back §rto your inventory at §41 HP§r.
 
 §6§l*§3Right-Click §ron §5Pickito-o §rto command it back to your inventory!
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/PyromagmicBoltProjectileHitsBlockProcedure.class
@@ -9550,16 +9550,16 @@ METHOD <init> ()V
 METHOD execute ()Ljava/lang/String;
   bytecode b800139900061215b01217b0
   0000 op=b8 net/minecraft/client/gui/screens/Screen m_96638_ ()Z
-  0006 op=12 
+  0006 op=12
 §6§l*§2Passively §rslows you down when held.
 
 §6§l*§rCan mine §e§l3x3x1 §rwhile §5sneaking§r.
 §8Cost: §a5 §8durability/per block
 
-§6§l*§3Right-Click §rto send a wave of §4Deadly §6Seismic Ruptures§r! 
+§6§l*§3Right-Click §rto send a wave of §4Deadly §6Seismic Ruptures§r!
 §8Cost: §a0.5% §8of max. durability
 §8Cooldown: §b15 §8seconds
-  0009 op=12 
+  0009 op=12
 §7§o[Hold §e§oSHIFT §7§ofor more details]
 
 ## com/marvvinekk/picksofpower/procedures/SeismicPickaxeToolInHandTickProcedure.class
@@ -9583,7 +9583,7 @@ METHOD <init> ()V
   0001 op=b7 java/lang/Object <init> ()V
 METHOD execute (Lnet/minecraft/world/entity/Entity;)Ljava/lang/String;
   bytecode 2ac700061219b02ab2001d01b60023bb000759b70024b6002ac00007b4002e14002f979a002dbb0032591234b700372ab2001d01b60023bb000759b70024b6002ac00007b4002eb6003bba00470000b02ab2001d01b60023bb000759b70024b6002ac00007b4002e0f989c002fbb0032591234b700372ab2001d01b60023bb000759b70024b6002ac00007b4002eb6003bba004a0000a7002cbb0032591234b700372ab2001d01b60023bb000759b70024b6002ac00007b4002eb6003bba004d0000b0
-  0004 op=12 
+  0004 op=12
   0008 op=b2 com/marvvinekk/picksofpower/network/PicksOfPowerModVariables PLAYER_VARIABLES_CAPABILITY Lnet/minecraftforge/common/capabilities/Capability;
   000c op=b6 net/minecraft/world/entity/Entity getCapability (Lnet/minecraftforge/common/capabilities/Capability;Lnet/minecraft/core/Direction;)Lnet/minecraftforge/common/util/LazyOptional;
   000f op=bb com/marvvinekk/picksofpower/network/PicksOfPowerModVariables$PlayerVariables

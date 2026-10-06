@@ -30,10 +30,10 @@ fuentes ni recursos del JAR).
 | Validación de recursos | 4 comprobaciones, OK |
 | `git diff --check` | OK |
 
-**Archivo:** `special-pickaxes-1.20.1-1.0.0.jar`  
-**Tamaño:** 70,177 bytes (68,53 KiB)  
-**Ubicación en el workspace:** `artifacts/special-pickaxes-1.20.1-1.0.0.jar`  
-**Salida original del build:** `build/libs/special-pickaxes-1.20.1-1.0.0.jar`  
+**Archivo:** `special-pickaxes-1.20.1-1.0.0.jar`
+**Tamaño:** 70,177 bytes (68,53 KiB)
+**Ubicación en el workspace:** `artifacts/special-pickaxes-1.20.1-1.0.0.jar`
+**Salida original del build:** `build/libs/special-pickaxes-1.20.1-1.0.0.jar`
 **SHA-256:** `7e89e5fd5a43082e92300e752338c061a988aa0cb193f91a0fb139203d23104d`
 
 La copia descargable en `artifacts/` está excluida de Git; se conserva en el

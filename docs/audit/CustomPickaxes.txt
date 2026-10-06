@@ -606,7 +606,7 @@ METHOD use (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/
   0032 op=bb net/minecraft/core/BlockPos$MutableBlockPos
   0036 op=b7 net/minecraft/core/BlockPos$MutableBlockPos <init> ()V
   003e op=14 1.7976931348623157e+308
-  0043 op=12 
+  0043 op=12
   0054 op=b6 net/minecraft/core/BlockPos getX ()I
   005b op=b6 net/minecraft/core/BlockPos getY ()I
   0062 op=b6 net/minecraft/core/BlockPos getZ ()I
@@ -1313,7 +1313,7 @@ description="Minecraft 1.20.1 Forge kazma modu 5 ozel kazma ve 5 yeni maden ekle
 ## assets/custompickaxes/lang/en_us.json
 {
   "creativetab.custompickaxes": "Custom Pickaxes & Ores",
-  
+
   "item.custompickaxes.volcanite_pickaxe": "Volcanite Pickaxe",
   "item.custompickaxes.stormstone_pickaxe": "Stormstone Pickaxe",
   "item.custompickaxes.echo_pickaxe": "Echo Pickaxe",
@@ -1363,7 +1363,7 @@ description="Minecraft 1.20.1 Forge kazma modu 5 ozel kazma ve 5 yeni maden ekle
 ## assets/custompickaxes/lang/tr_tr.json
 {
   "creativetab.custompickaxes": "Ozel Kazmalar ve Madenler",
-  
+
   "item.custompickaxes.volcanite_pickaxe": "Volkanit Kazmasi",
   "item.custompickaxes.stormstone_pickaxe": "Firtinatasi Kazmasi",
   "item.custompickaxes.echo_pickaxe": "Yanki Kazmasi",

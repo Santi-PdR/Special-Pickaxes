@@ -59,4 +59,4 @@ for path in sorted(pathlib.Path('referencias').glob('*/*.jar')):
   if name.endswith('.class'): out += ['\n## '+name,inspect(z.read(name))]
   elif name.endswith(('.json','.toml')): out+=['\n## '+name,z.read(name).decode('utf8','replace')]
  out+=['\n## All entries','\n'.join(z.namelist())]
- pathlib.Path('docs/audit/'+path.parent.name+'.txt').write_text('\n'.join(out))
+ pathlib.Path('docs/audit/'+path.parent.name+'.txt').write_text('\n'.join(line.rstrip() for line in '\n'.join(out).splitlines()).rstrip()+'\n')
