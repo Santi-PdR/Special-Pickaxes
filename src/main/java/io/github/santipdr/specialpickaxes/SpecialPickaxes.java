@@ -99,6 +99,8 @@ public final class SpecialPickaxes {
             ;
     }
     private void missing(MissingMappingsEvent e) {
+        for(var mapping:e.getMappings(ForgeRegistries.Keys.MOB_EFFECTS,ID))
+            if(mapping.getKey().getPath().equals("overdrive")) mapping.remap(DOMINION.get());
         String[] old={"overdrive","excavator","vein_miner","inferno","magnetic","scanner","storm","void","ender","explosive"};
         ArtifactKind[] kinds={ArtifactKind.ICARUS,ArtifactKind.WORLDLOOM,ArtifactKind.CHOIR,ArtifactKind.CRUCIBLE,
             ArtifactKind.EVENTIDE,ArtifactKind.AXIOM,ArtifactKind.INTERREGNUM,ArtifactKind.PALIMPSEST,ArtifactKind.MERIDIAN,ArtifactKind.ATLAS};

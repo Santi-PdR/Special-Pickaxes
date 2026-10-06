@@ -55,7 +55,12 @@ public final class ArtifactState {
         return List.copyOf(result);
     }
     public static void anchor(ServerPlayer p,ArtifactKind kind,String key,BlockPos pos) {
-        var data=of(p,kind);data.putLong(key,pos.asLong());data.putString("dimension",dimension(p));data.putLong("anchorTime",now(p));
+        var data=of(p,kind);
+        if(!data.getString("dimension").equals(dimension(p)) || now(p)-data.getLong("anchorTime")>ArtifactConfig.MEMORY_TTL.get()) {
+            data.remove("a");data.remove("b");
+        }
+        if(key.equals("a")) data.remove("b");
+        data.putLong(key,pos.asLong());data.putString("dimension",dimension(p));data.putLong("anchorTime",now(p));
     }
     public static Optional<BlockPos> anchor(ServerPlayer p,ArtifactKind kind,String key) {
         var data=of(p,kind);

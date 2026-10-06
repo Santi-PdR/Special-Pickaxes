@@ -1,116 +1,129 @@
-# Special Pickaxes — Forge 1.20.1
+# Special Pickaxes: Siege Artifacts 2.0
 
-Java 17 • Forge 47.3.0+ (47.x) • mod id `specialpickaxes` • sin dependencias de otros mods.
+**Minecraft 1.20.1 · Forge 47.3.0+ · Java 17 · no mandatory third-party APIs.**
 
-**Estado de entrega y resultados reales:** ver [VALIDACION.md](docs/VALIDACION.md).
-No confundir fuentes o tests escritos con un binario certificado.
+Ten endgame artifacts for **Eternal Craft — Siege**, not ten resized vanilla tools.
+No crafting recipes, ores, worldgen, random affix system, item magnet or XRay.
+The four reference JARs are preserved and are **not** bundled or dependencies.
 
-## Compilar y probar
+## The artifacts
+
+| ID | Name | Primary / secondary |
+|---|---|---|
+| `palimpsest` | Palimpsesto del Último Alba | Restore personal mining scars with paid materials / erase history |
+| `fault_choir` | Coro de las Fallas | Translate and replay a mining stencil / rotate it |
+| `eventide` | La Noche que Pesa | Geological shell collapse plus hostile trajectory field / reverse polarity |
+| `meridian` | Meridiano de Dos Mundos | Link two same-dimension anchors; mining at A echoes at B / unlink |
+| `paradox_crucible` | Crisol de la Paradoja | Rephase inert geology 1:1 / cycle rock family |
+| `interregnum` | Corona del Interregno | Mining-fed kinetic stasis with local mining rules / release momentum |
+| `worldloom` | Bastidor de la Primera Muralla | Weave a paid structural shelter or bridge / switch shape |
+| `icarus` | Lágrima de Ícaro | Ride an excavated, collision-validated kinetic bore / reverse direction |
+| `hollow_axiom` | El Axioma Hueco | Remove geological matrix, preserve ore and machinery / toggle structural ribs |
+| `bifold_atlas` | Atlas de las Dos Orillas | Mark two regions and permute their geology in atomic pairs / clear anchor |
+
+Complete appearance, mechanics, inspiration, controls, costs and Siege-overlap
+rationale: [design contract](docs/siege/DESIGNS.md).
+[Four-reference audit and overlap decisions](docs/siege/AUDIT.md).
+
+## Acquisition and controls
+
+Install **only** `special-pickaxes-1.20.1-2.0.0.jar` in client/server `mods/`.
+Admin permission level 2:
+
+```mcfunction
+/specialpickaxes grant PlayerName palimpsest
+/give @s specialpickaxes:palimpsest
+```
+
+All ten also appear in **Siege — Artifacts**. No special currency or new resource
+is required; hook these IDs into Siege's administrative/reward system.
+
+- Mainhand **Use** (default right click): primary; vanilla key can be rebound.
+- **Sneak + Use**: secondary. If a queued job is active, cancels that job first.
+- **Switch tools**: immediately stops further queued edits on the next scheduler tick.
+- Worldloom: hold plain stone/deepslate/etc. in offhand. Payment can come from any
+  matching inventory slot. It does not consume named/NBT-bearing materials.
+- Meridian/Atlas: aim at first anchor and use, then at second after cooldown.
+  Anchors require the same dimension and loaded chunks, within the player's tether.
+- Palimpsest/Choir record successful **manual** mining of curated inert geology;
+  scheduled work does not recursively record/replay itself. No ore-copy exploit.
+- Charge builds from manual mining; it amplifies volumes, not a grind prerequisite.
+  Artifact HUD, glint, animated textures, sounds, colored rings and work counts
+  show state. The HUD contains server-origin display data, not authority.
+
+All artifacts use a registered tier above netherite: 32,768 durability, speed 64,
+40 enchantability, fire resistance and epic rarity. Forge tier ordering uses its
+own **empty requirement tag**, not a redefinition of vanilla harvest restrictions.
+Normal mining still consumes durability and follows Fortune, Silk Touch and
+Unbreaking. Activation costs 4 durability by default, with a 40-tick cooldown.
+Those are configurable operational pacing, not vanilla power restrictions.
+
+## Safe operation and integration
+
+Default configuration: `<world>/serverconfig/specialpickaxes-server.toml`.
+Default work limits: 24 candidates/player/tick, 192 globally, 4096 steps/job,
+64-block tether, 120-second timeout, 256 memory records, 24 entities/domain.
+Failures consume scheduling budget too. One active job and one field per owner.
+
+- Every mining step rechecks block state, tool, dimension, loaded chunk, border,
+  player restrictions and protection, then uses `ServerPlayerGameMode.destroyBlock`.
+- Forge 47 calls item mining before block removal: an end-of-tick observation
+  confirms the resulting hole before recording memory or triggering entanglement.
+- Restoration and building cannot overwrite occupied cells and require real
+  inventory payment. Canceled placement or invalidated payment rolls back.
+- Rephasing/exchange only handles a closed list of inert vanilla default block
+  states. Never ores, block entities, fluids, falling blocks, machinery or security
+  blocks. Break/place hooks are honored. No loot/XP emitted by matter permutation.
+- Atlas exchanges are atomic **per pair**, not a transactional undo of a whole region.
+- Memories/anchors/cooldowns persist per player, carry dimension/age limits and
+  are not arbitrary inventory or block-entity NBT. Death keeps cooldowns but clears
+  spatial state. Queues/fields deliberately do not persist across server restart.
+- Stasis never alters AI/NBT flags, players or dropped items. It holds hostile
+  positions/velocities and suppresses attacks from captured entities while active;
+  release restores bounded momentum. It does not globally stop world time.
+- Icarus advances only after a full-body swept path is clear; an obstructed movement
+  step stops the remaining bore. No noclip or wall teleport.
+- `AbilityUseEvent` remains a cancelable integration point for territory policy,
+  including entity-domain effects. Per-block Forge BreakEvent/EntityPlaceEvent
+  handles normal claims. Real SecurityCraft/claims/modpack combinations still
+  require integration testing; no universal compatibility claim is made.
+
+Vanilla animated sprite extrusion produces ten distinct silhouettes (64px,
+4 frames each), with client-only HUD and vanilla particles/sounds. No GeckoLib,
+Photon, Visuality or Player Animator dependency is necessary. Old 1.0 item IDs
+are remapped on world load instead of registering twenty items.
+
+## Build, tests and exact provenance
 
 ```sh
 ./gradlew build
 ./gradlew test
 ./gradlew runGameTestServer
 python3 tools/validate_resources.py
+python3 tools/verify_release.py
+python3 tools/dedicated_smoke.py
 git diff --check
 ```
 
-JAR esperado: `build/libs/special-pickaxes-1.20.1-1.0.0.jar` (reobfuscado por ForgeGradle).
-Para desarrollo: `./gradlew runClient` / `./gradlew runServer` (aceptar EULA si procede).
-El workflow `Forge verification` ejecuta build, unit tests, GameTests y publica
-JAR/reportes/logs como artefacto `forge-validation`. No requiere secretos.
+No `package.json`: `npm run check` is not applicable.
 
-Instalación final: colocar **solo el JAR de este proyecto** en `mods/` del cliente
-y servidor Forge. Los JAR de `referencias/` no son dependencias ni se empaquetan.
+CI `Forge verification` installs Java 17, builds/reobfuscates, tests, verifies the
+JAR, boots it in a clean dedicated server, and runs a real graphical Forge client
+under Xvfb. The client uses a disposable world copy with a gallery of all ten
+artifacts; this is **CI-only data**, not mod world generation. The graphical smoke
+records a screenshot and resource-load log, then terminates its disposable process.
 
-## Uso y progresión
+The downloadable `forge-validation` artifact includes the JAR, test reports,
+server/client logs, gallery screenshot, **SHA256SUMS** and **RELEASE.json**.
+The manifest's **Build-Commit** and RELEASE.json's commit must equal the run's
+checkout SHA. Read the run result: an artifact from a failed run is diagnostic,
+not automatically a release. Source GameTests and fixture structures are excluded
+from the release JAR.
 
-Todos aparecen en la pestaña **Picos especiales**. `/give @s specialpickaxes:overdrive`
-(y el ID correspondiente) permite obtenerlos. Recetas desbloqueadas al obtener
-el ingrediente central, con patrón `MMM / ␣C␣ / ␣S␣`: material M, catalizador C,
-palo S. No se añaden minerales al mundo.
+The editing environment may lack Java / block external downloads. In that case
+CI is the execution authority, not an unexecuted local command. Checks API evidence
+is a bounded fallback for downloading the same products when the artifact CDN is
+blocked. It exports only explicitly listed build outputs, not secrets/world data.
 
-| ID | Material / catalizador | Función por defecto |
-|---|---|---|
-| `overdrive` | Diamante / bloque de redstone | Usar: 10× durante 5 s; cooldown 30 s; coste 8 |
-| `excavator` | Diamante / bloque de hierro | Minar: plano 3×3, cooldown 0,5 s; desgaste por bloque |
-| `vein_miner` | Diamante / esmeralda | Minar: hasta 32 minerales del mismo tipo, radio 8, cooldown 2 s |
-| `inferno` | Hierro / polvo de blaze | Pasivo: funde loot mediante recetas; Silk Touch desactiva fundición |
-| `magnetic` | Hierro / redstone | Pasivo en mano: atrae drops visibles en radio 5; no recoge directamente |
-| `scanner` | Hierro / amatista | Usar: radio 8, hasta 16 señales y mineral más cercano; cooldown 10 s; coste 2 |
-| `storm` | Diamante / pararrayos | Usar: hasta 3 monstruos visibles, radio 6, daño 6 + lentitud 2 s; cooldown 8 s; coste 8 |
-| `void` | Netherita / estrella del Nether | Usar: ancla 30 s, retorno dentro de 24 bloques; coste 12 por uso; armado 1 s, retorno 15 s |
-| `ender` | Diamante / perla de Ender | Usar: salto de hasta 8 bloques; cooldown 5 s; coste 4 |
-| `explosive` | Diamante / TNT | Usar sobre bloque: esfera conectada radio 2, máximo 24; cooldown 10 s; coste 8 + desgaste por bloque |
-
-**Usar** es la tecla vanilla configurable (clic derecho por defecto), no una tecla
-fija adicional. Solo mano principal. Agacharse desactiva minería adicional e imán;
-agacharse + usar Void elimina el ancla. El cooldown se muestra mediante el overlay
-vanilla del item; Overdrive tiene icono/partículas de efecto. Tooltips EN/ES.
-
-Durabilidad, velocidad base, harvest, daño base y encantabilidad proceden del tier
-vanilla indicado: los picos de utilidad de hierro no minan obsidiana. No hay
-"todos netherita" ni minería de bedrock. Fortune y Unbreaking siguen vanilla.
-Auto-smelt no concede XP adicional de horno (solo XP normal del bloque).
-
-## Configuración
-
-`<mundo>/serverconfig/specialpickaxes-server.toml`, sincronizada por Forge.
-Para valores por defecto de mundos nuevos: `defaultconfigs/`.
-Cooldown, duración y coste por habilidad en ticks; radios, límite de resultados,
-velocidad/objetos por tick del imán, objetivos/daño/lentitud Storm, límites de
-explosión, multiplicador Overdrive y relación máxima de dureza son configurables.
-Los rangos de config tienen topes de seguridad. Un cooldown de cero lo desactiva;
-una duración de Overdrive cero desactiva su activación.
-
-## Arquitectura e integración
-
-- `PickaxeDefinition` + `SpecialPickaxeItem`: un único item por composición de
-  `PickaxeAbility`; añadir combinaciones no requiere copiar clases de pico.
-- `AbilityRuntime`: permisos, evento cancelable, persistencia de cooldown por
-  jugador, coste y feedback. Reemplazar el item/reconectar no elimina el cooldown.
-- `MiningSafety`: una sola ruta de `ServerPlayerGameMode.destroyBlock` por bloque;
-  Forge BreakEvent, restricciones de jugador, loot tables, XP, daño y hooks vanilla.
-  Excluye inventarios/block entities, fluidos, bloques inadecuados/no cosechables,
-  chunks descargados, límites de mundo y bloques demasiado duros.
-- `BoundedTraversal`: BFS iterativa con deduplicación, tope de resultados y tope
-  independiente de exploración. Un bloque denegado es una barrera de recorrido.
-- `SmeltingLootModifier`: transforma cada drop real con RecipeManager; cantidades
-  Fortune ya decididas, respeta Silk Touch y recetas de otros mods. No busca ni
-  modifica ItemEntity ajenas. Otros loot modifiers posteriores pueden transformar
-  a su vez el resultado; no se promete un orden universal entre mods.
-- `SafeTeleport`: barrido del AABB completo, sin chunks nuevos ni paredes/fluidos;
-  valida destino, frontera, altura, dimensión/rango de ancla. No resetea caída.
-- Lógica de mundo solo en servidor. Activación mediante paquetes vanilla de uso;
-  efectos, cooldowns, movimiento, partículas y mensajes usan sincronización vanilla.
-  No hay clases cliente cargadas desde el servidor ni un protocolo propio innecesario.
-
-**Claims:** la minería honra cancelaciones del evento Forge de rotura para cada
-bloque, incluida la raíz de Explosive. Para impedir escaneo, movimiento, imán o
-Storm por zonas, las integraciones pueden cancelar `AbilityUseEvent` por jugador,
-habilidad y posición; las habilidades también respetan `Level.mayInteract`.
-Esto no equivale a afirmar compatibilidad probada con cada mod de claims: se
-requiere probar las integraciones concretas. Storm usa daño atribuido al jugador
-(hooks normales), solo monstruos, nunca rayos reales ni daño a otros jugadores.
-
-Texturas pixel art e icono originales generados por `tools/generate_assets.py`;
-modelos vanilla handheld, partículas y sonidos vanilla referenciados por registros.
-No hay archivos de sonido falsos ni dependencias de assets externos.
-
-## Referencias y auditoría
-
-[Auditoría y decisiones](docs/AUDITORIA.md), bytecode resuelto y recursos en
-`docs/audit/`. `tools/audit_jars.py` reproduce los informes. Los JAR originales se
-conservan intactos. Se han adaptado conceptos, no redistribuido sus clases dentro
-del mod. La autorización para inspeccionar/adaptar los JAR procede del propietario.
-
-## Limitaciones conocidas
-
-- No se afirma prueba visual de cliente ni certificación con mods de claims externos
-  sin sus correspondientes sesiones de juego.
-- Scanner usa tags `forge:ores`: minerales no etiquetados requieren datapack.
-- Vein Miner solo conecta seis caras, no diagonales; es deliberado.
-- Void no es un teletransporte interdimensional ni atraviesa muros; el retorno
-  puede fallar si se cierra el camino. Al morir se descarta el ancla.
-- Las operaciones masivas tienen límite por activación, pero muchos jugadores
-  simultáneos requieren evaluación de carga en el servidor real.
+[Validation scope and reproduction](docs/VALIDACION.md). The retained 1.0 logs
+are historical evidence and do not certify the 2.0 artifact implementation.

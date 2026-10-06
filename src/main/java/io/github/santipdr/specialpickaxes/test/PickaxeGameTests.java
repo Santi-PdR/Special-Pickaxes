@@ -229,4 +229,23 @@ public final class PickaxeGameTests {
         finish(h,p);
     }
 
+    @GameTest(template="empty") public static void anchorsDoNotCrossDimensions(GameTestHelper h) {
+        var p=player(h,ArtifactKind.MERIDIAN);var a=target(h);
+        ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b",a.offset(2,0,0));
+        ArtifactState.of(p,ArtifactKind.MERIDIAN).putString("dimension","minecraft:the_nether");
+        h.assertTrue(ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a").isEmpty(),"foreign anchor rejected");
+        ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);
+        h.assertTrue(ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b").isEmpty(),"new dimension cannot inherit old second anchor");finish(h,p);
+    }
+    @GameTest(template="empty") public static void dominionSpeedIsLocal(GameTestHelper h) {
+        var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
+        DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,4);
+        p.setPos(center.getX()+0.5,center.getY(),center.getZ()-2);DomainFields.tick();
+        var speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,Blocks.STONE.defaultBlockState(),64,center);
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(speed.getNewSpeed()==512,"domain grants actual eightfold speed");
+        p.setPos(center.getX()+12,center.getY(),center.getZ());
+        speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,Blocks.STONE.defaultBlockState(),64,center);
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(speed.getNewSpeed()==64,"no speed outside domain");finish(h,p);
+    }
+
 }
