@@ -12,7 +12,7 @@ exact release commit**, with matching `META-INF/MANIFEST.MF` Build-Commit and
   paid Palimpsest reconstruction; rotated/translated Choir state matching;
   Eventide quarry and trajectory control; Meridian consequences; Crucible material
   conservation; Interregnum stasis/release/local speed; Worldloom paid bridge;
-  Icarus safe bore and bedrock stop; Axiom rib/ore preservation; Atlas permutation;
+  Icarus safe bore and bedrock stop; Axiom rib/ore preservation; Atlas permutation and conserved relocation into air;
   break and placement cancellation; atomic rollback; payment mutation; serialized
   cooldown/memory; queue budget/tool cancellation; unloaded chunks; restricted
   blocks; Silk Touch/Fortune drops and wear; no unpaid placement; isolated tier;
