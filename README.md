@@ -72,7 +72,7 @@ Failures consume scheduling budget too. One active job and one field per owner.
 - Restoration and building cannot overwrite occupied cells and require real
   inventory payment. Canceled placement or invalidated payment rolls back.
 - Rephasing/exchange only handles a closed list of inert vanilla default block
-  states. Never ores, block entities, fluids, falling blocks, machinery or security
+  states, with vanilla air allowed as an Atlas endpoint for terrain relocation. Never ores, block entities, fluids, falling blocks, machinery or security
   blocks. Break/place hooks are honored. No loot/XP emitted by matter permutation.
 - Atlas exchanges are atomic **per pair**, not a transactional undo of a whole region.
 - Memories/anchors/cooldowns persist per player, carry dimension/age limits and

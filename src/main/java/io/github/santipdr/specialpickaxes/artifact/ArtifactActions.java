@@ -71,7 +71,7 @@ public final class ArtifactActions {
             default -> List.of();
         };
         boolean started=WorkQueue.start(p,tool,kind,steps);
-        if(started) { ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
+        if(started) { ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started || kind==ArtifactKind.EVENTIDE;
     }
     public static List<WorkStep> echo(ServerPlayer p,BlockPos center) {
@@ -147,11 +147,11 @@ public final class ArtifactActions {
     private static boolean link(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center) {
         var first=ArtifactState.anchor(p,kind,"a");
         if(first.isEmpty()) {
-            ArtifactState.anchor(p,kind,"a",center);ArtifactFeedback.message(p,"anchor_a");return true;
+            ArtifactState.anchor(p,kind,"a",center);ArtifactFeedback.burst(p,kind,center,8);ArtifactFeedback.message(p,"anchor_a");return true;
         }
         if(kind==ArtifactKind.MERIDIAN) {
             if(first.get().equals(center)) return false;
-            ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.message(p,"linked");return true;
+            ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.trace(p,kind,first.get(),center);ArtifactFeedback.message(p,"linked");return true;
         }
         var delta=center.subtract(first.get());int r=Math.min(4,2+ArtifactState.charge(p,kind)/128);
         if(Math.abs(delta.getX())<=2*r && Math.abs(delta.getY())<=2*r && Math.abs(delta.getZ())<=2*r) return false;
@@ -160,10 +160,10 @@ public final class ArtifactActions {
             var other=pos.offset(delta);
             if(!WorldSafety.allowed(p,kind,pos) || !WorldSafety.allowed(p,kind,other)) continue;
             var a=p.serverLevel().getBlockState(pos);var b=p.serverLevel().getBlockState(other);
-            if(WorldSafety.inert(a) && WorldSafety.inert(b) && a!=b) steps.add(new WorkStep.Exchange(pos,other,a,b));
+            if((WorldSafety.inert(a) || WorldSafety.vacant(a)) && (WorldSafety.inert(b) || WorldSafety.vacant(b)) && a!=b) steps.add(new WorkStep.Exchange(pos,other,a,b));
         }
         boolean result=WorkQueue.start(p,tool,kind,steps);
-        if(result) ArtifactState.clearAnchors(p,kind);
+        if(result) { ArtifactFeedback.trace(p,kind,first.get(),center);ArtifactState.clearAnchors(p,kind); }
         return result;
     }
     public static void mined(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {

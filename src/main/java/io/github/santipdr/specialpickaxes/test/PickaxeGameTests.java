@@ -248,4 +248,12 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(speed.getNewSpeed()==64,"no speed outside domain");finish(h,p);
     }
 
+    @GameTest(template="empty") public static void atlasRelocatesIntoAirWithoutDuplication(GameTestHelper h) {
+        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(3,1,0);
+        h.getLevel().setBlockAndUpdate(b,Blocks.AIR.defaultBlockState());
+        h.assertTrue(WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.AIR.defaultBlockState()),"solid transported into empty space");
+        h.assertTrue(h.getLevel().getBlockState(a).isAir() && h.getLevel().getBlockState(b).is(Blocks.STONE),"one block removed, exactly one block placed");
+        h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(a,b).inflate(1)).isEmpty(),"relocation emits no duplicated material");finish(h,p);
+    }
+
 }

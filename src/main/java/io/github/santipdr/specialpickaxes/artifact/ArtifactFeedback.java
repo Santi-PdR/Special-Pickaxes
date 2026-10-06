@@ -26,4 +26,21 @@ public final class ArtifactFeedback {
             burst(p,kind,center.offset((int)Math.round(Math.cos(angle)*radius),0,(int)Math.round(Math.sin(angle)*radius)),1);
         }
     }
+    public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
+        int stride=Math.max(1,steps.size()/24);
+        for(int i=0,count=0;i<steps.size() && count<24;i+=stride,count++) {
+            var pos=steps.get(i).pos();
+            if(p.serverLevel().hasChunkAt(pos)) burst(p,kind,pos,1);
+        }
+    }
+    public static void trace(ServerPlayer p,ArtifactKind kind,BlockPos a,BlockPos b) {
+        var start=net.minecraft.world.phys.Vec3.atCenterOf(a);var end=net.minecraft.world.phys.Vec3.atCenterOf(b);
+        for(int i=0;i<=16;i++) {
+            var point=start.lerp(end,i/16.0);if(!p.serverLevel().hasChunkAt(BlockPos.containing(point))) continue;
+            int color=i%2==0?kind.color:0xffd783;
+            var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),1.3F);
+            p.serverLevel().sendParticles(dust,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
+
 }

@@ -88,20 +88,24 @@ public final class WorldSafety {
             else level.blockUpdated(pos,next.getBlock());
         }
     }
+    public static boolean vacant(BlockState s) { return s.is(Blocks.AIR) || s.is(Blocks.CAVE_AIR) || s.is(Blocks.VOID_AIR); }
     public static boolean exchange(ServerPlayer p,ItemStack tool,BlockPos a,BlockPos b,BlockState sa,BlockState sb) {
-        if(a.equals(b) || sa==sb || !inert(sa) || !inert(sb) || !allowed(p,ArtifactKind.ATLAS,a)
+        if(a.equals(b) || sa==sb || vacant(sa) && vacant(sb) || !(inert(sa) || vacant(sa))
+                || !(inert(sb) || vacant(sb)) || !allowed(p,ArtifactKind.ATLAS,a)
                 || !allowed(p,ArtifactKind.ATLAS,b)) return false;
         var level=p.serverLevel();
-        if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb || !harvestable(p,tool,a)
-                || !harvestable(p,tool,b) || !breakPermission(p,a) || !breakPermission(p,b)) return false;
+        if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
+        if(!vacant(sa) && (!harvestable(p,tool,a) || !breakPermission(p,a))) return false;
+        if(!vacant(sb) && (!harvestable(p,tool,b) || !breakPermission(p,b))) return false;
+        if(vacant(sa) && !emptyForPlacement(p,a,sb) || vacant(sb) && !emptyForPlacement(p,b,sa)) return false;
         if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb) return false;
         var oldA=BlockSnapshot.create(level.dimension(),level,a);var oldB=BlockSnapshot.create(level.dimension(),level,b);
         boolean accepted=false;
         try {
             if(!level.setBlock(a,sb,2) || !level.setBlock(b,sa,2)) return false;
-            accepted=!ForgeEventFactory.onBlockPlace(p,oldA,Direction.UP)
-                && !ForgeEventFactory.onBlockPlace(p,oldB,Direction.UP)
-                && level.getBlockState(a)==sb && level.getBlockState(b)==sa;
+            accepted=(vacant(sb) || !ForgeEventFactory.onBlockPlace(p,oldA,Direction.UP))
+                && (vacant(sa) || !ForgeEventFactory.onBlockPlace(p,oldB,Direction.UP))
+                && level.getBlockState(a)==sb && level.getBlockState(b)==sa && p.getMainHandItem()==tool && !tool.isEmpty();
             return accepted;
         } finally {
             if(!accepted) { oldA.restore(true,false);oldB.restore(true,false); }

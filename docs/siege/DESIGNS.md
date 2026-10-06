@@ -36,7 +36,7 @@ candidate operations/tick, 24/player/tick, one job/player, maximum 4096/job,
 - Reconstruction/building consumes inventory **after successful protected placement**.
   No refunds of drops already emitted. No overwrite of occupied target cells.
 - Transmutation/exchange operate only on curated vanilla inert default block states,
-  never ores, fluids, inventories, machinery, security blocks or block entities.
+  with vanilla air allowed as an exchange endpoint; never ores, fluids, inventories, machinery, security blocks or block entities.
   They post break/place hooks, revalidate states and rollback denied placements;
   neither emits drops or XP. Exchange is pairwise atomic, not an all-region rollback.
 - Client uses vanilla use packets, NBT item synchronization, cooldown packets and
