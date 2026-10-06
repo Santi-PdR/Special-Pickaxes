@@ -15,6 +15,23 @@ HEADS=[
 [(2,13),(6,5),(12,2),(22,3),(28,10),(27,16),(22,11),(18,8),(12,8),(8,14)],
 [(2,6),(10,3),(16,7),(22,3),(29,6),(27,14),(20,17),(15,12),(9,17),(3,14)]]
 METALS=[(204,191,155),(110,174,165),(77,70,97),(168,180,198),(182,107,64),(139,169,198),(123,154,124),(189,125,74),(171,183,154),(179,155,168),(183,145,77),(151,135,173),(154,178,165),(169,132,153)]
+# Semantic insets: clock, strings, singularity, compass, furnace, hourglass,
+# loom, comet, hollow cage, paired plates, fracture, book, arch and tessellation.
+CORES=[
+['  @@@  ',' @...@ ','@..+..@','@..++.@','@.....@',' @...@ ','  @@@  '],
+['@..@..@','@..@..@','@..@..@','+..+..+','.@.@.@.','..@@@..','...@...'],
+['  @@@  ',' @...@ ','@.###.@','@.#.#.@','@.###.@',' @...@ ','  @@@  '],
+['...+...','.@.+.@.','..@+@..','+++@+++','..@+@..','.@.+.@.','...+...'],
+['+++++++','+@.@.@+','+@.+.@+','+@+++.@','+@.@.@+','+@@@@@+',' +++++ '],
+['+++++++','.+...+.','..+.+..','...@...','..+.+..','.+@@@+.','+++++++'],
+['@@@@@@@','@+.+.+@','@+.+.+@','@+++++@','@+.+.+@','@+.+.+@','@@@@@@@'],
+['....@@@','...@++@','..@@+@@','.@.@.@.','@.@.@..','.@.@...','@......'],
+['..+++++','.+...++','+++++.+','+...+.+','+.+.+.+','+...++ ','+++++  '],
+['@@@.+++','@.@.+.+','@.@.+.+','@.@#@.+','@.@.+.+','@.@.+.+','@@@.+++'],
+['....+..','...+...','@@+@@@@','..+++..','.@..+@.','@..+..@','..+....'],
+['+++@+++','+.+@+.+','+++@+++','+.+@+.+','+++@+++','+.+@+.+','+++@+++'],
+['..+++..','.+.@.+.','+..@..+','+.....+','@.....@','@.....@','@.....@'],
+['..@.@..','.@+@+@.','@+@+@+@','.@+@+@.','@+@+@+@','.@+@+@.','..@.@..']]
 def art(index,frame,colors):
  grid={};edge=(20,24,33);metal=METALS[index];rgb=colors[index];core=((rgb>>16)&255,(rgb>>8)&255,rgb&255)
  def line(x0,y0,x1,y1,color,width=1):
@@ -42,10 +59,18 @@ def art(index,frame,colors):
  # Deliberately placed engravings, no floating random symbols.
  for x in range(9,24,3):
   if (x,8)in inside:grid[x,8]=tuple(max(0,c-55)for c in metal)
- for y in range(8,15):
-  for x in range(12,19):
-   d=abs(x-15)+abs(y-11)
-   if d<=3:grid[x,y]=edge if d==3 else tuple(min(255,max(0,c+(18 if d==0 and frame%3==0 else -30 if y>11 else 0)))for c in core)
+ for row,pattern in enumerate(CORES[index]):
+  for col,ch in enumerate(pattern):
+   pos=(12+col,8+row)
+   if ch=='.':grid.pop(pos,None)
+   elif ch!=' ':grid[pos]=edge if ch=='#' else (235,230,207) if ch=='+' else tuple(min(245,max(0,c+(12 if frame%3==0 else -10)))for c in core)
+ # Clock hands, resonant strings, shuttle and sand are animated deliberately.
+ if index==0:
+  dx,dy=[(0,-1),(1,0),(0,1),(-1,0)][frame];grid[15+dx,11+dy]=(245,235,195)
+ if index==1:grid[12+frame%3*3,10]=(236,245,233)
+ if index==5:grid[15,10+frame%3]=core
+ if index==6:
+  for x in range(13,18):grid[x,9+frame]=(235,230,207)
  # Distinct negative spaces: ring, hourglass, loom, cage, book and paired plates.
  if index in [0,2,5,6,8,9,11,13]:
   for x,y in [(8,10),(9,10),(22,10),(23,10)]:

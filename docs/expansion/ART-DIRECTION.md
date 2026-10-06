@@ -12,8 +12,11 @@ ivory/brass, oxidized copper, dark mineral, cold silver and fired bronze. Negati
 spaces distinguish ring, cage, loom, double head and chronicle. Worldbreaker's
 oversized fractured blade has a distinct pale cutting highlight.
 
-Animation is deliberately restrained: a four-frame core highlight, not flickering
-noise or floating unrelated symbols. Nearest-neighbor grid, no plastic gradients,
+Each inset also encodes identity: clock, resonant strings, void, compass,
+furnace, hourglass, loom, comet, hollow cage, paired plates, fracture, book,
+arch and tessellation. These are deliberately drawn pixel patterns, not arbitrary
+symbols. Animation is restrained: clock hand, string accent, falling sand, moving
+shuttle or a four-frame core highlight; no flickering noise or unrelated glyphs. Nearest-neighbor grid, no plastic gradients,
 no blurred downscale. Handheld parent supplies standard first/third-person poses.
 
 Runtime evidence is produced in the real Forge client: fourteen displays,

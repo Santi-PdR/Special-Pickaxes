@@ -19,7 +19,7 @@ public final class ClientValidation {
         if(!Boolean.getBoolean("specialpickaxes.clientSmoke")||e.phase!=TickEvent.Phase.END)return;
         var server=ServerLifecycleHooks.getCurrentServer();if(server==null)return;
         for(var p:server.getPlayerList().getPlayers()){
-            if(!p.getTags().contains("artifact_gallery"))continue;
+            if(!p.getTags().contains("artifact_gallery")||!java.nio.file.Files.exists(java.nio.file.Path.of("gallery-captured.flag")))continue;
             if(ticks>=240&&(ticks-240)%100==99){
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}

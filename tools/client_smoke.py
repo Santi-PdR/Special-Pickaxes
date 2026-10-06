@@ -3,6 +3,7 @@
 import json,os,pathlib,queue,shutil,signal,subprocess,threading,time
 root=pathlib.Path.cwd();out=root/'build/client-smoke';out.mkdir(parents=True,exist_ok=True)
 ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
+gallery_flag=root/'run/gallery-captured.flag';gallery_flag.unlink(missing_ok=True)
 world=root/'run/saves/ArtifactSmoke'
 if world.exists():shutil.rmtree(world)
 shutil.copytree(root/'build/packaged-smoke/smoke-world',world)
@@ -53,7 +54,7 @@ try:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True,timeout=20)
    # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True,timeout=20)
-   gallery_done=True
+   gallery_done=True;gallery_flag.write_text("ready")
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
    if id not in ids:raise RuntimeError('Unexpected client artifact')
