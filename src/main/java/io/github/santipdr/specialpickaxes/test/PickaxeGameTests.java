@@ -49,13 +49,13 @@ public final class PickaxeGameTests {
             int result=h.getLevel().getServer().getCommands().performPrefixedCommand(source,"specialpickaxes grant @s "+kind.id);
             h.assertTrue(result==1 && p.getInventory().countItem(item)==1,"admin command actually grants "+kind.id);
         }
-        int denied=h.getLevel().getServer().getCommands().performPrefixedCommand(source.withPermission(0),"specialpickaxes grant @s palimpsest");
-        h.assertTrue(denied==0 && p.getInventory().countItem(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get())==1,"non-admin cannot grant");
+        boolean denied=!h.getLevel().getServer().getCommands().getDispatcher().getRoot().getChild("specialpickaxes").canUse(source.withPermission(0));
+        h.assertTrue(denied && p.getInventory().countItem(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get())==1,"non-admin cannot grant");
         finish(h,p);
     }
     @GameTest(template="empty") public static void palimpsestPaidReconstruction(GameTestHelper h) {
         var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);var tool=p.getMainHandItem();
-        h.assertTrue(p.gameMode.destroyBlock(pos),"manual mining succeeds");
+        h.assertTrue(p.gameMode.destroyBlock(pos),"manual mining succeeds");MiningObservations.flush();
         h.assertTrue(ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==1,"actual mining recorded");
         h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.PALIMPSEST,false),"reconstruction queued");drain(p);
         h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"no free restoration without material");
@@ -87,7 +87,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty") public static void meridianEntangledMining(GameTestHelper h) {
         var p=player(h,ArtifactKind.MERIDIAN);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
         ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b",b);
-        p.gameMode.destroyBlock(a);h.assertTrue(WorkQueue.busy(p),"manual mining queued consequence");drain(p);
+        p.gameMode.destroyBlock(a);MiningObservations.flush();h.assertTrue(WorkQueue.busy(p),"manual mining queued consequence");drain(p);
         h.assertTrue(h.getLevel().getBlockState(b).isAir(),"paired anchor consequence mined");
         h.assertTrue(p.getMainHandItem().getDamageValue()==2,"both physical blocks cost durability");finish(h,p);
     }
@@ -210,4 +210,23 @@ public final class PickaxeGameTests {
         h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState()),"occupied construction rejected");
         var air=pos.above();h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,air,Blocks.STONE.defaultBlockState()),"no free block without payment");finish(h,p);
     }
+    @GameTest(template="empty") public static void vanillaTiersRemainValid(GameTestHelper h) {
+        h.assertTrue(new ItemStack(Items.DIAMOND_PICKAXE).isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState()),"artifact tier does not revoke vanilla diamond harvesting");
+        h.assertTrue(new ItemStack(Items.NETHERITE_PICKAXE).isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()),"netherite remains valid");
+        h.succeed();
+    }
+    @GameTest(template="empty") public static void changedPaymentCannotDuplicateMatter(GameTestHelper h) {
+        var p=player(h,ArtifactKind.WORLDLOOM);var pos=target(h).above();
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,1));
+        Consumer<BlockEvent.EntityPlaceEvent> change=e -> {
+            if(e.getPos().equals(pos)) p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,change);
+        try {
+            h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState()),"invalidated payment rejects placement");
+            h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"unpaid matter rolled back");
+        } finally { MinecraftForge.EVENT_BUS.unregister(change); }
+        finish(h,p);
+    }
+
 }

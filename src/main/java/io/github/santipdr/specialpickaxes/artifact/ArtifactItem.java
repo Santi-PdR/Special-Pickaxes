@@ -29,7 +29,7 @@ public final class ArtifactItem extends PickaxeItem {
     }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
         boolean result=super.mineBlock(tool,level,state,pos,actor);
-        if(actor instanceof ServerPlayer p && !tool.isEmpty()) ArtifactActions.mined(p,tool,kind,pos,state);
+        if(actor instanceof ServerPlayer p && !tool.isEmpty()) MiningObservations.capture(p,tool,kind,pos,state);
         return result;
     }
     @Override public void inventoryTick(ItemStack tool,Level level,Entity entity,int slot,boolean selected) {

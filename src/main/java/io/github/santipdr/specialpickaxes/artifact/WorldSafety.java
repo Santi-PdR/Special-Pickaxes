@@ -46,35 +46,47 @@ public final class WorldSafety {
     }
     public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
         if(!allowed(p,kind,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty()) return false;
-        ItemStack payment=ItemStack.EMPTY;
+        int paymentSlot=-1;
         if(!p.isCreative()) {
             for(int i=0;i<p.getInventory().getContainerSize();i++) {
                 var stack=p.getInventory().getItem(i);
-                // Exact plain block items only: never consume containers, capabilities or custom named/NBT materials.
-                if(stack.is(state.getBlock().asItem()) && !stack.hasTag()) { payment=stack;break; }
+                if(stack.is(state.getBlock().asItem()) && !stack.hasTag()) { paymentSlot=i;break; }
             }
-            if(payment.isEmpty()) return false;
+            if(paymentSlot<0) return false;
         }
+        var payment=paymentSlot<0?ItemStack.EMPTY:p.getInventory().getItem(paymentSlot);
         var level=p.serverLevel();var snapshot=BlockSnapshot.create(level.dimension(),level,pos);
-        if(!level.setBlock(pos,state,2)) return false;
-        if(ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP) || level.getBlockState(pos)!=state) {
-            snapshot.restore(true,false);return false;
+        boolean accepted=false;
+        try {
+            if(!level.setBlock(pos,state,2) || ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP)
+                    || level.getBlockState(pos)!=state || p.getMainHandItem()!=tool || tool.isEmpty()) return false;
+            if(!p.isCreative()) {
+                // A listener may replace/remove the payment stack. Never place for free after such a change.
+                if(p.getInventory().getItem(paymentSlot)!=payment || payment.isEmpty()
+                        || !payment.is(state.getBlock().asItem()) || payment.hasTag()) return false;
+                payment.shrink(1);
+            }
+            accepted=true;return true;
+        } finally {
+            if(!accepted) snapshot.restore(true,false);
+            else level.blockUpdated(pos,state.getBlock());
         }
-        if(!p.isCreative()) payment.shrink(1);
-        level.blockUpdated(pos,state.getBlock());
-        return true;
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
         if(expected==next || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
                 || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(pos)!=expected) return false;
-        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);
-        if(!level.setBlock(pos,next,2)) return false;
-        if(ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP) || level.getBlockState(pos)!=next) {
-            snapshot.restore(true,false);return false;
+        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);boolean accepted=false;
+        try {
+            if(!level.setBlock(pos,next,2)) return false;
+            accepted=!ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP) && level.getBlockState(pos)==next
+                && p.getMainHandItem()==tool && !tool.isEmpty();
+            return accepted;
+        } finally {
+            if(!accepted) snapshot.restore(true,false);
+            else level.blockUpdated(pos,next.getBlock());
         }
-        level.blockUpdated(pos,next.getBlock());return true;
     }
     public static boolean exchange(ServerPlayer p,ItemStack tool,BlockPos a,BlockPos b,BlockState sa,BlockState sb) {
         if(a.equals(b) || sa==sb || !inert(sa) || !inert(sb) || !allowed(p,ArtifactKind.ATLAS,a)

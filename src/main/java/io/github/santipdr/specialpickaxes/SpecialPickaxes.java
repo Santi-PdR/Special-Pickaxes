@@ -29,7 +29,7 @@ import java.util.*;
 public final class SpecialPickaxes {
     public static final String ID="specialpickaxes";
     public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(4,32768,64F,12F,40,
-        BlockTags.NEEDS_DIAMOND_TOOL,() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
+        net.minecraft.tags.TagKey.create(Registries.BLOCK,new ResourceLocation(ID,"needs_artifact_tool")),() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
     public static final DeferredRegister<Item> ITEMS=DeferredRegister.create(ForgeRegistries.ITEMS,ID);
     public static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,ID);
     public static final DeferredRegister<MobEffect> EFFECTS=DeferredRegister.create(ForgeRegistries.MOB_EFFECTS,ID);
@@ -50,11 +50,11 @@ public final class SpecialPickaxes {
         forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
     private void tick(TickEvent.ServerTickEvent e) {
-        if(e.phase==TickEvent.Phase.END) { WorkQueue.tick();DomainFields.tick(); }
+        if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick(); }
     }
-    private void stopped(ServerStoppedEvent e) { WorkQueue.clear();DomainFields.clear(); }
+    private void stopped(ServerStoppedEvent e) { MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
@@ -63,7 +63,7 @@ public final class SpecialPickaxes {
             var state=new net.minecraft.nbt.CompoundTag();state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
         }
         e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
-        if(e.getOriginal() instanceof ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getOriginal() instanceof ServerPlayer p) { MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.values()) {

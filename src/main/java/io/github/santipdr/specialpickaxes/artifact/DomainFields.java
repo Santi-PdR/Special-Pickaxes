@@ -33,7 +33,8 @@ public final class DomainFields {
     public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field); }
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear(); }
     public static boolean contains(ServerPlayer p,BlockPos pos) {
-        var f=FIELDS.get(p.getUUID());return f!=null && f.kind==ArtifactKind.INTERREGNUM && pos.distSqr(f.center)<=f.radius*f.radius;
+        var f=FIELDS.get(p.getUUID());return f!=null && f.kind==ArtifactKind.INTERREGNUM && p.level().dimension()==f.dimension
+            && p.getMainHandItem()==f.tool && ArtifactState.now(p)<=f.expires && pos.distSqr(f.center)<=f.radius*f.radius;
     }
     public static boolean frozen(Entity entity) {
         return entity!=null && FIELDS.values().stream().anyMatch(f -> f.frozen.containsKey(entity.getUUID()));

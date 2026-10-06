@@ -36,7 +36,7 @@ public final class ArtifactActions {
         int cooldown=secondary?10:ArtifactConfig.COOLDOWN.get();
         data.putLong("ready",ArtifactState.now(p)+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         tool.hurtAndBreak(cost,p,who -> who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-        if(!secondary) data.putInt("charge",0);
+        if(!secondary && (WorkQueue.busy(p) || kind==ArtifactKind.EVENTIDE || kind==ArtifactKind.INTERREGNUM)) data.putInt("charge",0);
         ArtifactFeedback.sound(p,kind);return true;
     }
     private static boolean secondary(ServerPlayer p,ArtifactKind kind) {
@@ -153,10 +153,10 @@ public final class ArtifactActions {
             if(first.get().equals(center)) return false;
             ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.message(p,"linked");return true;
         }
-        var delta=center.subtract(first.get());int r=2;
+        var delta=center.subtract(first.get());int r=Math.min(4,2+ArtifactState.charge(p,kind)/128);
         if(Math.abs(delta.getX())<=2*r && Math.abs(delta.getY())<=2*r && Math.abs(delta.getZ())<=2*r) return false;
         var steps=new ArrayList<WorkStep>();
-        for(var pos:Geometry.cube(first.get(),r,125)) {
+        for(var pos:Geometry.cube(first.get(),r,ArtifactConfig.JOB_LIMIT.get())) {
             var other=pos.offset(delta);
             if(!WorldSafety.allowed(p,kind,pos) || !WorldSafety.allowed(p,kind,other)) continue;
             var a=p.serverLevel().getBlockState(pos);var b=p.serverLevel().getBlockState(other);
