@@ -50,33 +50,15 @@ public final class ArtifactItem extends PickaxeItem {
         super.inventoryTick(tool,level,entity,slot,selected);
         if(selected && entity instanceof ServerPlayer p && p.tickCount%10==0) {
             if(p.tickCount%100==0)ArtifactState.prune(p,kind);
-            // Vanilla inventory synchronization carries the display data; client never decides charge/work.
-            var tag=tool.getOrCreateTag();tag.putInt("artifactActivationCost",EnchantmentScaling.activationCost(tool,kind));tag.putInt("artifactCharge",ArtifactState.charge(p,kind));
+            // Vanilla inventory synchronization carries the display data; client never authorizes work.
+            var tag=tool.getOrCreateTag();tag.putInt("artifactActivationCost",EnchantmentScaling.activationCost(tool,kind));tag.remove("artifactCharge");tag.putInt("artifactCooldown",ArtifactConfig.COOLDOWN.get());
             tag.putInt("artifactMode",ArtifactState.mode(p,kind));tag.putInt("artifactWork",WorkQueue.remaining(p));
             tag.putInt("artifactMemory",ArtifactState.of(p,kind).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size());
             ArtifactInteraction.display(p,tool,kind);
         }
     }
-    @Override public boolean isFoil(ItemStack stack) {
-        return super.isFoil(stack) || stack.hasTag() && (stack.getTag().getInt("artifactCharge")>=128 || stack.getTag().getInt("artifactWork")>0);
-    }
+    @Override public boolean isFoil(ItemStack stack) { return true; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
-        lines.add(Component.translatable("tooltip.specialpickaxes."+kind.id));
-        lines.add(Component.translatable("tooltip.specialpickaxes.secondary."+kind.id));
-        if(stack.hasTag()&&!ArtifactInteraction.regional(kind)) lines.add(Component.translatable("ux.specialpickaxes.energy",stack.getTag().getInt("artifactCharge")));
-        lines.add(Component.translatable("ux.specialpickaxes.mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(kind,stack.hasTag()?stack.getTag().getInt("artifactMode"):0))));
-        lines.add(Component.translatable(ArtifactInteraction.regional(kind)?"ux.specialpickaxes.region_controls":"ux.specialpickaxes.controls"));
-        lines.add(Component.translatable("ux.specialpickaxes.cancel_help"));
-        int mode=stack.hasTag()?stack.getTag().getInt("artifactMode"):0;
-        boolean paid=kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.KEYSTONE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.WORLDBREAKER&&mode==4;
-        String resource=paid?"paid":kind==ArtifactKind.ATLAS||kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&(mode==2||mode==3)?"matter":"mining";
-        lines.add(Component.translatable("ux.specialpickaxes.cost."+resource,stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4));
-        if(stack.hasTag()) {
-            if(kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.CHOIR||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.WORLDBREAKER)lines.add(Component.translatable("ux.specialpickaxes.history",stack.getTag().getInt("artifactMemory"),stack.getTag().getLong("artifactOldest"),stack.getTag().getLong("artifactLatest")));
-            lines.add(Component.translatable("status.specialpickaxes."+stack.getTag().getString("artifactStatus")));
-            if(kind==ArtifactKind.MERIDIAN && stack.getTag().contains("artifactTarget"))lines.add(Component.translatable("ux.specialpickaxes.link",stack.getTag().getInt("artifactDistance"),stack.getTag().getInt("artifactRotation")));
-            if(stack.getTag().contains("artifactSource"))lines.add(Component.translatable("ux.specialpickaxes.volumes",stack.getTag().getString("artifactSource"),stack.getTag().getString("artifactTarget")));
-            if(stack.getTag().contains("artifactTransform"))lines.add(Component.translatable("message.specialpickaxes.transform",Component.translatable("mode.specialpickaxes."+stack.getTag().getString("artifactTransform"))));
-        }
+        ArtifactTooltips.compact(stack,kind,lines);
     }
 }

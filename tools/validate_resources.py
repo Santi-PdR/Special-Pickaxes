@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 import json,pathlib,struct,hashlib,unittest
 ROOT=pathlib.Path('src/main/resources')
-IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator'.split()
+IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
 class Resources(unittest.TestCase):
  def test_json(self):
   for pattern in ['*.json','*.mcmeta']:
    for p in ROOT.rglob(pattern):json.loads(p.read_text())
- def test_models_unique_animated_textures(self):
-  hashes=set()
+ def test_existing_vanilla_models(self):
+  allowed={'minecraft:item/'+base+'_pickaxe' for base in ['netherite','diamond','iron','golden']}
   for id in IDS:
    model=json.loads((ROOT/f'assets/specialpickaxes/models/item/{id}.json').read_text())
-   ns,path=model['textures']['layer0'].split(':');p=ROOT/f'assets/{ns}/textures/{path}.png';b=p.read_bytes()
-   self.assertEqual(b[:8],b'\x89PNG\r\n\x1a\n');self.assertEqual(struct.unpack('>II',b[16:24]),(64,256))
-   self.assertEqual(json.loads(p.with_suffix('.png.mcmeta').read_text())['animation']['frametime'],6)
-   hashes.add(hashlib.sha256(b).hexdigest())
-  self.assertEqual(len(hashes),14)
+   self.assertEqual(model['parent'],'minecraft:item/handheld');self.assertIn(model['textures']['layer0'],allowed)
+  self.assertFalse(list((ROOT/'assets/specialpickaxes/textures/item').glob('*')))
+ def test_no_energy_and_manual_keys(self):
+  for lang in ['en_us','es_es']:
+   data=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())
+   self.assertFalse(any('energy' in key for key in data))
+   for id in IDS:
+    for prefix in ['identity.','controls.','example.']:self.assertIn(prefix+'specialpickaxes.'+id,data)
  def test_languages(self):
   langs=[json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text()) for lang in ['en_us','es_es']]
   self.assertEqual(set(langs[0]),set(langs[1]))
@@ -27,6 +30,7 @@ class Resources(unittest.TestCase):
   self.assertFalse(list(ROOT.glob('data/*/worldgen/**/*.json')))
   self.assertFalse(list(ROOT.glob('assets/specialpickaxes/blockstates/*.json')))
  def test_pickaxe_tag(self):
-  tag=json.loads((ROOT/'data/minecraft/tags/items/pickaxes.json').read_text())
-  self.assertFalse(tag['replace']);self.assertEqual(set(tag['values']),{'specialpickaxes:'+id for id in IDS})
+  for name in ['pickaxes','axes','shovels']:
+   tag=json.loads((ROOT/f'data/minecraft/tags/items/{name}.json').read_text())
+   self.assertFalse(tag['replace']);self.assertEqual(set(tag['values']),{'specialpickaxes:'+id for id in IDS})
 if __name__=='__main__':unittest.main()

@@ -41,7 +41,7 @@ public final class PickaxeGameTests {
     private static void finish(GameTestHelper h,ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
-        h.assertTrue(SpecialPickaxes.PICKS.size()==14,"fourteen artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+        h.assertTrue(SpecialPickaxes.PICKS.size()==20,"twenty artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
         for(var kind:ArtifactKind.values()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");

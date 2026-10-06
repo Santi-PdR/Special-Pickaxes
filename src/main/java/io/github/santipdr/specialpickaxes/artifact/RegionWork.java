@@ -55,7 +55,7 @@ public final class RegionWork {
             // Indexed lookup assembled once at confirmation, never scan thousands of records per voxel.
             return new WorkStep.Place(pos,restoration.getOrDefault(pos,Blocks.AIR.defaultBlockState()));
         }
-        if(kind==ArtifactKind.WORLDBREAKER&&mode==2)return new WorkStep.Rephase(pos,old,material);
+        if(kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&mode==2)return new WorkStep.Rephase(pos,old,material);
         if(kind==ArtifactKind.WORLDBREAKER&&mode==1&&!carve(pos))return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer a,ItemStack t,ArtifactKind k){return false;}};
         return new WorkStep.Mine(pos,old);
     }

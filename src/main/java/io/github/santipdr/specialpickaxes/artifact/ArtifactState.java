@@ -21,11 +21,9 @@ public final class ArtifactState {
     public static CompoundTag of(ServerPlayer p, ArtifactKind kind) {
         var root=root(p);
         if (!root.contains(kind.id)) root.put(kind.id,new CompoundTag());
-        return root.getCompound(kind.id);
+        var data=root.getCompound(kind.id);data.remove("charge");return data; // discard retired 2.x/3.0 resource data
     }
     public static String dimension(ServerPlayer p) { return p.level().dimension().location().toString(); }
-    public static int charge(ServerPlayer p, ArtifactKind kind) { return Math.max(0,Math.min(256,of(p,kind).getInt("charge"))); }
-    public static void charge(ServerPlayer p, ArtifactKind kind, int amount) { of(p,kind).putInt("charge",Math.min(256,charge(p,kind)+amount)); }
     public static int mode(ServerPlayer p, ArtifactKind kind) { return Math.floorMod(of(p,kind).getInt("mode"),ArtifactInteraction.modeCount(kind)); }
     public static int rotate(ServerPlayer p, ArtifactKind kind) { int m=(mode(p,kind)+1)%ArtifactInteraction.modeCount(kind);of(p,kind).putInt("mode",m);return m; }
     public static void record(ServerPlayer p, ArtifactKind kind, BlockPos pos, BlockState state) {

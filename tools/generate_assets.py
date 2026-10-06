@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Deterministic original animated 64px artifact silhouettes. No image/animation runtime dependency."""
+"""Existing vanilla pickaxe bases; differentiation is glint, runtime aura and ability effects."""
 from pathlib import Path
 import json,struct,zlib,math,shutil
 R=Path('src/main/resources')
-IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator'.split()
+IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
 EN=['Palimpsest of the Last Dawn','Choir of Faults','The Night That Weighs','Meridian of Two Worlds','Paradox Crucible','Crown of the Interregnum','Loom of the First Wall','Tear of Icarus','The Hollow Axiom','Atlas of Two Shores']
 ES=['Palimpsesto del Último Alba','Coro de las Fallas','La Noche que Pesa','Meridiano de Dos Mundos','Crisol de la Paradoja','Corona del Interregno','Bastidor de la Primera Muralla','Lágrima de Ícaro','El Axioma Hueco','Atlas de las Dos Orillas']
 COLORS=[0xffd783,0x46ede0,0xa67aff,0x68b9ff,0xff8648,0x8ae5ff,0x64ffa9,0xffc057,0xd9ffbd,0xff7b99]
@@ -40,6 +40,13 @@ SEC_EN[0]='Cancel selection; memory is never erased by accident'
 SEC_ES[0]='Cancela selección; nunca borra la memoria accidentalmente'
 SEC_EN[9]='Cancel selection; sneak-left-click changes transformation'
 SEC_ES[9]='Cancela selección; agachado + clic izquierdo cambia transformación'
+EN += ['Aegis of the Horizon','Lodestar of the Returning Miner','Seam Ripper',"Pilgrim's Causeway",'Counterseal of the Bastion','Covenant of the Sealed Gallery']
+ES += ['Égida del Horizonte','Astrolabio del Retorno','Sutura de los Estratos','Calzada del Peregrino','Contrafirma del Bastión','Pacto de la Galería Sellada']
+COLORS += [0x87dfff,0xffe5a1,0xf5ac79,0x9bdfb0,0xb1a5ed,0xdda998]
+TIPS_EN += ['Redirect incoming hostile projectiles without changing their ownership.', 'Retrace remembered footsteps through still-clear loaded space.', 'Peel a connected material interface, not the whole vein.', 'Paid footing follows your route over gaps; it does not grant flight.', 'Protect nearby terrain from explosions, not entities from damage.', 'Seal confirmed manual mining scars after you pass them, using inventory material.']
+TIPS_ES += ['Redirige proyectiles hostiles sin cambiar su propietario.', 'Recorre de vuelta tus pasos por espacio aún despejado y cargado.', 'Retira una interfaz de materiales conectada, no la veta completa.', 'Un apoyo pagado sigue tus pasos sobre huecos; no concede vuelo.', 'Protege terreno cercano de explosiones, no a entidades del daño.', 'Sella huecos de minería manual cuando los dejas atrás, con material del inventario.']
+SEC_EN += ['Change reflection / shear','Forget route','Change contact / exposed surface','Stop companion','Stop ward','Stop sealing']
+SEC_ES += ['Alterna reflexión / desvío','Olvida la ruta','Alterna contacto / superficie expuesta','Detiene el acompañante','Detiene la protección','Detiene el sellado']
 def js(path,obj):
  p=R/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
 def png(path,pixels,w,h):
@@ -47,18 +54,13 @@ def png(path,pixels,w,h):
  raw=b''.join(b'\0'+bytes(sum(pixels[y*w:(y+1)*w],())) for y in range(h))
  p=R/path;p.parent.mkdir(parents=True,exist_ok=True)
  p.write_bytes(b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',w,h,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b''))
-from relic_art import art as draw_relic
-def art(index,frame):return draw_relic(index,frame,COLORS)
 # These directories contain only project-generated assets; remove legacy recipes/models and never touch references.
 for folder in ['assets/specialpickaxes','data/specialpickaxes/recipes','data/specialpickaxes/advancements/recipes','data/specialpickaxes/loot_modifiers','data/forge/loot_modifiers']:
  p=R/folder
  if p.exists():shutil.rmtree(p)
+BASES=['diamond','diamond','netherite','diamond','golden','diamond','iron','netherite','netherite','netherite','netherite','golden','iron','diamond','diamond','netherite','iron','iron','netherite','netherite']
 for index,id in enumerate(IDS):
- pixels=[]
- for frame in range(4):pixels.extend(art(index,frame))
- png(Path(f'assets/specialpickaxes/textures/item/{id}.png'),pixels,64,256)
- js(Path(f'assets/specialpickaxes/textures/item/{id}.png.mcmeta'),{'animation':{'frametime':6,'interpolate':False}})
- js(Path(f'assets/specialpickaxes/models/item/{id}.json'),{'parent':'minecraft:item/handheld','textures':{'layer0':'specialpickaxes:item/'+id},'display':{'gui':{'rotation':[0,0,(-8 if index%2 else 8)],'scale':[0.9,0.9,0.9]}}})
+ js(Path(f'assets/specialpickaxes/models/item/{id}.json'),{'parent':'minecraft:item/handheld','textures':{'layer0':'minecraft:item/'+BASES[index]+'_pickaxe'}})
 langs=[]
 for spanish in [False,True]:
  lang={'itemGroup.specialpickaxes':'Siege — Artefactos' if spanish else 'Siege — Artifacts',
@@ -92,5 +94,6 @@ for tag in ['axes','shovels']:
  js(Path('data/minecraft/tags/items')/(tag+'.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 # Shared UX translations are authored separately so resource regeneration is reproducible.
 from ux_strings import enrich
+from ux31_strings import revise
 for code in ['en_us','es_es']:
- path=Path('assets/specialpickaxes/lang')/(code+'.json');data=json.loads((R/path).read_text());enrich(data,code=='es_es');js(path,data)
+ path=Path('assets/specialpickaxes/lang')/(code+'.json');data=json.loads((R/path).read_text());enrich(data,code=='es_es');revise(data,code=='es_es',IDS);js(path,data)

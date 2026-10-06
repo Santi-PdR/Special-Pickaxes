@@ -55,7 +55,7 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition()))
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),12,0,false,true,true));
             var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
-                e.isAlive() && (e instanceof Monster || e instanceof Projectile)
+                e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
                 && !e.isAlliedTo(p) && e.position().distanceToSqr(Vec3.atCenterOf(f.center))<=f.radius*f.radius);
             entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(Vec3.atCenterOf(f.center))));
             var current=new HashSet<UUID>();int processed=0;
@@ -65,7 +65,12 @@ public final class DomainFields {
                         && (projectile.getOwner()==p || projectile.getOwner().isAlliedTo(p))) continue;
                 if(!WorldSafety.allowed(p,f.kind,entity.blockPosition())) continue;
                 processed++;current.add(entity.getUUID());
-                if(f.kind==ArtifactKind.INTERREGNUM) {
+                if(f.kind==ArtifactKind.AEGIS){
+                    var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001)continue;
+                    var away=entity.position().subtract(Vec3.atCenterOf(f.center)).normalize();
+                    if(ArtifactState.mode(p,f.kind)==1)away=new Vec3(-away.z,away.y*0.2,away.x).normalize();
+                    entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
+                } else if(f.kind==ArtifactKind.INTERREGNUM) {
                     var original=f.frozen.computeIfAbsent(entity.getUUID(),id -> new Frozen(entity,entity.position(),entity.getDeltaMovement()));
                     var box=entity.getBoundingBox().move(original.position.subtract(entity.position()));
                     if(level.noCollision(entity,box)) { entity.setPos(original.position);entity.setDeltaMovement(Vec3.ZERO); }

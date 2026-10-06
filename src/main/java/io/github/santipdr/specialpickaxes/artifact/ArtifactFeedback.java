@@ -28,7 +28,13 @@ public final class ArtifactFeedback {
             case ICARUS->net.minecraft.core.particles.ParticleTypes.CRIT;
             case AXIOM->net.minecraft.core.particles.ParticleTypes.SCULK_SOUL;
             case ATLAS,TESSELLATOR->net.minecraft.core.particles.ParticleTypes.PORTAL;
-            case WORLDBREAKER->net.minecraft.core.particles.ParticleTypes.GLOW;};
+            case WORLDBREAKER->net.minecraft.core.particles.ParticleTypes.GLOW;
+            case AEGIS->net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK;
+            case LODESTAR->net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL;
+            case SEAM_RIPPER->net.minecraft.core.particles.ParticleTypes.SCRAPE;
+            case CAUSEWAY->net.minecraft.core.particles.ParticleTypes.WAX_ON;
+            case COUNTERSEAL->net.minecraft.core.particles.ParticleTypes.SOUL;
+            case COVENANT->net.minecraft.core.particles.ParticleTypes.ENCHANT;};
         if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
         p.serverLevel().sendParticles(dust,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }

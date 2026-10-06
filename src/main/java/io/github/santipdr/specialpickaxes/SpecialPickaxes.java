@@ -47,18 +47,19 @@ public final class SpecialPickaxes {
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
-        forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
+        forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
-    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
+    private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
+    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
         if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.left(p,e.getPos(),p.isShiftKeyDown()))e.setCanceled(true);
     }
     private void tick(TickEvent.ServerTickEvent e) {
-        if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick(); }
+        if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick(); }
     }
-    private void stopped(ServerStoppedEvent e) { ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
+    private void stopped(ServerStoppedEvent e) { CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
@@ -67,7 +68,7 @@ public final class SpecialPickaxes {
             var state=clean.getCompound(kind.id);state.remove("a");state.remove("b");state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
         }
         e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
-        if(e.getOriginal() instanceof ServerPlayer p) { ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.values()) {

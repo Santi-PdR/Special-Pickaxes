@@ -17,7 +17,13 @@ public enum ArtifactKind {
     WORLDBREAKER("worldbreaker",0xf1bf65,SoundEvents.END_PORTAL_SPAWN),
     CHRONICLE("chronicle",0xb6a1ed,SoundEvents.AMETHYST_BLOCK_RESONATE),
     KEYSTONE("keystone",0x8fdac2,SoundEvents.ANVIL_PLACE),
-    TESSELLATOR("tessellator",0xe49abf,SoundEvents.NOTE_BLOCK_PLING.value());
+    TESSELLATOR("tessellator",0xe49abf,SoundEvents.NOTE_BLOCK_PLING.value()),
+    AEGIS("aegis",0x87dfff,SoundEvents.SHIELD_BLOCK),
+    LODESTAR("lodestar",0xffe5a1,SoundEvents.LODESTONE_COMPASS_LOCK),
+    SEAM_RIPPER("seam_ripper",0xf5ac79,SoundEvents.COPPER_BREAK),
+    CAUSEWAY("causeway",0x9bdfb0,SoundEvents.SCAFFOLDING_PLACE),
+    COUNTERSEAL("counterseal",0xb1a5ed,SoundEvents.BEACON_DEACTIVATE),
+    COVENANT("covenant",0xdda998,SoundEvents.DEEPSLATE_BRICKS_PLACE);
     public final String id;
     public final int color;
     public final SoundEvent sound;

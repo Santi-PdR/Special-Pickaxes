@@ -29,31 +29,32 @@ public final class ArtifactActions {
         if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
         var data=ArtifactState.of(p,kind);
         if(data.getLong("ready")>ArtifactState.now(p)) return false;
-        int cost=secondary?0:ArtifactConfig.COST.get();
+        int cost=secondary?0:EnchantmentScaling.activationCost(tool,kind);
         if(!p.isCreative() && tool.getMaxDamage()-tool.getDamageValue()<=cost) return false;
         boolean done=secondary?secondary(p,kind):primary(p,tool,kind);
         if(!done) { ArtifactFeedback.message(p,"no_target");return false; }
         int cooldown=secondary?10:ArtifactConfig.COOLDOWN.get();
         data.putLong("ready",ArtifactState.now(p)+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         tool.hurtAndBreak(cost,p,who -> who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-        if(!secondary && (WorkQueue.busy(p) || kind==ArtifactKind.EVENTIDE || kind==ArtifactKind.INTERREGNUM)) data.putInt("charge",0);
         ArtifactFeedback.sound(p,kind);return true;
     }
     private static boolean secondary(ServerPlayer p,ArtifactKind kind) {
         switch(kind) {
-            case PALIMPSEST -> ArtifactState.of(p,kind).remove("memory");
+            case PALIMPSEST -> ArtifactState.rotate(p,kind);
             case MERIDIAN, ATLAS -> ArtifactState.clearAnchors(p,kind);
             case INTERREGNUM -> DomainFields.stop(p);
             default -> ArtifactState.rotate(p,kind);
         }
         ArtifactFeedback.message(p,"mode",ArtifactState.mode(p,kind)+1);return true;
     }
-    public static int radius(ServerPlayer p,ArtifactKind kind) { return Math.min(ArtifactConfig.MAX_RADIUS.get(),4+ArtifactState.charge(p,kind)/32); }
+    public static int radius(ServerPlayer p,ArtifactKind kind) { return Math.min(ArtifactConfig.MAX_RADIUS.get(),8); }
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
+        if(DirectAbilities.handles(kind))return DirectAbilities.activate(p,tool,kind);
         if(kind==ArtifactKind.PALIMPSEST) {
             var steps=new ArrayList<WorkStep>();
-            for(var memory:ArtifactState.memories(p,kind)) steps.add(new WorkStep.Place(memory.pos(),memory.state()));
+            var center=target(p).orElse(p.blockPosition());
+            for(var memory:ArtifactState.memories(p,kind))if(memory.pos().distSqr(center)<=16*16)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
             return WorkQueue.start(p,tool,kind,steps);
         }
         if(kind==ArtifactKind.ICARUS) return WorkQueue.start(p,tool,kind,bore(p));
@@ -122,7 +123,7 @@ public final class ArtifactActions {
             }
         } else {
             var forward=p.getDirection();var side=forward.getClockWise();
-            int length=16+ArtifactState.charge(p,ArtifactKind.WORLDLOOM)/8;
+            int length=48;
             for(int i=0;i<length;i++) for(int w=-1;w<=1;w++) steps.add(new WorkStep.Place(origin.relative(forward,i).relative(side,w),state));
         }
         return steps;
@@ -130,7 +131,7 @@ public final class ArtifactActions {
     public static List<WorkStep> bore(ServerPlayer p) {
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
         if(ArtifactState.mode(p,ArtifactKind.ICARUS)%2!=0) direction=direction.getOpposite();
-        int length=Math.min(ArtifactConfig.BORE_LENGTH.get(),12+ArtifactState.charge(p,ArtifactKind.ICARUS)/8);
+        int length=Math.min(ArtifactConfig.BORE_LENGTH.get(),ArtifactConfig.BORE_LENGTH.get());
         var steps=new ArrayList<WorkStep>();
         for(int i=1;i<=length;i++) {
             var feet=p.blockPosition().relative(direction,i);
@@ -153,7 +154,7 @@ public final class ArtifactActions {
             if(first.get().equals(center)) return false;
             ArtifactState.of(p,kind).putInt("rotation",Math.floorMod(p.getDirection().get2DDataValue()-ArtifactState.of(p,kind).getInt("heading"),4));ArtifactState.anchor(p,kind,"b",center);ArtifactFeedback.trace(p,kind,first.get(),center);ArtifactFeedback.message(p,"linked");return true;
         }
-        var delta=center.subtract(first.get());int r=Math.min(4,2+ArtifactState.charge(p,kind)/128);
+        var delta=center.subtract(first.get());int r=4;
         if(Math.abs(delta.getX())<=2*r && Math.abs(delta.getY())<=2*r && Math.abs(delta.getZ())<=2*r) return false;
         var steps=new ArrayList<WorkStep>();
         for(var pos:Geometry.cube(first.get(),r,ArtifactConfig.JOB_LIMIT.get())) {
@@ -168,7 +169,7 @@ public final class ArtifactActions {
     }
     public static void mined(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
         if(WorkQueue.running() || !p.serverLevel().getBlockState(pos).isAir()) return;
-        ArtifactState.charge(p,kind,4);DomainFields.feed(p,pos);
+        DomainFields.feed(p,pos);CompanionActions.mined(p,kind,pos);if(p.tickCount%3==0)ArtifactFeedback.burst(p,kind,pos,2);
         if(kind==ArtifactKind.PALIMPSEST || kind==ArtifactKind.CHOIR) ArtifactState.record(p,kind,pos,state);
         if(kind==ArtifactKind.MERIDIAN) {
             var a=ArtifactState.anchor(p,kind,"a");var b=ArtifactState.anchor(p,kind,"b");

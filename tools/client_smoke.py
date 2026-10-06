@@ -17,7 +17,7 @@ execute as @a[scores={artifactAge=1}] run gamemode creative @s
 execute as @a[scores={artifactAge=1}] run tp @s 0 65 12 180 -6
 execute as @a[tag=!artifact_gallery,scores={artifactAge=60..}] run function artifact_gallery:setup
 ''')
-ids='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator'.split()
+ids='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
 commands=['tag @s add artifact_gallery','fill -9 65 0 9 74 16 minecraft:air','fill -9 64 -1 9 64 17 minecraft:polished_andesite','fill -9 65 0 9 74 0 minecraft:black_concrete','fill -9 74 0 9 74 16 minecraft:sea_lantern','time set noon','weather clear','gamerule doDaylightCycle false','gamerule doMobSpawning false','tp @s 0 65 12 180 -6','clear @s']
 for i,id in enumerate(ids):
  x=-7.5+(i%7)*2.5;y=69 if i<7 else 66
