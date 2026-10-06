@@ -36,6 +36,7 @@ public final class PickaxeConfig {
     public static final ForgeConfigSpec.IntValue STORM_TARGETS = B.defineInRange("storm.targets", 3, 1, 8);
     public static final ForgeConfigSpec.DoubleValue STORM_DAMAGE = B.defineInRange("storm.damage", 6.0, 1.0, 20.0);
     public static final ForgeConfigSpec.IntValue STORM_SLOW = B.defineInRange("storm.slowTicks", 40, 0, 100);
+    public static final ForgeConfigSpec.IntValue VOID_ARM_COOLDOWN = B.defineInRange("void.armCooldownTicks", 20, 1, 200);
     public static final ForgeConfigSpec.IntValue VOID_RANGE = B.defineInRange("void.range", 24, 1, 48);
     public static final ForgeConfigSpec.IntValue ENDER_RANGE = B.defineInRange("ender.range", 8, 1, 16);
     public static final ForgeConfigSpec.IntValue BLAST_RADIUS = B.defineInRange("explosive.radius", 2, 1, 3);

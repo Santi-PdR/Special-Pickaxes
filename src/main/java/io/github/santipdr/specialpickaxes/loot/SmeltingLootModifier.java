@@ -27,6 +27,7 @@ public final class SmeltingLootModifier extends LootModifier {
                 || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) return loot;
         ObjectArrayList<ItemStack> result = new ObjectArrayList<>();
         for (ItemStack drop : loot) {
+            if (drop.isEmpty()) continue;
             var input = new SimpleContainer(drop.copyWithCount(1));
             var recipe = context.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING, input, context.getLevel());
             ItemStack output = recipe.map(r -> r.assemble(input, context.getLevel().registryAccess())).orElse(ItemStack.EMPTY);

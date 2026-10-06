@@ -39,10 +39,13 @@ public final class AbilityRuntime {
     public static boolean activate(ServerPlayer player, ItemStack tool, PickaxeAbility ability) {
         if (!ability.active() || !ready(player, ability.id())
                 || !allowed(player, ability.id(), player.blockPosition())) return false;
+        var item = tool.getItem();
         int cost = PickaxeConfig.TIMINGS.get(ability.id()).cost().get();
         if (!player.isCreative() && tool.getMaxDamage() - tool.getDamageValue() <= cost) return false;
         if (!ability.activate(player, tool)) return false;
-        cooldown(player, tool, ability.id());
+        int ticks = ability.cooldownTicks(player);
+        data(player).putLong(ability.id() + "_ready", now(player) + ticks);
+        player.getCooldowns().addCooldown(item, ticks);
         tool.hurtAndBreak(cost, player, p -> p.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         feedback(player);
         return true;

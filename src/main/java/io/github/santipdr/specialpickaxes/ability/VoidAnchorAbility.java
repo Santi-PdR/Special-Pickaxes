@@ -9,6 +9,10 @@ import net.minecraft.world.phys.Vec3;
 /** Two-stage personal anchor; same dimension, finite lifetime, range and unobstructed return. */
 public final class VoidAnchorAbility implements PickaxeAbility {
     public String id() { return "void"; }
+    public int cooldownTicks(ServerPlayer player) {
+        return AbilityRuntime.data(player).contains("anchor") ? PickaxeConfig.VOID_ARM_COOLDOWN.get()
+            : PickaxeAbility.super.cooldownTicks(player);
+    }
     public boolean active() { return true; }
     public boolean activate(ServerPlayer player, ItemStack tool) {
         CompoundTag data = AbilityRuntime.data(player);

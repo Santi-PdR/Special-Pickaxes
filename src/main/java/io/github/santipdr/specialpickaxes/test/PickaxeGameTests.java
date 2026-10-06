@@ -128,6 +128,23 @@ public final class PickaxeGameTests {
         h.assertTrue(mob.getHealth() < health, "storm does actual damage");
         h.succeed();
     }
+    @GameTest(template = "empty") public static void explosiveBoundedAndProtected(GameTestHelper h) {
+        var p = player(h, "explosive"); p.setYRot(0); p.setXRot(0);
+        BlockPos center = h.absolutePos(new BlockPos(5, 3, 7));
+        for (BlockPos pos : BlockPos.betweenClosed(center.offset(-2,-2,0), center.offset(2,2,3)))
+            h.getLevel().setBlockAndUpdate(pos, Blocks.STONE.defaultBlockState());
+        BlockPos denied = center.above();
+        Consumer<BlockEvent.BreakEvent> deny = e -> { if (e.getPos().equals(denied)) e.setCanceled(true); };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, BlockEvent.BreakEvent.class, deny);
+        try {
+            h.assertTrue(AbilityRuntime.activate(p, p.getMainHandItem(), new ExplosiveMiningAbility()), "controlled blast activates");
+            h.assertTrue(h.getLevel().getBlockState(denied).is(Blocks.STONE), "protected blast neighbour survives");
+            int damage = p.getMainHandItem().getDamageValue() - PickaxeConfig.TIMINGS.get("explosive").cost().get();
+            h.assertTrue(damage > 0 && damage <= PickaxeConfig.BLAST_LIMIT.get(), "blast limit and per-block durability");
+            h.assertTrue(h.getLevel().getBlockState(center.offset(0,0,3)).is(Blocks.STONE), "outside radius survives");
+        } finally { MinecraftForge.EVENT_BUS.unregister(deny); }
+        h.succeed();
+    }
     @GameTest(template = "empty") public static void teleportWallsAndAnchor(GameTestHelper h) {
         var p = player(h, "ender");
         Vec3 destination = p.position().add(3, 0, 0);
@@ -139,6 +156,12 @@ public final class PickaxeGameTests {
         h.assertTrue(!SafeTeleport.free(p, Vec3.atBottomCenterOf(wall)), "solid destination denied");
         h.assertTrue(new VoidAnchorAbility().activate(p, p.getMainHandItem()), "anchor set");
         h.assertTrue(AbilityRuntime.data(p).contains("anchor"), "anchor recorded server-side");
+        Vec3 origin = p.position();
+        p.setPos(origin.x, origin.y, origin.z + 1);
+        h.assertTrue(new VoidAnchorAbility().activate(p, p.getMainHandItem()), "anchor return");
+        h.assertTrue(p.position().distanceToSqr(origin) < 0.01, "returned to exact anchor");
+        p.setYRot(180); p.setXRot(0);
+        h.assertTrue(new TeleportAbility().activate(p, p.getMainHandItem()), "ender open-path movement");
         h.succeed();
     }
 }
