@@ -34,6 +34,9 @@ public final class ArtifactHud {
         if(!(stack.getItem() instanceof ArtifactItem item)) return;
         var tag=stack.getTag();int charge=tag==null?0:Math.min(256,Math.max(0,tag.getInt("artifactCharge")));
         int mode=tag==null?1:tag.getInt("artifactMode")+1;int work=tag==null?0:tag.getInt("artifactWork");
+        if(io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.regional(item.kind)){
+            int done=tag==null?0:tag.getInt("artifactProgress");charge=done+work==0?0:(int)Math.min(256,256L*done/(done+work));
+        }
         int x=mc.getWindow().getGuiScaledWidth()/2-80,y=mc.getWindow().getGuiScaledHeight()-76;
         var gui=event.getGuiGraphics();gui.fill(x,y,x+160,y+4,0x990a1020);
         gui.fill(x,y,x+charge*160/256,y+4,0xff000000|item.kind.color);

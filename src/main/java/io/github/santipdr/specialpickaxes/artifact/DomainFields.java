@@ -32,6 +32,7 @@ public final class DomainFields {
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }
     public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field); }
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear(); }
+    public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
         var f=FIELDS.get(p.getUUID());return f!=null && f.kind==ArtifactKind.INTERREGNUM && p.level().dimension()==f.dimension
             && p.getMainHandItem()==f.tool && ArtifactState.now(p)<=f.expires && pos.distSqr(f.center)<=f.radius*f.radius;

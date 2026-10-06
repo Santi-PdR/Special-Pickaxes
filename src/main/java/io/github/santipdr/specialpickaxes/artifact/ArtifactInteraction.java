@@ -62,7 +62,7 @@ public final class ArtifactInteraction {
             else {ArtifactState.rotate(p,k);ArtifactFeedback.message(p,"named_mode",Component.translatable("mode.specialpickaxes."+modeKey(k,ArtifactState.mode(p,k))));}
             ArtifactFeedback.cue(p,"select");return true;
         }
-        if(!ArtifactState.of(p,k).getBoolean("helpSeen")){p.sendSystemMessage(Component.translatable(regional(k)?"ux.specialpickaxes.region_controls":"ux.specialpickaxes.controls"));ArtifactState.of(p,k).putBoolean("helpSeen",true);}
+        if(!ArtifactState.of(p,k).getBoolean("helpSeen")){p.sendSystemMessage(Component.translatable(regional(k)?"ux.specialpickaxes.intro_region":"ux.specialpickaxes.intro"));ArtifactState.of(p,k).putBoolean("helpSeen",true);}
         if(regional(k)){
             if(s==null){s=new Selection(p,tool,k);if(k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR)s.transform=ArtifactState.mode(p,k);SELECTED.put(p.getUUID(),s);ArtifactFeedback.message(p,"armed");ArtifactFeedback.cue(p,"select");return true;}
             if(s.points.size()!=corners(p,k)){ArtifactFeedback.message(p,"need_corners",s.points.size(),corners(p,k));ArtifactFeedback.cue(p,"error");return false;}
@@ -86,7 +86,8 @@ public final class ArtifactInteraction {
     }
     public static void display(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);s=null;}
-        String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?(s.points.size()==corners(p,k)?"ready":"selecting"):"idle";
+        String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?(s.points.size()==corners(p,k)?"selected":"selecting"):"idle";
+        if(!WorkQueue.busy(p)&&DomainFields.active(p))status="domain";
         var tag=tool.getOrCreateTag();tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));
         tag.putString("artifactModeName",modeKey(k,ArtifactState.mode(p,k)));
         tag.remove("artifactSource");tag.remove("artifactTarget");tag.remove("artifactTransform");

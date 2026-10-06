@@ -1,4 +1,10 @@
 PAIRS={
+'ux.specialpickaxes.intro_region':('Relic: Use arms; left clicks select; Use analyzes, then confirms. Details in the tooltip.','Reliquia: usar activa; clics izquierdos seleccionan; usar analiza y luego confirma. Detalles en el tooltip.'),
+'ux.specialpickaxes.intro':('Relic: Use previews, repeat to confirm. Sneak-use changes mode or cancels.','Reliquia: usar previsualiza; repite para confirmar. Agachado + usar cambia modo o cancela.'),
+'ux.specialpickaxes.energy':('Mining charge: %s/256','Carga de minería: %s/256'),
+'ux.specialpickaxes.cost.paid':('One plain inventory block per placement. Activation wear: %s.','Un bloque simple del inventario por colocación. Desgaste al activar: %s.'),
+'ux.specialpickaxes.cost.matter':('Conserves matter; no generated loot. Activation wear: %s.','Conserva materia; no genera drops. Desgaste al activar: %s.'),
+'ux.specialpickaxes.cost.mining':('Activation wear: %s; mining also uses normal durability.','Desgaste al activar: %s; minar consume además durabilidad normal.'),
 'ux.specialpickaxes.link':('Link distance %s blocks · rotation %s°','Enlace de %s bloques · rotación %s°'),
 'ux.specialpickaxes.volumes':('SOURCE %s · TARGET %s','ORIGEN %s · DESTINO %s'),
 'message.specialpickaxes.volume_limit':('Volume %s exceeds configured limit %s.','El volumen %s supera el límite configurado %s.'),
@@ -37,7 +43,7 @@ MODES={
 'world_rephase':('WORLD REPHASE · offhand rock','TRANSFORMACIÓN · roca secundaria'),'world_transpose':('WORLD TRANSPOSE','TRANSPOSICIÓN MUNDIAL'),
 'world_restore':('WORLD RESTORE','RESTAURACIÓN MUNDIAL'),'world_record':('WORLD RECORD','REGISTRO MUNDIAL'),
 'vault':('Parabolic vault','Bóveda parabólica'),'supported_vault':('Vault with pier ribs','Bóveda con nervios de apoyo')}
-STATES={'linked':('LINK ACTIVE · mine near A','ENLACE ACTIVO · mina cerca de A'),'anchor_b':('ANCHOR A set · aim B and Use','ANCLA A fijada · apunta B y usa'),'idle':('IDLE','INACTIVO'),'selecting':('SELECTING','SELECCIONANDO'),'ready':('READY · Use to confirm','LISTO · Usar confirma'),'preparing':('PREPARING','PREPARANDO'),'executing':('EXECUTING','EJECUTANDO'),'paused':('PAUSED · Use to resume','PAUSADO · Usar reanuda'),'':('IDLE','INACTIVO')}
+STATES={'selected':('SELECTION READY · Use to analyze','SELECCIÓN LISTA · Usar analiza'),'domain':('DOMAIN ACTIVE','DOMINIO ACTIVO'),'linked':('LINK ACTIVE · mine near A','ENLACE ACTIVO · mina cerca de A'),'anchor_b':('ANCHOR A set · aim B and Use','ANCLA A fijada · apunta B y usa'),'idle':('IDLE','INACTIVO'),'selecting':('SELECTING','SELECCIONANDO'),'ready':('READY · Use to confirm','LISTO · Usar confirma'),'preparing':('PREPARING','PREPARANDO'),'executing':('EXECUTING','EJECUTANDO'),'paused':('PAUSED · Use to resume','PAUSADO · Usar reanuda'),'':('IDLE','INACTIVO')}
 def enrich(data,spanish):
  for key,pair in PAIRS.items():data[key]=pair[int(spanish)]
  for key,pair in MODES.items():data['mode.specialpickaxes.'+key]=pair[int(spanish)]

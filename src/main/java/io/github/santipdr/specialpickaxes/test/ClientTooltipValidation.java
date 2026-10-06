@@ -15,6 +15,7 @@ public final class ClientTooltipValidation {
     @SubscribeEvent public static void draw(RenderGuiOverlayEvent.Post e){
         if(!Boolean.getBoolean("specialpickaxes.clientSmoke")||e.getOverlay()!=VanillaGuiOverlay.HOTBAR.type())return;
         var mc=Minecraft.getInstance();if(mc.player==null||mc.options.hideGui||mc.player.tickCount<250)return;
+        mc.gui.getChat().clearMessages(false); // Diagnostic capture markers remain in logs, not over the demonstration.
         if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem)e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);
     }
 }
