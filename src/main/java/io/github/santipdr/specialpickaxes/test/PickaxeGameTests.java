@@ -38,7 +38,7 @@ public final class PickaxeGameTests {
     private static BlockPos target(GameTestHelper h) {
         var pos=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());return pos;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p) { WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
+    private static void finish(GameTestHelper h,ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
         h.assertTrue(SpecialPickaxes.PICKS.size()==20,"twenty artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
@@ -358,4 +358,71 @@ public final class PickaxeGameTests {
         h.assertTrue(list.size()==1,"expired memory pruned from player-visible count");finish(h,p);
     }
 
+
+    @GameTest(template="empty") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
+        for(var k:ArtifactKind.values())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
+            boolean expected=k==ArtifactKind.ATLAS||k==ArtifactKind.CRUCIBLE||k==ArtifactKind.CHRONICLE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&m!=1&&m!=4;
+            h.assertTrue(ArtifactInteraction.regional(k,m)==expected,"regional contract "+k+" mode "+m);
+        }h.succeed();
+    }
+    @GameTest(template="empty") public static void compactAndExpandedTooltipContracts(GameTestHelper h){
+        for(var k:ArtifactKind.values()){
+            var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
+            ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
+            h.assertTrue(compact.size()==3&&expanded.size()>=9,"compact identity/mode/hint and advanced manual "+k);
+        }h.succeed();
+    }
+    @GameTest(template="empty") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);
+        data.putInt("charge",0);tool.getOrCreateTag().putInt("artifactCharge",999);
+        ((ArtifactItem)tool.getItem()).inventoryTick(tool,h.getLevel(),p,0,true);
+        h.assertTrue(!data.contains("charge")&&!tool.getTag().contains("artifactCharge"),"legacy values removed");
+        ArtifactInteraction.use(p,tool,ArtifactKind.INTERREGNUM,false);
+        h.assertTrue(DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
+    }
+    @GameTest(template="empty") public static void aegisReflectsWithoutTakingOwnership(GameTestHelper h){
+        var p=player(h,ArtifactKind.AEGIS);var center=target(h);
+        var shot=new net.minecraft.world.entity.projectile.Snowball(h.getLevel(),center.getX()+2.5,center.getY()+0.5,center.getZ()+0.5);
+        shot.setDeltaMovement(-0.3,0,0);h.getLevel().addFreshEntity(shot);
+        DomainFields.start(p,p.getMainHandItem(),ArtifactKind.AEGIS,center,8);DomainFields.tick();
+        h.assertTrue(shot.getDeltaMovement().x>0&&shot.getOwner()==null,"outward reflection, unchanged owner");shot.discard();finish(h,p);
+    }
+    @GameTest(template="empty") public static void lodestarRetracesAndConsumesRoute(GameTestHelper h){
+        var p=player(h,ArtifactKind.LODESTAR);var start=p.blockPosition();var tool=p.getMainHandItem();
+        h.assertTrue(DirectAbilities.activate(p,tool,ArtifactKind.LODESTAR),"anchor marked");
+        p.setPos(start.getX()+1.5,start.getY(),start.getZ()+0.5);DirectAbilities.recordFootstep(p);
+        p.setPos(start.getX()+2.5,start.getY(),start.getZ()+0.5);DirectAbilities.recordFootstep(p);
+        h.assertTrue(DirectAbilities.activate(p,tool,ArtifactKind.LODESTAR),"return queued");drain(p);
+        h.assertTrue(p.blockPosition().equals(start)&&ArtifactState.anchor(p,ArtifactKind.LODESTAR,"a").isEmpty(),"returned physically; route consumed");finish(h,p);
+    }
+    @GameTest(template="empty") public static void seamRipperExtractsOnlyContactSkin(GameTestHelper h){
+        var p=player(h,ArtifactKind.SEAM_RIPPER);var at=target(h);
+        h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIRT.defaultBlockState());
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.DIRT));var plan=DirectAbilities.seam(p,at);
+        h.assertTrue(plan.size()==1,"not whole connected vein");WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,plan);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(at.east()).is(Blocks.STONE)&&h.getLevel().getBlockState(at.above()).is(Blocks.DIRT),"only A touching B mined");finish(h,p);
+    }
+    @GameTest(template="empty") public static void causewayPaysForFootingAndCancels(GameTestHelper h){
+        var p=player(h,ArtifactKind.CAUSEWAY);var below=p.blockPosition().below();
+        h.getLevel().setBlockAndUpdate(below,Blocks.AIR.defaultBlockState());h.getLevel().setBlockAndUpdate(below.south(),Blocks.AIR.defaultBlockState());
+        p.getInventory().add(new ItemStack(Items.STONE,2));CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.CAUSEWAY);CompanionActions.tick();drain(p);
+        h.assertTrue(h.getLevel().getBlockState(below).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"two paid footings");
+        p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);CompanionActions.tick();h.assertTrue(!CompanionActions.active(p),"tool change cancels service");finish(h,p);
+    }
+    @GameTest(template="empty") public static void countersealFiltersTerrainButNotEntities(GameTestHelper h){
+        var p=player(h,ArtifactKind.COUNTERSEAL);var near=p.blockPosition();var far=near.east(12);
+        CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.COUNTERSEAL);
+        var explosion=new net.minecraft.world.level.Explosion(h.getLevel(),null,near.getX(),near.getY(),near.getZ(),4,false,net.minecraft.world.level.Explosion.BlockInteraction.DESTROY);
+        explosion.getToBlow().addAll(List.of(near,far));var entities=new ArrayList<Entity>();entities.add(p);
+        MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.level.ExplosionEvent.Detonate(h.getLevel(),explosion,entities));
+        h.assertTrue(explosion.getToBlow().equals(List.of(far))&&entities.equals(List.of(p)),"terrain ward leaves distant blocks and entity damage list unchanged");finish(h,p);
+    }
+    @GameTest(template="empty") public static void covenantSealsConfirmedManualScars(GameTestHelper h){
+        var p=player(h,ArtifactKind.COVENANT);var at=target(h);p.getInventory().add(new ItemStack(Items.STONE));
+        CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.COVENANT);
+        h.assertTrue(p.gameMode.destroyBlock(at),"manual break");MiningObservations.flush();CompanionActions.tick();drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir(),"not sealed before passing it");
+        p.setPos(at.getX()+0.5,at.getY(),at.getZ()+4.5);CompanionActions.tick();drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid wake sealed behind miner");finish(h,p);
+    }
 }
