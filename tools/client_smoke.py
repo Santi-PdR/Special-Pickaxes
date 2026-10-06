@@ -60,6 +60,7 @@ try:
    ux.add(id)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(ids):raise RuntimeError('Incomplete graphical artifact validation')
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True)
    success=True;break
 finally:
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.

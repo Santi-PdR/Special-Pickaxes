@@ -6,7 +6,7 @@ modId="specialpickaxes"
 version="3.0.0"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
-description='''Ten Siege endgame artifacts. Memory, kinetic domains and protected matter manipulation. No recipes or world generation.'''
+description='''Fourteen Siege endgame artifacts. Spatial selection, geological memory, streamed regional operations and combined tools. No recipes or world generation.'''
 [[dependencies.specialpickaxes]]
 modId="forge"
 mandatory=true

@@ -1,52 +1,32 @@
-# Siege artifact verification (2.0)
+# Validación 3.0.0
 
-The authoritative result is the **latest completed Forge verification run for the
-exact release commit**, with matching `META-INF/MANIFEST.MF` Build-Commit and
-`build/RELEASE.json`. Do not apply results from 1.0 or an earlier failed run.
+La autoridad es el run de Forge verification del commit del JAR, no un informe
+histórico. Manifiesto, RELEASE.json y SHA256SUMS deben coincidir.
 
-## Executable suites
+Se conservan los 23 GameTests de 2.0 y se amplía su registro a 14 herramientas.
+Nuevas pruebas: herramienta triple, niveles altos, selecciones y confirmación,
+pausa/reanudación, intercambio rotado, checkpoint pagado, dos regiones de 50.000
+celdas simultáneas, cancelación, cambio de herramienta, logout/muerte/dimensión,
+chunk ausente, cambios después del análisis, entidades de bloque, protecciones,
+plano pagado y bóveda geométrica.
 
-- JUnit: six bounded traversal cases plus three geometry cases (result limits,
-  visit budgets, denied barriers, cycles, rotations, planes and unique positions).
-- Forge GameTests: registration/no recipes, all admin grants and permission gate;
-  paid Palimpsest reconstruction; rotated/translated Choir state matching;
-  Eventide quarry and trajectory control; Meridian consequences; Crucible material
-  conservation; Interregnum stasis/release/local speed; Worldloom paid bridge;
-  Icarus safe bore and bedrock stop; Axiom rib/ore preservation; Atlas permutation and conserved relocation into air;
-  break and placement cancellation; atomic rollback; payment mutation; serialized
-  cooldown/memory; queue budget/tool cancellation; unloaded chunks; restricted
-  blocks; Silk Touch/Fortune drops and wear; no unpaid placement; isolated tier;
-  stale dimension anchor rejection. Tests use server fake players with a real
-  packet handler for server movement. This alone is not an external network test.
-- Static resources: parse JSON and mcmeta, ten distinct animated sprites and models,
-  matching languages, pickaxe tag, no crafting recipes/new blockstates/worldgen.
-- Installed release JAR: clean Forge 47.3.0 dedicated server, world startup, item-ID
-  command parsing, save and stop. Empty `@a` commands do not claim actual delivery
-  to a human player; administrative acquisition is verified separately in GameTests.
-- Graphical smoke: actual Minecraft client and integrated server under Xvfb,
-  disposable gallery world, ten item displays and inventory grants, HUD/animated
-  asset loading, runtime log checks and screenshot. The test ends the disposable
-  process intentionally; it is not a manual ten-artifact gameplay playthrough.
-- Log gate: ERROR/Exception/Crash/Stacktrace/Failed/Invalid cause failure. Additional
-  missing-texture/model/bake checks apply to the client log.
+JUnit: traversal y geometría originales, tamaños inclusivos pequeños/medianos/
+grandes, saturación de coordenadas, biyección de los seis transformadores,
+incompatibilidad y cálculos de encantamientos altos.
 
-## Limitations that must stay explicit
+Cliente: Minecraft/Forge real bajo Xvfb, no imágenes simuladas. Galería de 14
+artefactos, fixture de servidor que recorre cada herramienta, selección/preview,
+modos, tooltip renderizado con la API real, Efficiency 1000 y captura en tercera
+persona. La fixture conduce el estado de servidor; **no es una prueba automatizada
+de todas las pulsaciones físicas ni de todos los poderes en multiplayer**.
 
-No full Eternal Craft — Siege instance/configuration was supplied. We use the
-owner's confirmed overlap list, not a fabricated inspection of all 122 JARs.
-No certification of external claims plugins, every modded block/loot table,
-ToolLeveling-specific callbacks, dedicated multiplayer latency or large-player
-load testing. Client gallery execution, when successful, demonstrates actual
-rendering/resource loading and an integrated server, not those integrations.
+Servidor: instalación limpia de Forge con el JAR reobfuscado y arranque/guardado/
+parada. Recursos: JSON, traducciones, modelos/sprites distintos, animaciones, tags,
+ausencia de recetas y worldgen. Logs y diff pasan gates estrictos.
 
-## Reproduction / artifact
-
-See README and `.github/workflows/verify.yml`. Output:
-`build/libs/special-pickaxes-1.20.1-2.0.0.jar`.
-`python3 tools/verify_release.py` validates the archive and writes its exact size,
-SHA-256 and checkout commit. `forge-validation` publishes these alongside logs and
-reports, including a real screenshot if the graphical test reached its ready marker.
-The full tool suite runs only inside the workspace/disposable build directories.
-
-The original release's logs/report are retained in `docs/validation/` and
-`LEGACY-1.0.md` for traceability, explicitly **not current 2.0 evidence**.
+Límites explícitos: no se encontró `test-1` en el sandbox. No se accede a `siege`.
+El JAR se entrega listo para instalar en test-1, pero no se confunde esa prueba
+pendiente con CI. Tampoco se certifican claims externos, los 122 mods de Siege,
+latencia multiplayer ni todos los mods que alteran loot o encantamientos.
+Los tests de dos trabajos grandes verifican presupuesto/cursor, no constituyen
+un benchmark completo de TPS para una instancia con muchos jugadores.

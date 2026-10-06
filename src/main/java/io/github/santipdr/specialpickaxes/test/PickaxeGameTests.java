@@ -299,4 +299,42 @@ public final class PickaxeGameTests {
         WorkQueue.cancel(q);h.assertTrue(!WorkQueue.busy(q)&&WorkQueue.busy(p),"independent cancellation");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p),"tool switch cancels large work");finish(h,p);
     }
 
+    @GameTest(template="empty") public static void regionLifecycleCancellation(GameTestHelper h){
+        for(int reason=0;reason<3;reason++){
+            var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a.offset(10,10,10));
+            WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+            if(reason==0)MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(p));
+            if(reason==1){p.setHealth(0);WorkQueue.tick();}
+            if(reason==2)MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent(p,net.minecraft.world.level.Level.OVERWORLD,net.minecraft.world.level.Level.NETHER));
+            h.assertTrue(!WorkQueue.busy(p),"logout/death/dimension cancellation "+reason);
+        }h.succeed();
+    }
+    @GameTest(template="empty") public static void unloadedRegionPausesWithoutLoading(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var a=new BlockPos(1000000,60,1000000);var v=new SelectionVolume(a,a);
+        h.assertTrue(!h.getLevel().hasChunkAt(a),"fixture chunk absent");WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+        WorkQueue.tick();h.assertTrue(WorkQueue.status(p).equals("paused")&&WorkQueue.remaining(p)==1&&!h.getLevel().hasChunkAt(a),"no implicit chunk load, cursor retained");finish(h,p);
+    }
+    @GameTest(template="empty") public static void analyzedRegionDoesNotDestroyChangedBlocksOrMachines(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var b=a.offset(1,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.CHEST.defaultBlockState());
+        var v=new SelectionVolume(a,b);WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+        WorkQueue.tick();h.getLevel().setBlockAndUpdate(a,Blocks.OBSIDIAN.defaultBlockState());WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.OBSIDIAN)&&h.getLevel().getBlockState(b).is(Blocks.CHEST),"analyzed state changed: skipped; machine untouched");finish(h,p);
+    }
+    @GameTest(template="empty") public static void tessellatorPaysAndLeavesBlueprint(GameTestHelper h){
+        var p=player(h,ArtifactKind.TESSELLATOR);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE));
+        var r=new RegionWork(new SelectionVolume(a,a),new SelectionVolume(b,b),SelectionVolume.Transform.IDENTITY,ArtifactKind.TESSELLATOR,0,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.TESSELLATOR,r);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&h.getLevel().getBlockState(b).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"copy is paid, not free matter");finish(h,p);
+    }
+    @GameTest(template="empty") public static void keystoneBuildsPaidArch(GameTestHelper h){
+        var p=player(h,ArtifactKind.KEYSTONE);var a=target(h).above();var v=new SelectionVolume(a,a.offset(4,3,0));for(long n=0;n<v.size();n++)h.getLevel().setBlockAndUpdate(v.at(n),Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE,32));
+        WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.KEYSTONE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.KEYSTONE,0,Blocks.STONE.defaultBlockState()));WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        h.assertTrue(h.getLevel().getBlockState(a.offset(2,3,0)).is(Blocks.STONE),"vault apex");h.assertTrue(h.getLevel().getBlockState(a.offset(2,0,0)).isAir(),"walkable void under vault");h.assertTrue(p.getInventory().countItem(Items.STONE)==27,"five paid arch voxels");finish(h,p);
+    }
+    @GameTest(template="empty") public static void regionProtectionStillAppliesAfterAnalysis(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a);
+        WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));WorkQueue.tick();
+        Consumer<BlockEvent.BreakEvent> deny=e->{if(e.getPlayer()==p)e.setCanceled(true);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,deny);
+        try{WorkQueue.togglePause(p);drain(p);h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"new protection still cancels after preparing");}finally{MinecraftForge.EVENT_BUS.unregister(deny);}finish(h,p);
+    }
+
 }
