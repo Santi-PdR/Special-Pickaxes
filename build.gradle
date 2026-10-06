@@ -14,7 +14,12 @@ minecraft {
             property 'forge.logging.console.level', 'info'
             mods { specialpickaxes { source sourceSets.main } }
         }
-        client {}
+        client {
+            if (project.hasProperty('clientSmoke')) {
+                args '--username', 'ArtifactTester', '--quickPlaySingleplayer', 'ArtifactSmoke', '--width', '1280', '--height', '720'
+                jvmArgs '-Xmx2G'
+            }
+        }
         server { args '--nogui' }
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', 'specialpickaxes'
