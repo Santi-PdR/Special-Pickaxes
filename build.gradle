@@ -35,7 +35,7 @@ jar {
     reproducibleFileOrder = true
     finalizedBy 'reobfJar'
 }
-tasks.named('runGameTestServer').configure {
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     doFirst {
         def properties = file('run/server.properties')
         properties.parentFile.mkdirs()

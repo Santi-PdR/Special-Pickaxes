@@ -2,7 +2,7 @@
 """Publish reproducible evidence through Checks API, also accessible when blob artifact CDN is blocked.
 Only explicit build products are exported. No environment, credentials or world data.
 """
-import base64,hashlib,io,json,os,pathlib,urllib.request,zipfile
+import base64,hashlib,io,json,os,pathlib,subprocess,zipfile
 root=pathlib.Path('.'); files=[]
 for pattern in ['build/libs/*.jar','build/test-results/test/*.xml','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
@@ -20,5 +20,6 @@ for i,chunk in enumerate(chunks):
   'status':'completed','conclusion':'neutral','output':{'title':'Downloadable build and verification evidence',
    'summary':f'Run {os.environ["GITHUB_RUN_ID"]}. ZIP base64 chunk {i+1}/{len(chunks)}. SHA256(zip): {hashlib.sha256(b.getvalue()).hexdigest()}',
    'text':'```base64\n'+chunk+'\n```'}}
- req=urllib.request.Request(f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/check-runs',data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
- with urllib.request.urlopen(req) as resp:print(json.load(resp)['html_url'])
+ result=subprocess.run(['gh','api',f'repos/{os.environ["GITHUB_REPOSITORY"]}/check-runs','--input','-'],
+     input=json.dumps(payload),text=True,capture_output=True,check=True)
+ print(json.loads(result.stdout)['html_url'])
