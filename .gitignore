@@ -6,3 +6,6 @@ run-*/
 .idea/
 *.iml
 __pycache__/
+
+# Deliverable copies are retained in the workspace, not committed binaries.
+/artifacts/
