@@ -8,6 +8,12 @@ import javax.imageio.ImageIO;
 class CaptureScreen {
     public static void main(String[] args) throws Exception {
         var bounds = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-        ImageIO.write(new Robot().createScreenCapture(bounds), "png", new File(args[0]));
+        var robot = new Robot();
+        if (args.length > 1) {
+            robot.keyPress(java.awt.event.KeyEvent.VK_F1);
+            robot.keyRelease(java.awt.event.KeyEvent.VK_F1);
+            Thread.sleep(1000);
+        }
+        ImageIO.write(robot.createScreenCapture(bounds), "png", new File(args[0]));
     }
 }
