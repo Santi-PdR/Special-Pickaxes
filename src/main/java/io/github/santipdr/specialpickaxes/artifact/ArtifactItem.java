@@ -52,7 +52,7 @@ public final class ArtifactItem extends PickaxeItem {
             // Vanilla inventory synchronization carries the display data; client never decides charge/work.
             var tag=tool.getOrCreateTag();tag.putInt("artifactCharge",ArtifactState.charge(p,kind));
             tag.putInt("artifactMode",ArtifactState.mode(p,kind));tag.putInt("artifactWork",WorkQueue.remaining(p));
-            tag.putInt("artifactMemory",ArtifactState.memories(p,kind).size());
+            tag.putInt("artifactMemory",ArtifactState.of(p,kind).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size());
             ArtifactInteraction.display(p,tool,kind);
         }
     }
@@ -70,6 +70,7 @@ public final class ArtifactItem extends PickaxeItem {
         if(stack.hasTag()) {
             lines.add(Component.translatable("ux.specialpickaxes.history",stack.getTag().getInt("artifactMemory"),stack.getTag().getLong("artifactOldest"),stack.getTag().getLong("artifactLatest")));
             lines.add(Component.translatable("status.specialpickaxes."+stack.getTag().getString("artifactStatus")));
+            if(kind==ArtifactKind.MERIDIAN && stack.getTag().contains("artifactTarget"))lines.add(Component.translatable("ux.specialpickaxes.link",stack.getTag().getInt("artifactDistance"),stack.getTag().getInt("artifactRotation")));
             if(stack.getTag().contains("artifactSource"))lines.add(Component.translatable("ux.specialpickaxes.volumes",stack.getTag().getString("artifactSource"),stack.getTag().getString("artifactTarget")));
             if(stack.getTag().contains("artifactTransform"))lines.add(Component.translatable("message.specialpickaxes.transform",Component.translatable("mode.specialpickaxes."+stack.getTag().getString("artifactTransform"))));
         }

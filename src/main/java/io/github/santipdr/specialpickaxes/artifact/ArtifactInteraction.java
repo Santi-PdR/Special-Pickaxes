@@ -50,7 +50,7 @@ public final class ArtifactInteraction {
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind k,boolean shift){
         if(!WorldSafety.allowed(p,k,p.blockPosition()))return false;
         if(WorkQueue.busy(p)){
-            if(shift){WorkQueue.cancel(p);clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
+            if(shift){WorkQueue.cancel(p);DomainFields.stop(p);if(k==ArtifactKind.MERIDIAN)ArtifactState.clearAnchors(p,k);clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
             else {WorkQueue.togglePause(p);ArtifactFeedback.cue(p,"confirm");}return true;
         }
         var s=SELECTED.get(p.getUUID());
@@ -93,10 +93,13 @@ public final class ArtifactInteraction {
         if(s!=null&&corners(p,k)==4){tag.putString("artifactTransform",modes(ArtifactKind.ATLAS)[s.transform]);if(k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR)tag.putInt("artifactMode",s.transform);}
         if(s!=null){
             for(var point:s.points)ArtifactFeedback.burst(p,k,point,2);
-            if(s.points.size()>=2){var a=new SelectionVolume(s.points.get(0),s.points.get(1));ArtifactFeedback.box(p,k,a,false);tag.putString("artifactSource",a.dimensions());
+            if(s.points.size()>=2){var a=new SelectionVolume(s.points.get(0),s.points.get(1));ArtifactFeedback.box(p,k,a,false);ArtifactFeedback.shape(p,k,a,ArtifactState.mode(p,k));tag.putString("artifactSource",a.dimensions());
                 if(s.points.size()==4){var b=new SelectionVolume(s.points.get(2),s.points.get(3));ArtifactFeedback.box(p,k,b,true);tag.putString("artifactTarget",b.dimensions());if(SelectionVolume.Transform.values()[s.transform].compatible(a,b))ArtifactFeedback.trace(p,k,a.min(),SelectionVolume.Transform.values()[s.transform].map(a,b,a.min()));}}
         }
-        if(k==ArtifactKind.MERIDIAN){var a=ArtifactState.anchor(p,k,"a");var b=ArtifactState.anchor(p,k,"b");if(a.isPresent()){ArtifactFeedback.burst(p,k,a.get(),3);if(b.isPresent()){ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}}}
+        if(k==ArtifactKind.MERIDIAN){var a=ArtifactState.anchor(p,k,"a");var b=ArtifactState.anchor(p,k,"b");if(a.isPresent()){
+            tag.putString("artifactStatus",b.isPresent()?"linked":"anchor_b");tag.putString("artifactSource",a.get().toShortString());ArtifactFeedback.burst(p,k,a.get(),3);
+            if(b.isPresent()){tag.putString("artifactTarget",b.get().toShortString());tag.putInt("artifactRotation",ArtifactState.of(p,k).getInt("rotation")*90);tag.putInt("artifactDistance",(int)Math.round(Math.sqrt(a.get().distSqr(b.get()))));ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}
+        }}
         var preview=PREVIEW.get(p.getUUID());if(preview!=null){if(preview.tool()!=tool||!preview.dimension().equals(ArtifactState.dimension(p))||preview.expires()<ArtifactState.now(p))PREVIEW.remove(p.getUUID());else ArtifactFeedback.ring(p,k,preview.pos(),ArtifactActions.radius(p,k));}
         if(WorkQueue.busy(p))ArtifactFeedback.message(p,"progress",Component.translatable("status.specialpickaxes."+status),WorkQueue.completed(p),WorkQueue.completed(p)+WorkQueue.remaining(p),WorkQueue.succeeded(p));
         var memory=ArtifactState.of(p,k).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);

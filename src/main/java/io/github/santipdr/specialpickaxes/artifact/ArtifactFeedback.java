@@ -70,4 +70,23 @@ public final class ArtifactFeedback {
         }
     }
 
+    public static void shape(ServerPlayer p,ArtifactKind kind,SelectionVolume v,int mode){
+        var dust=new DustParticleOptions(new Vector3f(0.85F,0.95F,1F),1F);
+        if(kind==ArtifactKind.KEYSTONE||kind==ArtifactKind.WORLDBREAKER&&mode==1){
+            for(int end=0;end<2;end++)for(int i=0;i<24;i++){
+                double fraction=i/23D,x,y;
+                if(kind==ArtifactKind.KEYSTONE){x=v.min().getX()+fraction*(v.width()-1)+0.5;y=v.min().getY()+Math.round((v.height()-1)*(1-Math.pow(2*fraction-1,2)))+0.5;}
+                else {double a=fraction*Math.PI*2;x=v.min().getX()+v.width()*(1+Math.cos(a))/2;y=v.min().getY()+v.height()*(1+Math.sin(a))/2;}
+                double z=end==0?v.min().getZ()+0.5:v.max().getZ()+0.5;p.serverLevel().sendParticles(p,dust,false,x,y,z,1,0,0,0,0);
+            }
+        }
+        if(kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.WORLDBREAKER&&mode==4){
+            int count=0;for(var memory:ArtifactState.memories(p,kind)){
+                var pos=memory.pos();if(v.contains(pos)&&p.serverLevel().hasChunkAt(pos)&&p.serverLevel().getBlockState(pos).isAir()){
+                    p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,2,0.2,0.2,0.2,0);if(++count>=24)break;
+                }
+            }
+        }
+    }
+
 }

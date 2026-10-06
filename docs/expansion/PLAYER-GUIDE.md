@@ -406,4 +406,3 @@ CARVE conserva las esquinas del volumen y abre un túnel elíptico siguiendo Z. 
 **Límites:** Respeta límites y filtros compartidos. No fuerza chunks ni salta protecciones.
 
 **Ejemplo:** Repite una fachada de piedra/ladrillo en una zona vacía usando materiales reales.
-

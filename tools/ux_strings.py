@@ -1,4 +1,5 @@
 PAIRS={
+'ux.specialpickaxes.link':('Link distance %s blocks · rotation %s°','Enlace de %s bloques · rotación %s°'),
 'ux.specialpickaxes.volumes':('SOURCE %s · TARGET %s','ORIGEN %s · DESTINO %s'),
 'message.specialpickaxes.volume_limit':('Volume %s exceeds configured limit %s.','El volumen %s supera el límite configurado %s.'),
 'message.specialpickaxes.overlap':('INVALID · Source and target overlap. No operation queued.','INVÁLIDO · Origen y destino se solapan. No se encola la operación.'),
@@ -36,7 +37,7 @@ MODES={
 'world_rephase':('WORLD REPHASE · offhand rock','TRANSFORMACIÓN · roca secundaria'),'world_transpose':('WORLD TRANSPOSE','TRANSPOSICIÓN MUNDIAL'),
 'world_restore':('WORLD RESTORE','RESTAURACIÓN MUNDIAL'),'world_record':('WORLD RECORD','REGISTRO MUNDIAL'),
 'vault':('Parabolic vault','Bóveda parabólica'),'supported_vault':('Vault with pier ribs','Bóveda con nervios de apoyo')}
-STATES={'idle':('IDLE','INACTIVO'),'selecting':('SELECTING','SELECCIONANDO'),'ready':('READY · Use to confirm','LISTO · Usar confirma'),'preparing':('PREPARING','PREPARANDO'),'executing':('EXECUTING','EJECUTANDO'),'paused':('PAUSED · Use to resume','PAUSADO · Usar reanuda'),'':('IDLE','INACTIVO')}
+STATES={'linked':('LINK ACTIVE · mine near A','ENLACE ACTIVO · mina cerca de A'),'anchor_b':('ANCHOR A set · aim B and Use','ANCLA A fijada · apunta B y usa'),'idle':('IDLE','INACTIVO'),'selecting':('SELECTING','SELECCIONANDO'),'ready':('READY · Use to confirm','LISTO · Usar confirma'),'preparing':('PREPARING','PREPARANDO'),'executing':('EXECUTING','EJECUTANDO'),'paused':('PAUSED · Use to resume','PAUSADO · Usar reanuda'),'':('IDLE','INACTIVO')}
 def enrich(data,spanish):
  for key,pair in PAIRS.items():data[key]=pair[int(spanish)]
  for key,pair in MODES.items():data['mode.specialpickaxes.'+key]=pair[int(spanish)]
