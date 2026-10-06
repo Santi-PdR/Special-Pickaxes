@@ -8,11 +8,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.Tags;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public final class OreScannerAbility implements PickaxeAbility {
     public String id() { return "scanner"; }
     public boolean active() { return true; }
-    public boolean activate(ServerPlayer player, ItemStack tool) {
+    public List<BlockPos> scan(ServerPlayer player) {
         int radius = PickaxeConfig.SCAN_RADIUS.get();
         BlockPos center = player.blockPosition();
         var level = player.serverLevel();
@@ -25,7 +26,13 @@ public final class OreScannerAbility implements PickaxeAbility {
                     && AbilityRuntime.allowed(player, id(), pos)) found.add(pos.immutable());
         }
         found.sort(Comparator.comparingDouble(center::distSqr));
-        int count = Math.min(found.size(), PickaxeConfig.SCAN_LIMIT.get());
+        return List.copyOf(found.subList(0, Math.min(found.size(), PickaxeConfig.SCAN_LIMIT.get())));
+    }
+    public boolean activate(ServerPlayer player, ItemStack tool) {
+        var found = scan(player);
+        var level = player.serverLevel();
+        BlockPos center = player.blockPosition();
+        int count = found.size();
         for (int i = 0; i < count; i++) {
             BlockPos pos = found.get(i);
             level.sendParticles(player, ParticleTypes.END_ROD, false, pos.getX() + 0.5, pos.getY() + 0.5,

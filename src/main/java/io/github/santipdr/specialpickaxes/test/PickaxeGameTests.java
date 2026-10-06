@@ -126,6 +126,9 @@ public final class PickaxeGameTests {
     @GameTest(template = "empty") public static void scannerAndStorm(GameTestHelper h) {
         var p = player(h, "scanner");
         h.setBlock(new BlockPos(7,2,5), Blocks.DIAMOND_ORE);
+        var signals = new OreScannerAbility().scan(p);
+        h.assertTrue(signals.contains(h.absolutePos(new BlockPos(7,2,5))), "scanner detects actual ore");
+        h.assertTrue(signals.size() <= PickaxeConfig.SCAN_LIMIT.get(), "scanner result cap");
         h.assertTrue(AbilityRuntime.activate(p, p.getMainHandItem(), new OreScannerAbility()), "scanner server activation");
         var mob = EntityType.ZOMBIE.create(h.getLevel());
         h.assertTrue(mob != null, "zombie created");
