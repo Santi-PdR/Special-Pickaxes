@@ -38,7 +38,9 @@ public final class RegionWork {
         if(executing&&(net.minecraft.world.level.block.Block.getId(old)!=expectedSource[index]||second!=null&&net.minecraft.world.level.block.Block.getId(second)!=expectedTarget[index]))return skip(pos);
         if(!executing)return new WorkStep(){
             public BlockPos pos(){return pos;}
-            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&eligible(old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok)eligible++;else excluded++;return ok;}
+            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&eligible(old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))ok=WorldSafety.harvestable(actor,tool,pos);
+                if(ok&&other!=null)ok=kind==ArtifactKind.TESSELLATOR?WorldSafety.inert(old)&&WorldSafety.vacant(second):old!=second&&!(WorldSafety.vacant(old)&&WorldSafety.vacant(second));
+                if(ok)eligible++;else excluded++;return ok;}
         };
         if(other!=null){
             if(kind==ArtifactKind.TESSELLATOR)return new WorkStep(){public BlockPos pos(){return other;}public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){return WorldSafety.allowed(actor,k,pos)&&WorldSafety.placePaid(actor,tool,k,other,old);}};

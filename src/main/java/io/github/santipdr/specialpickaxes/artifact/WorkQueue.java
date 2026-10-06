@@ -18,7 +18,7 @@ public final class WorkQueue {
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;
-        int accepted,completed,succeeded; boolean paused; RegionWork region;
+        int accepted,completed,succeeded; boolean paused,aborted; RegionWork region;
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();
@@ -73,14 +73,15 @@ public final class WorkQueue {
                     if(ok) { feedback=step.pos();job.succeeded++; }
                     else if(step.stopOnFailure()) {job.steps.clear();break;}
                 } catch(RuntimeException error) {
-                    LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.paused=true;
+                    LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
                 } finally { running=false; }
                 if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) { job.steps.clear();job.paused=true;break; }
             }
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
             if(feedback!=null&&p.tickCount%20==0)p.playNotifySound(job.kind.sound,net.minecraft.sounds.SoundSource.PLAYERS,0.12F,1.4F);
-            if(job.region==null?job.steps.isEmpty():job.region.done()) {
-                ArtifactFeedback.message(p,"complete",job.succeeded,job.completed-job.succeeded);ArtifactFeedback.cue(p,"complete");JOBS.remove(id);
+            if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
+                if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
+                else {ArtifactFeedback.message(p,"complete",job.succeeded,job.completed-job.succeeded);ArtifactFeedback.cue(p,"complete");}JOBS.remove(id);
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());

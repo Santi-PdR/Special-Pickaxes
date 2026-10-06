@@ -46,7 +46,7 @@ public final class ArtifactInteraction {
         s.points.add(pos.immutable());ArtifactFeedback.cue(p,"select");ArtifactFeedback.burst(p,s.kind,pos,6);
         ArtifactFeedback.message(p,s.points.size()==corners(p,s.kind)?"selection_ready":"corner",s.points.size());return true;
     }
-    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.dimension(p).equals(s.dimension)&&ArtifactState.now(p)<=s.expires;}
+    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.dimension(p).equals(s.dimension)&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind k,boolean shift){
         if(!WorldSafety.allowed(p,k,p.blockPosition()))return false;
         if(WorkQueue.busy(p)){

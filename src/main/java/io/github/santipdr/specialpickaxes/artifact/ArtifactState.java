@@ -60,6 +60,10 @@ public final class ArtifactState {
         }
         return List.copyOf(result);
     }
+    public static void prune(ServerPlayer p,ArtifactKind kind){
+        var list=of(p,kind).getList("memory",Tag.TAG_COMPOUND);for(int i=list.size()-1;i>=0;i--)if(expired(p,list.getCompound(i)))list.remove(i);
+        while(list.size()>ArtifactConfig.MEMORY.get())list.remove(0);
+    }
     public static long age(ServerPlayer p,CompoundTag tag){return tag.contains("epoch")?Math.max(0,(System.currentTimeMillis()-tag.getLong("epoch"))/50):Math.max(0,now(p)-tag.getLong("time"));}
     private static boolean expired(ServerPlayer p,CompoundTag tag){return age(p,tag)>ArtifactConfig.MEMORY_TTL.get();}
     public static void anchor(ServerPlayer p,ArtifactKind kind,String key,BlockPos pos) {

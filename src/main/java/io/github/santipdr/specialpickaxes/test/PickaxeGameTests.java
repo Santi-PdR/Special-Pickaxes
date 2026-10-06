@@ -349,4 +349,13 @@ public final class PickaxeGameTests {
         h.assertTrue(tool.getDamageValue()<100,"Mending 1000 repairs with actual XP pickup");finish(h,p);
     }
 
+    @GameTest(template="empty") public static void memoriesKeepDimensionsAndExpire(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var a=target(h);ArtifactState.record(p,ArtifactKind.PALIMPSEST,a,Blocks.STONE.defaultBlockState());
+        var list=ArtifactState.of(p,ArtifactKind.PALIMPSEST).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);list.getCompound(0).putString("dim","minecraft:the_nether");
+        ArtifactState.record(p,ArtifactKind.PALIMPSEST,a.offset(1,0,0),Blocks.STONE.defaultBlockState());
+        h.assertTrue(list.size()==2&&ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==1,"other dimension history preserved but not restored here");
+        list.getCompound(0).putLong("epoch",System.currentTimeMillis()-(ArtifactConfig.MEMORY_TTL.get()+1L)*50);ArtifactState.prune(p,ArtifactKind.PALIMPSEST);
+        h.assertTrue(list.size()==1,"expired memory pruned from player-visible count");finish(h,p);
+    }
+
 }
