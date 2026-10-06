@@ -4,7 +4,7 @@ Only explicit build products are exported. No environment, credentials or world 
 """
 import base64,hashlib,io,json,os,pathlib,subprocess,zipfile
 root=pathlib.Path('.'); files=[]
-for pattern in ['build/libs/*.jar','build/test-results/test/*.xml','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
+for pattern in ['build/RELEASE.json','build/SHA256SUMS','build/libs/*.jar','build/test-results/test/*.xml','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
 files=sorted(set(p for p in files if p.is_file()))
 manifest=[{'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]

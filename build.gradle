@@ -29,6 +29,7 @@ dependencies {
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 test { useJUnitPlatform() }
 jar {
+    manifest { attributes('Implementation-Version': project.version, 'Build-Commit': providers.exec { commandLine 'git', 'rev-parse', 'HEAD' }.standardOutput.asText.get().trim()) }
     exclude 'io/github/santipdr/specialpickaxes/test/**'
     exclude 'data/specialpickaxes/structures/empty.nbt'
     preserveFileTimestamps = false

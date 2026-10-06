@@ -19,6 +19,7 @@ jobs:
           mkdir -p build
           set -o pipefail
           ./gradlew build test --stacktrace 2>&1 | tee build/verification-build.log
+      - run: python3 tools/verify_release.py
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
@@ -43,3 +44,5 @@ jobs:
             build/packaged-smoke/console.log
             build/verification-*.log
             build/evidence-manifest.json
+            build/RELEASE.json
+            build/SHA256SUMS
