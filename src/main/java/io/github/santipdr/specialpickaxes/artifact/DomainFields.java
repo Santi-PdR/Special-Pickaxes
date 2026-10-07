@@ -64,10 +64,12 @@ public final class DomainFields {
             }
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition()))
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),12,0,false,true,true));
+            var centerPosition=Vec3.atCenterOf(f.center);
+            double radiusSqr=(double)f.radius*f.radius;
             var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
                 e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
-                && !e.isAlliedTo(p) && e.position().distanceToSqr(Vec3.atCenterOf(f.center))<=f.radius*f.radius);
-            entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(Vec3.atCenterOf(f.center))));
+                && !e.isAlliedTo(p) && e.position().distanceToSqr(centerPosition)<=radiusSqr);
+            entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(centerPosition)));
             var current=new HashSet<UUID>();int processed=0;
             for(var entity:entities) {
                 if(processed>=ArtifactConfig.FIELD_TARGETS.get()) break;
@@ -77,7 +79,7 @@ public final class DomainFields {
                 processed++;current.add(entity.getUUID());
                 if(f.kind==ArtifactKind.AEGIS){
                     var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001 || entity instanceof net.minecraft.world.entity.projectile.AbstractArrow && !level.noCollision(entity,entity.getBoundingBox()))continue;
-                    var away=entity.position().subtract(Vec3.atCenterOf(f.center)).normalize();
+                    var away=entity.position().subtract(centerPosition).normalize();
                     if(ArtifactState.mode(p,f.kind)==1)away=new Vec3(-away.z,away.y*0.2,away.x).normalize();
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
                 } else if(f.kind==ArtifactKind.INTERREGNUM) {
@@ -90,7 +92,7 @@ public final class DomainFields {
                     var box=entity.getBoundingBox().move(original.position.subtract(entity.position()));
                     if(level.noCollision(entity,box)) { entity.setPos(original.position);entity.setDeltaMovement(Vec3.ZERO); }
                 } else {
-                    var delta=Vec3.atCenterOf(f.center).subtract(entity.position()).normalize();
+                    var delta=centerPosition.subtract(entity.position()).normalize();
                     double sign=ArtifactState.mode(p,f.kind)%2==0?1:-1;
                     entity.setDeltaMovement(clamp(entity.getDeltaMovement().scale(0.6).add(delta.scale(sign*ArtifactConfig.FIELD_FORCE.get()))));
                 }
@@ -102,7 +104,7 @@ public final class DomainFields {
                 removeFrozenMembership(entry.getKey());
                 return true;
             });
-            if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
+            if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",centerPosition);}
         }
     }
 }
