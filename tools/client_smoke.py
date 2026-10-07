@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Real Forge client + integrated-server gallery under Xvfb. Uses only a disposable copy of the smoke world."""
-import json,os,pathlib,queue,shutil,signal,subprocess,threading,time
+import json,os,pathlib,queue,re,shutil,signal,subprocess,threading,time
 root=pathlib.Path.cwd();out=root/'build/client-smoke';out.mkdir(parents=True,exist_ok=True)
 ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
 gallery_flag=root/'run/gallery-captured.flag';gallery_flag.unlink(missing_ok=True)
@@ -28,6 +28,13 @@ for i,id in enumerate(ids):
 commands+=['tellraw @s {"text":"ARTIFACT_CLIENT_SMOKE_READY"}']
 (functions/'setup.mcfunction').write_text('\n'.join(commands)+'\n')
 (root/'run/options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nrenderDistance:4\nsimulationDistance:5\nmaxFps:30\nguiScale:2\nsoundCategory_music:0.0\nlang:es_es\n')
+# Forge's early splash-window handoff can time out with Xvfb/llvmpipe.
+# Disable only that bootstrap window; Minecraft's real rendered game window and
+# every screenshot/control assertion remain mandatory. This is disposable CI config.
+fml=root/'run/config/fml.toml';fml.parent.mkdir(parents=True,exist_ok=True)
+config=fml.read_text() if fml.exists() else ''
+config=re.sub(r'(?m)^earlyWindowControl\s*=.*$', 'earlyWindowControl = false', config) if re.search(r'(?m)^earlyWindowControl\s*=',config) else config+'\nearlyWindowControl = false\n'
+fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
