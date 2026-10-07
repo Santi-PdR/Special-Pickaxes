@@ -1,54 +1,70 @@
-# Special Pickaxes 4.0
+# Special Pickaxes — mining rework
 
-**Forge 1.20.1 · Java 17 · veinte artefactos · ninguna energía**
+Forge **1.20.1 / Java 17**. Nueve artefactos de minería extrema, también efectivos
+como hacha y pala. Sin recetas obligatorias, minerales nuevos, worldgen, energía,
+almacenamiento ni X-Ray.
 
-Una revisión de los controles, presentación e identidad de 3.1, sin añadir
-objetos por cantidad. Hover: nombre, una frase y tecla principal. SHIFT: pequeño manual de juego.
-Sin HUD permanente, sin Shift + clic derecho para poderes.
+**5.0.0 está en validación; todavía no es una release aprobada.**
+No se usa la evidencia de 4.0 para certificar el rework. Los binarios permanecen
+bloqueados hasta pasar build, tests, GameTests, servidor, cliente y revisión visual.
 
-## Jugar
+## Catálogo
 
-[Guía breve](docs/4.0/PLAYER-GUIDE.md). Configura las teclas en
-**Opciones → Controles → Special Pickaxes**:
-R activar, G secundaria, C modo, B selección, Enter confirmar, V cancelar, K pausa.
-Son valores iniciales reasignables; pueden coincidir con otros mods.
+Palimpsest · Choir · Eventide · Crucible · Interregnum · Worldloom · Icarus ·
+Hollow Axiom · Worldbreaker.
 
-Directos: apuntar y activar. Regionales: seleccionar esquinas; el análisis comienza
-solo y Confirmar ejecuta cuando está listo. Solo Atlas, Crucible, Chronicle,
-Tessellator y los programas regionales de Worldbreaker usan esquinas.
+- Worldbreaker: CARVE, FRACTURE, CLEAVE, CORE DRILL y WORLD SHATTER.
+- Worldloom: REFUGIO, PUENTE y PARED; construcción con bloques reales.
+- Crucible: regional con dos esquinas y confirmación, o radial directo.
+- Axiom: matriz conectada a recursos existentes, preservando las menas.
+- Icarus: excava antes de avanzar, sin saltar barreras.
 
-**Worldbreaker es la pieza suprema.** Convergencia fractura un anillo conservando
-el núcleo y construye un santuario pagado; no es solamente aumentar el radio.
-Los otros diecinueve tienen especialidades, no copias de este programa.
+Solo Crisol regional utiliza selección. Todos los trabajos respetan bedrock,
+fluidos, bloques protegidos, block entities, borde y chunks cargados. Las rutas
+direccionales se detienen, no continúan tras una barrera. Los drops proceden del
+harvesting nativo y la congestión pausa el trabajo.
 
-Texturas reales seleccionadas de los cuatro JAR autorizados, con modelos propios,
-firmas espaciales y audio por fase. No texturas de picos vanilla ni el generador
-experimental de 3.0. [Procedencia de cada asset](docs/4.0/ASSET-PROVENANCE.json).
-No se añade dependencia de los mods de referencia ni se modifican sus archivos.
+## Jugar y administrar
 
-Instala `special-pickaxes-1.20.1-4.0.0.jar` en **cliente y servidor**, reemplazando
-el anterior. Obtención administrativa/creativo/recompensas: sin recetas, ores ni
-worldgen. Se conservan IDs, herramientas triples, ToolActions, encantamientos altos,
-materiales reales, checks de mundo y scheduler.
+R activa; C cambia de modo; B selecciona donde corresponde; Enter confirma;
+V cancela; K pausa/reanuda. Controles reasignables. SHIFT sobre el item muestra
+la ayuda del modo actual. No se usa Shift + clic derecho.
 
-## Ingeniería
+Adquisición administrativa:
 
-[Auditoría individual y arquitectura](docs/4.0/AUDIT.md).
-[Validación y alcance](docs/VALIDACION.md).
+```text
+/specialpickaxes grant <jugador> <id>
+```
+
+IDs: `palimpsest`, `fault_choir`, `eventide`, `paradox_crucible`, `interregnum`,
+`worldloom`, `icarus`, `hollow_axiom`, `worldbreaker`.
+
+- [Guía del jugador](docs/mining-rework/PLAYER-GUIDE.md)
+- [Estado y evidencia de validación](docs/mining-rework/STATUS.md)
+- [Compatibilidad y límites reales](docs/mining-rework/COMPATIBILITY.md)
+- [Procedencia de los nueve sprites](docs/mining-rework/ASSET-PROVENANCE.json)
+- [Biblioteca de ocho assets retirados](asset-library/README.md)
+
+Los cuatro JAR de referencia se conservan intactos. No se empaquetan en el mod.
+La documentación histórica 3.1/4.0 no describe el catálogo actual.
+
+## Verificar
 
 ```sh
-./gradlew build test
-./gradlew runGameTestServer
 python3 tools/validate_resources.py
 python3 tools/scan_secrets.py
-python3 tools/verify_release.py
+./gradlew build
+./gradlew runGameTestServer
+python3 tools/verify_gametests.py run/logs/latest.log
+python3 tools/dedicated_smoke.py
+python3 tools/client_smoke.py
 git diff --check
 ```
 
-Actions compila, prueba y empaqueta; su artefacto `forge-validation` incluye el
-JAR, manifiesto de procedencia, resultados y capturas de cliente real. Un run
-fallido no constituye una entrega validada. No hay package.json.
+El cliente desechable de CI utiliza Xvfb. Conserva PNG originales y copias de
+revisión de la misma captura; comprueba tooltips, cambios de modo y activaciones
+con teclas reales. El JAR excluye fixtures, clases de test y fluido de test Forge.
 
-No se usa/modifica siege, ni se inventa acceso a test-1. Los mundos CI son
-desechables y no certifican el modpack externo completo. La documentación 3.0/3.1
-se conserva como historia, no como controles actuales.
+La publicación requiere una revisión visual de un run exitoso con código idéntico.
+No se afirma acceso a test-1 ni haber probado el modpack completo Eternal Craft —
+Siege, shaders o todas las configuraciones de otros mods. No se utiliza su repositorio.
