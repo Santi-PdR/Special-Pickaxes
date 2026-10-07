@@ -21,7 +21,14 @@ public final class ArtifactState {
     public static CompoundTag of(ServerPlayer p, ArtifactKind kind) {
         var root=root(p);
         if (!root.contains(kind.id)) root.put(kind.id,new CompoundTag());
-        var data=root.getCompound(kind.id);data.remove("charge");return data; // discard retired 2.x/3.0 resource data
+        var data=root.getCompound(kind.id);
+        if(data.getInt("miningSchema")<5){
+            // Old TRANSPOSE/RESTORE/CONVERGENCE and material modes have different
+            // meanings now. Never reinterpret an old integer as a new excavation.
+            if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.CRUCIBLE)data.remove("mode");
+            data.putInt("miningSchema",5);
+        }
+        data.remove("charge");return data; // discard retired 2.x/3.0 resource data
     }
     public static String dimension(ServerPlayer p) { return p.level().dimension().location().toString(); }
     public static int mode(ServerPlayer p, ArtifactKind kind) { var data=of(p,kind);return Math.floorMod(data.contains("mode")?data.getInt("mode"):0,ArtifactInteraction.modeCount(kind)); }

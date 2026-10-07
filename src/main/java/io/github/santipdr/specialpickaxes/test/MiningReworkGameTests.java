@@ -181,4 +181,12 @@ public final class MiningReworkGameTests {
         RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL);h.assertTrue(!WorkQueue.busy(p)&&!ArtifactInteraction.selecting(p),"cancel clears owned state");finish(h,p);
     }
 
+    @GameTest(template="empty") public static void legacyModesCannotBecomeUnrelatedMiningOperations(GameTestHelper h){
+        for(var kind:java.util.List.of(ArtifactKind.WORLDBREAKER,ArtifactKind.CRUCIBLE)){
+            var p=player(h,kind);var data=ArtifactState.of(p,kind);data.remove("miningSchema");data.putInt("mode",3);
+            h.assertTrue(ArtifactState.mode(p,kind)==0,"old mode resets safely: "+kind);
+            ArtifactState.of(p,kind).putInt("mode",1);h.assertTrue(ArtifactState.mode(p,kind)==1,"new selections remain stable: "+kind);
+        }h.succeed();
+    }
+
 }
