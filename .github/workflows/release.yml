@@ -5,6 +5,8 @@ on:
     paths: [docs/mining-rework/VISUAL-REVIEW.json]
 permissions:
   contents: read
+  actions: read
+  checks: write
 jobs:
   reproduce-approved-jar:
     runs-on: ubuntu-latest
@@ -43,6 +45,11 @@ jobs:
           echo "$EXPECTED_SHA256  build/libs/special-pickaxes-1.20.1-5.0.0.jar" | sha256sum --check --strict
           python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar
           cp "$RUNNER_TEMP/visual-review.json" build/VISUAL-REVIEW.json
+      - name: Export approved binary for verifiable retrieval
+        run: python3 tools/ci_evidence.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_BINARY: 'true'
       - uses: actions/upload-artifact@v6
         with:
           name: special-pickaxes-5.0.0-verified
