@@ -18,7 +18,7 @@ jobs:
       - name: Recover previous graphical diagnostics
         run: |
           gh run download 37549318870 --name forge-validation --dir build/prior-diagnostics
-          python3 tools/publish_diagnostics.py build/prior-diagnostics/verification-client.log build/prior-diagnostics/client-smoke/client.log
+          python3 tools/publish_diagnostics.py build/prior-diagnostics/build/verification-client.log build/prior-diagnostics/build/client-smoke/client.log
         env:
           GH_TOKEN: ${{ github.token }}
       - run: python3 tools/validate_resources.py

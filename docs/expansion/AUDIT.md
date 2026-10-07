@@ -1,3 +1,5 @@
+> **Documento histórico de 3.0.** Los controles, tooltips y arte actuales están en [la guía 3.1](../3.1/PLAYER-GUIDE.md). El generador de sprites experimentales se retiró; su versión histórica permanece en Git.
+
 # Expansion audit — 2.0.0 baseline bd69d56
 
 The on-disk files matched the published baseline byte-for-byte; Git's restored

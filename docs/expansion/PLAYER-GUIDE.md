@@ -1,3 +1,5 @@
+> **Documento histórico de 3.0.** Los controles, tooltips y arte actuales están en [la guía 3.1](../3.1/PLAYER-GUIDE.md). El generador de sprites experimentales se retiró; su versión histórica permanece en Git.
+
 # Guía de campo — Special Pickaxes 3.0.0
 
 Minecraft 1.20.1 · Forge 47.3.0+ · Java 17. **14 herramientas combinadas: pico + hacha + pala.**

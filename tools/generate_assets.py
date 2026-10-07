@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Existing vanilla pickaxe bases; differentiation is glint, runtime aura and ability effects."""
 from pathlib import Path
-import json,struct,zlib,math,shutil
+import json,struct,zlib,shutil
 R=Path('src/main/resources')
 IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
 EN=['Palimpsest of the Last Dawn','Choir of Faults','The Night That Weighs','Meridian of Two Worlds','Paradox Crucible','Crown of the Interregnum','Loom of the First Wall','Tear of Icarus','The Hollow Axiom','Atlas of Two Shores']
 ES=['Palimpsesto del Último Alba','Coro de las Fallas','La Noche que Pesa','Meridiano de Dos Mundos','Crisol de la Paradoja','Corona del Interregno','Bastidor de la Primera Muralla','Lágrima de Ícaro','El Axioma Hueco','Atlas de las Dos Orillas']
-COLORS=[0xffd783,0x46ede0,0xa67aff,0x68b9ff,0xff8648,0x8ae5ff,0x64ffa9,0xffc057,0xd9ffbd,0xff7b99]
 TIPS_EN=['Rebuild your remembered mining scars. Each placed block consumes an actual inventory block.',
 'Replay your recorded excavation stencil at a new anchor. Only matching rock is removed.',
 'Collapse a geological domain while bending hostile trajectories. No item magnet or damage explosion.',
@@ -31,7 +30,6 @@ SEC_EN=['Erase history','Rotate stencil 90°','Reverse field polarity','Unlink a
 SEC_ES=['Borra el historial','Rota la plantilla 90°','Invierte la polaridad','Elimina el enlace','Alterna piedra / pizarra / basalto / obsidiana','Libera estasis e impulso','Alterna refugio / puente','Invierte la dirección','Alterna nervaduras estructurales','Elimina el ancla']
 EN += ['The Worldbreaker','Chronicle of the Silent Stone','Keystone of the Impossible Arch','The Tessellator']
 ES += ['El Rompemundos','Crónica de la Piedra Silente','Clave del Arco Imposible','El Teselador']
-COLORS += [0xf1bf65,0xb6a1ed,0x8fdac2,0xe49abf]
 TIPS_EN += ['Analyze a selected world volume, then break, carve, rephase, transpose, record or restore.', 'Record a geological checkpoint; restore missing cells later with real materials.', 'Build a parabolic vault defined by your selected span, rise and depth.', 'Reproduce an existing geological blueprint in another region, paying for every placed block.']
 TIPS_ES += ['Analiza un volumen; rompe, talla, transforma, intercambia, registra o restaura.', 'Registra un estado geológico; restaura después los huecos con materiales reales.', 'Construye una bóveda parabólica definida por la anchura, altura y profundidad elegidas.', 'Reproduce un plano geológico en otra región pagando cada bloque colocado.']
 SEC_EN += ['Cycle operation when idle; cancel selection/job otherwise']*4
@@ -42,7 +40,6 @@ SEC_EN[9]='Cancel selection; sneak-left-click changes transformation'
 SEC_ES[9]='Cancela selección; agachado + clic izquierdo cambia transformación'
 EN += ['Aegis of the Horizon','Lodestar of the Returning Miner','Seam Ripper',"Pilgrim's Causeway",'Counterseal of the Bastion','Covenant of the Sealed Gallery']
 ES += ['Égida del Horizonte','Astrolabio del Retorno','Sutura de los Estratos','Calzada del Peregrino','Contrafirma del Bastión','Pacto de la Galería Sellada']
-COLORS += [0x87dfff,0xffe5a1,0xf5ac79,0x9bdfb0,0xb1a5ed,0xdda998]
 TIPS_EN += ['Redirect incoming hostile projectiles without changing their ownership.', 'Retrace remembered footsteps through still-clear loaded space.', 'Peel a connected material interface, not the whole vein.', 'Paid footing follows your route over gaps; it does not grant flight.', 'Protect nearby terrain from explosions, not entities from damage.', 'Seal confirmed manual mining scars after you pass them, using inventory material.']
 TIPS_ES += ['Redirige proyectiles hostiles sin cambiar su propietario.', 'Recorre de vuelta tus pasos por espacio aún despejado y cargado.', 'Retira una interfaz de materiales conectada, no la veta completa.', 'Un apoyo pagado sigue tus pasos sobre huecos; no concede vuelo.', 'Protege terreno cercano de explosiones, no a entidades del daño.', 'Sella huecos de minería manual cuando los dejas atrás, con material del inventario.']
 SEC_EN += ['Change reflection / shear','Forget route','Change contact / exposed surface','Stop companion','Stop ward','Stop sealing']
