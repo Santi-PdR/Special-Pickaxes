@@ -23,6 +23,14 @@ public final class ClientValidation {
         var server=ServerLifecycleHooks.getCurrentServer();if(server==null)return;
         for(var p:server.getPlayerList().getPlayers()){
             if(!p.getTags().contains("artifact_gallery")||!java.nio.file.Files.exists(java.nio.file.Path.of("gallery-captured.flag")))continue;
+            // Observe input even while waiting for screenshot acknowledgement. Otherwise a
+            // slow screenshot helper can make activation and acknowledgement wait on each other.
+            if(ticks>=240&&(ticks-240)/100<SCENES.size()&&(ticks-240)%100>=40){
+                var current=SCENES.get((ticks-240)/100);var state=p.getPersistentData();
+                if(!state.getBoolean("sceneExecuted")&&ArtifactState.of(p,current.kind()).getLong("ready")>state.getLong("sceneReadyBefore")){
+                    state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
+                }
+            }
             if(ticks>=240&&(ticks-240)/100<SCENES.size()&&(ticks-240)%100==99){
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
@@ -87,9 +95,6 @@ public final class ClientValidation {
                     RelicControl.corner(p,new BlockPos(-5,65,6));RelicControl.corner(p,new BlockPos(-3,67,8));
                 }
                 p.getPersistentData().putBoolean("uxFixture",true);
-            }
-            if(phase>=40&&!p.getPersistentData().getBoolean("sceneExecuted")&&ArtifactState.of(p,k).getLong("ready")>p.getPersistentData().getLong("sceneReadyBefore")){
-                p.getPersistentData().putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+k.id+"-"+ArtifactInteraction.modeKey(k,scene.mode())));
             }
             if(phase==40){
                 p.sendSystemMessage(Component.literal("ARTIFACT_UX_READY_"+k.id+"-"+ArtifactInteraction.modeKey(k,scene.mode())));
