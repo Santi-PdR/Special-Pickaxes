@@ -31,8 +31,10 @@ public final class WorldSafety {
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&state.getFluidState().isEmpty()&&MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();
+        double range=ArtifactConfig.RANGE.get();
+        double maxDistanceSqr=range*range;
         return p.isAlive() && !p.isSpectator() && p.mayBuild() && !level.isOutsideBuildHeight(pos)
-            && p.distanceToSqr(Vec3.atCenterOf(pos))<=Math.pow(ArtifactConfig.RANGE.get(),2)
+            && p.distanceToSqr(pos.getX()+0.5D,pos.getY()+0.5D,pos.getZ()+0.5D)<=maxDistanceSqr
             && level.hasChunkAt(pos) && level.getWorldBorder().isWithinBounds(pos) && level.mayInteract(p,pos)
             && !MinecraftForge.EVENT_BUS.post(new AbilityUseEvent(p,kind.id,pos));
     }
