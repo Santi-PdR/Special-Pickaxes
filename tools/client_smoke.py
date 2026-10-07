@@ -83,6 +83,10 @@ try:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-complete.png')],env=env,check=True,timeout=20)
    success=True;break
 finally:
+ # PNG originals and JPEG review copies are encoded from the exact same Robot capture.
+ import hashlib
+ manifest=[{'original':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'review_copy':p.with_suffix('.jpg').name,'review_sha256':hashlib.sha256(p.with_suffix('.jpg').read_bytes()).hexdigest()} for p in out.glob('*.png') if p.with_suffix('.jpg').exists()]
+ (out/'image-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
  latest=root/'run/logs/latest.log'
  if latest.exists():shutil.copy2(latest,out/'client.log')

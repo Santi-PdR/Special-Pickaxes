@@ -4,7 +4,7 @@ Only explicit build products are exported. No environment, credentials or world 
 """
 import base64,hashlib,io,json,os,pathlib,subprocess,zipfile
 root=pathlib.Path('.'); files=[]
-for pattern in ['build/client-smoke/*.png','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
+for pattern in ['build/client-smoke/*.jpg','build/client-smoke/image-manifest.json','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
 if os.environ.get('PUBLISH_BINARY')=='true':files.extend(root.glob('build/libs/*.jar'))
 files=sorted(set(p for p in files if p.is_file()))
@@ -18,7 +18,7 @@ while True:
   for p in files:z.write(p,str(p))
   z.writestr('manifest.json',json.dumps(manifest,indent=2))
  if len(b.getvalue())<=12_000_000:break
- images=[p for p in files if p.suffix=='.png']
+ images=[p for p in files if p.suffix in ['.png','.jpg']]
  if not images:raise RuntimeError('Non-image evidence exceeds bounded export budget; diagnostics already published')
  # Keep matching normal/SHIFT Atlas for inspection until the last possible reduction.
  expendable=[p for p in images if p.name not in ['ux-bifold_atlas.png','ux-shift-bifold_atlas.png']]

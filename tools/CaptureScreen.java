@@ -15,7 +15,9 @@ class CaptureScreen {
             if(!args[1].equals("shift"))robot.keyRelease(key);
             Thread.sleep(1000);
         }
-        ImageIO.write(robot.createScreenCapture(bounds), "png", new File(args[0]));
+        var image=robot.createScreenCapture(bounds);
+        ImageIO.write(image, "png", new File(args[0]));
+        ImageIO.write(image, "jpg", new File(args[0].substring(0,args[0].length()-4)+".jpg"));
         if(args.length>1&&args[1].equals("shift"))robot.keyRelease(java.awt.event.KeyEvent.VK_SHIFT);
         System.exit(0); // AWT/X11 event threads must not keep this one-shot helper alive.
     }
