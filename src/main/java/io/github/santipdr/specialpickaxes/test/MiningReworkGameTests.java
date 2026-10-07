@@ -108,7 +108,7 @@ public final class MiningReworkGameTests {
             var p=player(h,kind);var at=h.absolutePos(new BlockPos(8,30,8));p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
             for(int x=-20;x<=20;x+=4)h.getLevel().getChunkAt(at.offset(x,0,0));
             var dir=shape==DirectionalProgram.Shape.CORE_DRILL?Direction.DOWN:Direction.SOUTH;
-            for(var obstacle:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),TestFluids.BLOCK.defaultBlockState())){
+            for(var obstacle:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL,5),Blocks.LAVA.defaultBlockState(),Blocks.LAVA.defaultBlockState().setValue(LiquidBlock.LEVEL,3),TestFluids.BLOCK.defaultBlockState(),TestFluids.BLOCK.defaultBlockState().setValue(LiquidBlock.LEVEL,4))){
                 // Large fixtures exceed the 12-block template: initialize every examined cell,
                 // rather than inherit geometry from a neighboring completed test.
                 for(int depth=0;depth<3;depth++)for(var pos:DirectionalProgram.section(at,dir,shape,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
@@ -187,6 +187,20 @@ public final class MiningReworkGameTests {
             h.assertTrue(ArtifactState.mode(p,kind)==0,"old mode resets safely: "+kind);
             ArtifactState.of(p,kind).putInt("mode",1);h.assertTrue(ArtifactState.mode(p,kind)==1,"new selections remain stable: "+kind);
         }h.succeed();
+    }
+
+    @GameTest(template="empty") public static void carveStopsAtForgeClaimWithoutMiningBehindIt(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(8,30,8));
+        p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
+        for(int depth=0;depth<3;depth++)for(var pos:DirectionalProgram.section(at,Direction.SOUTH,DirectionalProgram.Shape.CARVE,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        for(int depth=0;depth<3;depth++)h.getLevel().setBlockAndUpdate(at.south(depth),Blocks.STONE.defaultBlockState());
+        java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> deny=e->{if(e.getPlayer()==p&&e.getPos().equals(at.south()))e.setCanceled(true);};
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,deny);
+        try{WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new DirectionalProgram(at,Direction.SOUTH,DirectionalProgram.Shape.CARVE));for(int n=0;n<100&&WorkQueue.busy(p);n++)WorkQueue.tick();}
+        finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);}
+        h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(at).isAir(),"mines before claim and terminates");
+        h.assertTrue(h.getLevel().getBlockState(at.south()).is(Blocks.STONE)&&h.getLevel().getBlockState(at.south(2)).is(Blocks.STONE),"no skipped protection");
+        h.assertTrue(p.getMainHandItem().getDamageValue()==1,"only actual successful harvest consumes durability");finish(h,p);
     }
 
 }

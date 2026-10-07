@@ -59,6 +59,9 @@ public final class ClientValidation {
                         ||!p.serverLevel().getBlockState(new BlockPos(112,82,100)).is(net.minecraft.world.level.block.Blocks.STONE)
                         ||!p.serverLevel().getBlockState(new BlockPos(100,82,150)).is(net.minecraft.world.level.block.Blocks.BEDROCK)
                         ||!p.serverLevel().getBlockState(new BlockPos(100,82,151)).is(net.minecraft.world.level.block.Blocks.STONE))throw new IllegalStateException("Supreme wedge geometry or barrier failed");
+                    int removed=0;for(int x=76;x<=124;x++)for(int z=100;z<150;z++)for(int y=75;y<=95;y++)if(p.serverLevel().getBlockState(new BlockPos(x,y,z)).isAir())removed++;
+                    if(removed<=4096)throw new IllegalStateException("Supreme excavation truncated: "+removed);
+                    p.sendSystemMessage(Component.literal("SUPREME_REMOVED_BLOCKS_"+removed));
                     p.sendSystemMessage(Component.literal("SUPREME_COMPLETE"));
                 }
                 return;
