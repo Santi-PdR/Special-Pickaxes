@@ -45,11 +45,30 @@ jobs:
         run: |
           set -o pipefail
           python3 tools/client_smoke.py 2>&1 | tee build/verification-client.log
+      - run: git diff --check
+      - name: Check publication approval
+        id: publication
+        run: |
+          if test -f docs/mining-rework/VISUAL-REVIEW.json; then
+            python3 tools/verify_visual_review.py
+            echo "approved=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
       - if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         run: python3 tools/ci_evidence.py
         env:
           GH_TOKEN: ${{ github.token }}
-      - run: git diff --check
+          PUBLISH_BINARY: ${{ success() && steps.publication.outputs.approved == 'true' }}
+      - name: Publish verified release only
+        if: success() && steps.publication.outputs.approved == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: special-pickaxes-5.0.0-verified
+          path: |
+            build/libs/*.jar
+            build/RELEASE.json
+            build/SHA256SUMS
       - if: always()
         uses: actions/upload-artifact@v6
         with:
