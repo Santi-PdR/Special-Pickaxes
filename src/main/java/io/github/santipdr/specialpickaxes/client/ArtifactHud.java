@@ -17,7 +17,7 @@ public final class ArtifactHud {
     @SubscribeEvent public static void tooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.setMaxWidth(320);}
     @SubscribeEvent public static void levels(net.minecraftforge.event.entity.player.ItemTooltipEvent e){
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
-        var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(name);
+        var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(item.kind==io.github.santipdr.specialpickaxes.artifact.ArtifactKind.WORLDBREAKER?name.copy().withStyle(net.minecraft.ChatFormatting.GOLD):name);
         if(net.minecraft.client.gui.screens.Screen.hasShiftDown()){
             io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.expanded(e.getItemStack(),item.kind,lines);
             lines.add(Component.translatable("manual4.controls").withStyle(net.minecraft.ChatFormatting.GOLD));

@@ -46,3 +46,6 @@ def revise(d,spanish,ids):
    mode=key.split('.')[-1];d[key]=symbols.get(mode,'↻' if 'rotate' in mode else '•')+' '+d[key]
 
  d['message.specialpickaxes.not_ready']=('Finish the corners and wait for READY.','Completa las esquinas y espera a LISTO.')[i]
+
+ d['message.specialpickaxes.queued']=('Ability activated.','Habilidad activada.')[i]
+ d['message.specialpickaxes.volume_limit']=('Selection too large. Reduce its size.','Selección demasiado grande. Reduce su tamaño.')[i]

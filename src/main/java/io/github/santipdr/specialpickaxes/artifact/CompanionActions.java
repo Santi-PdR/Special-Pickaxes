@@ -31,7 +31,7 @@ public final class CompanionActions {
         var it=ACTIVE.values().iterator();
         while(it.hasNext()){
             var a=it.next();var p=a.player;
-            if(!a.valid()||!WorldSafety.allowed(p,a.kind,p.blockPosition())){it.remove();continue;}
+            if(!a.valid()||!WorldSafety.allowed(p,a.kind,p.blockPosition())){if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==a.tool&&ArtifactState.now(p)>a.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}it.remove();continue;}
             if(p.tickCount%5!=0)continue;
             if(a.kind==ArtifactKind.CAUSEWAY&&p.getDeltaMovement().y>-.4&&p.blockPosition().getY()-1==a.footingY){
                 var feet=p.blockPosition().below();var material=DirectAbilities.material(p);

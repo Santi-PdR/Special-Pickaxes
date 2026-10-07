@@ -50,6 +50,7 @@ public final class DomainFields {
             var f=iterator.next();var p=f.owner;var level=p.serverLevel();
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=f.tool || f.tool.isEmpty()
                     || p.level().dimension()!=f.dimension || ArtifactState.now(p)>f.expires || !WorldSafety.allowed(p,f.kind,f.center)) {
+                if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==f.tool&&p.level().dimension()==f.dimension&&ArtifactState.now(p)>f.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}
                 release(f);iterator.remove();continue;
             }
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition()))
