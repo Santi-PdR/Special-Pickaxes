@@ -109,6 +109,10 @@ public final class MiningReworkGameTests {
             for(int x=-20;x<=20;x+=4)h.getLevel().getChunkAt(at.offset(x,0,0));
             var dir=shape==DirectionalProgram.Shape.CORE_DRILL?Direction.DOWN:Direction.SOUTH;
             for(var obstacle:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),TestFluids.BLOCK.defaultBlockState())){
+                // Large fixtures exceed the 12-block template: initialize every examined cell,
+                // rather than inherit geometry from a neighboring completed test.
+                for(int depth=0;depth<3;depth++)for(var pos:DirectionalProgram.section(at,dir,shape,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+                p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
                 h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
                 h.getLevel().setBlockAndUpdate(at.relative(dir),obstacle);h.getLevel().setBlockAndUpdate(at.relative(dir,2),Blocks.STONE.defaultBlockState());
                 WorkQueue.startRegion(p,p.getMainHandItem(),kind,new DirectionalProgram(at,dir,shape));
