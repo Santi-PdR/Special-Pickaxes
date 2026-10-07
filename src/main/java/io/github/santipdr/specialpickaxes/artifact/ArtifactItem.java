@@ -55,7 +55,7 @@ public final class ArtifactItem extends PickaxeItem {
             ArtifactInteraction.display(p,tool,kind);
         }
     }
-    @Override public boolean isFoil(ItemStack stack) { return true; }
+    @Override public boolean isFoil(ItemStack stack) { return kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.ATLAS; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         ArtifactTooltips.compact(stack,kind,lines);
     }

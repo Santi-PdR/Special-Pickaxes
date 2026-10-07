@@ -11,14 +11,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
 
-/** Cosmetic only: animated head halo around a familiar vanilla tool. Never sends gameplay packets. */
+/** Cosmetic only: animated head halo around the reference-derived relic. Never sends gameplay packets. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class RelicAura {
     private static ArtifactKind equipped;
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
-        if(mc.player==null||mc.level==null||mc.isPaused()||mc.player.tickCount%4!=0||!(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item))return;
-        if(equipped!=item.kind){equipped=item.kind;
+        if(mc.player==null||mc.level==null||!(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item)){equipped=null;return;}
+        if(mc.isPaused()||mc.player.tickCount%4!=0)return;
+        if(equipped!=item.kind){equipped=item.kind;mc.player.playSound(item.kind.sound,.2F,1.2F);
             var action=ArtifactInteraction.regional(item.kind,ArtifactTooltips.mode(mc.player.getMainHandItem()))?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE;
             mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
         }

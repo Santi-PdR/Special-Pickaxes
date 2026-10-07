@@ -1,43 +1,40 @@
-# Special Pickaxes — 3.1.0
+# Special Pickaxes 4.0
 
-**Minecraft 1.20.1 · Forge 47.3.0+ · Java 17**
+**Forge 1.20.1 · Java 17 · veinte artefactos · ninguna energía**
 
-**20 artefactos legendarios, cada uno pico+hacha+pala.** La versión 3.1 conserva
-la infraestructura de 3.0, pero abandona la interacción regional universal:
-restauración local, partitura minera, dominios cinéticos, anclas, construcción,
-perforación física, retorno por pasos y acompañantes reactivos tienen controles propios.
+Una revisión de los controles, presentación e identidad de 3.1, sin añadir
+objetos por cantidad. Hover: nombre y una frase. SHIFT: pequeño manual de juego.
+Sin HUD permanente, sin Shift + clic derecho para poderes.
 
-- **Sin energía:** no existe recurso que cargar, regenerar o consumir. Quedan
-  durabilidad, cooldown, materiales reales y condiciones propias de cada habilidad.
-- **Tooltip compacto:** identidad, modo y aviso de SHIFT. Mantén **SHIFT** para
-  mecánica, controles, costes, límites, encantamientos, ejemplos y advertencias.
-- **Bases visuales existentes:** modelos handheld y texturas originales de los
-  picos de Minecraft. Glint, aura animada, partículas de operación y sonidos
-  distinguen las reliquias; se retiraron los 14 sprites experimentales de 3.0.
-- Sin recetas, minerales nuevos, worldgen ni dependencias de animación.
+## Jugar
 
-## Instalar y jugar
+[Guía breve](docs/4.0/PLAYER-GUIDE.md). Configura las teclas en
+**Opciones → Controles → Special Pickaxes**:
+R activar, G secundaria, C modo, B selección, Enter confirmar, V cancelar, K pausa.
+Son valores iniciales reasignables; pueden coincidir con otros mods.
 
-Instala `special-pickaxes-1.20.1-3.1.0.jar` en cliente y servidor, reemplazando el
-JAR anterior. No instales dos versiones. Los 14 IDs existentes se conservan.
-Obtención: creativo, `/give` o `/specialpickaxes grant Jugador ID` (permiso 2).
+Directos: apuntar y activar. Regionales: seleccionar esquinas; el análisis comienza
+solo y Confirmar ejecuta cuando está listo. Solo Atlas, Crucible, Chronicle,
+Tessellator y los programas regionales de Worldbreaker usan esquinas.
 
-**Nuevos:** `aegis`, `lodestar`, `seam_ripper`, `causeway`, `counterseal`, `covenant`.
-Consulta la [guía 3.1](docs/3.1/PLAYER-GUIDE.md) y la [auditoría de diseño](docs/3.1/DESIGN.md).
+**Worldbreaker es la pieza suprema.** Convergencia fractura un anillo conservando
+el núcleo y construye un santuario pagado; no es solamente aumentar el radio.
+Los otros diecinueve tienen especialidades, no copias de este programa.
 
-### ¿Quién usa regiones?
+Texturas reales seleccionadas de los cuatro JAR autorizados, con modelos propios,
+firmas espaciales y audio por fase. No texturas de picos vanilla ni el generador
+experimental de 3.0. [Procedencia de cada asset](docs/4.0/ASSET-PROVENANCE.json).
+No se añade dependencia de los mods de referencia ni se modifican sus archivos.
 
-Solo **Atlas, Crucible, Chronicle y Tessellator**, más Worldbreaker en
-**BREAK, REPHASE, TRANSPOSE y RECORD**. Worldbreaker **CARVE y RESTORE son directos**.
-Meridian usa dos anclas puntuales, no esquinas de una región.
+Instala `special-pickaxes-1.20.1-4.0.0.jar` en **cliente y servidor**, reemplazando
+el anterior. Obtención administrativa/creativo/recompensas: sin recetas, ores ni
+worldgen. Se conservan IDs, herramientas triples, ToolActions, encantamientos altos,
+materiales reales, checks de mundo y scheduler.
 
-En operaciones regionales: usar activa selección; izquierdo marca esquinas;
-agachado + izquierdo cambia modo/transformación; usar analiza sin modificar;
-usando otra vez en LISTO confirmas. Durante trabajos, usar pausa/reanuda y
-agachado + usar cancela. Cambiar herramienta cancela el trabajo en ejecución.
-Los controles directos específicos están en cada tooltip SHIFT y en la guía.
+## Ingeniería
 
-## Ingeniería y verificación
+[Auditoría individual y arquitectura](docs/4.0/AUDIT.md).
+[Validación y alcance](docs/VALIDACION.md).
 
 ```sh
 ./gradlew build test
@@ -45,20 +42,13 @@ Los controles directos específicos están en cada tooltip SHIFT y en la guía.
 python3 tools/validate_resources.py
 python3 tools/scan_secrets.py
 python3 tools/verify_release.py
-python3 tools/dedicated_smoke.py
 git diff --check
 ```
 
-Actions ejecuta Java 17, JUnit, GameTests, servidor con el JAR reobfuscado y cliente
-real bajo Xvfb: galería de 20, **40 capturas normales/SHIFT**, Efficiency 1000 y
-tercera persona. Las fixtures no se incluyen en el JAR. El artefacto
-`forge-validation` contiene JAR, `RELEASE.json`, `SHA256SUMS`, informes y capturas.
-**Build-Commit** identifica el código exacto: un run fallido no certifica una entrega.
-No hay `package.json`; `npm run check` no corresponde.
+Actions compila, prueba y empaqueta; su artefacto `forge-validation` incluye el
+JAR, manifiesto de procedencia, resultados y capturas de cliente real. Un run
+fallido no constituye una entrega validada. No hay package.json.
 
-[Alcance y límites de validación](docs/VALIDACION.md). No se ha inventado acceso a
-**test-1** ni se usa/modifica **siege**. CI crea mundos desechables; no equivale a
-certificar el modpack externo completo. Las cuatro referencias originales
-permanecen intactas y fuera del JAR; su auditoría histórica está en
-[docs/siege/AUDIT.md](docs/siege/AUDIT.md). Los documentos de expansión 3.0 son
-históricos y no describen los controles, tooltips ni arte de 3.1.
+No se usa/modifica siege, ni se inventa acceso a test-1. Los mundos CI son
+desechables y no certifican el modpack externo completo. La documentación 3.0/3.1
+se conserva como historia, no como controles actuales.

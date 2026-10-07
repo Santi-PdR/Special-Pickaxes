@@ -12,7 +12,7 @@ public final class ArtifactTooltips {
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("identity.specialpickaxes."+k.id).withStyle(ChatFormatting.GRAY));}
     private static void section(List<Component> lines,String heading,Component content){
         if(!lines.isEmpty())lines.add(Component.empty());
-        lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.copy().withStyle(ChatFormatting.GRAY));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
         var a=new ArrayList<RelicControl.Action>();boolean region=ArtifactInteraction.regional(k,mode);

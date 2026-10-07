@@ -109,7 +109,6 @@ public final class ArtifactInteraction {
             tag.putString("artifactStatus",b.isPresent()?"linked":"anchor_b");tag.putString("artifactSource",a.get().toShortString());ArtifactFeedback.burst(p,k,a.get(),3);
             if(b.isPresent()){tag.putString("artifactTarget",b.get().toShortString());tag.putInt("artifactRotation",ArtifactState.of(p,k).getInt("rotation")*90);tag.putInt("artifactDistance",(int)Math.round(Math.sqrt(a.get().distSqr(b.get()))));ArtifactFeedback.trace(p,k,a.get(),b.get());ArtifactFeedback.burst(p,ArtifactKind.PALIMPSEST,b.get(),3);}
         }}
-        if(!regional(k,ArtifactState.mode(p,k))&&!WorkQueue.busy(p))DirectAbilities.preview(p,k);
         var memory=ArtifactState.of(p,k).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);
         tag.putLong("artifactOldest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(0))/1200);tag.putLong("artifactLatest",memory.isEmpty()?0:ArtifactState.age(p,memory.getCompound(memory.size()-1))/1200);
     }
