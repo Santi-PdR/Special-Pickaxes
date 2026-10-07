@@ -17,7 +17,8 @@ execute as @a[scores={artifactAge=1}] run gamemode creative @s
 execute as @a[scores={artifactAge=1}] run tp @s 0 65 14 180 -14
 execute as @a[tag=!artifact_gallery,scores={artifactAge=60..}] run function artifact_gallery:setup
 ''')
-ids='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
+from mining_catalog import IDS as ids, MODES
+scenes=[id+'-'+mode for id in ids for mode in MODES[id]]
 commands=['tag @s add artifact_gallery','fill -9 65 0 9 74 16 minecraft:air','fill -9 64 -1 9 64 17 minecraft:polished_andesite','fill -9 65 0 9 74 0 minecraft:black_concrete','fill -9 74 0 9 74 16 minecraft:sea_lantern','time set noon','weather clear','gamerule doDaylightCycle false','gamerule doMobSpawning false','tp @s 0 65 14 180 -14','clear @s']
 for i,id in enumerate(ids):
  x=-6+(i%5)*3;y=72.5-(i//5)*2.1
@@ -54,16 +55,21 @@ try:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True,timeout=20)
    # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True,timeout=20)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory.png'),'inventory'],env=env,check=True,timeout=20)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory-closed.png'),'inventory'],env=env,check=True,timeout=20)
    gallery_done=True;gallery_flag.write_text("ready")
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
-   if id not in ids:raise RuntimeError('Unexpected client artifact')
+   if id not in scenes:raise RuntimeError('Unexpected client artifact')
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True,timeout=20)
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-shift-'+id+'.png')),'shift'],env=env,check=True,timeout=20)
    ux.add(id)
-   pending=ack.with_suffix('.tmp');pending.write_text(str(ids.index(id)));pending.replace(ack)
+   i=scenes.index(id)
+   if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
+    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('mode-switch-'+scenes[i+1]+'.png')),'mode'],env=env,check=True,timeout=20)
+   pending=ack.with_suffix('.tmp');pending.write_text(str(scenes.index(id)));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
-   if ux!=set(ids):raise RuntimeError('Incomplete graphical artifact validation')
+   if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True,timeout=20)
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-activate.png'),'activate'],env=env,check=True,timeout=20)
   if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
@@ -88,15 +94,15 @@ subprocess.run(['python3','tools/validate_runtime_logs.py',str(out/'client.log')
 text=(out/'client.log').read_text().lower()
 for issue in ['missing texture','unable to load model','unable to bake','using missing texture']:
  if issue in text:raise SystemExit('Client resource error: '+issue)
-for id in ids:
+for id in scenes:
  for phase in ['normal','shift']:
   if 'tooltip_validated '+id+'-'+phase not in text:raise SystemExit('Missing tooltip verification: '+id+' '+phase)
-print('GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS='+str(len(ux))+'; NORMAL_AND_SHIFT=40')
+print('GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS='+str(len(ux))+'; NORMAL_AND_SHIFT='+str(2*len(scenes)))
 
 assert "control_active" in text and "control_cancelled" in text
 print("KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK")
 
 assert "supreme_executing" in text and "supreme_complete" in text
-print("SUPREME_REAL_EXECUTION_AND_CORE_VAULT_VERIFIED")
+print("SUPREME_REAL_WEDGE_AND_BARRIER_VERIFIED")
 
 assert "key_bindings_registered_and_rebound_ok" in text

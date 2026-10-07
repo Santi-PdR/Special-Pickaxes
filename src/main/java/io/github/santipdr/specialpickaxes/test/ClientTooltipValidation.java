@@ -30,7 +30,7 @@ public final class ClientTooltipValidation {
                 }finally{bind.setKey(old);net.minecraft.client.KeyMapping.resetMapping();}
                 bindingsChecked=true;com.mojang.logging.LogUtils.getLogger().info("KEY_BINDINGS_REGISTERED_AND_REBOUND_OK");
             }
-            boolean shift=net.minecraft.client.gui.screens.Screen.hasShiftDown();String key=item.kind.id+(shift?"-shift":"-normal");
+            boolean shift=net.minecraft.client.gui.screens.Screen.hasShiftDown();String key=item.kind.id+"-"+io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.modeKey(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))+(shift?"-shift":"-normal");
             if(CHECKED.add(key)){
                 var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
                 if(shift?lines.size()<9:lines.size()!=3)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
