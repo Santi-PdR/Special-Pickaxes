@@ -30,6 +30,7 @@ def apply():
     d[f'mining.how.{artifact}.{mode}']=text[3 if es else 2]
     labels={'shelter':'REFUGIO','bridge':'PUENTE','wall':'PARED','regional':'REGIONAL','proximity':'PROXIMIDAD','stasis':'ESTASIS','forward':'ADELANTE','reverse':'ATRÁS','restore':'RECONSTRUIR','selective':'SELECTIVO','gravity_in':'HACIA EL CENTRO','gravity_out':'HACIA EL BORDE','rotate0':'ORIGINAL','rotate90':'90°','rotate180':'180°','rotate270':'270°','mirror_x':'REFLEXIÓN X','mirror_z':'REFLEXIÓN Z'}
     d[f'mode.specialpickaxes.{mode}']=labels.get(mode,mode.replace('_',' ').upper()) if es else mode.replace('_',' ').upper()
+  d['manual4.wear']='Desgaste al activar: %s; enfriamiento %s s.' if es else 'Activation wear: %s; cooldown %s s.'
   d['mining.limits']=('Nunca toca bedrock, fluidos, máquinas ni bloques protegidos. Las rutas direccionales se detienen ante barreras. Pausa o cancela con tus teclas configuradas.' if es else 'Never edits bedrock, fluids, machines or protected blocks. Directional routes stop at barriers. Pause or cancel with your configured keys.')
   d['message.specialpickaxes.drop_pause']='Pausa por acumulación de drops. Recógelos y reanuda.' if es else 'Paused for drop congestion. Collect drops, then resume.'
   d['message.specialpickaxes.duplicate_corner']='Esa esquina ya está marcada.' if es else 'That corner is already marked.'

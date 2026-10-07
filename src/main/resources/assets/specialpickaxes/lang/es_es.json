@@ -281,7 +281,7 @@
   "manual4.cost": "Qué consume",
   "manual4.limits": "Ten en cuenta",
   "manual4.controls": "Controles · reasigna en Opciones",
-  "manual4.wear": "Activar: %s de durabilidad; enfriamiento %s s. Construir gasta bloques.",
+  "manual4.wear": "Desgaste al activar: %s; enfriamiento %s s.",
   "key.specialpickaxes.activate": "Activar habilidad",
   "key.specialpickaxes.secondary": "Habilidad secundaria",
   "key.specialpickaxes.mode": "Cambiar modo",

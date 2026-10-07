@@ -281,7 +281,7 @@
   "manual4.cost": "Consumes",
   "manual4.limits": "Keep in mind",
   "manual4.controls": "Controls · rebind in Options",
-  "manual4.wear": "Activation: %s durability; cooldown %s s. Building spends blocks.",
+  "manual4.wear": "Activation wear: %s; cooldown %s s.",
   "key.specialpickaxes.activate": "Activate ability",
   "key.specialpickaxes.secondary": "Secondary ability",
   "key.specialpickaxes.mode": "Change mode",
