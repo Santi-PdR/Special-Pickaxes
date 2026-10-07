@@ -28,8 +28,10 @@ public enum ArtifactKind {
     public final int color;
     public final SoundEvent sound;
     ArtifactKind(String id, int color, SoundEvent sound) { this.id=id; this.color=color; this.sound=sound; }
+    public boolean playable(){return switch(this){case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,WORLDBREAKER->true;default->false;};}
+    public static ArtifactKind[] playableValues(){return java.util.Arrays.stream(values()).filter(ArtifactKind::playable).toArray(ArtifactKind[]::new);}
     public static ArtifactKind byId(String id) {
-        for (var kind : values()) if (kind.id.equals(id)) return kind;
+        for (var kind : values()) if (kind.playable() && kind.id.equals(id)) return kind;
         throw new IllegalArgumentException("Unknown artifact: " + id);
     }
 }

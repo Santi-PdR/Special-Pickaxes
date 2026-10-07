@@ -50,7 +50,6 @@ jobs:
         with:
           name: forge-validation
           path: |
-            build/libs/*.jar
             build/reports/
             run/logs/
             run/gametest*xml

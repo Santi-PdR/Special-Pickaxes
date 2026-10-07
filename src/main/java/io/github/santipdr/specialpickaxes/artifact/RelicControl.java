@@ -7,7 +7,7 @@ public final class RelicControl {
     public enum Action { ACTIVATE, SECONDARY, MODE, SELECT, CONFIRM, CANCEL, PAUSE }
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
-        if(!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
+        if(!expected.playable()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
         WorkQueue.discardStale(p);
         var k=item.kind;var tool=p.getMainHandItem();
         if(action==Action.CANCEL){
@@ -32,9 +32,9 @@ public final class RelicControl {
                 if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
                 return ArtifactInteraction.use(p,tool,k,false);
             case MODE:
-                if(WorkQueue.busy(p)||ArtifactInteraction.modeCount(k)<2)return false;
-                if(ArtifactInteraction.selecting(p))return ArtifactInteraction.left(p,p.blockPosition(),true);
-                ArtifactState.rotate(p,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;
+                if(ArtifactInteraction.modeCount(k)<2)return false;
+                WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
+                ArtifactState.rotate(p,k);tool.getOrCreateTag().putInt("artifactMode",ArtifactState.mode(p,k));ArtifactInteraction.display(p,tool,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;
             case SECONDARY:
                 if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){ArtifactState.clearAnchors(p,k);data.remove("trail");ArtifactFeedback.message(p,"unlinked");ArtifactFeedback.cue(p,"cancel");return true;}
                 if(DomainFields.active(p)||CompanionActions.active(p)){DomainFields.stop(p);CompanionActions.stop(p);WorkQueue.cancel(p);ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");return true;}

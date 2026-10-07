@@ -36,7 +36,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
-        for(var kind:ArtifactKind.values()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
+        for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
         TABS.register("artifacts",() -> CreativeModeTab.builder().title(Component.translatable("itemGroup.specialpickaxes"))
             .icon(() -> new ItemStack(PICKS.get(ArtifactKind.PALIMPSEST).get()))
             .displayItems((parameters,output) -> PICKS.values().forEach(item -> output.accept(item.get()))).build());
@@ -46,14 +46,20 @@ public final class SpecialPickaxes {
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
         var forge=MinecraftForge.EVENT_BUS;
-        forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
+        forge.addListener(this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
+    }
+    private void protectPhysicalLimit(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
+        if(e.getPlayer() instanceof ServerPlayer p&&p.getMainHandItem().getItem() instanceof ArtifactItem&&WorldSafety.barrier(p,e.getPos()))e.setCanceled(true);
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
-        if(e.getEntity() instanceof ServerPlayer p && RelicControl.corner(p,e.getPos()))e.setCanceled(true);
+        if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.selecting(p)){
+            if(e.getAction()==net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.Action.START)RelicControl.corner(p,e.getPos());
+            e.setCanceled(true);
+        }
     }
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick(); }
@@ -72,7 +78,7 @@ public final class SpecialPickaxes {
         if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.values()) {
+        if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.playableValues()) {
             ArtifactState.prune(p,kind);
             long ticks=ArtifactState.of(p,kind).getLong("ready")-ArtifactState.now(p);
             if(ticks>0) p.getCooldowns().addCooldown(PICKS.get(kind).get(),(int)Math.min(ticks,12000));
@@ -96,7 +102,7 @@ public final class SpecialPickaxes {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
             .then(Commands.literal("grant").then(Commands.argument("player",EntityArgument.player())
             .then(Commands.argument("artifact",StringArgumentType.word())
-                .suggests((context,builder) -> SharedSuggestionProvider.suggest(Arrays.stream(ArtifactKind.values()).map(k -> k.id),builder))
+                .suggests((context,builder) -> SharedSuggestionProvider.suggest(Arrays.stream(ArtifactKind.playableValues()).map(k -> k.id),builder))
                 .executes(context -> {
                     String id=StringArgumentType.getString(context,"artifact");ArtifactKind kind;
                     try { kind=ArtifactKind.byId(id); } catch(IllegalArgumentException invalid) {
@@ -116,7 +122,7 @@ public final class SpecialPickaxes {
         ArtifactKind[] kinds={ArtifactKind.ICARUS,ArtifactKind.WORLDLOOM,ArtifactKind.CHOIR,ArtifactKind.CRUCIBLE,
             ArtifactKind.EVENTIDE,ArtifactKind.AXIOM,ArtifactKind.INTERREGNUM,ArtifactKind.PALIMPSEST,ArtifactKind.MERIDIAN,ArtifactKind.ATLAS};
         for(var mapping:e.getMappings(ForgeRegistries.Keys.ITEMS,ID)) for(int i=0;i<old.length;i++)
-            if(mapping.getKey().getPath().equals(old[i])) mapping.remap(PICKS.get(kinds[i]).get());
+            if(mapping.getKey().getPath().equals(old[i])) {if(kinds[i].playable())mapping.remap(PICKS.get(kinds[i]).get());else mapping.ignore();}
     }
     private static final class DominionEffect extends MobEffect { private DominionEffect() { super(MobEffectCategory.BENEFICIAL,0x8ae5ff); } }
 }

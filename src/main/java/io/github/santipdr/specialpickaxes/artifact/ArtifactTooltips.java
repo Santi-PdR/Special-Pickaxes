@@ -8,8 +8,8 @@ import java.util.*;
 /** Presentation content only. No engine budgets, internal counters or client keyboard dependency. */
 public final class ArtifactTooltips {
     private ArtifactTooltips(){}
-    public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):stack.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER?6:0;}
-    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("identity.specialpickaxes."+k.id).withStyle(ChatFormatting.GRAY));}
+    public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):0;}
+    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))).withStyle(ChatFormatting.GRAY));}
     private static void section(List<Component> lines,String heading,Component content){
         if(!lines.isEmpty())lines.add(Component.empty());
         lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.copy().withStyle(ChatFormatting.GRAY));
@@ -19,18 +19,17 @@ public final class ArtifactTooltips {
         a.add(region?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE);
         if(region)a.add(RelicControl.Action.CONFIRM);
         if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
-        if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR||k==ArtifactKind.INTERREGNUM||k==ArtifactKind.EVENTIDE||k==ArtifactKind.AEGIS||CompanionActions.handles(k))a.add(RelicControl.Action.SECONDARY);
         a.add(RelicControl.Action.CANCEL);
         if(!CompanionActions.handles(k)&&k!=ArtifactKind.AEGIS&&k!=ArtifactKind.INTERREGNUM&&k!=ArtifactKind.MERIDIAN)a.add(RelicControl.Action.PAUSE);
         return a;
     }
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){
-        section(lines,"what",Component.translatable("identity.specialpickaxes."+k.id));
-        section(lines,"how",Component.translatable("play4."+k.id));
+        section(lines,"what",Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
+        section(lines,"how",Component.translatable("mining.how."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
         if(ArtifactInteraction.modeCount(k)>1)section(lines,"mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack))));
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;
         section(lines,"cost",Component.translatable("manual4.wear",cost,String.format(java.util.Locale.ROOT,"%.1f",cooldown/20D)));
-        section(lines,"limits",Component.translatable("warning4."+k.id));
+        section(lines,"limits",Component.translatable("mining.limits"));
     }
 }

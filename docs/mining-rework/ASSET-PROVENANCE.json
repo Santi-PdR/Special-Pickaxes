@@ -1,0 +1,65 @@
+[
+  {
+    "artifact": "palimpsest",
+    "archive": "referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar",
+    "entry": "assets/custompickaxes/textures/item/vitalite_pickaxe.png",
+    "sha256": "3477a547721e922261ed75e858d245d6c6bf84e0d9f0047a43955c2e55a76d1d",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "fault_choir",
+    "archive": "referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar",
+    "entry": "assets/custompickaxes/textures/item/echo_pickaxe.png",
+    "sha256": "50711f903cc9a14f301247f4c184e1ac899c051f2ec3b7d974e5b6a4d25fd026",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "eventide",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/schizo_pickaxe.png",
+    "sha256": "eccae34b08471a6684b054adce12826919c5bfa9f7ea057430f7225a3a741b9a",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "paradox_crucible",
+    "archive": "referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar",
+    "entry": "assets/custompickaxes/textures/item/volcanite_pickaxe.png",
+    "sha256": "efa0619fba03d2a0d639f792bfa139ec254d508a23b972e1ee7708a4d88149d8",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "interregnum",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/lighningpickaxe.png",
+    "sha256": "52d872e1f8d421055f1f712cc75ed9e081ec768a94ec78edf91e225ccee6f64b",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "worldloom",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/natural_pickaxe.png",
+    "sha256": "88679b2c56e65544dc984fe82a6c45fa0954a4f46453f3fc45dfedfa13e5d873",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "icarus",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/elytra_pickaxe.png",
+    "sha256": "064ddf43fbb77112b19573335a6860674a501f748a69a841476e372f28418d56",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "hollow_axiom",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/shadow_pickaxe.png",
+    "sha256": "68415544cd16cbc80b04eebbcae993bfc3f75799f854cb05783e68ba556a840c",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "worldbreaker",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
+    "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  }
+]

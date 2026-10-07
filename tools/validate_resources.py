@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import json,pathlib,struct,hashlib,unittest
 ROOT=pathlib.Path('src/main/resources')
-IDS='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
+from mining_catalog import IDS, MODES
+
 class Resources(unittest.TestCase):
  def test_json(self):
   for pattern in ['*.json','*.mcmeta']:
@@ -12,7 +13,15 @@ class Resources(unittest.TestCase):
    model=json.loads((ROOT/f'assets/specialpickaxes/models/item/{id}.json').read_text())
    self.assertEqual(model['textures']['layer0'],'specialpickaxes:item/'+id)
    hashes.add(hashlib.sha256((ROOT/f'assets/specialpickaxes/textures/item/{id}.png').read_bytes()).hexdigest())
-  self.assertEqual(len(hashes),20)
+  self.assertEqual(len(hashes),9)
+ def test_mining_modes_and_removed_models(self):
+  self.assertEqual({p.stem for p in (ROOT/'assets/specialpickaxes/models/item').glob('*.json')},set(IDS))
+  for lang in ['en_us','es_es']:
+   d=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())
+   for artifact,modes in MODES.items():
+    for mode in modes:
+     self.assertIn(f'mining.identity.{artifact}.{mode}',d)
+     self.assertIn(f'mining.how.{artifact}.{mode}',d)
  def test_current_controls(self):
   for lang in ['en_us','es_es']:
    d=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())

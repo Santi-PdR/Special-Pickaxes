@@ -18,7 +18,7 @@ public final class WorkQueue {
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;
-        int accepted,completed,succeeded; boolean paused,aborted; RegionWork region;
+        int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();
@@ -35,10 +35,10 @@ public final class WorkQueue {
     public static boolean togglePause(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j==null)return false;if(j.region!=null&&j.region.awaiting()){
         if(ArtifactState.of(p,j.kind).getLong("ready")>ArtifactState.now(p))return false;
         int cost=EnchantmentScaling.activationCost(j.tool,j.kind);if(!p.isCreative()&&j.tool.getMaxDamage()-j.tool.getDamageValue()<=cost)return false;
-        j.tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND));if(j.kind==ArtifactKind.CHRONICLE&&j.region.mode==0||j.kind==ArtifactKind.WORLDBREAKER&&j.region.mode==5)ArtifactState.of(p,j.kind).remove("memory");
+        j.tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND));if(j.region instanceof RegionWork r&&(j.kind==ArtifactKind.CHRONICLE&&r.mode==0))ArtifactState.of(p,j.kind).remove("memory");
         ArtifactState.of(p,j.kind).putLong("ready",ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get());p.getCooldowns().addCooldown(j.tool.getItem(),ArtifactConfig.COOLDOWN.get());
         j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;}else j.paused=!j.paused;return true;}
-    public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,RegionWork region){
+    public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,WorkProgram region){
         if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         var j=new Job(p,tool,kind,List.of());j.region=region;region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
     }
@@ -69,12 +69,15 @@ public final class WorkQueue {
             int turn=Math.min(budget,EnchantmentScaling.budget(job.tool));BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
+                if(job.region!=null?job.region.backpressured(p):job.steps.peekFirst() instanceof WorkStep.Mine mine&&WorldSafety.dropPressure(p,mine.pos())){
+                    job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
+                }
                 budget--;lastAttempts++;
                 WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);
                     if(ok) { feedback=step.pos();job.succeeded++; }
-                    else if(step.stopOnFailure()) {job.steps.clear();break;}
+                    else if(step.stopOnFailure()) {job.steps.clear();job.aborted=true;break;}
                 } catch(RuntimeException error) {
                     LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
                 } finally { running=false; }

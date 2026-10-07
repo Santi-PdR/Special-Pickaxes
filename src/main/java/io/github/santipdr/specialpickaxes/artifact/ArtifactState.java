@@ -24,7 +24,7 @@ public final class ArtifactState {
         var data=root.getCompound(kind.id);data.remove("charge");return data; // discard retired 2.x/3.0 resource data
     }
     public static String dimension(ServerPlayer p) { return p.level().dimension().location().toString(); }
-    public static int mode(ServerPlayer p, ArtifactKind kind) { var data=of(p,kind);return Math.floorMod(data.contains("mode")?data.getInt("mode"):kind==ArtifactKind.WORLDBREAKER?6:0,ArtifactInteraction.modeCount(kind)); }
+    public static int mode(ServerPlayer p, ArtifactKind kind) { var data=of(p,kind);return Math.floorMod(data.contains("mode")?data.getInt("mode"):0,ArtifactInteraction.modeCount(kind)); }
     public static int rotate(ServerPlayer p, ArtifactKind kind) { int m=(mode(p,kind)+1)%ArtifactInteraction.modeCount(kind);of(p,kind).putInt("mode",m);return m; }
     public static void record(ServerPlayer p, ArtifactKind kind, BlockPos pos, BlockState state) {
         // Both memories use only default inert states; no NBT/powered/fluid/machine reconstruction.

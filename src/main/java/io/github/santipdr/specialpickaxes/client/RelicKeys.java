@@ -13,6 +13,8 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT)
 public final class RelicKeys {
+    private static final boolean[] DOWN=new boolean[RelicControl.Action.values().length];
+    private static Object connection;private static long sequence;
     private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_G,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
@@ -22,9 +24,14 @@ public final class RelicKeys {
     }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
-        for(var a:RelicControl.Action.values())while(KEYS[a.ordinal()].consumeClick()){
-            if(mc.screen==null&&mc.player!=null&&mc.player.getMainHandItem().getItem() instanceof ArtifactItem item)
-                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a));
+        if(connection!=mc.getConnection()){
+            connection=mc.getConnection();sequence=0;for(var a:RelicControl.Action.values())DOWN[a.ordinal()]=KEYS[a.ordinal()].isDown();return;
+        }
+        for(var a:RelicControl.Action.values()){
+            var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
+            boolean down=key.isDown(),edge=down&&!DOWN[a.ordinal()];DOWN[a.ordinal()]=down;
+            if(edge&&mc.screen==null&&mc.player!=null&&mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable())
+                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence));
         }
     }
     public static net.minecraft.network.chat.Component name(RelicControl.Action action){return KEYS[action.ordinal()].getTranslatedKeyMessage();}

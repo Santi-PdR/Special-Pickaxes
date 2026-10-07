@@ -22,7 +22,7 @@ public final class WorldSafety {
         Blocks.JUNGLE_PLANKS,Blocks.ACACIA_PLANKS,Blocks.DARK_OAK_PLANKS,Blocks.MANGROVE_PLANKS,Blocks.CHERRY_PLANKS,
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK);
     private WorldSafety() {}
-    public static boolean inert(BlockState state) { return MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
+    public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&state.getFluidState().isEmpty()&&MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();
         return p.isAlive() && !p.isSpectator() && p.mayBuild() && !level.isOutsideBuildHeight(pos)
@@ -30,18 +30,28 @@ public final class WorldSafety {
             && level.hasChunkAt(pos) && level.getWorldBorder().isWithinBounds(pos) && level.mayInteract(p,pos)
             && !MinecraftForge.EVENT_BUS.post(new AbilityUseEvent(p,kind.id,pos));
     }
+    /** Physical barriers: query the level Fluid API as well as the block state. */
+    public static boolean barrier(ServerPlayer p,BlockPos pos){
+        var level=p.serverLevel();if(!level.hasChunkAt(pos)||level.isOutsideBuildHeight(pos))return true;
+        var state=level.getBlockState(pos);
+        return state.is(Blocks.BEDROCK)||!level.getFluidState(pos).isEmpty()||!state.getFluidState().isEmpty()||state.hasBlockEntity()||state.getDestroySpeed(level,pos)<0;
+    }
+    public static boolean directionClear(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos){
+        return allowed(p,kind,pos)&&!barrier(p,pos)&&(p.serverLevel().getBlockState(pos).isAir()||harvestable(p,tool,pos));
+    }
     public static boolean harvestable(ServerPlayer p, ItemStack tool, BlockPos pos) {
         var level=p.serverLevel();var s=level.getBlockState(pos);
-        return !tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
+        return !barrier(p,pos)&&!tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
             && s.getFluidState().isEmpty() && s.getDestroySpeed(level,pos)>=0
             && ArtifactTools.effective(s) && tool.isCorrectToolForDrops(s);
     }
     public static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
-        if(p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256)return false;
+        if(dropPressure(p,pos))return false;
         return p.gameMode.destroyBlock(pos);
     }
+    public static boolean dropPressure(ServerPlayer p,BlockPos pos){return p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256;}
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
         return ForgeHooks.onBlockBreakEvent(p.serverLevel(),p.gameMode.getGameModeForPlayer(),p,pos)>=0;
     }
@@ -50,7 +60,7 @@ public final class WorldSafety {
             && p.serverLevel().isUnobstructed(state,pos,net.minecraft.world.phys.shapes.CollisionContext.empty());
     }
     public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
-        if(!allowed(p,kind,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty()) return false;
+        if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty()) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             for(int i=0;i<p.getInventory().getContainerSize();i++) {
@@ -78,7 +88,7 @@ public final class WorldSafety {
         }
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
-        if(expected==next || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
+        if(expected==next || kind==ArtifactKind.CRUCIBLE&&!MiningDesigns.matrix(expected) || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
                 || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(pos)!=expected) return false;
@@ -96,7 +106,7 @@ public final class WorldSafety {
     public static boolean vacant(BlockState s) { return s.is(Blocks.AIR) || s.is(Blocks.CAVE_AIR) || s.is(Blocks.VOID_AIR); }
     public static boolean exchange(ServerPlayer p,ItemStack tool,BlockPos a,BlockPos b,BlockState sa,BlockState sb) {
         var kind=tool.getItem() instanceof ArtifactItem item?item.kind:ArtifactKind.ATLAS;
-        if(a.equals(b) || sa==sb || vacant(sa) && vacant(sb) || !(inert(sa) || vacant(sa))
+        if(barrier(p,a)||barrier(p,b)||a.equals(b) || sa==sb || vacant(sa) && vacant(sb) || !(inert(sa) || vacant(sa))
                 || !(inert(sb) || vacant(sb)) || !allowed(p,kind,a)
                 || !allowed(p,kind,b)) return false;
         var level=p.serverLevel();

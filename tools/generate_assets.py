@@ -95,3 +95,7 @@ for code in ['en_us','es_es']:
 from ux4_strings import revise as revise4
 for code in ["en_us","es_es"]:
  path=R/"assets/specialpickaxes/lang"/(code+".json");data=json.loads(path.read_text());revise4(data,code=="es_es",IDS);path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
+
+# Final nine-item mining catalog supersedes the historical input tables above.
+from mining_catalog import apply as mining_catalog
+mining_catalog()
