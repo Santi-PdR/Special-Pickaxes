@@ -86,7 +86,7 @@ public final class DomainFields {
                 if(entry.getValue().entity.isAlive()) entry.getValue().entity.setDeltaMovement(clamp(entry.getValue().velocity));
                 return true;
             });
-            if(p.tickCount%10==0) ArtifactFeedback.ring(p,f.kind,f.center,f.radius);
+            if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
         }
     }
 }

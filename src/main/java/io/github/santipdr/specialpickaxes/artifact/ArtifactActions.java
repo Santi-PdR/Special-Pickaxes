@@ -28,7 +28,7 @@ public final class ArtifactActions {
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
         if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
         var data=ArtifactState.of(p,kind);
-        if(data.getLong("ready")>ArtifactState.now(p)) return false;
+        if(data.getLong("ready")>ArtifactState.now(p)){ArtifactFeedback.message(p,"cooldown");ArtifactFeedback.cue(p,"error");return false;}
         int cost=secondary?0:EnchantmentScaling.activationCost(tool,kind);
         if(!p.isCreative() && tool.getMaxDamage()-tool.getDamageValue()<=cost) return false;
         boolean done=secondary?secondary(p,kind):primary(p,tool,kind);

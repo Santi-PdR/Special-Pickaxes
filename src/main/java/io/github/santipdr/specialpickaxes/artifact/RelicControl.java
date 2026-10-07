@@ -8,6 +8,7 @@ public final class RelicControl {
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
         if(!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
+        WorkQueue.discardStale(p);
         var k=item.kind;var tool=p.getMainHandItem();
         if(action==Action.CANCEL){
             boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);

@@ -26,7 +26,11 @@ public final class ArtifactHud {
                 int level=io.github.santipdr.specialpickaxes.artifact.EnchantmentScaling.level(e.getItemStack(),ench);
                 if(level>0)lines.add(numericLevels(ench.getFullname(level),0));
             }
-        }else io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
+        }else {
+            io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
+            var action=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())).get(0);
+            lines.add(RelicKeys.name(action).copy().append(" → ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))).withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+        }
     }
     private static Component numericLevels(Component c,int depth){
         if(depth>16)return c;

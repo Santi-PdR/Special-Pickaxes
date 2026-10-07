@@ -34,7 +34,7 @@ public final class ArtifactInteraction {
     private static int corners(ServerPlayer p,ArtifactKind k){return k==ArtifactKind.ATLAS||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,k)==3?4:2;}
     public static void clear(ServerPlayer p){SELECTED.remove(p.getUUID());}
     public static void clear(){SELECTED.clear();}
-    public static boolean selecting(ServerPlayer p){return SELECTED.containsKey(p.getUUID());}
+    public static boolean selecting(ServerPlayer p){var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);return false;}return s!=null;}
     public static boolean left(ServerPlayer p,BlockPos pos,boolean shift){
         var s=SELECTED.get(p.getUUID());
         if(s==null)return false;

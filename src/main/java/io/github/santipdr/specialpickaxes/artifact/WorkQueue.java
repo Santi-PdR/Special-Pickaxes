@@ -26,6 +26,7 @@ public final class WorkQueue {
     }
     private WorkQueue() {}
     public static boolean running() { return running; }
+    public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&(p.getMainHandItem()!=j.tool||p.level().dimension()!=j.dimension||!p.isAlive()))cancel(p);}
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
     public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
     public static String status(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?"idle":j.region!=null&&j.region.awaiting()?"ready":j.paused?"paused":j.region!=null&&!j.region.executing()?"preparing":"executing";}
@@ -79,6 +80,7 @@ public final class WorkQueue {
                 } finally { running=false; }
                 if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) { job.steps.clear();job.paused=true;break; }
             }
+            if(feedback!=null&&p.tickCount%10==0)RelicEffects.emit(p,job.kind,"work",net.minecraft.world.phys.Vec3.atCenterOf(feedback));
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
             if(feedback!=null&&p.tickCount%20==0)p.playNotifySound(job.kind.sound,net.minecraft.sounds.SoundSource.PLAYERS,0.12F,1.4F);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {

@@ -36,7 +36,8 @@ public final class RelicEffects {
                 case WORLDBREAKER->{x=Math.cos(a)*(1+t);y=Math.sin(a*3)*.4;z=Math.sin(a)*(1+t);}
                 default->{x=Math.cos(a);y=t*.6;z=Math.sin(a);}
             }
-            p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
+            if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
+            else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }
     }
 }
