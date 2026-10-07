@@ -203,4 +203,16 @@ public final class MiningReworkGameTests {
         h.assertTrue(p.getMainHandItem().getDamageValue()==1,"only actual successful harvest consumes durability");finish(h,p);
     }
 
+    @GameTest(template="empty") public static void nativeBreakCallbacksCannotReplaceTargetWithFluid(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
+        for(var barrier:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),Blocks.LAVA.defaultBlockState(),TestFluids.BLOCK.defaultBlockState())){
+            h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+            java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> change=e->{if(e.getPlayer()==p&&e.getPos().equals(at))h.getLevel().setBlockAndUpdate(at,barrier);};
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGH,change);
+            try{h.assertTrue(!WorldSafety.mine(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,at,Blocks.STONE.defaultBlockState()),"changed target vetoed after callback");}
+            finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(change);}
+            h.assertTrue(h.getLevel().getBlockState(at)==barrier,"callback-introduced barrier never deleted");
+        }finish(h,p);
+    }
+
 }

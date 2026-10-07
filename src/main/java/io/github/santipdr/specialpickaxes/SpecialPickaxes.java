@@ -46,12 +46,12 @@ public final class SpecialPickaxes {
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
         var forge=MinecraftForge.EVENT_BUS;
-        forge.addListener(this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
+        forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
     private void protectPhysicalLimit(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
-        if(e.getPlayer() instanceof ServerPlayer p&&p.getMainHandItem().getItem() instanceof ArtifactItem&&WorldSafety.barrier(p,e.getPos()))e.setCanceled(true);
+        if(e.getPlayer() instanceof ServerPlayer p&&(WorldSafety.changedDuringBreakEvent(p,e.getPos())||p.getMainHandItem().getItem() instanceof ArtifactItem&&WorldSafety.barrier(p,e.getPos())))e.setCanceled(true);
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}

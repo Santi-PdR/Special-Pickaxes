@@ -22,6 +22,12 @@ public final class WorldSafety {
         Blocks.JUNGLE_PLANKS,Blocks.ACACIA_PLANKS,Blocks.DARK_OAK_PLANKS,Blocks.MANGROVE_PLANKS,Blocks.CHERRY_PLANKS,
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK);
     private WorldSafety() {}
+    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected){}
+    private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
+    public static boolean changedDuringBreakEvent(ServerPlayer p,BlockPos pos){
+        var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
+            &&(p.getMainHandItem()!=context.tool()||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos));
+    }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&state.getFluidState().isEmpty()&&MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();
@@ -50,7 +56,8 @@ public final class WorldSafety {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(dropPressure(p,pos))return false;
-        return p.gameMode.destroyBlock(pos);
+        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected));
+        try{return p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
     }
     public static boolean dropPressure(ServerPlayer p,BlockPos pos){return p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256;}
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
