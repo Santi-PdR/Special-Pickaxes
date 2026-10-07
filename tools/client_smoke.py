@@ -42,7 +42,16 @@ try:
   for line in proc.stdout:lines.put(line)
  threading.Thread(target=read,daemon=True).start()
  deadline=time.monotonic()+540
+ next_progress=time.monotonic()+45
+ progress_id=None
  while time.monotonic()<deadline:
+  if os.environ.get('GH_TOKEN') and time.monotonic()>=next_progress:
+   markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
+   payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'completed','conclusion':'neutral','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
+   endpoint=f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs"+(f'/{progress_id}' if progress_id else '')
+   report=subprocess.run(['gh','api','--method','PATCH' if progress_id else 'POST',endpoint,'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
+   if report.returncode==0:progress_id=json.loads(report.stdout)['id']
+   next_progress=time.monotonic()+60
   try:line=lines.get(timeout=1)
   except queue.Empty:
    if proc.poll() is not None:break
