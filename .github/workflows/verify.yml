@@ -16,6 +16,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
       - run: python3 tools/validate_resources.py
       - run: python3 tools/scan_secrets.py
+      - run: python3 tools/withdraw_unvalidated.py
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: |
           mkdir -p build
           set -o pipefail
@@ -26,6 +29,8 @@ jobs:
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
           cp run/logs/latest.log run/logs/gametest.log
+          python3 tools/validate_runtime_logs.py run/logs/gametest.log
+          python3 tools/verify_gametests.py run/logs/gametest.log
       - run: |
           set -o pipefail
           python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log

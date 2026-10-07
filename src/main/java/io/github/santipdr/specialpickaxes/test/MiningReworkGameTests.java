@@ -102,4 +102,46 @@ public final class MiningReworkGameTests {
         }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(reenter);}finish(h,p);
     }
 
+    @GameTest(template="empty") public static void allDirectionalShapesStopBehindBarrier(GameTestHelper h){
+        for(var shape:DirectionalProgram.Shape.values()){
+            var kind=shape==DirectionalProgram.Shape.ICARUS?ArtifactKind.ICARUS:ArtifactKind.WORLDBREAKER;
+            var p=player(h,kind);var at=h.absolutePos(new BlockPos(8,30,8));p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
+            for(int x=-20;x<=20;x+=4)h.getLevel().getChunkAt(at.offset(x,0,0));
+            var dir=shape==DirectionalProgram.Shape.CORE_DRILL?Direction.DOWN:Direction.SOUTH;
+            for(var obstacle:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),TestFluids.BLOCK.defaultBlockState())){
+                h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+                h.getLevel().setBlockAndUpdate(at.relative(dir),obstacle);h.getLevel().setBlockAndUpdate(at.relative(dir,2),Blocks.STONE.defaultBlockState());
+                WorkQueue.startRegion(p,p.getMainHandItem(),kind,new DirectionalProgram(at,dir,shape));
+                for(int tick=0;tick<200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+                h.assertTrue(!WorkQueue.busy(p),"shape terminates: "+shape);
+                h.assertTrue(h.getLevel().getBlockState(at).isAir(),"mines before barrier: "+shape);
+                h.assertTrue(h.getLevel().getBlockState(at.relative(dir))==obstacle&&h.getLevel().getBlockState(at.relative(dir,2)).is(Blocks.STONE),"does not skip barrier: "+shape);
+                h.assertTrue(WorldSafety.freeBody(p,p.position()),"player not embedded: "+shape);
+            }WorkQueue.cancel(p);
+        }h.succeed();
+    }
+    @GameTest(template="empty") public static void worldloomAllModesOrientPayAndRespectOccupancy(GameTestHelper h){
+        for(int mode=0;mode<3;mode++)for(int yaw:new int[]{0,90,180,270}){
+            var p=player(h,ArtifactKind.WORLDLOOM);p.setYRot(yaw);var origin=h.absolutePos(new BlockPos(8,30+mode*8,8));
+            p.setPos(origin.getX()+.5,origin.getY()+1,origin.getZ()-2.5);
+            ArtifactState.of(p,ArtifactKind.WORLDLOOM).putInt("mode",mode);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,64));
+            for(int n=0;n<4;n++)p.getInventory().add(new ItemStack(Items.STONE,64));
+            var plan=ArtifactActions.weave(p,origin);var positions=new java.util.HashSet<BlockPos>();
+            for(var step:plan){h.assertTrue(positions.add(step.pos()),"no duplicate placement positions");h.getLevel().setBlockAndUpdate(step.pos(),Blocks.AIR.defaultBlockState());}
+            if(mode==0)h.assertTrue(!positions.contains(origin.above())&&!positions.contains(origin.above(2)),"two-block doorway remains open");
+            if(mode==1)h.assertTrue(positions.contains(origin.relative(p.getDirection(),47)),"bridge follows heading");
+            if(mode==2)h.assertTrue(positions.contains(origin.relative(p.getDirection().getClockWise(),4).above(6)),"wall across heading");
+            var occupied=plan.get(10).pos();var protectedCell=plan.get(5).pos();h.getLevel().setBlockAndUpdate(occupied,Blocks.DIAMOND_BLOCK.defaultBlockState());
+            java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent> deny=e->{if(e.getPos().equals(protectedCell))e.setCanceled(true);};
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,deny);
+            int before=p.getInventory().countItem(Items.STONE);
+            try{WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,plan);for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();}
+            finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);}
+            long placed=positions.stream().filter(pos->h.getLevel().getBlockState(pos).is(Blocks.STONE)).count();
+            h.assertTrue(placed>0&&before-p.getInventory().countItem(Items.STONE)==placed,"one real material per successful placement");
+            h.assertTrue(h.getLevel().getBlockState(occupied).is(Blocks.DIAMOND_BLOCK)&&h.getLevel().getBlockState(protectedCell).isAir(),"occupied and claimed cells preserved");
+            WorkQueue.cancel(p);
+        }h.succeed();
+    }
+
 }

@@ -40,6 +40,7 @@ public final class WorldSafety {
         return allowed(p,kind,pos)&&!barrier(p,pos)&&(p.serverLevel().getBlockState(pos).isAir()||harvestable(p,tool,pos));
     }
     public static boolean harvestable(ServerPlayer p, ItemStack tool, BlockPos pos) {
+        if(barrier(p,pos))return false;
         var level=p.serverLevel();var s=level.getBlockState(pos);
         return !barrier(p,pos)&&!tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
             && s.getFluidState().isEmpty() && s.getDestroySpeed(level,pos)>=0
