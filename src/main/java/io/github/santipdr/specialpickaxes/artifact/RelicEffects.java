@@ -27,8 +27,10 @@ public final class RelicEffects {
         for(int i=0;i<count;i++){
             double t=i/(double)(count-1),a=t*Math.PI*2+mode,x,y,z;
             switch(k){
-                case EVENTIDE,AXIOM,COUNTERSEAL->{x=Math.cos(a)*(1-t);z=Math.sin(a)*(1-t);y=t*.5;}
-                case WORLDLOOM,KEYSTONE,CAUSEWAY->{x=t*2-1;y=1-x*x;z=(i%2)*.3;}
+                case AXIOM->{x=Math.cos(a)*t;z=Math.sin(a)*t;y=t*.5;}
+                case EVENTIDE,COUNTERSEAL->{x=Math.cos(a)*(1-t);z=Math.sin(a)*(1-t);y=t*.5;}
+                case WORLDLOOM->{x=ArtifactState.mode(p,k)==2?t*2-1:0;y=ArtifactState.mode(p,k)==2?t:0;z=t*2;}
+                case KEYSTONE,CAUSEWAY->{x=t*2-1;y=1-x*x;z=(i%2)*.3;}
                 case MERIDIAN,ATLAS,TESSELLATOR->{x=(i%2==0?-1:1)*.65;y=Math.sin(a)*.5;z=Math.cos(a)*.5;}
                 case ICARUS,SEAM_RIPPER,CHOIR->{x=Math.cos(a*2)*.3;y=Math.sin(a*2)*.3;z=t*2;}
                 case PALIMPSEST,COVENANT->{x=(i%3-1)*(1-t);y=t;z=(i%4-1.5)*(1-t);}

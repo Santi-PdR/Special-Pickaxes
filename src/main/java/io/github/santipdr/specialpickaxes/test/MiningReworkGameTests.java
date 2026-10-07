@@ -28,9 +28,9 @@ public final class MiningReworkGameTests {
         p.connection=new ServerGamePacketListenerImpl(h.getLevel().getServer(),new Connection(PacketFlow.SERVERBOUND),p);
         p.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         var at=h.absolutePos(new BlockPos(5,3,3));p.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);p.setYRot(0);p.setXRot(0);
-        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));return p;
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());return p;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p){WorkQueue.cancel(p);ArtifactInteraction.clear(p);h.succeed();}
+    private static void finish(GameTestHelper h,ServerPlayer p){RelicNetwork.forget(p);WorkQueue.cancel(p);ArtifactInteraction.clear(p);h.succeed();}
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());
@@ -56,7 +56,7 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty") public static void axiomPacketCannotExecuteTwice(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIAMOND_ORE.defaultBlockState());
-        var packet=new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1);
+        var packet=new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,p.getMainHandItem().getOrCreateTag().getUUID("controlIdentity"));
         h.assertTrue(RelicNetwork.accept(p,packet),"first press activates");
         WorkQueue.cancel(p);ArtifactState.of(p,ArtifactKind.AXIOM).remove("ready");ArtifactState.of(p,ArtifactKind.AXIOM).remove("inputTick");
         h.assertTrue(!RelicNetwork.accept(p,packet)&&!WorkQueue.busy(p),"duplicate stays rejected even after job cancellation and cooldown removal");finish(h,p);
@@ -117,6 +117,7 @@ public final class MiningReworkGameTests {
                 h.assertTrue(h.getLevel().getBlockState(at).isAir(),"mines before barrier: "+shape);
                 h.assertTrue(h.getLevel().getBlockState(at.relative(dir))==obstacle&&h.getLevel().getBlockState(at.relative(dir,2)).is(Blocks.STONE),"does not skip barrier: "+shape);
                 h.assertTrue(WorldSafety.freeBody(p,p.position()),"player not embedded: "+shape);
+                h.getLevel().setBlockAndUpdate(at.relative(dir),Blocks.AIR.defaultBlockState());h.getLevel().setBlockAndUpdate(at.relative(dir,2),Blocks.AIR.defaultBlockState());
             }WorkQueue.cancel(p);
         }h.succeed();
     }

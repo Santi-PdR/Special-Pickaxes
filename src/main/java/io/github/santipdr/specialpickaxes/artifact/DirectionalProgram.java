@@ -18,7 +18,13 @@ public final class DirectionalProgram implements WorkProgram {
         prepare();
     }
     private void prepare(){
-        slice=new ArrayList<>();int w,h;
+        slice=section(origin,direction,shape,depth);
+        expected=new BlockState[slice.size()];index=0;digging=false;moving=false;
+    }
+    /** Exact live geometry, also used by previews and deterministic shape regressions. */
+    public static List<BlockPos> section(BlockPos origin,Direction direction,Shape shape,int depth){
+        if(depth<0||depth>192)throw new IllegalArgumentException("slice depth");
+        var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
             case ICARUS->{w=1;h=1;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
@@ -32,7 +38,7 @@ public final class DirectionalProgram implements WorkProgram {
             var c=origin.relative(direction,depth);
             var pos=switch(direction.getAxis()){case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};slice.add(pos);
         }
-        expected=new BlockState[slice.size()];index=0;digging=false;moving=false;
+        return slice;
     }
     public int remaining(){return finished?0:(length-depth)*slice.size()*2;}
     public boolean awaiting(){return false;}public boolean executing(){return true;}public boolean done(){return finished;}public void confirm(){}

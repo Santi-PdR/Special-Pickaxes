@@ -64,9 +64,9 @@ public final class SpecialPickaxes {
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick(); }
     }
-    private void stopped(ServerStoppedEvent e) { CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
+    private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);

@@ -7,7 +7,7 @@ public final class RelicControl {
     public enum Action { ACTIVATE, SECONDARY, MODE, SELECT, CONFIRM, CANCEL, PAUSE }
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
-        if(!expected.playable()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
+        if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
         WorkQueue.discardStale(p);
         var k=item.kind;var tool=p.getMainHandItem();
         if(action==Action.CANCEL){

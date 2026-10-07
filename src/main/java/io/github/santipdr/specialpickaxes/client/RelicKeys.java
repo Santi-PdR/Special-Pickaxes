@@ -30,8 +30,8 @@ public final class RelicKeys {
         for(var a:RelicControl.Action.values()){
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
-            if(edge&&mc.screen==null&&mc.player!=null&&mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable())
-                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence));
+            if(edge&&mc.screen==null&&mc.player!=null&&mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable()&&mc.player.getMainHandItem().hasTag()&&mc.player.getMainHandItem().getTag().hasUUID("controlIdentity"))
+                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,mc.player.getMainHandItem().getTag().getUUID("controlIdentity")));
         }
     }
     public static net.minecraft.network.chat.Component name(RelicControl.Action action){return KEYS[action.ordinal()].getTranslatedKeyMessage();}
