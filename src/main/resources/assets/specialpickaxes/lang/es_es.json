@@ -91,7 +91,7 @@
   "message.specialpickaxes.selection_ready": "Analizando tu selección…",
   "message.specialpickaxes.selection_invalid": "INVÁLIDO · Revisa tamaño, dimensiones transformadas, solapamiento, alcance y permisos.",
   "message.specialpickaxes.need_corners": "Esquinas %s / %s · Clic izquierdo selecciona la siguiente.",
-  "message.specialpickaxes.transform": "TRANSFORMACIÓN: %s · Observa la conexión origen-destino.",
+  "message.specialpickaxes.transform": "Transformación: %s",
   "message.specialpickaxes.named_mode": "MODO: %s",
   "message.specialpickaxes.unlinked": "DESCONECTADO · Usar elige una nueva ANCLA A.",
   "message.specialpickaxes.released": "Dominio liberado.",

@@ -467,7 +467,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.ATLAS);var at=target(h);
         RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.SELECT);RelicControl.corner(p,at);
         inputReady(p,ArtifactKind.ATLAS);h.assertTrue(!RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CONFIRM),"incomplete state cannot confirm");
-        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.MODE)&&ArtifactInteraction.selecting(p),"transform does not cancel selection");
+        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.MODE)&&ArtifactInteraction.selecting(p),"transform does not cancel selection");h.assertTrue(ArtifactState.mode(p,ArtifactKind.ATLAS)==1,"selected transform persists after leaving selection");
         RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CANCEL);h.assertTrue(!ArtifactInteraction.selecting(p),"explicit cancel exits");finish(h,p);
     }
     @GameTest(template="empty") public static void supremeProgramPreservesCoreAndCombinesPaidArchitecture(GameTestHelper h){
@@ -476,5 +476,12 @@ public final class PickaxeGameTests {
         var outer=center.east(6);h.getLevel().setBlockAndUpdate(outer,Blocks.STONE.defaultBlockState());var plan=DirectAbilities.convergence(p,center);
         h.assertTrue(plan.stream().anyMatch(s->s instanceof WorkStep.Mine)&&plan.stream().anyMatch(s->s instanceof WorkStep.Place),"two distinct operations in one bounded program");
         h.assertTrue(plan.stream().noneMatch(s->s instanceof WorkStep.Mine&&s.pos().equals(center)),"central core preserved");finish(h,p);
+    }
+
+    @GameTest(template="empty") public static void changingToDirectModeLeavesNoSelector(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h);
+        RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        inputReady(p,ArtifactKind.WORLDBREAKER);RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.MODE);
+        h.assertTrue(ArtifactState.mode(p,ArtifactKind.WORLDBREAKER)==1&&!ArtifactInteraction.selecting(p),"direct carve cannot inherit an active corner selector");finish(h,p);
     }
 }

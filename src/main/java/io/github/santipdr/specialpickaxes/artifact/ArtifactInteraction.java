@@ -40,8 +40,8 @@ public final class ArtifactInteraction {
         if(s==null)return false;
         if(!valid(p,s)){clear(p);return false;}
         if(shift){
-            if(corners(p,s.kind)==4){s.transform=(s.transform+1)%6;ArtifactFeedback.message(p,"transform",Component.translatable("mode.specialpickaxes."+modes(ArtifactKind.ATLAS)[s.transform]));}
-            else {ArtifactState.rotate(p,s.kind);s.points.clear();ArtifactFeedback.message(p,"named_mode",Component.translatable("mode.specialpickaxes."+modeKey(s.kind,ArtifactState.mode(p,s.kind))));}
+            if(corners(p,s.kind)==4){s.transform=(s.transform+1)%6;if(s.kind==ArtifactKind.ATLAS||s.kind==ArtifactKind.TESSELLATOR)ArtifactState.of(p,s.kind).putInt("mode",s.transform);ArtifactFeedback.message(p,"transform",Component.translatable("mode.specialpickaxes."+modes(ArtifactKind.ATLAS)[s.transform]));}
+            else {ArtifactState.rotate(p,s.kind);if(!regional(s.kind,ArtifactState.mode(p,s.kind)))clear(p);ArtifactFeedback.message(p,"named_mode",Component.translatable("mode.specialpickaxes."+modeKey(s.kind,ArtifactState.mode(p,s.kind))));}
             ArtifactFeedback.cue(p,"select");return true;
         }
         if(!WorldSafety.allowed(p,s.kind,pos)||s.points.size()>=corners(p,s.kind)){ArtifactFeedback.cue(p,"error");ArtifactFeedback.message(p,"selection_invalid");return true;}

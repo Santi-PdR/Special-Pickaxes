@@ -49,3 +49,5 @@ def revise(d,spanish,ids):
 
  d['message.specialpickaxes.queued']=('Ability activated.','Habilidad activada.')[i]
  d['message.specialpickaxes.volume_limit']=('Selection too large. Reduce its size.','Selección demasiado grande. Reduce su tamaño.')[i]
+
+ d['message.specialpickaxes.transform']=('Transform: %s','Transformación: %s')[i]
