@@ -42,9 +42,9 @@ public final class PickaxeGameTests {
     private static void finish(GameTestHelper h,ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
-        h.assertTrue(SpecialPickaxes.PICKS.size()==20,"twenty artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+        h.assertTrue(SpecialPickaxes.PICKS.size()==9,"nine artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
-        for(var kind:ArtifactKind.values()) {
+        for(var kind:ArtifactKind.playableValues()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");
             h.assertTrue(h.getLevel().getRecipeManager().getRecipes().stream().noneMatch(r -> r.getResultItem(h.getLevel().registryAccess()).is(item)),"no recipe outputs artifact");
             int result=h.getLevel().getServer().getCommands().performPrefixedCommand(source,"specialpickaxes grant @s "+kind.id);
@@ -75,25 +75,19 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"translated stroke mined");
         h.assertTrue(h.getLevel().getBlockState(pos.above()).is(Blocks.DIAMOND_ORE),"mismatched ore not mined");finish(h,p);
     }
-    @GameTest(template="empty") public static void singularityAndPreservation(GameTestHelper h) {
+    @GameTest(template="empty") public static void eventideMiningNotCombat(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.getLevel().setBlockAndUpdate(center.above(),Blocks.DIAMOND_ORE.defaultBlockState());
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+2,center.getY(),center.getZ());h.getLevel().addFreshEntity(mob);
         mob.setDeltaMovement(Vec3.ZERO);float health=mob.getHealth();
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"domain activates");DomainFields.tick();drain(p);
-        h.assertTrue(mob.getDeltaMovement().x<0,"hostile trajectory bends inward");
+        h.assertTrue(mob.getDeltaMovement().equals(Vec3.ZERO),"mining does not become entity combat");
         h.assertTrue(mob.getHealth()==health,"not a damage explosion");
         h.assertTrue(h.getLevel().getBlockState(center).isAir() && h.getLevel().getBlockState(center.above()).is(Blocks.DIAMOND_ORE),"geology removed, ore preserved");finish(h,p);
     }
-    @GameTest(template="empty") public static void meridianEntangledMining(GameTestHelper h) {
-        var p=player(h,ArtifactKind.MERIDIAN);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
-        ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b",b);
-        p.gameMode.destroyBlock(a);MiningObservations.flush();h.assertTrue(WorkQueue.busy(p),"manual mining queued consequence");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(b).isAir(),"paired anchor consequence mined");
-        h.assertTrue(p.getMainHandItem().getDamageValue()==2,"both physical blocks cost durability");finish(h,p);
-    }
+
     @GameTest(template="empty") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
-        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",3);
+        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",1);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"transmutation activates");drain(p);
         h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.OBSIDIAN),"curated rephase applied");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8)).isEmpty(),"no extra drops from replacement");finish(h,p);
@@ -112,7 +106,7 @@ public final class PickaxeGameTests {
         ArtifactState.of(p,ArtifactKind.WORLDLOOM).putInt("mode",1);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"loom activation");drain(p);
         h.assertTrue(p.getInventory().countItem(Items.STONE)<32,"construction paid from inventory");
-        h.assertTrue(h.getLevel().getBlockState(h.absolutePos(new BlockPos(5,4,7))).is(Blocks.STONE),"bridge built above target");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(h.absolutePos(new BlockPos(5,3,8))).is(Blocks.STONE),"bridge extends from base");finish(h,p);
     }
     @GameTest(template="empty") public static void icarusBoreAndSolidStop(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var wall=h.absolutePos(new BlockPos(5,2,5));
@@ -123,21 +117,16 @@ public final class PickaxeGameTests {
         h.assertTrue(p.getZ()>old && p.getZ()<barrier.getZ(),"advanced through excavation but not bedrock");
         h.assertTrue(h.getLevel().getBlockState(wall).isAir(),"bore excavated corridor");finish(h,p);
     }
-    @GameTest(template="empty") public static void axiomPreservesOreAndRibs(GameTestHelper h) {
+    @GameTest(template="empty") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(1,0,0);var ore=center.above();
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"axiom activation");drain(p);
         h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed");
-        h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"structural rib and ore preserved");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(center).isAir() && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"matrix extracted and ore preserved");finish(h,p);
     }
-    @GameTest(template="empty") public static void atlasAtomicSwap(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());
-        h.assertTrue(WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.DEEPSLATE.defaultBlockState()),"atomic geology swap");
-        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.DEEPSLATE) && h.getLevel().getBlockState(b).is(Blocks.STONE),"both sides exchanged");
-        h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(a,b).inflate(1)).isEmpty(),"exchange has no drops");finish(h,p);
-    }
+
     @GameTest(template="empty") public static void protectionRollbackAndPayment(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());
+        var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());
         Consumer<BlockEvent.EntityPlaceEvent> deny=e -> { if(e.getPos().equals(b)) e.setCanceled(true); };
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,deny);
         try {
@@ -186,9 +175,9 @@ public final class PickaxeGameTests {
         h.assertTrue(count[0]==previous && !WorkQueue.busy(p),"switching tool cancels pending work");finish(h,p);
     }
     @GameTest(template="empty") public static void unloadedChunkAndRestrictedBlocks(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ATLAS);var pos=new BlockPos(1000000,100,1000000);p.setPos(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5);
+        var p=player(h,ArtifactKind.WORLDLOOM);var pos=new BlockPos(1000000,100,1000000);p.setPos(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5);
         h.assertTrue(!h.getLevel().hasChunkAt(pos),"fixture chunk is unloaded");
-        h.assertTrue(!WorldSafety.mine(p,p.getMainHandItem(),ArtifactKind.ATLAS,pos,Blocks.STONE.defaultBlockState()),"unloaded denied");
+        h.assertTrue(!WorldSafety.mine(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState()),"unloaded denied");
         h.assertTrue(!h.getLevel().hasChunkAt(pos),"operation did not load chunk");
         h.assertTrue(!WorldSafety.inert(Blocks.CHEST.defaultBlockState()) && !WorldSafety.inert(Blocks.DIAMOND_ORE.defaultBlockState())
             && !WorldSafety.inert(Blocks.BEDROCK.defaultBlockState()),"protected matter categories excluded");finish(h,p);
@@ -230,14 +219,7 @@ public final class PickaxeGameTests {
         finish(h,p);
     }
 
-    @GameTest(template="empty") public static void anchorsDoNotCrossDimensions(GameTestHelper h) {
-        var p=player(h,ArtifactKind.MERIDIAN);var a=target(h);
-        ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b",a.offset(2,0,0));
-        ArtifactState.of(p,ArtifactKind.MERIDIAN).putString("dimension","minecraft:the_nether");
-        h.assertTrue(ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a").isEmpty(),"foreign anchor rejected");
-        ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"a",a);
-        h.assertTrue(ArtifactState.anchor(p,ArtifactKind.MERIDIAN,"b").isEmpty(),"new dimension cannot inherit old second anchor");finish(h,p);
-    }
+
     @GameTest(template="empty") public static void dominionSpeedIsLocal(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,4);
@@ -249,13 +231,7 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(speed.getNewSpeed()==64,"no speed outside domain");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void atlasRelocatesIntoAirWithoutDuplication(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(3,1,0);
-        h.getLevel().setBlockAndUpdate(b,Blocks.AIR.defaultBlockState());
-        h.assertTrue(WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.AIR.defaultBlockState()),"solid transported into empty space");
-        h.assertTrue(h.getLevel().getBlockState(a).isAir() && h.getLevel().getBlockState(b).is(Blocks.STONE),"one block removed, exactly one block placed");
-        h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(a,b).inflate(1)).isEmpty(),"relocation emits no duplicated material");finish(h,p);
-    }
+
 
     @GameTest(template="empty") public static void multiToolAndHighEnchantments(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();
@@ -270,44 +246,28 @@ public final class PickaxeGameTests {
         var fortune=new net.minecraft.nbt.CompoundTag();fortune.putString("id","minecraft:fortune");fortune.putInt("lvl",1000);tool.getEnchantmentTags().add(fortune);h.assertTrue(tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE)==1000,"Fortune 1000 not truncated to 255");finish(h,p);
     }
     @GameTest(template="empty") public static void regionSelectionAnalysisAndPause(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var b=a.offset(2,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
-        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"arm");
+        var p=player(h,ArtifactKind.CRUCIBLE);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.BASALT));var a=target(h);var b=a.offset(2,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"arm");
         h.assertTrue(ArtifactInteraction.left(p,a,false)&&ArtifactInteraction.left(p,b,false),"select corners");
-        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"analyze");WorkQueue.tick();
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"analyze");WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"analysis never mutates");h.assertTrue(WorkQueue.status(p).equals("ready"),"ready requires confirmation");
         WorkQueue.togglePause(p);WorkQueue.togglePause(p);WorkQueue.tick();h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"paused operation untouched");
-        WorkQueue.togglePause(p);drain(p);h.assertTrue(h.getLevel().getBlockState(a).isAir(),"confirmed operation mines");ArtifactInteraction.clear(p);finish(h,p);
+        WorkQueue.togglePause(p);drain(p);h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.BASALT),"confirmed operation transforms");ArtifactInteraction.clear(p);finish(h,p);
     }
-    @GameTest(template="empty") public static void transformedRegionExchange(GameTestHelper h){
-        var p=player(h,ArtifactKind.ATLAS);var a=target(h);var b=a.offset(4,0,0);
-        h.getLevel().setBlockAndUpdate(a.offset(1,0,0),Blocks.OBSIDIAN.defaultBlockState());h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());h.getLevel().setBlockAndUpdate(b.offset(0,0,1),Blocks.BASALT.defaultBlockState());
-        var region=new RegionWork(new SelectionVolume(a,a.offset(1,0,0)),new SelectionVolume(b,b.offset(0,0,1)),SelectionVolume.Transform.ROTATE_90,ArtifactKind.ATLAS,0,Blocks.STONE.defaultBlockState());
-        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.ATLAS,region),"queue transformed volume");WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
-        h.assertTrue(h.getLevel().getBlockState(b).is(Blocks.STONE)&&h.getLevel().getBlockState(b.offset(0,0,1)).is(Blocks.OBSIDIAN),"rotation maps every cell");finish(h,p);
-    }
-    @GameTest(template="empty") public static void checkpointPaidRestore(GameTestHelper h){
-        var p=player(h,ArtifactKind.CHRONICLE);var a=target(h);var volume=new SelectionVolume(a,a);
-        var record=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,0,Blocks.STONE.defaultBlockState());
-        WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,record);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
-        h.assertTrue(ArtifactState.memories(p,ArtifactKind.CHRONICLE).size()==1,"checkpoint recorded");h.getLevel().setBlockAndUpdate(a,Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE));
-        var restore=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,1,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,restore);WorkQueue.tick();
-        h.assertTrue(!WorkQueue.togglePause(p),"regional cooldown respected");
-        // Advance only this fake owner's readiness, without changing the shared test world's clock.
-        ArtifactState.of(p,ArtifactKind.CHRONICLE).putLong("ready",0);WorkQueue.togglePause(p);drain(p);
-        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid restoration conserves material");finish(h,p);
-    }
+
+
     @GameTest(template="empty") public static void simultaneousLargeRegionsAreBounded(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var q=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a.offset(49,19,49));
+        var p=player(h,ArtifactKind.CRUCIBLE);var q=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var v=new SelectionVolume(a,a.offset(49,19,49));
         h.assertTrue(v.size()==50000,"large selection");
-        for(var owner:List.of(p,q))h.assertTrue(WorkQueue.startRegion(owner,owner.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState())),"stream does not materialize/truncate large volume");
+        for(var owner:List.of(p,q))h.assertTrue(WorkQueue.startRegion(owner,owner.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState())),"stream does not materialize/truncate large volume");
         WorkQueue.tick();h.assertTrue(WorkQueue.lastAttempts()<=ArtifactConfig.GLOBAL.get(),"global fair budget");h.assertTrue(WorkQueue.remaining(p)>49000&&WorkQueue.remaining(q)>49000,"both cursors retained");
         WorkQueue.cancel(q);h.assertTrue(!WorkQueue.busy(q)&&WorkQueue.busy(p),"independent cancellation");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p),"tool switch cancels large work");finish(h,p);
     }
 
     @GameTest(template="empty") public static void regionLifecycleCancellation(GameTestHelper h){
         for(int reason=0;reason<3;reason++){
-            var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a.offset(10,10,10));
-            WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+            var p=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var v=new SelectionVolume(a,a.offset(10,10,10));
+            WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
             if(reason==0)MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(p));
             if(reason==1){p.setHealth(0);WorkQueue.tick();}
             if(reason==2)MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent(p,net.minecraft.world.level.Level.OVERWORLD,net.minecraft.world.level.Level.NETHER));
@@ -315,26 +275,18 @@ public final class PickaxeGameTests {
         }h.succeed();
     }
     @GameTest(template="empty") public static void unloadedRegionPausesWithoutLoading(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var a=new BlockPos(1000000,60,1000000);var v=new SelectionVolume(a,a);
-        h.assertTrue(!h.getLevel().hasChunkAt(a),"fixture chunk absent");WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+        var p=player(h,ArtifactKind.CRUCIBLE);var a=new BlockPos(1000000,60,1000000);var v=new SelectionVolume(a,a);
+        h.assertTrue(!h.getLevel().hasChunkAt(a),"fixture chunk absent");WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
         WorkQueue.tick();h.assertTrue(WorkQueue.status(p).equals("paused")&&WorkQueue.remaining(p)==1&&!h.getLevel().hasChunkAt(a),"no implicit chunk load, cursor retained");finish(h,p);
     }
     @GameTest(template="empty") public static void analyzedRegionDoesNotDestroyChangedBlocksOrMachines(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var b=a.offset(1,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.CHEST.defaultBlockState());
-        var v=new SelectionVolume(a,b);WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));
+        var p=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var b=a.offset(1,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.CHEST.defaultBlockState());
+        var v=new SelectionVolume(a,b);WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
         WorkQueue.tick();h.getLevel().setBlockAndUpdate(a,Blocks.OBSIDIAN.defaultBlockState());WorkQueue.togglePause(p);drain(p);
         h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.OBSIDIAN)&&h.getLevel().getBlockState(b).is(Blocks.CHEST),"analyzed state changed: skipped; machine untouched");finish(h,p);
     }
-    @GameTest(template="empty") public static void tessellatorPaysAndLeavesBlueprint(GameTestHelper h){
-        var p=player(h,ArtifactKind.TESSELLATOR);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE));
-        var r=new RegionWork(new SelectionVolume(a,a),new SelectionVolume(b,b),SelectionVolume.Transform.IDENTITY,ArtifactKind.TESSELLATOR,0,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.TESSELLATOR,r);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
-        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&h.getLevel().getBlockState(b).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"copy is paid, not free matter");finish(h,p);
-    }
-    @GameTest(template="empty") public static void keystoneBuildsPaidArch(GameTestHelper h){
-        var p=player(h,ArtifactKind.KEYSTONE);var a=target(h).above();var v=new SelectionVolume(a,a.offset(4,3,0));for(long n=0;n<v.size();n++)h.getLevel().setBlockAndUpdate(v.at(n),Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE,32));
-        WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.KEYSTONE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.KEYSTONE,0,Blocks.STONE.defaultBlockState()));WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
-        h.assertTrue(h.getLevel().getBlockState(a.offset(2,3,0)).is(Blocks.STONE),"vault apex");h.assertTrue(h.getLevel().getBlockState(a.offset(2,0,0)).isAir(),"walkable void under vault");h.assertTrue(p.getInventory().countItem(Items.STONE)==27,"five paid arch voxels");finish(h,p);
-    }
+
+
     @GameTest(template="empty") public static void regionProtectionStillAppliesAfterAnalysis(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a);
         WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));WorkQueue.tick();
@@ -364,13 +316,13 @@ public final class PickaxeGameTests {
 
 
     @GameTest(template="empty") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
-        for(var k:ArtifactKind.values())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
-            boolean expected=k==ArtifactKind.ATLAS||k==ArtifactKind.CRUCIBLE||k==ArtifactKind.CHRONICLE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&m!=1&&m!=4&&m!=6;
+        for(var k:ArtifactKind.playableValues())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
+            boolean expected=k==ArtifactKind.CRUCIBLE&&m==0;
             h.assertTrue(ArtifactInteraction.regional(k,m)==expected,"regional contract "+k+" mode "+m);
         }h.succeed();
     }
     @GameTest(template="empty") public static void compactAndExpandedTooltipContracts(GameTestHelper h){
-        for(var k:ArtifactKind.values()){
+        for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
             h.assertTrue(compact.size()==1&&expanded.size()>=9,"compact identity/mode/hint and advanced manual "+k);
@@ -384,62 +336,16 @@ public final class PickaxeGameTests {
         ArtifactInteraction.use(p,tool,ArtifactKind.INTERREGNUM,false);
         h.assertTrue(DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
     }
-    @GameTest(template="empty") public static void aegisReflectsWithoutTakingOwnership(GameTestHelper h){
-        var p=player(h,ArtifactKind.AEGIS);var center=target(h);
-        var shot=new net.minecraft.world.entity.projectile.Snowball(h.getLevel(),center.getX()+2.5,center.getY()+0.5,center.getZ()+0.5);
-        shot.setDeltaMovement(-0.3,0,0);h.getLevel().addFreshEntity(shot);
-        DomainFields.start(p,p.getMainHandItem(),ArtifactKind.AEGIS,center,8);DomainFields.tick();
-        h.assertTrue(shot.getDeltaMovement().x>0&&shot.getOwner()==null,"outward reflection, unchanged owner");shot.discard();finish(h,p);
-    }
-    @GameTest(template="empty") public static void lodestarRetracesAndConsumesRoute(GameTestHelper h){
-        var p=player(h,ArtifactKind.LODESTAR);var start=p.blockPosition();var tool=p.getMainHandItem();
-        h.assertTrue(DirectAbilities.activate(p,tool,ArtifactKind.LODESTAR),"anchor marked");
-        p.setPos(start.getX()+1.5,start.getY(),start.getZ()+0.5);DirectAbilities.recordFootstep(p);
-        p.setPos(start.getX()+2.5,start.getY(),start.getZ()+0.5);DirectAbilities.recordFootstep(p);
-        h.assertTrue(DirectAbilities.activate(p,tool,ArtifactKind.LODESTAR),"return queued");drain(p);
-        h.assertTrue(p.blockPosition().equals(start)&&ArtifactState.anchor(p,ArtifactKind.LODESTAR,"a").isEmpty(),"returned physically; route consumed");finish(h,p);
-    }
-    @GameTest(template="empty") public static void seamRipperExtractsOnlyContactSkin(GameTestHelper h){
-        var p=player(h,ArtifactKind.SEAM_RIPPER);var at=target(h);
-        h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIRT.defaultBlockState());
-        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE));h.assertTrue(DirectAbilities.seam(p,at).isEmpty(),"same material is not an interface");
-        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.DIRT));var plan=DirectAbilities.seam(p,at);
-        h.assertTrue(plan.size()==1,"not whole connected vein");WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,plan);drain(p);
-        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(at.east()).is(Blocks.STONE)&&h.getLevel().getBlockState(at.above()).is(Blocks.DIRT),"only A touching B mined");finish(h,p);
-    }
-    @GameTest(template="empty") public static void causewayPaysForFootingAndCancels(GameTestHelper h){
-        var p=player(h,ArtifactKind.CAUSEWAY);var below=p.blockPosition().below();
-        h.getLevel().setBlockAndUpdate(below,Blocks.AIR.defaultBlockState());h.getLevel().setBlockAndUpdate(below.south(),Blocks.AIR.defaultBlockState());
-        p.getInventory().add(new ItemStack(Items.STONE,2));CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.CAUSEWAY);CompanionActions.tick();drain(p);
-        h.assertTrue(h.getLevel().getBlockState(below).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"two paid footings");
-        p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);CompanionActions.tick();h.assertTrue(!CompanionActions.active(p),"tool change cancels service");finish(h,p);
-    }
-    @GameTest(template="empty") public static void countersealFiltersTerrainButNotEntities(GameTestHelper h){
-        var p=player(h,ArtifactKind.COUNTERSEAL);var near=p.blockPosition();var far=near.east(12);
-        CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.COUNTERSEAL);
-        var explosion=new net.minecraft.world.level.Explosion(h.getLevel(),null,near.getX(),near.getY(),near.getZ(),4,false,net.minecraft.world.level.Explosion.BlockInteraction.DESTROY);
-        explosion.getToBlow().addAll(List.of(near,far));var entities=new ArrayList<Entity>();entities.add(p);
-        MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.level.ExplosionEvent.Detonate(h.getLevel(),explosion,entities));
-        h.assertTrue(explosion.getToBlow().equals(List.of(far))&&entities.equals(List.of(p)),"terrain ward leaves distant blocks and entity damage list unchanged");finish(h,p);
-    }
-    @GameTest(template="empty") public static void covenantSealsConfirmedManualScars(GameTestHelper h){
-        var p=player(h,ArtifactKind.COVENANT);var at=target(h);p.getInventory().add(new ItemStack(Items.STONE));
-        CompanionActions.start(p,p.getMainHandItem(),ArtifactKind.COVENANT);
-        h.assertTrue(p.gameMode.destroyBlock(at),"manual break");MiningObservations.flush();CompanionActions.tick();drain(p);
-        h.assertTrue(h.getLevel().getBlockState(at).isAir(),"not sealed before passing it");
-        p.setPos(at.getX()+0.5,at.getY(),at.getZ()+4.5);CompanionActions.tick();drain(p);
-        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid wake sealed behind miner");finish(h,p);
-    }
 
-    @GameTest(template="empty") public static void lodestarUsesItsOwnPermissionEvent(GameTestHelper h){
-        var p=player(h,ArtifactKind.LODESTAR);var before=p.position();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=e->{if(e.player==p&&e.ability.equals("lodestar"))e.setCanceled(true);};
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,deny);
-        try{h.assertTrue(!new WorkStep.Move(p.blockPosition().east()).apply(p,p.getMainHandItem(),ArtifactKind.LODESTAR)&&p.position().equals(before),"route respects Lodestar permission, not Icarus permission");}
-        finally{MinecraftForge.EVENT_BUS.unregister(deny);}finish(h,p);
-    }
+
+
+
+
+
+
+
     @GameTest(template="empty") public static void allRelicsKeepTripleToolAndHighLevels(GameTestHelper h){
-        for(var k:ArtifactKind.values()){
+        for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());
             for(var block:List.of(Blocks.STONE,Blocks.OAK_LOG,Blocks.DIRT))h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"triple tool "+k);
             var tags=new net.minecraft.nbt.ListTag();
@@ -456,32 +362,26 @@ public final class PickaxeGameTests {
         h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!DomainFields.active(p),"cancel bypasses activation cooldown");finish(h,p);
     }
     @GameTest(template="empty") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
-        var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",3);
+        var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",0);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));
         h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"selection key arms");
-        RelicControl.corner(p,at);RelicControl.corner(p,at);WorkQueue.tick();
+        RelicControl.corner(p,at);RelicControl.corner(p,at.east());WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready")&&h.getLevel().getBlockState(at).is(Blocks.STONE),"last corner analyzes without mutation");
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"explicit confirm");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.OBSIDIAN),"confirmed region executes");finish(h,p);
     }
     @GameTest(template="empty") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){
-        var p=player(h,ArtifactKind.ATLAS);var at=target(h);
-        RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.SELECT);RelicControl.corner(p,at);
-        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(!RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CONFIRM),"incomplete state cannot confirm");
-        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.MODE)&&ArtifactInteraction.selecting(p),"transform does not cancel selection");h.assertTrue(ArtifactState.mode(p,ArtifactKind.ATLAS)==1,"selected transform persists after leaving selection");
-        RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CANCEL);h.assertTrue(!ArtifactInteraction.selecting(p),"explicit cancel exits");finish(h,p);
-    }
-    @GameTest(template="empty") public static void supremeProgramPreservesCoreAndCombinesPaidArchitecture(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var center=target(h);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("mode");
-        h.assertTrue(ArtifactState.mode(p,ArtifactKind.WORLDBREAKER)==6&&!ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,6),"new supreme mode defaults to direct convergence");
-        var outer=center.east(6);h.getLevel().setBlockAndUpdate(outer,Blocks.STONE.defaultBlockState());var plan=DirectAbilities.convergence(p,center);
-        h.assertTrue(plan.stream().anyMatch(s->s instanceof WorkStep.Mine)&&plan.stream().anyMatch(s->s instanceof WorkStep.Place),"two distinct operations in one bounded program");
-        h.assertTrue(plan.stream().noneMatch(s->s instanceof WorkStep.Mine&&s.pos().equals(center)),"central core preserved");finish(h,p);
+        var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
+        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"incomplete state cannot confirm");
+        inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE)&&!ArtifactInteraction.selecting(p),"mode cancels incompatible selection");h.assertTrue(ArtifactState.mode(p,ArtifactKind.CRUCIBLE)==1,"selected transform persists after leaving selection");
+        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL);h.assertTrue(!ArtifactInteraction.selecting(p),"explicit cancel exits");finish(h,p);
     }
 
+
     @GameTest(template="empty") public static void changingToDirectModeLeavesNoSelector(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h);
-        RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.SELECT);RelicControl.corner(p,at);
-        inputReady(p,ArtifactKind.WORLDBREAKER);RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.MODE);
-        h.assertTrue(ArtifactState.mode(p,ArtifactKind.WORLDBREAKER)==1&&!ArtifactInteraction.selecting(p),"direct carve cannot inherit an active corner selector");finish(h,p);
+        var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
+        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        inputReady(p,ArtifactKind.CRUCIBLE);RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE);
+        h.assertTrue(ArtifactState.mode(p,ArtifactKind.CRUCIBLE)==1&&!ArtifactInteraction.selecting(p),"direct carve cannot inherit an active corner selector");finish(h,p);
     }
 }

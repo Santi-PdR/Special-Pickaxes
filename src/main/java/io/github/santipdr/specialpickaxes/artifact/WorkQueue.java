@@ -57,6 +57,7 @@ public final class WorkQueue {
     public static void cancel(ServerPlayer p) { JOBS.remove(p.getUUID());ORDER.remove(p.getUUID()); }
     public static void clear() { JOBS.clear();ORDER.clear();running=false;lastAttempts=0; }
     public static void tick() {
+        if(running)return; // Forge callbacks cannot recursively consume this or another job.
         int budget=ArtifactConfig.GLOBAL.get();lastAttempts=0;int turns=ORDER.size(),initial=turns,visited=0;
         while(turns-->0 && budget>0 && !ORDER.isEmpty()) {
             visited++;UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;

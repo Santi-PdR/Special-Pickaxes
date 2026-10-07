@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '4.0.0'
+version = '5.0.0'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -23,6 +23,7 @@ minecraft {
         }
         server { args '--nogui' }
         gameTestServer {
+            property 'specialpickaxes.testFluids', 'true'
             property 'forge.enabledGameTestNamespaces', 'specialpickaxes'
         }
     }

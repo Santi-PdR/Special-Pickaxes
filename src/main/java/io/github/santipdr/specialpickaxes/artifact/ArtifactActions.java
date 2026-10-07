@@ -12,6 +12,7 @@ import java.util.*;
 /** Artifact orchestration; mutation is exclusively delegated to scheduled, revalidated steps. */
 public final class ArtifactActions {
     private ArtifactActions() {}
+    private static final Set<UUID> ACTIVATING=new HashSet<>();
     public static Optional<BlockPos> target(ServerPlayer p) {
         var level=p.serverLevel();Vec3 from=p.getEyePosition(),to=from.add(p.getLookAngle().scale(32));
         BlockPos last=null;
@@ -25,6 +26,10 @@ public final class ArtifactActions {
         return Optional.empty();
     }
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary) {
+        if(!ACTIVATING.add(p.getUUID()))return false;
+        try{return activate(p,tool,kind,secondary);}finally{ACTIVATING.remove(p.getUUID());}
+    }
+    private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
         if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
         var data=ArtifactState.of(p,kind);
@@ -99,7 +104,7 @@ public final class ArtifactActions {
             var state=p.serverLevel().getBlockState(pos);
             if(MiningDesigns.matrix(state)) steps.add(new WorkStep.Mine(pos,state));
         }
-        if(kind==ArtifactKind.EVENTIDE)steps.sort(java.util.Comparator.comparingDouble(step->(ArtifactState.mode(p,kind)==0?1:-1)*step.pos().distSqr(center)));
+        if(kind==ArtifactKind.EVENTIDE)steps.sort(java.util.Comparator.comparingDouble(step->(ArtifactState.mode(p,kind)==0?-1:1)*step.pos().distSqr(center)));
         return steps;
     }
     public static BlockState geologyMaterial(ServerPlayer p){

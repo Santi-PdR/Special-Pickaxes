@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT)
 public final class RelicKeys {
-    private static final boolean[] DOWN=new boolean[RelicControl.Action.values().length];
+    private static final io.github.santipdr.specialpickaxes.artifact.PressLatch[] DOWN=java.util.stream.IntStream.range(0,RelicControl.Action.values().length).mapToObj(i->new io.github.santipdr.specialpickaxes.artifact.PressLatch()).toArray(io.github.santipdr.specialpickaxes.artifact.PressLatch[]::new);
     private static Object connection;private static long sequence;
     private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_G,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
@@ -25,11 +25,11 @@ public final class RelicKeys {
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(connection!=mc.getConnection()){
-            connection=mc.getConnection();sequence=0;for(var a:RelicControl.Action.values())DOWN[a.ordinal()]=KEYS[a.ordinal()].isDown();return;
+            connection=mc.getConnection();sequence=0;for(var a:RelicControl.Action.values())DOWN[a.ordinal()].update(KEYS[a.ordinal()].isDown());return;
         }
         for(var a:RelicControl.Action.values()){
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
-            boolean down=key.isDown(),edge=down&&!DOWN[a.ordinal()];DOWN[a.ordinal()]=down;
+            boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(edge&&mc.screen==null&&mc.player!=null&&mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable())
                 RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence));
         }

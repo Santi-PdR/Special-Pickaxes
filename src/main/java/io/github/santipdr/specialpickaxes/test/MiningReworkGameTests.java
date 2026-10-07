@@ -67,4 +67,39 @@ public final class MiningReworkGameTests {
         for(int mode=0;mode<5;mode++)h.assertTrue(!ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,mode),"all Worldbreaker modes directional");
         h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.WORLDLOOM)==3,"three Worldloom modes");h.succeed();
     }
+    @GameTest(template="empty") public static void carveStopsAtForgeFluid(GameTestHelper h){
+        h.assertTrue(TestFluids.BLOCK.defaultBlockState().getFluidState().getFluidType()==TestFluids.TYPE,"genuine foreign Forge FluidType");barrier(h,TestFluids.BLOCK.defaultBlockState());
+    }
+    @GameTest(template="empty") public static void carveStopsAtFlowingForgeFluid(GameTestHelper h){barrier(h,TestFluids.BLOCK.defaultBlockState().setValue(LiquidBlock.LEVEL,4));}
+    @GameTest(template="empty") public static void everyArtifactRejectsPhysicalBarriers(GameTestHelper h){
+        var at=h.absolutePos(new BlockPos(5,4,7));var other=at.east();
+        for(var k:ArtifactKind.playableValues()){
+            var p=player(h,k);var tool=p.getMainHandItem();p.getInventory().add(new ItemStack(Items.STONE,64));
+            for(var state:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL,6),Blocks.LAVA.defaultBlockState(),Blocks.LAVA.defaultBlockState().setValue(LiquidBlock.LEVEL,2),TestFluids.BLOCK.defaultBlockState())){
+                h.getLevel().setBlockAndUpdate(at,state);h.getLevel().setBlockAndUpdate(other,Blocks.AIR.defaultBlockState());
+                h.assertTrue(!new WorkStep.Mine(at,state).apply(p,tool,k),"cannot mine barrier: "+k);
+                h.assertTrue(!new WorkStep.Rephase(at,state,Blocks.STONE.defaultBlockState()).apply(p,tool,k),"cannot transform barrier: "+k);
+                h.assertTrue(!new WorkStep.Place(at,Blocks.STONE.defaultBlockState()).apply(p,tool,k),"cannot overwrite barrier: "+k);
+                h.assertTrue(!new WorkStep.Place(other,state).apply(p,tool,k),"cannot copy barrier: "+k);
+                h.assertTrue(!new WorkStep.Exchange(at,other,state,Blocks.AIR.defaultBlockState()).apply(p,tool,k),"cannot exchange barrier: "+k);
+                h.assertTrue(h.getLevel().getBlockState(at)==state&&h.getLevel().getBlockState(other).isAir(),"world preserved: "+k);
+            }WorkQueue.cancel(p);
+        }h.succeed();
+    }
+    @GameTest(template="empty") public static void activationRejectsForgeCallbackReentry(GameTestHelper h){
+        var p=player(h,ArtifactKind.AXIOM);var at=h.absolutePos(new BlockPos(5,4,7));
+        h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIAMOND_ORE.defaultBlockState());
+        int[] callbacks={0};java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> reenter=event->{
+            if(callbacks[0]++==0)h.assertTrue(!ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"callback cannot activate recursively");
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,reenter);
+        try{
+            h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"outer activation succeeds");
+            h.assertTrue(callbacks[0]>0&&WorkQueue.busy(p),"exactly one outer job accepted");
+            h.assertTrue(p.getMainHandItem().getDamageValue()==EnchantmentScaling.activationCost(p.getMainHandItem(),ArtifactKind.AXIOM),"one activation cost");
+            long ready=ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready");
+            h.assertTrue(!ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false)&&ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready")==ready,"one cooldown deadline");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(reenter);}finish(h,p);
+    }
+
 }
