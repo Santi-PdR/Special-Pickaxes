@@ -99,7 +99,7 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"stasis activation");DomainFields.tick();
         h.assertTrue(DomainFields.frozen(mob),"hostile enrolled in stasis");mob.setPos(start.add(0.3,0,0));DomainFields.tick();
         h.assertTrue(mob.position().distanceToSqr(start)<0.001 && mob.getDeltaMovement().lengthSqr()==0,"position and momentum held");
-        DomainFields.stop(p);h.assertTrue(!DomainFields.frozen(mob) && mob.getDeltaMovement().x>0,"momentum restored on release");finish(h,p);
+        DomainFields.stop(p);h.assertTrue(!DomainFields.frozen(mob) && Math.abs(mob.getDeltaMovement().x-.15)<.00001,"original momentum restored without weaponizing release");finish(h,p);
     }
     @GameTest(template="empty") public static void worldloomPaidBridge(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);target(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));

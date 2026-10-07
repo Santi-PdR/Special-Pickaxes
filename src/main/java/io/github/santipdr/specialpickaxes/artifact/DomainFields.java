@@ -22,11 +22,12 @@ public final class DomainFields {
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();
     private DomainFields() {}
-    public static void start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
-        stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));
+    public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
+        if(kind!=ArtifactKind.INTERREGNUM||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
+        stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
     }
     private static void release(Field f) {
-        f.frozen.values().forEach(v -> { if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity.scale(2))); });
+        f.frozen.values().forEach(v -> { if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity)); });
         f.frozen.clear();f.owner.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
     }
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }

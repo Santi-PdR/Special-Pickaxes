@@ -1,56 +1,59 @@
-# Rework minero — trabajo en curso, no publicable
+# Rework minero — validación en curso, release bloqueado
 
-Este documento NO certifica una versión. La entrega 4.0 y sus resultados no
-verifican los cambios actuales. No se ha compilado, ejecutado Minecraft ni
-publicado un JAR de este rework.
+Se continúa el mismo diseño de nueve artefactos. No hay release 5.0 aprobado.
+Las pruebas y el JAR de 4.0 no certifican este trabajo.
 
-## Cambios introducidos
+## Correcciones y migración realizadas
 
-- Registro y comando administrativo limitados a nueve artefactos jugables.
-  Los enum antiguos siguen como compatibilidad interna pendiente de limpieza;
-  no registran items. Modelos, texturas runtime y tags contienen solo nueve.
-- Ocho sprites retirados preservados en `asset-library/`, con procedencia.
-  No se reutilizan los de Chronicle, Causeway ni Tessellator. Ningún JAR de
-  referencia modificado.
-- Scheduler compartido con programas direccionales por secciones. CARVE,
-  FRACTURE, CLEAVE, CORE DRILL, WORLD SHATTER e Icarus están conectados.
-  La prevalidación y la extracción consumen presupuesto; una barrera aborta
-  la ruta, no la salta. La congestión de drops pausa antes de consumir el paso.
-- Bedrock y FluidState de nivel/estado bloquean minería, colocación e intercambio.
-- Axiom busca matriz conectada a minerales existentes; no comunica sus posiciones.
-  Activación por flanco de tecla y rechazo de secuencias de paquetes repetidas.
-- Solo Crisol regional utiliza dos esquinas, distintas y con propietario exacto.
-  Cambiar de modo cancela selección/trabajo incompatible. Confirmación separada.
-- Crisol radial es esférico; Worldloom ofrece refugio, puente y pared; Coro tiene
-  rotación y reflexión. Eventide ordena una cantera elipsoidal, sin campo de combate.
-- Textos normal/SHIFT elegidos por modo actual en español e inglés.
-- Ocho nuevos GameTests escritos (NO ejecutados): cinco barreras CARVE,
-  esquina duplicada/cambio de modo, paquete Axiom repetido y catálogo.
+- Build Java 17 trasladado a GitHub Actions. Versión de trabajo: 5.0.0.
+- Retirados dieciséis tests de habilidades eliminadas; migrados catálogo, Crisol,
+  Worldloom, Eventide, Axiom, modos, tooltips y ciclo de selección al contrato actual.
+- Pruebas nuevas: fluidos source/flowing de agua/lava y fluido Forge externo real,
+  todas las fronteras destructivas, seis programas direccionales, tres Worldloom
+  en cuatro orientaciones, geometría, reentrada, repetición física y duplicación de
+  paquetes, propiedad de selección, herramienta exacta y Crisol radial.
+- Pulsaciones ligadas a UUID de herramienta; secuencia sobrevive respawn y se
+  limpia en logout. Callbacks no pueden reentrar activación ni scheduler.
+- Palimpsest recupera la excavación cercana cuando el rayo, tras minar, alcanza
+  una pared lejana sin memoria. Fixture direccional limpia sus barreras entre casos.
+- Fluido de prueba inicializado durante RegisterEvent, no con registro congelado.
+- Se exige resumen de GameTests completos: un exit 0 de Gradle no basta.
+- Servidor empaquetado valida los nueve IDs; escáner detecta también items desconocidos.
+- Cliente migrado a 23 modos, capturas normales/SHIFT, C real y activación real,
+  inventario de nueve items y escena de WORLD SHATTER con comprobación de cuña/barrera.
+  Esta migración todavía requiere resultados completos y revisión visual.
+- Estasis no aumenta velocidad al liberar entidades; dominios limitados por capacidad.
+- Documentación del jugador y compatibilidad añadida; ocho assets archivados intactos.
 
-## Comprobaciones realizadas en este estado
+## Evidencia nueva disponible (no extrapolar entre commits)
 
-- `python3 tools/validate_resources.py`: 8 pruebas aprobadas.
-- `git diff --check`: limpio.
-- `python3 tools/scan_secrets.py`: 101 entradas rastreadas revisadas; no sustituye
-  al análisis del JAR final ni de archivos nuevos una vez incluidos en Git.
-- Java no disponible localmente. Fallaron la instalación APT (repositorios
-  inaccesibles) y la consulta de descarga de Adoptium (error SSL).
+| Commit | Run | Resultado comprobado |
+|---|---|---|
+| 2c9db17 | 37675048174 | `./gradlew build` Java 17 aprobado; solo diagnóstico, no release. |
+| c85eff8 | 37675376388 | Build y 17 JUnit aprobados; integración detectó inicialización prematura del fluido de test. |
+| 0237600 | 37675999825 | 50 GameTests ejecutados: 48 pasaron, 2 fallaron (fixture CORE DRILL y reconstrucción). No release. |
+| fa0309a | 37676198338 / 37676198271 | Build con 20 JUnit aprobado; 50 GameTests ejecutados, solo reconstrucción falló. Corrección posterior en 5eedfa8. |
 
-## Trabajo obligatorio pendiente
+El conjunto actual añade casos posteriores; debe validarse entero en su propio
+commit. Recursos: 8 pruebas Python aprobadas. Diff-check limpio en los checkpoints.
+Ni los tests Java nuevos ni las capturas pendientes se dan por aprobados aquí.
 
-1. Compilar Java 17/Forge y corregir lo que revele. No hay certificación de compilación.
-2. Migrar los tests históricos: todavía esperan veinte items, modos viejos,
-   esquinas idénticas y Convergence. Actualmente NO representan el contrato nuevo.
-3. Añadir y ejecutar cobertura por cada geometría, fluidos modded/API, claims,
-   drops/pausa/reanudación, Icarus y ciclo completo de selección/red/multijugador.
-4. Revisar geología/UX, calidad de Eventide e Interregnum y efectos específicos.
-   No se implementó evolución: no introducir contadores o desbloqueos nominales.
-5. Migrar fixtures cliente, galería completa de los nueve y sus modos, textos de
-   ayuda restantes, auditoría de compatibilidad y documentación del jugador.
-6. Ajustar versión y herramientas de release (aún configuradas para 4.0), ejecutar
-   Actions completa, servidor empaquetado, cliente real, auditoría final y JAR.
-7. Revisar identidad de herramienta en intentos de red del mismo tipo y eliminar
-   rutas/infraestructura obsoleta que ya no tengan utilidad.
+## Publicación
 
-No se accedió a test-1 ni se usó/modificó siege. Ninguna validación del modpack
-completo se da por realizada. No hay commit/publicación nuevos de este trabajo.
+El workflow conserva diagnósticos sin JAR. Se descubrió que el exportador histórico
+por Checks también incluía binarios: se retiraron esos exports heredados de los
+primeros runs mediante `withdraw_unvalidated.py`, ejecutado por la app de Actions.
+El exportador actual no incluye JAR sin autorización explícita de publicación.
+No se debe anunciar ni entregar un binario hasta tener todos los checks verdes,
+revisar capturas, auditar el commit final y habilitar la publicación final.
+
+## Pendientes para cerrar
+
+1. Esperar los runs del código actual, recuperar evidencia y corregir fallos.
+2. Completar cliente/servidor y revisar visualmente TODAS las capturas requeridas.
+3. Auditar cobertura, regeneración de recursos, referencias y secretos del JAR final.
+4. Actualizar README, validación y guía con resultados definitivos.
+5. Registrar commit, run, tamaño y SHA-256 y publicar exclusivamente el JAR aprobado.
+
+No se usó/modificó el repositorio siege ni se accedió a test-1. No se probó el
+modpack completo, shaders, LOD, configuraciones reales de claims ni TPS multijugador.

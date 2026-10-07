@@ -70,7 +70,7 @@ public final class ArtifactActions {
         var target=target(p);if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
         BlockPos center=target.get();
         int r=radius(p,kind);
-        if(kind==ArtifactKind.INTERREGNUM) { DomainFields.start(p,tool,kind,center,r);ArtifactFeedback.ring(p,kind,center,r);return true; }
+        if(kind==ArtifactKind.INTERREGNUM) { if(!DomainFields.start(p,tool,kind,center,r))return false;ArtifactFeedback.ring(p,kind,center,r);return true; }
 
 
         List<WorkStep> steps=switch(kind) {
