@@ -51,3 +51,13 @@ def revise(d,spanish,ids):
  d['message.specialpickaxes.volume_limit']=('Selection too large. Reduce its size.','Selección demasiado grande. Reduce su tamaño.')[i]
 
  d['message.specialpickaxes.transform']=('Transform: %s','Transformación: %s')[i]
+ d['message.specialpickaxes.companion_active']=('Active. Secondary releases; Cancel stops.','Activo. Secundaria libera; Cancelar detiene.')[i]
+ d['message.specialpickaxes.trail_marked']=('Route marked. Walk, then activate again to return.','Ruta marcada. Camina y activa otra vez para regresar.')[i]
+ d['message.specialpickaxes.unlinked']=('Disconnected. Activate to mark again.','Desconectado. Activa para marcar de nuevo.')[i]
+ d['message.specialpickaxes.anchor_a']=('First anchor marked. Activate at the destination.','Primera ancla fijada. Activa en el destino.')[i]
+ d['message.specialpickaxes.chunk_pause']=('Paused: next chunk is unloaded. Load the area, then press Pause/resume.','Pausado: el siguiente chunk está descargado. Carga la zona y pulsa Pausar/reanudar.')[i]
+ d['status.specialpickaxes.paused']=('PAUSED · Pause/resume continues','PAUSADO · Pausar/reanudar continúa')[i]
+ d['status.specialpickaxes.selected']=('Selection complete','Selección completa')[i]
+ d['status.specialpickaxes.anchor_b']=('Anchor A marked · activate at B','Ancla A fijada · activa en B')[i]
+ d['manual4.wear']=('Activation: %s durability; cooldown %s s. Building spends blocks.','Activar: %s de durabilidad; enfriamiento %s s. Construir gasta bloques.')[i]
+ for old in ['message.specialpickaxes.working','message.specialpickaxes.progress']:d.pop(old,None)

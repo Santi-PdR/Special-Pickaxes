@@ -13,6 +13,12 @@ class Resources(unittest.TestCase):
    self.assertEqual(model['textures']['layer0'],'specialpickaxes:item/'+id)
    hashes.add(hashlib.sha256((ROOT/f'assets/specialpickaxes/textures/item/{id}.png').read_bytes()).hexdigest())
   self.assertEqual(len(hashes),20)
+ def test_current_controls(self):
+  for lang in ['en_us','es_es']:
+   d=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())
+   self.assertEqual(len([k for k in d if k.startswith('key.specialpickaxes.')]),7)
+   for key in ['message.specialpickaxes.companion_active','status.specialpickaxes.paused','message.specialpickaxes.chunk_pause']:
+    self.assertNotIn('agachado',d[key].lower());self.assertNotIn('sneak',d[key].lower());self.assertNotIn('usar',d[key].lower().replace('pausar',''))
  def test_no_energy_and_manual_keys(self):
   for lang in ['en_us','es_es']:
    data=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())

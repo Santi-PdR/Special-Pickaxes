@@ -29,7 +29,8 @@ public final class ArtifactTooltips {
         section(lines,"how",Component.translatable("play4."+k.id));
         if(ArtifactInteraction.modeCount(k)>1)section(lines,"mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack))));
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4;
-        section(lines,"cost",Component.translatable("manual4.wear",cost));
+        int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;
+        section(lines,"cost",Component.translatable("manual4.wear",cost,String.format(java.util.Locale.ROOT,"%.1f",cooldown/20D)));
         section(lines,"limits",Component.translatable("warning4."+k.id));
     }
 }
