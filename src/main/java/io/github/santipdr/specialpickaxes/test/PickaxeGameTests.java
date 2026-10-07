@@ -348,9 +348,15 @@ public final class PickaxeGameTests {
         for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());
             for(var block:List.of(Blocks.STONE,Blocks.OAK_LOG,Blocks.DIRT))h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"triple tool "+k);
-            var tags=new net.minecraft.nbt.ListTag();
-            for(String id:List.of("efficiency","fortune","silk_touch","unbreaking","mending")){var t=new net.minecraft.nbt.CompoundTag();t.putString("id","minecraft:"+id);t.putInt("lvl",1000);tags.add(t);}tool.getOrCreateTag().put("Enchantments",tags);
-            for(var enchant:List.of(Enchantments.BLOCK_EFFICIENCY,Enchantments.BLOCK_FORTUNE,Enchantments.SILK_TOUCH,Enchantments.UNBREAKING,Enchantments.MENDING))h.assertTrue(tool.getEnchantmentLevel(enchant)==1000,"level 1000 preserved on "+k);
+            for(int level:new int[]{100,255,1000,100000,Integer.MAX_VALUE}){
+                var tags=new net.minecraft.nbt.ListTag();
+                for(String id:List.of("efficiency","fortune","silk_touch","unbreaking","mending")){var t=new net.minecraft.nbt.CompoundTag();t.putString("id","minecraft:"+id);t.putInt("lvl",level);tags.add(t);}tool.getOrCreateTag().put("Enchantments",tags);
+                var restored=ItemStack.of(tool.save(new net.minecraft.nbt.CompoundTag()));
+                for(var enchant:List.of(Enchantments.BLOCK_EFFICIENCY,Enchantments.BLOCK_FORTUNE,Enchantments.SILK_TOUCH,Enchantments.UNBREAKING,Enchantments.MENDING)){
+                    h.assertTrue(EnchantmentScaling.level(restored,enchant)==level,"raw NBT roundtrip "+level+" on "+k);
+                    if(level<=1000)h.assertTrue(restored.getEnchantmentLevel(enchant)==level,"actual hook preserves "+level+" on "+k);
+                }
+            }
         }h.succeed();
     }
 
