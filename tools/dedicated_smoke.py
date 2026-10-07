@@ -25,8 +25,8 @@ try:
   output.append(line); print(line,end='')
   if 'Done (' in line and not started:
    started=True
-   # Parse all ten item IDs on the real installed server using console commands.
-   for id in 'palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas'.split():
+   # Parse all nine item IDs on the real installed server using console commands.
+   for id in __import__('mining_catalog').IDS:
     proc.stdin.write(f'give @a specialpickaxes:{id}\n')
    proc.stdin.write('save-all\nstop\n');proc.stdin.flush();stopped=True
  if proc.poll() is None:proc.wait(timeout=30)

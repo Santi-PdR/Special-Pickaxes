@@ -10,7 +10,7 @@ class CaptureScreen {
         var bounds = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         var robot = new Robot();
         if (args.length > 1) {
-            int key=args[1].equals("mode")?java.awt.event.KeyEvent.VK_C:args[1].equals("inventory")?java.awt.event.KeyEvent.VK_E:args[1].equals("activate")?java.awt.event.KeyEvent.VK_R:args[1].equals("cancel")?java.awt.event.KeyEvent.VK_V:args[1].equals("shift")?java.awt.event.KeyEvent.VK_SHIFT:args[1].equals("third")?java.awt.event.KeyEvent.VK_F5:java.awt.event.KeyEvent.VK_F1;
+            int key=args[1].equals("confirm")?java.awt.event.KeyEvent.VK_ENTER:args[1].equals("mode")?java.awt.event.KeyEvent.VK_C:args[1].equals("inventory")?java.awt.event.KeyEvent.VK_E:args[1].equals("activate")?java.awt.event.KeyEvent.VK_R:args[1].equals("cancel")?java.awt.event.KeyEvent.VK_V:args[1].equals("shift")?java.awt.event.KeyEvent.VK_SHIFT:args[1].equals("third")?java.awt.event.KeyEvent.VK_F5:java.awt.event.KeyEvent.VK_F1;
             robot.keyPress(key);Thread.sleep(120);
             if(!args[1].equals("shift"))robot.keyRelease(key);
             Thread.sleep(1000);

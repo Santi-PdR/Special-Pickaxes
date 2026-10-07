@@ -27,6 +27,7 @@ public final class ClientValidation {
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
             }
+            if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");}
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
@@ -68,11 +69,27 @@ public final class ClientValidation {
                     var list=new net.minecraft.nbt.ListTag();var ench=new net.minecraft.nbt.CompoundTag();ench.putString("id","minecraft:efficiency");ench.putInt("lvl",1000);list.add(ench);stack.getOrCreateTag().put("Enchantments",list);
                     p.setItemInHand(InteractionHand.MAIN_HAND,stack);ArtifactState.of(p,k).putInt("mode",0);
                 } else if(ArtifactState.mode(p,k)!=scene.mode())throw new IllegalStateException("Real C key did not change mode: "+k+" expected "+scene.mode());
+                p.connection.teleport(0.5,65,14.5,180,-14);
+                for(int x=-6;x<=6;x++)for(int y=65;y<=72;y++)for(int z=4;z<=12;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                for(int x=-5;x<=-3;x++)for(int y=65;y<=67;y++)for(int z=6;z<=8;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                var rock=new BlockPos(0,67,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                p.serverLevel().setBlockAndUpdate(rock.above(),net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState());
+                p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(k==ArtifactKind.CRUCIBLE?net.minecraft.world.item.Items.BASALT:net.minecraft.world.item.Items.STONE,64));
+                if(k==ArtifactKind.PALIMPSEST||k==ArtifactKind.CHOIR){
+                    p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+                    if(!p.gameMode.destroyBlock(rock))throw new IllegalStateException("Memory fixture mining failed");MiningObservations.flush();
+                    p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
+                    if(k==ArtifactKind.CHOIR)p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                }
+                p.getPersistentData().putLong("sceneReadyBefore",ArtifactState.of(p,k).getLong("ready"));p.getPersistentData().putBoolean("sceneExecuted",false);
                 if(ArtifactInteraction.regional(k,scene.mode())){
                     ArtifactInteraction.use(p,p.getMainHandItem(),k,false);
                     RelicControl.corner(p,new BlockPos(-5,65,6));RelicControl.corner(p,new BlockPos(-3,67,8));
                 }
                 p.getPersistentData().putBoolean("uxFixture",true);
+            }
+            if(phase>=40&&!p.getPersistentData().getBoolean("sceneExecuted")&&ArtifactState.of(p,k).getLong("ready")>p.getPersistentData().getLong("sceneReadyBefore")){
+                p.getPersistentData().putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+k.id+"-"+ArtifactInteraction.modeKey(k,scene.mode())));
             }
             if(phase==40){
                 p.sendSystemMessage(Component.literal("ARTIFACT_UX_READY_"+k.id+"-"+ArtifactInteraction.modeKey(k,scene.mode())));
