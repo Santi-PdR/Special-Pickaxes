@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT)
 public final class RelicKeys {
-    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_G,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_P};
+    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_G,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
     @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT,bus=Mod.EventBusSubscriber.Bus.MOD)

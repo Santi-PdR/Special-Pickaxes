@@ -65,6 +65,10 @@ try:
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(ids):raise RuntimeError('Incomplete graphical artifact validation')
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True,timeout=20)
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-activate.png'),'activate'],env=env,check=True,timeout=20)
+  if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-cancel.png'),'cancel'],env=env,check=True,timeout=20)
+  if '[CHAT]' in line and 'CONTROL_CANCELLED' in line:
    success=True;break
 finally:
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
@@ -85,3 +89,6 @@ for id in ids:
  for phase in ['normal','shift']:
   if 'tooltip_validated '+id+'-'+phase not in text:raise SystemExit('Missing tooltip verification: '+id+' '+phase)
 print('GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS='+str(len(ux))+'; NORMAL_AND_SHIFT=40')
+
+assert "control_active" in text and "control_cancelled" in text
+print("KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK")

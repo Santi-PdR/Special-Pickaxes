@@ -170,7 +170,7 @@
   "identity.specialpickaxes.bifold_atlas": "Intercambia regiones sin copiar materia.",
   "controls.specialpickaxes.bifold_atlas": "Usar: activa cuatro esquinas. Agachado + izquierdo: transforma. Analiza y confirma.",
   "example.specialpickaxes.bifold_atlas": "Ejemplo: Intercambia dos paredes de 9 x 3.",
-  "identity.specialpickaxes.worldbreaker": "Una herramienta suprema de intervención mundial.",
+  "identity.specialpickaxes.worldbreaker": "Fractura un anillo de terreno y forja su santuario central.",
   "controls.specialpickaxes.worldbreaker": "Agachado + usar: modo. CARVE y RESTORE son directos. BREAK/REPHASE/TRANSPOSE/RECORD usan regiones.",
   "example.specialpickaxes.worldbreaker": "Ejemplo: Usa ahora un corte directo; después, un programa regional.",
   "identity.specialpickaxes.chronicle": "Guarda y restaura un estado geológico.",
@@ -293,5 +293,7 @@
   "key.specialpickaxes.pause": "Pausar / reanudar",
   "key.categories.specialpickaxes": "Special Pickaxes",
   "message.specialpickaxes.select_key": "Usa primero la tecla de Selección.",
-  "mode.specialpickaxes.world_convergence": "Convergencia — forjar un santuario"
+  "mode.specialpickaxes.world_convergence": "Convergencia — forjar un santuario",
+  "message.specialpickaxes.nothing_changed": "Sin cambios. Revisa espacio y materiales.",
+  "message.specialpickaxes.partial": "Terminado; se omitieron celdas ocupadas o protegidas."
 }

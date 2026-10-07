@@ -34,3 +34,7 @@ def revise(d,spanish,ids):
  d['status.specialpickaxes.ready']=('READY · Confirm to execute','LISTO · Confirma para ejecutar')[i]
 
  d['message.specialpickaxes.complete']=('Work complete.','Trabajo terminado.')[i]
+
+ d['message.specialpickaxes.nothing_changed']=('Nothing changed. Check space and materials.','Sin cambios. Revisa espacio y materiales.')[i]
+ d['message.specialpickaxes.partial']=('Finished; some occupied or protected cells were skipped.','Terminado; se omitieron celdas ocupadas o protegidas.')[i]
+ d['identity.specialpickaxes.worldbreaker']=('Fracture a ring of terrain and forge its central sanctuary.','Fractura un anillo de terreno y forja su santuario central.')[i]

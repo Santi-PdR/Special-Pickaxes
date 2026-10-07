@@ -20,13 +20,19 @@ public final class ClientValidation {
         var server=ServerLifecycleHooks.getCurrentServer();if(server==null)return;
         for(var p:server.getPlayerList().getPlayers()){
             if(!p.getTags().contains("artifact_gallery")||!java.nio.file.Files.exists(java.nio.file.Path.of("gallery-captured.flag")))continue;
-            if(ticks>=240&&(ticks-240)%100==99){
+            if(ticks>=240&&(ticks-240)/100<ArtifactKind.values().length&&(ticks-240)%100==99){
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
             }
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
-            if(index>=ArtifactKind.values().length){if(index==ArtifactKind.values().length&&phase==0)p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));return;}
+            if(index>=ArtifactKind.values().length){
+                if(index==ArtifactKind.values().length&&phase==0)p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));
+                var data=p.getPersistentData();
+                if(CompanionActions.active(p)&&!data.getBoolean("controlActive")){data.putBoolean("controlActive",true);p.sendSystemMessage(Component.literal("CONTROL_ACTIVE"));}
+                if(data.getBoolean("controlActive")&&!CompanionActions.active(p)&&!data.getBoolean("controlCancelled")){data.putBoolean("controlCancelled",true);p.sendSystemMessage(Component.literal("CONTROL_CANCELLED"));}
+                return;
+            }
             var k=ArtifactKind.values()[index];
             if(phase==0){
                 CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);

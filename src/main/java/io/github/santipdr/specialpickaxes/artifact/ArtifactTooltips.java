@@ -8,7 +8,7 @@ import java.util.*;
 /** Presentation content only. No engine budgets, internal counters or client keyboard dependency. */
 public final class ArtifactTooltips {
     private ArtifactTooltips(){}
-    public static int mode(ItemStack stack){return stack.hasTag()?stack.getTag().getInt("artifactMode"):0;}
+    public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):stack.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER?6:0;}
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("identity.specialpickaxes."+k.id).withStyle(ChatFormatting.GRAY));}
     private static void section(List<Component> lines,String heading,Component content){
         if(!lines.isEmpty())lines.add(Component.empty());

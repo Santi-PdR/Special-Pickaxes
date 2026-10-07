@@ -170,7 +170,7 @@
   "identity.specialpickaxes.bifold_atlas": "Exchange two regions without copying matter.",
   "controls.specialpickaxes.bifold_atlas": "Use: arm four corners. Sneak-left: transform. Analyze, then confirm.",
   "example.specialpickaxes.bifold_atlas": "Example: Swap two 9 x 3 walls.",
-  "identity.specialpickaxes.worldbreaker": "A supreme tool for world-scale intervention.",
+  "identity.specialpickaxes.worldbreaker": "Fracture a ring of terrain and forge its central sanctuary.",
   "controls.specialpickaxes.worldbreaker": "Sneak-use: mode. CARVE and RESTORE are direct. BREAK/REPHASE/TRANSPOSE/RECORD use regions.",
   "example.specialpickaxes.worldbreaker": "Example: Use direct cleavage now, a regional program later.",
   "identity.specialpickaxes.chronicle": "Keep and restore a geological checkpoint.",
@@ -293,5 +293,7 @@
   "key.specialpickaxes.pause": "Pause / resume",
   "key.categories.specialpickaxes": "Special Pickaxes",
   "message.specialpickaxes.select_key": "Use your Selection binding first.",
-  "mode.specialpickaxes.world_convergence": "Convergence — forge a sanctuary"
+  "mode.specialpickaxes.world_convergence": "Convergence — forge a sanctuary",
+  "message.specialpickaxes.nothing_changed": "Nothing changed. Check space and materials.",
+  "message.specialpickaxes.partial": "Finished; some occupied or protected cells were skipped."
 }

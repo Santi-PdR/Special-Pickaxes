@@ -33,7 +33,7 @@ public final class DirectAbilities {
             int r=x*x+z*z;if(r<25||r>radius*radius)continue;var at=center.offset(x,y,z);
             if(WorldSafety.allowed(p,ArtifactKind.WORLDBREAKER,at)&&WorldSafety.inert(p.serverLevel().getBlockState(at)))result.add(new WorkStep.Mine(at,p.serverLevel().getBlockState(at)));
         }
-        result.addAll(vault(p,center.above()));return result;
+        result.addAll(vault(p,center.above(),true));return result;
     }
     public static BlockState material(ServerPlayer p){
         var off=p.getOffhandItem();return !off.hasTag()&&off.getItem() instanceof BlockItem b&&WorldSafety.inert(b.getBlock().defaultBlockState())?b.getBlock().defaultBlockState():Blocks.STONE.defaultBlockState();
@@ -41,12 +41,13 @@ public final class DirectAbilities {
     private static List<WorkStep> restore(ServerPlayer p,ArtifactKind k,BlockPos center){
         var result=new ArrayList<WorkStep>();for(var m:ArtifactState.memories(p,k))if(m.pos().distSqr(center)<=16*16)result.add(new WorkStep.Place(m.pos(),m.state()));return result;
     }
-    public static List<WorkStep> vault(ServerPlayer p,BlockPos origin){
+    public static List<WorkStep> vault(ServerPlayer p,BlockPos origin){return vault(p,origin,ArtifactState.mode(p,ArtifactKind.KEYSTONE)==1);}
+    private static List<WorkStep> vault(ServerPlayer p,BlockPos origin,boolean supports){
         var result=new ArrayList<WorkStep>();var forward=p.getDirection();var side=forward.getClockWise();var material=material(p);
         for(int z=0;z<5;z++)for(int x=-4;x<=4;x++){
             int y=(int)Math.round(4*(1-Math.pow(x/4.5,2)));
             result.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x).above(y),material));
-            if(ArtifactState.mode(p,ArtifactKind.KEYSTONE)==1&&Math.abs(x)==4&&z%2==0)
+            if(supports&&Math.abs(x)==4&&z%2==0)
                 for(int support=0;support<y;support++)result.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x).above(support),material));
         }return result;
     }

@@ -10,12 +10,15 @@ public final class RelicControl {
         if(!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
         var k=item.kind;var tool=p.getMainHandItem();
         if(action==Action.CANCEL){
+            boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);
+            if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,k,"a").isPresent();ArtifactState.clearAnchors(p,k);ArtifactState.of(p,k).remove("trail");}
             WorkQueue.cancel(p);DomainFields.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
+            if(!active)return true;
             ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
         }
         // Bound packet spam without preventing an emergency cancellation.
         var data=ArtifactState.of(p,k);long now=ArtifactState.now(p);
-        if(data.contains("inputTick")&&now-data.getLong("inputTick")<2)return false;data.putLong("inputTick",now);
+        if(data.contains("inputTick")&&data.getLong("inputTick")<=now&&now-data.getLong("inputTick")<2)return false;data.putLong("inputTick",now);
         switch(action){
             case PAUSE: return WorkQueue.busy(p)&&!WorkQueue.status(p).equals("ready")&&WorkQueue.togglePause(p);
             case CONFIRM: return WorkQueue.status(p).equals("ready")&&WorkQueue.togglePause(p);

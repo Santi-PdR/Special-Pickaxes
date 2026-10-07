@@ -83,7 +83,7 @@ public final class WorkQueue {
             if(feedback!=null&&p.tickCount%20==0)p.playNotifySound(job.kind.sound,net.minecraft.sounds.SoundSource.PLAYERS,0.12F,1.4F);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
-                else {ArtifactFeedback.message(p,"complete");ArtifactFeedback.cue(p,"complete");}JOBS.remove(id);
+                else {ArtifactFeedback.message(p,job.succeeded==0?"nothing_changed":job.succeeded<job.completed?"partial":"complete");ArtifactFeedback.cue(p,"complete");}JOBS.remove(id);
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());

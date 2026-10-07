@@ -33,6 +33,7 @@ public final class PickaxeGameTests {
         p.connection=new ServerGamePacketListenerImpl(h.getLevel().getServer(),new Connection(PacketFlow.SERVERBOUND),p);
         p.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         var at=h.absolutePos(new BlockPos(5,2,3));p.setPos(at.getX()+0.5,at.getY(),at.getZ()+0.5);
+        if(kind==ArtifactKind.WORLDBREAKER)ArtifactState.of(p,kind).putInt("mode",0);
         p.setYRot(0);p.setXRot(0);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));return p;
     }
     private static BlockPos target(GameTestHelper h) {
@@ -445,5 +446,35 @@ public final class PickaxeGameTests {
             for(String id:List.of("efficiency","fortune","silk_touch","unbreaking","mending")){var t=new net.minecraft.nbt.CompoundTag();t.putString("id","minecraft:"+id);t.putInt("lvl",1000);tags.add(t);}tool.getOrCreateTag().put("Enchantments",tags);
             for(var enchant:List.of(Enchantments.BLOCK_EFFICIENCY,Enchantments.BLOCK_FORTUNE,Enchantments.SILK_TOUCH,Enchantments.UNBREAKING,Enchantments.MENDING))h.assertTrue(tool.getEnchantmentLevel(enchant)==1000,"level 1000 preserved on "+k);
         }h.succeed();
+    }
+
+    private static void inputReady(ServerPlayer p,ArtifactKind k){ArtifactState.of(p,k).remove("inputTick");}
+    @GameTest(template="empty") public static void semanticControlsAreServerAuthoritative(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);target(h);
+        h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ACTIVATE),"stale tool packet rejected");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&DomainFields.active(p),"one intent activates without selection");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!DomainFields.active(p),"cancel bypasses activation cooldown");finish(h,p);
+    }
+    @GameTest(template="empty") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",3);
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"selection key arms");
+        RelicControl.corner(p,at);RelicControl.corner(p,at);WorkQueue.tick();
+        h.assertTrue(WorkQueue.status(p).equals("ready")&&h.getLevel().getBlockState(at).is(Blocks.STONE),"last corner analyzes without mutation");
+        inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"explicit confirm");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.OBSIDIAN),"confirmed region executes");finish(h,p);
+    }
+    @GameTest(template="empty") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){
+        var p=player(h,ArtifactKind.ATLAS);var at=target(h);
+        RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(!RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CONFIRM),"incomplete state cannot confirm");
+        inputReady(p,ArtifactKind.ATLAS);h.assertTrue(RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.MODE)&&ArtifactInteraction.selecting(p),"transform does not cancel selection");
+        RelicControl.execute(p,ArtifactKind.ATLAS,RelicControl.Action.CANCEL);h.assertTrue(!ArtifactInteraction.selecting(p),"explicit cancel exits");finish(h,p);
+    }
+    @GameTest(template="empty") public static void supremeProgramPreservesCoreAndCombinesPaidArchitecture(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var center=target(h);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("mode");
+        h.assertTrue(ArtifactState.mode(p,ArtifactKind.WORLDBREAKER)==6&&!ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,6),"new supreme mode defaults to direct convergence");
+        var outer=center.east(6);h.getLevel().setBlockAndUpdate(outer,Blocks.STONE.defaultBlockState());var plan=DirectAbilities.convergence(p,center);
+        h.assertTrue(plan.stream().anyMatch(s->s instanceof WorkStep.Mine)&&plan.stream().anyMatch(s->s instanceof WorkStep.Place),"two distinct operations in one bounded program");
+        h.assertTrue(plan.stream().noneMatch(s->s instanceof WorkStep.Mine&&s.pos().equals(center)),"central core preserved");finish(h,p);
     }
 }
