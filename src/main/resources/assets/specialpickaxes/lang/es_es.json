@@ -317,7 +317,7 @@
   "mining.how.eventide.gravity_out": "Apunta a geología. La extracción avanza del centro al borde, con drops normales y sin tocar minerales ni máquinas.",
   "mode.specialpickaxes.gravity_out": "GRAVITY OUT",
   "mining.identity.paradox_crucible.regional": "Cambia geología existente en una región.",
-  "mining.how.paradox_crucible.regional": "Arma la selección, marca dos esquinas distintas, espera el análisis y confirma. Piedra, pizarra, basalto u obsidiana en la secundaria eligen el resultado; vacía significa piedra.",
+  "mining.how.paradox_crucible.regional": "Elige material antes de la segunda esquina. Arma la selección, marca dos esquinas distintas, espera el análisis y confirma. Piedra, pizarra, basalto u obsidiana en la secundaria eligen el resultado; vacía significa piedra.",
   "mode.specialpickaxes.regional": "REGIONAL",
   "mining.identity.paradox_crucible.proximity": "Cambia geología cercana en esfera, sin esquinas.",
   "mining.how.paradox_crucible.proximity": "Activa una vez para transformar la matriz natural cercana. Piedra, pizarra, basalto u obsidiana en la secundaria eligen el resultado. No genera menas, drops ni experiencia.",

@@ -317,7 +317,7 @@
   "mining.how.eventide.gravity_out": "Aim at geology. Mining advances from the center outward, keeping normal drops and preserving ores and machines.",
   "mode.specialpickaxes.gravity_out": "GRAVITY OUT",
   "mining.identity.paradox_crucible.regional": "Change existing geology in a selected region.",
-  "mining.how.paradox_crucible.regional": "Arm selection, left-click two different corners, wait for analysis, then confirm. Offhand stone, deepslate, basalt or obsidian chooses the result; empty hand means stone.",
+  "mining.how.paradox_crucible.regional": "Choose material before the second corner. Arm selection, left-click two different corners, wait for analysis, then confirm. Offhand stone, deepslate, basalt or obsidian chooses the result; empty hand means stone.",
   "mode.specialpickaxes.regional": "REGIONAL",
   "mining.identity.paradox_crucible.proximity": "Change nearby geology in a sphere, without corners.",
   "mining.how.paradox_crucible.proximity": "Activate once to transform nearby natural matrix. Offhand stone, deepslate, basalt or obsidian chooses the result. No ore, loot or experience is created.",
