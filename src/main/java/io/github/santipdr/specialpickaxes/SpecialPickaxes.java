@@ -50,7 +50,7 @@ public final class SpecialPickaxes {
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
-    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
+    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
         if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.left(p,e.getPos(),p.isShiftKeyDown()))e.setCanceled(true);
     }

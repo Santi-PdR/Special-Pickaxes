@@ -49,6 +49,7 @@ public final class CompanionActions {
         }
     }
     public static void protect(Level level,List<BlockPos> affected){
+        if(level.isClientSide)return;
         // Bounded event work. This changes only terrain eligibility, never damage or entity ownership.
         var wards=ACTIVE.values().stream().filter(a->a.kind==ArtifactKind.COUNTERSEAL&&a.player.level()==level&&a.valid()).toList();
         if(wards.isEmpty())return;

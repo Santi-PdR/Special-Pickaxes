@@ -7,14 +7,23 @@ root=pathlib.Path('.'); files=[]
 for pattern in ['build/client-smoke/ux-shift-bifold_atlas.png','build/client-smoke/ux-shift-palimpsest.png','build/client-smoke/ux-bifold_atlas.png','build/client-smoke/ux-worldbreaker.png','build/client-smoke/gallery-clean.png','build/client-smoke/gallery.png','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/libs/*.jar','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
 files=sorted(set(p for p in files if p.is_file()))
-manifest=[{'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]
+subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True)
+# Full-resolution captures remain in the Actions artifact. Checks exports favor a
+# bounded, verifiable review subset and must never hide diagnostic text on overflow.
+while True:
+ manifest=[{'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]
+ b=io.BytesIO()
+ with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:
+  for p in files:z.write(p,str(p))
+  z.writestr('manifest.json',json.dumps(manifest,indent=2))
+ if len(b.getvalue())<=3_300_000:break
+ images=[p for p in files if p.suffix=='.png']
+ if not images:raise RuntimeError('Non-image evidence exceeds bounded export budget; diagnostics already published')
+ # Keep matching normal/SHIFT Atlas for inspection until the last possible reduction.
+ expendable=[p for p in images if p.name not in ['ux-bifold_atlas.png','ux-shift-bifold_atlas.png']]
+ files.remove(max(expendable or images,key=lambda p:p.stat().st_size))
 (root/'build/evidence-manifest.json').write_text(json.dumps(manifest,indent=2))
-b=io.BytesIO()
-with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:
- for p in files:z.write(p,str(p))
- z.writestr('manifest.json',json.dumps(manifest,indent=2))
 encoded=base64.b64encode(b.getvalue()).decode();chunks=[encoded[i:i+48000] for i in range(0,len(encoded),48000)]
-if len(chunks)>96:raise RuntimeError(f'Evidence exceeds bounded Checks export budget: {len(chunks)} chunks')
 print(f'Exporting {len(files)} files, {len(b.getvalue())} compressed bytes in {len(chunks)} bounded chunks')
 for i,chunk in enumerate(chunks):
  payload={'name':f'Build evidence {i+1:02d}/{len(chunks):02d}', 'head_sha':os.environ['GITHUB_SHA'],
