@@ -1,6 +1,6 @@
-# Rework minero — validación en curso, release bloqueado
+# Rework minero — suite y revisión visual aprobadas; reproducción binaria pendiente
 
-Se mantiene el diseño de nueve artefactos de 5.0.0. No hay JAR aprobado todavía.
+Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente y la revisión visual están aprobadas; la entrega del JAR espera la comprobación binaria final.
 Los resultados de un commit anterior no certifican sus correcciones posteriores.
 
 ## Correcciones verificables
@@ -28,7 +28,7 @@ Los resultados de un commit anterior no certifican sus correcciones posteriores.
 | `9fc9542` | `37681746690` | Éxito completo. 55 GameTests; cliente con 23 activaciones y 46 tooltips. WORLD SHATTER retiró 9341 bloques reales y conservó la barrera. Se inspeccionaron sus dos capturas supremas, no toda su galería. No aprobado para publicación. |
 | `44577ce` | `37682889162` | Run completo exitoso; anterior al endurecimiento de rollback. No certifica el candidato actual. |
 | `a5c2554` | `37683328797` | Build Java 17 y los 57 GameTests aprobados; servidor empaquetado superó su etapa. Cliente falló antes de producir capturas: timeout de la ventana temprana de Forge. Run fallido, no publicable. |
-| `0c7233659d3b695da9211575f3356d81a1aeb1a8` | `37685753507` | En curso. Deshabilita únicamente el splash temprano de Forge en la configuración desechable de CI para evitar el fallo anterior. Conserva la ventana real, capturas y todas las aserciones del cliente. |
+| `0c7233659d3b695da9211575f3356d81a1aeb1a8` | `37685753507` | Éxito completo: 20 JUnit, 57 GameTests, 8 pruebas de recursos, servidor empaquetado, 23 modos y 46 tooltips; 9341 bloques en la escena suprema. Deshabilita únicamente el splash temprano de Forge en la configuración desechable de CI para evitar el fallo anterior. Conserva la ventana real, capturas y todas las aserciones del cliente. |
 
 El conjunto actual contiene 20 JUnit, 57 GameTests y 8 pruebas Python de recursos.
 Las ocho pruebas Python y el chequeo de diff pasaron localmente; Java se ejecuta
@@ -44,8 +44,13 @@ no es una habilidad del artefacto ni se incluye el fixture en el JAR distribuibl
 Los JPG de revisión proceden del mismo frame Robot que los PNG, vinculados por
 `image-manifest.json` y hashes; no son imágenes generadas ni recreaciones.
 
-Todavía falta revisar íntegra la galería del candidato exitoso definitivo. No se
-ha creado `VISUAL-REVIEW.json`. Tras esa revisión, la publicación reconstruirá el
+Se revisaron las 95 copias JPG, con hashes contrastados: 23 normales, 23 SHIFT,
+23 ejecuciones, 14 cambios de modo y 12 vistas adicionales. Los tooltips se
+inspeccionaron en planchas de sus regiones completas; las escenas, en planchas
+y vistas completas de inventario, galería y suprema. `VISUAL-REVIEW.json` registra
+la procedencia y las limitaciones visuales: túneles oscuros de Ícaro/CORE DRILL,
+ancla elevada de Worldloom y cancelación de seguridad ante la barrera suprema.
+La publicación reconstruirá el
 commit exacto y exigirá SHA-256 idéntico al JAR ya sometido a la suite completa.
 Una diferencia binaria bloquea la entrega. Se conservarán fuente, run, tamaño,
 hash, aprobación y artefacto descargable. No se publica un JAR provisional.
@@ -58,3 +63,10 @@ multijugador. Las pruebas de Forge/claims no equivalen a certificar SecurityCraf
 Create, ToolLeveling, Better Combat, Relics o las configuraciones del servidor real.
 La protección frente a callbacks cubre los casos descritos, no una garantía ante
 modificaciones arbitrarias del mundo por cualquier otro mod.
+
+## Identidad del candidato aprobado
+
+- Fuente: `0c7233659d3b695da9211575f3356d81a1aeb1a8`. Run de suite: `37685753507`.
+- JAR: `special-pickaxes-1.20.1-5.0.0.jar`, 186554 bytes.
+- SHA-256 esperado: `c4b7a6f2b3041532cd4dff9823b5e8adbfc317b169153491f69f916fb0635857`.
+- Exportación binaria: pendiente de reproducción idéntica en el workflow de publicación.
