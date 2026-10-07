@@ -104,6 +104,7 @@ public final class ClientValidation {
         }
     }
     private static void setupSupreme(net.minecraft.server.level.ServerPlayer p){
+        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,12000,0,false,false,false));
         // Clear the approach as well as the workpiece: the disposable server world has
         // natural terrain, which must not put the actor inside a tree or mountain.
         for(int x=76;x<=124;x++)for(int z=90;z<=99;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);

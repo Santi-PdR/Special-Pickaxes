@@ -87,6 +87,9 @@ try:
   if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-cancel.png'),'cancel'],env=env,check=True,timeout=20)
   if '[CHAT]' in line and 'SUPREME_READY' in line:
+   # Return from the control-test third-person view to first person for an unobscured cut.
+   for view in ['front','first']:
+    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('supreme-camera-'+view+'.png')),'third'],env=env,check=True,timeout=20)
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-executing.png'),'activate'],env=env,check=True,timeout=20)
   if '[CHAT]' in line and 'SUPREME_COMPLETE' in line:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-complete.png')],env=env,check=True,timeout=20)
