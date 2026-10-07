@@ -31,6 +31,24 @@ public final class ClientValidation {
                 var data=p.getPersistentData();
                 if(CompanionActions.active(p)&&!data.getBoolean("controlActive")){data.putBoolean("controlActive",true);p.sendSystemMessage(Component.literal("CONTROL_ACTIVE"));}
                 if(data.getBoolean("controlActive")&&!CompanionActions.active(p)&&!data.getBoolean("controlCancelled")){data.putBoolean("controlCancelled",true);p.sendSystemMessage(Component.literal("CONTROL_CANCELLED"));}
+                if(data.getBoolean("controlCancelled")&&!data.getBoolean("supremeSetup")){
+                    data.putBoolean("supremeSetup",true);
+                    for(int x=84;x<=116;x++)for(int z=84;z<=116;z++)for(int y=80;y<=92;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),y==80?net.minecraft.world.level.block.Blocks.STONE.defaultBlockState():net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                    p.connection.teleport(100.5,81,115.5,180,6);
+                    p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
+                    ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",6);ArtifactConfig.PER_PLAYER.set(4);
+                    p.sendSystemMessage(Component.literal("SUPREME_READY"));
+                }
+                if(data.getBoolean("supremeSetup")&&WorkQueue.busy(p)&&!data.getBoolean("supremeRunning")){
+                    data.putBoolean("supremeRunning",true);data.putLong("supremeCenter",ArtifactActions.target(p).orElse(p.blockPosition()).asLong());
+                    p.sendSystemMessage(Component.literal("SUPREME_EXECUTING"));
+                }
+                if(data.getBoolean("supremeRunning")&&!WorkQueue.busy(p)&&!data.getBoolean("supremeDone")){
+                    data.putBoolean("supremeDone",true);ArtifactConfig.PER_PLAYER.set(24);
+                    var center=BlockPos.of(data.getLong("supremeCenter"));
+                    if(!p.serverLevel().getBlockState(center).is(net.minecraft.world.level.block.Blocks.STONE)||!p.serverLevel().getBlockState(center.above(5)).is(net.minecraft.world.level.block.Blocks.STONE))throw new IllegalStateException("Supreme demo did not preserve its core and build its vault");
+                    p.sendSystemMessage(Component.literal("SUPREME_COMPLETE"));
+                }
                 return;
             }
             var k=ArtifactKind.values()[index];

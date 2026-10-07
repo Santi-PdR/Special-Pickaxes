@@ -68,7 +68,10 @@ try:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-activate.png'),'activate'],env=env,check=True,timeout=20)
   if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-cancel.png'),'cancel'],env=env,check=True,timeout=20)
-  if '[CHAT]' in line and 'CONTROL_CANCELLED' in line:
+  if '[CHAT]' in line and 'SUPREME_READY' in line:
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-executing.png'),'activate'],env=env,check=True,timeout=20)
+  if '[CHAT]' in line and 'SUPREME_COMPLETE' in line:
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-complete.png')],env=env,check=True,timeout=20)
    success=True;break
 finally:
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
@@ -92,3 +95,6 @@ print('GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS='+str(len(ux))+'; NORMAL_AND_SH
 
 assert "control_active" in text and "control_cancelled" in text
 print("KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK")
+
+assert "supreme_executing" in text and "supreme_complete" in text
+print("SUPREME_REAL_EXECUTION_AND_CORE_VAULT_VERIFIED")
