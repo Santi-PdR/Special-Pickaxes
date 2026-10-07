@@ -57,7 +57,7 @@ public final class DirectAbilities {
         if(!WorldSafety.inert(source))return List.of();
         boolean exposed=ArtifactState.mode(p,ArtifactKind.SEAM_RIPPER)==1;
         var neighbor=p.getOffhandItem().getItem() instanceof BlockItem b?b.getBlock():Blocks.AIR;
-        if(!exposed&&neighbor==Blocks.AIR)return List.of();
+        if(!exposed&&(neighbor==Blocks.AIR||source.is(neighbor)))return List.of();
         var pending=new ArrayDeque<BlockPos>();var visited=new HashSet<BlockPos>();var result=new ArrayList<WorkStep>();pending.add(seed);visited.add(seed);
         while(!pending.isEmpty()&&visited.size()<=512&&result.size()<256){
             var at=pending.removeFirst();if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,at)||level.getBlockState(at)!=source)continue;

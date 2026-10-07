@@ -46,7 +46,7 @@ public final class ClientValidation {
             }
             if(phase==40){
                 p.sendSystemMessage(Component.literal("ARTIFACT_UX_READY_"+k.id));
-                System.out.println("CLIENT_FIXTURE "+k.id+" MODE="+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))+" EFFICIENCY="+EnchantmentScaling.level(p.getMainHandItem(),net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY));
+                com.mojang.logging.LogUtils.getLogger().info("CLIENT_FIXTURE {} MODE={} EFFICIENCY={}",k.id,ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k)),EnchantmentScaling.level(p.getMainHandItem(),net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY));
             }
         }
     }

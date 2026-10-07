@@ -2,7 +2,6 @@ name: Forge verification
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
-  actions: read
   checks: write
 jobs:
   forge:
@@ -15,12 +14,6 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v5
-      - name: Recover previous graphical diagnostics
-        run: |
-          gh run download 37549318870 --name forge-validation --dir build/prior-diagnostics
-          python3 tools/publish_diagnostics.py build/prior-diagnostics/build/verification-client.log build/prior-diagnostics/build/client-smoke/client.log
-        env:
-          GH_TOKEN: ${{ github.token }}
       - run: python3 tools/validate_resources.py
       - run: python3 tools/scan_secrets.py
       - run: |

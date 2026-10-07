@@ -401,6 +401,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty") public static void seamRipperExtractsOnlyContactSkin(GameTestHelper h){
         var p=player(h,ArtifactKind.SEAM_RIPPER);var at=target(h);
         h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIRT.defaultBlockState());
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE));h.assertTrue(DirectAbilities.seam(p,at).isEmpty(),"same material is not an interface");
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.DIRT));var plan=DirectAbilities.seam(p,at);
         h.assertTrue(plan.size()==1,"not whole connected vein");WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,plan);drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(at.east()).is(Blocks.STONE)&&h.getLevel().getBlockState(at.above()).is(Blocks.DIRT),"only A touching B mined");finish(h,p);

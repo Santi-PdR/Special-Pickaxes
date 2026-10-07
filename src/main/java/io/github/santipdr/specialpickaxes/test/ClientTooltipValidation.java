@@ -22,7 +22,7 @@ public final class ClientTooltipValidation {
             if(CHECKED.add(key)){
                 var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
                 if(shift?lines.size()<9:lines.size()!=4)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
-                System.out.println("TOOLTIP_VALIDATED "+key+" lines="+lines.size());
+                com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }
             e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);
         }
