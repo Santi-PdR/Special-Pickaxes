@@ -43,7 +43,7 @@ cantera con más radio. Se respetan permisos, estados, materiales y el scheduler
 Las seis transformaciones de Atlas/Tessellator son ajustes geométricos, no seis
 poderes distintos. Se conserva esta capacidad útil sin mostrar listas en el
 hover compacto. Los modos persisten por jugador; nuevas partidas Worldbreaker
-comienzan en Convergencia, partidas anteriores conservan su modo.
+comienzan en Convergencia, los valores de modo explícitamente guardados se conservan.
 
 ## Arquitectura y restricciones
 
@@ -57,7 +57,7 @@ más una frase y la acción principal. SHIFT contiene secciones de juego y nombr
 El análisis se inicia al marcar la última esquina; no hace falta otro clic ambiguo.
 
 Efectos de firma: máximo 12 partículas por fase, 24 para la pieza suprema y
-presupuesto agregado de 256 emisiones por tick. No entidades persistentes ni
+presupuesto agregado de 256 emisiones por tick. Idle queda reducido a polvo diminuto; no hay llamas grandes junto a la cámara. No entidades persistentes ni
 shader/dependencia obligatoria. Se evita sacudir la cámara o fingir distorsión
 mediante shaders no probados. Las firmas usan sonidos existentes distintos por
 artefacto, con pitch y volumen por fase; no se afirma haber grabado audio nuevo.
