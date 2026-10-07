@@ -1,6 +1,6 @@
-# Rework minero — suite y revisión visual aprobadas; reproducción binaria pendiente
+# Rework minero — 5.0.0 validado y publicado
 
-Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente y la revisión visual están aprobadas; la entrega del JAR espera la comprobación binaria final.
+Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente, revisión visual y reproducción binaria están aprobadas. El JAR final está publicado.
 Los resultados de un commit anterior no certifican sus correcciones posteriores.
 
 ## Correcciones verificables
@@ -50,10 +50,10 @@ inspeccionaron en planchas de sus regiones completas; las escenas, en planchas
 y vistas completas de inventario, galería y suprema. `VISUAL-REVIEW.json` registra
 la procedencia y las limitaciones visuales: túneles oscuros de Ícaro/CORE DRILL,
 ancla elevada de Worldloom y cancelación de seguridad ante la barrera suprema.
-La publicación reconstruirá el
-commit exacto y exigirá SHA-256 idéntico al JAR ya sometido a la suite completa.
-Una diferencia binaria bloquea la entrega. Se conservarán fuente, run, tamaño,
-hash, aprobación y artefacto descargable. No se publica un JAR provisional.
+La publicación reconstruyó el commit exacto y comprobó SHA-256 idéntico al JAR
+ya sometido a la suite completa. El workflow `37687885085` terminó exitosamente;
+la descarga recuperada también pasó comparación binaria, ZIP/Java 17, catálogo
+y escáner de secretos. No se publica un JAR provisional.
 
 ## Limitaciones pendientes de pruebas reales
 
@@ -64,9 +64,13 @@ Create, ToolLeveling, Better Combat, Relics o las configuraciones del servidor r
 La protección frente a callbacks cubre los casos descritos, no una garantía ante
 modificaciones arbitrarias del mundo por cualquier otro mod.
 
-## Identidad del candidato aprobado
+## Identidad de la entrega final
 
 - Fuente: `0c7233659d3b695da9211575f3356d81a1aeb1a8`. Run de suite: `37685753507`.
 - JAR: `special-pickaxes-1.20.1-5.0.0.jar`, 186554 bytes.
 - SHA-256 esperado: `c4b7a6f2b3041532cd4dff9823b5e8adbfc317b169153491f69f916fb0635857`.
-- Exportación binaria: pendiente de reproducción idéntica en el workflow de publicación.
+- Publicación: run `37687885085`, aprobado. Commit de aprobación: `fb6dd2d064a9a986dd0f8259438922e5bce660f0`.
+- Artefacto: [special-pickaxes-5.0.0-verified](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/37687885085/artifacts/11512342063).
+- Copia local: `artifacts/5.0.0/special-pickaxes-1.20.1-5.0.0.jar`.
+- Galería autocontenida: `artifacts/5.0.0/GALERIA.html` (95 capturas y hashes).
+- Los commits posteriores de documentación no cambian la identidad de la fuente compilada.

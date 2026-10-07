@@ -4,9 +4,13 @@ Forge **1.20.1 / Java 17**. Nueve artefactos de minería extrema, también efect
 como hacha y pala. Sin recetas obligatorias, minerales nuevos, worldgen, energía,
 almacenamiento ni X-Ray.
 
-**5.0.0 está en validación; todavía no es una release aprobada.**
-No se usa la evidencia de 4.0 para certificar el rework. Los binarios permanecen
-bloqueados hasta pasar build, tests, GameTests, servidor, cliente y revisión visual.
+**5.0.0 validado y publicado para Forge 1.20.1 / Java 17.**
+[Descargar artefacto verificado de Actions](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/37687885085/artifacts/11512342063).
+Fuente compilada: `0c7233659d3b695da9211575f3356d81a1aeb1a8`; 186554 bytes.
+SHA-256: `c4b7a6f2b3041532cd4dff9823b5e8adbfc317b169153491f69f916fb0635857`.
+20 JUnit, 57 GameTests, 8 pruebas de recursos, servidor y cliente aprobados;
+95 capturas revisadas antes de publicar una reproducción binaria idéntica.
+Esto no certifica test-1 ni el modpack completo. [Detalle y límites](docs/mining-rework/STATUS.md).
 
 ## Catálogo
 
