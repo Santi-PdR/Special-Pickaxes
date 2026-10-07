@@ -53,7 +53,7 @@ limita frecuencia y separa activar, secundaria, modo, selección, confirmar,
 cancelar y pausar. Cancelar no queda bloqueado por cooldown de activación.
 
 No HUD permanente ni progreso numérico recurrente. El hover normal tiene nombre
-más una frase. SHIFT contiene secciones de juego y nombres de teclas reasignadas.
+más una frase y la acción principal. SHIFT contiene secciones de juego y nombres de teclas reasignadas.
 El análisis se inicia al marcar la última esquina; no hace falta otro clic ambiguo.
 
 Efectos de firma: máximo 12 partículas por fase, 24 para la pieza suprema y

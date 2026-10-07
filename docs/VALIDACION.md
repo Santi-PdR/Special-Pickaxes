@@ -16,8 +16,8 @@ Forge verification. No se usan resultados de 3.1 para certificar cambios nuevos.
   ausencia de recetas/worldgen y energía.
 - Servidor dedicado con el JAR reobfuscado; Java 17. Fixtures fuera del JAR.
 - Cliente real Xvfb: galería, veinte hovers normales y veinte SHIFT, regiones,
-  modos y pulsaciones físicas R/V que atraviesan keybinding, red y estado del
-  servidor. No se sustituye este recorrido con llamadas al handler únicamente.
+  modos, registro/reasignación de teclas y pulsaciones físicas R/V que atraviesan keybinding, red y estado del
+  servidor. Convergencia se ejecuta en una zona de prueba y verifica núcleo y bóveda. No se sustituye este recorrido con llamadas al handler únicamente.
 - Inspección de logs, whitespace, manifiesto, hash y firmas comunes de secretos.
 
 ## Límites honestos

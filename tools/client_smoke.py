@@ -98,3 +98,5 @@ print("KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK")
 
 assert "supreme_executing" in text and "supreme_complete" in text
 print("SUPREME_REAL_EXECUTION_AND_CORE_VAULT_VERIFIED")
+
+assert "key_bindings_registered_and_rebound_ok" in text

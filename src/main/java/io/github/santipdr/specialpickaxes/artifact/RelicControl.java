@@ -21,19 +21,23 @@ public final class RelicControl {
         var data=ArtifactState.of(p,k);long now=ArtifactState.now(p);
         if(data.contains("inputTick")&&data.getLong("inputTick")<=now&&now-data.getLong("inputTick")<2)return false;data.putLong("inputTick",now);
         switch(action){
-            case PAUSE: return WorkQueue.busy(p)&&!WorkQueue.status(p).equals("ready")&&WorkQueue.togglePause(p);
-            case CONFIRM: return WorkQueue.status(p).equals("ready")&&WorkQueue.togglePause(p);
+            case PAUSE:
+                if(!WorkQueue.busy(p)||WorkQueue.status(p).equals("ready"))return false;
+                WorkQueue.togglePause(p);p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
+            case CONFIRM:
+                if(!WorkQueue.status(p).equals("ready")){ArtifactFeedback.message(p,"not_ready");ArtifactFeedback.cue(p,"error");return false;}
+                if(!WorkQueue.togglePause(p))return false;ArtifactFeedback.cue(p,"confirm");return true;
             case SELECT:
                 if(!ArtifactInteraction.regional(k,ArtifactState.mode(p,k))||WorkQueue.busy(p))return false;
-                if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);return true;}
+                if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
                 return ArtifactInteraction.use(p,tool,k,false);
             case MODE:
                 if(WorkQueue.busy(p)||ArtifactInteraction.modeCount(k)<2)return false;
                 if(ArtifactInteraction.selecting(p))return ArtifactInteraction.left(p,p.blockPosition(),true);
                 ArtifactState.rotate(p,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;
             case SECONDARY:
-                if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){ArtifactState.clearAnchors(p,k);data.remove("trail");ArtifactFeedback.message(p,"unlinked");return true;}
-                if(DomainFields.active(p)||CompanionActions.active(p)){DomainFields.stop(p);CompanionActions.stop(p);WorkQueue.cancel(p);ArtifactFeedback.message(p,"released");return true;}
+                if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){ArtifactState.clearAnchors(p,k);data.remove("trail");ArtifactFeedback.message(p,"unlinked");ArtifactFeedback.cue(p,"cancel");return true;}
+                if(DomainFields.active(p)||CompanionActions.active(p)){DomainFields.stop(p);CompanionActions.stop(p);WorkQueue.cancel(p);ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");return true;}
                 return false;
             case ACTIVATE:
                 if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k))){ArtifactFeedback.message(p,"select_key");return false;}

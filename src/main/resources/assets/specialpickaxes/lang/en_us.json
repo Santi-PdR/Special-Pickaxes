@@ -296,5 +296,6 @@
   "mode.specialpickaxes.world_convergence": "✦ Convergence — forge a sanctuary",
   "message.specialpickaxes.nothing_changed": "Nothing changed. Check space and materials.",
   "message.specialpickaxes.partial": "Finished; some occupied or protected cells were skipped.",
-  "message.specialpickaxes.cooldown": "Ability cooling down."
+  "message.specialpickaxes.cooldown": "Ability cooling down.",
+  "message.specialpickaxes.not_ready": "Finish the corners and wait for READY."
 }

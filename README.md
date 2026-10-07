@@ -3,7 +3,7 @@
 **Forge 1.20.1 · Java 17 · veinte artefactos · ninguna energía**
 
 Una revisión de los controles, presentación e identidad de 3.1, sin añadir
-objetos por cantidad. Hover: nombre y una frase. SHIFT: pequeño manual de juego.
+objetos por cantidad. Hover: nombre, una frase y tecla principal. SHIFT: pequeño manual de juego.
 Sin HUD permanente, sin Shift + clic derecho para poderes.
 
 ## Jugar

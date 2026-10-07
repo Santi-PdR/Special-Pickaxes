@@ -296,5 +296,6 @@
   "mode.specialpickaxes.world_convergence": "✦ Convergencia — forjar un santuario",
   "message.specialpickaxes.nothing_changed": "Sin cambios. Revisa espacio y materiales.",
   "message.specialpickaxes.partial": "Terminado; se omitieron celdas ocupadas o protegidas.",
-  "message.specialpickaxes.cooldown": "Habilidad en enfriamiento."
+  "message.specialpickaxes.cooldown": "Habilidad en enfriamiento.",
+  "message.specialpickaxes.not_ready": "Completa las esquinas y espera a LISTO."
 }

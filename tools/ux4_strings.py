@@ -44,3 +44,5 @@ def revise(d,spanish,ids):
  for key in list(d):
   if key.startswith('mode.specialpickaxes.'):
    mode=key.split('.')[-1];d[key]=symbols.get(mode,'↻' if 'rotate' in mode else '•')+' '+d[key]
+
+ d['message.specialpickaxes.not_ready']=('Finish the corners and wait for READY.','Completa las esquinas y espera a LISTO.')[i]
