@@ -21,25 +21,33 @@ public final class DomainFields {
         }
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();
+    /** Membership counts keep combat-event lookups constant-time when fields overlap. */
+    private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
         if(kind!=ArtifactKind.INTERREGNUM||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
     }
     private static void release(Field f) {
-        f.frozen.values().forEach(v -> { if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity)); });
+        f.frozen.forEach((id,v) -> {
+            if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity));
+            removeFrozenMembership(id);
+        });
         f.frozen.clear();f.owner.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
+    }
+    private static void removeFrozenMembership(UUID id) {
+        FROZEN_ENTITIES.computeIfPresent(id,(ignored,count)->count<=1?null:count-1);
     }
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }
     public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field); }
-    public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear(); }
+    public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
         var f=FIELDS.get(p.getUUID());return f!=null && f.kind==ArtifactKind.INTERREGNUM && p.level().dimension()==f.dimension
             && p.getMainHandItem()==f.tool && ArtifactState.now(p)<=f.expires && pos.distSqr(f.center)<=f.radius*f.radius;
     }
     public static boolean frozen(Entity entity) {
-        return entity!=null && FIELDS.values().stream().anyMatch(f -> f.frozen.containsKey(entity.getUUID()));
+        return entity!=null && FROZEN_ENTITIES.containsKey(entity.getUUID());
     }
     public static void feed(ServerPlayer p,BlockPos pos) {
         var field=FIELDS.get(p.getUUID());
@@ -73,7 +81,12 @@ public final class DomainFields {
                     if(ArtifactState.mode(p,f.kind)==1)away=new Vec3(-away.z,away.y*0.2,away.x).normalize();
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
                 } else if(f.kind==ArtifactKind.INTERREGNUM) {
-                    var original=f.frozen.computeIfAbsent(entity.getUUID(),id -> new Frozen(entity,entity.position(),entity.getDeltaMovement()));
+                    var original=f.frozen.get(entity.getUUID());
+                    if(original==null) {
+                        original=new Frozen(entity,entity.position(),entity.getDeltaMovement());
+                        f.frozen.put(entity.getUUID(),original);
+                        FROZEN_ENTITIES.merge(entity.getUUID(),1,Integer::sum);
+                    }
                     var box=entity.getBoundingBox().move(original.position.subtract(entity.position()));
                     if(level.noCollision(entity,box)) { entity.setPos(original.position);entity.setDeltaMovement(Vec3.ZERO); }
                 } else {
@@ -86,6 +99,7 @@ public final class DomainFields {
             f.frozen.entrySet().removeIf(entry -> {
                 if(current.contains(entry.getKey())) return false;
                 if(entry.getValue().entity.isAlive()) entry.getValue().entity.setDeltaMovement(clamp(entry.getValue().velocity));
+                removeFrozenMembership(entry.getKey());
                 return true;
             });
             if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
