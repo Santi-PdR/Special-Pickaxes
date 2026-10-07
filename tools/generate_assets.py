@@ -55,9 +55,8 @@ def png(path,pixels,w,h):
 for folder in ['assets/specialpickaxes','data/specialpickaxes/recipes','data/specialpickaxes/advancements/recipes','data/specialpickaxes/loot_modifiers','data/forge/loot_modifiers']:
  p=R/folder
  if p.exists():shutil.rmtree(p)
-BASES=['diamond','diamond','netherite','diamond','golden','diamond','iron','netherite','netherite','netherite','netherite','golden','iron','diamond','diamond','netherite','iron','iron','netherite','netherite']
-for index,id in enumerate(IDS):
- js(Path(f'assets/specialpickaxes/models/item/{id}.json'),{'parent':'minecraft:item/handheld','textures':{'layer0':'minecraft:item/'+BASES[index]+'_pickaxe'}})
+from reference_assets import install
+install(R)
 langs=[]
 for spanish in [False,True]:
  lang={'itemGroup.specialpickaxes':'Special Pickaxes — Artefactos' if spanish else 'Special Pickaxes — Artifacts',
@@ -92,3 +91,7 @@ from ux_strings import enrich
 from ux31_strings import revise
 for code in ['en_us','es_es']:
  path=Path('assets/specialpickaxes/lang')/(code+'.json');data=json.loads((R/path).read_text());enrich(data,code=='es_es');revise(data,code=='es_es',IDS);js(path,data)
+
+from ux4_strings import revise as revise4
+for code in ["en_us","es_es"]:
+ path=R/"assets/specialpickaxes/lang"/(code+".json");data=json.loads(path.read_text());revise4(data,code=="es_es",IDS);path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")

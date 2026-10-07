@@ -6,12 +6,13 @@ class Resources(unittest.TestCase):
  def test_json(self):
   for pattern in ['*.json','*.mcmeta']:
    for p in ROOT.rglob(pattern):json.loads(p.read_text())
- def test_existing_vanilla_models(self):
-  allowed={'minecraft:item/'+base+'_pickaxe' for base in ['netherite','diamond','iron','golden']}
+ def test_reference_models(self):
+  hashes=set()
   for id in IDS:
    model=json.loads((ROOT/f'assets/specialpickaxes/models/item/{id}.json').read_text())
-   self.assertEqual(model['parent'],'minecraft:item/handheld');self.assertIn(model['textures']['layer0'],allowed)
-  self.assertFalse(list((ROOT/'assets/specialpickaxes/textures/item').glob('*')))
+   self.assertEqual(model['textures']['layer0'],'specialpickaxes:item/'+id)
+   hashes.add(hashlib.sha256((ROOT/f'assets/specialpickaxes/textures/item/{id}.png').read_bytes()).hexdigest())
+  self.assertEqual(len(hashes),20)
  def test_no_energy_and_manual_keys(self):
   for lang in ['en_us','es_es']:
    data=json.loads((ROOT/f'assets/specialpickaxes/lang/{lang}.json').read_text())

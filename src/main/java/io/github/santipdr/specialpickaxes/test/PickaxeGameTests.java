@@ -364,7 +364,7 @@ public final class PickaxeGameTests {
 
     @GameTest(template="empty") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
         for(var k:ArtifactKind.values())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
-            boolean expected=k==ArtifactKind.ATLAS||k==ArtifactKind.CRUCIBLE||k==ArtifactKind.CHRONICLE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&m!=1&&m!=4;
+            boolean expected=k==ArtifactKind.ATLAS||k==ArtifactKind.CRUCIBLE||k==ArtifactKind.CHRONICLE||k==ArtifactKind.TESSELLATOR||k==ArtifactKind.WORLDBREAKER&&m!=1&&m!=4&&m!=6;
             h.assertTrue(ArtifactInteraction.regional(k,m)==expected,"regional contract "+k+" mode "+m);
         }h.succeed();
     }
@@ -372,7 +372,7 @@ public final class PickaxeGameTests {
         for(var k:ArtifactKind.values()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
-            h.assertTrue(compact.size()==3&&expanded.size()>=9,"compact identity/mode/hint and advanced manual "+k);
+            h.assertTrue(compact.size()==1&&expanded.size()>=9,"compact identity/mode/hint and advanced manual "+k);
         }h.succeed();
     }
     @GameTest(template="empty") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){

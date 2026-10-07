@@ -21,10 +21,19 @@ public final class DirectAbilities {
         List<WorkStep> steps=switch(k){
             case KEYSTONE->vault(p,center.above());
             case SEAM_RIPPER->seam(p,center);
-            case WORLDBREAKER->ArtifactState.mode(p,k)==1?cleave(p,center):ArtifactState.mode(p,k)==4?restore(p,k,center):List.of();
+            case WORLDBREAKER->ArtifactState.mode(p,k)==6?convergence(p,center):ArtifactState.mode(p,k)==1?cleave(p,center):ArtifactState.mode(p,k)==4?restore(p,k,center):List.of();
             default->List.of();
         };
         if(WorkQueue.start(p,tool,k,steps)){ArtifactFeedback.preview(p,k,steps);return true;}return false;
+    }
+    /** Supreme program: fracture an annular quarry without touching its core, then erect a paid sanctuary. */
+    public static List<WorkStep> convergence(ServerPlayer p,BlockPos center){
+        var result=new ArrayList<WorkStep>();int radius=Math.min(12,ArtifactConfig.MAX_RADIUS.get()+4);
+        for(int y=4;y>=0;y--)for(int x=-radius;x<=radius;x++)for(int z=-radius;z<=radius;z++){
+            int r=x*x+z*z;if(r<25||r>radius*radius)continue;var at=center.offset(x,y,z);
+            if(WorldSafety.allowed(p,ArtifactKind.WORLDBREAKER,at)&&WorldSafety.inert(p.serverLevel().getBlockState(at)))result.add(new WorkStep.Mine(at,p.serverLevel().getBlockState(at)));
+        }
+        result.addAll(vault(p,center.above()));return result;
     }
     public static BlockState material(ServerPlayer p){
         var off=p.getOffhandItem();return !off.hasTag()&&off.getItem() instanceof BlockItem b&&WorldSafety.inert(b.getBlock().defaultBlockState())?b.getBlock().defaultBlockState():Blocks.STONE.defaultBlockState();

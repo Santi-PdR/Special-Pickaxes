@@ -21,7 +21,7 @@ jobs:
           set -o pipefail
           ./gradlew build test --stacktrace 2>&1 | tee build/verification-build.log
       - run: python3 tools/verify_release.py
-      - run: python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-3.1.0.jar | tee build/verification-security.log
+      - run: python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-4.0.0.jar | tee build/verification-security.log
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log

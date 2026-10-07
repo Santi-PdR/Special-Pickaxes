@@ -14,9 +14,14 @@ import org.joml.Vector3f;
 /** Cosmetic only: animated head halo around a familiar vanilla tool. Never sends gameplay packets. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class RelicAura {
+    private static ArtifactKind equipped;
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null||mc.isPaused()||mc.player.tickCount%4!=0||!(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item))return;
+        if(equipped!=item.kind){equipped=item.kind;
+            var action=ArtifactInteraction.regional(item.kind,ArtifactTooltips.mode(mc.player.getMainHandItem()))?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE;
+            mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
+        }
         var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
         var hand=mc.player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
         double angle=mc.player.tickCount*0.12+item.kind.ordinal();var at=hand.add(side.scale(Math.cos(angle)*0.1)).add(0,Math.sin(angle)*0.1,0);

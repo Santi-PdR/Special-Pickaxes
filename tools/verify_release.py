@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify the built release, then publish its SHA/size/commit manifest for artifact consumers."""
 import hashlib,json,os,pathlib,struct,subprocess,tomllib,zipfile
-root=pathlib.Path('.');jar=root/'build/libs/special-pickaxes-1.20.1-3.1.0.jar'
+root=pathlib.Path('.');jar=root/'build/libs/special-pickaxes-1.20.1-4.0.0.jar'
 ids='palimpsest fault_choir eventide meridian paradox_crucible interregnum worldloom icarus hollow_axiom bifold_atlas worldbreaker chronicle keystone tessellator aegis lodestar seam_ripper causeway counterseal covenant'.split()
 sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 with zipfile.ZipFile(jar) as z:
@@ -15,7 +15,7 @@ with zipfile.ZipFile(jar) as z:
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
  assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==20
- assert not any('/textures/item/' in n for n in z.namelist())
+ assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==20
  assert 'io/github/santipdr/specialpickaxes/artifact/ArtifactActions.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/WorkQueue.class' in z.namelist()
 digest=hashlib.sha256(jar.read_bytes()).hexdigest()

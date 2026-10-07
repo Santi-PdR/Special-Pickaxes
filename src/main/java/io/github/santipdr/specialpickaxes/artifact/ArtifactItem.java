@@ -21,12 +21,9 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);
         if(hand!=InteractionHand.MAIN_HAND) return InteractionResultHolder.pass(tool);
-        if(player instanceof ServerPlayer p && !ArtifactInteraction.use(p,tool,kind,p.isShiftKeyDown())) return InteractionResultHolder.fail(tool);
-        return InteractionResultHolder.sidedSuccess(tool,level.isClientSide);
+        return InteractionResultHolder.pass(tool);
     }
-    @Override public InteractionResult useOn(UseOnContext context) {
-        return context.getPlayer()==null?InteractionResult.PASS:use(context.getLevel(),context.getPlayer(),context.getHand()).getResult();
-    }
+    @Override public InteractionResult useOn(UseOnContext context) { return InteractionResult.PASS; }
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
     @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}

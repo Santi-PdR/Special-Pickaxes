@@ -13,6 +13,7 @@ public final class ArtifactFeedback {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
+        RelicEffects.emit(p,kind,"activate",p.getEyePosition().add(p.getLookAngle().scale(2)));
         p.serverLevel().playSound(null,p.blockPosition(),kind.sound,SoundSource.PLAYERS,0.65F,0.85F+kind.ordinal()*0.04F);
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
@@ -62,9 +63,10 @@ public final class ArtifactFeedback {
     }
 
     public static void cue(ServerPlayer p,String phase){
-        var sound=switch(phase){case "error"->net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BASS.value();case "cancel"->net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH;case "complete"->net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP;case "confirm"->net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT;default->net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value();};
-        if((phase.equals("select")||phase.equals("confirm")) && p.getMainHandItem().getItem() instanceof ArtifactItem item)sound=item.kind.sound;
-        p.playNotifySound(sound,SoundSource.PLAYERS,0.45F,phase.equals("error")?0.6F:1.2F);
+        if(!(p.getMainHandItem().getItem() instanceof ArtifactItem item))return;
+        float pitch=switch(phase){case "error"->.55F;case "cancel"->.7F;case "complete"->1.25F;case "confirm"->.85F;default->1F;};
+        p.playNotifySound(item.kind.sound,SoundSource.PLAYERS,item.kind==ArtifactKind.WORLDBREAKER?.7F:.35F,pitch+(item.kind.ordinal()%4)*.04F);
+        RelicEffects.emit(p,item.kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){
         int rgb=target?0xffd783:kind.color;var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.8F);

@@ -42,6 +42,7 @@ public final class SpecialPickaxes {
             .displayItems((parameters,output) -> PICKS.values().forEach(item -> output.accept(item.get()))).build());
     }
     public SpecialPickaxes() {
+        io.github.santipdr.specialpickaxes.network.RelicNetwork.register();
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
         var forge=MinecraftForge.EVENT_BUS;
@@ -52,7 +53,7 @@ public final class SpecialPickaxes {
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
-        if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.left(p,e.getPos(),p.isShiftKeyDown()))e.setCanceled(true);
+        if(e.getEntity() instanceof ServerPlayer p && RelicControl.corner(p,e.getPos()))e.setCanceled(true);
     }
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick(); }

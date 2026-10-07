@@ -1,38 +1,35 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import java.util.List;
+import java.util.*;
 
-/** Pure tooltip content: keyboard state and rendering stay on the physical client. */
+/** Presentation content only. No engine budgets, internal counters or client keyboard dependency. */
 public final class ArtifactTooltips {
     private ArtifactTooltips(){}
     public static int mode(ItemStack stack){return stack.hasTag()?stack.getTag().getInt("artifactMode"):0;}
-    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
-        lines.add(Component.translatable("identity.specialpickaxes."+k.id));
-        lines.add(Component.translatable("ux.specialpickaxes.mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack)))));
-        lines.add(Component.translatable("manual.specialpickaxes.shift_hint"));
+    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("identity.specialpickaxes."+k.id).withStyle(ChatFormatting.GRAY));}
+    private static void section(List<Component> lines,String heading,Component content){
+        if(!lines.isEmpty())lines.add(Component.empty());
+        lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.withStyle(ChatFormatting.GRAY));
+    }
+    public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
+        var a=new ArrayList<RelicControl.Action>();boolean region=ArtifactInteraction.regional(k,mode);
+        a.add(region?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE);
+        if(region)a.add(RelicControl.Action.CONFIRM);
+        if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
+        if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR||k==ArtifactKind.INTERREGNUM||k==ArtifactKind.EVENTIDE||k==ArtifactKind.AEGIS||CompanionActions.handles(k))a.add(RelicControl.Action.SECONDARY);
+        a.add(RelicControl.Action.CANCEL);
+        if(!CompanionActions.handles(k)&&k!=ArtifactKind.AEGIS&&k!=ArtifactKind.INTERREGNUM&&k!=ArtifactKind.MERIDIAN)a.add(RelicControl.Action.PAUSE);
+        return a;
     }
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){
-        lines.add(Component.translatable("identity.specialpickaxes."+k.id));
-        lines.add(Component.translatable("ux.specialpickaxes.mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack)))));
-        lines.add(Component.translatable("manual.specialpickaxes.heading"));
-        lines.add(Component.translatable("tooltip.specialpickaxes."+k.id));
-        lines.add(Component.translatable("controls.specialpickaxes."+k.id));
-        if(ArtifactInteraction.regional(k,mode(stack)))lines.add(Component.translatable("ux.specialpickaxes.region_controls"));
-        lines.add(Component.translatable("manual.specialpickaxes.cancel"));
+        section(lines,"what",Component.translatable("identity.specialpickaxes."+k.id));
+        section(lines,"how",Component.translatable("play4."+k.id));
+        if(ArtifactInteraction.modeCount(k)>1)section(lines,"mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack))));
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4;
-        int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;
-        lines.add(Component.translatable("manual.specialpickaxes.cost",cost,cooldown));
-        lines.add(Component.translatable("manual.specialpickaxes.enchantments"));
-        lines.add(Component.translatable("limits.specialpickaxes."+k.id));
-        lines.add(Component.translatable("example.specialpickaxes."+k.id));
-        lines.add(Component.translatable(ArtifactInteraction.regional(k,mode(stack))?"manual.specialpickaxes.region_limits":"manual.specialpickaxes.direct_limits"));
-        if(stack.hasTag()){
-            var t=stack.getTag();
-            if(k==ArtifactKind.PALIMPSEST||k==ArtifactKind.CHOIR||k==ArtifactKind.CHRONICLE||k==ArtifactKind.WORLDBREAKER)lines.add(Component.translatable("ux.specialpickaxes.history",t.getInt("artifactMemory"),t.getLong("artifactOldest"),t.getLong("artifactLatest")));
-            if(t.contains("artifactSource"))lines.add(Component.translatable("ux.specialpickaxes.volumes",t.getString("artifactSource"),t.getString("artifactTarget")));
-            if(t.contains("artifactStatus"))lines.add(Component.translatable("status.specialpickaxes."+t.getString("artifactStatus")));
-        }
+        section(lines,"cost",Component.translatable("manual4.wear",cost));
+        section(lines,"limits",Component.translatable("warning4."+k.id));
     }
 }
