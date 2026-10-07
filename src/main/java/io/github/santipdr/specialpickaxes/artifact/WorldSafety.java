@@ -125,13 +125,14 @@ public final class WorldSafety {
             if(!level.hasChunkAt(pos) || !level.getFluidState(pos).isEmpty() || !level.mayInteract(p,pos)) return false;
         return level.noCollision(p,box);
     }
-    public static boolean move(ServerPlayer p,Vec3 target) {
+    public static boolean move(ServerPlayer p,Vec3 target) { return move(p,target,ArtifactKind.ICARUS); }
+    public static boolean move(ServerPlayer p,Vec3 target,ArtifactKind kind) {
         var delta=target.subtract(p.position());double distance=delta.length();
         if(!Double.isFinite(distance) || distance>8 || p.isPassenger() || p.isSleeping()) return false;
         int steps=Math.max(1,(int)Math.ceil(distance/0.2));
         for(int i=1;i<=steps;i++) {
             var point=p.position().add(delta.scale(i/(double)steps));
-            if(!freeBody(p,point) || !allowed(p,ArtifactKind.ICARUS,BlockPos.containing(point))) return false;
+            if(!freeBody(p,point) || !allowed(p,kind,BlockPos.containing(point))) return false;
         }
         p.connection.teleport(target.x,target.y,target.z,p.getYRot(),p.getXRot());return true;
     }

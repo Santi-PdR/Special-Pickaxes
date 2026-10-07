@@ -17,7 +17,7 @@ public final class DirectAbilities {
         if(k==ArtifactKind.LODESTAR)return returnPath(p,tool);
         var center=ArtifactActions.target(p).orElse(p.blockPosition());
         if(!WorldSafety.allowed(p,k,center))return false;
-        if(k==ArtifactKind.AEGIS){DomainFields.start(p,tool,k,center,8);ArtifactFeedback.ring(p,k,center,8);return true;}
+        if(k==ArtifactKind.AEGIS){int radius=Math.min(8,ArtifactConfig.MAX_RADIUS.get());DomainFields.start(p,tool,k,center,radius);ArtifactFeedback.ring(p,k,center,radius);return true;}
         List<WorkStep> steps=switch(k){
             case KEYSTONE->vault(p,center.above());
             case SEAM_RIPPER->seam(p,center);

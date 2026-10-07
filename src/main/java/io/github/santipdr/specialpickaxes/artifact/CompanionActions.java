@@ -9,9 +9,9 @@ import java.util.*;
 /** Reactive, player-owned companions: paid footing, paid wake sealing and non-destructive blast protection. */
 public final class CompanionActions {
     private static final class Active {
-        final ServerPlayer player;final ItemStack tool;final ArtifactKind kind;final String dimension;final long expires;
+        final ServerPlayer player;final ItemStack tool;final ArtifactKind kind;final String dimension;final long expires;final int footingY;
         final ArrayDeque<BlockPos> scars=new ArrayDeque<>();
-        Active(ServerPlayer p,ItemStack tool,ArtifactKind kind){player=p;this.tool=tool;this.kind=kind;dimension=ArtifactState.dimension(p);expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();}
+        Active(ServerPlayer p,ItemStack tool,ArtifactKind kind){player=p;footingY=p.blockPosition().getY()-1;this.tool=tool;this.kind=kind;dimension=ArtifactState.dimension(p);expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();}
         boolean valid(){return player.isAlive()&&!player.isRemoved()&&player.getMainHandItem()==tool&&!tool.isEmpty()&&dimension.equals(ArtifactState.dimension(player))&&ArtifactState.now(player)<=expires;}
     }
     private static final Map<UUID,Active> ACTIVE=new HashMap<>();
@@ -33,7 +33,7 @@ public final class CompanionActions {
             var a=it.next();var p=a.player;
             if(!a.valid()||!WorldSafety.allowed(p,a.kind,p.blockPosition())){it.remove();continue;}
             if(p.tickCount%5!=0)continue;
-            if(a.kind==ArtifactKind.CAUSEWAY&&p.getDeltaMovement().y>-.4){
+            if(a.kind==ArtifactKind.CAUSEWAY&&p.getDeltaMovement().y>-.4&&p.blockPosition().getY()-1==a.footingY){
                 var feet=p.blockPosition().below();var material=DirectAbilities.material(p);
                 for(int n=0;n<2;n++){var at=feet.relative(p.getDirection(),n);if(p.serverLevel().hasChunkAt(at)&&p.serverLevel().getBlockState(at).isAir())WorkQueue.append(p,a.tool,a.kind,new WorkStep.Place(at,material));}
             }
@@ -45,15 +45,21 @@ public final class CompanionActions {
                     }else a.scars.addLast(at);
                 }
             }
-            if(p.tickCount%10==0)ArtifactFeedback.ring(p,a.kind,p.blockPosition(),a.kind==ArtifactKind.COUNTERSEAL?8:2);
+            if(p.tickCount%10==0)ArtifactFeedback.ring(p,a.kind,p.blockPosition(),a.kind==ArtifactKind.COUNTERSEAL?Math.min(8,ArtifactConfig.MAX_RADIUS.get()):2);
         }
     }
     public static void protect(Level level,List<BlockPos> affected){
         // Bounded event work. This changes only terrain eligibility, never damage or entity ownership.
-        int checked=0;var it=affected.iterator();
+        var wards=ACTIVE.values().stream().filter(a->a.kind==ArtifactKind.COUNTERSEAL&&a.player.level()==level&&a.valid()).toList();
+        if(wards.isEmpty())return;
+        int checked=0,pairs=16384,permissions=1024,radius=Math.min(8,ArtifactConfig.MAX_RADIUS.get());var it=affected.iterator();
         while(it.hasNext()&&checked++<4096){
-            var pos=it.next();for(var a:ACTIVE.values()){
-                if(a.kind==ArtifactKind.COUNTERSEAL&&a.valid()&&a.player.level()==level&&a.player.blockPosition().distSqr(pos)<=64&&WorldSafety.allowed(a.player,a.kind,pos)){it.remove();break;}
+            var pos=it.next();for(var a:wards){
+                if(--pairs<0)return;
+                if(a.player.blockPosition().distSqr(pos)<=radius*radius){
+                    if(--permissions<0)return;
+                    if(WorldSafety.allowed(a.player,a.kind,pos)){it.remove();break;}
+                }
             }
         }
     }

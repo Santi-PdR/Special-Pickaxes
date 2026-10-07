@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ArtifactHud {
     private ArtifactHud() {}
-    @SubscribeEvent public static void tooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.setMaxWidth(280);}
+    @SubscribeEvent public static void tooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.setMaxWidth(320);}
     @SubscribeEvent public static void levels(net.minecraftforge.event.entity.player.ItemTooltipEvent e){
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
         var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(name);

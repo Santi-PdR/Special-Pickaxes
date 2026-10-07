@@ -63,10 +63,9 @@ for index,id in enumerate(IDS):
  js(Path(f'assets/specialpickaxes/models/item/{id}.json'),{'parent':'minecraft:item/handheld','textures':{'layer0':'minecraft:item/'+BASES[index]+'_pickaxe'}})
 langs=[]
 for spanish in [False,True]:
- lang={'itemGroup.specialpickaxes':'Siege — Artefactos' if spanish else 'Siege — Artifacts',
+ lang={'itemGroup.specialpickaxes':'Special Pickaxes — Artefactos' if spanish else 'Special Pickaxes — Artifacts',
  'effect.specialpickaxes.dominion':'Interregno' if spanish else 'Interregnum',
  'tooltip.specialpickaxes.controls':'Usar: primaria • Agachado: secundaria/cancelar • Sin recetas' if spanish else 'Use: primary • Sneak-use: secondary/cancel • No recipes',
- 'tooltip.specialpickaxes.state':'Energía %s/256 • Memoria %s • Modo %s' if spanish else 'Energy %s/256 • Memory %s • Mode %s',
  'message.specialpickaxes.cancelled':'Operación cancelada.' if spanish else 'Operation cancelled.',
  'message.specialpickaxes.mode':'Estado secundario %s.' if spanish else 'Secondary state %s.',
  'message.specialpickaxes.no_target':'Sin operación válida: revisa objetivo, memoria, anclas o material.' if spanish else 'No valid operation: check target, memory, anchors or material.',
@@ -75,8 +74,7 @@ for spanish in [False,True]:
  'message.specialpickaxes.anchor_a':'Primera ancla fijada. Apunta a la segunda.' if spanish else 'First anchor set. Aim at the second.',
  'message.specialpickaxes.linked':'Enlace activo. Minar cerca de A repercute en B.' if spanish else 'Link active. Mining near A echoes at B.',
  'message.specialpickaxes.unknown':'Artefacto desconocido.' if spanish else 'Unknown artifact.',
- 'message.specialpickaxes.granted':'Entregado %s a %s.' if spanish else 'Granted %s to %s.',
- 'hud.specialpickaxes.status':'Energía %s/256 • M%s • %s pasos' if spanish else 'Energy %s/256 • M%s • %s steps'}
+ 'message.specialpickaxes.granted':'Entregado %s a %s.' if spanish else 'Granted %s to %s.'}
  for i,id in enumerate(IDS):
   lang['item.specialpickaxes.'+id]=(ES if spanish else EN)[i]
   lang['tooltip.specialpickaxes.'+id]=(TIPS_ES if spanish else TIPS_EN)[i]

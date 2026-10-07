@@ -48,6 +48,7 @@ public final class ArtifactItem extends PickaxeItem {
     }
     @Override public void inventoryTick(ItemStack tool,Level level,Entity entity,int slot,boolean selected) {
         super.inventoryTick(tool,level,entity,slot,selected);
+        if(selected && entity instanceof ServerPlayer p && kind==ArtifactKind.LODESTAR)DirectAbilities.recordFootstep(p);
         if(selected && entity instanceof ServerPlayer p && p.tickCount%10==0) {
             if(p.tickCount%100==0)ArtifactState.prune(p,kind);
             // Vanilla inventory synchronization carries the display data; client never authorizes work.

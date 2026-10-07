@@ -62,11 +62,11 @@ public final class DomainFields {
             for(var entity:entities) {
                 if(processed>=ArtifactConfig.FIELD_TARGETS.get()) break;
                 if(entity instanceof Projectile projectile && projectile.getOwner()!=null
-                        && (projectile.getOwner()==p || projectile.getOwner().isAlliedTo(p))) continue;
+                        && (projectile.getOwner()==p || projectile.getOwner().isAlliedTo(p) || f.kind==ArtifactKind.AEGIS && projectile.getOwner() instanceof net.minecraft.world.entity.player.Player)) continue;
                 if(!WorldSafety.allowed(p,f.kind,entity.blockPosition())) continue;
                 processed++;current.add(entity.getUUID());
                 if(f.kind==ArtifactKind.AEGIS){
-                    var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001)continue;
+                    var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001 || entity instanceof net.minecraft.world.entity.projectile.AbstractArrow && !level.noCollision(entity,entity.getBoundingBox()))continue;
                     var away=entity.position().subtract(Vec3.atCenterOf(f.center)).normalize();
                     if(ArtifactState.mode(p,f.kind)==1)away=new Vec3(-away.z,away.y*0.2,away.x).normalize();
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));

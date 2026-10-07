@@ -25,6 +25,7 @@ public final class ArtifactTooltips {
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;
         lines.add(Component.translatable("manual.specialpickaxes.cost",cost,cooldown));
         lines.add(Component.translatable("manual.specialpickaxes.enchantments"));
+        lines.add(Component.translatable("limits.specialpickaxes."+k.id));
         lines.add(Component.translatable("example.specialpickaxes."+k.id));
         lines.add(Component.translatable(ArtifactInteraction.regional(k,mode(stack))?"manual.specialpickaxes.region_limits":"manual.specialpickaxes.direct_limits"));
         if(stack.hasTag()){

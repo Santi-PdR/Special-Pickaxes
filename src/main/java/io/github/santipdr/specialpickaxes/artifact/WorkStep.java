@@ -23,7 +23,7 @@ public interface WorkStep {
         public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.exchange(p,t,pos,other,first,second); }
     }
     record Move(BlockPos pos) implements WorkStep {
-        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.move(p,Vec3.atBottomCenterOf(pos).add(0,0.05,0)); }
+        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.move(p,Vec3.atBottomCenterOf(pos).add(0,0.05,0),k); }
         public boolean stopOnFailure() { return true; }
     }
 }

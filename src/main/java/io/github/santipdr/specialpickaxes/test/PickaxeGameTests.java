@@ -289,7 +289,10 @@ public final class PickaxeGameTests {
         var record=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,0,Blocks.STONE.defaultBlockState());
         WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,record);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
         h.assertTrue(ArtifactState.memories(p,ArtifactKind.CHRONICLE).size()==1,"checkpoint recorded");h.getLevel().setBlockAndUpdate(a,Blocks.AIR.defaultBlockState());p.getInventory().add(new ItemStack(Items.STONE));
-        var restore=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,1,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,restore);WorkQueue.tick();WorkQueue.togglePause(p);drain(p);
+        var restore=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CHRONICLE,1,Blocks.STONE.defaultBlockState());WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHRONICLE,restore);WorkQueue.tick();
+        h.assertTrue(!WorkQueue.togglePause(p),"regional cooldown respected");
+        // Advance only this fake owner's readiness, without changing the shared test world's clock.
+        ArtifactState.of(p,ArtifactKind.CHRONICLE).putLong("ready",0);WorkQueue.togglePause(p);drain(p);
         h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid restoration conserves material");finish(h,p);
     }
     @GameTest(template="empty") public static void simultaneousLargeRegionsAreBounded(GameTestHelper h){
@@ -424,5 +427,22 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(at).isAir(),"not sealed before passing it");
         p.setPos(at.getX()+0.5,at.getY(),at.getZ()+4.5);CompanionActions.tick();drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&p.getInventory().countItem(Items.STONE)==0,"paid wake sealed behind miner");finish(h,p);
+    }
+
+    @GameTest(template="empty") public static void lodestarUsesItsOwnPermissionEvent(GameTestHelper h){
+        var p=player(h,ArtifactKind.LODESTAR);var before=p.position();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=e->{if(e.player==p&&e.ability.equals("lodestar"))e.setCanceled(true);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,deny);
+        try{h.assertTrue(!new WorkStep.Move(p.blockPosition().east()).apply(p,p.getMainHandItem(),ArtifactKind.LODESTAR)&&p.position().equals(before),"route respects Lodestar permission, not Icarus permission");}
+        finally{MinecraftForge.EVENT_BUS.unregister(deny);}finish(h,p);
+    }
+    @GameTest(template="empty") public static void allRelicsKeepTripleToolAndHighLevels(GameTestHelper h){
+        for(var k:ArtifactKind.values()){
+            var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());
+            for(var block:List.of(Blocks.STONE,Blocks.OAK_LOG,Blocks.DIRT))h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"triple tool "+k);
+            var tags=new net.minecraft.nbt.ListTag();
+            for(String id:List.of("efficiency","fortune","silk_touch","unbreaking","mending")){var t=new net.minecraft.nbt.CompoundTag();t.putString("id","minecraft:"+id);t.putInt("lvl",1000);tags.add(t);}tool.getOrCreateTag().put("Enchantments",tags);
+            for(var enchant:List.of(Enchantments.BLOCK_EFFICIENCY,Enchantments.BLOCK_FORTUNE,Enchantments.SILK_TOUCH,Enchantments.UNBREAKING,Enchantments.MENDING))h.assertTrue(tool.getEnchantmentLevel(enchant)==1000,"level 1000 preserved on "+k);
+        }h.succeed();
     }
 }

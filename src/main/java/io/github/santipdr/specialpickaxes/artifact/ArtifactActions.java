@@ -131,7 +131,7 @@ public final class ArtifactActions {
     public static List<WorkStep> bore(ServerPlayer p) {
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
         if(ArtifactState.mode(p,ArtifactKind.ICARUS)%2!=0) direction=direction.getOpposite();
-        int length=Math.min(ArtifactConfig.BORE_LENGTH.get(),ArtifactConfig.BORE_LENGTH.get());
+        int length=ArtifactConfig.BORE_LENGTH.get();
         var steps=new ArrayList<WorkStep>();
         for(int i=1;i<=length;i++) {
             var feet=p.blockPosition().relative(direction,i);
