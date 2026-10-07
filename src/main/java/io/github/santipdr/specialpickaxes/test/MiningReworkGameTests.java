@@ -215,4 +215,21 @@ public final class MiningReworkGameTests {
         }finish(h,p);
     }
 
+    @GameTest(template="empty") public static void rollbackNeverOverwritesCallbackIntroducedBarriers(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var at=h.absolutePos(new BlockPos(5,4,7));var other=at.east();p.getInventory().add(new ItemStack(Items.STONE,16));
+        for(var barrier:java.util.List.of(Blocks.BEDROCK.defaultBlockState(),Blocks.WATER.defaultBlockState(),Blocks.LAVA.defaultBlockState(),TestFluids.BLOCK.defaultBlockState(),Blocks.CHEST.defaultBlockState())){
+            java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent> change=e->{if(e.getPos().equals(at)){h.getLevel().setBlockAndUpdate(at,barrier);e.setCanceled(true);}};
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGH,change);
+            try{
+                h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+                h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,at,Blocks.STONE.defaultBlockState())&&h.getLevel().getBlockState(at)==barrier,"paid rollback preserves external barrier");
+                h.assertTrue(p.getInventory().countItem(Items.STONE)==16,"denied placement not charged");
+                h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+                h.assertTrue(!WorldSafety.transmute(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,at,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState())&&h.getLevel().getBlockState(at)==barrier,"transmutation rollback preserves external barrier");
+                h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(other,Blocks.BASALT.defaultBlockState());
+                h.assertTrue(!WorldSafety.exchange(p,p.getMainHandItem(),at,other,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState())&&h.getLevel().getBlockState(at)==barrier&&h.getLevel().getBlockState(other).is(Blocks.BASALT),"pair rollback preserves external barrier and restores its own other write");
+            }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(change);}
+        }finish(h,p);
+    }
+
 }

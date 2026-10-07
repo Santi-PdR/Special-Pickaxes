@@ -67,6 +67,11 @@ public final class WorldSafety {
         return p.serverLevel().getBlockState(pos).isAir() && state.canSurvive(p.serverLevel(),pos)
             && p.serverLevel().isUnobstructed(state,pos,net.minecraft.world.phys.shapes.CollisionContext.empty());
     }
+    private static void restoreOwned(net.minecraft.server.level.ServerLevel level,BlockSnapshot snapshot,BlockPos pos,BlockState placed){
+        // Roll back our tentative write, never a fluid/bedrock/machine installed by
+        // another listener. Unconditional rollback would destructively overwrite it.
+        if(level.hasChunkAt(pos)&&level.getBlockState(pos)==placed&&level.getFluidState(pos).isEmpty()&&placed.getFluidState().isEmpty())snapshot.restore(true,false);
+    }
     public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
         if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty()) return false;
         int paymentSlot=-1;
@@ -91,7 +96,7 @@ public final class WorldSafety {
             }
             accepted=true;return true;
         } finally {
-            if(!accepted) snapshot.restore(true,false);
+            if(!accepted) restoreOwned(level,snapshot,pos,state);
             else level.blockUpdated(pos,state.getBlock());
         }
     }
@@ -107,7 +112,7 @@ public final class WorldSafety {
                 && p.getMainHandItem()==tool && !tool.isEmpty();
             return accepted;
         } finally {
-            if(!accepted) snapshot.restore(true,false);
+            if(!accepted) restoreOwned(level,snapshot,pos,next);
             else level.blockUpdated(pos,next.getBlock());
         }
     }
@@ -132,7 +137,7 @@ public final class WorldSafety {
                 && level.getBlockState(a)==sb && level.getBlockState(b)==sa && p.getMainHandItem()==tool && !tool.isEmpty();
             return accepted;
         } finally {
-            if(!accepted) { oldA.restore(true,false);oldB.restore(true,false); }
+            if(!accepted) { restoreOwned(level,oldA,a,sb);restoreOwned(level,oldB,b,sa); }
             else { level.blockUpdated(a,sb.getBlock());level.blockUpdated(b,sa.getBlock()); }
         }
     }
