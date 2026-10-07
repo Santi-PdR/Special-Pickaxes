@@ -1,5 +1,12 @@
 name: Forge verification
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    paths-ignore:
+      - docs/mining-rework/VISUAL-REVIEW.json
+      - docs/mining-rework/STATUS.md
+      - README.md
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
   checks: write
