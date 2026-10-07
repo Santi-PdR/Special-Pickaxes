@@ -3,8 +3,8 @@
 import argparse,base64,hashlib,io,json,pathlib,re,subprocess,zipfile
 p=argparse.ArgumentParser();p.add_argument('sha');p.add_argument('run_id');p.add_argument('destination');args=p.parse_args()
 repo=subprocess.check_output(['gh','repo','view','--json','nameWithOwner','--jq','.nameWithOwner'],text=True).strip()
-raw=subprocess.check_output(['gh','api','--paginate','--slurp',f'repos/{repo}/commits/{args.sha}/check-runs?per_page=100'],text=True)
-checks=[c for c in [c for page in json.loads(raw) for c in page['check_runs']] if c['name'].startswith('Build evidence ') and f'Run {args.run_id}.' in c['output']['summary']]
+raw=subprocess.check_output(['gh','api','--paginate',f'repos/{repo}/commits/{args.sha}/check-runs?per_page=100','--jq','.check_runs[] | @json'],text=True)
+checks=[c for c in [json.loads(line) for line in raw.splitlines() if line.strip()] if c['name'].startswith('Build evidence ') and f'Run {args.run_id}.' in c['output']['summary']]
 if not checks:raise SystemExit('No evidence available for this run')
 checks.sort(key=lambda c:int(c['name'].split()[2].split('/')[0]))
 expected=int(checks[0]['name'].split('/')[-1])

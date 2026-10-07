@@ -60,8 +60,10 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),6));
         if(kind==ArtifactKind.PALIMPSEST) {
             var steps=new ArrayList<WorkStep>();
-            var center=target(p).orElse(p.blockPosition());
-            for(var memory:ArtifactState.memories(p,kind))if(memory.pos().distSqr(center)<=16*16)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
+            var memories=ArtifactState.memories(p,kind);var aimed=target(p).orElse(p.blockPosition());
+            // After mining, the ray can hit a distant wall beyond the remembered scar.
+            var center=memories.stream().anyMatch(m->m.pos().distSqr(aimed)<=16*16)?aimed:p.blockPosition();
+            for(var memory:memories)if(memory.pos().distSqr(center)<=16*16)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
             return WorkQueue.start(p,tool,kind,steps);
         }
 

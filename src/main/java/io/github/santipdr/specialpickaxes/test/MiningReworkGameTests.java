@@ -145,4 +145,36 @@ public final class MiningReworkGameTests {
         }h.succeed();
     }
 
+    @GameTest(template="empty") public static void crucibleRadialIsSphericalAndPreservesExcludedCells(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var c=p.blockPosition();
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",1);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.BASALT));
+        var near=c.east(2);var corner=c.offset(6,0,6);var ore=c.east(3);var machine=c.east(4);var fluid=c.west(2);var bedrock=c.west(3);var claimed=c.west(4);
+        h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(corner,Blocks.STONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(machine,Blocks.CHEST.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(fluid,TestFluids.BLOCK.defaultBlockState());h.getLevel().setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());h.getLevel().setBlockAndUpdate(claimed,Blocks.STONE.defaultBlockState());
+        java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> deny=e->{if(e.getPos().equals(claimed))e.setCanceled(true);};
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,deny);
+        try{h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"direct radial activation");for(int n=0;n<100&&WorkQueue.busy(p);n++)WorkQueue.tick();}
+        finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);}
+        h.assertTrue(h.getLevel().getBlockState(near).is(Blocks.BASALT),"eligible geology transformed");
+        h.assertTrue(h.getLevel().getBlockState(corner).is(Blocks.STONE)&&h.getLevel().getBlockState(claimed).is(Blocks.STONE),"no cuboid corners or protected changes");
+        h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(machine).is(Blocks.CHEST)&&h.getLevel().getBlockState(fluid).is(TestFluids.BLOCK)&&h.getLevel().getBlockState(bedrock).is(Blocks.BEDROCK),"excluded resources, inventories and physical barriers unchanged");finish(h,p);
+    }
+    @GameTest(template="empty") public static void staleSameKindToolIntentIsRejected(GameTestHelper h){
+        var p=player(h,ArtifactKind.AXIOM);var old=p.getMainHandItem().getTag().getUUID("controlIdentity");
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.AXIOM).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());
+        h.assertTrue(!RelicNetwork.accept(p,new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,old))&&!WorkQueue.busy(p),"same kind is not the same tool");finish(h,p);
+    }
+    @GameTest(template="empty") public static void selectionOwnershipAndIncompleteConfirmation(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var at=h.absolutePos(new BlockPos(5,4,7));
+        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"incomplete selection cannot execute");
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CRUCIBLE).get()));
+        h.assertTrue(!ArtifactInteraction.selecting(p)&&!WorkQueue.busy(p),"switching exact tool invalidates selection");
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);RelicControl.corner(p,at.east());
+        h.assertTrue(WorkQueue.busy(p),"second distinct corner submits one analysis");int pending=WorkQueue.remaining(p);RelicControl.corner(p,at.above());h.assertTrue(WorkQueue.remaining(p)==pending,"repeated click cannot add work");
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"cannot start another selection during active work");
+        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL);h.assertTrue(!WorkQueue.busy(p)&&!ArtifactInteraction.selecting(p),"cancel clears owned state");finish(h,p);
+    }
+
 }

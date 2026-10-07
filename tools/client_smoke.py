@@ -25,7 +25,7 @@ for i,id in enumerate(ids):
  commands.append(f'give @s specialpickaxes:{id}')
  commands.append(f'''summon minecraft:item_display {x} {y} 3 {{item:{{id:"specialpickaxes:{id}",Count:1b}},item_display:"gui",billboard:"center",brightness:{{block:15,sky:15}},transformation:{{scale:[1.5f,1.5f,1.5f],translation:[0.0f,0.0f,0.0f],left_rotation:[0.0f,0.0f,0.0f,1.0f],right_rotation:[0.0f,0.0f,0.0f,1.0f]}}}}''')
  commands.append(f'''summon minecraft:text_display {x} {y-0.85} 3 {{text:'{{"text":"{id}","color":"white"}}',billboard:"center",alignment:"center",background:0,line_width:200}}''')
-commands+=['item replace entity @s weapon.mainhand with specialpickaxes:worldbreaker{Enchantments:[{id:"minecraft:efficiency",lvl:1000},{id:"minecraft:unbreaking",lvl:1000}]}','tellraw @s {"text":"ARTIFACT_CLIENT_SMOKE_READY"}']
+commands+=['tellraw @s {"text":"ARTIFACT_CLIENT_SMOKE_READY"}']
 (functions/'setup.mcfunction').write_text('\n'.join(commands)+'\n')
 (root/'run/options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nrenderDistance:4\nsimulationDistance:5\nmaxFps:30\nguiScale:2\nsoundCategory_music:0.0\nlang:es_es\n')
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
