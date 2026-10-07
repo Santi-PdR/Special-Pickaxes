@@ -35,23 +35,17 @@ public final class ClientValidation {
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
             }
-            if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");}
+            if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");setupSupreme(p);}
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
                 if(index==SCENES.size()&&phase==0)p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));
                 var data=p.getPersistentData();
-                if(WorkQueue.busy(p)&&!data.getBoolean("controlActive")){data.putBoolean("controlActive",true);p.sendSystemMessage(Component.literal("CONTROL_ACTIVE"));}
+                if(WorkQueue.busy(p)&&!data.getBoolean("controlActive")){data.putBoolean("controlActive",true);WorkQueue.togglePause(p);p.sendSystemMessage(Component.literal("CONTROL_ACTIVE"));}
                 if(data.getBoolean("controlActive")&&!WorkQueue.busy(p)&&!data.getBoolean("controlCancelled")){data.putBoolean("controlCancelled",true);p.sendSystemMessage(Component.literal("CONTROL_CANCELLED"));}
                 if(data.getBoolean("controlCancelled")&&!data.getBoolean("supremeSetup")){
                     data.putBoolean("supremeSetup",true);
-                    for(int x=76;x<=124;x++)for(int z=100;z<=151;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                    p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
-                    for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                    p.connection.teleport(100.5,81,96.5,0,0);
-                    p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
-                    p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
-                    ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",4);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");
+                    setupSupreme(p);
                     p.sendSystemMessage(Component.literal("SUPREME_READY"));
                 }
                 if(data.getBoolean("supremeSetup")&&WorkQueue.busy(p)&&!data.getBoolean("supremeRunning")){
@@ -77,7 +71,11 @@ public final class ClientValidation {
                     var list=new net.minecraft.nbt.ListTag();var ench=new net.minecraft.nbt.CompoundTag();ench.putString("id","minecraft:efficiency");ench.putInt("lvl",1000);list.add(ench);stack.getOrCreateTag().put("Enchantments",list);
                     p.setItemInHand(InteractionHand.MAIN_HAND,stack);ArtifactState.of(p,k).putInt("mode",0);
                 } else if(ArtifactState.mode(p,k)!=scene.mode())throw new IllegalStateException("Real C key did not change mode: "+k+" expected "+scene.mode());
+                // CORE DRILL legitimately excavates under the actor. Restore the next
+                // scene's standing platform instead of inheriting that open shaft.
+                for(int x=-9;x<=9;x++)for(int z=-1;z<=17;z++)p.serverLevel().setBlock(new BlockPos(x,64,z),net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE.defaultBlockState(),2);
                 p.connection.teleport(0.5,65,14.5,180,-14);
+                p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.fallDistance=0;
                 for(int x=-6;x<=6;x++)for(int y=65;y<=72;y++)for(int z=4;z<=12;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
                 for(int x=-5;x<=-3;x++)for(int y=65;y<=67;y++)for(int z=6;z<=8;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
                 var rock=new BlockPos(0,67,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
@@ -102,4 +100,19 @@ public final class ClientValidation {
             }
         }
     }
+    private static void setupSupreme(net.minecraft.server.level.ServerPlayer p){
+        // Clear the approach as well as the workpiece: the disposable server world has
+        // natural terrain, which must not put the actor inside a tree or mountain.
+        for(int x=76;x<=124;x++)for(int z=90;z<=99;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                    for(int x=76;x<=124;x++)for(int z=100;z<=151;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                    p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
+                    for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                    p.connection.teleport(100.5,81,96.5,0,0);
+                    p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
+                    p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
+                    ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",4);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");
+        p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.fallDistance=0;
+        p.getMainHandItem().getOrCreateTag().putInt("artifactMode",4);
+    }
+
 }
