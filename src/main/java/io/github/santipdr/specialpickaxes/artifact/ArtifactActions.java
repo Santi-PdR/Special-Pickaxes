@@ -78,7 +78,10 @@ public final class ArtifactActions {
             var aimed=target(p);return aimed.isPresent()&&WorkQueue.startRegion(p,tool,kind,new OrefallProgram(aimed.get()));
         }
         if(kind==ArtifactKind.PALIMPSEST) {
-            var aimed=target(p);return aimed.isPresent()&&startVein(p,tool,aimed.get());
+            var aimed=target(p);if(aimed.isEmpty())return false;
+            var origin=aimed.get();var initial=p.serverLevel().getBlockState(origin);
+            return ArtifactOres.isOre(initial)&&WorldSafety.allowed(p,kind,origin)&&WorldSafety.harvestable(p,tool,origin)
+                    &&WorkQueue.startRegion(p,tool,kind,new ConnectedVeinProgram(origin,initial,ArtifactConfig.PALIMPSEST_VEIN_LIMIT.get()));
         }
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
@@ -133,23 +136,6 @@ public final class ArtifactActions {
             if(offset.distSqr(BlockPos.ZERO)<=48*48) steps.add(new WorkStep.Mine(center.offset(offset),memory.state()));
         }
         return steps;
-    }
-    private static boolean startVein(ServerPlayer p,ItemStack tool,BlockPos origin) {
-        var level=p.serverLevel();var initial=level.getBlockState(origin);
-        if(!ArtifactOres.isOre(initial)||!WorldSafety.harvestable(p,tool,origin))return false;
-        var steps=new ArrayList<WorkStep>();var seen=new HashSet<BlockPos>();var pending=new ArrayDeque<BlockPos>();
-        seen.add(origin.immutable());pending.add(origin.immutable());
-        while(!pending.isEmpty()&&steps.size()<ArtifactConfig.PALIMPSEST_VEIN_LIMIT.get()) {
-            var pos=pending.removeFirst();var state=level.getBlockState(pos);
-            if(!WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)||WorldSafety.barrier(p,pos)||state.getBlock()!=initial.getBlock())continue;
-            steps.add(new WorkStep.Mine(pos,state));
-            for(var direction:Direction.values()) {
-                var next=pos.relative(direction);
-                if(next.distSqr(origin)<=64&&seen.add(next.immutable())&&level.hasChunkAt(next)
-                        &&level.getBlockState(next).getBlock()==initial.getBlock())pending.addLast(next.immutable());
-            }
-        }
-        return WorkQueue.start(p,tool,ArtifactKind.PALIMPSEST,steps);
     }
     public static List<WorkStep> gravityPulse(ServerPlayer p,BlockPos broken,BlockState material,BlockPos fieldCenter,int mode) {
         var forward=p.getDirection();var side=forward.getClockWise();var candidates=new ArrayList<BlockPos>();

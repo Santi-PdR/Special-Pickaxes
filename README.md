@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.7.2** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. Las técnicas que afectan entidades comprueban permisos en la zona de cada objetivo. Iridium, Worldloom, Axiom y Crucible recorren sus áreas por turnos. Iridium vincula su resplandor y retorno únicamente a drops nuevos o aumentados por la rotura actual. Ícaro lanza al objetivo hacia arriba y atrás con una ráfaga visual propia. Las partículas de trabajo, ráfaga y enlace se envían solo al dueño del pico. Worldloom recupera hambre gradualmente. El Manual precisa las condiciones de las pasivas. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.8.0** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. Las técnicas que afectan entidades comprueban permisos en la zona de cada objetivo. Palimpsest, Iridium, Worldloom, Axiom y Crucible recorren sus áreas por turnos. Iridium vincula su resplandor y retorno únicamente a drops nuevos o aumentados por la rotura actual. Ícaro lanza al objetivo hacia arriba y atrás con una ráfaga visual propia. Las partículas de trabajo, ráfaga y enlace se envían solo al dueño del pico. Worldloom recupera hambre gradualmente. El Manual precisa las condiciones de las pasivas. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.7.2 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.8.0 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
