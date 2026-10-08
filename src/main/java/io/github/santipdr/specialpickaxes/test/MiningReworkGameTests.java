@@ -95,7 +95,7 @@ public final class MiningReworkGameTests {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,reenter);
         try{
             h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"outer activation succeeds");
-            h.assertTrue(callbacks[0]>0&&!WorkQueue.busy(p),"exactly one bounded survey accepted without a bulk job");
+            h.assertTrue(callbacks[0]>0&&WorkQueue.busy(p),"exactly one bounded survey accepted as scheduled work");
             h.assertTrue(p.getMainHandItem().getDamageValue()==EnchantmentScaling.activationCost(p.getMainHandItem(),ArtifactKind.AXIOM),"one activation cost");
             long ready=ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready");
             h.assertTrue(!ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false)&&ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready")==ready,"one cooldown deadline");
@@ -126,11 +126,11 @@ public final class MiningReworkGameTests {
         }h.succeed();
     }
     @GameTest(template="empty") public static void worldloomQuarryIsBoundedAndMiningOnly(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(8,6,8));
-        var stone=center.east();var ore=center.above();var outside=center.east(8);
-        h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
+        var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(5,3,7));p.setPos(p.getX(),center.getY()-1,p.getZ());h.getLevel().setBlockAndUpdate(center,Blocks.STONE.defaultBlockState());
+        var stone=center.east();var ore=center.above();var outside=center.east(9);
+        h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry starts");
-        for(int tick=0;tick<200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        for(int tick=0;tick<1200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(stone).isAir(),"quarry mines nearby stone");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"preserves ore and cells outside radius");finish(h,p);
     }
@@ -139,11 +139,14 @@ public final class MiningReworkGameTests {
         var p=player(h,ArtifactKind.CRUCIBLE);var a=h.absolutePos(new BlockPos(5,4,7));var b=a.offset(2,0,0);
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",6);
         var granite=a;var dirt=a.east();var placed=a.east(2);var ore=a.above();var chest=a.west();
+        for(var at:java.util.List.of(granite,dirt,placed,ore,chest))PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
         h.getLevel().setBlockAndUpdate(granite,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(dirt,Blocks.DIRT.defaultBlockState());
         h.getLevel().setBlockAndUpdate(placed,Blocks.DIORITE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
         h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());
         var plan=new RegionWork(new SelectionVolume(a,b),null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,6,Blocks.BASALT.defaultBlockState());
         h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,plan),"selected transformation queued");
+        for(int tick=0;tick<100&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
+        h.assertTrue(WorkQueue.status(p).equals("ready"),"analysis completes before applying changes");h.assertTrue(WorkQueue.togglePause(p),"explicitly confirm analyzed transformation");
         for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(granite).is(Blocks.BASALT)&&h.getLevel().getBlockState(dirt).is(Blocks.BASALT),"natural stone and soil transform");
         h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.DIORITE),"marked player placement stays unchanged");

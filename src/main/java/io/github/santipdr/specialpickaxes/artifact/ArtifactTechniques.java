@@ -12,7 +12,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -286,27 +285,39 @@ public final class ArtifactTechniques {
         return recalled>0;
     }
 
-    private static boolean quenchLava(ServerPlayer player) {
-        Vec3 from = player.getEyePosition(), to = from.add(player.getLookAngle().scale(24));
-        var hit = player.serverLevel().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));
-        if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) return false;
-        BlockPos pos = hit.getBlockPos();
-        var level = player.serverLevel();
-        var before = level.getBlockState(pos);
-        var fluid = level.getFluidState(pos);
-        if (!fluid.is(net.minecraft.tags.FluidTags.LAVA) || !fluid.isSource() || before.hasBlockEntity()
-                || !WorldSafety.allowed(player, ArtifactKind.HELLSPEC, pos)
-                || net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) return false;
-        var snapshot = BlockSnapshot.create(level.dimension(), level, pos);
-        var obsidian = Blocks.OBSIDIAN.defaultBlockState();
-        if (!level.setBlock(pos, obsidian, 3)) return false;
-        if (ForgeEventFactory.onBlockPlace(player, snapshot, Direction.UP) || level.getBlockState(pos) != obsidian) {
-            if (level.hasChunkAt(pos) && level.getBlockState(pos) == obsidian) snapshot.restore(true, false);
-            return false;
+    private static boolean quenchLava(ServerPlayer player,ItemStack tool) {
+        var level=player.serverLevel();Vec3 from=player.getEyePosition(),look=player.getLookAngle().normalize();
+        var steps=new java.util.ArrayList<WorkStep>(24);BlockPos previous=null;
+        for(int sample=1;sample<=96&&steps.size()<24;sample++){
+            Vec3 point=from.add(look.scale(sample*.25));BlockPos pos=BlockPos.containing(point);
+            if(pos.equals(previous))continue;previous=pos;
+            if(!level.hasChunkAt(pos))break;
+            var state=level.getBlockState(pos);var fluid=level.getFluidState(pos);
+            if(fluid.is(net.minecraft.tags.FluidTags.LAVA)){
+                if(!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))break;
+                if(fluid.isSource()&&!state.hasBlockEntity())steps.add(new WorkStep(){
+                    @Override public BlockPos pos(){return pos;}
+                    @Override public boolean apply(ServerPlayer actor,ItemStack held,ArtifactKind kind){
+                        var current=level.getBlockState(pos);var currentFluid=level.getFluidState(pos);
+                        if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)||!currentFluid.isSource()
+                                ||current.hasBlockEntity()||!WorldSafety.allowed(actor,kind,pos)
+                                ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,actor.gameMode.getGameModeForPlayer(),actor,pos)<0)return false;
+                        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
+                        if(!level.setBlock(pos,obsidian,3))return false;
+                        if(ForgeEventFactory.onBlockPlace(actor,snapshot,Direction.UP)||level.getBlockState(pos)!=obsidian){
+                            if(level.hasChunkAt(pos)&&level.getBlockState(pos)==obsidian&&level.getFluidState(pos).isEmpty())snapshot.restore(true,false);
+                            return false;
+                        }
+                        level.blockUpdated(pos,Blocks.OBSIDIAN);ArtifactFeedback.burst(actor,ArtifactKind.HELLSPEC,pos,3);return true;
+                    }
+                });
+                continue;
+            }
+            if(!fluid.isEmpty()||!state.getCollisionShape(level,pos).isEmpty())break;
         }
-        level.blockUpdated(pos, Blocks.OBSIDIAN);
-        ArtifactFeedback.message(player, "lava_quenched");
-        return true;
+        if(steps.isEmpty())return false;
+        int sources=steps.size();if(!WorkQueue.start(player,tool,ArtifactKind.HELLSPEC,steps))return false;
+        ArtifactFeedback.message(player,"lava_quenched",sources);return true;
     }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
@@ -324,7 +335,7 @@ public final class ArtifactTechniques {
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfold(player);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
-            case HELLSPEC -> quenchLava(player);
+            case HELLSPEC -> quenchLava(player,tool);
             default -> false;
         };
     }

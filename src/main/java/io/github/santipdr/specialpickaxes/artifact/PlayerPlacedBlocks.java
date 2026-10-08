@@ -25,6 +25,9 @@ public final class PlayerPlacedBlocks extends SavedData {
     public void mark(BlockPos pos) {
         if (positions.add(pos.asLong())) setDirty();
     }
+    public void unmark(BlockPos pos) {
+        if (positions.remove(pos.asLong())) setDirty();
+    }
 
     public boolean contains(BlockPos pos) { return positions.contains(pos.asLong()); }
 
