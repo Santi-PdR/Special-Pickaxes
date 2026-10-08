@@ -22,10 +22,10 @@
   },
   {
     "artifact": "paradox_crucible",
-    "archive": "referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar",
-    "entry": "assets/custompickaxes/textures/item/volcanite_pickaxe.png",
-    "sha256": "efa0619fba03d2a0d639f792bfa139ec254d508a23b972e1ee7708a4d88149d8",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/fire_pickaxe.png",
+    "sha256": "b0d60836e9ca8d3db42ac47647317ba5e1a1db479456f62c98977f6921de312c",
+    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
   },
   {
     "artifact": "interregnum",
