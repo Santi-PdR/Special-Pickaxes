@@ -42,7 +42,8 @@ public final class RelicControl {
                         ArtifactFeedback.message(p,"resumed");ArtifactFeedback.cue(p,"select");return true;
                     }
                     if(status.equals("ready"))return confirm(p);
-                    return false;
+                    if(!WorkQueue.togglePause(p))return false;
+                    p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
                 if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k))){ArtifactFeedback.message(p,"select_key");return false;}
                 return ArtifactActions.use(p,tool,k,false);

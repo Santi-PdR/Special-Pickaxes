@@ -27,7 +27,6 @@ public final class ArtifactTooltips {
         a.add(RelicControl.Action.ALT_SKILL);
         if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
         a.add(RelicControl.Action.CANCEL);
-        if(!CompanionActions.handles(k)&&k!=ArtifactKind.AEGIS&&k!=ArtifactKind.INTERREGNUM&&k!=ArtifactKind.MERIDIAN)a.add(RelicControl.Action.PAUSE);
         return a;
     }
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){

@@ -21,7 +21,7 @@ public final class RelicKeys {
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
     @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT,bus=Mod.EventBusSubscriber.Bus.MOD)
     public static final class Registration {
-        @SubscribeEvent public static void register(RegisterKeyMappingsEvent e){for(var action:RelicControl.Action.values())if(action!=RelicControl.Action.CONFIRM)e.register(KEYS[action.ordinal()]);e.register(MANUAL);}
+        @SubscribeEvent public static void register(RegisterKeyMappingsEvent e){for(var action:RelicControl.Action.values())if(action!=RelicControl.Action.CONFIRM&&action!=RelicControl.Action.PAUSE)e.register(KEYS[action.ordinal()]);e.register(MANUAL);}
     }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
@@ -33,7 +33,7 @@ public final class RelicKeys {
             else {var equipped=CuriosCompat.find(mc.player);if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)mc.setScreen(new ArtifactManualScreen(item.kind));}
         }
         for(var a:RelicControl.Action.values()){
-            if(a==RelicControl.Action.CONFIRM)continue;
+            if(a==RelicControl.Action.CONFIRM||a==RelicControl.Action.PAUSE)continue;
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(!edge||mc.screen!=null||mc.player==null)continue;
