@@ -46,6 +46,8 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
         boolean damaged=super.hurtEnemy(stack,target,attacker);
         if(damaged&&attacker instanceof ServerPlayer player) {
+            if(target.isAlliedTo(player)||target instanceof Player other&&!player.canHarmPlayer(other)
+                    ||!WorldSafety.allowed(player,kind,target.blockPosition()))return damaged;
             switch(kind) {
                 case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,true,true)); }
                 case CHOIR -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,160,2,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,100,1,false,true,true)); }
