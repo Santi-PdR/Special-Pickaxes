@@ -72,7 +72,7 @@ public final class SpecialPickaxes {
         MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,e.getPos(),e.getState());
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
-    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
+    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
         if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.selecting(p)){
             if(e.getAction()==net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.Action.START)RelicControl.corner(p,e.getPos());
@@ -81,16 +81,16 @@ public final class SpecialPickaxes {
     }
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) {
-            MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();
+            MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();WorldloomSnare.tick();
             for(var level:e.getServer().getAllLevels())for(var player:level.players())if(player.tickCount%10==0){
                 var equipped=CuriosCompat.find(player);
                 if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.tick(player,pick.kind);
             }
         }
     }
-    private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
+    private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
@@ -99,7 +99,7 @@ public final class SpecialPickaxes {
             var state=clean.getCompound(kind.id);state.remove("a");state.remove("b");state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
         }
         e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
-        if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p); }
+        if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.playableValues()) {

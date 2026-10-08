@@ -213,13 +213,11 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean pullTarget(ServerPlayer player, double range, double strength) {
+    private static boolean rootSnare(ServerPlayer player, double range) {
         LivingEntity target = targetInLook(player, ArtifactKind.WORLDLOOM, range);
         if (target == null) return false;
-        Vec3 pull = player.position().subtract(target.position()).normalize().scale(strength);
-        target.setDeltaMovement(target.getDeltaMovement().add(pull));
-        target.hasImpulse = true;
-        return true;
+        if(!WorldloomSnare.bind(player,target))return false;
+        ArtifactFeedback.message(player,"root_snared",target.getDisplayName());return true;
     }
 
     private static LivingEntity targetInLook(ServerPlayer player, ArtifactKind kind, double range) {
@@ -295,7 +293,7 @@ public final class ArtifactTechniques {
             case INTERREGNUM -> ArtifactState.mode(player,kind)==1
                     ? arrestMotion(player,kind,player.blockPosition(),8,24)
                     : DomainFields.relocate(player,aimed(player));
-            case WORLDLOOM -> pullTarget(player, 10, .9);
+            case WORLDLOOM -> rootSnare(player, 10);
             case ICARUS -> knockbackTarget(player, kind, 7, 1.35);
             case AXIOM -> pullHostiles(player, kind, aimed(player), 9, 24);
             case WORLDBREAKER -> echo(player, tool, 2);
