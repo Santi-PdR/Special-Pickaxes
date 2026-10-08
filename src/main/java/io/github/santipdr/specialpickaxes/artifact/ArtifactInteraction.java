@@ -26,8 +26,9 @@ public final class ArtifactInteraction {
         default->new String[]{"retired"};};}
     public static int modeCount(ArtifactKind k){return modes(k).length;}
     public static String modeKey(ArtifactKind k,int mode){return modes(k)[Math.floorMod(mode,modeCount(k))];}
-    public static void clear(ServerPlayer p){SELECTED.remove(p.getUUID());}
-    public static void clear(){SELECTED.clear();}
+    private static void resetDisplay(Selection selection){if(selection!=null&&!selection.tool.isEmpty())selection.tool.getOrCreateTag().putString("artifactStatus","idle");}
+    public static void clear(ServerPlayer p){resetDisplay(SELECTED.remove(p.getUUID()));}
+    public static void clear(){SELECTED.values().forEach(ArtifactInteraction::resetDisplay);SELECTED.clear();}
     private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.mode(p,s.kind)==s.mode&&ArtifactState.dimension(p).equals(s.dimension)&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
     private static Selection selection(ServerPlayer p){var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);return null;}return s;}
     public static boolean selecting(ServerPlayer p){return selection(p)!=null;}
@@ -38,7 +39,7 @@ public final class ArtifactInteraction {
         if(s.submitted||s.points.size()==2)return true;
         if(s.points.contains(pos)){ArtifactFeedback.message(p,"duplicate_corner");return true;}
         if(!WorldSafety.allowed(p,s.kind,pos)||p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos))>32*32){ArtifactFeedback.message(p,"selection_invalid");return true;}
-        s.points.add(pos.immutable());ArtifactFeedback.cue(p,"select");ArtifactFeedback.message(p,"corner",s.points.size());return true;
+        s.points.add(pos.immutable());ArtifactFeedback.cue(p,"select");ArtifactFeedback.message(p,"corner",s.points.size());display(p,s.tool,s.kind);return true;
     }
     public static void analyzeComplete(ServerPlayer p){
         var s=selection(p);if(s==null||s.submitted||s.points.size()!=2||WorkQueue.busy(p))return;
@@ -55,9 +56,9 @@ public final class ArtifactInteraction {
         if(!regional(kind,ArtifactState.mode(p,kind)))return ArtifactActions.use(p,tool,kind,false);
         if(WorkQueue.busy(p))return false;
         var selected=selection(p);
-        if(selected==null){SELECTED.put(p.getUUID(),new Selection(p,tool,kind));ArtifactFeedback.message(p,"armed");return true;}
+        if(selected==null){SELECTED.put(p.getUUID(),new Selection(p,tool,kind));ArtifactFeedback.message(p,"armed");display(p,tool,kind);return true;}
         if(selected.points.size()<2){ArtifactFeedback.message(p,"need_corners",selected.points.size(),2);return true;}
-        analyzeComplete(p);return true;
+        analyzeComplete(p);display(p,tool,kind);return true;
     }
     public static void display(ServerPlayer p,ItemStack tool,ArtifactKind kind){
         var s=selection(p);String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?"selecting":DomainFields.active(p)?"domain":"idle";

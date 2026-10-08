@@ -25,6 +25,10 @@ public final class ArtifactItem extends PickaxeItem {
     }
     @Override public InteractionResult useOn(UseOnContext context) { return InteractionResult.PASS; }
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) {
+        if(ArtifactInteraction.regional(kind,ArtifactTooltips.mode(stack))&&stack.hasTag()){
+            String status=stack.getTag().getString("artifactStatus");
+            if(status.equals("selecting")||status.equals("preparing")||status.equals("ready")||status.equals("paused")||status.equals("executing"))return 1F;
+        }
         if(!ArtifactTools.effective(state))return super.getDestroySpeed(stack,state);
         boolean ore=ArtifactOres.isOre(state),stone=MiningDesigns.matrix(state);
         return switch(kind){
