@@ -50,6 +50,7 @@ public final class SpecialPickaxes {
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
+        forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::schedulePlacedBlockCleanup);
         forge.addListener(this::curiosIridiumMine);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
         forge.addListener(this::fall);
@@ -63,6 +64,10 @@ public final class SpecialPickaxes {
                 &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
                 &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||ArtifactOres.isOre(level.getBlockState(e.getPos()))))
             PlayerPlacedBlocks.get(level).mark(e.getPos());
+    }
+    private void schedulePlacedBlockCleanup(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
+        if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
+            PlayerPlacedBlocks.scheduleCleanup(level,e.getPos());
     }
     private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
@@ -81,14 +86,14 @@ public final class SpecialPickaxes {
     }
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) {
-            MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();WorldloomSnare.tick();
+            MiningObservations.flush();PlayerPlacedBlocks.tickCleanup();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();WorldloomSnare.tick();
             for(var level:e.getServer().getAllLevels())for(var player:level.players())if(player.tickCount%10==0){
                 var equipped=CuriosCompat.find(player);
                 if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.tick(player,pick.kind);
             }
         }
     }
-    private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
+    private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) { io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
