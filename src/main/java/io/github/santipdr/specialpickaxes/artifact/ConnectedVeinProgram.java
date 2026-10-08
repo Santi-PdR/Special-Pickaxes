@@ -13,18 +13,21 @@ public final class ConnectedVeinProgram implements WorkProgram {
     private final BlockPos origin;
     private final Block ore;
     private final Set<net.minecraft.tags.TagKey<Block>> families;
+    private final String registryFamily;
     private final int limit;
     private final ArrayDeque<BlockPos> frontier=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
     private int accepted;
 
     public ConnectedVeinProgram(BlockPos origin,BlockState initial,int limit){
-        this.origin=origin.immutable();this.ore=initial.getBlock();this.families=ArtifactOres.veinFamilies(initial);this.limit=Math.max(1,limit);
+        this.origin=origin.immutable();this.ore=initial.getBlock();this.families=ArtifactOres.veinFamilies(initial);
+        this.registryFamily=ArtifactOres.registryOreFamily(this.ore);this.limit=Math.max(1,limit);
         frontier.add(this.origin);seen.add(this.origin);
     }
 
     private boolean sameOreFamily(BlockState state){
-        return state.getBlock()==ore||!families.isEmpty()&&state.getTags().anyMatch(families::contains);
+        if(state.getBlock()==ore||!families.isEmpty()&&state.getTags().anyMatch(families::contains))return true;
+        return registryFamily!=null&&registryFamily.equals(ArtifactOres.registryOreFamily(state.getBlock()));
     }
 
     @Override public int remaining(){return Math.max(0,limit-accepted);}
