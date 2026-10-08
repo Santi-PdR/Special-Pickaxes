@@ -45,7 +45,7 @@ public final class RelicControl {
                     if(!WorkQueue.togglePause(p))return false;
                     p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
-                if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k))){ArtifactFeedback.message(p,"select_key");return false;}
+                if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
                 if(WorkQueue.busy(p))return false;

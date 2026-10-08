@@ -20,7 +20,7 @@ public final class RelicAura {
         if(mc.player==null||mc.level==null||!(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item)){equipped=null;return;}
         if(mc.isPaused()||mc.options.hideGui||mc.player.tickCount%4!=0)return;
         if(equipped!=item.kind){equipped=item.kind;
-            var action=ArtifactInteraction.regional(item.kind,ArtifactTooltips.mode(mc.player.getMainHandItem()))?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE;
+            var action=RelicControl.Action.ACTIVATE;
             mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
         }
         var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();

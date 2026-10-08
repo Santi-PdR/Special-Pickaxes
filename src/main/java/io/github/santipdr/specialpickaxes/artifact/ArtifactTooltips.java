@@ -21,9 +21,8 @@ public final class ArtifactTooltips {
         return actions(ItemStack.EMPTY,k,mode);
     }
     public static List<RelicControl.Action> actions(ItemStack stack,ArtifactKind k,int mode){
-        var a=new ArrayList<RelicControl.Action>();boolean region=ArtifactInteraction.regional(k,mode);
-        a.add(region?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE);
-        if(region)a.add(RelicControl.Action.ACTIVATE);
+        var a=new ArrayList<RelicControl.Action>();
+        a.add(RelicControl.Action.ACTIVATE);
         a.add(RelicControl.Action.ALT_SKILL);
         if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
         a.add(RelicControl.Action.CANCEL);

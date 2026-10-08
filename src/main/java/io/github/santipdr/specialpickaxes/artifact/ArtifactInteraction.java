@@ -54,7 +54,9 @@ public final class ArtifactInteraction {
         if(secondary){WorkQueue.cancel(p);DomainFields.stop(p);clear(p);return true;}
         if(!regional(kind,ArtifactState.mode(p,kind)))return ArtifactActions.use(p,tool,kind,false);
         if(WorkQueue.busy(p))return false;
-        if(selection(p)==null){SELECTED.put(p.getUUID(),new Selection(p,tool,kind));ArtifactFeedback.message(p,"armed");return true;}
+        var selected=selection(p);
+        if(selected==null){SELECTED.put(p.getUUID(),new Selection(p,tool,kind));ArtifactFeedback.message(p,"armed");return true;}
+        if(selected.points.size()<2){ArtifactFeedback.message(p,"need_corners",selected.points.size(),2);return true;}
         analyzeComplete(p);return true;
     }
     public static void display(ServerPlayer p,ItemStack tool,ArtifactKind kind){
