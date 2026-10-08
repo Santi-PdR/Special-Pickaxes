@@ -31,6 +31,22 @@ public final class ArtifactTooltips {
         return a;
     }
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){
-        compact(stack,k,lines);
+        String mode=ArtifactInteraction.modeKey(k,mode(stack));
+        section(lines,"manual4.what",Component.translatable("mining.identity."+k.id+"."+mode));
+        section(lines,"manual4.how",Component.translatable("mining.how."+k.id+"."+mode));
+        section(lines,"screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+k.id));
+        section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
+        section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));
+        section(lines,"screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios_passive"));
+        if(ArtifactInteraction.modeCount(k)>1)section(lines,"manual4.mode",Component.translatable("mode.specialpickaxes."+mode));
+        int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
+        int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
+        section(lines,"manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)));
+        section(lines,"manual4.limits",Component.translatable("mining.limits"));
+        section(lines,"manual4.controls",Component.translatable("tooltip.specialpickaxes.controls"));
+    }
+    private static void section(List<Component> lines,String heading,Component body){
+        lines.add(Component.translatable(heading).withStyle(ChatFormatting.GOLD));
+        lines.add(body.copy().withStyle(ChatFormatting.GRAY));
     }
 }

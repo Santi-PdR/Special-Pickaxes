@@ -346,7 +346,7 @@ public final class PickaxeGameTests {
         for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
-            h.assertTrue(compact.size()==1&&expanded.size()>=9,"compact identity/mode/hint and advanced manual "+k);
+            h.assertTrue(compact.size()==3&&expanded.size()>=9,"compact R/X/passive tooltip and complete manual "+k);
         }h.succeed();
     }
     @GameTest(template="empty") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
