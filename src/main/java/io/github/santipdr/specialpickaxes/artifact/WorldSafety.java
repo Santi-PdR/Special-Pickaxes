@@ -20,7 +20,8 @@ public final class WorldSafety {
         Blocks.STONE_BRICKS,Blocks.BRICKS,Blocks.DEEPSLATE_BRICKS,Blocks.DEEPSLATE_TILES,Blocks.BLACKSTONE,Blocks.POLISHED_BLACKSTONE,
         Blocks.QUARTZ_BLOCK,Blocks.SMOOTH_QUARTZ,Blocks.TERRACOTTA,Blocks.GLASS,Blocks.OAK_PLANKS,Blocks.SPRUCE_PLANKS,Blocks.BIRCH_PLANKS,
         Blocks.JUNGLE_PLANKS,Blocks.ACACIA_PLANKS,Blocks.DARK_OAK_PLANKS,Blocks.MANGROVE_PLANKS,Blocks.CHERRY_PLANKS,
-        Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK);
+        Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK,
+        Blocks.DIRT,Blocks.COARSE_DIRT,Blocks.GRASS_BLOCK,Blocks.PODZOL,Blocks.ROOTED_DIRT,Blocks.GRAVEL,Blocks.DRIPSTONE_BLOCK,Blocks.POINTED_DRIPSTONE);
     private WorldSafety() {}
     private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected){}
     private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
@@ -103,7 +104,7 @@ public final class WorldSafety {
         }
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
-        if(expected==next || kind==ArtifactKind.CRUCIBLE&&!MiningDesigns.matrix(expected) || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
+        if(expected==next || kind==ArtifactKind.CRUCIBLE&&(!MiningDesigns.crucibleGeology(expected)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
                 || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(pos)!=expected) return false;

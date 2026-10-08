@@ -16,6 +16,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.*;
 import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.*;
@@ -47,11 +48,19 @@ public final class SpecialPickaxes {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
+        forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
+        forge.addListener(this::fall);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
     private void protectPhysicalLimit(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.getPlayer() instanceof ServerPlayer p&&(WorldSafety.changedDuringBreakEvent(p,e.getPos())||p.getMainHandItem().getItem() instanceof ArtifactItem&&WorldSafety.barrier(p,e.getPos())))e.setCanceled(true);
+    }
+    private void trackPlayerPlacedBlocks(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent e){
+        if(!e.isCanceled()&&e.getEntity() instanceof net.minecraft.world.entity.player.Player
+                &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
+                &&MiningDesigns.crucibleGeology(level.getBlockState(e.getPos())))
+            PlayerPlacedBlocks.get(level).mark(e.getPos());
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
@@ -98,6 +107,7 @@ public final class SpecialPickaxes {
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
     }
+    private void fall(LivingFallEvent e){if(e.getEntity() instanceof ServerPlayer p&&WorkQueue.protectsFall(p))e.setCanceled(true);}
     private void commands(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
             .then(Commands.literal("grant").then(Commands.argument("player",EntityArgument.player())

@@ -64,8 +64,8 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty") public static void ninePlayableMiningArtifacts(GameTestHelper h){
         h.assertTrue(SpecialPickaxes.PICKS.size()==9,"exact final roster");
         for(var kind:ArtifactKind.values())h.assertTrue(SpecialPickaxes.PICKS.containsKey(kind)==kind.playable(),"retired artifact not registered: "+kind);
-        for(int mode=0;mode<5;mode++)h.assertTrue(!ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,mode),"all Worldbreaker modes directional");
-        h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.WORLDLOOM)==3,"three Worldloom modes");h.succeed();
+        for(int mode=0;mode<6;mode++)h.assertTrue(ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,mode)==(mode==5),"only region break selects corners");
+        h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.WORLDLOOM)==1,"Worldloom has one mining mode");h.succeed();
     }
     @GameTest(template="empty") public static void carveStopsAtForgeFluid(GameTestHelper h){
         h.assertTrue(TestFluids.BLOCK.defaultBlockState().getFluidState().getFluidType()==TestFluids.TYPE,"genuine foreign Forge FluidType");barrier(h,TestFluids.BLOCK.defaultBlockState());
@@ -95,7 +95,7 @@ public final class MiningReworkGameTests {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,reenter);
         try{
             h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"outer activation succeeds");
-            h.assertTrue(callbacks[0]>0&&WorkQueue.busy(p),"exactly one outer job accepted");
+            h.assertTrue(callbacks[0]>0&&!WorkQueue.busy(p),"exactly one bounded survey accepted without a bulk job");
             h.assertTrue(p.getMainHandItem().getDamageValue()==EnchantmentScaling.activationCost(p.getMainHandItem(),ArtifactKind.AXIOM),"one activation cost");
             long ready=ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready");
             h.assertTrue(!ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false)&&ArtifactState.of(p,ArtifactKind.AXIOM).getLong("ready")==ready,"one cooldown deadline");
@@ -104,7 +104,7 @@ public final class MiningReworkGameTests {
 
     @GameTest(template="empty") public static void allDirectionalShapesStopBehindBarrier(GameTestHelper h){
         for(var shape:DirectionalProgram.Shape.values()){
-            var kind=shape==DirectionalProgram.Shape.ICARUS?ArtifactKind.ICARUS:ArtifactKind.WORLDBREAKER;
+            var kind=shape==DirectionalProgram.Shape.ICARUS||shape==DirectionalProgram.Shape.ICARUS_WIDE?ArtifactKind.ICARUS:ArtifactKind.WORLDBREAKER;
             var p=player(h,kind);var at=h.absolutePos(new BlockPos(8,30,8));p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
             for(int x=-20;x<=20;x+=4)h.getLevel().getChunkAt(at.offset(x,0,0));
             var dir=shape==DirectionalProgram.Shape.CORE_DRILL?Direction.DOWN:Direction.SOUTH;
@@ -125,44 +125,29 @@ public final class MiningReworkGameTests {
             }WorkQueue.cancel(p);
         }h.succeed();
     }
-    @GameTest(template="empty") public static void worldloomAllModesOrientPayAndRespectOccupancy(GameTestHelper h){
-        for(int mode=0;mode<3;mode++)for(int yaw:new int[]{0,90,180,270}){
-            var p=player(h,ArtifactKind.WORLDLOOM);p.setYRot(yaw);var origin=h.absolutePos(new BlockPos(8,30+mode*8,8));
-            p.setPos(origin.getX()+.5,origin.getY()+1,origin.getZ()-2.5);
-            ArtifactState.of(p,ArtifactKind.WORLDLOOM).putInt("mode",mode);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,64));
-            for(int n=0;n<4;n++)p.getInventory().add(new ItemStack(Items.STONE,64));
-            var plan=ArtifactActions.weave(p,origin);var positions=new java.util.HashSet<BlockPos>();
-            for(var step:plan){h.assertTrue(positions.add(step.pos()),"no duplicate placement positions");h.getLevel().setBlockAndUpdate(step.pos(),Blocks.AIR.defaultBlockState());}
-            if(mode==0)h.assertTrue(!positions.contains(origin.above())&&!positions.contains(origin.above(2)),"two-block doorway remains open");
-            if(mode==1)h.assertTrue(positions.contains(origin.relative(p.getDirection(),47)),"bridge follows heading");
-            if(mode==2)h.assertTrue(positions.contains(origin.relative(p.getDirection().getClockWise(),4).above(6)),"wall across heading");
-            var occupied=plan.get(10).pos();var protectedCell=plan.get(5).pos();h.getLevel().setBlockAndUpdate(occupied,Blocks.DIAMOND_BLOCK.defaultBlockState());
-            java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent> deny=e->{if(e.getPos().equals(protectedCell))e.setCanceled(true);};
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,deny);
-            int before=p.getInventory().countItem(Items.STONE);
-            try{WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,plan);for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();}
-            finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);}
-            long placed=positions.stream().filter(pos->h.getLevel().getBlockState(pos).is(Blocks.STONE)).count();
-            h.assertTrue(placed>0&&before-p.getInventory().countItem(Items.STONE)==placed,"one real material per successful placement");
-            h.assertTrue(h.getLevel().getBlockState(occupied).is(Blocks.DIAMOND_BLOCK)&&h.getLevel().getBlockState(protectedCell).isAir(),"occupied and claimed cells preserved");
-            WorkQueue.cancel(p);
-        }h.succeed();
+    @GameTest(template="empty") public static void worldloomQuarryIsBoundedAndMiningOnly(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(8,6,8));
+        var stone=center.east();var ore=center.above();var outside=center.east(8);
+        h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry starts");
+        for(int tick=0;tick<200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(stone).isAir(),"quarry mines nearby stone");
+        h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"preserves ore and cells outside radius");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void crucibleRadialIsSphericalAndPreservesExcludedCells(GameTestHelper h){
-        var p=player(h,ArtifactKind.CRUCIBLE);var c=p.blockPosition();
-        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",1);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.BASALT));
-        var near=c.east(2);var corner=c.offset(6,0,6);var ore=c.east(3);var machine=c.east(4);var fluid=c.west(2);var bedrock=c.west(3);var claimed=c.west(4);
-        h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(corner,Blocks.STONE.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(machine,Blocks.CHEST.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(fluid,TestFluids.BLOCK.defaultBlockState());h.getLevel().setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());h.getLevel().setBlockAndUpdate(claimed,Blocks.STONE.defaultBlockState());
-        java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> deny=e->{if(e.getPos().equals(claimed))e.setCanceled(true);};
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,deny);
-        try{h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"direct radial activation");for(int n=0;n<100&&WorkQueue.busy(p);n++)WorkQueue.tick();}
-        finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);}
-        h.assertTrue(h.getLevel().getBlockState(near).is(Blocks.BASALT),"eligible geology transformed");
-        h.assertTrue(h.getLevel().getBlockState(corner).is(Blocks.STONE)&&h.getLevel().getBlockState(claimed).is(Blocks.STONE),"no cuboid corners or protected changes");
-        h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(machine).is(Blocks.CHEST)&&h.getLevel().getBlockState(fluid).is(TestFluids.BLOCK)&&h.getLevel().getBlockState(bedrock).is(Blocks.BEDROCK),"excluded resources, inventories and physical barriers unchanged");finish(h,p);
+    @GameTest(template="empty") public static void crucibleSelectsGeologyAndProtectsPlacedBlocks(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var a=h.absolutePos(new BlockPos(5,4,7));var b=a.offset(2,0,0);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",6);
+        var granite=a;var dirt=a.east();var placed=a.east(2);var ore=a.above();var chest=a.west();
+        h.getLevel().setBlockAndUpdate(granite,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(dirt,Blocks.DIRT.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(placed,Blocks.DIORITE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());
+        var plan=new RegionWork(new SelectionVolume(a,b),null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,6,Blocks.BASALT.defaultBlockState());
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,plan),"selected transformation queued");
+        for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(granite).is(Blocks.BASALT)&&h.getLevel().getBlockState(dirt).is(Blocks.BASALT),"natural stone and soil transform");
+        h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.DIORITE),"marked player placement stays unchanged");
+        h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST),"ore and inventory stay unchanged");finish(h,p);
     }
     @GameTest(template="empty") public static void staleSameKindToolIntentIsRejected(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var old=p.getMainHandItem().getTag().getUUID("controlIdentity");

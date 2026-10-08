@@ -26,6 +26,7 @@ public final class WorkQueue {
     }
     private WorkQueue() {}
     public static boolean running() { return running; }
+    public static boolean protectsFall(ServerPlayer p){var job=JOBS.get(p.getUUID());return job!=null&&job.tool==p.getMainHandItem()&&(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3);}
     public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&(p.getMainHandItem()!=j.tool||p.level().dimension()!=j.dimension||!p.isAlive()))cancel(p);}
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
     public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
@@ -66,7 +67,7 @@ public final class WorkQueue {
                     || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
-            if(job.kind==ArtifactKind.ICARUS) p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,10,0,false,false,true));
+            if(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3)p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
             int turn=Math.min(budget,EnchantmentScaling.budget(job.tool));BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
@@ -86,7 +87,6 @@ public final class WorkQueue {
             }
             if(feedback!=null&&p.tickCount%10==0)RelicEffects.emit(p,job.kind,"work",net.minecraft.world.phys.Vec3.atCenterOf(feedback));
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
-            if(feedback!=null&&p.tickCount%20==0)p.playNotifySound(job.kind.sound,net.minecraft.sounds.SoundSource.PLAYERS,0.12F,1.4F);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
                 else {ArtifactFeedback.message(p,job.succeeded==0?"nothing_changed":job.succeeded<job.completed?"partial":"complete");ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);

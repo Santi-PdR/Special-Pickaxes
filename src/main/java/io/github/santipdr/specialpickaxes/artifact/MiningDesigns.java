@@ -10,9 +10,8 @@ public final class MiningDesigns {
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
-        if(k==ArtifactKind.ICARUS&&ArtifactState.mode(p,k)==1)direction=direction.getOpposite();
         int mode=ArtifactState.mode(p,k);
-        var shape=k==ArtifactKind.ICARUS?DirectionalProgram.Shape.ICARUS:DirectionalProgram.Shape.values()[mode];
+        var shape=k==ArtifactKind.ICARUS?(mode==1?DirectionalProgram.Shape.ICARUS_WIDE:DirectionalProgram.Shape.ICARUS):DirectionalProgram.Shape.values()[mode];
         var origin=k==ArtifactKind.ICARUS?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
         return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape));
     }
@@ -33,5 +32,24 @@ public final class MiningDesigns {
         }
         return steps;
     }
-    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT);}
+    public static int survey(ServerPlayer p,BlockPos center){
+        int radius=8,halfHeight=4,count=0,shown=0;var level=p.serverLevel();
+        var particle=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.35F,0.9F,1F),1.1F);
+        for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
+            if((double)x*x+(double)z*z+4D*y*y>radius*radius)continue;var pos=center.offset(x,y,z);
+            if(!level.hasChunkAt(pos)||!level.getBlockState(pos).is(net.minecraftforge.common.Tags.Blocks.ORES))continue;
+            count++;if(shown<32){level.sendParticles(p,particle,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,3,0.22,0.22,0.22,0);shown++;}
+        }
+        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,200,0,false,true,true));
+        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,200,2,false,true,true));
+        return count;
+    }
+    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
+    public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
+        var block=s.getBlock();return block==Blocks.STONE||block==Blocks.COBBLESTONE||block==Blocks.DEEPSLATE||block==Blocks.COBBLED_DEEPSLATE
+            ||block==Blocks.GRANITE||block==Blocks.DIORITE||block==Blocks.ANDESITE||block==Blocks.TUFF||block==Blocks.CALCITE
+            ||block==Blocks.BASALT||block==Blocks.SMOOTH_BASALT||block==Blocks.OBSIDIAN||block==Blocks.NETHERRACK||block==Blocks.END_STONE
+            ||block==Blocks.DIRT||block==Blocks.COARSE_DIRT||block==Blocks.GRASS_BLOCK||block==Blocks.PODZOL||block==Blocks.ROOTED_DIRT||block==Blocks.GRAVEL
+            ||block==Blocks.DRIPSTONE_BLOCK||block==Blocks.POINTED_DRIPSTONE;
+    }
 }

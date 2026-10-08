@@ -30,7 +30,7 @@ public final class ArtifactFeedback {
         for(var listener:level.players())if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
-        nearbySound(p,kind.sound,0.45F,0.85F+kind.ordinal()*0.04F);
+        nearbySound(p,kind.sound,0.25F,0.85F+kind.ordinal()*0.04F);
         RelicEffects.emit(p,kind,"activate",p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
@@ -62,6 +62,10 @@ public final class ArtifactFeedback {
             burst(p,kind,center.offset((int)Math.round(Math.cos(angle)*radius),0,(int)Math.round(Math.sin(angle)*radius)),1);
         }
     }
+    public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
+        var min=center.offset(-radius,-halfHeight,-radius);var max=center.offset(radius,halfHeight,radius);
+        box(p,kind,new SelectionVolume(min,max),false);
+    }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);
         for(int i=0,count=0;i<steps.size() && count<24;i+=stride,count++) {
@@ -82,7 +86,7 @@ public final class ArtifactFeedback {
     public static void cue(ServerPlayer p,String phase){
         if(!(p.getMainHandItem().getItem() instanceof ArtifactItem item))return;
         float pitch=switch(phase){case "error"->.55F;case "cancel"->.7F;case "complete"->1.25F;case "confirm"->.85F;default->1F;};
-        nearbySound(p,item.kind.sound,item.kind==ArtifactKind.WORLDBREAKER?.45F:.32F,pitch+(item.kind.ordinal()%4)*.04F);
+        nearbySound(p,item.kind.sound,item.kind==ArtifactKind.WORLDBREAKER?.18F:.16F,pitch+(item.kind.ordinal()%4)*.04F);
         RelicEffects.emit(p,item.kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){
@@ -105,7 +109,7 @@ public final class ArtifactFeedback {
                 double z=end==0?v.min().getZ()+0.5:v.max().getZ()+0.5;p.serverLevel().sendParticles(p,dust,false,x,y,z,1,0,0,0,0);
             }
         }
-        if(kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.WORLDBREAKER&&mode==4){
+        if(kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.WORLDBREAKER&&mode==4){
             int count=0;for(var memory:ArtifactState.memories(p,kind)){
                 var pos=memory.pos();if(v.contains(pos)&&p.serverLevel().hasChunkAt(pos)&&p.serverLevel().getBlockState(pos).isAir()){
                     p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,2,0.2,0.2,0.2,0);if(++count>=24)break;

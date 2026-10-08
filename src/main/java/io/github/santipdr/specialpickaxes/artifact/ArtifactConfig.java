@@ -19,8 +19,8 @@ public final class ArtifactConfig {
     public static final ForgeConfigSpec.IntValue MAX_RADIUS = B.defineInRange("geometry.maxRadius",10,3,12);
     public static final ForgeConfigSpec.IntValue BORE_LENGTH = B.defineInRange("geometry.boreLength",40,4,48);
     public static final ForgeConfigSpec.IntValue AXIOM_DEPTH = B.defineInRange("geometry.axiomOreShellDepth",6,1,8);
-    public static final ForgeConfigSpec.IntValue SOUND_RADIUS = B.defineInRange("audio.nearbyRadius",24,8,64);
-    public static final ForgeConfigSpec.IntValue SOUND_COOLDOWN = B.defineInRange("audio.cooldownTicks",12,1,40);
+    public static final ForgeConfigSpec.IntValue SOUND_RADIUS = B.defineInRange("audio.nearbyRadius",5,1,8);
+    public static final ForgeConfigSpec.IntValue SOUND_COOLDOWN = B.defineInRange("audio.cooldownTicks",20,1,40);
     public static final ForgeConfigSpec.IntValue REGION_LIMIT=B.defineInRange("selection.maxVolume",262144,64,1048576);
     public static final ForgeConfigSpec.IntValue ACTIVE_JOBS=B.defineInRange("work.maxConcurrentJobs",32,1,128);
     public static final ForgeConfigSpec.IntValue ENCHANT_BUDGET=B.defineInRange("work.enchantedPlayerBudget",128,24,512);

@@ -56,29 +56,41 @@ public final class ArtifactActions {
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
-        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS)return MiningDesigns.drill(p,tool,kind);
-        if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),6));
+        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS) {
+            boolean started=MiningDesigns.drill(p,tool,kind);
+            if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
+            return started;
+        }
         if(kind==ArtifactKind.PALIMPSEST) {
-            var steps=new ArrayList<WorkStep>();
-            var memories=ArtifactState.memories(p,kind);var aimed=target(p).orElse(p.blockPosition());
-            // After mining, the ray can hit a distant wall beyond the remembered scar.
-            var center=memories.stream().anyMatch(m->m.pos().distSqr(aimed)<=24*24)?aimed:p.blockPosition();
-            for(var memory:memories)if(memory.pos().distSqr(center)<=24*24)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
-            return WorkQueue.start(p,tool,kind,steps);
+            var aimed=target(p);return aimed.isPresent()&&startVein(p,tool,aimed.get());
         }
 
-        var target=target(p);if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
+        var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
+        if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
         BlockPos center=target.get();
-        int r=radius(p,kind);
-        if(kind==ArtifactKind.INTERREGNUM) { int fieldRadius=Math.min(r,8);if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;ArtifactFeedback.ring(p,kind,center,fieldRadius);return true; }
+        int r=kind==ArtifactKind.WORLDLOOM?6:radius(p,kind);
+        if(kind==ArtifactKind.INTERREGNUM) {
+            int fieldRadius=ArtifactState.mode(p,kind)==1?2:8;
+            if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
+            ArtifactFeedback.domain(p,kind,center,fieldRadius,ArtifactState.mode(p,kind)==1?2:fieldRadius/2);
+            return true;
+        }
+        if(kind==ArtifactKind.EVENTIDE) {
+            int fieldRadius=Math.min(r,8);
+            if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
+            ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
+        }
+        if(kind==ArtifactKind.AXIOM) {
+            int found=MiningDesigns.survey(p,center);ArtifactFeedback.message(p,found==0?"survey_empty":"survey",found);ArtifactFeedback.burst(p,kind,center,10);return true;
+        }
 
 
         List<WorkStep> steps=switch(kind) {
             case CHOIR -> echo(p,center);
             case CRUCIBLE -> rephase(p,center,r);
-            case WORLDLOOM -> weave(p,center);
-            case EVENTIDE -> quarry(p,kind,center,r);
-            case AXIOM -> MiningDesigns.selective(p,center);
+            case WORLDLOOM -> quarry(p,kind,center,r);
+            case EVENTIDE -> List.of();
+            case AXIOM -> List.of();
             default -> List.of();
         };
         boolean started=WorkQueue.start(p,tool,kind,steps);
@@ -89,17 +101,37 @@ public final class ArtifactActions {
         var memories=ArtifactState.memories(p,ArtifactKind.CHOIR);var steps=new ArrayList<WorkStep>();
         if(memories.isEmpty()) return steps;
         BlockPos origin=memories.get(0).pos();
+        int recordedHeading=Math.floorMod(ArtifactState.of(p,ArtifactKind.CHOIR).getInt("heading"),4);
+        int turns=Math.floorMod(p.getDirection().get2DDataValue()-recordedHeading,4);
         for(var memory:memories) {
-            int mode=ArtifactState.mode(p,ArtifactKind.CHOIR);BlockPos raw=memory.pos().subtract(origin);
-            BlockPos offset=mode<4?Geometry.rotate(raw,mode):mode==4?new BlockPos(-raw.getX(),raw.getY(),raw.getZ()):new BlockPos(raw.getX(),raw.getY(),-raw.getZ());
+            BlockPos raw=memory.pos().subtract(origin);
+            BlockPos offset=Geometry.rotate(raw,turns);
             if(offset.distSqr(BlockPos.ZERO)<=48*48) steps.add(new WorkStep.Mine(center.offset(offset),memory.state()));
         }
         return steps;
+    }
+    private static boolean startVein(ServerPlayer p,ItemStack tool,BlockPos origin) {
+        var level=p.serverLevel();var initial=level.getBlockState(origin);
+        if(!initial.is(net.minecraftforge.common.Tags.Blocks.ORES)||!WorldSafety.harvestable(p,tool,origin))return false;
+        var steps=new ArrayList<WorkStep>();var seen=new HashSet<BlockPos>();var pending=new ArrayDeque<BlockPos>();
+        seen.add(origin.immutable());pending.add(origin.immutable());
+        while(!pending.isEmpty()&&steps.size()<64) {
+            var pos=pending.removeFirst();var state=level.getBlockState(pos);
+            if(!WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)||WorldSafety.barrier(p,pos)||state.getBlock()!=initial.getBlock())continue;
+            steps.add(new WorkStep.Mine(pos,state));
+            for(var direction:Direction.values()) {
+                var next=pos.relative(direction);
+                if(next.distSqr(origin)<=64&&seen.add(next.immutable())&&level.hasChunkAt(next)
+                        &&level.getBlockState(next).getBlock()==initial.getBlock())pending.addLast(next.immutable());
+            }
+        }
+        return WorkQueue.start(p,tool,ArtifactKind.PALIMPSEST,steps);
     }
     public static List<WorkStep> quarry(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         var steps=new ArrayList<WorkStep>();
         for(BlockPos pos:Geometry.cube(center,radius,ArtifactConfig.JOB_LIMIT.get())) {
             if(kind==ArtifactKind.EVENTIDE && (Math.pow(pos.getX()-center.getX(),2)+4*Math.pow(pos.getY()-center.getY(),2)+Math.pow(pos.getZ()-center.getZ(),2))>radius*radius) continue;
+            if(kind==ArtifactKind.WORLDLOOM&&pos.distSqr(center)>radius*radius)continue;
             if(kind==ArtifactKind.AXIOM && ArtifactState.mode(p,kind)%2==0
                     && Math.floorMod(pos.getX()-center.getX(),4)==0 && Math.floorMod(pos.getZ()-center.getZ(),4)==0) continue;
             if(!WorldSafety.allowed(p,kind,pos)) continue;
@@ -109,45 +141,32 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.EVENTIDE)steps.sort(java.util.Comparator.comparingDouble(step->(ArtifactState.mode(p,kind)==0?-1:1)*step.pos().distSqr(center)));
         return steps;
     }
-    public static BlockState geologyMaterial(ServerPlayer p){
-        var item=p.getOffhandItem().getItem();return item==Items.DEEPSLATE?Blocks.DEEPSLATE.defaultBlockState():item==Items.BASALT?Blocks.BASALT.defaultBlockState():item==Items.OBSIDIAN?Blocks.OBSIDIAN.defaultBlockState():Blocks.STONE.defaultBlockState();
-    }
-    public static List<WorkStep> rephase(ServerPlayer p,BlockPos center,int radius) {
-        BlockState next=geologyMaterial(p);
-        var steps=new ArrayList<WorkStep>();
-        for(BlockPos pos:Geometry.cube(center,radius,ArtifactConfig.JOB_LIMIT.get())) {
-            if(pos.distSqr(center)>radius*radius||!WorldSafety.allowed(p,ArtifactKind.CRUCIBLE,pos)||WorldSafety.barrier(p,pos)) continue;
-            var old=p.serverLevel().getBlockState(pos);
-            if(MiningDesigns.matrix(old) && old!=next) steps.add(new WorkStep.Rephase(pos,old,next));
+    public static List<WorkStep> gravityPulse(ServerPlayer p,BlockPos broken,BlockState material,BlockPos fieldCenter,int mode) {
+        var forward=p.getDirection();var side=forward.getClockWise();var candidates=new ArrayList<BlockPos>();
+        for(int depth=1;depth<=2;depth++)for(int lateral=-1;lateral<=1;lateral++)for(int vertical=-1;vertical<=1;vertical++) {
+            var pos=broken.relative(forward,depth).relative(side,lateral).above(vertical);
+            if(!p.serverLevel().hasChunkAt(pos)||!DomainFields.contains(p,pos)||!WorldSafety.allowed(p,ArtifactKind.EVENTIDE,pos)||WorldSafety.barrier(p,pos))continue;
+            var state=p.serverLevel().getBlockState(pos);if(state.getBlock()==material.getBlock())candidates.add(pos.immutable());
         }
+        candidates.sort(Comparator.comparingDouble(pos->(mode==0?1:-1)*pos.distSqr(fieldCenter)));
+        var steps=new ArrayList<WorkStep>(4);for(var pos:candidates){steps.add(new WorkStep.Mine(pos,p.serverLevel().getBlockState(pos)));if(steps.size()==4)break;}
         return steps;
     }
-    public static List<WorkStep> weave(ServerPlayer p,BlockPos origin) {
-        var held=p.getOffhandItem();if(!(held.getItem() instanceof BlockItem block)) return List.of();
-        var state=block.getBlock().defaultBlockState();if(!WorldSafety.inert(state) || held.hasTag()) return List.of();
-        var steps=new ArrayList<WorkStep>();var forward=p.getDirection();var side=forward.getClockWise();int mode=ArtifactState.mode(p,ArtifactKind.WORLDLOOM);
-        if(mode==1){for(int z=0;z<80;z++)for(int x=-1;x<=1;x++)steps.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x),state));}
-        else if(mode==2){for(int y=1;y<=8;y++)for(int x=-6;x<=6;x++)steps.add(new WorkStep.Place(origin.relative(side,x).above(y),state));}
-        else {for(int y=0;y<=6;y++)for(int z=0;z<=8;z++)for(int x=-5;x<=5;x++){
-            if(y!=0&&y!=6&&z!=0&&z!=8&&Math.abs(x)!=5)continue;
-            if(z==0&&x==0&&(y==1||y==2))continue;
-            steps.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x).above(y),state));
-        }}return steps;
+    public static BlockState geologyMaterial(ServerPlayer p,int mode){
+        return switch(Math.floorMod(mode,ArtifactInteraction.modeCount(ArtifactKind.CRUCIBLE))) {
+            case 1 -> Blocks.DEEPSLATE.defaultBlockState();case 2 -> Blocks.GRANITE.defaultBlockState();case 3 -> Blocks.DIORITE.defaultBlockState();
+            case 4 -> Blocks.ANDESITE.defaultBlockState();case 5 -> Blocks.DIRT.defaultBlockState();case 6 -> Blocks.BASALT.defaultBlockState();case 7 -> Blocks.OBSIDIAN.defaultBlockState();
+            default -> Blocks.STONE.defaultBlockState();
+        };
     }
-    public static List<WorkStep> bore(ServerPlayer p) {
-        var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
-        if(ArtifactState.mode(p,ArtifactKind.ICARUS)%2!=0) direction=direction.getOpposite();
-        int length=ArtifactConfig.BORE_LENGTH.get();
-        var steps=new ArrayList<WorkStep>();
-        for(int i=1;i<=length;i++) {
-            var feet=p.blockPosition().relative(direction,i);
-            var slice=direction.getAxis()==Direction.Axis.Y?feet:feet.above();
-            for(var pos:Geometry.section(slice,direction)) {
-                if(!WorldSafety.allowed(p,ArtifactKind.ICARUS,pos)) continue;
-                var state=p.serverLevel().getBlockState(pos);
-                if(!state.isAir()) steps.add(new WorkStep.Mine(pos,state));
-            }
-            steps.add(new WorkStep.Move(feet));
+    public static List<WorkStep> rephase(ServerPlayer p,BlockPos center,int radius) {
+        BlockState next=geologyMaterial(p,ArtifactState.mode(p,ArtifactKind.CRUCIBLE));
+        var steps=new ArrayList<WorkStep>();var placed=PlayerPlacedBlocks.get(p.serverLevel());
+        for(BlockPos pos:Geometry.cube(center,radius,ArtifactConfig.JOB_LIMIT.get())) {
+            if(pos.distSqr(center)>radius*radius||!WorldSafety.allowed(p,ArtifactKind.CRUCIBLE,pos)||WorldSafety.barrier(p,pos)
+                    ||placed.contains(pos)) continue;
+            var old=p.serverLevel().getBlockState(pos);
+            if(MiningDesigns.crucibleGeology(old) && old!=next) steps.add(new WorkStep.Rephase(pos,old,next));
         }
         return steps;
     }
@@ -175,8 +194,12 @@ public final class ArtifactActions {
     }
     public static void mined(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
         if(WorkQueue.running() || !p.serverLevel().getBlockState(pos).isAir()) return;
-        DomainFields.feed(p,pos);if(p.tickCount%3==0)ArtifactFeedback.burst(p,kind,pos,2);
-        if(kind==ArtifactKind.PALIMPSEST || kind==ArtifactKind.CHOIR) ArtifactState.record(p,kind,pos,state);
+        DomainFields.feed(p,tool,pos,state);if(p.tickCount%3==0)ArtifactFeedback.burst(p,kind,pos,2);
+        if(kind==ArtifactKind.CHOIR) {
+            var memory=ArtifactState.memories(p,kind);
+            if(memory.isEmpty())ArtifactState.of(p,kind).putInt("heading",p.getDirection().get2DDataValue());
+            ArtifactState.record(p,kind,pos,state);
+        }
         if(kind==ArtifactKind.MERIDIAN) {
             var a=ArtifactState.anchor(p,kind,"a");var b=ArtifactState.anchor(p,kind,"b");
             if(a.isPresent() && b.isPresent() && pos.distSqr(a.get())<=8*8) {

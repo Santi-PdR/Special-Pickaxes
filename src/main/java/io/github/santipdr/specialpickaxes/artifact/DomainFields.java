@@ -14,10 +14,11 @@ public final class DomainFields {
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class Field {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;final BlockPos center;final int radius;
+        final int mode;int minedSincePulse;long pulseReady;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final Map<UUID,Frozen> frozen=new HashMap<>();long expires;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius) {
-            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();
+            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();
         }
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();
@@ -43,15 +44,25 @@ public final class DomainFields {
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
-        var f=FIELDS.get(p.getUUID());return f!=null && (f.kind==ArtifactKind.INTERREGNUM||f.kind==ArtifactKind.EVENTIDE) && p.level().dimension()==f.dimension
-            && p.getMainHandItem()==f.tool && ArtifactState.now(p)<=f.expires && pos.distSqr(f.center)<=f.radius*f.radius;
+        var f=FIELDS.get(p.getUUID());if(f==null||p.level().dimension()!=f.dimension||p.getMainHandItem()!=f.tool||ArtifactState.now(p)>f.expires)return false;
+        if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){var owner=p.blockPosition();return Math.abs(pos.getX()-owner.getX())<=2&&Math.abs(pos.getY()-owner.getY())<=2&&Math.abs(pos.getZ()-owner.getZ())<=2;}
+        if(f.kind==ArtifactKind.INTERREGNUM)return Math.abs(pos.getX()-f.center.getX())<=f.radius&&Math.abs(pos.getZ()-f.center.getZ())<=f.radius&&Math.abs(pos.getY()-f.center.getY())<=Math.max(2,f.radius/2);
+        return f.kind==ArtifactKind.EVENTIDE&&pos.distSqr(f.center)<=f.radius*f.radius;
     }
     public static boolean frozen(Entity entity) {
         return entity!=null && FROZEN_ENTITIES.containsKey(entity.getUUID());
     }
-    public static void feed(ServerPlayer p,BlockPos pos) {
+    public static void feed(ServerPlayer p,ItemStack tool,BlockPos pos,net.minecraft.world.level.block.state.BlockState minedState) {
         var field=FIELDS.get(p.getUUID());
-        if(field!=null && contains(p,pos)) field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
+        if(field==null||!contains(p,pos))return;
+        field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
+        if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool&&minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)
+                &&++field.minedSincePulse>=6&&ArtifactState.now(p)>=field.pulseReady) {
+            field.minedSincePulse=0;field.pulseReady=ArtifactState.now(p)+10;
+            var pulse=ArtifactActions.gravityPulse(p,pos,minedState,field.center,field.mode);
+            int added=0;for(var step:pulse)if(added<4&&WorkQueue.append(p,tool,ArtifactKind.EVENTIDE,step))added++;
+            if(added>0)ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,pos,6);
+        }
     }
     public static void tick() {
         var iterator=FIELDS.values().iterator();
@@ -62,19 +73,27 @@ public final class DomainFields {
                 if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==f.tool&&p.level().dimension()==f.dimension&&ArtifactState.now(p)>f.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}
                 release(f);iterator.remove();continue;
             }
-            if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition()))
+            if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition())) {
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),12,0,false,true,true));
+                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,false,true,true));
+                if(f.mode==0){
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,12,4,false,true,true));
+                    if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
+                } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
+            }
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
-                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,1,false,true,true));
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
                 if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
                 continue; // Eventide shapes mining only; it never moves or damages entities.
             }
+            if(f.mode==1){if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
+            if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
             var centerPosition=Vec3.atCenterOf(f.center);
             double radiusSqr=(double)f.radius*f.radius;
             var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
                 e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
-                && !e.isAlliedTo(p) && e.position().distanceToSqr(centerPosition)<=radiusSqr);
+                && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr));
             entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(centerPosition)));
             var current=new HashSet<UUID>();int processed=0;
             for(var entity:entities) {

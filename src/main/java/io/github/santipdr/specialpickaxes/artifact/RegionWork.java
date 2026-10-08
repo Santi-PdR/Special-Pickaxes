@@ -38,7 +38,7 @@ public final class RegionWork implements WorkProgram {
         if(executing&&(net.minecraft.world.level.block.Block.getId(old)!=expectedSource[index]||second!=null&&net.minecraft.world.level.block.Block.getId(second)!=expectedTarget[index]))return skip(pos);
         if(!executing)return new WorkStep(){
             public BlockPos pos(){return pos;}
-            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&!WorldSafety.barrier(actor,pos)&&eligible(old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))ok=WorldSafety.harvestable(actor,tool,pos);
+            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&!WorldSafety.barrier(actor,pos)&&eligible(actor,old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1||mode==5))ok=WorldSafety.harvestable(actor,tool,pos);
                 if(ok&&other!=null)ok=kind==ArtifactKind.TESSELLATOR?WorldSafety.inert(old)&&WorldSafety.vacant(second):old!=second&&!(WorldSafety.vacant(old)&&WorldSafety.vacant(second));
                 if(ok)eligible++;else excluded++;return ok;}
         };
@@ -47,7 +47,7 @@ public final class RegionWork implements WorkProgram {
             return new WorkStep.Exchange(pos,other,old,second);
         }
         if(kind==ArtifactKind.KEYSTONE)return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){return arch(pos)&&WorldSafety.placePaid(actor,tool,k,pos,material);}};
-        if(kind==ArtifactKind.CHRONICLE && mode==0 || kind==ArtifactKind.WORLDBREAKER && mode==5)return new WorkStep(){
+        if(kind==ArtifactKind.CHRONICLE && mode==0)return new WorkStep(){
             public BlockPos pos(){return pos;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){return WorldSafety.allowed(actor,k,pos)&&ArtifactState.snapshot(actor,k,pos,old);}
         };
@@ -62,12 +62,13 @@ public final class RegionWork implements WorkProgram {
     private static WorkStep skip(BlockPos pos){return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return false;}};}
     private final java.util.Map<BlockPos,BlockState> restoration=new java.util.HashMap<>();
     public void loadMemories(ServerPlayer p){for(var m:ArtifactState.memories(p,kind))if(source.contains(m.pos()))restoration.put(m.pos(),m.state());}
-    private boolean eligible(BlockState s,BlockPos pos){
+    private boolean eligible(ServerPlayer p,BlockState s,BlockPos pos){
         if(kind==ArtifactKind.KEYSTONE)return arch(pos)&&s.isAir();
         if(kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.WORLDBREAKER&&mode==4)return restoration.containsKey(pos)&&s.isAir();
         if(target!=null)return WorldSafety.inert(s)||WorldSafety.vacant(s);
         if(kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&(mode==0||carve(pos));
-        return kind==ArtifactKind.CRUCIBLE?MiningDesigns.matrix(s):WorldSafety.inert(s);
+        if(kind==ArtifactKind.WORLDBREAKER&&mode==5)return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&s.getDestroySpeed(p.serverLevel(),pos)>=0;
+        return kind==ArtifactKind.CRUCIBLE?MiningDesigns.crucibleGeology(s)&&!PlayerPlacedBlocks.get(p.serverLevel()).contains(pos):WorldSafety.inert(s);
     }
     /** Elliptical bore follows the selected Z axis; corners are preserved. */
     private boolean carve(BlockPos p){double x=2*(p.getX()-source.min().getX()+0.5)/source.width()-1,y=2*(p.getY()-source.min().getY()+0.5)/source.height()-1;return x*x+y*y<=1;}

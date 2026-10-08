@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
-/** Only Crucible's regional program has corners. A selection is owned by one exact stack and mode. */
+/** Region selections are owned by one exact stack and mode. */
 public final class ArtifactInteraction {
     private static final class Selection {
         final ItemStack tool;final ArtifactKind kind;final String dimension;final int mode;final long expires;
@@ -15,13 +15,13 @@ public final class ArtifactInteraction {
     private static final Map<UUID,Selection> SELECTED=new HashMap<>();
     private ArtifactInteraction(){}
     public static boolean regional(ArtifactKind k){return k==ArtifactKind.CRUCIBLE;}
-    public static boolean regional(ArtifactKind k,int mode){return k==ArtifactKind.CRUCIBLE&&mode==0;}
+    public static boolean regional(ArtifactKind k,int mode){return k==ArtifactKind.CRUCIBLE||k==ArtifactKind.WORLDBREAKER&&mode==5;}
     public static String[] modes(ArtifactKind k){return switch(k){
-        case PALIMPSEST->new String[]{"restore"};case CHOIR->new String[]{"rotate0","rotate90","rotate180","rotate270","mirror_x","mirror_z"};
-        case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"regional","proximity"};
-        case INTERREGNUM->new String[]{"stasis"};case WORLDLOOM->new String[]{"shelter","bridge","wall"};
-        case ICARUS->new String[]{"forward","reverse"};case AXIOM->new String[]{"selective"};
-        case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter"};
+        case PALIMPSEST->new String[]{"vein"};case CHOIR->new String[]{"forward"};
+        case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian"};
+        case INTERREGNUM->new String[]{"domain","aura"};case WORLDLOOM->new String[]{"quarry"};
+        case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"survey"};
+        case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter","region_break"};
         default->new String[]{"retired"};};}
     public static int modeCount(ArtifactKind k){return modes(k).length;}
     public static String modeKey(ArtifactKind k,int mode){return modes(k)[Math.floorMod(mode,modeCount(k))];}
@@ -43,7 +43,8 @@ public final class ArtifactInteraction {
         var s=selection(p);if(s==null||s.submitted||s.points.size()!=2||WorkQueue.busy(p))return;
         try{
             var volume=new SelectionVolume(s.points.get(0),s.points.get(1));
-            var program=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,s.kind,0,ArtifactActions.geologyMaterial(p));
+            var material=s.kind==ArtifactKind.CRUCIBLE?ArtifactActions.geologyMaterial(p,s.mode):net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
+            var program=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,s.kind,s.mode,material);
             if(WorkQueue.startRegion(p,s.tool,s.kind,program)){s.submitted=true;ArtifactFeedback.message(p,"selection_ready");}
         }catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"selection_invalid");}
     }
@@ -63,6 +64,5 @@ public final class ArtifactInteraction {
         if(s!=null){tag.putString("selectionDimension",s.dimension);for(int i=0;i<s.points.size();i++)tag.putLong("selection"+i,s.points.get(i).asLong());
             if(s.points.size()==2)ArtifactFeedback.box(p,kind,new SelectionVolume(s.points.get(0),s.points.get(1)),false);
         }
-        if(kind==ArtifactKind.WORLDLOOM&&!WorkQueue.busy(p))ArtifactActions.target(p).ifPresent(at->ArtifactFeedback.preview(p,kind,ArtifactActions.weave(p,at)));
     }
 }

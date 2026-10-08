@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
@@ -54,40 +55,40 @@ public final class PickaxeGameTests {
         h.assertTrue(denied && p.getInventory().countItem(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get())==1,"non-admin cannot grant");
         finish(h,p);
     }
-    @GameTest(template="empty") public static void palimpsestPaidReconstruction(GameTestHelper h) {
-        var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);var tool=p.getMainHandItem();
-        h.assertTrue(p.gameMode.destroyBlock(pos),"manual mining succeeds");MiningObservations.flush();
-        h.assertTrue(ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==1,"actual mining recorded");
-        h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.PALIMPSEST,false),"reconstruction queued");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"no free restoration without material");
-        p.getInventory().add(new ItemStack(Items.STONE,2));
-        h.assertTrue(ArtifactActions.primary(p,tool,ArtifactKind.PALIMPSEST),"retry with payment");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.STONE),"restored original state");
-        h.assertTrue(p.getInventory().countItem(Items.STONE)==1,"exactly one material consumed");
-        finish(h,p);
+    @GameTest(template="empty") public static void palimpsestMinesOnlyItsConnectedOreVein(GameTestHelper h) {
+        var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);
+        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
+        var stone=pos.south();h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());
+        var distant=pos.east(8);h.getLevel().setBlockAndUpdate(distant,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"vein echo activates");drain(p);
+        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"connected vein mined");
+        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE)&&h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"stone and disconnected ore preserved");finish(h,p);
     }
     @GameTest(template="empty") public static void choirReplayMatchesState(GameTestHelper h) {
-        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var source=pos.offset(-2,0,0);
+        var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var pos=target(h);var source=pos.north(4);
+        ArtifactState.of(p,ArtifactKind.CHOIR).putInt("heading",Direction.NORTH.get2DDataValue());
         ArtifactState.record(p,ArtifactKind.CHOIR,source,Blocks.STONE.defaultBlockState());
-        ArtifactState.record(p,ArtifactKind.CHOIR,source.above(),Blocks.STONE.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(pos.above(),Blocks.DIAMOND_ORE.defaultBlockState());
+        ArtifactState.record(p,ArtifactKind.CHOIR,source.north(2),Blocks.STONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(pos.south(2),Blocks.STONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(pos.north(2),Blocks.STONE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"replay activates");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"translated stroke mined");
-        h.assertTrue(h.getLevel().getBlockState(pos.above()).is(Blocks.DIAMOND_ORE),"mismatched ore not mined");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(pos).isAir()&&h.getLevel().getBlockState(pos.south(2)).isAir(),"stencil follows current facing");
+        h.assertTrue(h.getLevel().getBlockState(pos.north(2)).is(Blocks.STONE),"template never flips behind the player");finish(h,p);
     }
     @GameTest(template="empty") public static void eventideMiningNotCombat(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.getLevel().setBlockAndUpdate(center.above(),Blocks.DIAMOND_ORE.defaultBlockState());
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+2,center.getY(),center.getZ());h.getLevel().addFreshEntity(mob);
         mob.setDeltaMovement(Vec3.ZERO);float health=mob.getHealth();
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"domain activates");DomainFields.tick();drain(p);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");DomainFields.tick();
         h.assertTrue(mob.getDeltaMovement().equals(Vec3.ZERO),"mining does not become entity combat");
         h.assertTrue(mob.getHealth()==health,"not a damage explosion");
-        h.assertTrue(h.getLevel().getBlockState(center).isAir() && h.getLevel().getBlockState(center.above()).is(Blocks.DIAMOND_ORE),"geology removed, ore preserved");finish(h,p);
+        h.assertTrue(DomainFields.contains(p,center)&&p.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"field grants its mining effect");
+        h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE)&&h.getLevel().getBlockState(center.above()).is(Blocks.DIAMOND_ORE),"activation does not perform a large quarry");finish(h,p);
     }
 
     @GameTest(template="empty") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
-        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",1);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));
+        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"transmutation activates");drain(p);
         h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.OBSIDIAN),"curated rephase applied");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8)).isEmpty(),"no extra drops from replacement");finish(h,p);
@@ -99,14 +100,22 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"stasis activation");DomainFields.tick();
         h.assertTrue(DomainFields.frozen(mob),"hostile enrolled in stasis");mob.setPos(start.add(0.3,0,0));DomainFields.tick();
         h.assertTrue(mob.position().distanceToSqr(start)<0.001 && mob.getDeltaMovement().lengthSqr()==0,"position and momentum held");
+        h.assertTrue(p.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)&&p.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==4&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"domain grants Regeneration V and Night Vision");
         DomainFields.stop(p);h.assertTrue(!DomainFields.frozen(mob) && Math.abs(mob.getDeltaMovement().x-.15)<.00001,"original momentum restored without weaponizing release");finish(h,p);
     }
-    @GameTest(template="empty") public static void worldloomPaidBridge(GameTestHelper h) {
-        var p=player(h,ArtifactKind.WORLDLOOM);target(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
-        ArtifactState.of(p,ArtifactKind.WORLDLOOM).putInt("mode",1);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"loom activation");drain(p);
-        h.assertTrue(p.getInventory().countItem(Items.STONE)<32,"construction paid from inventory");
-        h.assertTrue(h.getLevel().getBlockState(h.absolutePos(new BlockPos(5,3,8))).is(Blocks.STONE),"bridge extends from base");finish(h,p);
+    @GameTest(template="empty") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",1);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"personal aura activates without a target block");DomainFields.tick();
+        h.assertTrue(DomainFields.contains(p,p.blockPosition())&&p.hasEffect(SpecialPickaxes.DOMINION.get())&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"aura follows owner with personal effects");
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(p.getX()+1,p.getY(),p.getZ());h.getLevel().addFreshEntity(mob);mob.setDeltaMovement(.1,0,0);DomainFields.tick();
+        h.assertTrue(!DomainFields.frozen(mob),"personal aura does not freeze nearby mobs");finish(h,p);
+    }
+    @GameTest(template="empty") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
+        var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);var stone=center.east();var ore=center.above();
+        h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry activation");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(stone).isAir(),"scheduled quarry mines the stone sphere");
+        h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"quarry preserves ores");finish(h,p);
     }
     @GameTest(template="empty") public static void icarusBoreAndSolidStop(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var wall=h.absolutePos(new BlockPos(5,2,5));
@@ -246,7 +255,7 @@ public final class PickaxeGameTests {
         var fortune=new net.minecraft.nbt.CompoundTag();fortune.putString("id","minecraft:fortune");fortune.putInt("lvl",1000);tool.getEnchantmentTags().add(fortune);h.assertTrue(tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE)==1000,"Fortune 1000 not truncated to 255");finish(h,p);
     }
     @GameTest(template="empty") public static void regionSelectionAnalysisAndPause(GameTestHelper h){
-        var p=player(h,ArtifactKind.CRUCIBLE);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.BASALT));var a=target(h);var b=a.offset(2,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
+        var p=player(h,ArtifactKind.CRUCIBLE);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",6);var a=target(h);var b=a.offset(2,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
         h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"arm");
         h.assertTrue(ArtifactInteraction.left(p,a,false)&&ArtifactInteraction.left(p,b,false),"select corners");
         h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"analyze");WorkQueue.tick();
@@ -317,9 +326,21 @@ public final class PickaxeGameTests {
 
     @GameTest(template="empty") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
         for(var k:ArtifactKind.playableValues())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
-            boolean expected=k==ArtifactKind.CRUCIBLE&&m==0;
+            boolean expected=k==ArtifactKind.CRUCIBLE||k==ArtifactKind.WORLDBREAKER&&m==5;
             h.assertTrue(ArtifactInteraction.regional(k,m)==expected,"regional contract "+k+" mode "+m);
         }h.succeed();
+    }
+    @GameTest(template="empty") public static void worldbreakerRegionBreakSkipsFluidsAndMachines(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",5);
+        var a=target(h);var granite=a.east();var fluid=a.east(2);var chest=a.east(3);var b=a.east(4);
+        h.getLevel().setBlockAndUpdate(granite,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(fluid,Blocks.LAVA.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,5),"region mode uses corner selection");
+        RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.SELECT);RelicControl.corner(p,a);RelicControl.corner(p,b);WorkQueue.tick();
+        h.assertTrue(WorkQueue.status(p).equals("ready"),"selection is analyzed before execution");
+        inputReady(p,ArtifactKind.WORLDBREAKER);h.assertTrue(RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.CONFIRM),"region break confirms");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(a).isAir()&&h.getLevel().getBlockState(granite).isAir()&&h.getLevel().getBlockState(b).isAir(),"minable region geology is harvested");
+        h.assertTrue(h.getLevel().getBlockState(fluid).is(Blocks.LAVA)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST),"fluid and container are preserved");finish(h,p);
     }
     @GameTest(template="empty") public static void compactAndExpandedTooltipContracts(GameTestHelper h){
         for(var k:ArtifactKind.playableValues()){
