@@ -53,7 +53,7 @@ public final class WorldSafety {
     public static boolean harvestable(ServerPlayer p, ItemStack tool, BlockPos pos) {
         if(barrier(p,pos))return false;
         var level=p.serverLevel();var s=level.getBlockState(pos);
-        return !barrier(p,pos)&&!tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
+        return !tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
             && s.getFluidState().isEmpty() && s.getDestroySpeed(level,pos)>=0
             && ArtifactTools.effective(s) && tool.isCorrectToolForDrops(s);
     }
