@@ -9,7 +9,12 @@ import java.util.*;
 public final class ArtifactTooltips {
     private ArtifactTooltips(){}
     public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):0;}
-    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){lines.add(Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))).withStyle(ChatFormatting.GRAY));lines.add(Component.translatable("combat.specialpickaxes."+k.id).withStyle(ChatFormatting.DARK_PURPLE));}
+    public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
+        var identity=Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))).withStyle(ChatFormatting.GRAY);
+        identity.append(Component.literal(" · ").withStyle(ChatFormatting.DARK_GRAY));
+        identity.append(Component.translatable("combat.specialpickaxes."+k.id).withStyle(ChatFormatting.DARK_PURPLE));
+        lines.add(identity);
+    }
     private static void section(List<Component> lines,String heading,Component content){
         if(!lines.isEmpty())lines.add(Component.empty());
         lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.copy().withStyle(ChatFormatting.GRAY));
