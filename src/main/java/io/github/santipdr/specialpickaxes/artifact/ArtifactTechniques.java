@@ -90,9 +90,14 @@ public final class ArtifactTechniques {
             return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
         }).stream().min(java.util.Comparator.comparingDouble(entity -> entity.distanceToSqr(player))).orElse(null);
         if (target == null) return false;
-        target.setDeltaMovement(target.getDeltaMovement().add(look.scale(strength).add(0, .18, 0)));
+        target.setDeltaMovement(target.getDeltaMovement().add(look.scale(strength).add(0, kind==ArtifactKind.ICARUS?.48:.18, 0)));
         target.hasImpulse = true;
-        player.serverLevel().sendParticles(player, ParticleTypes.SWEEP_ATTACK, false, target.getX(), target.getY() + target.getBbHeight() / 2, target.getZ(), 8, .2, .2, .2, .04);
+        double fx=target.getX(),fy=target.getY()+target.getBbHeight()/2,fz=target.getZ();
+        if(kind==ArtifactKind.ICARUS){
+            var feather=new DustParticleOptions(new Vector3f(1F,.86F,.58F),1.25F);
+            player.serverLevel().sendParticles(player,feather,false,fx,fy,fz,18,.38,.65,.38,.035);
+            player.serverLevel().sendParticles(player,ParticleTypes.CLOUD,false,fx,fy,fz,7,.28,.25,.28,.08);
+        }else player.serverLevel().sendParticles(player, ParticleTypes.SWEEP_ATTACK, false, fx, fy, fz, 8, .2, .2, .2, .04);
         return true;
     }
 
