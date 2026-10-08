@@ -10,13 +10,7 @@ public final class RelicControl {
         if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
         WorkQueue.discardStale(p);
         var k=item.kind;var tool=p.getMainHandItem();
-        if(action==Action.CANCEL){
-            boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);
-            if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,k,"a").isPresent();ArtifactState.clearAnchors(p,k);ArtifactState.of(p,k).remove("trail");}
-            WorkQueue.cancel(p);DomainFields.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
-            if(!active)return true;
-            ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
-        }
+        if(action==Action.CANCEL)return cancel(p,k);
         // Bound packet spam without preventing an emergency cancellation.
         var data=ArtifactState.of(p,k);long now=ArtifactState.now(p);
         if(data.contains("inputTick")&&data.getLong("inputTick")<=now&&now-data.getLong("inputTick")<2)return false;data.putLong("inputTick",now);
@@ -45,10 +39,11 @@ public final class RelicControl {
                     if(!WorkQueue.togglePause(p))return false;
                     p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
+                if(DomainFields.active(p)||CompanionActions.active(p))return cancel(p,k);
                 if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
-                if(WorkQueue.busy(p))return false;
+                if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p))return cancel(p,k);
                 return ArtifactActions.useAlternate(p,tool,k);
             default:return false;
         }
@@ -56,6 +51,13 @@ public final class RelicControl {
     private static boolean confirm(ServerPlayer p){
         if(!WorkQueue.status(p).equals("ready")||!WorkQueue.togglePause(p))return false;
         ArtifactFeedback.cue(p,"confirm");return true;
+    }
+    private static boolean cancel(ServerPlayer p,ArtifactKind kind){
+        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);
+        if(kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,kind,"a").isPresent();ArtifactState.clearAnchors(p,kind);ArtifactState.of(p,kind).remove("trail");}
+        WorkQueue.cancel(p);DomainFields.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
+        if(!active)return true;
+        ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
     }
     public static boolean corner(ServerPlayer p,net.minecraft.core.BlockPos pos){
         if(!ArtifactInteraction.left(p,pos,false))return false;
