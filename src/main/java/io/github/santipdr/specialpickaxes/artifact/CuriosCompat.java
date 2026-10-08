@@ -10,6 +10,8 @@ public final class CuriosCompat {
     public record Equipped(ItemStack stack, int slot) {}
     private static final String API = "top.theillusivec4.curios.api.CuriosApi";
     private static final Class<?> API_CLASS = loadApi();
+    private record Access(Method inventory,Method stacksHandler,Method stacks,Method slots,Method stackInSlot) {}
+    private static final Access ACCESS = resolveAccess();
     private CuriosCompat() {}
 
     private static Class<?> loadApi(){
@@ -17,23 +19,32 @@ public final class CuriosCompat {
         catch(ClassNotFoundException|LinkageError ignored){return null;}
     }
 
+    private static Access resolveAccess(){
+        if(API_CLASS==null)return null;
+        try{
+            ClassLoader loader=CuriosCompat.class.getClassLoader();
+            Class<?> handler=Class.forName("top.theillusivec4.curios.api.type.capability.ICuriosItemHandler",false,loader);
+            Class<?> stacksHandler=Class.forName("top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler",false,loader);
+            Class<?> dynamicStacks=Class.forName("top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler",false,loader);
+            return new Access(API_CLASS.getMethod("getCuriosInventory",LivingEntity.class),
+                    handler.getMethod("getStacksHandler",String.class),stacksHandler.getMethod("getStacks"),
+                    dynamicStacks.getMethod("getSlots"),dynamicStacks.getMethod("getStackInSlot",int.class));
+        }catch(ReflectiveOperationException|LinkageError ignored){return null;}
+    }
+
     public static Equipped find(LivingEntity entity) {
+        Access methods=ACCESS;if(methods==null)return null;
         try {
-            Class<?> api = API_CLASS;if(api==null)return null;
-            Object lazy = api.getMethod("getCuriosInventory", LivingEntity.class).invoke(null, entity);
+            Object lazy = methods.inventory.invoke(null, entity);
             Object handler = lazy == null ? null : ((net.minecraftforge.common.util.LazyOptional<?>) lazy).orElse(null);
             if (handler == null) return null;
-            Class<?> handlerApi = Class.forName("top.theillusivec4.curios.api.type.capability.ICuriosItemHandler", false, CuriosCompat.class.getClassLoader());
-            Object stacksOptional = handlerApi.getMethod("getStacksHandler", String.class).invoke(handler, "pickaxe");
+            Object stacksOptional = methods.stacksHandler.invoke(handler, "pickaxe");
             Object stacksHandler = optionalValue(stacksOptional);
             if (stacksHandler == null) return null;
-            Class<?> stacksApi = Class.forName("top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler", false, CuriosCompat.class.getClassLoader());
-            Object stacks = stacksApi.getMethod("getStacks").invoke(stacksHandler);
-            Class<?> dynamicApi = Class.forName("top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler", false, CuriosCompat.class.getClassLoader());
-            int count = (int) dynamicApi.getMethod("getSlots").invoke(stacks);
-            Method get = dynamicApi.getMethod("getStackInSlot", int.class);
+            Object stacks = methods.stacks.invoke(stacksHandler);
+            int count = (int) methods.slots.invoke(stacks);
             for (int slot = 0; slot < count; slot++) {
-                Object value = get.invoke(stacks, slot);
+                Object value = methods.stackInSlot.invoke(stacks, slot);
                 if (value instanceof ItemStack stack && stack.getItem() instanceof ArtifactItem) return new Equipped(stack, slot);
             }
         } catch (ReflectiveOperationException | LinkageError ignored) {
