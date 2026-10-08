@@ -64,6 +64,12 @@ public final class DomainFields {
             }
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition()))
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),12,0,false,true,true));
+            if(f.kind==ArtifactKind.EVENTIDE) {
+                if(contains(p,p.blockPosition()))
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,1,false,true,true));
+                if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
+                continue; // Eventide shapes mining only; it never moves or damages entities.
+            }
             var centerPosition=Vec3.atCenterOf(f.center);
             double radiusSqr=(double)f.radius*f.radius;
             var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
