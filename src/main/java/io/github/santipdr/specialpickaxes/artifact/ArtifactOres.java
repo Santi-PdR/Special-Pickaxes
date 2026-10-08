@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Vanilla ore families plus conventional common and Forge tags for modded ores. */
+/** Vanilla/common ore tags, modded ore tags and conventional registry names. */
 public final class ArtifactOres {
     private static final ConcurrentMap<Block,Boolean> NONSTANDARD_ORES = new ConcurrentHashMap<>();
     private ArtifactOres() {}
@@ -17,7 +17,11 @@ public final class ArtifactOres {
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
             ||state.is(BlockTags.GOLD_ORES)||state.is(BlockTags.DIAMOND_ORES)||state.is(BlockTags.REDSTONE_ORES)
             ||state.is(BlockTags.LAPIS_ORES)||state.is(BlockTags.EMERALD_ORES)||state.is(BlockTags.COPPER_ORES)
-            ||NONSTANDARD_ORES.computeIfAbsent(state.getBlock(), ignored -> state.getTags().anyMatch(ArtifactOres::isOreTag));
+            ||NONSTANDARD_ORES.computeIfAbsent(state.getBlock(), block -> {
+                if(state.getTags().anyMatch(ArtifactOres::isOreTag))return true;
+                var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+                return key!=null&&isOreTagPath(key.getPath());
+            });
     }
 
     /** Datapack reloads can change tag membership, so discard the bounded registry-block cache then. */
