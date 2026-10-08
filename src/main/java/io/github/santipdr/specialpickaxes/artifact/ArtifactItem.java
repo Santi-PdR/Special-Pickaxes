@@ -27,6 +27,24 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
     @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
+    @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
+        boolean damaged=super.hurtEnemy(stack,target,attacker);
+        if(damaged&&attacker instanceof ServerPlayer player) {
+            switch(kind) {
+                case PALIMPSEST -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,80,0,false,true,true));
+                case CHOIR -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,80,1,false,true,true));
+                case EVENTIDE -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.LEVITATION,30,0,false,true,true));
+                case CRUCIBLE -> target.setSecondsOnFire(5);
+                case INTERREGNUM -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,80,3,false,true,true));
+                case WORLDLOOM -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,100,1,false,true,true));
+                case ICARUS -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,100,0,false,true,true));
+                case AXIOM -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,100,0,false,true,true));
+                case WORLDBREAKER -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST,60,1,false,true,true));
+                default -> { }
+            }
+        }
+        return damaged;
+    }
     @Override public boolean canPerformAction(ItemStack stack,net.minecraftforge.common.ToolAction action) { return ArtifactTools.action(action); }
     @Override public int getEnchantmentLevel(ItemStack stack,net.minecraft.world.item.enchantment.Enchantment e) {
         int raw=EnchantmentScaling.level(stack,e);

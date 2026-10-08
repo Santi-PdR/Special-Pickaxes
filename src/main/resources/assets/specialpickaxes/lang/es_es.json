@@ -355,5 +355,14 @@
   "mode.specialpickaxes.world_shatter": "WORLD SHATTER",
   "mining.limits": "Nunca toca bedrock, fluidos, máquinas ni bloques protegidos. Las rutas direccionales se detienen ante barreras. Pausa o cancela con tus teclas configuradas.",
   "message.specialpickaxes.duplicate_corner": "Esa esquina ya está marcada.",
-  "message.specialpickaxes.drop_pause": "Pausa por acumulación de drops. Recógelos y reanuda."
+  "message.specialpickaxes.drop_pause": "Pausa por acumulación de drops. Recógelos y reanuda.",
+  "combat.specialpickaxes.palimpsest": "Al golpear: Regeneración I durante 4 s.",
+  "combat.specialpickaxes.fault_choir": "Al golpear: Debilidad II durante 4 s.",
+  "combat.specialpickaxes.eventide": "Al golpear: Levitación durante 1,5 s.",
+  "combat.specialpickaxes.paradox_crucible": "Al golpear: prende fuego al objetivo durante 5 s.",
+  "combat.specialpickaxes.interregnum": "Al golpear: Lentitud IV durante 4 s.",
+  "combat.specialpickaxes.worldloom": "Al golpear: Absorción II durante 5 s.",
+  "combat.specialpickaxes.icarus": "Al golpear: Caída lenta durante 5 s.",
+  "combat.specialpickaxes.hollow_axiom": "Al golpear: revela al objetivo con Brillo durante 5 s.",
+  "combat.specialpickaxes.worldbreaker": "Al golpear: Fuerza II durante 3 s."
 }

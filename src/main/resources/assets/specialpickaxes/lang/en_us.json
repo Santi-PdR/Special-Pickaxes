@@ -355,5 +355,14 @@
   "mode.specialpickaxes.world_shatter": "WORLD SHATTER",
   "mining.limits": "Never edits bedrock, fluids, machines or protected blocks. Directional routes stop at barriers. Pause or cancel with your configured keys.",
   "message.specialpickaxes.duplicate_corner": "That corner is already marked.",
-  "message.specialpickaxes.drop_pause": "Paused for drop congestion. Collect drops, then resume."
+  "message.specialpickaxes.drop_pause": "Paused for drop congestion. Collect drops, then resume.",
+  "combat.specialpickaxes.palimpsest": "On hit: Regeneration I for 4s.",
+  "combat.specialpickaxes.fault_choir": "On hit: Weakness II for 4s.",
+  "combat.specialpickaxes.eventide": "On hit: Levitation for 1.5s.",
+  "combat.specialpickaxes.paradox_crucible": "On hit: ignite the target for 5s.",
+  "combat.specialpickaxes.interregnum": "On hit: Slowness IV for 4s.",
+  "combat.specialpickaxes.worldloom": "On hit: Absorption II for 5s.",
+  "combat.specialpickaxes.icarus": "On hit: Slow Falling for 5s.",
+  "combat.specialpickaxes.hollow_axiom": "On hit: reveal the target with Glowing for 5s.",
+  "combat.specialpickaxes.worldbreaker": "On hit: Strength II for 3s."
 }
