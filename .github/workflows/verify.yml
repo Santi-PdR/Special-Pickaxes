@@ -59,9 +59,15 @@ jobs:
       - name: Check publication approval
         id: publication
         run: |
-          if test -f docs/mining-rework/VISUAL-REVIEW.json; then
-            python3 tools/verify_visual_review.py
+          echo "approved=false" >> "$GITHUB_OUTPUT"
+          if ! test -f docs/mining-rework/VISUAL-REVIEW.json; then
+            echo "::notice::Binary publication skipped: no visual review is recorded."
+            exit 0
+          fi
+          if python3 tools/verify_visual_review.py; then
             echo "approved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Binary publication skipped: the visual review does not approve this exact source."
           fi
         env:
           GH_TOKEN: ${{ github.token }}
