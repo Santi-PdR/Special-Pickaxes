@@ -5,12 +5,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.core.BlockPos;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.Iterator;
 
 /** Persistent provenance for player-placed cells, used to protect geology from Crucible edits. */
 public final class PlayerPlacedBlocks extends SavedData {
@@ -21,8 +20,8 @@ public final class PlayerPlacedBlocks extends SavedData {
     private static final Map<ServerLevel, PlayerPlacedBlocks> LOADED = new WeakHashMap<>();
     private static int sweepClock;
     private record PendingCleanup(ServerLevel level, long position, Block originalBlock) {}
-    private final Set<Long> positions = new HashSet<>();
-    private Iterator<Long> staleScan;
+    private final LongOpenHashSet positions = new LongOpenHashSet();
+    private LongIterator staleScan;
 
     public static PlayerPlacedBlocks get(ServerLevel level) {
         return LOADED.computeIfAbsent(level,
@@ -75,7 +74,7 @@ public final class PlayerPlacedBlocks extends SavedData {
         if (staleScan == null || !staleScan.hasNext()) staleScan = positions.iterator();
         int checked = 0;
         while (checked++ < budget && staleScan.hasNext()) {
-            long packed = staleScan.next();
+            long packed = staleScan.nextLong();
             var pos = BlockPos.of(packed);
             if (!level.hasChunkAt(pos)) continue;
             var state = level.getBlockState(pos);
@@ -84,11 +83,11 @@ public final class PlayerPlacedBlocks extends SavedData {
                 setDirty();
             }
         }
-        if (!staleScan.hasNext()) staleScan = null;
+        if (!staleScan.hasNext()) { staleScan = null; positions.trim(); }
     }
 
     @Override public CompoundTag save(CompoundTag tag) {
-        tag.putLongArray("positions", positions.stream().mapToLong(Long::longValue).toArray());
+        tag.putLongArray("positions", positions.toLongArray());
         return tag;
     }
 }
