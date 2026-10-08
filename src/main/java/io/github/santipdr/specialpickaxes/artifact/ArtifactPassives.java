@@ -6,21 +6,53 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.phys.Vec3;
 
 /** Small, always-on identities for every artifact. No attack-strength effects are used. */
 public final class ArtifactPassives {
     private ArtifactPassives() {}
 
-    /** Curios-only Stasis reflex: a timed damage ward that briefly slows its aggressor. */
+    /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
-        if(kind!=ArtifactKind.INTERREGNUM||event.getAmount()<=0)return;
-        if(!(event.getSource().getEntity() instanceof LivingEntity attacker)||attacker==player||attacker.isAlliedTo(player))return;
+        if(event.getAmount()<=0)return;
+        var source=event.getSource();
+        if(kind==ArtifactKind.HELLSPEC&&source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)) {
+            var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
+            if(state.getLong("curiosPassiveReady")<=now){
+                state.putLong("curiosPassiveReady",now+80);event.setAmount(event.getAmount()*.35F);
+                ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
+            }
+            return;
+        }
+        if(!(source.getEntity() instanceof LivingEntity attacker)||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
         var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
-        if(state.getLong("curiosStasisReady")>now)return;
-        state.putLong("curiosStasisReady",now+160);
-        event.setAmount(event.getAmount()*0.85F);
-        attacker.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));
+        if(state.getLong("curiosPassiveReady")>now)return;
+        state.putLong("curiosPassiveReady",now+160);
+        switch(kind) {
+            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);player.getFoodData().eat(1,.1F);}
+            case CHOIR -> attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,60,1,true,false,true));
+            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);attacker.addEffect(new MobEffectInstance(MobEffects.WEAKNESS,60,0,true,false,true));}
+            case CRUCIBLE -> attacker.setSecondsOnFire(3);
+            case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
+            case WORLDLOOM -> player.addEffect(new MobEffectInstance(MobEffects.REGENERATION,60,1,true,false,true));
+            case ICARUS -> {
+                Vec3 away=attacker.position().subtract(player.position());
+                if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
+                attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.8).add(0,.25,0)));
+                attacker.hasImpulse=true;
+            }
+            case AXIOM -> {attacker.addEffect(new MobEffectInstance(MobEffects.GLOWING,60,0,true,false,true));attacker.addEffect(new MobEffectInstance(MobEffects.WEAKNESS,40,0,true,false,true));}
+            case WORLDBREAKER -> {event.setAmount(event.getAmount()*.8F);player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,60,1,true,false,true));}
+            case EXODIUM -> {
+                Vec3 away=attacker.position().subtract(player.position());
+                if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
+                attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.45).add(0,.65,0)));
+                attacker.hasImpulse=true;
+            }
+            case IRIDIUM -> player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,80,0,true,false,true));
+            default -> {return;}
+        }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
     }
 

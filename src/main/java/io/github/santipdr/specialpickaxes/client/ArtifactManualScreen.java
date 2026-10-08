@@ -68,8 +68,7 @@ public final class ArtifactManualScreen extends Screen {
         result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));
         result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
         var curiosInfo=new ArrayList<Component>();curiosInfo.add(Component.translatable("screen.specialpickaxes.curios_passive"));
-        if(kind==ArtifactKind.INTERREGNUM)curiosInfo.add(Component.translatable("curios.detail.specialpickaxes.interregnum"));
-        if(kind==ArtifactKind.IRIDIUM)curiosInfo.add(Component.translatable("curios.detail.specialpickaxes.iridium"));
+        curiosInfo.add(Component.translatable("curios.detail.specialpickaxes."+kind.id));
         result.add(new Section(Component.translatable("screen.specialpickaxes.curios"),curiosInfo,0xffb9d4ff));
         if(ArtifactInteraction.modeCount(kind)>1){
             result.add(section("manual4.modes",allModes(),0xffd6e0e8));
