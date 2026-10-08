@@ -69,9 +69,8 @@ public final class ArtifactItem extends PickaxeItem {
         for(var e:net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValues()){int n=getEnchantmentLevel(stack,e);if(n>0)result.put(e,n);}return result;
     }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
-        boolean result=super.mineBlock(tool,level,state,pos,actor);
         if(actor instanceof ServerPlayer p && !tool.isEmpty()) MiningObservations.capture(p,tool,kind,pos,state);
-        return result;
+        return super.mineBlock(tool,level,state,pos,actor);
     }
     @Override public void inventoryTick(ItemStack tool,Level level,Entity entity,int slot,boolean selected) {
         super.inventoryTick(tool,level,entity,slot,selected);
