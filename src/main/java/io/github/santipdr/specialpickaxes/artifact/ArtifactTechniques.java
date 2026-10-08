@@ -49,8 +49,8 @@ public final class ArtifactTechniques {
             drop.hasImpulse = true;
             if (++moved >= cap) break;
         }
-        ArtifactFeedback.message(player, "drops_gathered", moved);
-        return true;
+        if(moved>0)ArtifactFeedback.message(player, "drops_gathered", moved);
+        return moved>0;
     }
 
     private static boolean eatFromInventory(ServerPlayer player) {
@@ -114,8 +114,8 @@ public final class ArtifactTechniques {
             target.hasImpulse = true;
             if (++pushed >= cap) break;
         }
-        ArtifactFeedback.message(player, "targets_pushed", pushed);
-        return true;
+        if(pushed>0)ArtifactFeedback.message(player, "targets_pushed", pushed);
+        return pushed>0;
     }
 
     private static boolean rotateCrucible(ServerPlayer player) {
@@ -136,8 +136,8 @@ public final class ArtifactTechniques {
             entity.hasImpulse = true;
             if (++stopped >= cap) break;
         }
-        ArtifactFeedback.message(player, "motion_arrested", stopped);
-        return true;
+        if(stopped>0)ArtifactFeedback.message(player, "motion_arrested", stopped);
+        return stopped>0;
     }
 
     private static boolean markSquare(ServerPlayer player, BlockPos center, int radius) {
@@ -193,9 +193,11 @@ public final class ArtifactTechniques {
             mob.hasImpulse = true;
             if (++pulled >= cap) break;
         }
-        player.serverLevel().sendParticles(player, ParticleTypes.PORTAL, false, point.x, point.y, point.z, 24, .8, .8, .8, .08);
-        ArtifactFeedback.message(player, "hollow_pulse", pulled);
-        return true;
+        if(pulled>0){
+            player.serverLevel().sendParticles(player, ParticleTypes.PORTAL, false, point.x, point.y, point.z, 24, .8, .8, .8, .08);
+            ArtifactFeedback.message(player, "hollow_pulse", pulled);
+        }
+        return pulled>0;
     }
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
@@ -233,8 +235,8 @@ public final class ArtifactTechniques {
             projectile.hasImpulse = true;
             if (++deflected >= cap) break;
         }
-        ArtifactFeedback.message(player, "projectiles_deflected", deflected);
-        return true;
+        if(deflected>0)ArtifactFeedback.message(player, "projectiles_deflected", deflected);
+        return deflected>0;
     }
 
     private static boolean rootSnare(ServerPlayer player, double range) {

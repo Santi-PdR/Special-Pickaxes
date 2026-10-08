@@ -14,7 +14,10 @@ public final class ArtifactSkills {
             ArtifactFeedback.message(player, "cooldown");
             return false;
         }
-        if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) return false;
+        if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) {
+            ArtifactFeedback.message(player, "no_target");
+            return false;
+        }
         data.putLong("alternateReady", now + Math.max(100, ArtifactConfig.COOLDOWN.get() * 5));
         ArtifactFeedback.sound(player, kind, "alternate");
         ArtifactFeedback.burst(player, kind, player.blockPosition(), 10);
