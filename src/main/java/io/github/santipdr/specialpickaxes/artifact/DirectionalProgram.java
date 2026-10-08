@@ -26,7 +26,7 @@ public final class DirectionalProgram implements WorkProgram {
         if(depth<0||depth>192)throw new IllegalArgumentException("slice depth");
         var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
-            case ICARUS->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
+            case ICARUS->{w=3;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
             case CLEAVE->{w=18;h=8;}
             default->{w=Math.min(24,3+depth/3);h=Math.min(10,2+depth/10);}
