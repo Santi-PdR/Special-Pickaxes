@@ -226,11 +226,11 @@ public final class ArtifactTechniques {
 
     private static boolean blinkBehindTarget(ServerPlayer player, double range) {
         LivingEntity target = targetInLook(player, range);
-        if (target == null) return false;
+        if (target == null || player.isPassenger() || player.isSleeping()
+                || !WorldSafety.allowed(player,ArtifactKind.EXODIUM,target.blockPosition())) return false;
         Vec3 destination = target.position().subtract(target.getLookAngle().normalize().scale(1.5));
         BlockPos at = BlockPos.containing(destination);
-        if (!player.serverLevel().hasChunkAt(at) || !player.serverLevel().getWorldBorder().isWithinBounds(at)
-                || !player.serverLevel().noCollision(player, player.getBoundingBox().move(destination.subtract(player.position())))) return false;
+        if (!WorldSafety.allowed(player,ArtifactKind.EXODIUM,at)||!WorldSafety.freeBody(player,destination)) return false;
         player.connection.teleport(destination.x, destination.y, destination.z, player.getYRot(), player.getXRot());
         return true;
     }
