@@ -28,9 +28,9 @@ public final class RadialMiningProgram implements WorkProgram {
     }
 
     private int countCandidates(){
-        int count=0;
+        int count=0,limit=Math.max(1,ArtifactConfig.JOB_LIMIT.get());
         for(int dx=-radius;dx<=radius;dx++)for(int dy=-radius;dy<=radius;dy++)for(int dz=-radius;dz<=radius;dz++)
-            if(Math.max(Math.max(Math.abs(dx),Math.abs(dy)),Math.abs(dz))<=radius&&inside(dx,dy,dz))count++;
+            if(Math.max(Math.max(Math.abs(dx),Math.abs(dy)),Math.abs(dz))<=radius&&inside(dx,dy,dz)&&++count>=limit)return limit;
         return count;
     }
 

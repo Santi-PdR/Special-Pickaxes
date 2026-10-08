@@ -71,7 +71,9 @@ public final class ArtifactFeedback {
         var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
         double topY=center.getY()+halfHeight+0.08;
-        int segments=Math.max(4,radius*2);
+        // One sample per block keeps the marked domain legible without emitting
+        // hundreds of individual particle packets for the larger fields.
+        int segments=Math.max(4,radius);
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
