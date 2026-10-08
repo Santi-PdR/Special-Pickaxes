@@ -10,25 +10,37 @@ import java.util.*;
 public final class OrefallProgram implements WorkProgram {
     private record Ore(BlockPos pos,BlockState state) {}
     private static final int RADIUS=14,HALF_HEIGHT=7,MAX_ORES=192;
+    private static final int SCAN_SIZE=countScan();
     private final BlockPos center;
-    private final List<BlockPos> scan=new ArrayList<>();
     private final List<Ore> ores=new ArrayList<>();
-    private int scanIndex,oreIndex;private boolean sorted;
+    private int scanX=-RADIUS,scanY=-HALF_HEIGHT,scanZ=-RADIUS,scanned,oreIndex;private boolean sorted;
     public OrefallProgram(BlockPos center){
         this.center=center.immutable();
-        for(int x=-RADIUS;x<=RADIUS;x++)for(int y=-HALF_HEIGHT;y<=HALF_HEIGHT;y++)for(int z=-RADIUS;z<=RADIUS;z++)
-            if(x*x+z*z+4*y*y<=RADIUS*RADIUS)scan.add(center.offset(x,y,z).immutable());
     }
-    @Override public int remaining(){return Math.max(0,scan.size()-scanIndex)+Math.max(0,ores.size()-oreIndex);}
+    private static int countScan(){
+        int count=0;
+        for(int x=-RADIUS;x<=RADIUS;x++)for(int y=-HALF_HEIGHT;y<=HALF_HEIGHT;y++)for(int z=-RADIUS;z<=RADIUS;z++)
+            if(x*x+z*z+4*y*y<=RADIUS*RADIUS)count++;
+        return count;
+    }
+    private BlockPos nextScanPos(){
+        while(scanY<=HALF_HEIGHT){
+            int x=scanX,y=scanY,z=scanZ;
+            if(++scanZ>RADIUS){scanZ=-RADIUS;if(++scanX>RADIUS){scanX=-RADIUS;scanY++;}}
+            if(x*x+z*z+4*y*y<=RADIUS*RADIUS){scanned++;return center.offset(x,y,z).immutable();}
+        }
+        return null;
+    }
+    @Override public int remaining(){return Math.max(0,SCAN_SIZE-scanned)+Math.max(0,ores.size()-oreIndex);}
     @Override public boolean awaiting(){return false;}
     @Override public boolean executing(){return true;}
-    @Override public boolean done(){return scanIndex>=scan.size()&&sorted&&oreIndex>=ores.size();}
+    @Override public boolean done(){return scanned>=SCAN_SIZE&&sorted&&oreIndex>=ores.size();}
     @Override public void confirm(){}
     @Override public boolean loaded(ServerPlayer p){return true;} // unloaded chunks are skipped, never requested
     @Override public boolean backpressured(ServerPlayer p){return sorted&&oreIndex<ores.size()&&WorldSafety.dropPressure(p,ores.get(oreIndex).pos());}
     @Override public WorkStep next(ServerPlayer p){
-        if(scanIndex<scan.size()){
-            var pos=scan.get(scanIndex++);
+        if(scanned<SCAN_SIZE){
+            var pos=nextScanPos();
             return new WorkStep(){
                 public BlockPos pos(){return pos;}
                 public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
