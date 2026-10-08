@@ -1,0 +1,26 @@
+> **Documento histórico de 3.0.** Los controles, tooltips y arte actuales están en [la guía 3.1](../3.1/PLAYER-GUIDE.md). El generador de sprites experimentales se retiró; su versión histórica permanece en Git.
+
+# Relic workshop collection — 3.0
+
+Not another image-generation batch. `tools/relic_art.py` contains fourteen authored
+polygon silhouettes on a **32×32 pixel grid**, exported at integer 2× to Minecraft's
+64px four-frame sprites. No random pixels, interpolation, external illustration
+model or texture replacement dependency.
+
+Shared language: dark cut edge, northwest bevel, three-value metal ramps,
+diagonal wrapped leather haft, inset diamond core and deliberate chisel marks.
+Each head has its own outline, not just another palette. Materials distinguish
+ivory/brass, oxidized copper, dark mineral, cold silver and fired bronze. Negative
+spaces distinguish ring, cage, loom, double head and chronicle. Worldbreaker's
+oversized fractured blade has a distinct pale cutting highlight.
+
+Each inset also encodes identity: clock, resonant strings, void, compass,
+furnace, hourglass, loom, comet, hollow cage, paired plates, fracture, book,
+arch and tessellation. These are deliberately drawn pixel patterns, not arbitrary
+symbols. Animation is restrained: clock hand, string accent, falling sand, moving
+shuttle or a four-frame core highlight; no flickering noise or unrelated glyphs. Nearest-neighbor grid, no plastic gradients,
+no blurred downscale. Handheld parent supplies standard first/third-person poses.
+
+Runtime evidence is produced in the real Forge client: fourteen displays,
+fourteen tooltips/previews with Efficiency 1000, first-person HUD and a third-person
+capture. This is technical asset validation, not a claim of independent art review.

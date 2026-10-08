@@ -1,0 +1,2798 @@
+# referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar
+SHA256 57e976014fe954fac6f2eea48e674cb3ecdb9d0976d11a7abc45b7a45f284522
+
+## com/custompickaxes/CustomPickaxesMod.class
+FIELD MODID Ljava/lang/String;
+METHOD <init> ()V
+  bytecode 2ab70001b80007b6000d4cb200112bb60017b2001d2bb60017b200222bb60017b200272ab9002d0200b200321238b6003ab1
+  0001 op=b7 java/lang/Object <init> ()V
+  0004 op=b8 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext get ()Lnet/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext;
+  0007 op=b6 net/minecraftforge/fml/javafmlmod/FMLJavaModLoadingContext getModEventBus ()Lnet/minecraftforge/eventbus/api/IEventBus;
+  000b op=b2 com/custompickaxes/init/ModBlocks BLOCKS Lnet/minecraftforge/registries/DeferredRegister;
+  000f op=b6 net/minecraftforge/registries/DeferredRegister register (Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  0012 op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  0016 op=b6 net/minecraftforge/registries/DeferredRegister register (Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  0019 op=b2 com/custompickaxes/init/ModCreativeModeTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  001d op=b6 net/minecraftforge/registries/DeferredRegister register (Lnet/minecraftforge/eventbus/api/IEventBus;)V
+  0020 op=b2 net/minecraftforge/common/MinecraftForge EVENT_BUS Lnet/minecraftforge/eventbus/api/IEventBus;
+  0024 op=b9 net/minecraftforge/eventbus/api/IEventBus register (Ljava/lang/Object;)V
+  0029 op=b2 java/lang/System out Ljava/io/PrintStream;
+  002c op=12 [CustomPickaxesMod] 5 Custom Pickaxes & 5 Custom Ores successfully loaded!
+  002e op=b6 java/io/PrintStream println (Ljava/lang/String;)V
+
+## com/custompickaxes/init/ModBlocks.class
+FIELD BLOCKS Lnet/minecraftforge/registries/DeferredRegister;
+FIELD VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD DEEPSLATE_VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD DEEPSLATE_STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD DEEPSLATE_ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD DEEPSLATE_VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+FIELD DEEPSLATE_TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+METHOD <init> ()V
+  bytecode 2ab70001b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  bytecode b200072a2bb6000d4db200132a2cba00180000b6000d572cb0
+  0000 op=b2 com/custompickaxes/init/ModBlocks BLOCKS Lnet/minecraftforge/registries/DeferredRegister;
+  0005 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  000e op=ba bootstrap:0 get (Lnet/minecraftforge/registries/RegistryObject;)Ljava/util/function/Supplier;
+  0013 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+METHOD lambda$registerBlock$18 (Lnet/minecraftforge/registries/RegistryObject;)Lnet/minecraft/world/item/BlockItem;
+  bytecode bb001c592ab6001ec00023bb002559b70027b70028b0
+  0000 op=bb net/minecraft/world/item/BlockItem
+  0005 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0008 op=c0 net/minecraft/world/level/block/Block
+  000b op=bb net/minecraft/world/item/Item$Properties
+  000f op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  0012 op=b7 net/minecraft/world/item/BlockItem <init> (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$17 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b2002bb8003112371237b60038b7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_DIAMOND_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=12 6.0
+  000c op=12 6.0
+  000e op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties strength (FF)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0011 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$16 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b2003fb8003112421243b60038b7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DIAMOND_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=12 4.5
+  000c op=12 5.0
+  000e op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties strength (FF)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0011 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$15 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20044b80031ba00470000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_EMERALD_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:1 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$14 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1007ac
+METHOD lambda$static$13 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b2004fb80031ba00520000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks EMERALD_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:2 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$12 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1007ac
+METHOD lambda$static$11 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20053b80031ba00560000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:3 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$10 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1009ac
+METHOD lambda$static$9 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20057b80031ba005a0000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:4 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$8 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1009ac
+METHOD lambda$static$7 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20053b80031ba005b0000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:5 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$6 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1006ac
+METHOD lambda$static$5 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20057b80031ba005c0000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:6 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$4 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1006ac
+METHOD lambda$static$3 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20053b80031ba005d0000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:7 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$2 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1008ac
+METHOD lambda$static$1 ()Lnet/minecraft/world/level/block/Block;
+  bytecode bb002359b20057b80031ba005e0000b6004bb7003cb0
+  0000 op=bb net/minecraft/world/level/block/Block
+  0004 op=b2 net/minecraft/world/level/block/Blocks IRON_ORE Lnet/minecraft/world/level/block/Block;
+  0007 op=b8 net/minecraft/world/level/block/state/BlockBehaviour$Properties copy (Lnet/minecraft/world/level/block/state/BlockBehaviour;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  000a op=ba bootstrap:8 applyAsInt ()Ljava/util/function/ToIntFunction;
+  000f op=b6 net/minecraft/world/level/block/state/BlockBehaviour$Properties lightLevel (Ljava/util/function/ToIntFunction;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;
+  0012 op=b7 net/minecraft/world/level/block/Block <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+METHOD lambda$static$0 (Lnet/minecraft/world/level/block/state/BlockState;)I
+  bytecode 1008ac
+METHOD <clinit> ()V
+  bytecode b2005f1266b80068b30007126cba006e0000b80071b300741278ba007a0000b80071b3007b127eba00800000b80071b300811284ba00860000b80071b30087128aba008c0000b80071b3008d1290ba00920000b80071b300931296ba00980000b80071b30099129cba009e0000b80071b3009f12a2ba00a40000b80071b300a512a8ba00aa0000b80071b300abb1
+  0000 op=b2 net/minecraftforge/registries/ForgeRegistries BLOCKS Lnet/minecraftforge/registries/IForgeRegistry;
+  0003 op=12 custompickaxes
+  0005 op=b8 net/minecraftforge/registries/DeferredRegister create (Lnet/minecraftforge/registries/IForgeRegistry;Ljava/lang/String;)Lnet/minecraftforge/registries/DeferredRegister;
+  0008 op=b3 com/custompickaxes/init/ModBlocks BLOCKS Lnet/minecraftforge/registries/DeferredRegister;
+  000b op=12 volcanite_ore
+  000d op=ba bootstrap:9 get ()Ljava/util/function/Supplier;
+  0012 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0015 op=b3 com/custompickaxes/init/ModBlocks VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0018 op=12 deepslate_volcanite_ore
+  001a op=ba bootstrap:10 get ()Ljava/util/function/Supplier;
+  001f op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0022 op=b3 com/custompickaxes/init/ModBlocks DEEPSLATE_VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0025 op=12 stormstone_ore
+  0027 op=ba bootstrap:11 get ()Ljava/util/function/Supplier;
+  002c op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  002f op=b3 com/custompickaxes/init/ModBlocks STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0032 op=12 deepslate_stormstone_ore
+  0034 op=ba bootstrap:12 get ()Ljava/util/function/Supplier;
+  0039 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  003c op=b3 com/custompickaxes/init/ModBlocks DEEPSLATE_STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  003f op=12 echo_ore
+  0041 op=ba bootstrap:13 get ()Ljava/util/function/Supplier;
+  0046 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0049 op=b3 com/custompickaxes/init/ModBlocks ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  004c op=12 deepslate_echo_ore
+  004e op=ba bootstrap:14 get ()Ljava/util/function/Supplier;
+  0053 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0056 op=b3 com/custompickaxes/init/ModBlocks DEEPSLATE_ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0059 op=12 vitalite_ore
+  005b op=ba bootstrap:15 get ()Ljava/util/function/Supplier;
+  0060 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0063 op=b3 com/custompickaxes/init/ModBlocks VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0066 op=12 deepslate_vitalite_ore
+  0068 op=ba bootstrap:16 get ()Ljava/util/function/Supplier;
+  006d op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0070 op=b3 com/custompickaxes/init/ModBlocks DEEPSLATE_VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0073 op=12 titanium_ore
+  0075 op=ba bootstrap:17 get ()Ljava/util/function/Supplier;
+  007a op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  007d op=b3 com/custompickaxes/init/ModBlocks TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0080 op=12 deepslate_titanium_ore
+  0082 op=ba bootstrap:18 get ()Ljava/util/function/Supplier;
+  0087 op=b8 com/custompickaxes/init/ModBlocks registerBlock (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  008a op=b3 com/custompickaxes/init/ModBlocks DEEPSLATE_TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+
+## com/custompickaxes/init/ModCreativeModeTab.class
+FIELD CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+FIELD CUSTOM_PICKAXES_TAB Lnet/minecraftforge/registries/RegistryObject;
+METHOD <init> ()V
+  bytecode 2ab70001b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD lambda$static$2 ()Lnet/minecraft/world/item/CreativeModeTab;
+  bytecode b80007ba000d0000b600111217b80019b6001fba00230000b60027b6002bb0
+  0000 op=b8 net/minecraft/world/item/CreativeModeTab builder ()Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  0003 op=ba bootstrap:0 get ()Ljava/util/function/Supplier;
+  0008 op=b6 net/minecraft/world/item/CreativeModeTab$Builder icon (Ljava/util/function/Supplier;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  000b op=12 creativetab.custompickaxes
+  000d op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0010 op=b6 net/minecraft/world/item/CreativeModeTab$Builder title (Lnet/minecraft/network/chat/Component;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  0013 op=ba bootstrap:1 accept ()Lnet/minecraft/world/item/CreativeModeTab$DisplayItemsGenerator;
+  0018 op=b6 net/minecraft/world/item/CreativeModeTab$Builder displayItems (Lnet/minecraft/world/item/CreativeModeTab$DisplayItemsGenerator;)Lnet/minecraft/world/item/CreativeModeTab$Builder;
+  001b op=b6 net/minecraft/world/item/CreativeModeTab$Builder build ()Lnet/minecraft/world/item/CreativeModeTab;
+METHOD lambda$static$1 (Lnet/minecraft/world/item/CreativeModeTab$ItemDisplayParameters;Lnet/minecraft/world/item/CreativeModeTab$Output;)V
+  bytecode 2bb2002fb60035c0003ab9003c02002bb20041b60035c0003ab9003c02002bb20044b60035c0003ab9003c02002bb20047b60035c0003ab9003c02002bb2004ab60035c0003ab9003c02002bb2004db60035c0003ab9003c02002bb20050b60035c0003ab9003c02002bb20053b60035c0003ab9003c02002bb20056b60035c0003ab9003c02002bb20059b60035c0003ab9003c02002bb2005cb60035c0003ab9003c02002bb2005fb60035c0003ab9003c02002bb20062b60035c0003ab9003c02002bb20067b60035c0003ab9003c02002bb2006ab60035c0003ab9003c02002bb2006db60035c0003ab9003c02002bb20070b60035c0003ab9003c02002bb20073b60035c0003ab9003c02002bb20076b60035c0003ab9003c02002bb20079b60035c0003ab9003c02002bb2007cb60035c0003ab9003c02002bb2007fb60035c0003ab9003c0200b1
+  0001 op=b2 com/custompickaxes/init/ModItems VOLCANITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0004 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0007 op=c0 net/minecraft/world/level/ItemLike
+  000a op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  0010 op=b2 com/custompickaxes/init/ModItems STORMSTONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0013 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0016 op=c0 net/minecraft/world/level/ItemLike
+  0019 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  001f op=b2 com/custompickaxes/init/ModItems ECHO_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0022 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0025 op=c0 net/minecraft/world/level/ItemLike
+  0028 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  002e op=b2 com/custompickaxes/init/ModItems VITALITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0031 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0034 op=c0 net/minecraft/world/level/ItemLike
+  0037 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  003d op=b2 com/custompickaxes/init/ModItems TITANIUM_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0040 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0043 op=c0 net/minecraft/world/level/ItemLike
+  0046 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  004c op=b2 com/custompickaxes/init/ModItems RAW_VOLCANITE Lnet/minecraftforge/registries/RegistryObject;
+  004f op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0052 op=c0 net/minecraft/world/level/ItemLike
+  0055 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  005b op=b2 com/custompickaxes/init/ModItems VOLCANITE_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  005e op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0061 op=c0 net/minecraft/world/level/ItemLike
+  0064 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  006a op=b2 com/custompickaxes/init/ModItems STORMSTONE_CRYSTAL Lnet/minecraftforge/registries/RegistryObject;
+  006d op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0070 op=c0 net/minecraft/world/level/ItemLike
+  0073 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  0079 op=b2 com/custompickaxes/init/ModItems ECHO_SHARD Lnet/minecraftforge/registries/RegistryObject;
+  007c op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  007f op=c0 net/minecraft/world/level/ItemLike
+  0082 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  0088 op=b2 com/custompickaxes/init/ModItems VITALITE_GEM Lnet/minecraftforge/registries/RegistryObject;
+  008b op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  008e op=c0 net/minecraft/world/level/ItemLike
+  0091 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  0097 op=b2 com/custompickaxes/init/ModItems RAW_TITANIUM Lnet/minecraftforge/registries/RegistryObject;
+  009a op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  009d op=c0 net/minecraft/world/level/ItemLike
+  00a0 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00a6 op=b2 com/custompickaxes/init/ModItems TITANIUM_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  00a9 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00ac op=c0 net/minecraft/world/level/ItemLike
+  00af op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00b5 op=b2 com/custompickaxes/init/ModBlocks VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00b8 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00bb op=c0 net/minecraft/world/level/ItemLike
+  00be op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00c4 op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00c7 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00ca op=c0 net/minecraft/world/level/ItemLike
+  00cd op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00d3 op=b2 com/custompickaxes/init/ModBlocks STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00d6 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00d9 op=c0 net/minecraft/world/level/ItemLike
+  00dc op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00e2 op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00e5 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00e8 op=c0 net/minecraft/world/level/ItemLike
+  00eb op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  00f1 op=b2 com/custompickaxes/init/ModBlocks ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00f4 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00f7 op=c0 net/minecraft/world/level/ItemLike
+  00fa op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  0100 op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0103 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0106 op=c0 net/minecraft/world/level/ItemLike
+  0109 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  010f op=b2 com/custompickaxes/init/ModBlocks VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0112 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0115 op=c0 net/minecraft/world/level/ItemLike
+  0118 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  011e op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0121 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0124 op=c0 net/minecraft/world/level/ItemLike
+  0127 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  012d op=b2 com/custompickaxes/init/ModBlocks TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0130 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0133 op=c0 net/minecraft/world/level/ItemLike
+  0136 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+  013c op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+  013f op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0142 op=c0 net/minecraft/world/level/ItemLike
+  0145 op=b9 net/minecraft/world/item/CreativeModeTab$Output accept (Lnet/minecraft/world/level/ItemLike;)V
+METHOD lambda$static$0 ()Lnet/minecraft/world/item/ItemStack;
+  bytecode bb008259b2004ab60035c0003ab70084b0
+  0000 op=bb net/minecraft/world/item/ItemStack
+  0004 op=b2 com/custompickaxes/init/ModItems TITANIUM_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  0007 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000a op=c0 net/minecraft/world/level/ItemLike
+  000d op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;)V
+METHOD <clinit> ()V
+  bytecode b20086128eb80090b30096b20096129cba009e0000b6009fb300a3b1
+  0000 op=b2 net/minecraft/core/registries/Registries CREATIVE_MODE_TAB Lnet/minecraft/resources/ResourceKey;
+  0003 op=12 custompickaxes
+  0005 op=b8 net/minecraftforge/registries/DeferredRegister create (Lnet/minecraft/resources/ResourceKey;Ljava/lang/String;)Lnet/minecraftforge/registries/DeferredRegister;
+  0008 op=b3 com/custompickaxes/init/ModCreativeModeTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  000b op=b2 com/custompickaxes/init/ModCreativeModeTab CREATIVE_MODE_TABS Lnet/minecraftforge/registries/DeferredRegister;
+  000e op=12 custom_pickaxes_tab
+  0010 op=ba bootstrap:2 get ()Ljava/util/function/Supplier;
+  0015 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0018 op=b3 com/custompickaxes/init/ModCreativeModeTab CUSTOM_PICKAXES_TAB Lnet/minecraftforge/registries/RegistryObject;
+
+## com/custompickaxes/init/ModItems.class
+FIELD ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+FIELD VOLCANITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD STORMSTONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD ECHO_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD VITALITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD TITANIUM_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+FIELD RAW_VOLCANITE Lnet/minecraftforge/registries/RegistryObject;
+FIELD VOLCANITE_INGOT Lnet/minecraftforge/registries/RegistryObject;
+FIELD STORMSTONE_CRYSTAL Lnet/minecraftforge/registries/RegistryObject;
+FIELD ECHO_SHARD Lnet/minecraftforge/registries/RegistryObject;
+FIELD VITALITE_GEM Lnet/minecraftforge/registries/RegistryObject;
+FIELD RAW_TITANIUM Lnet/minecraftforge/registries/RegistryObject;
+FIELD TITANIUM_INGOT Lnet/minecraftforge/registries/RegistryObject;
+METHOD <init> ()V
+  bytecode 2ab70001b1
+  0001 op=b7 java/lang/Object <init> ()V
+METHOD lambda$static$6 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$5 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$4 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$3 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$2 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$1 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb6000fb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b6 net/minecraft/world/item/Item$Properties fireResistant ()Lnet/minecraft/world/item/Item$Properties;
+  000e op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD lambda$static$0 ()Lnet/minecraft/world/item/Item;
+  bytecode bb000759bb000959b7000bb6000fb7000cb0
+  0000 op=bb net/minecraft/world/item/Item
+  0004 op=bb net/minecraft/world/item/Item$Properties
+  0008 op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000b op=b6 net/minecraft/world/item/Item$Properties fireResistant ()Lnet/minecraft/world/item/Item$Properties;
+  000e op=b7 net/minecraft/world/item/Item <init> (Lnet/minecraft/world/item/Item$Properties;)V
+METHOD <clinit> ()V
+  bytecode b20013121bb8001db30023b200231228ba002a0000b6002eb30032b200231236ba00380000b6002eb30039b20023123cba003e0000b6002eb3003fb200231242ba00440000b6002eb30045b200231248ba004a0000b6002eb3004bb20023124eba00500000b6002eb30051b200231254ba00560000b6002eb30057b20023125aba005c0000b6002eb3005db200231260ba00620000b6002eb30063b200231266ba00680000b6002eb30069b20023126cba006e0000b6002eb3006fb200231272ba00740000b6002eb30075b1
+  0000 op=b2 net/minecraftforge/registries/ForgeRegistries ITEMS Lnet/minecraftforge/registries/IForgeRegistry;
+  0003 op=12 custompickaxes
+  0005 op=b8 net/minecraftforge/registries/DeferredRegister create (Lnet/minecraftforge/registries/IForgeRegistry;Ljava/lang/String;)Lnet/minecraftforge/registries/DeferredRegister;
+  0008 op=b3 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  000b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  000e op=12 volcanite_pickaxe
+  0010 op=ba bootstrap:0 get ()Ljava/util/function/Supplier;
+  0015 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0018 op=b3 com/custompickaxes/init/ModItems VOLCANITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  001b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  001e op=12 stormstone_pickaxe
+  0020 op=ba bootstrap:1 get ()Ljava/util/function/Supplier;
+  0025 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0028 op=b3 com/custompickaxes/init/ModItems STORMSTONE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  002b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  002e op=12 echo_pickaxe
+  0030 op=ba bootstrap:2 get ()Ljava/util/function/Supplier;
+  0035 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0038 op=b3 com/custompickaxes/init/ModItems ECHO_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  003b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  003e op=12 vitalite_pickaxe
+  0040 op=ba bootstrap:3 get ()Ljava/util/function/Supplier;
+  0045 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0048 op=b3 com/custompickaxes/init/ModItems VITALITE_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  004b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  004e op=12 titanium_pickaxe
+  0050 op=ba bootstrap:4 get ()Ljava/util/function/Supplier;
+  0055 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0058 op=b3 com/custompickaxes/init/ModItems TITANIUM_PICKAXE Lnet/minecraftforge/registries/RegistryObject;
+  005b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  005e op=12 raw_volcanite
+  0060 op=ba bootstrap:5 get ()Ljava/util/function/Supplier;
+  0065 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0068 op=b3 com/custompickaxes/init/ModItems RAW_VOLCANITE Lnet/minecraftforge/registries/RegistryObject;
+  006b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  006e op=12 volcanite_ingot
+  0070 op=ba bootstrap:6 get ()Ljava/util/function/Supplier;
+  0075 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0078 op=b3 com/custompickaxes/init/ModItems VOLCANITE_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  007b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  007e op=12 stormstone_crystal
+  0080 op=ba bootstrap:7 get ()Ljava/util/function/Supplier;
+  0085 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0088 op=b3 com/custompickaxes/init/ModItems STORMSTONE_CRYSTAL Lnet/minecraftforge/registries/RegistryObject;
+  008b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  008e op=12 echo_shard
+  0090 op=ba bootstrap:8 get ()Ljava/util/function/Supplier;
+  0095 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  0098 op=b3 com/custompickaxes/init/ModItems ECHO_SHARD Lnet/minecraftforge/registries/RegistryObject;
+  009b op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  009e op=12 vitalite_gem
+  00a0 op=ba bootstrap:9 get ()Ljava/util/function/Supplier;
+  00a5 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  00a8 op=b3 com/custompickaxes/init/ModItems VITALITE_GEM Lnet/minecraftforge/registries/RegistryObject;
+  00ab op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  00ae op=12 raw_titanium
+  00b0 op=ba bootstrap:10 get ()Ljava/util/function/Supplier;
+  00b5 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  00b8 op=b3 com/custompickaxes/init/ModItems RAW_TITANIUM Lnet/minecraftforge/registries/RegistryObject;
+  00bb op=b2 com/custompickaxes/init/ModItems ITEMS Lnet/minecraftforge/registries/DeferredRegister;
+  00be op=12 titanium_ingot
+  00c0 op=ba bootstrap:11 get ()Ljava/util/function/Supplier;
+  00c5 op=b6 net/minecraftforge/registries/DeferredRegister register (Ljava/lang/String;Ljava/util/function/Supplier;)Lnet/minecraftforge/registries/RegistryObject;
+  00c8 op=b3 com/custompickaxes/init/ModItems TITANIUM_INGOT Lnet/minecraftforge/registries/RegistryObject;
+
+## com/custompickaxes/init/ModTiers.class
+FIELD VOLCANITE Lcom/custompickaxes/init/ModTiers;
+FIELD STORMSTONE Lcom/custompickaxes/init/ModTiers;
+FIELD ECHO Lcom/custompickaxes/init/ModTiers;
+FIELD VITALITE Lcom/custompickaxes/init/ModTiers;
+FIELD TITANIUM Lcom/custompickaxes/init/ModTiers;
+FIELD level I
+FIELD uses I
+FIELD speed F
+FIELD attackDamageBonus F
+FIELD enchantmentValue I
+FIELD repairIngredient Ljava/util/function/Supplier;
+FIELD $VALUES [Lcom/custompickaxes/init/ModTiers;
+METHOD values ()[Lcom/custompickaxes/init/ModTiers;
+  bytecode b20013b60017c00018b0
+  0000 op=b2 com/custompickaxes/init/ModTiers $VALUES [Lcom/custompickaxes/init/ModTiers;
+  0003 op=b6 [Lcom/custompickaxes/init/ModTiers; clone ()Ljava/lang/Object;
+  0006 op=c0 [Lcom/custompickaxes/init/ModTiers;
+METHOD valueOf (Ljava/lang/String;)Lcom/custompickaxes/init/ModTiers;
+  bytecode 12012ab8001cc00001b0
+  0000 op=12 com/custompickaxes/init/ModTiers
+  0003 op=b8 java/lang/Enum valueOf (Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;
+  0006 op=c0 com/custompickaxes/init/ModTiers
+METHOD <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  bytecode 2a2b1cb700222a1db500262a1504b5002a2a1705b5002d2a1706b500312a1507b500342a1908b50037b1
+  0003 op=b7 java/lang/Enum <init> (Ljava/lang/String;I)V
+  0008 op=b5 com/custompickaxes/init/ModTiers level I
+  000e op=b5 com/custompickaxes/init/ModTiers uses I
+  0014 op=b5 com/custompickaxes/init/ModTiers speed F
+  001a op=b5 com/custompickaxes/init/ModTiers attackDamageBonus F
+  0020 op=b5 com/custompickaxes/init/ModTiers enchantmentValue I
+  0026 op=b5 com/custompickaxes/init/ModTiers repairIngredient Ljava/util/function/Supplier;
+METHOD getUses ()I
+  bytecode 2ab4002aac
+  0001 op=b4 com/custompickaxes/init/ModTiers uses I
+METHOD getSpeed ()F
+  bytecode 2ab4002dae
+  0001 op=b4 com/custompickaxes/init/ModTiers speed F
+METHOD getAttackDamageBonus ()F
+  bytecode 2ab40031ae
+  0001 op=b4 com/custompickaxes/init/ModTiers attackDamageBonus F
+METHOD getLevel ()I
+  bytecode 2ab40026ac
+  0001 op=b4 com/custompickaxes/init/ModTiers level I
+METHOD getEnchantmentValue ()I
+  bytecode 2ab40034ac
+  0001 op=b4 com/custompickaxes/init/ModTiers enchantmentValue I
+METHOD getRepairIngredient ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 2ab40037b9003b0100c00040b0
+  0001 op=b4 com/custompickaxes/init/ModTiers repairIngredient Ljava/util/function/Supplier;
+  0004 op=b9 java/util/function/Supplier get ()Ljava/lang/Object;
+  0009 op=c0 net/minecraft/world/item/crafting/Ingredient
+METHOD lambda$static$4 ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 04bd00425903b20044b6004ac0004253b8004db0
+  0001 op=bd net/minecraft/world/level/ItemLike
+  0006 op=b2 com/custompickaxes/init/ModItems TITANIUM_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000c op=c0 net/minecraft/world/level/ItemLike
+  0010 op=b8 net/minecraft/world/item/crafting/Ingredient of ([Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/item/crafting/Ingredient;
+METHOD lambda$static$3 ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 04bd00425903b20051b6004ac0004253b8004db0
+  0001 op=bd net/minecraft/world/level/ItemLike
+  0006 op=b2 com/custompickaxes/init/ModItems VITALITE_GEM Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000c op=c0 net/minecraft/world/level/ItemLike
+  0010 op=b8 net/minecraft/world/item/crafting/Ingredient of ([Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/item/crafting/Ingredient;
+METHOD lambda$static$2 ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 04bd00425903b20054b6004ac0004253b8004db0
+  0001 op=bd net/minecraft/world/level/ItemLike
+  0006 op=b2 com/custompickaxes/init/ModItems ECHO_SHARD Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000c op=c0 net/minecraft/world/level/ItemLike
+  0010 op=b8 net/minecraft/world/item/crafting/Ingredient of ([Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/item/crafting/Ingredient;
+METHOD lambda$static$1 ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 04bd00425903b20057b6004ac0004253b8004db0
+  0001 op=bd net/minecraft/world/level/ItemLike
+  0006 op=b2 com/custompickaxes/init/ModItems STORMSTONE_CRYSTAL Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000c op=c0 net/minecraft/world/level/ItemLike
+  0010 op=b8 net/minecraft/world/item/crafting/Ingredient of ([Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/item/crafting/Ingredient;
+METHOD lambda$static$0 ()Lnet/minecraft/world/item/crafting/Ingredient;
+  bytecode 04bd00425903b2005ab6004ac0004253b8004db0
+  0001 op=bd net/minecraft/world/level/ItemLike
+  0006 op=b2 com/custompickaxes/init/ModItems VOLCANITE_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  0009 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  000c op=c0 net/minecraft/world/level/ItemLike
+  0010 op=b8 net/minecraft/world/item/crafting/Ingredient of ([Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/item/crafting/Ingredient;
+METHOD $values ()[Lcom/custompickaxes/init/ModTiers;
+  bytecode 08bd00015903b20003535904b20007535905b2000a535906b2000d535907b2001053b0
+  0001 op=bd com/custompickaxes/init/ModTiers
+  0006 op=b2 com/custompickaxes/init/ModTiers VOLCANITE Lcom/custompickaxes/init/ModTiers;
+  000c op=b2 com/custompickaxes/init/ModTiers STORMSTONE Lcom/custompickaxes/init/ModTiers;
+  0012 op=b2 com/custompickaxes/init/ModTiers ECHO Lcom/custompickaxes/init/ModTiers;
+  0018 op=b2 com/custompickaxes/init/ModTiers VITALITE Lcom/custompickaxes/init/ModTiers;
+  001e op=b2 com/custompickaxes/init/ModTiers TITANIUM Lcom/custompickaxes/init/ModTiers;
+METHOD <clinit> ()V
+  bytecode bb000159125d0306110672125e125f1012ba00600000b70063b30003bb00015912660406110578126712681016ba00690000b70063b30007bb000159126a050711076c126b12681019ba006c0000b70063b3000abb000159126d0606110898126e125f101eba006f0000b70063b3000dbb00015912700707110c8012711272100fba00730000b70063b30010b80074b30013b1
+  0000 op=bb com/custompickaxes/init/ModTiers
+  0004 op=12 VOLCANITE
+  000b op=12 9.0
+  000d op=12 3.0
+  0011 op=ba bootstrap:0 get ()Ljava/util/function/Supplier;
+  0016 op=b7 com/custompickaxes/init/ModTiers <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  0019 op=b3 com/custompickaxes/init/ModTiers VOLCANITE Lcom/custompickaxes/init/ModTiers;
+  001c op=bb com/custompickaxes/init/ModTiers
+  0020 op=12 STORMSTONE
+  0027 op=12 13.0
+  0029 op=12 3.5
+  002d op=ba bootstrap:1 get ()Ljava/util/function/Supplier;
+  0032 op=b7 com/custompickaxes/init/ModTiers <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  0035 op=b3 com/custompickaxes/init/ModTiers STORMSTONE Lcom/custompickaxes/init/ModTiers;
+  0038 op=bb com/custompickaxes/init/ModTiers
+  003c op=12 ECHO
+  0043 op=12 9.5
+  0045 op=12 3.5
+  0049 op=ba bootstrap:2 get ()Ljava/util/function/Supplier;
+  004e op=b7 com/custompickaxes/init/ModTiers <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  0051 op=b3 com/custompickaxes/init/ModTiers ECHO Lcom/custompickaxes/init/ModTiers;
+  0054 op=bb com/custompickaxes/init/ModTiers
+  0058 op=12 VITALITE
+  005f op=12 8.5
+  0061 op=12 3.0
+  0065 op=ba bootstrap:3 get ()Ljava/util/function/Supplier;
+  006a op=b7 com/custompickaxes/init/ModTiers <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  006d op=b3 com/custompickaxes/init/ModTiers VITALITE Lcom/custompickaxes/init/ModTiers;
+  0070 op=bb com/custompickaxes/init/ModTiers
+  0074 op=12 TITANIUM
+  007b op=12 10.5
+  007d op=12 4.5
+  0081 op=ba bootstrap:4 get ()Ljava/util/function/Supplier;
+  0086 op=b7 com/custompickaxes/init/ModTiers <init> (Ljava/lang/String;IIIFFILjava/util/function/Supplier;)V
+  0089 op=b3 com/custompickaxes/init/ModTiers TITANIUM Lcom/custompickaxes/init/ModTiers;
+  008c op=b8 com/custompickaxes/init/ModTiers $values ()[Lcom/custompickaxes/init/ModTiers;
+  008f op=b3 com/custompickaxes/init/ModTiers $VALUES [Lcom/custompickaxes/init/ModTiers;
+
+## com/custompickaxes/item/EchoPickaxe.class
+FIELD VALUABLE_ORES Ljava/util/Set;
+METHOD <init> ()V
+  bytecode 2ab20001041207bb000859b7000ab7000eb1
+  0001 op=b2 com/custompickaxes/init/ModTiers ECHO Lcom/custompickaxes/init/ModTiers;
+  0005 op=12 -2.799999952316284
+  0007 op=bb net/minecraft/world/item/Item$Properties
+  000b op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000e op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD use (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResultHolder;
+  bytecode 2c2db600133a042cb600192ab6001d9900091904b80023b02bb400299a023e2bc1002f9902372bc0002f3a052cb600313a06bb003559b700373a07013a0814003a3909123c3a0b100c360c150c150c68360d1906b6003e360e1906b60044360f1906b600473610150c7436111511150ca300b715111511683612150c7436131513150ca3009e151215131513686036141514150da40006a70084150c7436151515150ca30078151415151515686036161516150da40006a7005e1907150e151160150f1513601510151560b6004a572b1907b6004e3a171917b60052990006a700361917b600583a18b2005c1918b9006202009900221516871809989c001915168739091907b600683a081918b6006bb600713a0b841501a7ff87841301a7ff61841101a7ff481908c6010c1809b80077b8007d8836111908b600441906b60044643612151205a400081281a70011151210fea200081283a7000512853a132c190b15111913ba00870000b8008b04b600912b011906b20095b2009b0c12a1b600a22b011906b200a6b2009b0c12a9b600a21908b6003e1906b6003e6487041511b800aa876f39141908b600441906b600446487041511b800aa876f39161908b600471906b600476487041511b800aa876f391804361a151a1511100ab800aea300521905b200b11906b6003e871400b7631814151a876b631906b60044871400b9631816151a876b631906b60047871400b7631818151a876b63051400bb1400bb1400bb1400bdb600bf57841a01a7ffa8a7001e2c12c3b8008b04b600912b011906b200c5b2009b12c812c9b600a22cb600192a1032b600ca19042bb600ceb800d0b0
+  0002 op=b6 net/minecraft/world/entity/player/Player getItemInHand (Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;
+  0008 op=b6 net/minecraft/world/entity/player/Player getCooldowns ()Lnet/minecraft/world/item/ItemCooldowns;
+  000c op=b6 net/minecraft/world/item/ItemCooldowns isOnCooldown (Lnet/minecraft/world/item/Item;)Z
+  0014 op=b8 net/minecraft/world/InteractionResultHolder fail (Ljava/lang/Object;)Lnet/minecraft/world/InteractionResultHolder;
+  0019 op=b4 net/minecraft/world/level/Level isClientSide Z
+  0020 op=c1 net/minecraft/server/level/ServerLevel
+  0027 op=c0 net/minecraft/server/level/ServerLevel
+  002d op=b6 net/minecraft/world/entity/player/Player blockPosition ()Lnet/minecraft/core/BlockPos;
+  0032 op=bb net/minecraft/core/BlockPos$MutableBlockPos
+  0036 op=b7 net/minecraft/core/BlockPos$MutableBlockPos <init> ()V
+  003e op=14 1.7976931348623157e+308
+  0043 op=12
+  0054 op=b6 net/minecraft/core/BlockPos getX ()I
+  005b op=b6 net/minecraft/core/BlockPos getY ()I
+  0062 op=b6 net/minecraft/core/BlockPos getZ ()I
+  00cb op=b6 net/minecraft/core/BlockPos$MutableBlockPos set (III)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+  00d2 op=b6 net/minecraft/world/level/Level getBlockState (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+  00d9 op=b6 net/minecraft/world/level/block/state/BlockState isAir ()Z
+  00e4 op=b6 net/minecraft/world/level/block/state/BlockState getBlock ()Lnet/minecraft/world/level/block/Block;
+  00e9 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00ee op=b9 java/util/Set contains (Ljava/lang/Object;)Z
+  0106 op=b6 net/minecraft/core/BlockPos$MutableBlockPos immutable ()Lnet/minecraft/core/BlockPos;
+  010d op=b6 net/minecraft/world/level/block/Block getName ()Lnet/minecraft/network/chat/MutableComponent;
+  0110 op=b6 net/minecraft/network/chat/MutableComponent getString ()Ljava/lang/String;
+  012e op=b8 java/lang/Math sqrt (D)D
+  0131 op=b8 java/lang/Math round (D)J
+  0139 op=b6 net/minecraft/core/BlockPos getY ()I
+  013e op=b6 net/minecraft/core/BlockPos getY ()I
+  014a op=12 Yukarıda
+  0156 op=12 Aşağıda / Derinde
+  015b op=12 Aynı Seviyede
+  0166 op=ba bootstrap:0 makeConcatWithConstants (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+  016b op=b8 net/minecraft/network/chat/Component literal (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  016f op=b6 net/minecraft/world/entity/player/Player displayClientMessage (Lnet/minecraft/network/chat/Component;Z)V
+  0176 op=b2 net/minecraft/sounds/SoundEvents SCULK_BLOCK_SPREAD Lnet/minecraft/sounds/SoundEvent;
+  0179 op=b2 net/minecraft/sounds/SoundSource PLAYERS Lnet/minecraft/sounds/SoundSource;
+  017d op=12 1.2000000476837158
+  017f op=b6 net/minecraft/world/level/Level playSound (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+  0186 op=b2 net/minecraft/sounds/SoundEvents AMETHYST_BLOCK_CHIME Lnet/minecraft/sounds/SoundEvent;
+  0189 op=b2 net/minecraft/sounds/SoundSource PLAYERS Lnet/minecraft/sounds/SoundSource;
+  018d op=12 0.800000011920929
+  018f op=b6 net/minecraft/world/level/Level playSound (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+  0194 op=b6 net/minecraft/core/BlockPos getX ()I
+  0199 op=b6 net/minecraft/core/BlockPos getX ()I
+  01a1 op=b8 java/lang/Math max (II)I
+  01aa op=b6 net/minecraft/core/BlockPos getY ()I
+  01af op=b6 net/minecraft/core/BlockPos getY ()I
+  01b7 op=b8 java/lang/Math max (II)I
+  01c0 op=b6 net/minecraft/core/BlockPos getZ ()I
+  01c5 op=b6 net/minecraft/core/BlockPos getZ ()I
+  01cd op=b8 java/lang/Math max (II)I
+  01dd op=b8 java/lang/Math min (II)I
+  01e5 op=b2 net/minecraft/core/particles/ParticleTypes SCULK_CHARGE_POP Lnet/minecraft/core/particles/SimpleParticleType;
+  01ea op=b6 net/minecraft/core/BlockPos getX ()I
+  01ee op=14 0.5
+  01fb op=b6 net/minecraft/core/BlockPos getY ()I
+  01ff op=14 1.2
+  020c op=b6 net/minecraft/core/BlockPos getZ ()I
+  0210 op=14 0.5
+  021c op=14 0.05
+  021f op=14 0.05
+  0222 op=14 0.05
+  0225 op=14 0.01
+  0228 op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+  0236 op=12 §7[Yankı Radarı] 12 blok çevrede değerli maden bulunamadı.
+  0238 op=b8 net/minecraft/network/chat/Component literal (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  023c op=b6 net/minecraft/world/entity/player/Player displayClientMessage (Lnet/minecraft/network/chat/Component;Z)V
+  0243 op=b2 net/minecraft/sounds/SoundEvents SCULK_SHRIEKER_SHRIEK Lnet/minecraft/sounds/SoundEvent;
+  0246 op=b2 net/minecraft/sounds/SoundSource PLAYERS Lnet/minecraft/sounds/SoundSource;
+  0249 op=12 0.4000000059604645
+  024b op=12 1.7999999523162842
+  024d op=b6 net/minecraft/world/level/Level playSound (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+  0251 op=b6 net/minecraft/world/entity/player/Player getCooldowns ()Lnet/minecraft/world/item/ItemCooldowns;
+  0257 op=b6 net/minecraft/world/item/ItemCooldowns addCooldown (Lnet/minecraft/world/item/Item;I)V
+  025d op=b6 net/minecraft/world/level/Level isClientSide ()Z
+  0260 op=b8 net/minecraft/world/InteractionResultHolder sidedSuccess (Ljava/lang/Object;Z)Lnet/minecraft/world/InteractionResultHolder;
+METHOD appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 2d12d4b800d6b200d9b600dfb900e30200572d12e8b800d6b200eab600dfb900e30200572d12edb800d6b200efb600dfb900e30200572a2b2c2d1904b700f2b1
+  0001 op=12 tooltip.custompickaxes.echo_1
+  0003 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0006 op=b2 net/minecraft/ChatFormatting DARK_AQUA Lnet/minecraft/ChatFormatting;
+  0009 op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  000c op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0013 op=12 tooltip.custompickaxes.echo_2
+  0015 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0018 op=b2 net/minecraft/ChatFormatting LIGHT_PURPLE Lnet/minecraft/ChatFormatting;
+  001b op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  001e op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0025 op=12 tooltip.custompickaxes.echo_3
+  0027 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  002a op=b2 net/minecraft/ChatFormatting DARK_GRAY Lnet/minecraft/ChatFormatting;
+  002d op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  0030 op=b9 java/util/List add (Ljava/lang/Object;)Z
+  003c op=b7 net/minecraft/world/item/PickaxeItem appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+METHOD <clinit> ()V
+  bytecode bb00f659b700f8b3005cb2005cb200f9b900ff020057b2005cb20100b900ff020057b2005cb20103b900ff020057b2005cb20106b900ff020057b2005cb20109b900ff020057b2005cb2010cb900ff020057b2005cb2010fb900ff020057b2005cb20112b900ff020057b2005cb20115b6011bc0006cb900ff020057b2005cb20121b6011bc0006cb900ff020057b2005cb20124b6011bc0006cb900ff020057b2005cb20127b6011bc0006cb900ff020057b2005cb2012ab6011bc0006cb900ff020057b2005cb2012db6011bc0006cb900ff020057b2005cb20130b6011bc0006cb900ff020057b2005cb20133b6011bc0006cb900ff020057b2005cb20136b6011bc0006cb900ff020057b2005cb20139b6011bc0006cb900ff020057b1
+  0000 op=bb java/util/HashSet
+  0004 op=b7 java/util/HashSet <init> ()V
+  0007 op=b3 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  000a op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  000d op=b2 net/minecraft/world/level/block/Blocks DIAMOND_ORE Lnet/minecraft/world/level/block/Block;
+  0010 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  0016 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0019 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_DIAMOND_ORE Lnet/minecraft/world/level/block/Block;
+  001c op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  0022 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0025 op=b2 net/minecraft/world/level/block/Blocks ANCIENT_DEBRIS Lnet/minecraft/world/level/block/Block;
+  0028 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  002e op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0031 op=b2 net/minecraft/world/level/block/Blocks EMERALD_ORE Lnet/minecraft/world/level/block/Block;
+  0034 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  003a op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  003d op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_EMERALD_ORE Lnet/minecraft/world/level/block/Block;
+  0040 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  0046 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0049 op=b2 net/minecraft/world/level/block/Blocks GOLD_ORE Lnet/minecraft/world/level/block/Block;
+  004c op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  0052 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0055 op=b2 net/minecraft/world/level/block/Blocks DEEPSLATE_GOLD_ORE Lnet/minecraft/world/level/block/Block;
+  0058 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  005e op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0061 op=b2 net/minecraft/world/level/block/Blocks NETHER_GOLD_ORE Lnet/minecraft/world/level/block/Block;
+  0064 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  006a op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  006d op=b2 com/custompickaxes/init/ModBlocks VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0070 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0073 op=c0 net/minecraft/world/level/block/Block
+  0076 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  007c op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  007f op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_VOLCANITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0082 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0085 op=c0 net/minecraft/world/level/block/Block
+  0088 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  008e op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  0091 op=b2 com/custompickaxes/init/ModBlocks STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0094 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0097 op=c0 net/minecraft/world/level/block/Block
+  009a op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00a0 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00a3 op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_STORMSTONE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00a6 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00a9 op=c0 net/minecraft/world/level/block/Block
+  00ac op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00b2 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00b5 op=b2 com/custompickaxes/init/ModBlocks ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00b8 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00bb op=c0 net/minecraft/world/level/block/Block
+  00be op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00c4 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00c7 op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_ECHO_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00ca op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00cd op=c0 net/minecraft/world/level/block/Block
+  00d0 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00d6 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00d9 op=b2 com/custompickaxes/init/ModBlocks VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00dc op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00df op=c0 net/minecraft/world/level/block/Block
+  00e2 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00e8 op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00eb op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_VITALITE_ORE Lnet/minecraftforge/registries/RegistryObject;
+  00ee op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00f1 op=c0 net/minecraft/world/level/block/Block
+  00f4 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  00fa op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  00fd op=b2 com/custompickaxes/init/ModBlocks TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0100 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0103 op=c0 net/minecraft/world/level/block/Block
+  0106 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+  010c op=b2 com/custompickaxes/item/EchoPickaxe VALUABLE_ORES Ljava/util/Set;
+  010f op=b2 com/custompickaxes/init/ModBlocks DEEPSLATE_TITANIUM_ORE Lnet/minecraftforge/registries/RegistryObject;
+  0112 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  0115 op=c0 net/minecraft/world/level/block/Block
+  0118 op=b9 java/util/Set add (Ljava/lang/Object;)Z
+
+## com/custompickaxes/item/StormstonePickaxe.class
+METHOD <init> ()V
+  bytecode 2ab20001041207bb000859b7000ab7000eb1
+  0001 op=b2 com/custompickaxes/init/ModTiers STORMSTONE Lcom/custompickaxes/init/ModTiers;
+  0005 op=12 -2.700000047683716
+  0007 op=bb net/minecraft/world/item/Item$Properties
+  000b op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000e op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD inventoryTick (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;IZ)V
+  bytecode 15059900382dc100139900312dc000133a062cb400159a00241906b4001b100f709a00191906bb001f59b20021102304030304b70027b6002a572a2b2c2d15041505b7002eb1
+  0006 op=c1 net/minecraft/world/entity/player/Player
+  000d op=c0 net/minecraft/world/entity/player/Player
+  0013 op=b4 net/minecraft/world/level/Level isClientSide Z
+  001b op=b4 net/minecraft/world/entity/player/Player tickCount I
+  0026 op=bb net/minecraft/world/effect/MobEffectInstance
+  002a op=b2 net/minecraft/world/effect/MobEffects DIG_SPEED Lnet/minecraft/world/effect/MobEffect;
+  0033 op=b7 net/minecraft/world/effect/MobEffectInstance <init> (Lnet/minecraft/world/effect/MobEffect;IIZZZ)V
+  0036 op=b6 net/minecraft/world/entity/player/Player addEffect (Lnet/minecraft/world/effect/MobEffectInstance;)Z
+  0042 op=b7 net/minecraft/world/item/PickaxeItem inventoryTick (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;IZ)V
+METHOD hurtEnemy (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2a2cb600322cb600382db6003c2a2b2c2db70042ac
+  0002 op=b6 net/minecraft/world/entity/LivingEntity level ()Lnet/minecraft/world/level/Level;
+  0006 op=b6 net/minecraft/world/entity/LivingEntity blockPosition ()Lnet/minecraft/core/BlockPos;
+  000a op=b6 com/custompickaxes/item/StormstonePickaxe triggerElectricShock (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V
+  0011 op=b7 net/minecraft/world/item/PickaxeItem hurtEnemy (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2cb400159a00272d2c1904b600460b959e001b2cb4004cb9005001001256969c000c2a2c19041905b6003c2a2b2c2d19041905b70057ac
+  0001 op=b4 net/minecraft/world/level/Level isClientSide Z
+  000b op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  0014 op=b4 net/minecraft/world/level/Level random Lnet/minecraft/util/RandomSource;
+  0017 op=b9 net/minecraft/util/RandomSource nextFloat ()F
+  001c op=12 0.15000000596046448
+  0028 op=b6 com/custompickaxes/item/StormstonePickaxe triggerElectricShock (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V
+  0033 op=b7 net/minecraft/world/item/PickaxeItem mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD triggerElectricShock (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V
+  bytecode 2bc1005b9900db2bc0005b3a041904b2005d2cb6006387140069632cb6006b87140069632cb6006e87140069631014140069140069140069140071b60073572b012cb20077b2007d12831284b60085bb0089592cb7008b14008eb600903a052b12941905b600963a062dc100139900152dc000133a082bb6009a1908b6009ea7000a2bb6009ab600a43a071906b900a801003a081908b900ae01009900441908b900b40100c000943a091909190712b8b600b9571904b2005d1909b600bd1909b600c00f631909b600c210081400c41400c61400c41400c8b6007357a7ffb8b1
+  0001 op=c1 net/minecraft/server/level/ServerLevel
+  0008 op=c0 net/minecraft/server/level/ServerLevel
+  000f op=b2 net/minecraft/core/particles/ParticleTypes ELECTRIC_SPARK Lnet/minecraft/core/particles/SimpleParticleType;
+  0013 op=b6 net/minecraft/core/BlockPos getX ()I
+  0017 op=14 0.5
+  001c op=b6 net/minecraft/core/BlockPos getY ()I
+  0020 op=14 0.5
+  0025 op=b6 net/minecraft/core/BlockPos getZ ()I
+  0029 op=14 0.5
+  002f op=14 0.5
+  0032 op=14 0.5
+  0035 op=14 0.5
+  0038 op=14 0.1
+  003b op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+  0042 op=b2 net/minecraft/sounds/SoundEvents LIGHTNING_BOLT_THUNDER Lnet/minecraft/sounds/SoundEvent;
+  0045 op=b2 net/minecraft/sounds/SoundSource PLAYERS Lnet/minecraft/sounds/SoundSource;
+  0048 op=12 0.6000000238418579
+  004a op=12 1.600000023841858
+  004c op=b6 net/minecraft/world/level/Level playSound (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+  004f op=bb net/minecraft/world/phys/AABB
+  0054 op=b7 net/minecraft/world/phys/AABB <init> (Lnet/minecraft/core/BlockPos;)V
+  0057 op=14 6.0
+  005a op=b6 net/minecraft/world/phys/AABB inflate (D)Lnet/minecraft/world/phys/AABB;
+  0060 op=12 net/minecraft/world/entity/monster/Monster
+  0064 op=b6 net/minecraft/world/level/Level getEntitiesOfClass (Ljava/lang/Class;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;
+  006a op=c1 net/minecraft/world/entity/player/Player
+  0071 op=c0 net/minecraft/world/entity/player/Player
+  0077 op=b6 net/minecraft/world/level/Level damageSources ()Lnet/minecraft/world/damagesource/DamageSources;
+  007c op=b6 net/minecraft/world/damagesource/DamageSources playerAttack (Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/damagesource/DamageSource;
+  0083 op=b6 net/minecraft/world/level/Level damageSources ()Lnet/minecraft/world/damagesource/DamageSources;
+  0086 op=b6 net/minecraft/world/damagesource/DamageSources lightningBolt ()Lnet/minecraft/world/damagesource/DamageSource;
+  008d op=b9 java/util/List iterator ()Ljava/util/Iterator;
+  0096 op=b9 java/util/Iterator hasNext ()Z
+  00a0 op=b9 java/util/Iterator next ()Ljava/lang/Object;
+  00a5 op=c0 net/minecraft/world/entity/monster/Monster
+  00ae op=12 6.0
+  00b0 op=b6 net/minecraft/world/entity/monster/Monster hurt (Lnet/minecraft/world/damagesource/DamageSource;F)Z
+  00b6 op=b2 net/minecraft/core/particles/ParticleTypes ELECTRIC_SPARK Lnet/minecraft/core/particles/SimpleParticleType;
+  00bb op=b6 net/minecraft/world/entity/monster/Monster getX ()D
+  00c0 op=b6 net/minecraft/world/entity/monster/Monster getY ()D
+  00c7 op=b6 net/minecraft/world/entity/monster/Monster getZ ()D
+  00cc op=14 0.2
+  00cf op=14 0.4
+  00d2 op=14 0.2
+  00d5 op=14 0.05
+  00d8 op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+METHOD appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 2d12cab800ccb200d2b600d8b900de0200572d12e2b800ccb200e4b600d8b900de0200572d12e7b800ccb200e9b600d8b900de0200572a2b2c2d1904b700ecb1
+  0001 op=12 tooltip.custompickaxes.stormstone_1
+  0003 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0006 op=b2 net/minecraft/ChatFormatting AQUA Lnet/minecraft/ChatFormatting;
+  0009 op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  000c op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0013 op=12 tooltip.custompickaxes.stormstone_2
+  0015 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0018 op=b2 net/minecraft/ChatFormatting YELLOW Lnet/minecraft/ChatFormatting;
+  001b op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  001e op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0025 op=12 tooltip.custompickaxes.stormstone_3
+  0027 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  002a op=b2 net/minecraft/ChatFormatting DARK_GRAY Lnet/minecraft/ChatFormatting;
+  002d op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  0030 op=b9 java/util/List add (Ljava/lang/Object;)Z
+  003c op=b7 net/minecraft/world/item/PickaxeItem appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+
+## com/custompickaxes/item/TitaniumPickaxe.class
+FIELD IS_AOE_MINING Ljava/lang/ThreadLocal;
+METHOD <init> ()V
+  bytecode 2ab20001051207bb000859b7000ab7000eb1
+  0001 op=b2 com/custompickaxes/init/ModTiers TITANIUM Lcom/custompickaxes/init/ModTiers;
+  0005 op=12 -2.799999952316284
+  0007 op=bb net/minecraft/world/item/Item$Properties
+  000b op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000e op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2cb400139a0074b20019b6001fc00025b600279a00651905c1002b99005d1905c0002b3a061906b6002d9a004e2d2c1904b600300b959e00422cc1003699003b2cc000363a07b2001904b80038b6003c2a190719062b19042db60040b2001903b80038b6003ca700123a08b2001903b80038b6003c1908bf2a2b2c2d19041905b70044ac
+  0001 op=b4 net/minecraft/world/level/Level isClientSide Z
+  0007 op=b2 com/custompickaxes/item/TitaniumPickaxe IS_AOE_MINING Ljava/lang/ThreadLocal;
+  000a op=b6 java/lang/ThreadLocal get ()Ljava/lang/Object;
+  000d op=c0 java/lang/Boolean
+  0010 op=b6 java/lang/Boolean booleanValue ()Z
+  0018 op=c1 net/minecraft/server/level/ServerPlayer
+  0020 op=c0 net/minecraft/server/level/ServerPlayer
+  0027 op=b6 net/minecraft/server/level/ServerPlayer isShiftKeyDown ()Z
+  0031 op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  003a op=c1 net/minecraft/server/level/ServerLevel
+  0041 op=c0 net/minecraft/server/level/ServerLevel
+  0046 op=b2 com/custompickaxes/item/TitaniumPickaxe IS_AOE_MINING Ljava/lang/ThreadLocal;
+  004a op=b8 java/lang/Boolean valueOf (Z)Ljava/lang/Boolean;
+  004d op=b6 java/lang/ThreadLocal set (Ljava/lang/Object;)V
+  0059 op=b6 com/custompickaxes/item/TitaniumPickaxe mine3x3Area (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V
+  005c op=b2 com/custompickaxes/item/TitaniumPickaxe IS_AOE_MINING Ljava/lang/ThreadLocal;
+  0060 op=b8 java/lang/Boolean valueOf (Z)Ljava/lang/Boolean;
+  0063 op=b6 java/lang/ThreadLocal set (Ljava/lang/Object;)V
+  006b op=b2 com/custompickaxes/item/TitaniumPickaxe IS_AOE_MINING Ljava/lang/ThreadLocal;
+  006f op=b8 java/lang/Boolean valueOf (Z)Ljava/lang/Boolean;
+  0072 op=b6 java/lang/ThreadLocal set (Ljava/lang/Object;)V
+  0080 op=b7 net/minecraft/world/item/PickaxeItem mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD mine3x3Area (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V
+  bytecode 2c0cb600483a061906b4004cb80052140058979e000bb2005a3a07a700241906b40060b800521906b40063b80052979e000bb200663a07a70008b200693a0719052b1904b600303808023609150904a300dc02360a150a04a300cd15099a000b150a9a0006a700ba1907b2005aa600121904150903150ab6006b3a0ba700261907b20066a600121904031509150ab6006b3a0ba7000f19041509150a03b6006b3a0b2c2b190b2cb40071b60075b6007b990006a7006c2b2cb40071b600752c190bb8007f02a00006a700572b190bb600853a0c190c2b190bb60030380d170d0b969c0006a7003b170d12891708128a6ab8008b959e0006a70028190cb6008f9a00202b190b042cb60092572d042c2cba00960000b6009a2db600a0990004b1840a01a7ff33840901a7ff24b1
+  0002 op=b6 net/minecraft/server/level/ServerPlayer getViewVector (F)Lnet/minecraft/world/phys/Vec3;
+  0009 op=b4 net/minecraft/world/phys/Vec3 y D
+  000c op=b8 java/lang/Math abs (D)D
+  000f op=14 0.65
+  0016 op=b2 net/minecraft/core/Direction$Axis Y Lnet/minecraft/core/Direction$Axis;
+  0020 op=b4 net/minecraft/world/phys/Vec3 x D
+  0023 op=b8 java/lang/Math abs (D)D
+  0028 op=b4 net/minecraft/world/phys/Vec3 z D
+  002b op=b8 java/lang/Math abs (D)D
+  0032 op=b2 net/minecraft/core/Direction$Axis X Lnet/minecraft/core/Direction$Axis;
+  003a op=b2 net/minecraft/core/Direction$Axis Z Lnet/minecraft/core/Direction$Axis;
+  0044 op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  006a op=b2 net/minecraft/core/Direction$Axis Y Lnet/minecraft/core/Direction$Axis;
+  0077 op=b6 net/minecraft/core/BlockPos offset (III)Lnet/minecraft/core/BlockPos;
+  0081 op=b2 net/minecraft/core/Direction$Axis X Lnet/minecraft/core/Direction$Axis;
+  008e op=b6 net/minecraft/core/BlockPos offset (III)Lnet/minecraft/core/BlockPos;
+  009d op=b6 net/minecraft/core/BlockPos offset (III)Lnet/minecraft/core/BlockPos;
+  00a7 op=b4 net/minecraft/server/level/ServerPlayer gameMode Lnet/minecraft/server/level/ServerPlayerGameMode;
+  00aa op=b6 net/minecraft/server/level/ServerPlayerGameMode getGameModeForPlayer ()Lnet/minecraft/world/level/GameType;
+  00ad op=b6 net/minecraft/server/level/ServerPlayer blockActionRestricted (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/GameType;)Z
+  00b8 op=b4 net/minecraft/server/level/ServerPlayer gameMode Lnet/minecraft/server/level/ServerPlayerGameMode;
+  00bb op=b6 net/minecraft/server/level/ServerPlayerGameMode getGameModeForPlayer ()Lnet/minecraft/world/level/GameType;
+  00c1 op=b8 net/minecraftforge/common/ForgeHooks onBlockBreakEvent (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/GameType;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/core/BlockPos;)I
+  00ce op=b6 net/minecraft/server/level/ServerLevel getBlockState (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+  00d8 op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  00e9 op=12 1.5
+  00ed op=12 2.5
+  00f0 op=b8 java/lang/Math max (FF)F
+  00fc op=b6 net/minecraft/world/level/block/state/BlockState isAir ()Z
+  0107 op=b6 net/minecraft/server/level/ServerLevel destroyBlock (Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z
+  010f op=ba bootstrap:0 accept (Lnet/minecraft/server/level/ServerPlayer;)Ljava/util/function/Consumer;
+  0114 op=b6 net/minecraft/world/item/ItemStack hurtAndBreak (ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V
+  0118 op=b6 net/minecraft/world/item/ItemStack isEmpty ()Z
+METHOD appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 2d12a3b800a5b200abb600b1b900b70200572d12bdb800a5b200bfb600b1b900b70200572d12c2b800a5b200c4b600b1b900b70200572a2b2c2d1904b700c7b1
+  0001 op=12 tooltip.custompickaxes.titanium_1
+  0003 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0006 op=b2 net/minecraft/ChatFormatting WHITE Lnet/minecraft/ChatFormatting;
+  0009 op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  000c op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0013 op=12 tooltip.custompickaxes.titanium_2
+  0015 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0018 op=b2 net/minecraft/ChatFormatting GRAY Lnet/minecraft/ChatFormatting;
+  001b op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  001e op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0025 op=12 tooltip.custompickaxes.titanium_3
+  0027 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  002a op=b2 net/minecraft/ChatFormatting DARK_GRAY Lnet/minecraft/ChatFormatting;
+  002d op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  0030 op=b9 java/util/List add (Ljava/lang/Object;)Z
+  003c op=b7 net/minecraft/world/item/PickaxeItem appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+METHOD lambda$mine3x3Area$1 (Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerPlayer;)V
+  bytecode 2b2ab600cbb600cfb1
+  0002 op=b6 net/minecraft/server/level/ServerPlayer getUsedItemHand ()Lnet/minecraft/world/InteractionHand;
+  0005 op=b6 net/minecraft/server/level/ServerPlayer broadcastBreakEvent (Lnet/minecraft/world/InteractionHand;)V
+METHOD lambda$static$0 ()Ljava/lang/Boolean;
+  bytecode 03b80038b0
+  0001 op=b8 java/lang/Boolean valueOf (Z)Ljava/lang/Boolean;
+METHOD <clinit> ()V
+  bytecode ba00d30000b800d6b30019b1
+  0000 op=ba bootstrap:1 get ()Ljava/util/function/Supplier;
+  0005 op=b8 java/lang/ThreadLocal withInitial (Ljava/util/function/Supplier;)Ljava/lang/ThreadLocal;
+  0008 op=b3 com/custompickaxes/item/TitaniumPickaxe IS_AOE_MINING Ljava/lang/ThreadLocal;
+
+## com/custompickaxes/item/VitalitePickaxe.class
+METHOD <init> ()V
+  bytecode 2ab20001041207bb000859b7000ab7000eb1
+  0001 op=b2 com/custompickaxes/init/ModTiers VITALITE Lcom/custompickaxes/init/ModTiers;
+  0005 op=12 -2.799999952316284
+  0007 op=bb net/minecraft/world/item/Item$Properties
+  000b op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000e op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2cb400139a00b12d2c1904b600190b959e00a52bb6001f9900112b032bb600250564b80029b6002f1905c100339900461905c000333a061906b600351906b60039969c000a1906123cb6003d1906b60041b600451014a2001d2cb4004ab9004e01001253969c000e1906b6004104123cb600542cc1005899003e2cc000583a061906b2005a1904b6006087140065631904b6006787140065631904b6006a8714006563100614006d14006d14006d14006fb60071572a2b2c2d19041905b70075ac
+  0001 op=b4 net/minecraft/world/level/Level isClientSide Z
+  000b op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  0014 op=b6 net/minecraft/world/item/ItemStack isDamaged ()Z
+  001d op=b6 net/minecraft/world/item/ItemStack getDamageValue ()I
+  0022 op=b8 java/lang/Math max (II)I
+  0025 op=b6 net/minecraft/world/item/ItemStack setDamageValue (I)V
+  002a op=c1 net/minecraft/world/entity/player/Player
+  0032 op=c0 net/minecraft/world/entity/player/Player
+  0039 op=b6 net/minecraft/world/entity/player/Player getHealth ()F
+  003e op=b6 net/minecraft/world/entity/player/Player getMaxHealth ()F
+  0047 op=12 0.5
+  0049 op=b6 net/minecraft/world/entity/player/Player heal (F)V
+  004e op=b6 net/minecraft/world/entity/player/Player getFoodData ()Lnet/minecraft/world/food/FoodData;
+  0051 op=b6 net/minecraft/world/food/FoodData getFoodLevel ()I
+  005a op=b4 net/minecraft/world/level/Level random Lnet/minecraft/util/RandomSource;
+  005d op=b9 net/minecraft/util/RandomSource nextFloat ()F
+  0062 op=12 0.25
+  006a op=b6 net/minecraft/world/entity/player/Player getFoodData ()Lnet/minecraft/world/food/FoodData;
+  006e op=12 0.5
+  0070 op=b6 net/minecraft/world/food/FoodData eat (IF)V
+  0074 op=c1 net/minecraft/server/level/ServerLevel
+  007b op=c0 net/minecraft/server/level/ServerLevel
+  0082 op=b2 net/minecraft/core/particles/ParticleTypes HAPPY_VILLAGER Lnet/minecraft/core/particles/SimpleParticleType;
+  0087 op=b6 net/minecraft/core/BlockPos getX ()I
+  008b op=14 0.5
+  0091 op=b6 net/minecraft/core/BlockPos getY ()I
+  0095 op=14 0.5
+  009b op=b6 net/minecraft/core/BlockPos getZ ()I
+  009f op=14 0.5
+  00a5 op=14 0.3
+  00a8 op=14 0.3
+  00ab op=14 0.3
+  00ae op=14 0.02
+  00b1 op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+  00bd op=b7 net/minecraft/world/item/PickaxeItem mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 2d1279b8007bb20081b60087b9008d0200572d1293b8007bb20095b60087b9008d0200572d1298b8007bb2009ab60087b9008d0200572a2b2c2d1904b7009db1
+  0001 op=12 tooltip.custompickaxes.vitalite_1
+  0003 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0006 op=b2 net/minecraft/ChatFormatting GREEN Lnet/minecraft/ChatFormatting;
+  0009 op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  000c op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0013 op=12 tooltip.custompickaxes.vitalite_2
+  0015 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0018 op=b2 net/minecraft/ChatFormatting GOLD Lnet/minecraft/ChatFormatting;
+  001b op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  001e op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0025 op=12 tooltip.custompickaxes.vitalite_3
+  0027 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  002a op=b2 net/minecraft/ChatFormatting DARK_GRAY Lnet/minecraft/ChatFormatting;
+  002d op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  0030 op=b9 java/util/List add (Ljava/lang/Object;)Z
+  003c op=b7 net/minecraft/world/item/PickaxeItem appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+
+## com/custompickaxes/item/VolcanitePickaxe.class
+FIELD SMELT_ITEM_MAP Ljava/util/Map;
+FIELD FALLBACK_BLOCK_SMELT Ljava/util/Map;
+METHOD <init> ()V
+  bytecode 2ab20001041207bb000859b7000ab6000eb70012b1
+  0001 op=b2 com/custompickaxes/init/ModTiers VOLCANITE Lcom/custompickaxes/init/ModTiers;
+  0005 op=12 -2.799999952316284
+  0007 op=bb net/minecraft/world/item/Item$Properties
+  000b op=b7 net/minecraft/world/item/Item$Properties <init> ()V
+  000e op=b6 net/minecraft/world/item/Item$Properties fireResistant ()Lnet/minecraft/world/item/Item$Properties;
+  0011 op=b7 net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+METHOD hurtEnemy (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2c08b600172a2b2c2db7001dac
+  0002 op=b6 net/minecraft/world/entity/LivingEntity setSecondsOnFire (I)V
+  0009 op=b7 net/minecraft/world/item/PickaxeItem hurtEnemy (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+  bytecode 2cb400219a015d2cc100279901562cc000273a06b200292bb8002f9e000704a7000403360715079a013a2d2c1904b600350b959e012ebb003b591904b7003d140040b600423a082c12461908b600483a0903360a1909b9004c01003a0b190bb90052010099007e190bb900580100c000463a0c190cb6005c3a0d190db600603a0eb20065190eb9006b0200c000713a0f190fc70032190eb20073b60079a60011b2007db60079c000713a0fa70019190eb20080b60079a6000eb20083b60079c000713a0f190fc60019190cbb006159190f190db60086b7008ab6008d04360aa7ff7e150a99007d1906b200911904b600978714009c631904b6009e8714009c631904b600a18714009c6310081400a41400a41400a41400a6b600a8571906b200ac1904b600978714009c631904b6009e8714009c631904b600a18714009c63061400af1400af1400af1400b1b600a8572c011904b200b3b200b912bf12c0b600c12a2b2c2d19041905b700c5ac
+  0001 op=b4 net/minecraft/world/level/Level isClientSide Z
+  0008 op=c1 net/minecraft/server/level/ServerLevel
+  000f op=c0 net/minecraft/server/level/ServerLevel
+  0014 op=b2 net/minecraft/world/item/enchantment/Enchantments SILK_TOUCH Lnet/minecraft/world/item/enchantment/Enchantment;
+  0018 op=b8 net/minecraft/world/item/enchantment/EnchantmentHelper getItemEnchantmentLevel (Lnet/minecraft/world/item/enchantment/Enchantment;Lnet/minecraft/world/item/ItemStack;)I
+  002e op=b6 net/minecraft/world/level/block/state/BlockState getDestroySpeed (Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+  0036 op=bb net/minecraft/world/phys/AABB
+  003c op=b7 net/minecraft/world/phys/AABB <init> (Lnet/minecraft/core/BlockPos;)V
+  003f op=14 1.25
+  0042 op=b6 net/minecraft/world/phys/AABB inflate (D)Lnet/minecraft/world/phys/AABB;
+  0048 op=12 net/minecraft/world/entity/item/ItemEntity
+  004c op=b6 net/minecraft/world/level/Level getEntitiesOfClass (Ljava/lang/Class;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;
+  0056 op=b9 java/util/List iterator ()Ljava/util/Iterator;
+  005f op=b9 java/util/Iterator hasNext ()Z
+  0069 op=b9 java/util/Iterator next ()Ljava/lang/Object;
+  006e op=c0 net/minecraft/world/entity/item/ItemEntity
+  0075 op=b6 net/minecraft/world/entity/item/ItemEntity getItem ()Lnet/minecraft/world/item/ItemStack;
+  007c op=b6 net/minecraft/world/item/ItemStack getItem ()Lnet/minecraft/world/item/Item;
+  0081 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0086 op=b9 java/util/Map get (Ljava/lang/Object;)Ljava/lang/Object;
+  008b op=c0 net/minecraft/world/level/ItemLike
+  0097 op=b2 com/custompickaxes/init/ModItems RAW_VOLCANITE Lnet/minecraftforge/registries/RegistryObject;
+  009a op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00a0 op=b2 com/custompickaxes/init/ModItems VOLCANITE_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  00a3 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00a6 op=c0 net/minecraft/world/level/ItemLike
+  00b0 op=b2 com/custompickaxes/init/ModItems RAW_TITANIUM Lnet/minecraftforge/registries/RegistryObject;
+  00b3 op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00b9 op=b2 com/custompickaxes/init/ModItems TITANIUM_INGOT Lnet/minecraftforge/registries/RegistryObject;
+  00bc op=b6 net/minecraftforge/registries/RegistryObject get ()Ljava/lang/Object;
+  00bf op=c0 net/minecraft/world/level/ItemLike
+  00cb op=bb net/minecraft/world/item/ItemStack
+  00d3 op=b6 net/minecraft/world/item/ItemStack getCount ()I
+  00d6 op=b7 net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/world/level/ItemLike;I)V
+  00d9 op=b6 net/minecraft/world/entity/item/ItemEntity setItem (Lnet/minecraft/world/item/ItemStack;)V
+  00e9 op=b2 net/minecraft/core/particles/ParticleTypes FLAME Lnet/minecraft/core/particles/SimpleParticleType;
+  00ee op=b6 net/minecraft/core/BlockPos getX ()I
+  00f2 op=14 0.5
+  00f8 op=b6 net/minecraft/core/BlockPos getY ()I
+  00fc op=14 0.5
+  0102 op=b6 net/minecraft/core/BlockPos getZ ()I
+  0106 op=14 0.5
+  010c op=14 0.3
+  010f op=14 0.3
+  0112 op=14 0.3
+  0115 op=14 0.05
+  0118 op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+  011e op=b2 net/minecraft/core/particles/ParticleTypes LAVA Lnet/minecraft/core/particles/SimpleParticleType;
+  0123 op=b6 net/minecraft/core/BlockPos getX ()I
+  0127 op=14 0.5
+  012d op=b6 net/minecraft/core/BlockPos getY ()I
+  0131 op=14 0.5
+  0137 op=b6 net/minecraft/core/BlockPos getZ ()I
+  013b op=14 0.5
+  0140 op=14 0.2
+  0143 op=14 0.2
+  0146 op=14 0.2
+  0149 op=14 0.02
+  014c op=b6 net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I
+  0154 op=b2 net/minecraft/sounds/SoundEvents FIRECHARGE_USE Lnet/minecraft/sounds/SoundEvent;
+  0157 op=b2 net/minecraft/sounds/SoundSource BLOCKS Lnet/minecraft/sounds/SoundSource;
+  015a op=12 0.5
+  015c op=12 1.2000000476837158
+  015e op=b6 net/minecraft/world/level/Level playSound (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V
+  0169 op=b7 net/minecraft/world/item/PickaxeItem mineBlock (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
+METHOD appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+  bytecode 2d12c9b800cbb200d1b600d7b900dd0200572d12e1b800cbb200e3b600d7b900dd0200572d12e6b800cbb200e8b600d7b900dd0200572a2b2c2d1904b700ebb1
+  0001 op=12 tooltip.custompickaxes.volcanite_1
+  0003 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0006 op=b2 net/minecraft/ChatFormatting GOLD Lnet/minecraft/ChatFormatting;
+  0009 op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  000c op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0013 op=12 tooltip.custompickaxes.volcanite_2
+  0015 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  0018 op=b2 net/minecraft/ChatFormatting RED Lnet/minecraft/ChatFormatting;
+  001b op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  001e op=b9 java/util/List add (Ljava/lang/Object;)Z
+  0025 op=12 tooltip.custompickaxes.volcanite_3
+  0027 op=b8 net/minecraft/network/chat/Component translatable (Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+  002a op=b2 net/minecraft/ChatFormatting DARK_GRAY Lnet/minecraft/ChatFormatting;
+  002d op=b6 net/minecraft/network/chat/MutableComponent withStyle (Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;
+  0030 op=b9 java/util/List add (Ljava/lang/Object;)Z
+  003c op=b7 net/minecraft/world/item/PickaxeItem appendHoverText (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V
+METHOD <clinit> ()V
+  bytecode bb00ef59b700f1b30065bb00ef59b700f1b300f2b20065b200f5b200fbb900fe030057b20065b20102b20105b900fe030057b20065b20108b2010bb900fe030057b20065b2010eb20111b900fe030057b20065b20114b20117b900fe030057b20065b2011ab2011db900fe030057b20065b20123b2011db900fe030057b20065b20126b20129b900fe030057b20065b2012cb2012fb900fe030057b20065b20111b20132b900fe030057b200f2b20135b2011db900fe030057b200f2b20137b2011db900fe030057b200f2b20139b2013cb900fe030057b1
+  0000 op=bb java/util/HashMap
+  0004 op=b7 java/util/HashMap <init> ()V
+  0007 op=b3 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  000a op=bb java/util/HashMap
+  000e op=b7 java/util/HashMap <init> ()V
+  0011 op=b3 com/custompickaxes/item/VolcanitePickaxe FALLBACK_BLOCK_SMELT Ljava/util/Map;
+  0014 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0017 op=b2 net/minecraft/world/item/Items RAW_IRON Lnet/minecraft/world/item/Item;
+  001a op=b2 net/minecraft/world/item/Items IRON_INGOT Lnet/minecraft/world/item/Item;
+  001d op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  0023 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0026 op=b2 net/minecraft/world/item/Items RAW_GOLD Lnet/minecraft/world/item/Item;
+  0029 op=b2 net/minecraft/world/item/Items GOLD_INGOT Lnet/minecraft/world/item/Item;
+  002c op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  0032 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0035 op=b2 net/minecraft/world/item/Items RAW_COPPER Lnet/minecraft/world/item/Item;
+  0038 op=b2 net/minecraft/world/item/Items COPPER_INGOT Lnet/minecraft/world/item/Item;
+  003b op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  0041 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0044 op=b2 net/minecraft/world/item/Items COBBLESTONE Lnet/minecraft/world/item/Item;
+  0047 op=b2 net/minecraft/world/item/Items STONE Lnet/minecraft/world/item/Item;
+  004a op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  0050 op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0053 op=b2 net/minecraft/world/item/Items COBBLED_DEEPSLATE Lnet/minecraft/world/item/Item;
+  0056 op=b2 net/minecraft/world/item/Items DEEPSLATE Lnet/minecraft/world/item/Item;
+  0059 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  005f op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0062 op=b2 net/minecraft/world/item/Items SAND Lnet/minecraft/world/item/Item;
+  0065 op=b2 net/minecraft/world/level/block/Blocks GLASS Lnet/minecraft/world/level/block/Block;
+  0068 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  006e op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0071 op=b2 net/minecraft/world/item/Items RED_SAND Lnet/minecraft/world/item/Item;
+  0074 op=b2 net/minecraft/world/level/block/Blocks GLASS Lnet/minecraft/world/level/block/Block;
+  0077 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  007d op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  0080 op=b2 net/minecraft/world/item/Items CLAY_BALL Lnet/minecraft/world/item/Item;
+  0083 op=b2 net/minecraft/world/item/Items BRICK Lnet/minecraft/world/item/Item;
+  0086 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  008c op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  008f op=b2 net/minecraft/world/item/Items ANCIENT_DEBRIS Lnet/minecraft/world/item/Item;
+  0092 op=b2 net/minecraft/world/item/Items NETHERITE_SCRAP Lnet/minecraft/world/item/Item;
+  0095 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  009b op=b2 com/custompickaxes/item/VolcanitePickaxe SMELT_ITEM_MAP Ljava/util/Map;
+  009e op=b2 net/minecraft/world/item/Items STONE Lnet/minecraft/world/item/Item;
+  00a1 op=b2 net/minecraft/world/level/block/Blocks SMOOTH_STONE Lnet/minecraft/world/level/block/Block;
+  00a4 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  00aa op=b2 com/custompickaxes/item/VolcanitePickaxe FALLBACK_BLOCK_SMELT Ljava/util/Map;
+  00ad op=b2 net/minecraft/world/level/block/Blocks SAND Lnet/minecraft/world/level/block/Block;
+  00b0 op=b2 net/minecraft/world/level/block/Blocks GLASS Lnet/minecraft/world/level/block/Block;
+  00b3 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  00b9 op=b2 com/custompickaxes/item/VolcanitePickaxe FALLBACK_BLOCK_SMELT Ljava/util/Map;
+  00bc op=b2 net/minecraft/world/level/block/Blocks RED_SAND Lnet/minecraft/world/level/block/Block;
+  00bf op=b2 net/minecraft/world/level/block/Blocks GLASS Lnet/minecraft/world/level/block/Block;
+  00c2 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  00c8 op=b2 com/custompickaxes/item/VolcanitePickaxe FALLBACK_BLOCK_SMELT Ljava/util/Map;
+  00cb op=b2 net/minecraft/world/level/block/Blocks CLAY Lnet/minecraft/world/level/block/Block;
+  00ce op=b2 net/minecraft/world/level/block/Blocks TERRACOTTA Lnet/minecraft/world/level/block/Block;
+  00d1 op=b9 java/util/Map put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+## META-INF/mods.toml
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="custompickaxes"
+version="1.0.0"
+displayName="Ozel Kazmalar Modu (Custom Pickaxes)"
+authors="User & Antigravity"
+description="Minecraft 1.20.1 Forge kazma modu 5 ozel kazma ve 5 yeni maden ekler."
+
+[[dependencies.custompickaxes]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.custompickaxes]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="BOTH"
+
+## assets/custompickaxes/blockstates/deepslate_echo_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/deepslate_echo_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/deepslate_stormstone_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/deepslate_stormstone_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/deepslate_titanium_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/deepslate_titanium_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/deepslate_vitalite_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/deepslate_vitalite_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/deepslate_volcanite_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/deepslate_volcanite_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/echo_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/echo_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/stormstone_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/stormstone_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/titanium_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/titanium_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/vitalite_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/vitalite_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/blockstates/volcanite_ore.json
+﻿{
+  "variants": {
+    "": {
+      "model": "custompickaxes:block/volcanite_ore"
+    }
+  }
+}
+
+## assets/custompickaxes/lang/en_us.json
+{
+  "creativetab.custompickaxes": "Custom Pickaxes & Ores",
+
+  "item.custompickaxes.volcanite_pickaxe": "Volcanite Pickaxe",
+  "item.custompickaxes.stormstone_pickaxe": "Stormstone Pickaxe",
+  "item.custompickaxes.echo_pickaxe": "Echo Pickaxe",
+  "item.custompickaxes.vitalite_pickaxe": "Vitalite Pickaxe",
+  "item.custompickaxes.titanium_pickaxe": "Titanium Pickaxe",
+
+  "item.custompickaxes.raw_volcanite": "Raw Volcanite",
+  "item.custompickaxes.volcanite_ingot": "Volcanite Ingot",
+  "item.custompickaxes.stormstone_crystal": "Stormstone Crystal",
+  "item.custompickaxes.echo_shard": "Echo Shard",
+  "item.custompickaxes.vitalite_gem": "Vitalite Gem",
+  "item.custompickaxes.raw_titanium": "Raw Titanium",
+  "item.custompickaxes.titanium_ingot": "Titanium Ingot",
+
+  "block.custompickaxes.volcanite_ore": "Volcanite Ore",
+  "block.custompickaxes.deepslate_volcanite_ore": "Deepslate Volcanite Ore",
+  "block.custompickaxes.stormstone_ore": "Stormstone Ore",
+  "block.custompickaxes.deepslate_stormstone_ore": "Deepslate Stormstone Ore",
+  "block.custompickaxes.echo_ore": "Echo Ore",
+  "block.custompickaxes.deepslate_echo_ore": "Deepslate Echo Ore",
+  "block.custompickaxes.vitalite_ore": "Vitalite Ore",
+  "block.custompickaxes.deepslate_vitalite_ore": "Deepslate Vitalite Ore",
+  "block.custompickaxes.titanium_ore": "Titanium Ore",
+  "block.custompickaxes.deepslate_titanium_ore": "Deepslate Titanium Ore",
+
+  "tooltip.custompickaxes.volcanite_1": "Ability: Auto-Smelt (Smelts ores instantly)",
+  "tooltip.custompickaxes.volcanite_2": "Fire & Lava immune / Ignites targets on hit",
+  "tooltip.custompickaxes.volcanite_3": "Turns iron and gold ores straight into ingots.",
+
+  "tooltip.custompickaxes.stormstone_1": "Ability: Permanent Haste II while held",
+  "tooltip.custompickaxes.stormstone_2": "15% Chance for Chain Lightning Shockwave",
+  "tooltip.custompickaxes.stormstone_3": "Mines at extreme lightning velocity.",
+
+  "tooltip.custompickaxes.echo_1": "Ability: Ore Sonar Radar",
+  "tooltip.custompickaxes.echo_2": "Right Click: Locates nearest valuable ore in 16 blocks",
+  "tooltip.custompickaxes.echo_3": "Uses Warden sculk resonance to reveal hidden diamonds.",
+
+  "tooltip.custompickaxes.vitalite_1": "Ability: Soul Mending & Life Leech",
+  "tooltip.custompickaxes.vitalite_2": "Repairs durability & heals player on every block mined",
+  "tooltip.custompickaxes.vitalite_3": "Endless mining lifespan with innate fortune.",
+
+  "tooltip.custompickaxes.titanium_1": "Ability: 3x3 Area of Effect Mining (Excavator)",
+  "tooltip.custompickaxes.titanium_2": "Destroys a 3x3 tunnel per strike (Sneak for 1x1)",
+  "tooltip.custompickaxes.titanium_3": "3200 Extreme Durability, Tier 4 Netherite power."
+}
+
+## assets/custompickaxes/lang/tr_tr.json
+{
+  "creativetab.custompickaxes": "Ozel Kazmalar ve Madenler",
+
+  "item.custompickaxes.volcanite_pickaxe": "Volkanit Kazmasi",
+  "item.custompickaxes.stormstone_pickaxe": "Firtinatasi Kazmasi",
+  "item.custompickaxes.echo_pickaxe": "Yanki Kazmasi",
+  "item.custompickaxes.vitalite_pickaxe": "Can Kazmasi",
+  "item.custompickaxes.titanium_pickaxe": "Titanyum Kazmasi",
+
+  "item.custompickaxes.raw_volcanite": "Ham Volkanit",
+  "item.custompickaxes.volcanite_ingot": "Volkanit Kulcesi",
+  "item.custompickaxes.stormstone_crystal": "Firtinatasi Kristali",
+  "item.custompickaxes.echo_shard": "Yanki Parcasi",
+  "item.custompickaxes.vitalite_gem": "Can Cevheri Mucevheri",
+  "item.custompickaxes.raw_titanium": "Ham Titanyum",
+  "item.custompickaxes.titanium_ingot": "Titanyum Kulcesi",
+
+  "block.custompickaxes.volcanite_ore": "Volkanit Cevheri",
+  "block.custompickaxes.deepslate_volcanite_ore": "Derintas Volkanit Cevheri",
+  "block.custompickaxes.stormstone_ore": "Firtinatasi Cevheri",
+  "block.custompickaxes.deepslate_stormstone_ore": "Derintas Firtinatasi Cevheri",
+  "block.custompickaxes.echo_ore": "Yanki Cevheri",
+  "block.custompickaxes.deepslate_echo_ore": "Derintas Yanki Cevheri",
+  "block.custompickaxes.vitalite_ore": "Can Cevheri",
+  "block.custompickaxes.deepslate_vitalite_ore": "Derintas Can Cevheri",
+  "block.custompickaxes.titanium_ore": "Titanyum Cevheri",
+  "block.custompickaxes.deepslate_titanium_ore": "Derintas Titanyum Cevheri",
+
+  "tooltip.custompickaxes.volcanite_1": "Ozel Guc: Otomatik Pisirme (Auto-Smelt)",
+  "tooltip.custompickaxes.volcanite_2": "Ates ve Lavda asla yanmaz / Vurusta atese verir",
+  "tooltip.custompickaxes.volcanite_3": "Demir ve Altin madenlerini aninda kulceye donusturur.",
+
+  "tooltip.custompickaxes.stormstone_1": "Ozel Guc: Daimi Acele II (Haste II)",
+  "tooltip.custompickaxes.stormstone_2": "%15 Sansla Yildirim Soku / Alan Hasari",
+  "tooltip.custompickaxes.stormstone_3": "Yildirim hizinda blok kazar.",
+
+  "tooltip.custompickaxes.echo_1": "Ozel Guc: Yanki Radari (Ore Sonar)",
+  "tooltip.custompickaxes.echo_2": "Sag Tik: 16 bloktaki en yakin degerli madeni tespit eder",
+  "tooltip.custompickaxes.echo_3": "Warden titresimleriyle gizli elmas ve cevherleri gosterir.",
+
+  "tooltip.custompickaxes.vitalite_1": "Ozel Guc: Ruh Onarimi (Soul Mending)",
+  "tooltip.custompickaxes.vitalite_2": "Blok kazdikca kendini tamir eder ve can doldurur",
+  "tooltip.custompickaxes.vitalite_3": "Dogal sans bonusu ve sinirsiz dayaniklilik.",
+
+  "tooltip.custompickaxes.titanium_1": "Ozel Guc: 3x3 Alan Kazma (Excavator)",
+  "tooltip.custompickaxes.titanium_2": "Tek vurusta 3x3 tunel acar (Shift ile normal 1x1)",
+  "tooltip.custompickaxes.titanium_3": "3200 Ekstrem Dayaniklilik, Netherite seviyesi guc."
+}
+
+## assets/custompickaxes/models/block/deepslate_echo_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/deepslate_echo_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/deepslate_stormstone_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/deepslate_stormstone_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/deepslate_titanium_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/deepslate_titanium_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/deepslate_vitalite_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/deepslate_vitalite_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/deepslate_volcanite_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/deepslate_volcanite_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/echo_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/echo_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/stormstone_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/stormstone_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/titanium_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/titanium_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/vitalite_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/vitalite_ore"
+  }
+}
+
+## assets/custompickaxes/models/block/volcanite_ore.json
+﻿{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "custompickaxes:block/volcanite_ore"
+  }
+}
+
+## assets/custompickaxes/models/item/deepslate_echo_ore.json
+﻿{
+  "parent": "custompickaxes:block/deepslate_echo_ore"
+}
+
+## assets/custompickaxes/models/item/deepslate_stormstone_ore.json
+﻿{
+  "parent": "custompickaxes:block/deepslate_stormstone_ore"
+}
+
+## assets/custompickaxes/models/item/deepslate_titanium_ore.json
+﻿{
+  "parent": "custompickaxes:block/deepslate_titanium_ore"
+}
+
+## assets/custompickaxes/models/item/deepslate_vitalite_ore.json
+﻿{
+  "parent": "custompickaxes:block/deepslate_vitalite_ore"
+}
+
+## assets/custompickaxes/models/item/deepslate_volcanite_ore.json
+﻿{
+  "parent": "custompickaxes:block/deepslate_volcanite_ore"
+}
+
+## assets/custompickaxes/models/item/echo_ore.json
+﻿{
+  "parent": "custompickaxes:block/echo_ore"
+}
+
+## assets/custompickaxes/models/item/echo_pickaxe.json
+﻿{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "custompickaxes:item/echo_pickaxe"
+  }
+}
+
+## assets/custompickaxes/models/item/echo_shard.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/echo_shard"
+  }
+}
+
+## assets/custompickaxes/models/item/raw_titanium.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/raw_titanium"
+  }
+}
+
+## assets/custompickaxes/models/item/raw_volcanite.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/raw_volcanite"
+  }
+}
+
+## assets/custompickaxes/models/item/stormstone_crystal.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/stormstone_crystal"
+  }
+}
+
+## assets/custompickaxes/models/item/stormstone_ore.json
+﻿{
+  "parent": "custompickaxes:block/stormstone_ore"
+}
+
+## assets/custompickaxes/models/item/stormstone_pickaxe.json
+﻿{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "custompickaxes:item/stormstone_pickaxe"
+  }
+}
+
+## assets/custompickaxes/models/item/titanium_ingot.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/titanium_ingot"
+  }
+}
+
+## assets/custompickaxes/models/item/titanium_ore.json
+﻿{
+  "parent": "custompickaxes:block/titanium_ore"
+}
+
+## assets/custompickaxes/models/item/titanium_pickaxe.json
+﻿{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "custompickaxes:item/titanium_pickaxe"
+  }
+}
+
+## assets/custompickaxes/models/item/vitalite_gem.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/vitalite_gem"
+  }
+}
+
+## assets/custompickaxes/models/item/vitalite_ore.json
+﻿{
+  "parent": "custompickaxes:block/vitalite_ore"
+}
+
+## assets/custompickaxes/models/item/vitalite_pickaxe.json
+﻿{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "custompickaxes:item/vitalite_pickaxe"
+  }
+}
+
+## assets/custompickaxes/models/item/volcanite_ingot.json
+﻿{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "custompickaxes:item/volcanite_ingot"
+  }
+}
+
+## assets/custompickaxes/models/item/volcanite_ore.json
+﻿{
+  "parent": "custompickaxes:block/volcanite_ore"
+}
+
+## assets/custompickaxes/models/item/volcanite_pickaxe.json
+﻿{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "custompickaxes:item/volcanite_pickaxe"
+  }
+}
+
+## data/custompickaxes/forge/biome_modifier/add_custom_ores.json
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "custompickaxes:volcanite_ore_placed",
+    "custompickaxes:stormstone_ore_placed",
+    "custompickaxes:echo_ore_placed",
+    "custompickaxes:vitalite_ore_placed",
+    "custompickaxes:titanium_ore_placed"
+  ],
+  "step": "underground_ores"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/deepslate_echo_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:deepslate_echo_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:echo_shard"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/deepslate_echo_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/deepslate_stormstone_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:deepslate_stormstone_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:stormstone_crystal"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/deepslate_stormstone_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/deepslate_titanium_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:deepslate_titanium_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:raw_titanium"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/deepslate_titanium_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/deepslate_vitalite_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:deepslate_vitalite_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:vitalite_gem"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/deepslate_vitalite_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/deepslate_volcanite_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:deepslate_volcanite_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:raw_volcanite"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/deepslate_volcanite_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/echo_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:echo_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:echo_shard"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/echo_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/stormstone_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:stormstone_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:stormstone_crystal"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/stormstone_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/titanium_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:titanium_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:raw_titanium"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/titanium_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/vitalite_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:vitalite_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:vitalite_gem"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/vitalite_ore"
+}
+
+
+## data/custompickaxes/loot_tables/blocks/volcanite_ore.json
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "name": "custompickaxes:volcanite_ore"
+            },
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "enchantment": "minecraft:fortune",
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
+                },
+                {
+                  "function": "minecraft:explosion_decay"
+                }
+              ],
+              "name": "custompickaxes:raw_volcanite"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "custompickaxes:blocks/volcanite_ore"
+}
+
+
+## data/custompickaxes/recipes/echo_pickaxe.json
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MMM",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "custompickaxes:echo_shard"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "custompickaxes:echo_pickaxe",
+    "count": 1
+  }
+}
+
+## data/custompickaxes/recipes/smelt_titanium.json
+﻿{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "custompickaxes:raw_titanium"
+  },
+  "result": "custompickaxes:titanium_ingot",
+  "experience": 1.0,
+  "cookingtime": 200
+}
+
+## data/custompickaxes/recipes/smelt_volcanite.json
+﻿{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "custompickaxes:raw_volcanite"
+  },
+  "result": "custompickaxes:volcanite_ingot",
+  "experience": 1.0,
+  "cookingtime": 200
+}
+
+## data/custompickaxes/recipes/stormstone_pickaxe.json
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MMM",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "custompickaxes:stormstone_crystal"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "custompickaxes:stormstone_pickaxe",
+    "count": 1
+  }
+}
+
+## data/custompickaxes/recipes/titanium_pickaxe.json
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MMM",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "custompickaxes:titanium_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "custompickaxes:titanium_pickaxe",
+    "count": 1
+  }
+}
+
+## data/custompickaxes/recipes/vitalite_pickaxe.json
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MMM",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "custompickaxes:vitalite_gem"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "custompickaxes:vitalite_pickaxe",
+    "count": 1
+  }
+}
+
+## data/custompickaxes/recipes/volcanite_pickaxe.json
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MMM",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "custompickaxes:volcanite_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "custompickaxes:volcanite_pickaxe",
+    "count": 1
+  }
+}
+
+## data/custompickaxes/worldgen/configured_feature/echo_ore.json
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 4,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:deepslate_echo_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:echo_ore"
+        }
+      }
+    ]
+  }
+}
+
+
+## data/custompickaxes/worldgen/configured_feature/stormstone_ore.json
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 8,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:stormstone_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:deepslate_stormstone_ore"
+        }
+      }
+    ]
+  }
+}
+
+
+## data/custompickaxes/worldgen/configured_feature/titanium_ore.json
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 5,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:deepslate_titanium_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:titanium_ore"
+        }
+      }
+    ]
+  }
+}
+
+
+## data/custompickaxes/worldgen/configured_feature/vitalite_ore.json
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 6,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:vitalite_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:deepslate_vitalite_ore"
+        }
+      }
+    ]
+  }
+}
+
+
+## data/custompickaxes/worldgen/configured_feature/volcanite_ore.json
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 7,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:volcanite_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "custompickaxes:deepslate_volcanite_ore"
+        }
+      }
+    ]
+  }
+}
+
+
+## data/custompickaxes/worldgen/placed_feature/echo_ore_placed.json
+{
+  "feature": "custompickaxes:echo_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 5
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": -64
+        },
+        "max_inclusive": {
+          "absolute": -35
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
+
+
+## data/custompickaxes/worldgen/placed_feature/stormstone_ore_placed.json
+{
+  "feature": "custompickaxes:stormstone_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 9
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": 32
+        },
+        "max_inclusive": {
+          "absolute": 180
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
+
+
+## data/custompickaxes/worldgen/placed_feature/titanium_ore_placed.json
+{
+  "feature": "custompickaxes:titanium_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 6
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": -55
+        },
+        "max_inclusive": {
+          "absolute": 0
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
+
+
+## data/custompickaxes/worldgen/placed_feature/vitalite_ore_placed.json
+{
+  "feature": "custompickaxes:vitalite_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 7
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": -30
+        },
+        "max_inclusive": {
+          "absolute": 50
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
+
+
+## data/custompickaxes/worldgen/placed_feature/volcanite_ore_placed.json
+{
+  "feature": "custompickaxes:volcanite_ore",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 8
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": -64
+        },
+        "max_inclusive": {
+          "absolute": -10
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
+
+
+## data/minecraft/tags/blocks/mineable/pickaxe.json
+﻿{
+  "replace": false,
+  "values": [
+    "custompickaxes:volcanite_ore",
+    "custompickaxes:deepslate_volcanite_ore",
+    "custompickaxes:stormstone_ore",
+    "custompickaxes:deepslate_stormstone_ore",
+    "custompickaxes:echo_ore",
+    "custompickaxes:deepslate_echo_ore",
+    "custompickaxes:vitalite_ore",
+    "custompickaxes:deepslate_vitalite_ore",
+    "custompickaxes:titanium_ore",
+    "custompickaxes:deepslate_titanium_ore"
+  ]
+}
+
+## data/minecraft/tags/blocks/needs_iron_tool.json
+{
+  "replace": false,
+  "values": [
+    "custompickaxes:titanium_ore",
+    "custompickaxes:deepslate_titanium_ore",
+    "custompickaxes:echo_ore",
+    "custompickaxes:deepslate_echo_ore"
+  ]
+}
+
+
+## data/minecraft/tags/blocks/needs_stone_tool.json
+{
+  "replace": false,
+  "values": [
+    "custompickaxes:volcanite_ore",
+    "custompickaxes:deepslate_volcanite_ore",
+    "custompickaxes:stormstone_ore",
+    "custompickaxes:deepslate_stormstone_ore",
+    "custompickaxes:vitalite_ore",
+    "custompickaxes:deepslate_vitalite_ore"
+  ]
+}
+
+
+## All entries
+META-INF/
+META-INF/MANIFEST.MF
+com/
+com/custompickaxes/
+com/custompickaxes/CustomPickaxesMod.class
+com/custompickaxes/init/
+com/custompickaxes/init/ModBlocks.class
+com/custompickaxes/init/ModCreativeModeTab.class
+com/custompickaxes/init/ModItems.class
+com/custompickaxes/init/ModTiers.class
+com/custompickaxes/item/
+com/custompickaxes/item/EchoPickaxe.class
+com/custompickaxes/item/StormstonePickaxe.class
+com/custompickaxes/item/TitaniumPickaxe.class
+com/custompickaxes/item/VitalitePickaxe.class
+com/custompickaxes/item/VolcanitePickaxe.class
+META-INF/mods.toml
+assets/
+assets/custompickaxes/
+assets/custompickaxes/blockstates/
+assets/custompickaxes/blockstates/deepslate_echo_ore.json
+assets/custompickaxes/blockstates/deepslate_stormstone_ore.json
+assets/custompickaxes/blockstates/deepslate_titanium_ore.json
+assets/custompickaxes/blockstates/deepslate_vitalite_ore.json
+assets/custompickaxes/blockstates/deepslate_volcanite_ore.json
+assets/custompickaxes/blockstates/echo_ore.json
+assets/custompickaxes/blockstates/stormstone_ore.json
+assets/custompickaxes/blockstates/titanium_ore.json
+assets/custompickaxes/blockstates/vitalite_ore.json
+assets/custompickaxes/blockstates/volcanite_ore.json
+assets/custompickaxes/lang/
+assets/custompickaxes/lang/en_us.json
+assets/custompickaxes/lang/tr_tr.json
+assets/custompickaxes/models/
+assets/custompickaxes/models/block/
+assets/custompickaxes/models/block/deepslate_echo_ore.json
+assets/custompickaxes/models/block/deepslate_stormstone_ore.json
+assets/custompickaxes/models/block/deepslate_titanium_ore.json
+assets/custompickaxes/models/block/deepslate_vitalite_ore.json
+assets/custompickaxes/models/block/deepslate_volcanite_ore.json
+assets/custompickaxes/models/block/echo_ore.json
+assets/custompickaxes/models/block/stormstone_ore.json
+assets/custompickaxes/models/block/titanium_ore.json
+assets/custompickaxes/models/block/vitalite_ore.json
+assets/custompickaxes/models/block/volcanite_ore.json
+assets/custompickaxes/models/item/
+assets/custompickaxes/models/item/deepslate_echo_ore.json
+assets/custompickaxes/models/item/deepslate_stormstone_ore.json
+assets/custompickaxes/models/item/deepslate_titanium_ore.json
+assets/custompickaxes/models/item/deepslate_vitalite_ore.json
+assets/custompickaxes/models/item/deepslate_volcanite_ore.json
+assets/custompickaxes/models/item/echo_ore.json
+assets/custompickaxes/models/item/echo_pickaxe.json
+assets/custompickaxes/models/item/echo_shard.json
+assets/custompickaxes/models/item/raw_titanium.json
+assets/custompickaxes/models/item/raw_volcanite.json
+assets/custompickaxes/models/item/stormstone_crystal.json
+assets/custompickaxes/models/item/stormstone_ore.json
+assets/custompickaxes/models/item/stormstone_pickaxe.json
+assets/custompickaxes/models/item/titanium_ingot.json
+assets/custompickaxes/models/item/titanium_ore.json
+assets/custompickaxes/models/item/titanium_pickaxe.json
+assets/custompickaxes/models/item/vitalite_gem.json
+assets/custompickaxes/models/item/vitalite_ore.json
+assets/custompickaxes/models/item/vitalite_pickaxe.json
+assets/custompickaxes/models/item/volcanite_ingot.json
+assets/custompickaxes/models/item/volcanite_ore.json
+assets/custompickaxes/models/item/volcanite_pickaxe.json
+assets/custompickaxes/textures/
+assets/custompickaxes/textures/block/
+assets/custompickaxes/textures/block/deepslate_echo_ore.png
+assets/custompickaxes/textures/block/deepslate_stormstone_ore.png
+assets/custompickaxes/textures/block/deepslate_titanium_ore.png
+assets/custompickaxes/textures/block/deepslate_vitalite_ore.png
+assets/custompickaxes/textures/block/deepslate_volcanite_ore.png
+assets/custompickaxes/textures/block/echo_ore.png
+assets/custompickaxes/textures/block/stormstone_ore.png
+assets/custompickaxes/textures/block/titanium_ore.png
+assets/custompickaxes/textures/block/vitalite_ore.png
+assets/custompickaxes/textures/block/volcanite_ore.png
+assets/custompickaxes/textures/item/
+assets/custompickaxes/textures/item/echo_pickaxe.png
+assets/custompickaxes/textures/item/echo_shard.png
+assets/custompickaxes/textures/item/raw_titanium.png
+assets/custompickaxes/textures/item/raw_volcanite.png
+assets/custompickaxes/textures/item/stormstone_crystal.png
+assets/custompickaxes/textures/item/stormstone_pickaxe.png
+assets/custompickaxes/textures/item/titanium_ingot.png
+assets/custompickaxes/textures/item/titanium_pickaxe.png
+assets/custompickaxes/textures/item/vitalite_gem.png
+assets/custompickaxes/textures/item/vitalite_pickaxe.png
+assets/custompickaxes/textures/item/volcanite_ingot.png
+assets/custompickaxes/textures/item/volcanite_pickaxe.png
+data/
+data/custompickaxes/
+data/custompickaxes/forge/
+data/custompickaxes/forge/biome_modifier/
+data/custompickaxes/forge/biome_modifier/add_custom_ores.json
+data/custompickaxes/loot_tables/
+data/custompickaxes/loot_tables/blocks/
+data/custompickaxes/loot_tables/blocks/deepslate_echo_ore.json
+data/custompickaxes/loot_tables/blocks/deepslate_stormstone_ore.json
+data/custompickaxes/loot_tables/blocks/deepslate_titanium_ore.json
+data/custompickaxes/loot_tables/blocks/deepslate_vitalite_ore.json
+data/custompickaxes/loot_tables/blocks/deepslate_volcanite_ore.json
+data/custompickaxes/loot_tables/blocks/echo_ore.json
+data/custompickaxes/loot_tables/blocks/stormstone_ore.json
+data/custompickaxes/loot_tables/blocks/titanium_ore.json
+data/custompickaxes/loot_tables/blocks/vitalite_ore.json
+data/custompickaxes/loot_tables/blocks/volcanite_ore.json
+data/custompickaxes/recipes/
+data/custompickaxes/recipes/echo_pickaxe.json
+data/custompickaxes/recipes/smelt_titanium.json
+data/custompickaxes/recipes/smelt_volcanite.json
+data/custompickaxes/recipes/stormstone_pickaxe.json
+data/custompickaxes/recipes/titanium_pickaxe.json
+data/custompickaxes/recipes/vitalite_pickaxe.json
+data/custompickaxes/recipes/volcanite_pickaxe.json
+data/custompickaxes/worldgen/
+data/custompickaxes/worldgen/configured_feature/
+data/custompickaxes/worldgen/configured_feature/echo_ore.json
+data/custompickaxes/worldgen/configured_feature/stormstone_ore.json
+data/custompickaxes/worldgen/configured_feature/titanium_ore.json
+data/custompickaxes/worldgen/configured_feature/vitalite_ore.json
+data/custompickaxes/worldgen/configured_feature/volcanite_ore.json
+data/custompickaxes/worldgen/placed_feature/
+data/custompickaxes/worldgen/placed_feature/echo_ore_placed.json
+data/custompickaxes/worldgen/placed_feature/stormstone_ore_placed.json
+data/custompickaxes/worldgen/placed_feature/titanium_ore_placed.json
+data/custompickaxes/worldgen/placed_feature/vitalite_ore_placed.json
+data/custompickaxes/worldgen/placed_feature/volcanite_ore_placed.json
+data/minecraft/
+data/minecraft/tags/
+data/minecraft/tags/blocks/
+data/minecraft/tags/blocks/mineable/
+data/minecraft/tags/blocks/mineable/pickaxe.json
+data/minecraft/tags/blocks/needs_iron_tool.json
+data/minecraft/tags/blocks/needs_stone_tool.json
+pack.mcmeta

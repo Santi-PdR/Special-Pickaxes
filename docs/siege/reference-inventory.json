@@ -1,0 +1,42 @@
+[
+  {
+    "jar": "referencias/CustomPickaxes/CustomPickaxes-1.20.1-1.0.0.jar",
+    "sha256": "57e976014fe954fac6f2eea48e674cb3ecdb9d0976d11a7abc45b7a45f284522",
+    "classes": 10,
+    "item_models": 22,
+    "textures": 22,
+    "sounds": 0,
+    "recipes": 7,
+    "worldgen": 10
+  },
+  {
+    "jar": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "sha256": "ac5a3b95bef0fa9bd667f59a3999851983ffc2b52a073e24745a2a2659eed33e",
+    "classes": 30,
+    "item_models": 11,
+    "textures": 12,
+    "sounds": 0,
+    "recipes": 10,
+    "worldgen": 0
+  },
+  {
+    "jar": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "sha256": "61a86eb815892fbb350cb8ecdae231710d92aeeeb9c9734458fec6190624d5a8",
+    "classes": 158,
+    "item_models": 10,
+    "textures": 42,
+    "sounds": 9,
+    "recipes": 8,
+    "worldgen": 1
+  },
+  {
+    "jar": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "sha256": "fb0ccf0a08aaa4f9a98a912551d098eb22b651664757e6cb6afd04023e91e98b",
+    "classes": 12,
+    "item_models": 7,
+    "textures": 7,
+    "sounds": 0,
+    "recipes": 7,
+    "worldgen": 0
+  }
+]

@@ -1,0 +1,691 @@
+{
+  "source_commit": "0c7233659d3b695da9211575f3356d81a1aeb1a8",
+  "run_id": 37685753507,
+  "jar_sha256": "c4b7a6f2b3041532cd4dff9823b5e8adbfc317b169153491f69f916fb0635857",
+  "jar_bytes": 186554,
+  "approved": true,
+  "reviewer": "Arena coding agent",
+  "reviewed_images": [
+    "control-activate.png",
+    "control-cancel.png",
+    "execution-eventide-gravity_in.png",
+    "execution-eventide-gravity_out.png",
+    "execution-fault_choir-mirror_x.png",
+    "execution-fault_choir-mirror_z.png",
+    "execution-fault_choir-rotate0.png",
+    "execution-fault_choir-rotate180.png",
+    "execution-fault_choir-rotate270.png",
+    "execution-fault_choir-rotate90.png",
+    "execution-hollow_axiom-selective.png",
+    "execution-icarus-forward.png",
+    "execution-icarus-reverse.png",
+    "execution-interregnum-stasis.png",
+    "execution-palimpsest-restore.png",
+    "execution-paradox_crucible-proximity.png",
+    "execution-paradox_crucible-regional.png",
+    "execution-worldbreaker-carve.png",
+    "execution-worldbreaker-cleave.png",
+    "execution-worldbreaker-core_drill.png",
+    "execution-worldbreaker-fracture.png",
+    "execution-worldbreaker-world_shatter.png",
+    "execution-worldloom-bridge.png",
+    "execution-worldloom-shelter.png",
+    "execution-worldloom-wall.png",
+    "gallery-clean.png",
+    "gallery-hud.png",
+    "gallery.png",
+    "inventory-closed.png",
+    "inventory.png",
+    "mode-switch-eventide-gravity_out.png",
+    "mode-switch-fault_choir-mirror_x.png",
+    "mode-switch-fault_choir-mirror_z.png",
+    "mode-switch-fault_choir-rotate180.png",
+    "mode-switch-fault_choir-rotate270.png",
+    "mode-switch-fault_choir-rotate90.png",
+    "mode-switch-icarus-reverse.png",
+    "mode-switch-paradox_crucible-proximity.png",
+    "mode-switch-worldbreaker-cleave.png",
+    "mode-switch-worldbreaker-core_drill.png",
+    "mode-switch-worldbreaker-fracture.png",
+    "mode-switch-worldbreaker-world_shatter.png",
+    "mode-switch-worldloom-bridge.png",
+    "mode-switch-worldloom-wall.png",
+    "supreme-camera-first.png",
+    "supreme-camera-front.png",
+    "supreme-complete.png",
+    "supreme-executing.png",
+    "third-person.png",
+    "ux-eventide-gravity_in.png",
+    "ux-eventide-gravity_out.png",
+    "ux-fault_choir-mirror_x.png",
+    "ux-fault_choir-mirror_z.png",
+    "ux-fault_choir-rotate0.png",
+    "ux-fault_choir-rotate180.png",
+    "ux-fault_choir-rotate270.png",
+    "ux-fault_choir-rotate90.png",
+    "ux-hollow_axiom-selective.png",
+    "ux-icarus-forward.png",
+    "ux-icarus-reverse.png",
+    "ux-interregnum-stasis.png",
+    "ux-palimpsest-restore.png",
+    "ux-paradox_crucible-proximity.png",
+    "ux-paradox_crucible-regional.png",
+    "ux-shift-eventide-gravity_in.png",
+    "ux-shift-eventide-gravity_out.png",
+    "ux-shift-fault_choir-mirror_x.png",
+    "ux-shift-fault_choir-mirror_z.png",
+    "ux-shift-fault_choir-rotate0.png",
+    "ux-shift-fault_choir-rotate180.png",
+    "ux-shift-fault_choir-rotate270.png",
+    "ux-shift-fault_choir-rotate90.png",
+    "ux-shift-hollow_axiom-selective.png",
+    "ux-shift-icarus-forward.png",
+    "ux-shift-icarus-reverse.png",
+    "ux-shift-interregnum-stasis.png",
+    "ux-shift-palimpsest-restore.png",
+    "ux-shift-paradox_crucible-proximity.png",
+    "ux-shift-paradox_crucible-regional.png",
+    "ux-shift-worldbreaker-carve.png",
+    "ux-shift-worldbreaker-cleave.png",
+    "ux-shift-worldbreaker-core_drill.png",
+    "ux-shift-worldbreaker-fracture.png",
+    "ux-shift-worldbreaker-world_shatter.png",
+    "ux-shift-worldloom-bridge.png",
+    "ux-shift-worldloom-shelter.png",
+    "ux-shift-worldloom-wall.png",
+    "ux-worldbreaker-carve.png",
+    "ux-worldbreaker-cleave.png",
+    "ux-worldbreaker-core_drill.png",
+    "ux-worldbreaker-fracture.png",
+    "ux-worldbreaker-world_shatter.png",
+    "ux-worldloom-bridge.png",
+    "ux-worldloom-shelter.png",
+    "ux-worldloom-wall.png"
+  ],
+  "review_copies": [
+    {
+      "original": "mode-switch-fault_choir-mirror_x.png",
+      "sha256": "558b6a5e503a02d6025a88cafa47d430b0e02a29b5a1340c3e3aebd58a930340",
+      "review_copy": "mode-switch-fault_choir-mirror_x.jpg",
+      "review_sha256": "cb1efdcadb9106d742949111cfb76f9db0d774521e22f95853fd7d9d8fca459f"
+    },
+    {
+      "original": "supreme-camera-first.png",
+      "sha256": "9651cc4cd6722ae8c35844ae402648971feeba82855428b53d9964f71e904ba1",
+      "review_copy": "supreme-camera-first.jpg",
+      "review_sha256": "f1cd706cd6a534f5ed1952d3ced952a16b4b8f6d13225c90172c13fa9b816f93"
+    },
+    {
+      "original": "ux-shift-paradox_crucible-regional.png",
+      "sha256": "f1a70dac37fc7bb9cdcfde8af0128b616f7b6efaf9d0d7560eb2077efba85187",
+      "review_copy": "ux-shift-paradox_crucible-regional.jpg",
+      "review_sha256": "f32f02d3bffa551f8a99793dfb126e08f538ee985e2318d2eec158db7042c95c"
+    },
+    {
+      "original": "ux-shift-palimpsest-restore.png",
+      "sha256": "0843c776c4c7812e9b86fb5cbac04f5fb32dd2c33d33ca53f10237a233521de5",
+      "review_copy": "ux-shift-palimpsest-restore.jpg",
+      "review_sha256": "e21c2fe9aedbe668a2d08097fa0c4bc5ba79bc0abdd627e6d28f771becea0ecc"
+    },
+    {
+      "original": "ux-shift-fault_choir-rotate180.png",
+      "sha256": "f161d72201d10b87a72679ac402fc7ee36a75d285fd766b7668fd5b0090e4e2b",
+      "review_copy": "ux-shift-fault_choir-rotate180.jpg",
+      "review_sha256": "6d9fe0caba2c0b9e5af33b8251a687b1d4bfb87a7c95c0361b735fa32121a9cb"
+    },
+    {
+      "original": "gallery.png",
+      "sha256": "b65474dcdd7c7f78b290a15a8dc1570592450292935f23b26646a0117bee8ae7",
+      "review_copy": "gallery.jpg",
+      "review_sha256": "c7f7c37e283f00a75c849fdc22637e1ba29ab2814ee32c6df8757d1d3c4c1ece"
+    },
+    {
+      "original": "execution-fault_choir-mirror_z.png",
+      "sha256": "e73a9c08a74465e71dba27b03dd73ee347d6b983849baf43f489678087a5d39f",
+      "review_copy": "execution-fault_choir-mirror_z.jpg",
+      "review_sha256": "35276284a294a200fcd71464e535d16df8233a23ab91f9722a0071f0f6d97bc9"
+    },
+    {
+      "original": "ux-shift-worldbreaker-fracture.png",
+      "sha256": "4649f5f044902cbbcf8ce1601473226f430627c6970bfce7bea1f3465eeff1f0",
+      "review_copy": "ux-shift-worldbreaker-fracture.jpg",
+      "review_sha256": "22aa2c002e310bb58a18ab61778901e1645daae734bb347a1b1f720d8f031381"
+    },
+    {
+      "original": "execution-eventide-gravity_out.png",
+      "sha256": "e8d29fb6016de6cf40a0ac51d7e97fdbbb6eed8a4cfffca488e2dd0b281a9252",
+      "review_copy": "execution-eventide-gravity_out.jpg",
+      "review_sha256": "59b52c2251a4f7bc820740cfeaf3e24d4049cc45676cb9d48513f87a4c3d07e8"
+    },
+    {
+      "original": "ux-shift-worldbreaker-world_shatter.png",
+      "sha256": "6960a97475a911669af3c7bb33e0e38b1f3d4a4680c09a4aaaaa21f08d0398f9",
+      "review_copy": "ux-shift-worldbreaker-world_shatter.jpg",
+      "review_sha256": "a49653a5ef79f03ad4f40fa85f6bcb0d09f3661a363a33b63cac25c271dfeadb"
+    },
+    {
+      "original": "execution-paradox_crucible-regional.png",
+      "sha256": "4c998c8a04e43e2df4090b7bc90c679433e9b7587801638cfd1fc0d173707a34",
+      "review_copy": "execution-paradox_crucible-regional.jpg",
+      "review_sha256": "3cbf863e40efe04c9eba746f3de708a6deb8dff22bdba6daaed2b45b72227b07"
+    },
+    {
+      "original": "ux-fault_choir-mirror_x.png",
+      "sha256": "8948a2e10a61311e88685217d1cde5b34fa1db27c49d95b79273f60e060deb63",
+      "review_copy": "ux-fault_choir-mirror_x.jpg",
+      "review_sha256": "ed8c73a1123c6a266fde5c5079733eebb8027619cc2345859864ae9fcd05e116"
+    },
+    {
+      "original": "execution-worldbreaker-world_shatter.png",
+      "sha256": "38655f238dce0ec5586ea80903fe18f57bd64f72856c29c5a80d96a221243aaa",
+      "review_copy": "execution-worldbreaker-world_shatter.jpg",
+      "review_sha256": "416c7c2fbda683ef6adb5e485e5115be81095db5ccf3995160d4ae73dbd36ba2"
+    },
+    {
+      "original": "ux-worldbreaker-cleave.png",
+      "sha256": "dcf594336ce4b25860c5411d35c1b4778a804472f828b48fb604622d62232db8",
+      "review_copy": "ux-worldbreaker-cleave.jpg",
+      "review_sha256": "13ec4fdbc47ef45bb52da56c234901f3c310ccb15677f82243bc4bf425961592"
+    },
+    {
+      "original": "mode-switch-eventide-gravity_out.png",
+      "sha256": "67a4dfff3da496942f04b692e43a607f6b5b7fb7955a9d61af901ea840d6df5c",
+      "review_copy": "mode-switch-eventide-gravity_out.jpg",
+      "review_sha256": "7996e990ca3718d88209cbb4d56907102f9b445874f2dc3a658468aacd3a4aea"
+    },
+    {
+      "original": "execution-fault_choir-mirror_x.png",
+      "sha256": "c3048df783b79c5b8037a609e25533faa5188894433337f9fa748485cfb8cbc4",
+      "review_copy": "execution-fault_choir-mirror_x.jpg",
+      "review_sha256": "f88fce3f010e5b08f93e0cf2124aab6dc431e1d44532867c36997d13ffa6a78e"
+    },
+    {
+      "original": "third-person.png",
+      "sha256": "dc6e49a097db76036c806f4a0e7c600d4837f0316fd5e1c42564cfaaae00f21a",
+      "review_copy": "third-person.jpg",
+      "review_sha256": "bf9d0acf5a6868d8d7ed8e18a6b28ffeea6a58fcef9f421d9bbae85aa1300040"
+    },
+    {
+      "original": "ux-worldloom-bridge.png",
+      "sha256": "ec695384b2252f0f090a6dec76d17ce42f3df9c6b34aef18f30dab96c075a465",
+      "review_copy": "ux-worldloom-bridge.jpg",
+      "review_sha256": "f73adf191256d0dc3c0795c4492aaf47494d85963bf994a2ebc6afed0f20a409"
+    },
+    {
+      "original": "gallery-clean.png",
+      "sha256": "25f208f554a2d8151104b19f836ed72cb75d200387c6630efc99291f57ac80b0",
+      "review_copy": "gallery-clean.jpg",
+      "review_sha256": "3ab261f61328847c4c90a0f28008904ec4c3cebca47905c7df822030c4862975"
+    },
+    {
+      "original": "mode-switch-worldloom-wall.png",
+      "sha256": "68a41a124872ed9cc48b5d2ed6f37edb32dc7d441cc1c4fd4d663db9984e0d1b",
+      "review_copy": "mode-switch-worldloom-wall.jpg",
+      "review_sha256": "48a138da791a6cab1656f7fe833ceca68ef1481d764b31f3b8916465a1442bc2"
+    },
+    {
+      "original": "ux-eventide-gravity_in.png",
+      "sha256": "dfea98b2d40ac2cc06155a56a5c434a1140ed0121fc69dbf43845250588d7b1e",
+      "review_copy": "ux-eventide-gravity_in.jpg",
+      "review_sha256": "3358a5d32f4c7463d46f7c6818baec38bdadf6c02c0f4ef326afb61c3bf428ba"
+    },
+    {
+      "original": "ux-worldbreaker-core_drill.png",
+      "sha256": "98f4280d058a3ec4bb9c47654e9104057ce1e74bd81f9eee408f55b75966a1cb",
+      "review_copy": "ux-worldbreaker-core_drill.jpg",
+      "review_sha256": "be2b88ed15f15f1565ace535550fb4b183cc9c58a42c26dab82bba061f5678b6"
+    },
+    {
+      "original": "supreme-complete.png",
+      "sha256": "2aff075f8bfdc85f81bb04c11dba3a593b38c412b9a92ae3d953de3566b32941",
+      "review_copy": "supreme-complete.jpg",
+      "review_sha256": "3e8b8f917918873c45670418758d2dc50a368bd8383c2b7a1c7fc4933aa53ebf"
+    },
+    {
+      "original": "ux-fault_choir-rotate0.png",
+      "sha256": "f3ad5ebe4d3323a9dc598960b387f4e14084f28fecbac60543a8d9fb67bfc5b3",
+      "review_copy": "ux-fault_choir-rotate0.jpg",
+      "review_sha256": "62b7c6c7cee88b24528c21f00aff92bad51a69eaef5fdac8ef6f09cc154a8cc7"
+    },
+    {
+      "original": "execution-worldloom-wall.png",
+      "sha256": "d9bc242b074e6cecc66692e124ec3e527005af86cb82de2de3c00fc9dd8b6f81",
+      "review_copy": "execution-worldloom-wall.jpg",
+      "review_sha256": "525944cf979bbd1c0f606e4d02c33d579b7ffad576c24ea59eda1af65f0c7ddc"
+    },
+    {
+      "original": "mode-switch-worldbreaker-cleave.png",
+      "sha256": "294506c6f41a0e7785284663ab88d4f3a8fb9dc21b0afd07a37af2b8f3a79236",
+      "review_copy": "mode-switch-worldbreaker-cleave.jpg",
+      "review_sha256": "e710ed9431f1e57784f20d14613825706afc2e3aa54349a42a37c40e792bfdd2"
+    },
+    {
+      "original": "ux-fault_choir-rotate90.png",
+      "sha256": "253b22f01be24d99343118098f8de9b279e02ec5e406c1b324e3262bfbe33f8a",
+      "review_copy": "ux-fault_choir-rotate90.jpg",
+      "review_sha256": "bc6bb1bb0b4b68607a0439a71b8a23c5908ca2621cb27366fb75a319d22e99f4"
+    },
+    {
+      "original": "ux-shift-eventide-gravity_in.png",
+      "sha256": "1958db97c60c38a4223c6e3f802d1fe64b91b6020e4f03a22eb92f161158c94e",
+      "review_copy": "ux-shift-eventide-gravity_in.jpg",
+      "review_sha256": "df962c7cb2f426da44b500b25da6ae707e90bc68e3809a0a65072e4bf00b4bc4"
+    },
+    {
+      "original": "ux-fault_choir-rotate180.png",
+      "sha256": "bb1b2a78e30a73a9cc6cd8ca9b5964e9b81645a20d221eaaf108a99967c20483",
+      "review_copy": "ux-fault_choir-rotate180.jpg",
+      "review_sha256": "28c1460c2a2b8d5b6bfe1a824f3d389763f979c313d916c38084ad3625ab4749"
+    },
+    {
+      "original": "supreme-executing.png",
+      "sha256": "adee5c12e702c993ae8da98bf59142ad0bf25c40c23b02c813b0873bc96b88a7",
+      "review_copy": "supreme-executing.jpg",
+      "review_sha256": "9d540734e37ece9c34888437976a5a608ad236e21592d3d366b09ccaab66dc3d"
+    },
+    {
+      "original": "ux-shift-worldloom-shelter.png",
+      "sha256": "10b1a1704a1381e12c66b867d93e9ece8b789c246ad8341703841499c7fd8515",
+      "review_copy": "ux-shift-worldloom-shelter.jpg",
+      "review_sha256": "572f5a4e7aa534966742d94aeb8daa1d87cd33573579cb46da48ec620c83e838"
+    },
+    {
+      "original": "gallery-hud.png",
+      "sha256": "3919f7cd429a0963149afdf68f07f86962e29fe3c2d1effab6deaa0b9ac8cd19",
+      "review_copy": "gallery-hud.jpg",
+      "review_sha256": "2cf22f25915d916b4f9d07f178744ce4e8f926dbc54f28a6d6233b1a4d5142ea"
+    },
+    {
+      "original": "ux-shift-interregnum-stasis.png",
+      "sha256": "afca0004c029bad97f691ac71de63fec9b977c3dac99737fa1c2725700fd1498",
+      "review_copy": "ux-shift-interregnum-stasis.jpg",
+      "review_sha256": "d1334a7b0af2a6014f9070197a150346c63bb5fd67f1bf7ab53a2c2769cd21a6"
+    },
+    {
+      "original": "execution-paradox_crucible-proximity.png",
+      "sha256": "b059ad032bff66f70ee1bc20853689096ab7aaa2dcd8b0901b2e8699a95b5b58",
+      "review_copy": "execution-paradox_crucible-proximity.jpg",
+      "review_sha256": "ea3b0cbaa023b7b518922f4eb53d4a1c36568c14223f9778ccdfcd7777a7a515"
+    },
+    {
+      "original": "ux-shift-fault_choir-rotate90.png",
+      "sha256": "d77ea0de99c5655451ab5ec02f026539135509530216f31b4ff617e3077dce00",
+      "review_copy": "ux-shift-fault_choir-rotate90.jpg",
+      "review_sha256": "d736364eeb09e2c617d500441e44438c3eb70a07ea2dd9952e872f95ef4f2b42"
+    },
+    {
+      "original": "ux-eventide-gravity_out.png",
+      "sha256": "6cf835be7043b9d3054755746f7aea1f98f7f942ea357d17512c3e4d8f4874d0",
+      "review_copy": "ux-eventide-gravity_out.jpg",
+      "review_sha256": "59ab6b887e6b2696b19a098512f6a4ba3b2c642f2e4a7a17bcc4440f64ab19be"
+    },
+    {
+      "original": "ux-shift-paradox_crucible-proximity.png",
+      "sha256": "43d6895cc3dbb345d93c306a041cc6ea8b5b58eba7122db6c64b72d186151de2",
+      "review_copy": "ux-shift-paradox_crucible-proximity.jpg",
+      "review_sha256": "62df9d989c3141d186ff6c9c02eceebdaee7ce95556f0df14c1f7188fe40769d"
+    },
+    {
+      "original": "execution-fault_choir-rotate180.png",
+      "sha256": "cfc038e433d8c9626343410773742881eb48f88eb954656cd8c508770949adb3",
+      "review_copy": "execution-fault_choir-rotate180.jpg",
+      "review_sha256": "b1b3763cada502a46d37cba341a7090850ce95aa1f1e031e1970538ccf1326af"
+    },
+    {
+      "original": "execution-palimpsest-restore.png",
+      "sha256": "425d44573d3311cfd60865e0af26ed37f9cb0f5909a0b969794b17956e69fb46",
+      "review_copy": "execution-palimpsest-restore.jpg",
+      "review_sha256": "f5b9d032efed2e7ca3405ccb9c8611bcd5ecc14bd3422a9d3e0b281798d8b3b1"
+    },
+    {
+      "original": "ux-shift-worldbreaker-carve.png",
+      "sha256": "78d3f6283f5bda46b550a749ff9f9faa6166c8b2d816a45e5029d524ef445ac7",
+      "review_copy": "ux-shift-worldbreaker-carve.jpg",
+      "review_sha256": "b4d73211c3477192d34bcbd3ad738799dcdf1b5d0a9db1ab2f5aeb22ff1ba0ea"
+    },
+    {
+      "original": "ux-worldloom-shelter.png",
+      "sha256": "f62fc0107a48ccd4b54013c008073233eadbe1ecf59532887663a108829c8b95",
+      "review_copy": "ux-worldloom-shelter.jpg",
+      "review_sha256": "d8e19c5d359eca82beef8c23ed69a577242a9ab1a3104700e764af2b3afdb441"
+    },
+    {
+      "original": "mode-switch-fault_choir-mirror_z.png",
+      "sha256": "a7e9c965b38797bc85c5ca27c5fbe53904653db83bc85b44a691691131ab5de7",
+      "review_copy": "mode-switch-fault_choir-mirror_z.jpg",
+      "review_sha256": "76a2010a0991917dc9f899cf0378db59fde6177b4d1730a118eddd538c808ba8"
+    },
+    {
+      "original": "execution-fault_choir-rotate90.png",
+      "sha256": "49738a92b030f2dcbc48ba8b3ab0642b772ced6bca100bdb175eab0119cf4ef0",
+      "review_copy": "execution-fault_choir-rotate90.jpg",
+      "review_sha256": "4aae333ae6dcd75c64d296f236e8b3cbe396bdedd7d3d14664c176ea72c233cc"
+    },
+    {
+      "original": "execution-eventide-gravity_in.png",
+      "sha256": "927a8099b03fa1ce1cdd35f42e55351ff70e626284fe0a8ca270108f61971e09",
+      "review_copy": "execution-eventide-gravity_in.jpg",
+      "review_sha256": "d4aef763b5c2c1e3ba6210ddc2bcf7c43d32d510e6e4432905c3e89a416d1b44"
+    },
+    {
+      "original": "ux-shift-worldloom-wall.png",
+      "sha256": "d8788ba9b9a7cfd17e3b0ecec25af81e93b53a3e4951c8f522e276774908e41d",
+      "review_copy": "ux-shift-worldloom-wall.jpg",
+      "review_sha256": "061d4a9aaff2cd4188662538218e19ee33ae1f010374dfa41764dd4cda44ed1d"
+    },
+    {
+      "original": "ux-worldloom-wall.png",
+      "sha256": "4818385a3d974c1580213bf4fe2d26bf3ee78bdb63d405b86ad1fcde558e0cfe",
+      "review_copy": "ux-worldloom-wall.jpg",
+      "review_sha256": "18918a6d31901597de003090a75f73908599414cc8eb2f9bfc04e9f5e84371cb"
+    },
+    {
+      "original": "inventory-closed.png",
+      "sha256": "5eaaaedad454a313b9591053621debac8d65246b87b8023b94bd51a0da7b6978",
+      "review_copy": "inventory-closed.jpg",
+      "review_sha256": "20e460f83cd5278087378f33182dda83a12e20270007f160bddd6a4c9816d4ba"
+    },
+    {
+      "original": "execution-interregnum-stasis.png",
+      "sha256": "e4b3d13c5bcf67a3ff3ea4d70354a94b1de41edfd02cd793a9038155211acd07",
+      "review_copy": "execution-interregnum-stasis.jpg",
+      "review_sha256": "5e87f4aac832c093cbb6608e967fe9331627323d989a516309189b9455d634d1"
+    },
+    {
+      "original": "execution-icarus-forward.png",
+      "sha256": "b1f7088c9ed8d9249ab85c5b8b47d35d2b80dfac810b86a93338ef61d2e6f517",
+      "review_copy": "execution-icarus-forward.jpg",
+      "review_sha256": "8eed60fe991e27d768d605495728f8767e3c6bcd53c7bba242b9096e35fa6799"
+    },
+    {
+      "original": "ux-worldbreaker-fracture.png",
+      "sha256": "80a3a55122f726eb4818b64003b971807a0d6418e6fedafa1fe5dc5b65b199f2",
+      "review_copy": "ux-worldbreaker-fracture.jpg",
+      "review_sha256": "19b3982ddea5923401d1cdcccfd801df87e45bc2c8e531a15460d67aa231792f"
+    },
+    {
+      "original": "execution-worldloom-shelter.png",
+      "sha256": "2386a0c2ccbbc3f861ecdd025c2ee81af7493c5ba5eb939aa420ae87694af097",
+      "review_copy": "execution-worldloom-shelter.jpg",
+      "review_sha256": "17947601df9aea02a7e621acb214ac51b4e6157b5457e2c06f7527bb0200bf2c"
+    },
+    {
+      "original": "execution-worldloom-bridge.png",
+      "sha256": "bb5e34295fde96d2229963ce6899c512c7e04b8ac68b7bfa255805aaab33c6fe",
+      "review_copy": "execution-worldloom-bridge.jpg",
+      "review_sha256": "145eaca40f2b78c908ff35443fb3d1b96e386292b05c4fb132aa55d47d7111c3"
+    },
+    {
+      "original": "ux-shift-eventide-gravity_out.png",
+      "sha256": "2b91afa55a37f9bda3ca46f289405bed55e83af22293576eb89c6ea6b326e1d5",
+      "review_copy": "ux-shift-eventide-gravity_out.jpg",
+      "review_sha256": "4cd27e24c4a089f0f6d114598c95feefece7e44c7dea870c4b01bd7ecb724d08"
+    },
+    {
+      "original": "mode-switch-fault_choir-rotate180.png",
+      "sha256": "c3163fe82b5adbd77839fd945aee4365844a72fe4c60dbd59d52b09eee8b5be5",
+      "review_copy": "mode-switch-fault_choir-rotate180.jpg",
+      "review_sha256": "6877f0fd2a040592dd8687f465efcf844dfe7c0e90e6be55586f449fdabdb3eb"
+    },
+    {
+      "original": "execution-worldbreaker-fracture.png",
+      "sha256": "ae1cce5345bed6eba28a3dd79324b02994e75113c5b27509f821af0b8fcfece7",
+      "review_copy": "execution-worldbreaker-fracture.jpg",
+      "review_sha256": "8b8699989fa39c6edb74c3658c414bda09f4e0707c39ef0ffef55b0af3beeffe"
+    },
+    {
+      "original": "inventory.png",
+      "sha256": "702c7f4041fc716c192ad57997b014e24bf34a0a5a4d32eefb88af1a58dd42b3",
+      "review_copy": "inventory.jpg",
+      "review_sha256": "80769937b32415738ce20af1ddb6fbe1d9300708f5e008328a144071298f01d1"
+    },
+    {
+      "original": "mode-switch-paradox_crucible-proximity.png",
+      "sha256": "2fae19d432305ee8274364ab8b7abe4be843ec7d7c88a4328ee7e65986fd8b0e",
+      "review_copy": "mode-switch-paradox_crucible-proximity.jpg",
+      "review_sha256": "529b1f23b509fea779d1b0c11c6e7addd24ec3be64bb6301296f63d4dd4fd996"
+    },
+    {
+      "original": "ux-shift-fault_choir-rotate270.png",
+      "sha256": "3dd1b6a0248783cf018da0c698598a71d19f4eb5b4635550ff151069a55500e3",
+      "review_copy": "ux-shift-fault_choir-rotate270.jpg",
+      "review_sha256": "99db15b2ad21583410a90949455cbe661f7bc3ed40c0a4de35b01fa9d4d85d35"
+    },
+    {
+      "original": "supreme-camera-front.png",
+      "sha256": "a5d30245e6b88ae5935389778e2b1804a423c3b298c9e4b655207a94717ed50e",
+      "review_copy": "supreme-camera-front.jpg",
+      "review_sha256": "f536a9a2fe4c50e832e65da663247fbc833da0e0ade5c6953975d0e783ad3e12"
+    },
+    {
+      "original": "ux-shift-icarus-forward.png",
+      "sha256": "eb3ffb0c71081311378889c882b30e6c431b96629ef781512c8cc84087570eea",
+      "review_copy": "ux-shift-icarus-forward.jpg",
+      "review_sha256": "2e67c962821ceb9553393d9d3dc20c350f58fcc089a0d914a56b0e3dff93fe19"
+    },
+    {
+      "original": "ux-shift-worldbreaker-cleave.png",
+      "sha256": "d3630195f904877eea95e66ce8356f759ff68343b03bbda7a2992a486e1868b3",
+      "review_copy": "ux-shift-worldbreaker-cleave.jpg",
+      "review_sha256": "69d03cd9719dda04de4d23f3012d1decafc217315180eb6f01da79b35350944e"
+    },
+    {
+      "original": "ux-shift-fault_choir-mirror_z.png",
+      "sha256": "dd8b03d1618195bc49742a8f75afa5d14825b02f1117a00751562d74b2503f16",
+      "review_copy": "ux-shift-fault_choir-mirror_z.jpg",
+      "review_sha256": "b8c8da168aaec1e027b5d496d9354f074c87601f6a3f78525a02d066537d60fe"
+    },
+    {
+      "original": "execution-icarus-reverse.png",
+      "sha256": "a3d7db5d17f139ec6733c251cc143ae92df6a78f14a76cd78681fdd70cfe10bc",
+      "review_copy": "execution-icarus-reverse.jpg",
+      "review_sha256": "3dc01b9783561bd0811de061eb1887ec8204e8ac58872547cf60dc7ede5dfcfc"
+    },
+    {
+      "original": "execution-worldbreaker-cleave.png",
+      "sha256": "b6720521c5d663a9c5e4c87e085c92c472d78c41d93af8f1074b78c4ccbdbffb",
+      "review_copy": "execution-worldbreaker-cleave.jpg",
+      "review_sha256": "a88336618911bb1e90d3b470e1505fa5fe7b23e8c1e32600a515a9664ce5e88b"
+    },
+    {
+      "original": "ux-worldbreaker-carve.png",
+      "sha256": "c8c908d51175843132b2ef046fddf02ba1ce002c89ada172676141211a8ed0c8",
+      "review_copy": "ux-worldbreaker-carve.jpg",
+      "review_sha256": "66916a7f1da94452f831875d82050bf7bb0e27b4fe92811978667617c669facf"
+    },
+    {
+      "original": "ux-fault_choir-mirror_z.png",
+      "sha256": "6b32519fb3f343615c4f576be5937d803be8072fdad4038bc3de0bee11cb2baf",
+      "review_copy": "ux-fault_choir-mirror_z.jpg",
+      "review_sha256": "29788fd35bd2415aed2b5f30d3167e79c585223dd2633c2f2d7a79b373847266"
+    },
+    {
+      "original": "mode-switch-worldloom-bridge.png",
+      "sha256": "4d753cefcb5da4b2384790d8d23356a0e3c888dcea745ae339c541da7905fdd7",
+      "review_copy": "mode-switch-worldloom-bridge.jpg",
+      "review_sha256": "43f8ed488a92a2a88237b9bc7fdd97ce6fbd9cc77f1e1111e4557f6ff3604cf9"
+    },
+    {
+      "original": "ux-shift-icarus-reverse.png",
+      "sha256": "a66fd474a0213808180f7f64b0a02cb2045d14ec2f848854fa8311e6e05e83b8",
+      "review_copy": "ux-shift-icarus-reverse.jpg",
+      "review_sha256": "016b07a4d3158ea1a0a3fac2a4fdbc99c9f252788219cf18f30bec4fd81896b8"
+    },
+    {
+      "original": "mode-switch-worldbreaker-core_drill.png",
+      "sha256": "858a2e132c15ef25e9365afae2b399580d483cb6d3626f3249d12e994f97d536",
+      "review_copy": "mode-switch-worldbreaker-core_drill.jpg",
+      "review_sha256": "c8d5543d5fee4bcfb605e34adf276b3a95368ca4c5b8fc7b2355b62027397e93"
+    },
+    {
+      "original": "mode-switch-icarus-reverse.png",
+      "sha256": "b046b0023d1b4ae29ef251877982632e50630fd3077ee4583e1fcabfc2e8e410",
+      "review_copy": "mode-switch-icarus-reverse.jpg",
+      "review_sha256": "4f484973a26fb6087de7680b357756aeaf58548bcbe4206935326dd55e1e2033"
+    },
+    {
+      "original": "ux-paradox_crucible-proximity.png",
+      "sha256": "591c0e3950f9de7b21803c44497467b4f0187ccf3806b3bc628b8d3b26288a8e",
+      "review_copy": "ux-paradox_crucible-proximity.jpg",
+      "review_sha256": "3eda19aca361da31ec5b499e328d22a8a630b356414f160d7e652c43ddeadf20"
+    },
+    {
+      "original": "mode-switch-worldbreaker-world_shatter.png",
+      "sha256": "540b11c5bcb157240871b64429416534e0ffc223b46a3c51a2611effabf88e34",
+      "review_copy": "mode-switch-worldbreaker-world_shatter.jpg",
+      "review_sha256": "3cfe0d3d09f68acedb5457753891fdf669493563098bc604b38cbf40e523c397"
+    },
+    {
+      "original": "ux-shift-fault_choir-rotate0.png",
+      "sha256": "e97ea92b63eaad1ede51e975f9c20a6c65422b85c8ec705251b13063677c2c2f",
+      "review_copy": "ux-shift-fault_choir-rotate0.jpg",
+      "review_sha256": "22d21b01b3b083447628c754b751f8e02a72d9d2e9b28d157a5a50bbbf3bf5f4"
+    },
+    {
+      "original": "execution-fault_choir-rotate0.png",
+      "sha256": "9302853da43861bc9bf6b43324873cdf8df525b5d0e41e8bf2a802410ac038b4",
+      "review_copy": "execution-fault_choir-rotate0.jpg",
+      "review_sha256": "ee30d543c127119fc564b98db3c8487100585a03185744153dd065403dbcc7ab"
+    },
+    {
+      "original": "control-cancel.png",
+      "sha256": "ff659a29036dab01eeea9c00812d5dacaa456e38d3486b3bec35c662852ca7bd",
+      "review_copy": "control-cancel.jpg",
+      "review_sha256": "856fabfbfaa17fe39f6477aa877dd24f7776161ded6556010f4c9e7baf907f9a"
+    },
+    {
+      "original": "ux-icarus-forward.png",
+      "sha256": "7b419caf147288f9efa90e53b373bec1242ba0277761717c191f5e52f3c98fef",
+      "review_copy": "ux-icarus-forward.jpg",
+      "review_sha256": "961713e018cae9001987712d04d9ba9db9be9ed2a14703070faedb4aedf231f2"
+    },
+    {
+      "original": "ux-shift-hollow_axiom-selective.png",
+      "sha256": "714e5814da50089e10f7cec0bb19e2e02e484248559753c16431a1b87d1c15fc",
+      "review_copy": "ux-shift-hollow_axiom-selective.jpg",
+      "review_sha256": "31bd05134a6723469511a704b0ee27e8e9e554aaa0d8f4531636bc161a788b56"
+    },
+    {
+      "original": "ux-fault_choir-rotate270.png",
+      "sha256": "df4fd3344bdb44675501a054506b0d5267051a607c4188c5506db5a9f4e85e92",
+      "review_copy": "ux-fault_choir-rotate270.jpg",
+      "review_sha256": "5b94cbcb49125f658103967d532a6d9c26863c8960c8e70720817fd936bfaf28"
+    },
+    {
+      "original": "ux-worldbreaker-world_shatter.png",
+      "sha256": "d8de8932407abed96e5eb5ce05b8802147ddc7f02ad42a1fc36cc520f86e77a3",
+      "review_copy": "ux-worldbreaker-world_shatter.jpg",
+      "review_sha256": "8360f407a84d3dd3249ef427323814d59d82eaaf66a01649a6e1951fbc9b6b84"
+    },
+    {
+      "original": "control-activate.png",
+      "sha256": "797e74ebf3063bad31144235f6a01f36165bd11b95e96d916500e355ff541a34",
+      "review_copy": "control-activate.jpg",
+      "review_sha256": "9506584698a78a45b51ad0753bb23d02c7b180711f3857dd6b1a74f1bf367a1d"
+    },
+    {
+      "original": "mode-switch-fault_choir-rotate270.png",
+      "sha256": "64f9fa8157efb4c1c0e9b6159ddff2314d5f4bc4ae265f20e11970716805010a",
+      "review_copy": "mode-switch-fault_choir-rotate270.jpg",
+      "review_sha256": "79b5f4d7d7074fd6c05a55e9b4716fddff2fcad6d7ec6449ae10381467187635"
+    },
+    {
+      "original": "execution-worldbreaker-core_drill.png",
+      "sha256": "a3e3fd9a8faf9d01d4313e2d130b5dd1328d9b7f81ade8c417c13b8811047074",
+      "review_copy": "execution-worldbreaker-core_drill.jpg",
+      "review_sha256": "4b9c059477624a16710d6b14ce32f785402b68e3e12160831b2b39f0ed67b598"
+    },
+    {
+      "original": "ux-icarus-reverse.png",
+      "sha256": "7743215a520f62982e4ad07af19f874e843ecae98d70d8ea29327ed1c04dd116",
+      "review_copy": "ux-icarus-reverse.jpg",
+      "review_sha256": "3b366f1526478f22798548f08d76df24b5e043c07569bc8cbe69958fb2122cfd"
+    },
+    {
+      "original": "ux-paradox_crucible-regional.png",
+      "sha256": "93d525cb491ee4113fbca00fed196cffeedd639f8c28a18acebdb31415c0b2fe",
+      "review_copy": "ux-paradox_crucible-regional.jpg",
+      "review_sha256": "a6698d274ae9b5063971f2ad35898b739a414b5886be5fa90073198d670b472b"
+    },
+    {
+      "original": "ux-interregnum-stasis.png",
+      "sha256": "a06f0a1029059e82f5198739ffb5d5245155303c4a20ac7a35463602a6f23adc",
+      "review_copy": "ux-interregnum-stasis.jpg",
+      "review_sha256": "d375d5efaac8a7bfebd0e96fed6bd8a34edea67ae666cae03e30d444b30175d0"
+    },
+    {
+      "original": "execution-fault_choir-rotate270.png",
+      "sha256": "3cfc1bebdcbfc176e45436a26aeb3ff2f303bd6def2ced8229425e417dccb125",
+      "review_copy": "execution-fault_choir-rotate270.jpg",
+      "review_sha256": "2ea4edca58dc19d3450bf1bb9ec88f782e70221e361ed370f0bba03914524b56"
+    },
+    {
+      "original": "mode-switch-worldbreaker-fracture.png",
+      "sha256": "1c5d2f1fcea563031807c3d597d6f69e9a0a0952f13ea8754d74c477ab7a7c47",
+      "review_copy": "mode-switch-worldbreaker-fracture.jpg",
+      "review_sha256": "05b04376b9812e08201ea63a5cb23f2d3eed93d99f94cf433ccc381bd7866ace"
+    },
+    {
+      "original": "mode-switch-fault_choir-rotate90.png",
+      "sha256": "c9baa832676371ef8e7d8ef353be1d95284d480dc2e811734710140c4ac1c221",
+      "review_copy": "mode-switch-fault_choir-rotate90.jpg",
+      "review_sha256": "9d48d049367af7aadfc8dd379fd1428db75cce246d9b5b884ba70eeae17dc5e2"
+    },
+    {
+      "original": "execution-hollow_axiom-selective.png",
+      "sha256": "3a4b6911bed8eb6379a92374901610d2c342a1a403d28a040b26e985696367ab",
+      "review_copy": "execution-hollow_axiom-selective.jpg",
+      "review_sha256": "5dfc7f1ecfa9d1e9bd194169b81732647acdf5fb71f31696dd7cd7f78d999ed9"
+    },
+    {
+      "original": "ux-shift-worldbreaker-core_drill.png",
+      "sha256": "9e10cdd3595319a65caa2702f80c4f57a8cbe0eff34e3d69639addbf147c3127",
+      "review_copy": "ux-shift-worldbreaker-core_drill.jpg",
+      "review_sha256": "0ff2134ee624fdbd208269cc735b4d4002c0bcb49611c8594125a360cd79afff"
+    },
+    {
+      "original": "ux-hollow_axiom-selective.png",
+      "sha256": "a31e8495f93e1e6ea97435dd5b3c956271974fd3acaf7615f99d62bc6891b005",
+      "review_copy": "ux-hollow_axiom-selective.jpg",
+      "review_sha256": "b36c294086b2d7d59aaaa021e9a65a78f4d50af018d6eb3d3246e20d02976657"
+    },
+    {
+      "original": "ux-shift-worldloom-bridge.png",
+      "sha256": "586e398e77421f86f4ef0afa700fcb491414593f761817668e1bf817da11e242",
+      "review_copy": "ux-shift-worldloom-bridge.jpg",
+      "review_sha256": "d33fdfe96fbcff05460e8e124f55781cf2f45e58f1240ec9fd61ffb07272fdad"
+    },
+    {
+      "original": "ux-shift-fault_choir-mirror_x.png",
+      "sha256": "3344153e92b22dd08c1b2475828eed7a1f99dba8cfaa4d1e24287f72196e605a",
+      "review_copy": "ux-shift-fault_choir-mirror_x.jpg",
+      "review_sha256": "6d5ed563b86b07f813ca1d4e3f71873fb635b0a5e6cc5f31a9885fc59b8b815c"
+    },
+    {
+      "original": "execution-worldbreaker-carve.png",
+      "sha256": "2c22d5b3f3515f11a1fa1f6b751e7959d746403c6f6c9958d83acbef6c041ebd",
+      "review_copy": "execution-worldbreaker-carve.jpg",
+      "review_sha256": "b477665b023b497fbe424983140aab3ccdddff2632224342806b7fdc2c6236c0"
+    },
+    {
+      "original": "ux-palimpsest-restore.png",
+      "sha256": "fab92e030510d71c80e8a65fbcef258259e98d3bcc8c45713e96c281117642d3",
+      "review_copy": "ux-palimpsest-restore.jpg",
+      "review_sha256": "8b9756bebd0468fe921b9d05c832cd533ebe4ac94ed89992999a542698aff099"
+    }
+  ],
+  "image_manifest_sha256": "2cef45844968315e32e03ffd4e0b9cff3269f3c88191ebd4333adc676803be8b",
+  "review_method": "Inspected all 95 same-frame JPEG copies: complete tooltip-region contact sheets for 23 normal and 23 SHIFT views; execution, mode-switch and supplemental scene sheets; full inventory, gallery and both supreme frames. Source copies hash-checked against image-manifest.json.",
+  "observations": [
+    "Nine distinct item identities visible in gallery and inventory; no missing-texture pattern.",
+    "All normal and SHIFT descriptions match their current modes; complete visible manuals and controls, no clipped footer or raw translation keys.",
+    "C changes the description; native activation/cancel and regional selection visible.",
+    "Effects and excavated/placed blocks visible; Icarus tunnels and the CORE DRILL execution are dark under ordinary Minecraft lighting, limiting their still-frame geometry detail. Native tests cover their route geometry and barriers.",
+    "Worldloom gallery uses a deliberately elevated test anchor and occupied cells; it is not a survival-site placement demonstration. Native tests cover payment, orientation and safe geometry.",
+    "Supreme execution and final wedge visible in first person; 9341 blocks removed; cancellation text at the terminal barrier is the current safety-stop feedback, not an assertion of all 96 slices being mined.",
+    "Fixture-only vanilla Night Vision illuminates the supreme scene; tooltip overlay and bootstrap splash setting are test-only. No permanent tooltip HUD or Night Vision ability is shipped."
+  ],
+  "limitations": [
+    "No siege repository or test-1 access. No full modpack, shader, real claims configuration or multiplayer TPS certification."
+  ]
+}

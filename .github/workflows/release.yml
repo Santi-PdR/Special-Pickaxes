@@ -1,0 +1,60 @@
+name: Publish visually approved mining release
+on:
+  push:
+    branches: [arena/74873685-special-pickaxes]
+    paths: [docs/mining-rework/VISUAL-REVIEW.json]
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  reproduce-approved-jar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Verify successful source run and complete visual approval
+        id: review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/verify_visual_review.py
+          cp docs/mining-rework/VISUAL-REVIEW.json "$RUNNER_TEMP/visual-review.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open('docs/mining-rework/VISUAL-REVIEW.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('source='+d['source_commit']+'\n')
+              f.write('expected_sha256='+d['jar_sha256']+'\n')
+          PY
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.review.outputs.source }}
+      - name: Reproduce the exact already validated binary
+        run: ./gradlew build --stacktrace
+      - run: python3 tools/verify_release.py
+      - name: Reject any byte difference from the fully tested JAR
+        env:
+          EXPECTED_SHA256: ${{ steps.review.outputs.expected_sha256 }}
+        run: |
+          echo "$EXPECTED_SHA256  build/libs/special-pickaxes-1.20.1-5.0.0.jar" | sha256sum --check --strict
+          python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar
+          cp "$RUNNER_TEMP/visual-review.json" build/VISUAL-REVIEW.json
+      - name: Export approved binary for verifiable retrieval
+        run: python3 tools/ci_evidence.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_BINARY: 'true'
+      - uses: actions/upload-artifact@v6
+        with:
+          name: special-pickaxes-5.0.0-verified
+          path: |
+            build/libs/*.jar
+            build/RELEASE.json
+            build/SHA256SUMS
+            build/VISUAL-REVIEW.json

@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+group = 'io.github.santipdr.specialpickaxes'
+version = '5.1.0'
+base { archivesName = 'special-pickaxes-1.20.1' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            mods { specialpickaxes { source sourceSets.main } }
+        }
+        client {
+            if (project.hasProperty('clientSmoke')) {
+                property 'specialpickaxes.clientSmoke', 'true'
+                args '--username', 'ArtifactTester', '--quickPlaySingleplayer', 'ArtifactSmoke', '--width', '1280', '--height', '720'
+                jvmArgs '-Xmx2G'
+            }
+        }
+        server { args '--nogui' }
+        gameTestServer {
+            property 'specialpickaxes.testFluids', 'true'
+            property 'forge.enabledGameTestNamespaces', 'specialpickaxes'
+        }
+    }
+}
+repositories { mavenCentral() }
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+test { useJUnitPlatform() }
+jar {
+    manifest { attributes('Implementation-Version': project.version, 'Build-Commit': providers.exec { commandLine 'git', 'rev-parse', 'HEAD' }.standardOutput.asText.get().trim()) }
+    exclude 'io/github/santipdr/specialpickaxes/test/**'
+    exclude 'data/specialpickaxes/structures/empty.nbt'
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    finalizedBy 'reobfJar'
+}
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    doFirst {
+        def properties = file('run/server.properties')
+        properties.parentFile.mkdirs()
+        if (!properties.exists()) properties.text = 'spawn-protection=0\n'
+    }
+}

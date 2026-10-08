@@ -1,0 +1,101 @@
+name: Forge verification
+on:
+  push:
+    paths-ignore:
+      - docs/mining-rework/VISUAL-REVIEW.json
+      - docs/mining-rework/STATUS.md
+      - README.md
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  forge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v5
+      - run: python3 tools/validate_resources.py
+      - run: python3 tools/scan_secrets.py
+      - run: python3 tools/withdraw_unvalidated.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: |
+          mkdir -p build
+          set -o pipefail
+          ./gradlew build test --stacktrace 2>&1 | tee build/verification-build.log
+      - run: python3 tools/verify_release.py
+      - run: python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar | tee build/verification-security.log
+      - run: |
+          set -o pipefail
+          ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
+          cp run/logs/latest.log run/logs/gametest.log
+          python3 tools/validate_runtime_logs.py run/logs/gametest.log
+          python3 tools/verify_gametests.py run/logs/gametest.log
+      - run: |
+          set -o pipefail
+          python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log
+      - run: python3 tools/validate_runtime_logs.py run/logs/latest.log build/packaged-smoke/console.log
+      - name: Client runtime dependencies
+        timeout-minutes: 6
+        run: |
+          timeout 120s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -qq
+          timeout 180s sudo apt-get install -y xvfb libflite1
+      - name: Real client gallery and nine normal and SHIFT tooltip captures
+        timeout-minutes: 13
+        run: |
+          set -o pipefail
+          python3 tools/client_smoke.py 2>&1 | tee build/verification-client.log
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: git diff --check
+      - name: Check publication approval
+        id: publication
+        run: |
+          echo "approved=false" >> "$GITHUB_OUTPUT"
+          if ! test -f docs/mining-rework/VISUAL-REVIEW.json; then
+            echo "::notice::Binary publication skipped: no visual review is recorded."
+            exit 0
+          fi
+          if python3 tools/verify_visual_review.py; then
+            echo "approved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Binary publication skipped: the visual review does not approve this exact source."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        run: python3 tools/ci_evidence.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_BINARY: ${{ job.status == 'success' && steps.publication.outputs.approved == 'true' }}
+      - name: Publish verified release only
+        if: success() && steps.publication.outputs.approved == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: special-pickaxes-5.0.0-verified
+          path: |
+            build/libs/*.jar
+            build/RELEASE.json
+            build/SHA256SUMS
+      - if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: forge-validation
+          path: |
+            build/reports/
+            run/logs/
+            run/gametest*xml
+            build/packaged-smoke/console.log
+            build/verification-*.log
+            build/evidence-manifest.json
+            build/RELEASE.json
+            build/SHA256SUMS
+            build/client-smoke/

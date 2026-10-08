@@ -1,0 +1,86 @@
+[
+  {
+    "artifact": "palimpsest",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/adamantiumpickaxe.png",
+    "sha256": "19e4ad13e6576279a8f1b35d066572f72f9f0dfadc359c2e6efb7e3944627903",
+    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+  },
+  {
+    "artifact": "fault_choir",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/seismic_pickaxe.png",
+    "sha256": "a8957b6a166eb519b7e31ca8d27a055d1b3c19fc1702ba431d9a324012a390ff",
+    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+  },
+  {
+    "artifact": "eventide",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/schizo_pickaxe.png",
+    "sha256": "eccae34b08471a6684b054adce12826919c5bfa9f7ea057430f7225a3a741b9a",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "paradox_crucible",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/fire_pickaxe.png",
+    "sha256": "b0d60836e9ca8d3db42ac47647317ba5e1a1db479456f62c98977f6921de312c",
+    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+  },
+  {
+    "artifact": "interregnum",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/lighningpickaxe.png",
+    "sha256": "52d872e1f8d421055f1f712cc75ed9e081ec768a94ec78edf91e225ccee6f64b",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "worldloom",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/natural_pickaxe.png",
+    "sha256": "88679b2c56e65544dc984fe82a6c45fa0954a4f46453f3fc45dfedfa13e5d873",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "icarus",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/elytra_pickaxe.png",
+    "sha256": "064ddf43fbb77112b19573335a6860674a501f748a69a841476e372f28418d56",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "hollow_axiom",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/shadow_pickaxe.png",
+    "sha256": "68415544cd16cbc80b04eebbcae993bfc3f75799f854cb05783e68ba556a840c",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "worldbreaker",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
+    "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "exodium",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/exodium_pickaxe.png",
+    "sha256": "3908b3d7b6e101a6517c3c29aac6da167f85c8460444e61f4b7c7816bc0acb1e",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+  },
+  {
+    "artifact": "iridium",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/iridium_pickaxe.png",
+    "sha256": "bf7a1762354030256ebc3cc099617d760530c990bb5e9f497b3fab2465e67ee5",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+  },
+  {
+    "artifact": "hellspec",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/hellspec_pickaxe.png",
+    "sha256": "1bad527651745b25844edd661acee8e8c0974ab9eed904166481e90b19584e80",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+  }
+]

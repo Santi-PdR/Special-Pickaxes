@@ -1,0 +1,58 @@
+[
+  {
+    "artifact": "meridian",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/ender_pickaxe.png",
+    "sha256": "14644f32964ee74f872e78859c4587b0b6740711a6da07c0c626991690ff63ff",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "bifold_atlas",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/adamantiumpickaxe.png",
+    "sha256": "19e4ad13e6576279a8f1b35d066572f72f9f0dfadc359c2e6efb7e3944627903",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "keystone",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/hammerpickaxe.png",
+    "sha256": "16e3075964415d69a4278ffb3088f235241cb6018d2e168f6df452f0d8796195",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "aegis",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/pickaxe3.png",
+    "sha256": "e91646c3d21220e5a74c0cb8b0744d7da7fb94608687ff6cdfd4c4276401106c",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "lodestar",
+    "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
+    "entry": "assets/picks_of_power/textures/item/seismic_pickaxe.png",
+    "sha256": "a8957b6a166eb519b7e31ca8d27a055d1b3c19fc1702ba431d9a324012a390ff",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "seam_ripper",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/pickaxe1.png",
+    "sha256": "683b855ba19dd188df760ac121a20d46762e43177ec3d432e48896f3753ce386",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "counterseal",
+    "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
+    "entry": "assets/more_pickaxe/textures/item/sculkpickaxe.png",
+    "sha256": "90205539813acd503c88e7ba79f850bf971c0c7ab62d31e3c802baaf86a6ba39",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "covenant",
+    "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
+    "entry": "assets/ultimatepickaxes/textures/item/bone_pickaxe.png",
+    "sha256": "d170e6878f81e173ffad2c6870d2ae8a710d772d26b5bb6460ac57f62cdfdac3",
+    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  }
+]
