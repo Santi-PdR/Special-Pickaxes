@@ -116,11 +116,19 @@ public final class ArtifactManualScreen extends Screen {
             var label=source==ArtifactKind.WORLDBREAKER?Component.translatable("screen.specialpickaxes.copy_native"):stack.getHoverName();
             g.drawString(font,label,px+21,py+5,selected?0xffffd079:0xffd2dce5,false);
             if(hover&&source==ArtifactKind.WORLDBREAKER)g.renderTooltip(font,List.of(label,Component.translatable("screen.specialpickaxes.copy_native_help")),Optional.empty(),mouseX,mouseY);
-            else if(hover){String mode=ArtifactInteraction.modeKey(source,0);g.renderTooltip(font,List.of(
-                    stack.getHoverName(),
-                    Component.translatable("screen.specialpickaxes.main").append(": ").append(Component.translatable("mining.identity."+source.id+"."+mode)),
-                    Component.translatable("screen.specialpickaxes.alternate").append(": ").append(Component.translatable("alternate.detail.specialpickaxes."+source.id)),
-                    Component.translatable("screen.specialpickaxes.passive").append(": ").append(Component.translatable("passive.specialpickaxes."+source.id))),Optional.empty(),mouseX,mouseY);}
+            else if(hover){
+                String mode=ArtifactInteraction.modeKey(source,0);var details=new ArrayList<Component>();
+                details.add(stack.getHoverName());
+                details.add(Component.translatable("screen.specialpickaxes.main").append(": ").append(Component.translatable("mining.identity."+source.id+"."+mode)));
+                if(ArtifactInteraction.modeCount(source)>1){
+                    var modes=Component.empty();String[] available=ArtifactInteraction.modes(source);
+                    for(int m=0;m<available.length;m++){if(m>0)modes.append(" · ");modes.append(Component.translatable("mode.specialpickaxes."+available[m]));}
+                    details.add(Component.translatable("manual4.modes").append(": ").append(modes));
+                }
+                details.add(Component.translatable("screen.specialpickaxes.alternate").append(": ").append(Component.translatable("alternate.detail.specialpickaxes."+source.id)));
+                details.add(Component.translatable("screen.specialpickaxes.passive").append(": ").append(Component.translatable("passive.specialpickaxes."+source.id)));
+                g.renderTooltip(font,details,Optional.empty(),mouseX,mouseY);
+            }
         }
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
