@@ -16,7 +16,7 @@ public final class DomainFields {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
         final int mode;int minedSincePulse;long pulseReady;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
-        final Map<UUID,Frozen> frozen=new HashMap<>();long expires;
+        final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius) {
             owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();
         }
@@ -50,6 +50,13 @@ public final class DomainFields {
         FROZEN_ENTITIES.computeIfPresent(id,(ignored,count)->count<=1?null:count-1);
     }
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }
+    private static void holdFrozen(net.minecraft.server.level.ServerLevel level,Field field) {
+        for(var frozen:field.frozen.values())if(frozen.entity.isAlive()){
+            var box=frozen.entity.getBoundingBox().move(frozen.position.subtract(frozen.entity.position()));
+            if(level.noCollision(frozen.entity,box))frozen.entity.setPos(frozen.position);
+            frozen.entity.setDeltaMovement(Vec3.ZERO);frozen.entity.hasImpulse=true;
+        }
+    }
     public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field); }
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
@@ -112,15 +119,18 @@ public final class DomainFields {
             }
             if(f.mode==1){if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
             if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
+            // Keep already frozen entities pinned every tick, but scan for new targets every other tick.
+            if((p.tickCount&1)!=0){holdFrozen(level,f);continue;}
             var centerPosition=Vec3.atCenterOf(f.center);
             double radiusSqr=(double)f.radius*f.radius;
             var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
                 e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
                 && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr));
-            entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(centerPosition)));
-            var current=new HashSet<UUID>();int processed=0;
+            int targetLimit=ArtifactConfig.FIELD_TARGETS.get();
+            if(entities.size()>targetLimit)entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(centerPosition)));
+            var current=f.observed;current.clear();int processed=0;
             for(var entity:entities) {
-                if(processed>=ArtifactConfig.FIELD_TARGETS.get()) break;
+                if(processed>=targetLimit) break;
                 if(entity instanceof Projectile projectile && projectile.getOwner()!=null
                         && (projectile.getOwner()==p || projectile.getOwner().isAlliedTo(p) || f.kind==ArtifactKind.AEGIS && projectile.getOwner() instanceof net.minecraft.world.entity.player.Player)) continue;
                 if(!WorldSafety.allowed(p,f.kind,entity.blockPosition())) continue;
