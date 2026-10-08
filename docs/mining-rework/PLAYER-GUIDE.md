@@ -1,12 +1,13 @@
-# Guía del catálogo 5.2.2
+# Guía del catálogo 5.2.3
 
 R activa la habilidad principal de minería; X la técnica secundaria; C cambia de modo; I abre el
 Manual con la textura, pasiva y habilidades. Curios solo aplica las pasivas del pico equipado; no tiene botones propios. B arma una selección regional,
 los clics izquierdos fijan esquinas, Enter confirma solo cuando aparece LISTO,
 V cancela y K pausa/reanuda. R también reanuda un trabajo pausado por drops.
 
-Todos los picos dan Visión nocturna y una pasiva propia mientras los sostienes
-en la mano principal o los llevas en Curios.
+Todos los picos tienen técnica principal R, técnica alternativa X y una pasiva.
+El tooltip resume esas tres líneas; abre el Manual con I para ver instrucciones.
+Al equiparlos en Curios solo se aplican sus pasivas.
 
 | Pico | Habilidades principales y alternativas |
 |---|---|

@@ -10,7 +10,7 @@ public final class RelicEffects {
     private RelicEffects(){}
     public static void emit(ServerPlayer p,ArtifactKind k,String phase,Vec3 center){
         long now=ArtifactState.now(p);if(tick!=now){tick=now;remaining=256;}
-        int count=k==ArtifactKind.WORLDBREAKER?24:12;if(remaining<count)return;remaining-=count;
+        int count=k==ArtifactKind.WORLDBREAKER?24:16;if(remaining<count)return;remaining-=count;
         ParticleOptions particle=switch(k){
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
             case EVENTIDE->ParticleTypes.REVERSE_PORTAL;case MERIDIAN->ParticleTypes.PORTAL;
@@ -23,8 +23,8 @@ public final class RelicEffects {
             case AEGIS->ParticleTypes.ELECTRIC_SPARK;case LODESTAR->ParticleTypes.NAUTILUS;
             case SEAM_RIPPER->ParticleTypes.ASH;case CAUSEWAY->ParticleTypes.CLOUD;
             case COUNTERSEAL->ParticleTypes.SOUL;case COVENANT->ParticleTypes.DRIPPING_OBSIDIAN_TEAR;};
-        double scale=phase.equals("error")||phase.equals("cancel")?.35:phase.equals("complete")?1.5:1;
-        double mode=ArtifactState.mode(p,k)*Math.PI/6;
+        double scale=phase.equals("error")||phase.equals("cancel")?.35:phase.equals("complete")?1.5:phase.equals("alternate")?1.25:1;
+        double mode=ArtifactState.mode(p,k)*Math.PI/6+(phase.equals("alternate")?Math.PI/8:0);
         for(int i=0;i<count;i++){
             double t=i/(double)(count-1),a=t*Math.PI*2+mode,x,y,z;
             switch(k){

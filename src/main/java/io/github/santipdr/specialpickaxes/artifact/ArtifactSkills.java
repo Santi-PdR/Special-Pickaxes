@@ -16,7 +16,7 @@ public final class ArtifactSkills {
         }
         if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) return false;
         data.putLong("alternateReady", now + Math.max(100, ArtifactConfig.COOLDOWN.get() * 5));
-        ArtifactFeedback.sound(player, kind);
+        ArtifactFeedback.sound(player, kind, "alternate");
         ArtifactFeedback.burst(player, kind, player.blockPosition(), 10);
         ArtifactFeedback.message(player, "alternate_used");
         return true;

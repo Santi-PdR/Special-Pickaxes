@@ -10,12 +10,12 @@ public final class ArtifactTooltips {
     private ArtifactTooltips(){}
     public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):0;}
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
-        lines.add(Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))).withStyle(ChatFormatting.GRAY));
-        lines.add(Component.translatable("passive.specialpickaxes."+k.id).withStyle(ChatFormatting.GREEN));
-    }
-    private static void section(List<Component> lines,String heading,Component content){
-        if(!lines.isEmpty())lines.add(Component.empty());
-        lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.copy().withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("tooltip.specialpickaxes.r",
+                Component.translatable("mining.short.specialpickaxes."+k.id)).withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("tooltip.specialpickaxes.x",
+                Component.translatable("alternate.specialpickaxes."+k.id)).withStyle(ChatFormatting.AQUA));
+        lines.add(Component.translatable("tooltip.specialpickaxes.passive",
+                Component.translatable("passive.specialpickaxes."+k.id)).withStyle(ChatFormatting.GREEN));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
         return actions(ItemStack.EMPTY,k,mode);
@@ -31,14 +31,6 @@ public final class ArtifactTooltips {
         return a;
     }
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){
-        section(lines,"what",Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
-        section(lines,"how",Component.translatable("mining.how."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
-        section(lines,"passive",Component.translatable("passive.specialpickaxes."+k.id));
-        section(lines,"alternate",Component.translatable("alternate.specialpickaxes."+k.id));
-        if(ArtifactInteraction.modeCount(k)>1)section(lines,"mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack))));
-        int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4;
-        int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;
-        section(lines,"cost",Component.translatable("manual4.wear",cost,String.format(java.util.Locale.ROOT,"%.1f",cooldown/20D)));
-        section(lines,"limits",Component.translatable("mining.limits"));
+        compact(stack,k,lines);
     }
 }

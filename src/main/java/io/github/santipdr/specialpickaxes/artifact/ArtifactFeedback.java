@@ -30,8 +30,11 @@ public final class ArtifactFeedback {
         for(var listener:level.players())if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
-        nearbySound(p,kind.sound,0.25F,0.85F+kind.ordinal()*0.04F);
-        RelicEffects.emit(p,kind,"activate",p.getEyePosition().add(p.getLookAngle().scale(2)));
+        sound(p,kind,"activate");
+    }
+    public static void sound(ServerPlayer p,ArtifactKind kind,String phase) {
+        nearbySound(p,kind.sound,phase.equals("alternate")?0.2F:0.25F,0.85F+kind.ordinal()*0.04F);
+        RelicEffects.emit(p,kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
         int rgb=kind.color;
@@ -64,16 +67,20 @@ public final class ArtifactFeedback {
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
-        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.72F);
+        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.82F);
+        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
+        double topY=center.getY()+halfHeight+0.08;
         int segments=Math.max(4,radius*2);
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
             p.serverLevel().sendParticles(p,dust,false,minX,y,z,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,maxX,y,z,1,0,0,0,0);
+            if(i%2==0){p.serverLevel().sendParticles(p,crown,false,x,topY,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,x,topY,maxZ,1,0,0,0,0);
+                p.serverLevel().sendParticles(p,crown,false,minX,topY,z,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,maxX,topY,z,1,0,0,0,0);}
         }
-        for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
-            p.serverLevel().sendParticles(p,dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
+        for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=5;i++)
+            p.serverLevel().sendParticles(p,i%2==0?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/6),center.getZ()+dz+0.5,1,0,0,0,0);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);
