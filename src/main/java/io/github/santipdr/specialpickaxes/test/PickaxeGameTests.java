@@ -30,7 +30,10 @@ import java.util.function.Consumer;
 @PrefixGameTestTemplate(false)
 public final class PickaxeGameTests {
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
-        var p=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"ArtifactTest"));
+        return player(h,kind,"ArtifactTest");
+    }
+    private static ServerPlayer player(GameTestHelper h,ArtifactKind kind,String name) {
+        var p=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),name));
         p.connection=new ServerGamePacketListenerImpl(h.getLevel().getServer(),new Connection(PacketFlow.SERVERBOUND),p);
         p.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         var at=h.absolutePos(new BlockPos(5,2,3));p.setPos(at.getX()+0.5,at.getY(),at.getZ()+0.5);
@@ -119,6 +122,21 @@ public final class PickaxeGameTests {
         h.assertTrue(DomainFields.contains(p,p.blockPosition())&&p.hasEffect(SpecialPickaxes.DOMINION.get())&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"aura follows owner with personal effects");
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(p.getX()+1,p.getY(),p.getZ());h.getLevel().addFreshEntity(mob);mob.setDeltaMovement(.1,0,0);DomainFields.tick();
         h.assertTrue(!DomainFields.frozen(mob),"personal aura does not freeze nearby mobs");finish(h,p);
+    }
+    @GameTest(template="empty") public static void stasisDomainSupportsAlliedMiners(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM);var ally=player(h,ArtifactKind.INTERREGNUM,"ArtifactAlly");var center=target(h);
+        var team=h.getLevel().getScoreboard().addPlayerTeam("stasis_"+owner.getUUID().toString().substring(0,8));
+        h.getLevel().getScoreboard().addPlayerToTeam(owner.getScoreboardName(),team);
+        h.getLevel().getScoreboard().addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);ally.getFoodData().setFoodLevel(0);
+        h.getLevel().addFreshEntity(ally);
+        h.assertTrue(DomainFields.start(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,center,8),"team stasis starts");
+        DomainFields.tick();
+        h.assertTrue(ally.hasEffect(SpecialPickaxes.DOMINION.get())&&ally.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"ally receives the domain identity effects");
+        h.assertTrue(ally.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED).getAmplifier()==2
+                &&ally.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==1,"ally receives Haste III and Regeneration II");
+        h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");
+        DomainFields.stop(owner);finish(h,owner);
     }
     @GameTest(template="empty") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);var stone=center.east();var ore=center.above();

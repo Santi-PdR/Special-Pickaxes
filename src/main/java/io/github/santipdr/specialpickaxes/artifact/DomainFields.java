@@ -114,11 +114,11 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
-                if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
+                if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
                 continue; // Eventide shapes mining only; it never moves or damages entities.
             }
-            if(f.mode==1){if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
-            if(p.tickCount%10==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
+            if(f.mode==1){if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
+            if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
             // Keep already frozen entities pinned every tick, but scan for new targets every other tick.
             if((p.tickCount&1)!=0){holdFrozen(level,f);continue;}
             var centerPosition=Vec3.atCenterOf(f.center);
