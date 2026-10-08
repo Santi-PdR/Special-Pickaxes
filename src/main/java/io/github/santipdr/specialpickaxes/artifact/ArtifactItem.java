@@ -26,7 +26,7 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public InteractionResult useOn(UseOnContext context) { return InteractionResult.PASS; }
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) {
         if(!ArtifactTools.effective(state))return super.getDestroySpeed(stack,state);
-        boolean ore=state.is(net.minecraftforge.common.Tags.Blocks.ORES),stone=MiningDesigns.matrix(state);
+        boolean ore=ArtifactOres.isOre(state),stone=MiningDesigns.matrix(state);
         return switch(kind){
             case PALIMPSEST->ore?192F:72F;case CHOIR->stone?96F:72F;case EVENTIDE->96F;
             case CRUCIBLE->MiningDesigns.crucibleGeology(state)?128F:72F;case INTERREGNUM->96F;
@@ -78,6 +78,7 @@ public final class ArtifactItem extends PickaxeItem {
         if(selected&&entity instanceof ServerPlayer&&!tool.getOrCreateTag().hasUUID("controlIdentity"))tool.getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());
         if(selected && entity instanceof ServerPlayer p && kind==ArtifactKind.LODESTAR)DirectAbilities.recordFootstep(p);
         if(selected && entity instanceof ServerPlayer p && p.tickCount%10==0) {
+            ArtifactPassives.tick(p,kind);
             if(kind==ArtifactKind.HELLSPEC)p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,40,0,false,true,true));
             if(p.tickCount%100==0)ArtifactState.prune(p,kind);
             // Vanilla inventory synchronization carries the display data; client never authorizes work.

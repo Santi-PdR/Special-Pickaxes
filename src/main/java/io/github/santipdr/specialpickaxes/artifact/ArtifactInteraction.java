@@ -20,7 +20,7 @@ public final class ArtifactInteraction {
         case PALIMPSEST->new String[]{"vein"};case CHOIR->new String[]{"forward"};
         case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian","calcite","tuff","dripstone","gravel"};
         case INTERREGNUM->new String[]{"domain","aura"};case WORLDLOOM->new String[]{"quarry"};
-        case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"survey"};
+        case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"hollow_pulse"};
         case EXODIUM->new String[]{"starfall"};case IRIDIUM->new String[]{"orefall"};case HELLSPEC->new String[]{"hellforge"};
         case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter","region_break"};
         default->new String[]{"retired"};};}

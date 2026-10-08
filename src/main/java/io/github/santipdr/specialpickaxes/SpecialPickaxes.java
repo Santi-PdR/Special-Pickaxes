@@ -59,7 +59,7 @@ public final class SpecialPickaxes {
     private void trackPlayerPlacedBlocks(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent e){
         if(!e.isCanceled()&&e.getEntity() instanceof net.minecraft.world.entity.player.Player
                 &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
-                &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||level.getBlockState(e.getPos()).is(net.minecraftforge.common.Tags.Blocks.ORES)))
+                &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||ArtifactOres.isOre(level.getBlockState(e.getPos()))))
             PlayerPlacedBlocks.get(level).mark(e.getPos());
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
@@ -71,7 +71,13 @@ public final class SpecialPickaxes {
         }
     }
     private void tick(TickEvent.ServerTickEvent e) {
-        if(e.phase==TickEvent.Phase.END) { MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick(); }
+        if(e.phase==TickEvent.Phase.END) {
+            MiningObservations.flush();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();
+            for(var level:e.getServer().getAllLevels())for(var player:level.players())if(player.tickCount%10==0){
+                var equipped=CuriosCompat.find(player);
+                if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.tick(player,pick.kind);
+            }
+        }
     }
     private void stopped(ServerStoppedEvent e) { io.github.santipdr.specialpickaxes.network.RelicNetwork.clear(); CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();WorkQueue.clear();DomainFields.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
@@ -95,6 +101,9 @@ public final class SpecialPickaxes {
     }
     private void speed(PlayerEvent.BreakSpeed e) {
         var p=e.getEntity();
+        if(p instanceof ServerPlayer server&&p.getMainHandItem().getItem() instanceof ArtifactItem&&ArtifactInteraction.selecting(server)){
+            e.setNewSpeed(0F);return;
+        }
         if(p.getMainHandItem().getItem() instanceof ArtifactItem && ArtifactTools.effective(e.getState())) {
             int raw=EnchantmentScaling.level(p.getMainHandItem(),net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY);
             if(raw>46340){double nativeBase=64D+46340D*46340D+1;double environment=Math.max(0,e.getNewSpeed())/nativeBase;e.setNewSpeed(EnchantmentScaling.finiteSpeed((64D+(double)raw*raw+1)*environment));}

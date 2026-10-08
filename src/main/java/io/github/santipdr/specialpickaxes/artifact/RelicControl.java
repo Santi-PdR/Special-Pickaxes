@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** Semantic intents shared by keyboard input, packets and tests. No client coordinates are trusted. */
 public final class RelicControl {
-    public enum Action { ACTIVATE, SECONDARY, MODE, SELECT, CONFIRM, CANCEL, PAUSE }
+    public enum Action { ACTIVATE, SECONDARY, MODE, SELECT, CONFIRM, CANCEL, PAUSE, ALT_SKILL, CURIO_ONE, CURIO_TWO, COPY_PRIMARY }
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
         if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
@@ -25,7 +25,10 @@ public final class RelicControl {
                 if(!WorkQueue.busy(p)||WorkQueue.status(p).equals("ready"))return false;
                 WorkQueue.togglePause(p);p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
             case CONFIRM:
-                if(!WorkQueue.status(p).equals("ready")){ArtifactFeedback.message(p,"not_ready");ArtifactFeedback.cue(p,"error");return false;}
+                // Regional selections analyze themselves after the second corner. Enter is
+                // only a confirmation key once that analysis is complete; pressing it
+                // during corner selection should not produce a misleading prompt.
+                if(!WorkQueue.status(p).equals("ready"))return false;
                 if(!WorkQueue.togglePause(p))return false;ArtifactFeedback.cue(p,"confirm");return true;
             case SELECT:
                 if(!ArtifactInteraction.regional(k,ArtifactState.mode(p,k))||WorkQueue.busy(p))return false;
@@ -40,9 +43,24 @@ public final class RelicControl {
                 if(DomainFields.active(p)||CompanionActions.active(p)){DomainFields.stop(p);CompanionActions.stop(p);WorkQueue.cancel(p);ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");return true;}
                 return false;
             case ACTIVATE:
+                if(WorkQueue.busy(p)){
+                    var status=WorkQueue.status(p);
+                    if(status.equals("paused")){
+                        if(!WorkQueue.togglePause(p))return false;
+                        ArtifactFeedback.message(p,"resumed");ArtifactFeedback.cue(p,"select");return true;
+                    }
+                    return false;
+                }
                 if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k))){ArtifactFeedback.message(p,"select_key");return false;}
-                if(WorkQueue.busy(p))return false;
                 return ArtifactActions.use(p,tool,k,false);
+            case ALT_SKILL:
+                if(WorkQueue.busy(p))return false;
+                return ArtifactActions.useAlternate(p,tool,k);
+            case COPY_PRIMARY:
+                if(k!=ArtifactKind.WORLDBREAKER||WorkQueue.busy(p))return false;
+                return ArtifactActions.useCopiedPrimary(p,tool);
+            case CURIO_ONE, CURIO_TWO:
+                return false; // Curio actions are validated against the equipped slot in RelicNetwork.
             default:return false;
         }
     }

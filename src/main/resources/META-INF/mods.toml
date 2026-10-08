@@ -3,7 +3,7 @@ loaderVersion="[47,)"
 license="All Rights Reserved"
 [[mods]]
 modId="specialpickaxes"
-version="5.1.0"
+version="5.2.0"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
 description='''Twelve tier-IV mining pickaxes with custom abilities, safe scheduled excavation, modded geology support and referenced Terramity textures.'''
@@ -18,4 +18,10 @@ modId="minecraft"
 mandatory=true
 versionRange="[1.20.1,1.20.2)"
 ordering="NONE"
+side="BOTH"
+[[dependencies.specialpickaxes]]
+modId="curios"
+mandatory=false
+versionRange="[5,)"
+ordering="AFTER"
 side="BOTH"

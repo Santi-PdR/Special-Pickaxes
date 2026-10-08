@@ -15,7 +15,7 @@ public final class RelicEffects {
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
             case EVENTIDE->ParticleTypes.REVERSE_PORTAL;case MERIDIAN->ParticleTypes.PORTAL;
             case CRUCIBLE->ParticleTypes.SMALL_FLAME;case INTERREGNUM->ParticleTypes.END_ROD;
-            case WORLDLOOM->ParticleTypes.COMPOSTER;case ICARUS->ParticleTypes.CRIT;
+            case WORLDLOOM->ParticleTypes.COMPOSTER;case ICARUS->ParticleTypes.END_ROD;
             case AXIOM->ParticleTypes.SCULK_SOUL;case ATLAS->ParticleTypes.ENCHANT;
             case WORLDBREAKER->ParticleTypes.FIREWORK;case CHRONICLE->ParticleTypes.GLOW;
             case EXODIUM->ParticleTypes.END_ROD;case IRIDIUM->ParticleTypes.GLOW;case HELLSPEC->ParticleTypes.FLAME;

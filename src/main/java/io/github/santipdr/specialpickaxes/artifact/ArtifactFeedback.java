@@ -44,7 +44,7 @@ public final class ArtifactFeedback {
             case CRUCIBLE->net.minecraft.core.particles.ParticleTypes.WAX_ON;
             case INTERREGNUM->net.minecraft.core.particles.ParticleTypes.END_ROD;
             case WORLDLOOM,KEYSTONE->net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER;
-            case ICARUS->net.minecraft.core.particles.ParticleTypes.CRIT;
+            case ICARUS->net.minecraft.core.particles.ParticleTypes.END_ROD;
             case AXIOM->net.minecraft.core.particles.ParticleTypes.SCULK_SOUL;
             case ATLAS,TESSELLATOR->net.minecraft.core.particles.ParticleTypes.PORTAL;
             case WORLDBREAKER->net.minecraft.core.particles.ParticleTypes.GLOW;
@@ -64,8 +64,16 @@ public final class ArtifactFeedback {
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
-        var min=center.offset(-radius,-halfHeight,-radius);var max=center.offset(radius,halfHeight,radius);
-        box(p,kind,new SelectionVolume(min,max),false);
+        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.72F);
+        double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
+        int segments=Math.max(4,radius*2);
+        for(int i=0;i<=segments;i++){
+            double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
+            p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
+            p.serverLevel().sendParticles(p,dust,false,minX,y,z,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,maxX,y,z,1,0,0,0,0);
+        }
+        for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
+            p.serverLevel().sendParticles(p,dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);

@@ -29,6 +29,21 @@ public final class ArtifactActions {
         if(!ACTIVATING.add(p.getUUID()))return false;
         try{return activate(p,tool,kind,secondary);}finally{ACTIVATING.remove(p.getUUID());}
     }
+    public static boolean useAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
+        if(p.getMainHandItem()!=tool||tool.isEmpty()||!WorldSafety.allowed(p,kind,p.blockPosition()))return false;
+        int cost=EnchantmentScaling.activationCost(tool,kind);
+        if(!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<=cost)return false;
+        if(!ArtifactSkills.use(p,tool,kind))return false;
+        if(!p.isCreative())tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
+        return true;
+    }
+    public static boolean useCopiedPrimary(ServerPlayer p,ItemStack tool){
+        if(p.getMainHandItem()!=tool||!(tool.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER||!tool.hasTag())return false;
+        ArtifactKind source;try{source=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));}catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
+        if(source==ArtifactKind.WORLDBREAKER)return false;
+        return use(p,tool,source,false);
+    }
     private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
         if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
@@ -56,13 +71,13 @@ public final class ArtifactActions {
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
-        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM) {
+        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
             return started;
         }
         if(kind==ArtifactKind.IRIDIUM) {
-            var aimed=target(p);return aimed.isPresent()&&MiningDesigns.orefall(p,tool,aimed.get());
+            var aimed=target(p);return aimed.isPresent()&&WorkQueue.startRegion(p,tool,kind,new OrefallProgram(aimed.get()));
         }
         if(kind==ArtifactKind.PALIMPSEST) {
             var aimed=target(p);boolean started=aimed.isPresent()&&startVein(p,tool,aimed.get());
@@ -85,9 +100,7 @@ public final class ArtifactActions {
             if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
             ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
         }
-        if(kind==ArtifactKind.AXIOM) {
-            int found=MiningDesigns.survey(p,center);ArtifactFeedback.message(p,found==0?"survey_empty":"survey",found);ArtifactFeedback.burst(p,kind,center,10);return true;
-        }
+        if(kind==ArtifactKind.AXIOM) return hollowPulse(p,center);
         if(kind==ArtifactKind.HELLSPEC) {
             var steps=MiningDesigns.hellforge(p,center);boolean started=WorkQueue.start(p,tool,kind,steps);
             if(started){p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,600,0,false,true,true));p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,600,3,false,true,true));ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
@@ -96,7 +109,7 @@ public final class ArtifactActions {
 
 
         List<WorkStep> steps=switch(kind) {
-            case CHOIR -> echo(p,center);
+            case CHOIR -> List.of();
             case CRUCIBLE -> rephase(p,center,r);
             case WORLDLOOM -> quarry(p,kind,center,r);
             case EVENTIDE -> List.of();
@@ -106,6 +119,23 @@ public final class ArtifactActions {
         boolean started=WorkQueue.start(p,tool,kind,steps);
         if(started) { if(kind==ArtifactKind.EVENTIDE&&!DomainFields.start(p,tool,kind,center,Math.min(r,8))){WorkQueue.cancel(p);return false;}if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started;
+    }
+    private static boolean hollowPulse(ServerPlayer p,BlockPos center){
+        var level=p.serverLevel();var point=Vec3.atCenterOf(center);
+        int affected=0;
+        for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class,
+                new net.minecraft.world.phys.AABB(point,point).inflate(9),m->m.isAlive()&&!m.isAlliedTo(p))){
+            var pull=point.subtract(mob.position());double distance=pull.length();
+            if(distance>0.01)mob.setDeltaMovement(mob.getDeltaMovement().add(pull.scale(Math.min(0.8,0.8/distance))));
+            mob.hasImpulse=true;
+            mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,100,2,true,false,true));
+            mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,100,0,true,false,true));
+            if(++affected>=24)break;
+        }
+        var voidDust=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.16F,0.08F,0.28F),1.5F);
+        level.sendParticles(p,net.minecraft.core.particles.ParticleTypes.PORTAL,false,point.x,point.y,point.z,36,1.2,1.2,1.2,0.12);
+        level.sendParticles(p,voidDust,false,point.x,point.y,point.z,18,0.8,0.8,0.8,0.02);
+        ArtifactFeedback.message(p,"hollow_pulse",affected);ArtifactFeedback.burst(p,ArtifactKind.AXIOM,center,10);return true;
     }
     public static List<WorkStep> echo(ServerPlayer p,BlockPos center) {
         var memories=ArtifactState.memories(p,ArtifactKind.CHOIR);var steps=new ArrayList<WorkStep>();
@@ -122,7 +152,7 @@ public final class ArtifactActions {
     }
     private static boolean startVein(ServerPlayer p,ItemStack tool,BlockPos origin) {
         var level=p.serverLevel();var initial=level.getBlockState(origin);
-        if(!initial.is(net.minecraftforge.common.Tags.Blocks.ORES)||!WorldSafety.harvestable(p,tool,origin))return false;
+        if(!ArtifactOres.isOre(initial)||!WorldSafety.harvestable(p,tool,origin))return false;
         var steps=new ArrayList<WorkStep>();var seen=new HashSet<BlockPos>();var pending=new ArrayDeque<BlockPos>();
         seen.add(origin.immutable());pending.add(origin.immutable());
         while(!pending.isEmpty()&&steps.size()<ArtifactConfig.PALIMPSEST_VEIN_LIMIT.get()) {
@@ -206,11 +236,6 @@ public final class ArtifactActions {
     public static void mined(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
         if(WorkQueue.running() || !p.serverLevel().getBlockState(pos).isAir()) return;
         DomainFields.feed(p,tool,pos,state);if(p.tickCount%3==0)ArtifactFeedback.burst(p,kind,pos,2);
-        if(kind==ArtifactKind.CHOIR) {
-            var memory=ArtifactState.memories(p,kind);
-            if(memory.isEmpty())ArtifactState.of(p,kind).putInt("heading",p.getDirection().get2DDataValue());
-            ArtifactState.record(p,kind,pos,state);
-        }
         if(kind==ArtifactKind.MERIDIAN) {
             var a=ArtifactState.anchor(p,kind,"a");var b=ArtifactState.anchor(p,kind,"b");
             if(a.isPresent() && b.isPresent() && pos.distSqr(a.get())<=8*8) {

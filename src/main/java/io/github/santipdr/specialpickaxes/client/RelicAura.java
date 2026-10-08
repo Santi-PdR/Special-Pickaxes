@@ -26,12 +26,12 @@ public final class RelicAura {
         var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
         var hand=mc.player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
         double angle=mc.player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(mc.player.getMainHandItem())*0.22;
-        int color=item.kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.3F);
+        int color=item.kind==ArtifactKind.ICARUS?0xffe8c6:item.kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),item.kind==ArtifactKind.ICARUS?0.4F:0.3F);
         ParticleOptions accent=switch(item.kind){
             case PALIMPSEST->ParticleTypes.ENCHANT;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
             case EVENTIDE->ParticleTypes.REVERSE_PORTAL;case CRUCIBLE->ParticleTypes.SMALL_FLAME;
             case INTERREGNUM->ParticleTypes.END_ROD;case WORLDLOOM->ParticleTypes.HAPPY_VILLAGER;
-            case ICARUS->ParticleTypes.CRIT;case AXIOM->ParticleTypes.SCULK_SOUL;
+            case ICARUS->ParticleTypes.ENCHANT;case AXIOM->ParticleTypes.SCULK_SOUL;
             case WORLDBREAKER->ParticleTypes.FIREWORK;
             case EXODIUM->ParticleTypes.END_ROD;case IRIDIUM->ParticleTypes.GLOW;case HELLSPEC->ParticleTypes.FLAME;
             default->dust;

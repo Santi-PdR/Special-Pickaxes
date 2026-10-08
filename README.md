@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. La rama de trabajo `arena/74873685-special-pickaxes` prepara el candidato **5.1.0**: doce picos mineros extremos con habilidades distintas. Todos son tier IV, con velocidad base mínima 64, 32.768 de durabilidad y encantabilidad 50; los picos de especialidad superan esa velocidad. Sin recetas obligatorias, minerales propios, worldgen, energía ni X-Ray.
+Forge **1.20.1 / Java 17**. El candidato **5.2.0** lleva doce picos tier IV, cada uno con pasiva, habilidad principal, habilidad alternativa y dos habilidades mientras está equipado en Curios. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.1.0 todavía no es una publicación ni una validación del modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.0 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
@@ -11,17 +11,17 @@ Loom of the First Quarry · Tear of Icarus · Hollow Axiom · Worldbreaker ·
 Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 
 - **Palimpsest:** extracción de vetas conectadas hasta un límite configurable de 192, Prisa V y Regeneración II breves.
-- **Choir:** recuerda una plantilla minada y la vuelve a extraer mirando hacia delante.
-- **Eventide:** campo gravitatorio que carga pulsos de minería direccionales.
-- **Crucible:** transforma doce materiales geológicos con selección de dos esquinas y confirmación.
-- **Stasis:** dominio de 16×16 marcado o aura personal; velocidad minera ×8 y efectos defensivos.
-- **Worldloom:** cantera esférica de geología natural, radio 8; nunca construye ni toca menas.
-- **Icarus:** perforación hacia delante normal o amplia; para ante fluidos y protege contra caídas mientras avanza.
-- **Axiom:** escanea una elipse cargada de 17×9×17 y te señala hasta 32 menas existentes.
-- **Worldbreaker:** cinco cortes direccionales y un modo de rotura por región seleccionada.
+- **Choir:** túnel resonante fijo 2×2, 20 bloques hacia delante; ya no repite una plantilla vieja.
+- **Eventide:** campo gravitatorio y pulso telepático que revela hostiles de noche.
+- **Crucible:** transforma doce materiales geológicos, ahora también calcita y obsidiana; X activa lectura geológica.
+- **Stasis:** dominio 16×16 con borde visible, ayuda a compañeros dentro o te sigue como aura.
+- **Worldloom:** cantera esférica de radio 8 y Pacto Silvestre para curar/alimentar aliados.
+- **Icarus:** perforación hacia delante, partículas angelicales y Ascenso de Ícaro para movilidad.
+- **Axiom:** escanea una elipse cargada de 17×9×17 y te señala hasta 32 menas; también pliega al jugador por espacio libre.
+- **Worldbreaker:** varios cortes, rotura regional y selección visual de una habilidad de otro pico para copiar.
 - **Exodium:** lanza minera de 13×9 hasta 48 bloques.
-- **Iridium:** localiza y extrae hasta 128 menas en el volumen cercano.
-- **Hellspec:** excava geología y menas en una cavidad acotada; aporta Resistencia al fuego y Prisa IV.
+- **Iridium:** sondea por tandas un volumen mayor; menas y drops brillan y cosecha hasta 192.
+- **Hellspec:** cava con su textura intacta; apunta a lava para activar el Manto Magmático.
 
 Toda minería se agenda por ticks y vuelve a validar cada bloque. No carga chunks,
 no procesa fluids, bedrock, máquinas ni celdas protegidas, y pausa ante congestión
@@ -43,9 +43,11 @@ y [ASSET-PROVENANCE.json](docs/mining-rework/ASSET-PROVENANCE.json).
 
 ## Jugar y administrar
 
-R activa; C cambia de modo cuando hay más de uno; B activa la selección regional;
-Enter confirma; V cancela; K pausa/reanuda. Los controles son reasignables y el
-SHIFT del tooltip describe el modo actual.
+R activa; X usa la habilidad alternativa; C cambia de modo; H/J activan las dos
+habilidades del slot Curios; I abre el Manual con la textura y las habilidades.
+B selecciona regiones; Enter confirma solo cuando el análisis está listo; V
+cancela; K pausa/reanuda (R también reanuda una pausa por drops). Los controles
+son reasignables.
 
 ```text
 /specialpickaxes grant <jugador> <id>

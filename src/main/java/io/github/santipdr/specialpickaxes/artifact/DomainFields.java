@@ -83,6 +83,17 @@ public final class DomainFields {
                     if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
                 } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
             }
+            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%10==0){
+                var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
+                for(var ally:level.getEntitiesOfClass(ServerPlayer.class,bounds,q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()))){
+                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),40,0,true,false,true));
+                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,80,0,true,false,true));
+                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,40,2,true,false,true));
+                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,40,1,true,false,true));
+                    if(ally.tickCount%100==0)ally.getFoodData().eat(1,0.2F);
+                    if(++supported>=16)break;
+                }
+            }
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));

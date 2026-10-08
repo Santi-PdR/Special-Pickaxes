@@ -8,13 +8,13 @@ import java.util.*;
 
 /** Bounded slice memory. Every slice is checked before excavation; any barrier terminates the entire route. */
 public final class DirectionalProgram implements WorkProgram {
-    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE }
+    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, RESONANT_TUNNEL }
     private final BlockPos origin;private final Direction direction;private final Shape shape;private final int length;
     private int depth,index;private boolean digging,moving,finished;
     private List<BlockPos> slice;private BlockState[] expected;
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape){
         this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;
-        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;};
+        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case RESONANT_TUNNEL->20;};
         prepare();
     }
     private void prepare(){
@@ -27,11 +27,14 @@ public final class DirectionalProgram implements WorkProgram {
         var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
             case ICARUS->{w=3;h=2;}case ICARUS_WIDE->{w=4;h=3;}case EXODIUM_LANCE->{w=6;h=4;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
+            case RESONANT_TUNNEL->{w=0;h=0;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
             case CLEAVE->{w=12;h=5;}
             default->{w=Math.min(24,3+depth/3);h=Math.min(10,2+depth/10);}
         }
-        for(int u=-w;u<=w;u++)for(int v=-h;v<=h;v++){
+        int uMin=shape==Shape.RESONANT_TUNNEL?-1:-w,uMax=shape==Shape.RESONANT_TUNNEL?0:w;
+        int vMin=shape==Shape.RESONANT_TUNNEL?-1:-h,vMax=shape==Shape.RESONANT_TUNNEL?0:h;
+        for(int u=uMin;u<=uMax;u++)for(int v=vMin;v<=vMax;v++){
             if(shape==Shape.CARVE&&u*u+v*v>10)continue;
             if(shape==Shape.CLEAVE&&(u*u/144.0+v*v/25.0)>1.0)continue;
             if(shape==Shape.WORLD_SHATTER&&Math.abs(u)+Math.max(0,v)*2>w)continue;

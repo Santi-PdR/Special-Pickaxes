@@ -13,6 +13,8 @@ public final class ArtifactTooltips {
         var identity=Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))).withStyle(ChatFormatting.GRAY);
         identity.append(Component.literal(" · ").withStyle(ChatFormatting.DARK_GRAY));
         identity.append(Component.translatable("combat.specialpickaxes."+k.id).withStyle(ChatFormatting.DARK_PURPLE));
+        identity.append(Component.literal(" · ").withStyle(ChatFormatting.DARK_GRAY));
+        identity.append(Component.translatable("passive.specialpickaxes."+k.id).withStyle(ChatFormatting.GREEN));
         lines.add(identity);
     }
     private static void section(List<Component> lines,String heading,Component content){
@@ -20,9 +22,15 @@ public final class ArtifactTooltips {
         lines.add(Component.translatable("manual4."+heading).withStyle(ChatFormatting.GOLD));lines.add(content.copy().withStyle(ChatFormatting.GRAY));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
+        return actions(ItemStack.EMPTY,k,mode);
+    }
+    public static List<RelicControl.Action> actions(ItemStack stack,ArtifactKind k,int mode){
         var a=new ArrayList<RelicControl.Action>();boolean region=ArtifactInteraction.regional(k,mode);
         a.add(region?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE);
-        if(region)a.add(RelicControl.Action.CONFIRM);
+        a.add(RelicControl.Action.ALT_SKILL);
+        if(k==ArtifactKind.WORLDBREAKER)a.add(RelicControl.Action.COPY_PRIMARY);
+        a.add(RelicControl.Action.CURIO_ONE);a.add(RelicControl.Action.CURIO_TWO);
+        if(region&&stack.hasTag()&&"ready".equals(stack.getTag().getString("artifactStatus")))a.add(RelicControl.Action.CONFIRM);
         if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
         a.add(RelicControl.Action.CANCEL);
         if(!CompanionActions.handles(k)&&k!=ArtifactKind.AEGIS&&k!=ArtifactKind.INTERREGNUM&&k!=ArtifactKind.MERIDIAN)a.add(RelicControl.Action.PAUSE);
@@ -31,6 +39,9 @@ public final class ArtifactTooltips {
     public static void expanded(ItemStack stack,ArtifactKind k,List<Component> lines){
         section(lines,"what",Component.translatable("mining.identity."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
         section(lines,"how",Component.translatable("mining.how."+k.id+"."+ArtifactInteraction.modeKey(k,mode(stack))));
+        section(lines,"passive",Component.translatable("passive.specialpickaxes."+k.id));
+        section(lines,"alternate",Component.translatable("alternate.specialpickaxes."+k.id));
+        section(lines,"curio",Component.translatable("curio.specialpickaxes."+k.id));
         if(ArtifactInteraction.modeCount(k)>1)section(lines,"mode",Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,mode(stack))));
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):4;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):40;

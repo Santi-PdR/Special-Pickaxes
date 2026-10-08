@@ -1,31 +1,33 @@
-# Guía del catálogo 5.1.0
+# Guía del catálogo 5.2.0
 
-Candidato de la rama `arena/74873685-special-pickaxes`; no es anuncio de release.
-R activa, C cambia de modo, B arma una selección, Enter confirma, V cancela y K
-pausa o reanuda. Las teclas se pueden reasignar en Controles. SHIFT sobre el pico
-muestra el manual del modo seleccionado.
+R activa la habilidad principal; X la alternativa; C cambia de modo; I abre el
+Manual con la textura, pasiva y habilidades. H/J activan las dos habilidades
+Curios si tienes un pico equipado en ese slot. B arma una selección regional,
+los clics izquierdos fijan esquinas, Enter confirma solo cuando aparece LISTO,
+V cancela y K pausa/reanuda. R también reanuda un trabajo pausado por drops.
 
-| Pico | Habilidad |
+Todos los picos dan Visión nocturna y una pasiva propia mientras los sostienes
+en la mano principal o los llevas en Curios.
+
+| Pico | Habilidades principales y alternativas |
 |---|---|
-| Palimpsest | Apunta a una mena expuesta. Extrae hasta 192 bloques conectados de esa mena, con drops y Fortuna normales. Da Prisa V y Regeneración II por ocho segundos. El servidor puede cambiar el límite. |
-| Choir of Faults | Mina una plantilla con este pico; apunta al inicio y actívalo mirando hacia el túnel. La plantilla rota al frente y solo rompe el estado de bloque que registró. |
-| Eventide | Apunta y fija el campo. Cada cuatro bloques de piedra iguales extraídos carga un colapso controlado de hasta seis bloques en la dirección de la mirada. Tiene Prisa III dentro del campo. |
-| Paradox Crucible | Selecciona dos esquinas con clic izquierdo y confirma. C transforma hacia piedra, pizarra, granito, diorita, andesita, tierra, basalto, obsidiana, calcita, toba, espeleotema o grava. No produce drops ni XP. |
-| Crown of Stasis | Modo dominio: marca un cuadrado de 16×16 con velocidad minera ×8, Regeneración V, Absorción IV, Resistencia II, comida y Visión nocturna. Modo aura: beneficios menores te siguen y no congela enemigos. |
-| Loom of the First Quarry | Apunta a roca y activa. Excava una esfera de geología natural de radio 8, distribuida en ticks; preserva menas, máquinas y bloques colocados. |
-| Tear of Icarus | Elige una perforación hacia delante normal o amplia. Cada sección se valida antes de minar y avanzar; agua, lava, fluidos de mods, claims y barreras detienen el recorrido. No recibe daño de caída durante el trabajo. |
-| Hollow Axiom | Apunta a una zona cargada y activa. Marca para ti hasta 32 menas ya existentes dentro de una elipse de 17×9×17; da Prisa III y Visión nocturna durante diez segundos. No rompe bloques. |
-| Worldbreaker | CARVE, FRACTURE, CLEAVE, CORE DRILL y WORLD SHATTER son cortes direccionales. REGION BREAK selecciona dos esquinas, analiza y extrae solo bloques picables. Core Drill evita el daño de caída hasta terminar. |
-| Exodium Starfall | Dispara un frente de minería de 13×9 hasta 48 bloques. La cola distribuye el trabajo por ticks y se detiene ante toda barrera. |
-| Iridium Lodebreaker | Escanea una elipse de 17×9×17 en chunks cargados; prioriza cercanía y extrae hasta 128 menas vanilla o de mods. |
-| Hellspec Infernal Bloom | Apunta al centro y extrae menas y geología natural en una cavidad elíptica de siete bloques. Da Resistencia al fuego y Prisa IV; nunca mina fluidos. |
+| Palimpsest | Extrae vetas conectadas; X activa Prisa V y Regeneración III. |
+| Choir of Faults | Abre un túnel seguro 2×2 de 20 bloques hacia delante; X protege y da visión nocturna a aliados cercanos. |
+| Eventide — La Noche que Pesa | Mantiene el campo gravitatorio; X aplica telepatía nocturna y Brillo a hostiles cercanos. |
+| Paradox Crucible | Selecciona una región y transmuta geología, incluida calcita y obsidiana; X resalta geología natural cercana. |
+| Crown of Stasis | Alterna dominio marcado de 16×16 y aura; el dominio también ayuda a compañeros dentro de sus límites visibles. |
+| Loom of the First Quarry | Excava una esfera de geología natural; X activa Pacto Silvestre para curar y alimentar aliados cercanos. |
+| Tear of Icarus | Perfora hacia delante; X te impulsa como un ala y evita caídas. Sus efectos usan partículas doradas, de encantamiento y vara de End. |
+| Hollow Axiom | Pulso Hueco atrae hostiles hacia un punto, los ralentiza y los revela; X pliega al jugador hasta 18 bloques por espacios libres. |
+| Worldbreaker | Conserva sus cortes y selección regional; en el Manual puedes elegir, por icono, qué habilidad alternativa copiar y activarla con X. |
+| Exodium Starfall | Lanza minera de 13×9 hasta 48 bloques; X da velocidad, Prisa y Caída lenta. |
+| Iridium Lodebreaker | Busca menas de Forge y vanilla en un volumen 29×15×29 por tandas, extrae hasta 192 y hace brillar los drops. |
+| Hellspec Infernal Bloom | Mantiene su aspecto y efectos; X apunta a lava para activar Manto Magmático. |
 
-## Seguridad y rendimiento
+Las habilidades Curios H/J son adicionales al ataque principal y a X; cada pico
+tiene dos poderes distintos al llevarlo en el slot `pickaxe`. Curios es opcional.
 
-Todos los trabajos usan harvesting nativo y durabilidad normal. Las operaciones
-revalidan permisos, alcance, chunk cargado, fluidos, block entities y estado del
-bloque. No se cargan chunks artificialmente. La congestión de drops pausa el
-trabajo para que el servidor no acumule entidades sin límite. El scheduler limita
-el trabajo por jugador y globalmente. Los bloques geológicos colocados por
-jugadores quedan protegidos desde que esta versión registra su colocación; no se
-puede recuperar el historial de colocaciones anteriores.
+Las excavaciones se procesan en el scheduler global, verifican cada bloque y
+pausan ante congestión de drops. No cargan chunks ni atraviesan fluidos, máquinas,
+bedrock, claims o celdas protegidas. El modo regional baja a cero la velocidad de
+rotura mientras eliges esquinas, para evitar romper bloques por accidente.

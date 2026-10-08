@@ -21,14 +21,14 @@ public final class ArtifactHud {
         if(net.minecraft.client.gui.screens.Screen.hasShiftDown()){
             io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.expanded(e.getItemStack(),item.kind,lines);
             lines.add(Component.translatable("manual4.controls").withStyle(net.minecraft.ChatFormatting.GOLD));
-            for(var action:io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())))lines.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
+            for(var action:io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(e.getItemStack(),item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())))lines.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
             for(var ench:net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValues()){
                 int level=io.github.santipdr.specialpickaxes.artifact.EnchantmentScaling.level(e.getItemStack(),ench);
                 if(level>0)lines.add(numericLevels(ench.getFullname(level),0));
             }
         }else {
             io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
-            var action=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())).get(0);
+            var action=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(e.getItemStack(),item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())).get(0);
             lines.add(RelicKeys.name(action).copy().append(" → ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))).withStyle(net.minecraft.ChatFormatting.AQUA));
         }
     }
