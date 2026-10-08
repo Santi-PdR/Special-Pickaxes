@@ -39,23 +39,6 @@ public final class MiningDesigns {
         if(steps.size()>ArtifactConfig.JOB_LIMIT.get())return steps.subList(0,ArtifactConfig.JOB_LIMIT.get());
         return steps;
     }
-    public static List<WorkStep> selective(ServerPlayer p,BlockPos center){
-        // Inspect an ellipsoid, retaining all ores and machines. Only matrix connected to a real ore is peeled.
-        var candidates=new HashSet<BlockPos>();var distances=new HashMap<BlockPos,Integer>();var frontier=new ArrayDeque<BlockPos>();
-        int r=Math.min(12,ArtifactConfig.MAX_RADIUS.get());
-        for(int x=-r;x<=r;x++)for(int y=-r/2;y<=r/2;y++)for(int z=-r;z<=r;z++){
-            if(x*x+4*y*y+z*z>r*r)continue;var at=center.offset(x,y,z);if(!WorldSafety.allowed(p,ArtifactKind.AXIOM,at)||WorldSafety.barrier(p,at))continue;
-            var s=p.serverLevel().getBlockState(at);
-            if(ArtifactOres.isOre(s)){frontier.add(at);distances.put(at,0);}
-            else if(matrix(s))candidates.add(at);
-        }
-        var steps=new ArrayList<WorkStep>();int shellDepth=ArtifactConfig.AXIOM_DEPTH.get();
-        while(!frontier.isEmpty()&&steps.size()<ArtifactConfig.JOB_LIMIT.get()){
-            var at=frontier.removeFirst();int d=distances.get(at);if(d>=shellDepth)continue;
-            for(var direction:Direction.values()){var next=at.relative(direction);if(candidates.remove(next)){distances.put(next,d+1);frontier.addLast(next);steps.add(new WorkStep.Mine(next,p.serverLevel().getBlockState(next)));}}
-        }
-        return steps;
-    }
     public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;

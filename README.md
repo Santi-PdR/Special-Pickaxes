@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.2.1** lleva doce picos tier IV, cada uno con pasiva, habilidad principal, habilidad alternativa y dos habilidades mientras está equipado en Curios. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.2.2** lleva doce picos tier IV con habilidades de minería y pasivas propias. En Curios conservan solo sus pasivas; no necesitan teclas extra. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.1 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.2 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
@@ -10,18 +10,18 @@ Palimpsest · Choir of Faults · Eventide · Paradox Crucible · Crown of Stasis
 Loom of the First Quarry · Tear of Icarus · Hollow Axiom · Worldbreaker ·
 Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 
-- **Palimpsest:** extracción de vetas conectadas hasta un límite configurable de 192, Prisa V y Regeneración II breves.
+- **Palimpsest:** extracción segura de vetas conectadas con un límite configurable; su pasiva ayuda a minar y recuperarte.
 - **Choir:** túnel resonante fijo 2×2, 20 bloques hacia delante; ya no repite una plantilla vieja.
-- **Eventide:** campo gravitatorio y pulso telepático que revela hostiles de noche.
-- **Crucible:** transforma doce materiales geológicos, ahora también calcita y obsidiana; X activa lectura geológica.
+- **Eventide:** campo gravitatorio que ordena derrumbes controlados al minar piedra.
+- **Crucible:** transforma doce materiales geológicos, ahora también calcita y obsidiana; respeta menas, cofres, fluidos y bloques colocados.
 - **Stasis:** dominio 16×16 con borde visible, ayuda a compañeros dentro o te sigue como aura.
-- **Worldloom:** cantera esférica de radio 8 y Pacto Silvestre para curar/alimentar aliados.
+- **Worldloom:** cantera esférica de radio 6, repartida por ticks.
 - **Icarus:** perforación hacia delante, partículas angelicales y Ascenso de Ícaro para movilidad.
-- **Axiom:** escanea una elipse cargada de 17×9×17 y te señala hasta 32 menas; también pliega al jugador por espacio libre.
-- **Worldbreaker:** varios cortes, rotura regional y selección visual de una habilidad de otro pico para copiar.
+- **Axiom:** excava una malla radial de geología natural y conserva las menas; no detecta vetas. Su pliegue secundario sirve para combate.
+- **Worldbreaker:** varios cortes, rotura regional y selección visual de otro pico para copiar con R/X.
 - **Exodium:** lanza minera de 13×9 hasta 48 bloques.
-- **Iridium:** sondea por tandas un volumen mayor; menas y drops brillan y cosecha hasta 192.
-- **Hellspec:** cava con su textura intacta; apunta a lava para activar el Manto Magmático.
+- **Iridium:** extrae menas por tandas dentro de un volumen acotado; las menas y sus drops brillan.
+- **Hellspec:** excava cavidades seguras y gana resistencia al fuego cerca de lava.
 
 Toda minería se agenda por ticks y vuelve a validar cada bloque. No carga chunks,
 no procesa fluids, bedrock, máquinas ni celdas protegidas, y pausa ante congestión
@@ -43,11 +43,11 @@ y [ASSET-PROVENANCE.json](docs/mining-rework/ASSET-PROVENANCE.json).
 
 ## Jugar y administrar
 
-R activa; X usa la habilidad alternativa; C cambia de modo; H/J activan las dos
-habilidades del slot Curios; I abre el Manual con la textura y las habilidades.
+R activa la minería; X usa la técnica secundaria; C cambia de modo; I abre el
+Manual. Worldbreaker usa R/X para las técnicas copiadas desde el Manual.
 B selecciona regiones; Enter confirma solo cuando el análisis está listo; V
 cancela; K pausa/reanuda (R también reanuda una pausa por drops). Los controles
-son reasignables.
+son reasignables. Curios solo aplica las pasivas del pico equipado.
 
 ```text
 /specialpickaxes grant <jugador> <id>

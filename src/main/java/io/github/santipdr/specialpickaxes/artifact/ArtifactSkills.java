@@ -14,7 +14,7 @@ public final class ArtifactSkills {
             ArtifactFeedback.message(player, "cooldown");
             return false;
         }
-        if (!CurioAbilities.performHeldAlternate(player, tool, kind)) return false;
+        if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) return false;
         data.putLong("alternateReady", now + Math.max(100, ArtifactConfig.COOLDOWN.get() * 5));
         ArtifactFeedback.sound(player, kind);
         ArtifactFeedback.burst(player, kind, player.blockPosition(), 10);

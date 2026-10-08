@@ -16,7 +16,7 @@ public final class RelicKeys {
     private static final io.github.santipdr.specialpickaxes.artifact.PressLatch[] DOWN=java.util.stream.IntStream.range(0,RelicControl.Action.values().length).mapToObj(i->new io.github.santipdr.specialpickaxes.artifact.PressLatch()).toArray(io.github.santipdr.specialpickaxes.artifact.PressLatch[]::new);
     private static Object connection;private static long sequence;
     public static final KeyMapping MANUAL=new KeyMapping("key.specialpickaxes.manual",net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_I,"key.categories.specialpickaxes");
-    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_G,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X,GLFW.GLFW_KEY_H,GLFW.GLFW_KEY_J,GLFW.GLFW_KEY_P};
+    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
     @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT,bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -36,21 +36,14 @@ public final class RelicKeys {
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(!edge||mc.screen!=null||mc.player==null)continue;
-            if(a==RelicControl.Action.CURIO_ONE||a==RelicControl.Action.CURIO_TWO){
-                var equipped=CuriosCompat.find(mc.player);
-                if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)
-                    RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,null,equipped.slot()));
-            }else if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable()&&mc.player.getMainHandItem().hasTag()&&mc.player.getMainHandItem().getTag().hasUUID("controlIdentity"))
-                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,mc.player.getMainHandItem().getTag().getUUID("controlIdentity"),-1));
+            if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable()&&mc.player.getMainHandItem().hasTag()&&mc.player.getMainHandItem().getTag().hasUUID("controlIdentity"))
+                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,mc.player.getMainHandItem().getTag().getUUID("controlIdentity")));
         }
     }
     public static void chooseCopy(ArtifactKind source){
         var mc=Minecraft.getInstance();if(mc.player==null)return;var hand=mc.player.getMainHandItem();
-        if(hand.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER&&hand.hasTag()&&hand.getTag().hasUUID("controlIdentity")){
-            RelicNetwork.chooseCopy(source,++sequence,hand.getTag().getUUID("controlIdentity"),-1);return;
-        }
-        var equipped=CuriosCompat.find(mc.player);if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER)
-            RelicNetwork.chooseCopy(source,++sequence,null,equipped.slot());
+        if(hand.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER&&hand.hasTag()&&hand.getTag().hasUUID("controlIdentity"))
+            RelicNetwork.chooseCopy(source,++sequence,hand.getTag().getUUID("controlIdentity"));
     }
     public static net.minecraft.network.chat.Component name(RelicControl.Action action){return KEYS[action.ordinal()].getTranslatedKeyMessage();}
 }

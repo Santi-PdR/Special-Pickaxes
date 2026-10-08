@@ -38,12 +38,6 @@ public final class ArtifactActions {
         int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         return true;
     }
-    public static boolean useCopiedPrimary(ServerPlayer p,ItemStack tool){
-        if(p.getMainHandItem()!=tool||!(tool.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER||!tool.hasTag())return false;
-        ArtifactKind source;try{source=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));}catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
-        if(source==ArtifactKind.WORLDBREAKER)return false;
-        return use(p,tool,source,false);
-    }
     private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
         if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
@@ -71,6 +65,10 @@ public final class ArtifactActions {
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
+        if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
+            try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));return copied!=ArtifactKind.WORLDBREAKER&&primary(p,tool,copied);}
+            catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
+        }
         if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
@@ -98,7 +96,11 @@ public final class ArtifactActions {
             if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
             ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
         }
-        if(kind==ArtifactKind.AXIOM) return hollowPulse(p,center);
+        if(kind==ArtifactKind.AXIOM){
+            var steps=quarry(p,kind,center,r);boolean started=WorkQueue.start(p,tool,kind,steps);
+            if(started){ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size());}
+            return started;
+        }
         if(kind==ArtifactKind.HELLSPEC) {
             var steps=MiningDesigns.hellforge(p,center);boolean started=WorkQueue.start(p,tool,kind,steps);
             if(started){ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
@@ -117,21 +119,6 @@ public final class ArtifactActions {
         boolean started=WorkQueue.start(p,tool,kind,steps);
         if(started) { if(kind==ArtifactKind.EVENTIDE&&!DomainFields.start(p,tool,kind,center,Math.min(r,8))){WorkQueue.cancel(p);return false;}if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started;
-    }
-    private static boolean hollowPulse(ServerPlayer p,BlockPos center){
-        var level=p.serverLevel();var point=Vec3.atCenterOf(center);
-        int affected=0;
-        for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class,
-                new net.minecraft.world.phys.AABB(point,point).inflate(9),m->m.isAlive()&&!m.isAlliedTo(p))){
-            var pull=point.subtract(mob.position());double distance=pull.length();
-            if(distance>0.01)mob.setDeltaMovement(mob.getDeltaMovement().add(pull.scale(Math.min(0.8,0.8/distance))));
-            mob.hasImpulse=true;
-            if(++affected>=24)break;
-        }
-        var voidDust=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.16F,0.08F,0.28F),1.5F);
-        level.sendParticles(p,net.minecraft.core.particles.ParticleTypes.PORTAL,false,point.x,point.y,point.z,36,1.2,1.2,1.2,0.12);
-        level.sendParticles(p,voidDust,false,point.x,point.y,point.z,18,0.8,0.8,0.8,0.02);
-        ArtifactFeedback.message(p,"hollow_pulse",affected);ArtifactFeedback.burst(p,ArtifactKind.AXIOM,center,10);return true;
     }
     public static List<WorkStep> echo(ServerPlayer p,BlockPos center) {
         var memories=ArtifactState.memories(p,ArtifactKind.CHOIR);var steps=new ArrayList<WorkStep>();

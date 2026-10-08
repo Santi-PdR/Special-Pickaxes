@@ -56,7 +56,7 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty") public static void axiomPacketCannotExecuteTwice(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIAMOND_ORE.defaultBlockState());
-        var packet=new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,p.getMainHandItem().getOrCreateTag().getUUID("controlIdentity"),-1);
+        var packet=new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,p.getMainHandItem().getOrCreateTag().getUUID("controlIdentity"));
         h.assertTrue(RelicNetwork.accept(p,packet),"first press activates");
         WorkQueue.cancel(p);ArtifactState.of(p,ArtifactKind.AXIOM).remove("ready");ArtifactState.of(p,ArtifactKind.AXIOM).remove("inputTick");
         h.assertTrue(!RelicNetwork.accept(p,packet)&&!WorkQueue.busy(p),"duplicate stays rejected even after job cancellation and cooldown removal");finish(h,p);
@@ -152,7 +152,7 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty") public static void staleSameKindToolIntentIsRejected(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var old=p.getMainHandItem().getTag().getUUID("controlIdentity");
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.AXIOM).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());
-        h.assertTrue(!RelicNetwork.accept(p,new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,old,-1))&&!WorkQueue.busy(p),"same kind is not the same tool");finish(h,p);
+        h.assertTrue(!RelicNetwork.accept(p,new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,old))&&!WorkQueue.busy(p),"same kind is not the same tool");finish(h,p);
     }
     @GameTest(template="empty") public static void selectionOwnershipAndIncompleteConfirmation(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=h.absolutePos(new BlockPos(5,4,7));

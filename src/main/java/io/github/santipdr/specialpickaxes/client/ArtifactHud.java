@@ -28,8 +28,6 @@ public final class ArtifactHud {
             }
         }else {
             io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
-            var action=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.actions(e.getItemStack(),item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(e.getItemStack())).get(0);
-            lines.add(RelicKeys.name(action).copy().append(" → ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))).withStyle(net.minecraft.ChatFormatting.AQUA));
         }
     }
     private static Component numericLevels(Component c,int depth){

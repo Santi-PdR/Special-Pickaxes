@@ -20,44 +20,9 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.common.util.BlockSnapshot;
 import org.joml.Vector3f;
 
-/** Bounded, action-based Curios abilities. Potion buffs belong to ArtifactPassives. */
-public final class CurioAbilities {
-    private CurioAbilities() {}
-
-    public static boolean execute(ServerPlayer player, ItemStack tool, ArtifactKind kind, RelicControl.Action action) {
-        int skill = action == RelicControl.Action.CURIO_TWO ? 2 : 1;
-        String key = "curioSkill" + skill + "Ready";
-        var data = ArtifactState.of(player, kind);
-        long now = ArtifactState.now(player);
-        if (data.getLong(key) > now) {
-            ArtifactFeedback.message(player, "curio_cooldown");
-            return false;
-        }
-        if (!perform(player, tool, kind, skill)) return false;
-        data.putLong(key, now + 600);
-        ArtifactFeedback.burst(player, kind, player.blockPosition(), 8);
-        ArtifactFeedback.message(player, skill == 1 ? "curio_one" : "curio_two");
-        return true;
-    }
-
-    /** Also used by the ordinary alternate key so active skills never grant timed potion effects. */
-    static boolean perform(ServerPlayer player, ItemStack tool, ArtifactKind kind, int skill) {
-        return switch (kind) {
-            case PALIMPSEST -> skill == 1 ? eatFromInventory(player) : magnetDrops(player, 10, 48);
-            case CHOIR -> skill == 1 ? knockbackTarget(player, 7, 1.15) : deflectProjectiles(player, 10, 32);
-            case EVENTIDE -> skill == 1 ? pullTarget(player, 10, .9) : knockbackPulse(player, 6, 1.0, 24);
-            case CRUCIBLE -> skill == 1 ? rotateCrucible(player) : knockbackPulse(player, 7, 1.25, 24);
-            case INTERREGNUM -> skill == 1 ? arrestMotion(player, aimed(player), 16, 32) : markSquare(player, player.blockPosition(), 8);
-            case WORLDLOOM -> skill == 1 ? eatFromInventory(player) : magnetDrops(player, 12, 64);
-            case ICARUS -> skill == 1 ? lift(player) : dash(player, 12);
-            case AXIOM -> skill == 1 ? knockbackTarget(player, 10, 1.45) : blinkBehindTarget(player, 10);
-            case WORLDBREAKER -> echo(player, tool, skill);
-            case EXODIUM -> skill == 1 ? dash(player, 24) : knockbackPulse(player, 7, 1.25, 24);
-            case IRIDIUM -> skill == 1 ? glowOreDrops(player, 14, 64) : magnetOreDrops(player, 14, 64);
-            case HELLSPEC -> skill == 1 ? quenchLava(player) : eatFromInventory(player);
-            default -> false;
-        };
-    }
+/** Bounded held-tool alternate actions. Curios equipment grants passives only. */
+public final class ArtifactTechniques {
+    private ArtifactTechniques() {}
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
         if (!tool.hasTag() || !tool.getTag().contains("copiedSkill")) {
@@ -67,7 +32,7 @@ public final class CurioAbilities {
         ArtifactKind source;
         try { source = ArtifactKind.byId(tool.getTag().getString("copiedSkill")); }
         catch (IllegalArgumentException invalid) { return false; }
-        return source != ArtifactKind.WORLDBREAKER && perform(player, tool, source, skill);
+        return source != ArtifactKind.WORLDBREAKER && performHeldAlternate(player, tool, source);
     }
 
     private static BlockPos aimed(ServerPlayer player) {

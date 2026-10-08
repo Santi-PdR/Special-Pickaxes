@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
-/** Compact relic guide. Worldbreaker uses its icon grid to choose which alternate skill to echo. */
+/** Compact relic guide. Worldbreaker selects a copied mining technique from its icon grid. */
 public final class ArtifactManualScreen extends Screen {
     private static final int WIDTH=500,HEIGHT=278;
     private final ArtifactKind kind;
@@ -29,14 +29,16 @@ public final class ArtifactManualScreen extends Screen {
         drawSection(g,"screen.specialpickaxes.main",Component.translatable("mining.identity."+kind.id+"."+key),x+18,y+75,bodyWidth,0xffd6e0e8);
         drawSection(g,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),x+18,y+110,bodyWidth,0xff9de8c1);
         drawSection(g,"screen.specialpickaxes.alternate",Component.translatable("alternate.specialpickaxes."+kind.id),x+18,y+145,bodyWidth,0xffffd079);
-        drawSection(g,"screen.specialpickaxes.curios",Component.translatable("curio.specialpickaxes."+kind.id),x+18,y+180,bodyWidth,0xffb9d4ff);
+        g.drawString(font,Component.translatable("screen.specialpickaxes.curios_passive"),x+18,y+185,0xffb9d4ff,false);
         ItemStack held=displayStack();
         if(kind==ArtifactKind.WORLDBREAKER){
             String copied=held.hasTag()?held.getTag().getString("copiedSkill"):"";
             Component chosen=Component.translatable("screen.specialpickaxes.selected",copied.isBlank()?Component.translatable("screen.specialpickaxes.none"):Component.translatable("item.specialpickaxes."+copied));
             g.drawString(font,chosen,x+18,y+218,0xffe9c96f,false);
-            g.drawString(font,Component.translatable("screen.specialpickaxes.copy_help"),x+258,y+27,0xffdddddd,false);
-            drawChoices(g,x+258,y+44,mouseX,mouseY,copied);
+            if(canChooseCopy()){
+                g.drawString(font,Component.translatable("screen.specialpickaxes.copy_help"),x+258,y+27,0xffdddddd,false);
+                drawChoices(g,x+258,y+44,mouseX,mouseY,copied);
+            }else g.drawString(font,Component.translatable("screen.specialpickaxes.copy_hand_only"),x+258,y+35,0xffb9d4ff,false);
         }else{
             g.drawCenteredString(font,Component.translatable("screen.specialpickaxes.close"),width/2,y+247,0xffaab7c5);
         }
@@ -47,6 +49,7 @@ public final class ArtifactManualScreen extends Screen {
         var hand=player.getMainHandItem();if(hand.getItem() instanceof ArtifactItem item&&item.kind==kind)return hand;
         var equipped=CuriosCompat.find(player);return equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item&&item.kind==kind?equipped.stack():ItemStack.EMPTY;
     }
+    private boolean canChooseCopy(){var player=Minecraft.getInstance().player;return player!=null&&player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER;}
     private void drawSection(GuiGraphics g,String heading,Component body,int x,int y,int maxWidth,int color){
         g.drawString(font,Component.translatable(heading),x,y,0xffd0ab64,false);
         var lines=font.split(body,maxWidth);int lineY=y+12;
@@ -63,7 +66,7 @@ public final class ArtifactManualScreen extends Screen {
         }
     }
     @Override public boolean mouseClicked(double mouseX,double mouseY,int button){
-        if(button==0&&kind==ArtifactKind.WORLDBREAKER){
+        if(button==0&&kind==ArtifactKind.WORLDBREAKER&&canChooseCopy()){
             int x=left()+258,y=top()+44;
             for(int i=0;i<choices.size();i++){
                 int px=x,py=y+i*19;

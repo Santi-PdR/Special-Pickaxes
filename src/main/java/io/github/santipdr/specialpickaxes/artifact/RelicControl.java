@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** Semantic intents shared by keyboard input, packets and tests. No client coordinates are trusted. */
 public final class RelicControl {
-    public enum Action { ACTIVATE, SECONDARY, MODE, SELECT, CONFIRM, CANCEL, PAUSE, ALT_SKILL, CURIO_ONE, CURIO_TWO, COPY_PRIMARY }
+    public enum Action { ACTIVATE, MODE, SELECT, CONFIRM, CANCEL, PAUSE, ALT_SKILL }
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
         if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
@@ -38,10 +38,6 @@ public final class RelicControl {
                 if(ArtifactInteraction.modeCount(k)<2)return false;
                 WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
                 ArtifactState.rotate(p,k);tool.getOrCreateTag().putInt("artifactMode",ArtifactState.mode(p,k));ArtifactInteraction.display(p,tool,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;
-            case SECONDARY:
-                if(k==ArtifactKind.MERIDIAN||k==ArtifactKind.LODESTAR){ArtifactState.clearAnchors(p,k);data.remove("trail");ArtifactFeedback.message(p,"unlinked");ArtifactFeedback.cue(p,"cancel");return true;}
-                if(DomainFields.active(p)||CompanionActions.active(p)){DomainFields.stop(p);CompanionActions.stop(p);WorkQueue.cancel(p);ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");return true;}
-                return false;
             case ACTIVATE:
                 if(WorkQueue.busy(p)){
                     var status=WorkQueue.status(p);
@@ -56,11 +52,6 @@ public final class RelicControl {
             case ALT_SKILL:
                 if(WorkQueue.busy(p))return false;
                 return ArtifactActions.useAlternate(p,tool,k);
-            case COPY_PRIMARY:
-                if(k!=ArtifactKind.WORLDBREAKER||WorkQueue.busy(p))return false;
-                return ArtifactActions.useCopiedPrimary(p,tool);
-            case CURIO_ONE, CURIO_TWO:
-                return false; // Curio actions are validated against the equipped slot in RelicNetwork.
             default:return false;
         }
     }
