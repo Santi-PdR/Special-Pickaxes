@@ -1,6 +1,9 @@
 {
   "size": 1,
   "order": 35,
-  "icon": "curios:slot/empty_curios_slot",
+  "icon": "specialpickaxes:slot/empty_pickaxe_slot",
+  "validators": [
+    "curios:tag"
+  ],
   "add_cosmetic": false
 }

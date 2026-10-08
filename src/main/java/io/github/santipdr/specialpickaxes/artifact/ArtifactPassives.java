@@ -12,7 +12,7 @@ public final class ArtifactPassives {
     public static void tick(ServerPlayer player, ArtifactKind kind) {
         grant(player, MobEffects.NIGHT_VISION, 0, 240);
         switch (kind) {
-            case PALIMPSEST -> grant(player, MobEffects.REGENERATION, 0, 80);
+            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, 80); grant(player, MobEffects.DIG_SPEED, 1, 80); }
             case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, 80);
             case EVENTIDE -> grant(player, MobEffects.SLOW_FALLING, 0, 80);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, 80); }

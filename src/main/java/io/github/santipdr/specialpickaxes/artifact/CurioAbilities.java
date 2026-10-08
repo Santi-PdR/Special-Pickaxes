@@ -1,57 +1,357 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.common.util.BlockSnapshot;
+import org.joml.Vector3f;
 
-/** Two support abilities for each artifact while equipped in its Curios slot. */
+/** Bounded, action-based Curios abilities. Potion buffs belong to ArtifactPassives. */
 public final class CurioAbilities {
     private CurioAbilities() {}
+
     public static boolean execute(ServerPlayer player, ItemStack tool, ArtifactKind kind, RelicControl.Action action) {
         int skill = action == RelicControl.Action.CURIO_TWO ? 2 : 1;
         String key = "curioSkill" + skill + "Ready";
-        var data = ArtifactState.of(player, kind);long now = ArtifactState.now(player);
-        if (data.getLong(key) > now) { ArtifactFeedback.message(player,"curio_cooldown");return false; }
-        int duration = 240;
-        switch (kind) {
-            case PALIMPSEST -> { if(skill==1){grant(player,MobEffects.REGENERATION,2,duration);grant(player,MobEffects.SATURATION,0,40);}else{grant(player,MobEffects.ABSORPTION,3,duration);grant(player,MobEffects.DAMAGE_RESISTANCE,1,duration);} }
-            case CHOIR -> { if(skill==1)grant(player,MobEffects.DIG_SPEED,3,duration);else{grant(player,MobEffects.DAMAGE_RESISTANCE,2,duration);grant(player,MobEffects.NIGHT_VISION,0,duration);} }
-            case EVENTIDE -> { if(skill==1)markHostiles(player);grant(player,MobEffects.NIGHT_VISION,0,duration);grant(player,MobEffects.SLOW_FALLING,0,duration); }
-            case CRUCIBLE -> { grant(player,MobEffects.FIRE_RESISTANCE,0,duration);grant(player,MobEffects.ABSORPTION,skill==1?1:3,duration); }
-            case INTERREGNUM -> { if(skill==1){grant(player,MobEffects.REGENERATION,3,duration);grant(player,MobEffects.NIGHT_VISION,0,duration);}else{grant(player,MobEffects.DAMAGE_RESISTANCE,3,duration);grant(player,MobEffects.ABSORPTION,3,duration);} }
-            case WORLDLOOM -> { if(skill==1)grant(player,MobEffects.REGENERATION,3,duration);else{grant(player,MobEffects.SATURATION,0,80);grant(player,MobEffects.JUMP,1,duration);} }
-            case ICARUS -> { grant(player,MobEffects.SLOW_FALLING,0,duration);if(skill==1)grant(player,MobEffects.JUMP,3,duration);else{player.setDeltaMovement(player.getDeltaMovement().add(0,0.9,0));player.hasImpulse=true;grant(player,MobEffects.MOVEMENT_SPEED,2,duration);} }
-            case AXIOM -> { if(skill==1){grant(player,MobEffects.INVISIBILITY,0,160);grant(player,MobEffects.MOVEMENT_SPEED,2,duration);}else if(!ArtifactSkills.use(player,tool,kind))return false; }
-            case WORLDBREAKER -> { if(skill==2){if(!ArtifactSkills.use(player,tool,kind))return false;}else{grant(player,MobEffects.DAMAGE_RESISTANCE,2,duration);grant(player,MobEffects.ABSORPTION,2,duration);} }
-            case EXODIUM -> { if(skill==1)grant(player,MobEffects.MOVEMENT_SPEED,3,duration);else{grant(player,MobEffects.DIG_SPEED,3,duration);grant(player,MobEffects.SLOW_FALLING,0,duration);} }
-            case IRIDIUM -> { if(skill==1){MiningDesigns.survey(player,player.blockPosition());grant(player,MobEffects.DIG_SPEED,2,duration);}else{magnetDrops(player);grant(player,MobEffects.MOVEMENT_SPEED,1,duration);} }
-            case HELLSPEC -> { if(skill==1){grant(player,MobEffects.FIRE_RESISTANCE,0,duration*2);grant(player,MobEffects.REGENERATION,1,duration);}else if(!ArtifactSkills.use(player,tool,kind))return false; }
-            default -> { return false; }
+        var data = ArtifactState.of(player, kind);
+        long now = ArtifactState.now(player);
+        if (data.getLong(key) > now) {
+            ArtifactFeedback.message(player, "curio_cooldown");
+            return false;
         }
+        if (!perform(player, tool, kind, skill)) return false;
         data.putLong(key, now + 600);
-        ArtifactFeedback.burst(player,kind,player.blockPosition(),8);
-        ArtifactFeedback.message(player,skill==1?"curio_one":"curio_two");
+        ArtifactFeedback.burst(player, kind, player.blockPosition(), 8);
+        ArtifactFeedback.message(player, skill == 1 ? "curio_one" : "curio_two");
         return true;
     }
-    private static void markHostiles(ServerPlayer player) {
-        int left=32;
-        for(var mob:player.serverLevel().getEntitiesOfClass(Monster.class,player.getBoundingBox().inflate(24),m->m.isAlive()&&!m.isAlliedTo(player))) {
-            mob.addEffect(new MobEffectInstance(MobEffects.GLOWING,240,0,true,false,true));
-            if(--left<=0)break;
-        }
+
+    /** Also used by the ordinary alternate key so active skills never grant timed potion effects. */
+    static boolean perform(ServerPlayer player, ItemStack tool, ArtifactKind kind, int skill) {
+        return switch (kind) {
+            case PALIMPSEST -> skill == 1 ? eatFromInventory(player) : magnetDrops(player, 10, 48);
+            case CHOIR -> skill == 1 ? knockbackTarget(player, 7, 1.15) : deflectProjectiles(player, 10, 32);
+            case EVENTIDE -> skill == 1 ? pullTarget(player, 10, .9) : knockbackPulse(player, 6, 1.0, 24);
+            case CRUCIBLE -> skill == 1 ? rotateCrucible(player) : knockbackPulse(player, 7, 1.25, 24);
+            case INTERREGNUM -> skill == 1 ? arrestMotion(player, aimed(player), 16, 32) : markSquare(player, player.blockPosition(), 8);
+            case WORLDLOOM -> skill == 1 ? eatFromInventory(player) : magnetDrops(player, 12, 64);
+            case ICARUS -> skill == 1 ? lift(player) : dash(player, 12);
+            case AXIOM -> skill == 1 ? knockbackTarget(player, 10, 1.45) : blinkBehindTarget(player, 10);
+            case WORLDBREAKER -> echo(player, tool, skill);
+            case EXODIUM -> skill == 1 ? dash(player, 24) : knockbackPulse(player, 7, 1.25, 24);
+            case IRIDIUM -> skill == 1 ? glowOreDrops(player, 14, 64) : magnetOreDrops(player, 14, 64);
+            case HELLSPEC -> skill == 1 ? quenchLava(player) : eatFromInventory(player);
+            default -> false;
+        };
     }
-    private static void magnetDrops(ServerPlayer player){
-        var center=player.getEyePosition();int pulled=0;
-        for(var drop:player.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,player.getBoundingBox().inflate(12),e->e.isAlive()&&(e.getOwner()==null||player.getUUID().equals(e.getOwner())))){
-            var delta=center.subtract(drop.position());if(delta.lengthSqr()<0.25)continue;drop.setDeltaMovement(delta.normalize().scale(0.65));drop.hasImpulse=true;if(++pulled>=64)break;
+
+    private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
+        if (!tool.hasTag() || !tool.getTag().contains("copiedSkill")) {
+            ArtifactFeedback.message(player, "copy_pick_first");
+            return false;
         }
+        ArtifactKind source;
+        try { source = ArtifactKind.byId(tool.getTag().getString("copiedSkill")); }
+        catch (IllegalArgumentException invalid) { return false; }
+        return source != ArtifactKind.WORLDBREAKER && perform(player, tool, source, skill);
     }
-    private static void grant(ServerPlayer player,MobEffect effect,int amplifier,int duration) {
-        var current=player.getEffect(effect);
-        if(current==null||current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<duration/2)
-            player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+
+    private static BlockPos aimed(ServerPlayer player) {
+        return ArtifactActions.target(player).orElseGet(() -> player.blockPosition().relative(player.getDirection(), 6)).immutable();
+    }
+
+    private static boolean magnetDrops(ServerPlayer player, int radius, int cap) {
+        Vec3 center = player.getEyePosition();
+        int moved = 0;
+        for (var drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
+                e -> e.isAlive() && (e.getOwner() == null || player.getUUID().equals(e.getOwner())))) {
+            Vec3 delta = center.subtract(drop.position());
+            if (delta.lengthSqr() < .25) continue;
+            drop.setDeltaMovement(delta.normalize().scale(.65));
+            drop.hasImpulse = true;
+            if (++moved >= cap) break;
+        }
+        ArtifactFeedback.message(player, "drops_gathered", moved);
+        return true;
+    }
+
+    private static boolean eatFromInventory(ServerPlayer player) {
+        if (!player.getFoodData().needsFood()) return false;
+        int bestSlot = -1, bestNutrition = 0;
+        float bestSaturation = 0;
+        net.minecraft.world.food.FoodProperties bestFood = null;
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            var stack = player.getInventory().getItem(slot);
+            if (stack.isEmpty()) continue;
+            var food = stack.getFoodProperties(player);
+            if (food == null) continue;
+            if (food.getNutrition() > bestNutrition || food.getNutrition() == bestNutrition && food.getSaturationModifier() > bestSaturation) {
+                bestSlot = slot;
+                bestNutrition = food.getNutrition();
+                bestSaturation = food.getSaturationModifier();
+                bestFood = food;
+            }
+        }
+        if (bestSlot < 0 || bestFood == null) return false;
+        var stack = player.getInventory().getItem(bestSlot);
+        player.getFoodData().eat(bestFood.getNutrition(), bestFood.getSaturationModifier());
+        if (!player.isCreative()) stack.shrink(1);
+        ArtifactFeedback.message(player, "food_used");
+        return true;
+    }
+
+    private static boolean knockbackTarget(ServerPlayer player, double range, double strength) {
+        Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
+        AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
+        LivingEntity target = player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
+            Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
+            return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
+        }).stream().min(java.util.Comparator.comparingDouble(entity -> entity.distanceToSqr(player))).orElse(null);
+        if (target == null) return false;
+        target.setDeltaMovement(target.getDeltaMovement().add(look.scale(strength).add(0, .18, 0)));
+        target.hasImpulse = true;
+        player.serverLevel().sendParticles(player, ParticleTypes.SWEEP_ATTACK, false, target.getX(), target.getY() + target.getBbHeight() / 2, target.getZ(), 8, .2, .2, .2, .04);
+        return true;
+    }
+
+    private static boolean knockbackPulse(ServerPlayer player, int radius, double strength, int cap) {
+        Vec3 center = player.position();
+        int pushed = 0;
+        for (LivingEntity target : player.serverLevel().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius), entity -> {
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            return !(entity instanceof Player other) || player.canHarmPlayer(other);
+        })) {
+            Vec3 away = target.position().subtract(center);
+            if (away.lengthSqr() < .01) continue;
+            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(strength).add(0, .25, 0)));
+            target.hasImpulse = true;
+            if (++pushed >= cap) break;
+        }
+        ArtifactFeedback.message(player, "targets_pushed", pushed);
+        return true;
+    }
+
+    private static boolean rotateCrucible(ServerPlayer player) {
+        ArtifactState.rotate(player, ArtifactKind.CRUCIBLE);
+        int mode = ArtifactState.mode(player, ArtifactKind.CRUCIBLE);
+        ArtifactFeedback.message(player, "named_mode", net.minecraft.network.chat.Component.translatable(
+                "mode.specialpickaxes." + ArtifactInteraction.modeKey(ArtifactKind.CRUCIBLE, mode)));
+        return true;
+    }
+
+    private static boolean arrestMotion(ServerPlayer player, BlockPos center, int radius, int cap) {
+        var level = player.serverLevel();
+        int stopped = 0;
+        for (Entity entity : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius),
+                e -> e.isAlive() && (e instanceof Projectile || e instanceof Monster) && !e.isAlliedTo(player))) {
+            entity.setDeltaMovement(Vec3.ZERO);
+            entity.hasImpulse = true;
+            if (++stopped >= cap) break;
+        }
+        ArtifactFeedback.message(player, "motion_arrested", stopped);
+        return true;
+    }
+
+    private static boolean markSquare(ServerPlayer player, BlockPos center, int radius) {
+        var level = player.serverLevel();
+        var color = new DustParticleOptions(new Vector3f(.55F, .78F, 1F), 1.35F);
+        for (int offset = -radius; offset <= radius; offset += 2) {
+            particle(level, player, color, center.offset(offset, 0, -radius));
+            particle(level, player, color, center.offset(offset, 0, radius));
+            particle(level, player, color, center.offset(-radius, 0, offset));
+            particle(level, player, color, center.offset(radius, 0, offset));
+        }
+        ArtifactFeedback.message(player, "stasis_boundary");
+        return true;
+    }
+
+    private static void particle(net.minecraft.server.level.ServerLevel level, ServerPlayer player, DustParticleOptions color, BlockPos pos) {
+        if (level.hasChunkAt(pos)) level.sendParticles(player, color, false, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5, 3, .08, .03, .08, 0);
+    }
+
+    private static boolean lift(ServerPlayer player) {
+        player.setDeltaMovement(player.getDeltaMovement().add(0, 1.05, 0));
+        player.hasImpulse = true;
+        player.serverLevel().sendParticles(player, ParticleTypes.END_ROD, false, player.getX(), player.getY(), player.getZ(), 16, .45, .2, .45, .08);
+        return true;
+    }
+
+    private static boolean dash(ServerPlayer player, int distance) {
+        Vec3 start = player.position(), direction = player.getLookAngle().normalize(), last = start;
+        var box = player.getBoundingBox();
+        for (int step = 1; step <= distance; step++) {
+            Vec3 next = start.add(direction.scale(step));
+            BlockPos at = BlockPos.containing(next);
+            if (!player.serverLevel().hasChunkAt(at) || !player.serverLevel().getWorldBorder().isWithinBounds(at)
+                    || !player.serverLevel().noCollision(player, box.move(next.subtract(start)))) break;
+            last = next;
+        }
+        if (last.distanceToSqr(start) < 4) return false;
+        player.connection.teleport(last.x, last.y, last.z, player.getYRot(), player.getXRot());
+        return true;
+    }
+
+    private static boolean blink(ServerPlayer player, int distance) {
+        return dash(player, distance);
+    }
+
+    private static boolean pullHostiles(ServerPlayer player, BlockPos center, int radius, int cap) {
+        Vec3 point = Vec3.atCenterOf(center);
+        int pulled = 0;
+        for (var mob : player.serverLevel().getEntitiesOfClass(Monster.class, new AABB(center).inflate(radius),
+                m -> m.isAlive() && !m.isAlliedTo(player))) {
+            Vec3 delta = point.subtract(mob.position());
+            if (delta.lengthSqr() > .01) mob.setDeltaMovement(mob.getDeltaMovement().add(delta.normalize().scale(.6)));
+            mob.hasImpulse = true;
+            if (++pulled >= cap) break;
+        }
+        player.serverLevel().sendParticles(player, ParticleTypes.PORTAL, false, point.x, point.y, point.z, 24, .8, .8, .8, .08);
+        ArtifactFeedback.message(player, "hollow_pulse", pulled);
+        return true;
+    }
+
+    private static boolean deflectProjectiles(ServerPlayer player, int radius, int cap) {
+        int deflected = 0;
+        for (Projectile projectile : player.serverLevel().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(radius),
+                entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player)))) {
+            Vec3 away = projectile.position().subtract(player.position()).normalize();
+            projectile.setDeltaMovement(away.scale(Math.max(.8, projectile.getDeltaMovement().length())));
+            projectile.hasImpulse = true;
+            if (++deflected >= cap) break;
+        }
+        ArtifactFeedback.message(player, "projectiles_deflected", deflected);
+        return true;
+    }
+
+    private static boolean pullTarget(ServerPlayer player, double range, double strength) {
+        LivingEntity target = targetInLook(player, range);
+        if (target == null) return false;
+        Vec3 pull = player.position().subtract(target.position()).normalize().scale(strength);
+        target.setDeltaMovement(target.getDeltaMovement().add(pull));
+        target.hasImpulse = true;
+        return true;
+    }
+
+    private static LivingEntity targetInLook(ServerPlayer player, double range) {
+        Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
+        AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
+        return player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
+            Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
+            return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
+        }).stream().min(java.util.Comparator.comparingDouble(entity -> entity.distanceToSqr(player))).orElse(null);
+    }
+
+    private static boolean blinkBehindTarget(ServerPlayer player, double range) {
+        LivingEntity target = targetInLook(player, range);
+        if (target == null) return false;
+        Vec3 destination = target.position().subtract(target.getLookAngle().normalize().scale(1.5));
+        BlockPos at = BlockPos.containing(destination);
+        if (!player.serverLevel().hasChunkAt(at) || !player.serverLevel().getWorldBorder().isWithinBounds(at)
+                || !player.serverLevel().noCollision(player, player.getBoundingBox().move(destination.subtract(player.position())))) return false;
+        player.connection.teleport(destination.x, destination.y, destination.z, player.getYRot(), player.getXRot());
+        return true;
+    }
+
+    private static boolean glowOreDrops(ServerPlayer player, int radius, int cap) {
+        int marked = 0;
+        for (ItemEntity drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
+                item -> item.isAlive() && item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"))) {
+            drop.setGlowingTag(true);
+            if (++marked >= cap) break;
+        }
+        ArtifactFeedback.message(player, "ore_drops_glowing", marked);
+        return true;
+    }
+
+    private static boolean magnetOreDrops(ServerPlayer player, int radius, int cap) {
+        Vec3 center = player.getEyePosition();
+        int moved = 0;
+        for (ItemEntity drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
+                item -> item.isAlive() && item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"))) {
+            Vec3 delta = center.subtract(drop.position());
+            if (delta.lengthSqr() < .25) continue;
+            drop.setDeltaMovement(delta.normalize().scale(.75));
+            drop.hasImpulse = true;
+            if (++moved >= cap) break;
+        }
+        ArtifactFeedback.message(player, "ore_drops_gathered", moved);
+        return true;
+    }
+
+    private static boolean quenchLava(ServerPlayer player) {
+        Vec3 from = player.getEyePosition(), to = from.add(player.getLookAngle().scale(24));
+        var hit = player.serverLevel().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));
+        if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) return false;
+        BlockPos pos = hit.getBlockPos();
+        var level = player.serverLevel();
+        var before = level.getBlockState(pos);
+        var fluid = level.getFluidState(pos);
+        if (!fluid.is(net.minecraft.tags.FluidTags.LAVA) || !fluid.isSource() || before.hasBlockEntity()
+                || !WorldSafety.allowed(player, ArtifactKind.HELLSPEC, pos)
+                || net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) return false;
+        var snapshot = BlockSnapshot.create(level.dimension(), level, pos);
+        var obsidian = Blocks.OBSIDIAN.defaultBlockState();
+        if (!level.setBlock(pos, obsidian, 3)) return false;
+        if (ForgeEventFactory.onBlockPlace(player, snapshot, Direction.UP) || level.getBlockState(pos) != obsidian) {
+            if (level.hasChunkAt(pos) && level.getBlockState(pos) == obsidian) snapshot.restore(true, false);
+            return false;
+        }
+        level.blockUpdated(pos, Blocks.OBSIDIAN);
+        ArtifactFeedback.message(player, "lava_quenched");
+        return true;
+    }
+
+    static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
+        return switch (kind) {
+            case PALIMPSEST -> knockbackPulse(player, 6, 1.0, 24);
+            case CHOIR -> boreTunnel(player, tool, kind, 8, 32);
+            case EVENTIDE -> magnetDrops(player, 16, 64);
+            case CRUCIBLE -> deflectProjectiles(player, 10, 32);
+            case INTERREGNUM -> knockbackPulse(player, 8, 1.1, 24);
+            case WORLDLOOM -> pullTarget(player, 10, .9);
+            case ICARUS -> knockbackTarget(player, 7, 1.35);
+            case AXIOM -> pullHostiles(player, aimed(player), 9, 24);
+            case WORLDBREAKER -> echo(player, tool, 2);
+            case EXODIUM -> knockbackPulse(player, 7, 1.25, 24);
+            case IRIDIUM -> knockbackTarget(player, 10, 1.5);
+            case HELLSPEC -> deflectProjectiles(player, 10, 32);
+            default -> false;
+        };
+    }
+
+    private static boolean boreTunnel(ServerPlayer player, ItemStack tool, ArtifactKind kind, int depth, int cap) {
+        var forward = Direction.getNearest(player.getLookAngle().x, player.getLookAngle().y, player.getLookAngle().z);
+        var side = forward.getClockWise();
+        var origin = player.blockPosition().above().relative(forward);
+        int mined = 0;
+        for (int step = 0; step < depth && mined < cap; step++)
+            for (int lateral = -1; lateral <= 0 && mined < cap; lateral++)
+                for (int vertical = -1; vertical <= 0 && mined < cap; vertical++) {
+                    var pos = origin.relative(forward, step).relative(side, lateral).above(vertical);
+                    if (!player.serverLevel().hasChunkAt(pos) || !WorldSafety.allowed(player, kind, pos)) continue;
+                    var state = player.serverLevel().getBlockState(pos);
+                    if (!WorldSafety.inert(state) || !WorldSafety.harvestable(player, tool, pos)) continue;
+                    if (WorldSafety.mine(player, tool, kind, pos, state)) mined++;
+                }
+        ArtifactFeedback.message(player, "tunnel_bored", mined);
+        return mined > 0;
     }
 }

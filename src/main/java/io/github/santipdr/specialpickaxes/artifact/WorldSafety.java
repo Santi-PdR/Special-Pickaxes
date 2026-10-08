@@ -67,7 +67,7 @@ public final class WorldSafety {
         if(mined&&kind==ArtifactKind.IRIDIUM){
             var glowBox=new AABB(pos).inflate(2);
             for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,glowBox))
-                if(drop.tickCount<2)drop.setGlowingTag(true);
+                if(drop.tickCount<2){drop.setGlowingTag(true);drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);}
         }
         return mined;
     }

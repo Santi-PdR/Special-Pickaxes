@@ -56,18 +56,6 @@ public final class MiningDesigns {
         }
         return steps;
     }
-    public static int survey(ServerPlayer p,BlockPos center){
-        int radius=8,halfHeight=4,count=0,shown=0;var level=p.serverLevel();
-        var particle=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.35F,0.9F,1F),1.1F);
-        for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
-            if((double)x*x+(double)z*z+4D*y*y>radius*radius)continue;var pos=center.offset(x,y,z);
-            if(!level.hasChunkAt(pos)||!ArtifactOres.isOre(level.getBlockState(pos)))continue;
-            count++;if(shown<32){level.sendParticles(p,particle,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,3,0.22,0.22,0.22,0);shown++;}
-        }
-        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,200,0,false,true,true));
-        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,200,2,false,true,true));
-        return count;
-    }
     public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;

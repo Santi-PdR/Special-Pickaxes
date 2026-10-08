@@ -80,9 +80,7 @@ public final class ArtifactActions {
             var aimed=target(p);return aimed.isPresent()&&WorkQueue.startRegion(p,tool,kind,new OrefallProgram(aimed.get()));
         }
         if(kind==ArtifactKind.PALIMPSEST) {
-            var aimed=target(p);boolean started=aimed.isPresent()&&startVein(p,tool,aimed.get());
-            if(started){p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,160,4,false,true,true));p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,160,1,false,true,true));}
-            return started;
+            var aimed=target(p);return aimed.isPresent()&&startVein(p,tool,aimed.get());
         }
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
@@ -103,7 +101,7 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.AXIOM) return hollowPulse(p,center);
         if(kind==ArtifactKind.HELLSPEC) {
             var steps=MiningDesigns.hellforge(p,center);boolean started=WorkQueue.start(p,tool,kind,steps);
-            if(started){p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,600,0,false,true,true));p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,600,3,false,true,true));ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
+            if(started){ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
             return started;
         }
 
@@ -128,8 +126,6 @@ public final class ArtifactActions {
             var pull=point.subtract(mob.position());double distance=pull.length();
             if(distance>0.01)mob.setDeltaMovement(mob.getDeltaMovement().add(pull.scale(Math.min(0.8,0.8/distance))));
             mob.hasImpulse=true;
-            mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,100,2,true,false,true));
-            mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,100,0,true,false,true));
             if(++affected>=24)break;
         }
         var voidDust=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.16F,0.08F,0.28F),1.5F);

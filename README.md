@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.2.0** lleva doce picos tier IV, cada uno con pasiva, habilidad principal, habilidad alternativa y dos habilidades mientras está equipado en Curios. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.2.1** lleva doce picos tier IV, cada uno con pasiva, habilidad principal, habilidad alternativa y dos habilidades mientras está equipado en Curios. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.0 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.1 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
