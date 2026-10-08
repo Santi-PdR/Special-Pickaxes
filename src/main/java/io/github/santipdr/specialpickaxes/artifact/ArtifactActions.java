@@ -57,7 +57,7 @@ public final class ArtifactActions {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
         if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS)return MiningDesigns.drill(p,tool,kind);
-        if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),radius(p,kind)));
+        if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),6));
         if(kind==ArtifactKind.PALIMPSEST) {
             var steps=new ArrayList<WorkStep>();
             var memories=ArtifactState.memories(p,kind);var aimed=target(p).orElse(p.blockPosition());
