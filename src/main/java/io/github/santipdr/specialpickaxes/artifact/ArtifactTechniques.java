@@ -79,11 +79,12 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean knockbackTarget(ServerPlayer player, double range, double strength) {
+    private static boolean knockbackTarget(ServerPlayer player, ArtifactKind kind, double range, double strength) {
         Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
         AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
         LivingEntity target = player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
+                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
             Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
             return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
@@ -95,11 +96,12 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean knockbackPulse(ServerPlayer player, int radius, double strength, int cap) {
+    private static boolean knockbackPulse(ServerPlayer player, ArtifactKind kind, int radius, double strength, int cap) {
         Vec3 center = player.position();
         int pushed = 0;
         for (LivingEntity target : player.serverLevel().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius), entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
+                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             return !(entity instanceof Player other) || player.canHarmPlayer(other);
         })) {
             Vec3 away = target.position().subtract(center);
@@ -120,11 +122,12 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean arrestMotion(ServerPlayer player, BlockPos center, int radius, int cap) {
+    private static boolean arrestMotion(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
         var level = player.serverLevel();
         int stopped = 0;
         for (Entity entity : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius),
-                e -> e.isAlive() && (e instanceof Projectile || e instanceof Monster) && !e.isAlliedTo(player))) {
+                e -> e.isAlive() && (e instanceof Projectile || e instanceof Monster) && !e.isAlliedTo(player)
+                        && WorldSafety.allowed(player, kind, e.blockPosition()))) {
             entity.setDeltaMovement(Vec3.ZERO);
             entity.hasImpulse = true;
             if (++stopped >= cap) break;
@@ -176,11 +179,11 @@ public final class ArtifactTechniques {
         return dash(player, distance);
     }
 
-    private static boolean pullHostiles(ServerPlayer player, BlockPos center, int radius, int cap) {
+    private static boolean pullHostiles(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
         Vec3 point = Vec3.atCenterOf(center);
         int pulled = 0;
         for (var mob : player.serverLevel().getEntitiesOfClass(Monster.class, new AABB(center).inflate(radius),
-                m -> m.isAlive() && !m.isAlliedTo(player))) {
+                m -> m.isAlive() && !m.isAlliedTo(player) && WorldSafety.allowed(player, kind, m.blockPosition()))) {
             Vec3 delta = point.subtract(mob.position());
             if (delta.lengthSqr() > .01) mob.setDeltaMovement(mob.getDeltaMovement().add(delta.normalize().scale(.6)));
             mob.hasImpulse = true;
@@ -191,10 +194,11 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean deflectProjectiles(ServerPlayer player, int radius, int cap) {
+    private static boolean deflectProjectiles(ServerPlayer player, ArtifactKind kind, int radius, int cap) {
         int deflected = 0;
         for (Projectile projectile : player.serverLevel().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(radius),
-                entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player)))) {
+                entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player))
+                        && WorldSafety.allowed(player, kind, entity.blockPosition()))) {
             Vec3 away = projectile.position().subtract(player.position()).normalize();
             projectile.setDeltaMovement(away.scale(Math.max(.8, projectile.getDeltaMovement().length())));
             projectile.hasImpulse = true;
@@ -205,7 +209,7 @@ public final class ArtifactTechniques {
     }
 
     private static boolean pullTarget(ServerPlayer player, double range, double strength) {
-        LivingEntity target = targetInLook(player, range);
+        LivingEntity target = targetInLook(player, ArtifactKind.WORLDLOOM, range);
         if (target == null) return false;
         Vec3 pull = player.position().subtract(target.position()).normalize().scale(strength);
         target.setDeltaMovement(target.getDeltaMovement().add(pull));
@@ -213,11 +217,12 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static LivingEntity targetInLook(ServerPlayer player, double range) {
+    private static LivingEntity targetInLook(ServerPlayer player, ArtifactKind kind, double range) {
         Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
         AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
         return player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)) return false;
+            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
+                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
             Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
             return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
@@ -225,7 +230,7 @@ public final class ArtifactTechniques {
     }
 
     private static boolean blinkBehindTarget(ServerPlayer player, double range) {
-        LivingEntity target = targetInLook(player, range);
+        LivingEntity target = targetInLook(player, ArtifactKind.EXODIUM, range);
         if (target == null || player.isPassenger() || player.isSleeping()
                 || !WorldSafety.allowed(player,ArtifactKind.EXODIUM,target.blockPosition())) return false;
         Vec3 destination = target.position().subtract(target.getLookAngle().normalize().scale(1.5));
@@ -278,16 +283,16 @@ public final class ArtifactTechniques {
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
-            case PALIMPSEST -> knockbackPulse(player, 6, 1.0, 24);
+            case PALIMPSEST -> knockbackPulse(player, kind, 6, 1.0, 24);
             case CHOIR -> boreTunnel(player, tool, kind, 8, 32);
             case EVENTIDE -> magnetDrops(player, 16, 64);
-            case CRUCIBLE -> deflectProjectiles(player, 10, 32);
+            case CRUCIBLE -> deflectProjectiles(player, kind, 10, 32);
             case INTERREGNUM -> ArtifactState.mode(player,kind)==1
-                    ? arrestMotion(player,player.blockPosition(),8,24)
+                    ? arrestMotion(player,kind,player.blockPosition(),8,24)
                     : DomainFields.relocate(player,aimed(player));
             case WORLDLOOM -> pullTarget(player, 10, .9);
-            case ICARUS -> knockbackTarget(player, 7, 1.35);
-            case AXIOM -> pullHostiles(player, aimed(player), 9, 24);
+            case ICARUS -> knockbackTarget(player, kind, 7, 1.35);
+            case AXIOM -> pullHostiles(player, kind, aimed(player), 9, 24);
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfold(player);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);

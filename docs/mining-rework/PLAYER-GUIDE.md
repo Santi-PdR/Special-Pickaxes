@@ -1,4 +1,4 @@
-# Guía del catálogo 5.2.8
+# Guía del catálogo 5.2.9
 
 R activa la habilidad principal de minería; X la técnica secundaria; C cambia de modo; I abre el
 Manual con la textura, pasiva y habilidades. Curios solo aplica las pasivas del pico equipado; no tiene botones propios. B arma una selección regional,
