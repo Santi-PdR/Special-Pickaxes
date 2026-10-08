@@ -287,11 +287,17 @@ public final class ArtifactTechniques {
             case ICARUS -> knockbackTarget(player, 7, 1.35);
             case AXIOM -> pullHostiles(player, aimed(player), 9, 24);
             case WORLDBREAKER -> echo(player, tool, 2);
-            case EXODIUM -> knockbackPulse(player, 7, 1.25, 24);
+            case EXODIUM -> starfold(player);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
-            case HELLSPEC -> deflectProjectiles(player, 10, 32);
+            case HELLSPEC -> quenchLava(player);
             default -> false;
         };
+    }
+
+    private static boolean starfold(ServerPlayer player){
+        if(!blinkBehindTarget(player,16))return false;
+        ArtifactFeedback.message(player,"exodium_blink");
+        return true;
     }
 
     private static boolean boreTunnel(ServerPlayer player, ItemStack tool, ArtifactKind kind, int depth, int cap) {

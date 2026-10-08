@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.2.5** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles verificados. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.2.6** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles verificados. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.5 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.6 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
@@ -19,9 +19,9 @@ Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 - **Icarus:** perforación hacia delante, partículas angelicales y Ascenso de Ícaro para movilidad.
 - **Axiom:** excava una malla radial de geología natural y conserva las menas; no detecta vetas. Su pliegue secundario sirve para combate.
 - **Worldbreaker:** varios cortes, rotura regional y selección visual de otro pico para copiar con R/X.
-- **Exodium:** lanza minera de 13×9 hasta 48 bloques.
+- **Exodium:** lanza minera de 13×9 hasta 48 bloques; X pliega detrás de un enemigo visible.
 - **Iridium:** extrae hasta 192 menas por tandas; sus drops brillan y X atrae hasta 96 drops propios cercanos.
-- **Hellspec:** excava cavidades seguras y gana resistencia al fuego cerca de lava.
+- **Hellspec:** excava cavidades seguras; su X convierte fuentes de lava apuntadas en obsidiana bajo permisos.
 
 Toda minería se agenda por ticks y vuelve a validar cada bloque. No carga chunks,
 no procesa fluids, bedrock, máquinas ni celdas protegidas, y pausa ante congestión

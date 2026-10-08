@@ -1,4 +1,4 @@
-# Guía del catálogo 5.2.5
+# Guía del catálogo 5.2.6
 
 R activa la habilidad principal de minería; X la técnica secundaria; C cambia de modo; I abre el
 Manual con la textura, pasiva y habilidades. Curios solo aplica las pasivas del pico equipado; no tiene botones propios. B arma una selección regional,
@@ -20,9 +20,9 @@ Al equiparlos en Curios solo se aplican sus pasivas.
 | Tear of Icarus | Perfora hacia delante; X empuja al objetivo que miras; Caída lenta es pasiva en el aire. Sus efectos usan partículas doradas, de encantamiento y vara de End. |
 | Hollow Axiom | Excava una malla radial de roca natural y conserva las menas; X pliega un objetivo hostil hacia ti. |
 | Worldbreaker | Conserva sus cortes y selección regional; el Manual permite elegir por icono qué técnicas R/X copiar. |
-| Exodium Starfall | Lanza minera de 13×9 hasta 48 bloques; X genera una onda de empuje. |
+| Exodium Starfall | Lanza minera de 13×9 hasta 48 bloques; X te pliega detrás de un objetivo visible, en espacio seguro. |
 | Iridium Lodebreaker | Busca menas de Forge y vanilla en un volumen 29×15×29 por tandas, extrae hasta 192, ilumina sus drops y X los atrae hacia ti. |
-| Hellspec Infernal Bloom | Mantiene su aspecto; la resistencia al fuego es pasiva y X desvía proyectiles. |
+| Hellspec Infernal Bloom | Excava geología y menas; la resistencia al fuego es pasiva y X convierte lava fuente apuntada en obsidiana. |
 
 R/X corresponden al pico cuando lo usas en la mano. Al equiparlo en Curios conserva sus pasivas, incluida Visión nocturna, sin habilidades activas adicionales. No se aplica Fuerza. Curios es opcional.
 
