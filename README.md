@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.2.4** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.2.5** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles verificados. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.4 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.5 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
@@ -15,12 +15,12 @@ Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 - **Eventide:** campo gravitatorio que ordena derrumbes controlados al minar piedra.
 - **Crucible:** transforma doce materiales geológicos, ahora también calcita y obsidiana; respeta menas, cofres, fluidos y bloques colocados.
 - **Stasis:** dominio 16×16 con borde visible, ayuda a compañeros dentro o te sigue como aura.
-- **Worldloom:** cantera esférica de radio 6, repartida por ticks.
+- **Worldloom:** cantera esférica de radio 8, repartida por ticks.
 - **Icarus:** perforación hacia delante, partículas angelicales y Ascenso de Ícaro para movilidad.
 - **Axiom:** excava una malla radial de geología natural y conserva las menas; no detecta vetas. Su pliegue secundario sirve para combate.
 - **Worldbreaker:** varios cortes, rotura regional y selección visual de otro pico para copiar con R/X.
 - **Exodium:** lanza minera de 13×9 hasta 48 bloques.
-- **Iridium:** extrae menas por tandas dentro de un volumen acotado; las menas y sus drops brillan.
+- **Iridium:** extrae hasta 192 menas por tandas; sus drops brillan y X atrae hasta 96 drops propios cercanos.
 - **Hellspec:** excava cavidades seguras y gana resistencia al fuego cerca de lava.
 
 Toda minería se agenda por ticks y vuelve a validar cada bloque. No carga chunks,

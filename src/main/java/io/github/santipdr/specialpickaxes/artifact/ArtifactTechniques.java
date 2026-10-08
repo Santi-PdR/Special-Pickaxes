@@ -235,30 +235,22 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean glowOreDrops(ServerPlayer player, int radius, int cap) {
-        int marked = 0;
-        for (ItemEntity drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
-                item -> item.isAlive() && item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"))) {
-            drop.setGlowingTag(true);
-            if (++marked >= cap) break;
-        }
-        ArtifactFeedback.message(player, "ore_drops_glowing", marked);
-        return true;
-    }
-
-    private static boolean magnetOreDrops(ServerPlayer player, int radius, int cap) {
+    private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
-        int moved = 0;
+        int recalled = 0;
         for (ItemEntity drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
-                item -> item.isAlive() && item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"))) {
+                item -> item.isAlive() && item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop")
+                        && item.getPersistentData().hasUUID("specialpickaxesIridiumOwner")
+                        && player.getUUID().equals(item.getPersistentData().getUUID("specialpickaxesIridiumOwner")))) {
             Vec3 delta = center.subtract(drop.position());
+            drop.setGlowingTag(true);
             if (delta.lengthSqr() < .25) continue;
-            drop.setDeltaMovement(delta.normalize().scale(.75));
+            drop.setDeltaMovement(drop.getDeltaMovement().scale(.2).add(delta.normalize().scale(.85)));
             drop.hasImpulse = true;
-            if (++moved >= cap) break;
+            if (++recalled >= cap) break;
         }
-        ArtifactFeedback.message(player, "ore_drops_gathered", moved);
-        return true;
+        if(recalled>0)ArtifactFeedback.message(player,"ore_drops_recalled",recalled);
+        return recalled>0;
     }
 
     private static boolean quenchLava(ServerPlayer player) {
@@ -296,7 +288,7 @@ public final class ArtifactTechniques {
             case AXIOM -> pullHostiles(player, aimed(player), 9, 24);
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> knockbackPulse(player, 7, 1.25, 24);
-            case IRIDIUM -> knockbackTarget(player, 10, 1.5);
+            case IRIDIUM -> recallIridiumDrops(player, 24, 96);
             case HELLSPEC -> deflectProjectiles(player, 10, 32);
             default -> false;
         };

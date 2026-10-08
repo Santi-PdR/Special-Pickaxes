@@ -38,7 +38,12 @@ public final class ArtifactTooltips {
         section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios_passive"));
-        if(ArtifactInteraction.modeCount(k)>1)section(lines,"manual4.mode",Component.translatable("mode.specialpickaxes."+mode));
+        if(ArtifactInteraction.modeCount(k)>1){
+            var allModes=Component.empty();String[] modes=ArtifactInteraction.modes(k);
+            for(int i=0;i<modes.length;i++){if(i>0)allModes.append(" · ");allModes.append(Component.translatable("mode.specialpickaxes."+modes[i]));}
+            section(lines,"manual4.modes",allModes);
+            section(lines,"manual4.mode",Component.translatable("mode.specialpickaxes."+mode));
+        }
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
         section(lines,"manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)));

@@ -68,8 +68,10 @@ public final class ArtifactManualScreen extends Screen {
         result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));
         result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
         result.add(section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios_passive"),0xffb9d4ff));
-        if(ArtifactInteraction.modeCount(kind)>1)
+        if(ArtifactInteraction.modeCount(kind)>1){
+            result.add(section("manual4.modes",allModes(),0xffd6e0e8));
             result.add(section("manual4.mode",Component.translatable("mode.specialpickaxes."+modeKey),0xffffd079));
+        }
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
         result.add(section("manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)),0xffd6e0e8));
@@ -80,6 +82,11 @@ public final class ArtifactManualScreen extends Screen {
         controls.add(Component.translatable("key.specialpickaxes.manual").append(": I"));
         result.add(new Section(Component.translatable("manual4.controls"),controls,0xffd6e0e8));
         return result;
+    }
+    private Component allModes(){
+        var text=Component.empty();String[] modes=ArtifactInteraction.modes(kind);
+        for(int i=0;i<modes.length;i++){if(i>0)text.append(" · ");text.append(Component.translatable("mode.specialpickaxes."+modes[i]));}
+        return text;
     }
     private static Section section(String heading,Component body,int color){return new Section(Component.translatable(heading),List.of(body),color);}
     private int measure(List<Section> sections,int maxWidth){
