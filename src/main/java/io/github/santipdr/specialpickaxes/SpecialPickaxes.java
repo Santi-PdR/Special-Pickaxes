@@ -17,6 +17,7 @@ import net.minecraftforge.common.*;
 import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.*;
@@ -49,7 +50,7 @@ public final class SpecialPickaxes {
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
-        forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);
+        forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
         forge.addListener(this::fall);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
@@ -115,6 +116,12 @@ public final class SpecialPickaxes {
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
+    }
+    private void hurt(LivingHurtEvent e){
+        if(e.getEntity() instanceof ServerPlayer p){
+            var equipped=CuriosCompat.find(p);
+            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.onCuriosDamage(p,e,pick.kind);
+        }
     }
     private void fall(LivingFallEvent e){if(e.getEntity() instanceof ServerPlayer p&&WorkQueue.protectsFall(p))e.setCanceled(true);}
     private void commands(RegisterCommandsEvent e) {
