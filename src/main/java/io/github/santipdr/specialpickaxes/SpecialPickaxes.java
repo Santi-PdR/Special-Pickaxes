@@ -51,6 +51,7 @@ public final class SpecialPickaxes {
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::schedulePlacedBlockCleanup);
+        forge.addListener(this::tagsUpdated);
         forge.addListener(this::curiosIridiumMine);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
         forge.addListener(this::fall);
@@ -69,6 +70,7 @@ public final class SpecialPickaxes {
         if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
             PlayerPlacedBlocks.scheduleCleanup(level,e.getPos());
     }
+    private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();}
     private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
