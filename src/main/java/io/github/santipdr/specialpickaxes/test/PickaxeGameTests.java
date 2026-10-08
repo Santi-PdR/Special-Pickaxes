@@ -60,6 +60,16 @@ public final class PickaxeGameTests {
         h.assertTrue(denied && p.getInventory().countItem(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get())==1,"non-admin cannot grant");
         finish(h,p);
     }
+    @GameTest(template="empty") public static void activeControlsRequireHoldingTheMatchingPickaxe(GameTestHelper h) {
+        for(var kind:ArtifactKind.playableValues()){
+            var p=player(h,kind);var relic=p.getMainHandItem();int damage=relic.getDamageValue();
+            p.getInventory().add(relic.copy());p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
+            for(var action:List.of(RelicControl.Action.ACTIVATE,RelicControl.Action.MODE,RelicControl.Action.ALT_SKILL))
+                h.assertTrue(!RelicControl.execute(p,kind,action),"Curios/inventory relic cannot authorize active control: "+kind+" "+action);
+            h.assertTrue(!WorkQueue.busy(p)&&!DomainFields.active(p)&&relic.getDamageValue()==damage,"denied controls start no work and spend no durability: "+kind);
+        }
+        h.succeed();
+    }
     @GameTest(template="empty") public static void placedBlockProvenanceIsPrunedSafely(GameTestHelper h) {
         var removed=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(removed,Blocks.STONE.defaultBlockState());
         var data=PlayerPlacedBlocks.get(h.getLevel());data.mark(removed);PlayerPlacedBlocks.scheduleCleanup(h.getLevel(),removed);
