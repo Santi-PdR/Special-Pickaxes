@@ -59,12 +59,14 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty") public static void palimpsestMinesOnlyItsConnectedOreVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);
-        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
+        for(var at:List.of(pos,pos.east(),pos.above()))h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(pos.east(2),Blocks.DEEPSLATE_DIAMOND_ORE.defaultBlockState());
+        var adjacentGold=pos.east(3);h.getLevel().setBlockAndUpdate(adjacentGold,Blocks.GOLD_ORE.defaultBlockState());
         var stone=pos.south();h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());
         var distant=pos.east(8);h.getLevel().setBlockAndUpdate(distant,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"vein echo activates");drain(p);
-        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"connected vein mined");
-        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE)&&h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"stone and disconnected ore preserved");finish(h,p);
+        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"connected ore-family vein mined");
+        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE)&&h.getLevel().getBlockState(adjacentGold).is(Blocks.GOLD_ORE)&&h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"stone, adjacent different ore family, and disconnected ore preserved");finish(h,p);
     }
     @GameTest(template="empty") public static void choirReplayMatchesState(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);

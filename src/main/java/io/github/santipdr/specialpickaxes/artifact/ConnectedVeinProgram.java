@@ -12,14 +12,19 @@ import java.util.*;
 public final class ConnectedVeinProgram implements WorkProgram {
     private final BlockPos origin;
     private final Block ore;
+    private final Set<net.minecraft.tags.TagKey<Block>> families;
     private final int limit;
     private final ArrayDeque<BlockPos> frontier=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
     private int accepted;
 
     public ConnectedVeinProgram(BlockPos origin,BlockState initial,int limit){
-        this.origin=origin.immutable();this.ore=initial.getBlock();this.limit=Math.max(1,limit);
+        this.origin=origin.immutable();this.ore=initial.getBlock();this.families=ArtifactOres.veinFamilies(initial);this.limit=Math.max(1,limit);
         frontier.add(this.origin);seen.add(this.origin);
+    }
+
+    private boolean sameOreFamily(BlockState state){
+        return state.getBlock()==ore||!families.isEmpty()&&state.getTags().anyMatch(families::contains);
     }
 
     @Override public int remaining(){return Math.max(0,limit-accepted);}
@@ -32,7 +37,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
     @Override public boolean backpressured(ServerPlayer p){
         BlockPos pos=frontier.peekFirst();if(pos==null||!p.serverLevel().hasChunkAt(pos)||!WorldSafety.dropPressure(p,pos))return false;
         BlockState state=p.serverLevel().getBlockState(pos);
-        return state.getBlock()==ore&&WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)
+        return sameOreFamily(state)&&WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)
                 &&!WorldSafety.barrier(p,pos)&&WorldSafety.harvestable(p,p.getMainHandItem(),pos);
     }
 
@@ -44,12 +49,12 @@ public final class ConnectedVeinProgram implements WorkProgram {
                 var level=player.serverLevel();
                 if(!level.hasChunkAt(pos))return false;
                 BlockState state=level.getBlockState(pos);
-                if(state.getBlock()!=ore||!WorldSafety.allowed(player,kind,pos)||WorldSafety.barrier(player,pos))return false;
+                if(!sameOreFamily(state)||!WorldSafety.allowed(player,kind,pos)||WorldSafety.barrier(player,pos))return false;
                 accepted++;
                 if(accepted<limit)for(Direction direction:Direction.values()){
                     BlockPos next=pos.relative(direction);
                     if(next.distSqr(origin)<=64&&seen.add(next.immutable())&&level.hasChunkAt(next)
-                            &&level.getBlockState(next).getBlock()==ore)frontier.addLast(next.immutable());
+                            &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next.immutable());
                 }
                 return WorldSafety.mine(player,tool,kind,pos,state);
             }

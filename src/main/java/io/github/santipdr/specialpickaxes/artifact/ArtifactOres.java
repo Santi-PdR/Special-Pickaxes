@@ -1,7 +1,11 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Vanilla ore families plus Forge's conventional tag for modded ores. */
 public final class ArtifactOres {
@@ -10,5 +14,13 @@ public final class ArtifactOres {
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
             ||state.is(BlockTags.GOLD_ORES)||state.is(BlockTags.DIAMOND_ORES)||state.is(BlockTags.REDSTONE_ORES)
             ||state.is(BlockTags.LAPIS_ORES)||state.is(BlockTags.EMERALD_ORES)||state.is(BlockTags.COPPER_ORES);
+    }
+
+    /** Specific family tags bridge natural/deepslate and modded variants without joining every ore via forge:ores. */
+    public static Set<TagKey<Block>> veinFamilies(BlockState state){
+        return state.getTags().filter(tag->{
+            String path=tag.location().getPath();
+            return path.startsWith("ores/")&&path.length()>6||path.startsWith("ore/")&&path.length()>4||path.endsWith("_ores")&&path.length()>5;
+        }).collect(Collectors.toUnmodifiableSet());
     }
 }
