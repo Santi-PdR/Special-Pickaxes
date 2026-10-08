@@ -17,7 +17,10 @@ public final class ArtifactPassives {
             case EVENTIDE -> grant(player, MobEffects.SLOW_FALLING, 0, 80);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, 80); }
             case INTERREGNUM -> grant(player, MobEffects.ABSORPTION, 0, 80);
-            case WORLDLOOM -> grant(player, MobEffects.REGENERATION, 0, 80);
+            case WORLDLOOM -> {
+                grant(player, MobEffects.REGENERATION, 0, 80);
+                sustain(player);
+            }
             case ICARUS -> { if (!player.onGround()) grant(player, MobEffects.SLOW_FALLING, 0, 80); }
             case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, 80);
             case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, 80);
@@ -32,5 +35,14 @@ public final class ArtifactPassives {
         var current = player.getEffect(effect);
         if (current == null || current.getAmplifier() < amplifier || current.getAmplifier() == amplifier && current.getDuration() <= 40)
             player.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false, true));
+    }
+
+    private static void sustain(ServerPlayer player){
+        if(!player.getFoodData().needsFood())return;
+        var state=ArtifactState.of(player,ArtifactKind.WORLDLOOM);
+        long now=ArtifactState.now(player);
+        if(state.getLong("rootSustainReady")>now)return;
+        player.getFoodData().eat(2,.25F);
+        state.putLong("rootSustainReady",now+100);
     }
 }
