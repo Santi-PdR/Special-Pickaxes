@@ -97,8 +97,16 @@ public final class ArtifactActions {
             ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
         }
         if(kind==ArtifactKind.AXIOM){
-            var steps=quarry(p,kind,center,r);boolean started=WorkQueue.start(p,tool,kind,steps);
-            if(started){ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size());}
+            var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),null);
+            boolean started=WorkQueue.startRegion(p,tool,kind,program);
+            if(started){ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
+            return started;
+        }
+        if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE){
+            var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),
+                    kind==ArtifactKind.CRUCIBLE?geologyMaterial(p,ArtifactState.mode(p,kind)):null);
+            boolean started=WorkQueue.startRegion(p,tool,kind,program);
+            if(started){ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
             return started;
         }
         if(kind==ArtifactKind.HELLSPEC) {
@@ -108,14 +116,7 @@ public final class ArtifactActions {
         }
 
 
-        List<WorkStep> steps=switch(kind) {
-            case CHOIR -> List.of();
-            case CRUCIBLE -> rephase(p,center,r);
-            case WORLDLOOM -> quarry(p,kind,center,r);
-            case EVENTIDE -> List.of();
-            case AXIOM -> List.of();
-            default -> List.of();
-        };
+        List<WorkStep> steps=List.of();
         boolean started=WorkQueue.start(p,tool,kind,steps);
         if(started) { if(kind==ArtifactKind.EVENTIDE&&!DomainFields.start(p,tool,kind,center,Math.min(r,8))){WorkQueue.cancel(p);return false;}if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started;
@@ -150,20 +151,6 @@ public final class ArtifactActions {
         }
         return WorkQueue.start(p,tool,ArtifactKind.PALIMPSEST,steps);
     }
-    public static List<WorkStep> quarry(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
-        var steps=new ArrayList<WorkStep>();
-        for(BlockPos pos:Geometry.cube(center,radius,ArtifactConfig.JOB_LIMIT.get())) {
-            if(kind==ArtifactKind.EVENTIDE && (Math.pow(pos.getX()-center.getX(),2)+4*Math.pow(pos.getY()-center.getY(),2)+Math.pow(pos.getZ()-center.getZ(),2))>radius*radius) continue;
-            if(kind==ArtifactKind.WORLDLOOM&&pos.distSqr(center)>radius*radius)continue;
-            if(kind==ArtifactKind.AXIOM && ArtifactState.mode(p,kind)%2==0
-                    && Math.floorMod(pos.getX()-center.getX(),4)==0 && Math.floorMod(pos.getZ()-center.getZ(),4)==0) continue;
-            if(!WorldSafety.allowed(p,kind,pos)) continue;
-            var state=p.serverLevel().getBlockState(pos);
-            if(MiningDesigns.matrix(state)) steps.add(new WorkStep.Mine(pos,state));
-        }
-        if(kind==ArtifactKind.EVENTIDE)steps.sort(java.util.Comparator.comparingDouble(step->(ArtifactState.mode(p,kind)==0?-1:1)*step.pos().distSqr(center)));
-        return steps;
-    }
     public static List<WorkStep> gravityPulse(ServerPlayer p,BlockPos broken,BlockState material,BlockPos fieldCenter,int mode) {
         var forward=p.getDirection();var side=forward.getClockWise();var candidates=new ArrayList<BlockPos>();
         for(int depth=1;depth<=2;depth++)for(int lateral=-1;lateral<=1;lateral++)for(int vertical=-1;vertical<=1;vertical++) {
@@ -182,17 +169,6 @@ public final class ArtifactActions {
             case 8 -> Blocks.CALCITE.defaultBlockState();case 9 -> Blocks.TUFF.defaultBlockState();case 10 -> Blocks.DRIPSTONE_BLOCK.defaultBlockState();case 11 -> Blocks.GRAVEL.defaultBlockState();
             default -> Blocks.STONE.defaultBlockState();
         };
-    }
-    public static List<WorkStep> rephase(ServerPlayer p,BlockPos center,int radius) {
-        BlockState next=geologyMaterial(p,ArtifactState.mode(p,ArtifactKind.CRUCIBLE));
-        var steps=new ArrayList<WorkStep>();var placed=PlayerPlacedBlocks.get(p.serverLevel());
-        for(BlockPos pos:Geometry.cube(center,radius,ArtifactConfig.JOB_LIMIT.get())) {
-            if(pos.distSqr(center)>radius*radius||!WorldSafety.allowed(p,ArtifactKind.CRUCIBLE,pos)||WorldSafety.barrier(p,pos)
-                    ||placed.contains(pos)) continue;
-            var old=p.serverLevel().getBlockState(pos);
-            if(MiningDesigns.crucibleGeology(old) && old!=next) steps.add(new WorkStep.Rephase(pos,old,next));
-        }
-        return steps;
     }
     private static boolean link(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center) {
         var first=ArtifactState.anchor(p,kind,"a");
