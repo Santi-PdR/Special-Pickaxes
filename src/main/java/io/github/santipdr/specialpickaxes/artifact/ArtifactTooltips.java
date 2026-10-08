@@ -23,8 +23,8 @@ public final class ArtifactTooltips {
     public static List<RelicControl.Action> actions(ItemStack stack,ArtifactKind k,int mode){
         var a=new ArrayList<RelicControl.Action>();boolean region=ArtifactInteraction.regional(k,mode);
         a.add(region?RelicControl.Action.SELECT:RelicControl.Action.ACTIVATE);
+        if(region)a.add(RelicControl.Action.ACTIVATE);
         a.add(RelicControl.Action.ALT_SKILL);
-        if(region&&stack.hasTag()&&"ready".equals(stack.getTag().getString("artifactStatus")))a.add(RelicControl.Action.CONFIRM);
         if(ArtifactInteraction.modeCount(k)>1)a.add(RelicControl.Action.MODE);
         a.add(RelicControl.Action.CANCEL);
         if(!CompanionActions.handles(k)&&k!=ArtifactKind.AEGIS&&k!=ArtifactKind.INTERREGNUM&&k!=ArtifactKind.MERIDIAN)a.add(RelicControl.Action.PAUSE);

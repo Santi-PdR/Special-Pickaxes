@@ -25,11 +25,7 @@ public final class RelicControl {
                 if(!WorkQueue.busy(p)||WorkQueue.status(p).equals("ready"))return false;
                 WorkQueue.togglePause(p);p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
             case CONFIRM:
-                // Regional selections analyze themselves after the second corner. Enter is
-                // only a confirmation key once that analysis is complete; pressing it
-                // during corner selection should not produce a misleading prompt.
-                if(!WorkQueue.status(p).equals("ready"))return false;
-                if(!WorkQueue.togglePause(p))return false;ArtifactFeedback.cue(p,"confirm");return true;
+                return confirm(p);
             case SELECT:
                 if(!ArtifactInteraction.regional(k,ArtifactState.mode(p,k))||WorkQueue.busy(p))return false;
                 if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
@@ -45,6 +41,7 @@ public final class RelicControl {
                         if(!WorkQueue.togglePause(p))return false;
                         ArtifactFeedback.message(p,"resumed");ArtifactFeedback.cue(p,"select");return true;
                     }
+                    if(status.equals("ready"))return confirm(p);
                     return false;
                 }
                 if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k))){ArtifactFeedback.message(p,"select_key");return false;}
@@ -54,6 +51,10 @@ public final class RelicControl {
                 return ArtifactActions.useAlternate(p,tool,k);
             default:return false;
         }
+    }
+    private static boolean confirm(ServerPlayer p){
+        if(!WorkQueue.status(p).equals("ready")||!WorkQueue.togglePause(p))return false;
+        ArtifactFeedback.cue(p,"confirm");return true;
     }
     public static boolean corner(ServerPlayer p,net.minecraft.core.BlockPos pos){
         if(!ArtifactInteraction.left(p,pos,false))return false;
