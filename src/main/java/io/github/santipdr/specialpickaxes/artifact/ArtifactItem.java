@@ -79,7 +79,6 @@ public final class ArtifactItem extends PickaxeItem {
         if(selected && entity instanceof ServerPlayer p && kind==ArtifactKind.LODESTAR)DirectAbilities.recordFootstep(p);
         if(selected && entity instanceof ServerPlayer p && p.tickCount%10==0) {
             ArtifactPassives.tick(p,kind);
-            if(kind==ArtifactKind.HELLSPEC)p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,40,0,false,true,true));
             if(p.tickCount%100==0)ArtifactState.prune(p,kind);
             // Vanilla inventory synchronization carries the display data; client never authorizes work.
             var tag=tool.getOrCreateTag();tag.putInt("artifactActivationCost",EnchantmentScaling.activationCost(tool,kind));tag.remove("artifactCharge");tag.putInt("artifactCooldown",ArtifactConfig.COOLDOWN.get());
