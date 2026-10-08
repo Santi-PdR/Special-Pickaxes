@@ -199,6 +199,31 @@ public final class ArtifactTechniques {
         return true;
     }
 
+    /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
+    private static boolean faultEcho(ServerPlayer player,int radius,int cap){
+        var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
+        var targets=level.getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
+            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
+                    ||!entity.onGround()||entity.isAlliedTo(player)
+                    ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
+            return !(entity instanceof Player other)||player.canHarmPlayer(other);
+        });
+        if(targets.isEmpty())return false;
+        if(targets.size()>cap)targets.sort(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
+        int stopped=0;
+        for(var target:targets){
+            if(stopped>=cap)break;
+            target.setDeltaMovement(0,Math.min(0,target.getDeltaMovement().y),0);target.hasImpulse=true;
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,2,true,false,true));
+            ArtifactFeedback.burst(player,ArtifactKind.CHOIR,target.blockPosition(),3);stopped++;
+        }
+        for(int i=0;i<12;i++){
+            double angle=i*Math.PI/6,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
+            level.sendParticles(player,ParticleTypes.ELECTRIC_SPARK,false,x,player.getY()+.08,z,1,0,0,0,0);
+        }
+        ArtifactFeedback.message(player,"fault_echo",stopped);return true;
+    }
+
     private static boolean deflectProjectiles(ServerPlayer player, ArtifactKind kind, int radius, int cap) {
         int deflected = 0;
         for (Projectile projectile : player.serverLevel().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(radius),
@@ -287,7 +312,7 @@ public final class ArtifactTechniques {
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
             case PALIMPSEST -> knockbackPulse(player, kind, 6, 1.0, 24);
-            case CHOIR -> boreTunnel(player, tool, kind, 8, 32);
+            case CHOIR -> faultEcho(player, 6, 4);
             case EVENTIDE -> magnetDrops(player, 16, 64);
             case CRUCIBLE -> deflectProjectiles(player, kind, 10, 32);
             case INTERREGNUM -> ArtifactState.mode(player,kind)==1
@@ -310,21 +335,4 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean boreTunnel(ServerPlayer player, ItemStack tool, ArtifactKind kind, int depth, int cap) {
-        var forward = Direction.getNearest(player.getLookAngle().x, player.getLookAngle().y, player.getLookAngle().z);
-        var side = forward.getClockWise();
-        var origin = player.blockPosition().above().relative(forward);
-        int mined = 0;
-        for (int step = 0; step < depth && mined < cap; step++)
-            for (int lateral = -1; lateral <= 0 && mined < cap; lateral++)
-                for (int vertical = -1; vertical <= 0 && mined < cap; vertical++) {
-                    var pos = origin.relative(forward, step).relative(side, lateral).above(vertical);
-                    if (!player.serverLevel().hasChunkAt(pos) || !WorldSafety.allowed(player, kind, pos)) continue;
-                    var state = player.serverLevel().getBlockState(pos);
-                    if (!WorldSafety.inert(state) || !WorldSafety.harvestable(player, tool, pos)) continue;
-                    if (WorldSafety.mine(player, tool, kind, pos, state)) mined++;
-                }
-        ArtifactFeedback.message(player, "tunnel_bored", mined);
-        return mined > 0;
-    }
 }
