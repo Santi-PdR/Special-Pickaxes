@@ -16,7 +16,8 @@ public final class ArtifactPassives {
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
         if(event.getAmount()<=0)return;
         var source=event.getSource();
-        if(kind==ArtifactKind.HELLSPEC&&source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)) {
+        if(kind==ArtifactKind.HELLSPEC) {
+            if(!source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE))return;
             var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
             if(state.getLong("curiosPassiveReady")<=now){
                 state.putLong("curiosPassiveReady",now+80);event.setAmount(event.getAmount()*.35F);
