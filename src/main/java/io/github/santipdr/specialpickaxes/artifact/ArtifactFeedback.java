@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.AABB;
 import org.joml.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,8 @@ import java.util.UUID;
 public final class ArtifactFeedback {
     private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
     private ArtifactFeedback() {}
+    public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());}
+    public static void clearSounds(){SOUND_READY.clear();}
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
     }
@@ -27,7 +30,9 @@ public final class ArtifactFeedback {
         var at=p.getEyePosition().add(p.getLookAngle().scale(2));
         var packet=new ClientboundSoundPacket(Holder.direct(sound),SoundSource.PLAYERS,at.x,at.y,at.z,volume,pitch,level.getRandom().nextLong());
         double range=ArtifactConfig.SOUND_RADIUS.get(),rangeSqr=range*range;
-        for(var listener:level.players())if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
+        var nearby=new AABB(at.x-range,at.y-range,at.z-range,at.x+range,at.y+range,at.z+range);
+        for(var listener:level.getEntitiesOfClass(ServerPlayer.class,nearby,ServerPlayer::isAlive))
+            if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
         sound(p,kind,"activate");
