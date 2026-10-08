@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '5.9.5'
+version = '5.9.6'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {

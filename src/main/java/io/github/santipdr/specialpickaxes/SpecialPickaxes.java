@@ -50,6 +50,7 @@ public final class SpecialPickaxes {
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
+        forge.addListener(this::curiosIridiumMine);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
         forge.addListener(this::fall);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
@@ -62,6 +63,13 @@ public final class SpecialPickaxes {
                 &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
                 &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||ArtifactOres.isOre(level.getBlockState(e.getPos()))))
             PlayerPlacedBlocks.get(level).mark(e.getPos());
+    }
+    private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
+        if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
+        var equipped=CuriosCompat.find(p);
+        if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem pick)||pick.kind!=ArtifactKind.IRIDIUM)return;
+        if(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return;
+        MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,e.getPos(),e.getState());
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);}}
