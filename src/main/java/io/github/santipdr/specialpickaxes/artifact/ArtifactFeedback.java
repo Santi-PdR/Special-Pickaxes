@@ -58,7 +58,7 @@ public final class ArtifactFeedback {
             case COUNTERSEAL->net.minecraft.core.particles.ParticleTypes.SOUL;
             case COVENANT->net.minecraft.core.particles.ParticleTypes.ENCHANT;};
         if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
-        p.serverLevel().sendParticles(dust,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
+        p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         for(int i=0;i<8;i++) {
@@ -95,7 +95,7 @@ public final class ArtifactFeedback {
             var point=start.lerp(end,i/16.0);if(!p.serverLevel().hasChunkAt(BlockPos.containing(point))) continue;
             int color=i%2==0?kind.color:0xffd783;
             var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),1.3F);
-            p.serverLevel().sendParticles(dust,point.x,point.y,point.z,1,0,0,0,0);
+            p.serverLevel().sendParticles(p,dust,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
 
