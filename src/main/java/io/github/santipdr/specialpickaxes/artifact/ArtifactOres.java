@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 /** Vanilla/common ore tags, modded ore tags and conventional registry names. */
 public final class ArtifactOres {
     private static final ConcurrentMap<Block,Boolean> NONSTANDARD_ORES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Block,String> ORE_FAMILIES = new ConcurrentHashMap<>();
+    private static final String NO_ORE_FAMILY="";
+    private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
     private ArtifactOres() {}
     public static boolean isOre(BlockState state){
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
@@ -26,13 +29,18 @@ public final class ArtifactOres {
 
     /** Stable family fallback for conventional host-rock variants such as tin_ore/deepslate_tin_ore. */
     public static String registryOreFamily(Block block){
+        String family=ORE_FAMILIES.get(block);
+        if(family!=null)return family.isEmpty()?null:family;
         var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-        if(key==null||!isOreTagPath(key.getPath()))return null;
+        if(key==null)return null;
+        if(!isOreTagPath(key.getPath())){ORE_FAMILIES.putIfAbsent(block,NO_ORE_FAMILY);return null;}
         String path=key.getPath();
-        for(String host:new String[]{"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"})
+        for(String host:HOST_PREFIXES)
             if(path.startsWith(host)){path=path.substring(host.length());break;}
         if(path.endsWith("_deepslate_ore"))path=path.substring(0,path.length()-"_deepslate_ore".length())+"_ore";
-        return key.getNamespace()+":"+path;
+        family=key.getNamespace()+":"+path;
+        ORE_FAMILIES.putIfAbsent(block,family);
+        return ORE_FAMILIES.get(block);
     }
 
     /** Datapack reloads can change tag membership, so discard the bounded registry-block cache then. */
