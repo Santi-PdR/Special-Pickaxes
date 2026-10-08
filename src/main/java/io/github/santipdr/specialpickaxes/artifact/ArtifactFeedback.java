@@ -39,6 +39,7 @@ public final class ArtifactFeedback {
         net.minecraft.core.particles.ParticleOptions accent=switch(kind){
             case PALIMPSEST,CHRONICLE->net.minecraft.core.particles.ParticleTypes.ENCHANT;
             case CHOIR,MERIDIAN->net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK;
+            case EXODIUM->net.minecraft.core.particles.ParticleTypes.END_ROD;case IRIDIUM->net.minecraft.core.particles.ParticleTypes.GLOW;case HELLSPEC->net.minecraft.core.particles.ParticleTypes.FLAME;
             case EVENTIDE->net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL;
             case CRUCIBLE->net.minecraft.core.particles.ParticleTypes.WAX_ON;
             case INTERREGNUM->net.minecraft.core.particles.ParticleTypes.END_ROD;

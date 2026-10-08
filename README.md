@@ -1,74 +1,61 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. Nueve artefactos de minería extrema, también efectivos
-como hacha y pala. Sin recetas obligatorias, minerales nuevos, worldgen, energía,
-almacenamiento ni X-Ray.
+Forge **1.20.1 / Java 17**. La rama de trabajo `arena/74873685-special-pickaxes` prepara el candidato **5.1.0**: doce picos mineros extremos con habilidades distintas. Todos son tier IV, con velocidad base mínima 64, 32.768 de durabilidad y encantabilidad 50; los picos de especialidad superan esa velocidad. Sin recetas obligatorias, minerales propios, worldgen, energía ni X-Ray.
 
-**5.0.0 validado y publicado para Forge 1.20.1 / Java 17.**
-[Descargar artefacto verificado de Actions](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/37687885085/artifacts/11512342063).
-Fuente compilada: `0c7233659d3b695da9211575f3356d81a1aeb1a8`; 186554 bytes.
-SHA-256: `c4b7a6f2b3041532cd4dff9823b5e8adbfc317b169153491f69f916fb0635857`.
-20 JUnit, 57 GameTests, 8 pruebas de recursos, servidor y cliente aprobados;
-95 capturas revisadas antes de publicar una reproducción binaria idéntica.
-Esto no certifica test-1 ni el modpack completo. [Detalle y límites](docs/mining-rework/STATUS.md).
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.1.0 todavía no es una publicación ni una validación del modpack completo.
 
 ## Catálogo
 
-Palimpsest · Choir · Eventide · Crucible · Interregnum · Worldloom · Icarus ·
-Hollow Axiom · Worldbreaker.
+Palimpsest · Choir of Faults · Eventide · Paradox Crucible · Crown of Stasis ·
+Loom of the First Quarry · Tear of Icarus · Hollow Axiom · Worldbreaker ·
+Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 
-- Worldbreaker: CARVE, FRACTURE, CLEAVE, CORE DRILL y WORLD SHATTER.
-- Worldloom: REFUGIO, PUENTE y PARED; construcción con bloques reales.
-- Crucible: regional con dos esquinas y confirmación, o radial directo.
-- Axiom: matriz conectada a recursos existentes, preservando las menas.
-- Icarus: excava antes de avanzar, sin saltar barreras.
+- **Palimpsest:** extracción de vetas conectadas hasta un límite configurable de 192, Prisa V y Regeneración II breves.
+- **Choir:** recuerda una plantilla minada y la vuelve a extraer mirando hacia delante.
+- **Eventide:** campo gravitatorio que carga pulsos de minería direccionales.
+- **Crucible:** transforma doce materiales geológicos con selección de dos esquinas y confirmación.
+- **Stasis:** dominio de 16×16 marcado o aura personal; velocidad minera ×8 y efectos defensivos.
+- **Worldloom:** cantera esférica de geología natural, radio 8; nunca construye ni toca menas.
+- **Icarus:** perforación hacia delante normal o amplia; para ante fluidos y protege contra caídas mientras avanza.
+- **Axiom:** escanea una elipse cargada de 17×9×17 y te señala hasta 32 menas existentes.
+- **Worldbreaker:** cinco cortes direccionales y un modo de rotura por región seleccionada.
+- **Exodium:** lanza minera de 13×9 hasta 48 bloques.
+- **Iridium:** localiza y extrae hasta 128 menas en el volumen cercano.
+- **Hellspec:** excava geología y menas en una cavidad acotada; aporta Resistencia al fuego y Prisa IV.
 
-Solo Crisol regional utiliza selección. Todos los trabajos respetan bedrock,
-fluidos, bloques protegidos, block entities, borde y chunks cargados. Las rutas
-direccionales se detienen, no continúan tras una barrera. Los drops proceden del
-harvesting nativo y la congestión pausa el trabajo.
+Toda minería se agenda por ticks y vuelve a validar cada bloque. No carga chunks,
+no procesa fluids, bedrock, máquinas ni celdas protegidas, y pausa ante congestión
+de drops. Los tags Forge amplían la compatibilidad con menas y geología de mods.
+Los bloques geológicos colocados por jugadores desde esta versión quedan protegidos
+de las transformaciones masivas del Crucible y de la cantera Hellspec.
+
+## Referencia de nivel
+
+La instancia `ghouls` trae Terramity 0.9.8. Su Exodium Pickaxe es tier IV, velocidad
+20, durabilidad 8.124 y encantabilidad 50. Los picos Special Pickaxes usan tier IV,
+velocidad base 64 o mayor, durabilidad 32.768 y encantabilidad 50; la habilidad de
+herramienta permite extraer bloques picables y menas con tags de Forge.
+
+Exodium, Iridium y Hellspec usan los sprites de Terramity con permiso del
+propietario. La procedencia y SHA-256 están en
+[TEXTURE_CREDITS.md](src/main/resources/assets/specialpickaxes/TEXTURE_CREDITS.md)
+y [ASSET-PROVENANCE.json](docs/mining-rework/ASSET-PROVENANCE.json).
 
 ## Jugar y administrar
 
-R activa; C cambia de modo; B selecciona donde corresponde; Enter confirma;
-V cancela; K pausa/reanuda. Controles reasignables. SHIFT sobre el item muestra
-la ayuda del modo actual. No se usa Shift + clic derecho.
-
-Adquisición administrativa:
+R activa; C cambia de modo cuando hay más de uno; B activa la selección regional;
+Enter confirma; V cancela; K pausa/reanuda. Los controles son reasignables y el
+SHIFT del tooltip describe el modo actual.
 
 ```text
 /specialpickaxes grant <jugador> <id>
 ```
 
 IDs: `palimpsest`, `fault_choir`, `eventide`, `paradox_crucible`, `interregnum`,
-`worldloom`, `icarus`, `hollow_axiom`, `worldbreaker`.
+`worldloom`, `icarus`, `hollow_axiom`, `worldbreaker`, `exodium`, `iridium`,
+`hellspec`.
 
 - [Guía del jugador](docs/mining-rework/PLAYER-GUIDE.md)
-- [Estado y evidencia de validación](docs/mining-rework/STATUS.md)
-- [Compatibilidad y límites reales](docs/mining-rework/COMPATIBILITY.md)
-- [Procedencia de los nueve sprites](docs/mining-rework/ASSET-PROVENANCE.json)
-- [Biblioteca de ocho assets retirados](asset-library/README.md)
-
-Los cuatro JAR de referencia se conservan intactos. No se empaquetan en el mod.
-La documentación histórica 3.1/4.0 no describe el catálogo actual.
-
-## Verificar
-
-```sh
-python3 tools/validate_resources.py
-python3 tools/scan_secrets.py
-./gradlew build
-./gradlew runGameTestServer
-python3 tools/verify_gametests.py run/logs/latest.log
-python3 tools/dedicated_smoke.py
-python3 tools/client_smoke.py
-git diff --check
-```
-
-El cliente desechable de CI utiliza Xvfb. Conserva PNG originales y copias de
-revisión de la misma captura; comprueba tooltips, cambios de modo y activaciones
-con teclas reales. El JAR excluye fixtures, clases de test y fluido de test Forge.
-
-La publicación requiere una revisión visual de un run exitoso con código idéntico.
-No se afirma acceso a test-1 ni haber probado el modpack completo Eternal Craft —
-Siege, shaders o todas las configuraciones de otros mods. No se utiliza su repositorio.
+- [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+- [Evidencia histórica de la versión 5.0.0](docs/mining-rework/STATUS.md)
+- [Assets archivados](asset-library/README.md)

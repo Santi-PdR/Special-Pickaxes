@@ -29,7 +29,9 @@ public final class WorldSafety {
         var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
             &&(p.getMainHandItem()!=context.tool()||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos));
     }
-    public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&state.getFluidState().isEmpty()&&MATTER.contains(state.getBlock()) && state==state.getBlock().defaultBlockState(); }
+    public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!state.is(Tags.Blocks.ORES)
+        &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL))
+        && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();
         double range=ArtifactConfig.RANGE.get();

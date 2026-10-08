@@ -18,6 +18,7 @@ public final class RelicEffects {
             case WORLDLOOM->ParticleTypes.COMPOSTER;case ICARUS->ParticleTypes.CRIT;
             case AXIOM->ParticleTypes.SCULK_SOUL;case ATLAS->ParticleTypes.ENCHANT;
             case WORLDBREAKER->ParticleTypes.FIREWORK;case CHRONICLE->ParticleTypes.GLOW;
+            case EXODIUM->ParticleTypes.END_ROD;case IRIDIUM->ParticleTypes.GLOW;case HELLSPEC->ParticleTypes.FLAME;
             case KEYSTONE->ParticleTypes.WAX_ON;case TESSELLATOR->ParticleTypes.SCRAPE;
             case AEGIS->ParticleTypes.ELECTRIC_SPARK;case LODESTAR->ParticleTypes.NAUTILUS;
             case SEAM_RIPPER->ParticleTypes.ASH;case CAUSEWAY->ParticleTypes.CLOUD;

@@ -16,7 +16,7 @@ import java.util.List;
 public final class ArtifactItem extends PickaxeItem {
     public final ArtifactKind kind;
     public ArtifactItem(ArtifactKind kind) {
-        super(SpecialPickaxes.TIER,10,-2.6F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR?Rarity.EPIC:Rarity.RARE));this.kind=kind;
+        super(SpecialPickaxes.TIER,12,-2.4F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.IRIDIUM||kind==ArtifactKind.HELLSPEC?Rarity.EPIC:Rarity.RARE));this.kind=kind;
     }
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);
@@ -24,8 +24,20 @@ public final class ArtifactItem extends PickaxeItem {
         return InteractionResultHolder.pass(tool);
     }
     @Override public InteractionResult useOn(UseOnContext context) { return InteractionResult.PASS; }
-    @Override public float getDestroySpeed(ItemStack stack,BlockState state) { return ArtifactTools.effective(state)?64F:super.getDestroySpeed(stack,state); }
-    @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state); }
+    @Override public float getDestroySpeed(ItemStack stack,BlockState state) {
+        if(!ArtifactTools.effective(state))return super.getDestroySpeed(stack,state);
+        boolean ore=state.is(net.minecraftforge.common.Tags.Blocks.ORES),stone=MiningDesigns.matrix(state);
+        return switch(kind){
+            case PALIMPSEST->ore?192F:72F;case CHOIR->stone?96F:72F;case EVENTIDE->96F;
+            case CRUCIBLE->MiningDesigns.crucibleGeology(state)?128F:72F;case INTERREGNUM->96F;
+            case WORLDLOOM->stone?112F:72F;case ICARUS->96F;case AXIOM->ore?112F:72F;
+            case WORLDBREAKER->144F;case EXODIUM->192F;case IRIDIUM->ore?256F:80F;case HELLSPEC->ore||stone?144F:80F;
+            default->64F;
+        };
+    }
+    // The artifact tier is IV and intentionally outclasses Terramity's Exodium tier IV.
+    // Keep harvesting enabled for modded pickaxe blocks even when their mod omits tier tags.
+    @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state); }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
         boolean damaged=super.hurtEnemy(stack,target,attacker);
@@ -66,6 +78,7 @@ public final class ArtifactItem extends PickaxeItem {
         if(selected&&entity instanceof ServerPlayer&&!tool.getOrCreateTag().hasUUID("controlIdentity"))tool.getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());
         if(selected && entity instanceof ServerPlayer p && kind==ArtifactKind.LODESTAR)DirectAbilities.recordFootstep(p);
         if(selected && entity instanceof ServerPlayer p && p.tickCount%10==0) {
+            if(kind==ArtifactKind.HELLSPEC)p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,40,0,false,true,true));
             if(p.tickCount%100==0)ArtifactState.prune(p,kind);
             // Vanilla inventory synchronization carries the display data; client never authorizes work.
             var tag=tool.getOrCreateTag();tag.putInt("artifactActivationCost",EnchantmentScaling.activationCost(tool,kind));tag.remove("artifactCharge");tag.putInt("artifactCooldown",ArtifactConfig.COOLDOWN.get());

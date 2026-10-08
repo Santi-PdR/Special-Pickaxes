@@ -18,9 +18,10 @@ public final class ArtifactInteraction {
     public static boolean regional(ArtifactKind k,int mode){return k==ArtifactKind.CRUCIBLE||k==ArtifactKind.WORLDBREAKER&&mode==5;}
     public static String[] modes(ArtifactKind k){return switch(k){
         case PALIMPSEST->new String[]{"vein"};case CHOIR->new String[]{"forward"};
-        case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian"};
+        case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian","calcite","tuff","dripstone","gravel"};
         case INTERREGNUM->new String[]{"domain","aura"};case WORLDLOOM->new String[]{"quarry"};
         case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"survey"};
+        case EXODIUM->new String[]{"starfall"};case IRIDIUM->new String[]{"orefall"};case HELLSPEC->new String[]{"hellforge"};
         case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter","region_break"};
         default->new String[]{"retired"};};}
     public static int modeCount(ArtifactKind k){return modes(k).length;}

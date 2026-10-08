@@ -33,6 +33,7 @@ public final class RelicAura {
             case INTERREGNUM->ParticleTypes.END_ROD;case WORLDLOOM->ParticleTypes.HAPPY_VILLAGER;
             case ICARUS->ParticleTypes.CRIT;case AXIOM->ParticleTypes.SCULK_SOUL;
             case WORLDBREAKER->ParticleTypes.FIREWORK;
+            case EXODIUM->ParticleTypes.END_ROD;case IRIDIUM->ParticleTypes.GLOW;case HELLSPEC->ParticleTypes.FLAME;
             default->dust;
         };
         for(int i=0;i<3;i++){

@@ -61,8 +61,8 @@ public final class MiningReworkGameTests {
         WorkQueue.cancel(p);ArtifactState.of(p,ArtifactKind.AXIOM).remove("ready");ArtifactState.of(p,ArtifactKind.AXIOM).remove("inputTick");
         h.assertTrue(!RelicNetwork.accept(p,packet)&&!WorkQueue.busy(p),"duplicate stays rejected even after job cancellation and cooldown removal");finish(h,p);
     }
-    @GameTest(template="empty") public static void ninePlayableMiningArtifacts(GameTestHelper h){
-        h.assertTrue(SpecialPickaxes.PICKS.size()==9,"exact final roster");
+    @GameTest(template="empty") public static void twelvePlayableMiningArtifacts(GameTestHelper h){
+        h.assertTrue(SpecialPickaxes.PICKS.size()==12,"exact final roster");
         for(var kind:ArtifactKind.values())h.assertTrue(SpecialPickaxes.PICKS.containsKey(kind)==kind.playable(),"retired artifact not registered: "+kind);
         for(int mode=0;mode<6;mode++)h.assertTrue(ArtifactInteraction.regional(ArtifactKind.WORLDBREAKER,mode)==(mode==5),"only region break selects corners");
         h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.WORLDLOOM)==1,"Worldloom has one mining mode");h.succeed();
@@ -104,7 +104,7 @@ public final class MiningReworkGameTests {
 
     @GameTest(template="empty") public static void allDirectionalShapesStopBehindBarrier(GameTestHelper h){
         for(var shape:DirectionalProgram.Shape.values()){
-            var kind=shape==DirectionalProgram.Shape.ICARUS||shape==DirectionalProgram.Shape.ICARUS_WIDE?ArtifactKind.ICARUS:ArtifactKind.WORLDBREAKER;
+            var kind=shape==DirectionalProgram.Shape.ICARUS||shape==DirectionalProgram.Shape.ICARUS_WIDE?ArtifactKind.ICARUS:shape==DirectionalProgram.Shape.EXODIUM_LANCE?ArtifactKind.EXODIUM:ArtifactKind.WORLDBREAKER;
             var p=player(h,kind);var at=h.absolutePos(new BlockPos(8,30,8));p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-1.5);
             for(int x=-20;x<=20;x+=4)h.getLevel().getChunkAt(at.offset(x,0,0));
             var dir=shape==DirectionalProgram.Shape.CORE_DRILL?Direction.DOWN:Direction.SOUTH;

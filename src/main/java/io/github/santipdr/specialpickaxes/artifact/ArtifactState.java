@@ -22,12 +22,12 @@ public final class ArtifactState {
         var root=root(p);
         if (!root.contains(kind.id)) root.put(kind.id,new CompoundTag());
         var data=root.getCompound(kind.id);
-        if(data.getInt("miningSchema")<6){
+        if(data.getInt("miningSchema")<7){
             // Old TRANSPOSE/RESTORE/CONVERGENCE and material modes have different
             // meanings now. Never reinterpret an old integer as a new excavation.
             if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.CRUCIBLE)data.remove("mode");
             if(kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.CHOIR){data.remove("memory");data.remove("heading");}
-            data.putInt("miningSchema",6);
+            data.putInt("miningSchema",7);
         }
         data.remove("charge");return data; // discard retired 2.x/3.0 resource data
     }

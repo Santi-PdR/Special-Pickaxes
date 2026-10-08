@@ -56,19 +56,24 @@ public final class ArtifactActions {
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
-        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS) {
+        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
             return started;
         }
+        if(kind==ArtifactKind.IRIDIUM) {
+            var aimed=target(p);return aimed.isPresent()&&MiningDesigns.orefall(p,tool,aimed.get());
+        }
         if(kind==ArtifactKind.PALIMPSEST) {
-            var aimed=target(p);return aimed.isPresent()&&startVein(p,tool,aimed.get());
+            var aimed=target(p);boolean started=aimed.isPresent()&&startVein(p,tool,aimed.get());
+            if(started){p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,160,4,false,true,true));p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,160,1,false,true,true));}
+            return started;
         }
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
         if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
         BlockPos center=target.get();
-        int r=kind==ArtifactKind.WORLDLOOM?6:radius(p,kind);
+        int r=kind==ArtifactKind.WORLDLOOM?8:radius(p,kind);
         if(kind==ArtifactKind.INTERREGNUM) {
             int fieldRadius=ArtifactState.mode(p,kind)==1?2:8;
             if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
@@ -82,6 +87,11 @@ public final class ArtifactActions {
         }
         if(kind==ArtifactKind.AXIOM) {
             int found=MiningDesigns.survey(p,center);ArtifactFeedback.message(p,found==0?"survey_empty":"survey",found);ArtifactFeedback.burst(p,kind,center,10);return true;
+        }
+        if(kind==ArtifactKind.HELLSPEC) {
+            var steps=MiningDesigns.hellforge(p,center);boolean started=WorkQueue.start(p,tool,kind,steps);
+            if(started){p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE,600,0,false,true,true));p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,600,3,false,true,true));ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
+            return started;
         }
 
 
@@ -115,7 +125,7 @@ public final class ArtifactActions {
         if(!initial.is(net.minecraftforge.common.Tags.Blocks.ORES)||!WorldSafety.harvestable(p,tool,origin))return false;
         var steps=new ArrayList<WorkStep>();var seen=new HashSet<BlockPos>();var pending=new ArrayDeque<BlockPos>();
         seen.add(origin.immutable());pending.add(origin.immutable());
-        while(!pending.isEmpty()&&steps.size()<64) {
+        while(!pending.isEmpty()&&steps.size()<ArtifactConfig.PALIMPSEST_VEIN_LIMIT.get()) {
             var pos=pending.removeFirst();var state=level.getBlockState(pos);
             if(!WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)||WorldSafety.barrier(p,pos)||state.getBlock()!=initial.getBlock())continue;
             steps.add(new WorkStep.Mine(pos,state));
@@ -149,13 +159,14 @@ public final class ArtifactActions {
             var state=p.serverLevel().getBlockState(pos);if(state.getBlock()==material.getBlock())candidates.add(pos.immutable());
         }
         candidates.sort(Comparator.comparingDouble(pos->(mode==0?1:-1)*pos.distSqr(fieldCenter)));
-        var steps=new ArrayList<WorkStep>(4);for(var pos:candidates){steps.add(new WorkStep.Mine(pos,p.serverLevel().getBlockState(pos)));if(steps.size()==4)break;}
+        var steps=new ArrayList<WorkStep>(6);for(var pos:candidates){steps.add(new WorkStep.Mine(pos,p.serverLevel().getBlockState(pos)));if(steps.size()==6)break;}
         return steps;
     }
     public static BlockState geologyMaterial(ServerPlayer p,int mode){
         return switch(Math.floorMod(mode,ArtifactInteraction.modeCount(ArtifactKind.CRUCIBLE))) {
             case 1 -> Blocks.DEEPSLATE.defaultBlockState();case 2 -> Blocks.GRANITE.defaultBlockState();case 3 -> Blocks.DIORITE.defaultBlockState();
             case 4 -> Blocks.ANDESITE.defaultBlockState();case 5 -> Blocks.DIRT.defaultBlockState();case 6 -> Blocks.BASALT.defaultBlockState();case 7 -> Blocks.OBSIDIAN.defaultBlockState();
+            case 8 -> Blocks.CALCITE.defaultBlockState();case 9 -> Blocks.TUFF.defaultBlockState();case 10 -> Blocks.DRIPSTONE_BLOCK.defaultBlockState();case 11 -> Blocks.GRAVEL.defaultBlockState();
             default -> Blocks.STONE.defaultBlockState();
         };
     }

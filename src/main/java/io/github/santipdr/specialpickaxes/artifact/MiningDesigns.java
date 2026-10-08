@@ -11,9 +11,33 @@ public final class MiningDesigns {
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
         int mode=ArtifactState.mode(p,k);
-        var shape=k==ArtifactKind.ICARUS?(mode==1?DirectionalProgram.Shape.ICARUS_WIDE:DirectionalProgram.Shape.ICARUS):DirectionalProgram.Shape.values()[mode];
-        var origin=k==ArtifactKind.ICARUS?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
+        var shape=k==ArtifactKind.ICARUS?(mode==1?DirectionalProgram.Shape.ICARUS_WIDE:DirectionalProgram.Shape.ICARUS):k==ArtifactKind.EXODIUM?DirectionalProgram.Shape.EXODIUM_LANCE:DirectionalProgram.Shape.values()[mode];
+        var origin=k==ArtifactKind.ICARUS||k==ArtifactKind.EXODIUM?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
         return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape));
+    }
+    public static boolean orefall(ServerPlayer p,ItemStack tool,BlockPos center){
+        int radius=8,halfHeight=4;var candidates=new ArrayList<BlockPos>();var level=p.serverLevel();
+        for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
+            if(x*x+z*z+4*y*y>radius*radius)continue;var pos=center.offset(x,y,z);
+            if(level.hasChunkAt(pos)&&level.getBlockState(pos).is(net.minecraftforge.common.Tags.Blocks.ORES)
+                    &&WorldSafety.allowed(p,ArtifactKind.IRIDIUM,pos)&&WorldSafety.harvestable(p,tool,pos))candidates.add(pos.immutable());
+        }
+        candidates.sort(java.util.Comparator.comparingDouble(pos->pos.distSqr(center)));
+        var steps=new ArrayList<WorkStep>(Math.min(candidates.size(),128));
+        for(int i=0;i<candidates.size()&&i<128;i++)steps.add(new WorkStep.Mine(candidates.get(i),level.getBlockState(candidates.get(i))));
+        return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
+    }
+    public static List<WorkStep> hellforge(ServerPlayer p,BlockPos center){
+        int radius=7,halfHeight=5;var level=p.serverLevel();var placed=PlayerPlacedBlocks.get(p.serverLevel());var steps=new ArrayList<WorkStep>();
+        for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
+            if(x*x+z*z+2*y*y>radius*radius)continue;var pos=center.offset(x,y,z);
+            if(!level.hasChunkAt(pos)||!WorldSafety.allowed(p,ArtifactKind.HELLSPEC,pos)||WorldSafety.barrier(p,pos)||placed.contains(pos))continue;
+            var state=level.getBlockState(pos);
+            if((matrix(state)||state.is(net.minecraftforge.common.Tags.Blocks.ORES))&&WorldSafety.harvestable(p,p.getMainHandItem(),pos))steps.add(new WorkStep.Mine(pos,state));
+        }
+        steps.sort(java.util.Comparator.comparingDouble(step->step.pos().distSqr(center)));
+        if(steps.size()>ArtifactConfig.JOB_LIMIT.get())return steps.subList(0,ArtifactConfig.JOB_LIMIT.get());
+        return steps;
     }
     public static List<WorkStep> selective(ServerPlayer p,BlockPos center){
         // Inspect an ellipsoid, retaining all ores and machines. Only matrix connected to a real ore is peeled.
@@ -44,8 +68,10 @@ public final class MiningDesigns {
         p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,200,2,false,true,true));
         return count;
     }
-    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
+    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
+        if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||s.is(net.minecraftforge.common.Tags.Blocks.ORES))return false;
+        if(s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL))return true;
         var block=s.getBlock();return block==Blocks.STONE||block==Blocks.COBBLESTONE||block==Blocks.DEEPSLATE||block==Blocks.COBBLED_DEEPSLATE
             ||block==Blocks.GRANITE||block==Blocks.DIORITE||block==Blocks.ANDESITE||block==Blocks.TUFF||block==Blocks.CALCITE
             ||block==Blocks.BASALT||block==Blocks.SMOOTH_BASALT||block==Blocks.OBSIDIAN||block==Blocks.NETHERRACK||block==Blocks.END_STONE

@@ -57,10 +57,10 @@ public final class DomainFields {
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
         if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool&&minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)
-                &&++field.minedSincePulse>=6&&ArtifactState.now(p)>=field.pulseReady) {
+                &&++field.minedSincePulse>=4&&ArtifactState.now(p)>=field.pulseReady) {
             field.minedSincePulse=0;field.pulseReady=ArtifactState.now(p)+10;
             var pulse=ArtifactActions.gravityPulse(p,pos,minedState,field.center,field.mode);
-            int added=0;for(var step:pulse)if(added<4&&WorkQueue.append(p,tool,ArtifactKind.EVENTIDE,step))added++;
+            int added=0;for(var step:pulse)if(added<6&&WorkQueue.append(p,tool,ArtifactKind.EVENTIDE,step))added++;
             if(added>0)ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,pos,6);
         }
     }
@@ -78,6 +78,8 @@ public final class DomainFields {
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,false,true,true));
                 if(f.mode==0){
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,12,4,false,true,true));
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,40,3,false,true,true));
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,12,1,false,true,true));
                     if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
                 } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
             }

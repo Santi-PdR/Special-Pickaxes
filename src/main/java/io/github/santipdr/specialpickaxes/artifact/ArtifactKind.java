@@ -13,6 +13,9 @@ public enum ArtifactKind {
     WORLDLOOM("worldloom", 0x64ffa9, SoundEvents.STONE_PLACE),
     ICARUS("icarus", 0xffc057, SoundEvents.PISTON_EXTEND),
     AXIOM("hollow_axiom", 0xd9ffbd, SoundEvents.SCULK_CATALYST_BLOOM),
+    EXODIUM("exodium",0xff6ba5,SoundEvents.BEACON_POWER_SELECT),
+    IRIDIUM("iridium",0x74d7d0,SoundEvents.AMETHYST_BLOCK_RESONATE),
+    HELLSPEC("hellspec",0xf35a39,SoundEvents.FIRECHARGE_USE),
     ATLAS("bifold_atlas", 0xff7b99, SoundEvents.ENCHANTMENT_TABLE_USE),
     WORLDBREAKER("worldbreaker",0xf1bf65,SoundEvents.END_PORTAL_SPAWN),
     CHRONICLE("chronicle",0xb6a1ed,SoundEvents.AMETHYST_BLOCK_RESONATE),
@@ -28,7 +31,7 @@ public enum ArtifactKind {
     public final int color;
     public final SoundEvent sound;
     ArtifactKind(String id, int color, SoundEvent sound) { this.id=id; this.color=color; this.sound=sound; }
-    public boolean playable(){return switch(this){case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,WORLDBREAKER->true;default->false;};}
+    public boolean playable(){return switch(this){case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,WORLDBREAKER,EXODIUM,IRIDIUM,HELLSPEC->true;default->false;};}
     public static ArtifactKind[] playableValues(){return java.util.Arrays.stream(values()).filter(ArtifactKind::playable).toArray(ArtifactKind[]::new);}
     public static ArtifactKind byId(String id) {
         for (var kind : values()) if (kind.playable() && kind.id.equals(id)) return kind;

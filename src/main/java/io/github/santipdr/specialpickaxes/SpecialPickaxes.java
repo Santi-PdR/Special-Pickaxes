@@ -29,7 +29,7 @@ import java.util.*;
 @Mod(SpecialPickaxes.ID)
 public final class SpecialPickaxes {
     public static final String ID="specialpickaxes";
-    public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(4,32768,64F,12F,40,
+    public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(4,32768,64F,12F,50,
         net.minecraft.tags.TagKey.create(Registries.BLOCK,new ResourceLocation(ID,"needs_artifact_tool")),() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
     public static final DeferredRegister<Item> ITEMS=DeferredRegister.create(ForgeRegistries.ITEMS,ID);
     public static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,ID);
@@ -59,7 +59,7 @@ public final class SpecialPickaxes {
     private void trackPlayerPlacedBlocks(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent e){
         if(!e.isCanceled()&&e.getEntity() instanceof net.minecraft.world.entity.player.Player
                 &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
-                &&MiningDesigns.crucibleGeology(level.getBlockState(e.getPos())))
+                &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||level.getBlockState(e.getPos()).is(net.minecraftforge.common.Tags.Blocks.ORES)))
             PlayerPlacedBlocks.get(level).mark(e.getPos());
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}

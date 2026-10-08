@@ -61,5 +61,26 @@
     "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
     "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
     "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+  },
+  {
+    "artifact": "exodium",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/exodium_pickaxe.png",
+    "sha256": "3908b3d7b6e101a6517c3c29aac6da167f85c8460444e61f4b7c7816bc0acb1e",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+  },
+  {
+    "artifact": "iridium",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/iridium_pickaxe.png",
+    "sha256": "bf7a1762354030256ebc3cc099617d760530c990bb5e9f497b3fab2465e67ee5",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+  },
+  {
+    "artifact": "hellspec",
+    "archive": "ghouls/mods/terramity-0.9.8-forge-1.20.1.jar",
+    "entry": "assets/terramity/textures/item/hellspec_pickaxe.png",
+    "sha256": "1bad527651745b25844edd661acee8e8c0974ab9eed904166481e90b19584e80",
+    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
   }
 ]
