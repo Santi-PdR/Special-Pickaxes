@@ -58,9 +58,16 @@ public final class WorldSafety {
             && ArtifactTools.effective(s) && tool.isCorrectToolForDrops(s);
     }
     public static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
+        return mine(p,tool,kind,pos,expected,true);
+    }
+    /** Queue callers have already checked local drop pressure in this same server tick. */
+    static boolean mineQueued(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
+        return mine(p,tool,kind,pos,expected,false);
+    }
+    private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure) {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
-        if(dropPressure(p,pos))return false;
+        if(checkDropPressure&&dropPressure(p,pos))return false;
         var level=p.serverLevel();
         Map<UUID,ItemStack> nearbyBefore=kind==ArtifactKind.IRIDIUM?dropSnapshot(level,pos):Map.of();
         var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected));

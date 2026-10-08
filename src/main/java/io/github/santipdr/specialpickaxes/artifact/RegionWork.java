@@ -30,6 +30,13 @@ public final class RegionWork implements WorkProgram {
     public boolean done(){return executing && cursor==total();}
     public void confirm(){if(awaiting()){executing=true;cursor=0;}}
     public boolean loaded(ServerPlayer p){if(cursor==total())return true;var pos=source.at(cursor);return p.serverLevel().hasChunkAt(pos)&&(target==null||p.serverLevel().hasChunkAt(transform.map(source,target,pos)));}
+    public boolean backpressured(ServerPlayer p){
+        if(!executing||target!=null||kind!=ArtifactKind.WORLDBREAKER||mode!=0&&mode!=1&&mode!=5||cursor>=total())return false;
+        var pos=source.at(cursor);var level=p.serverLevel();if(!level.hasChunkAt(pos))return false;
+        var state=level.getBlockState(pos);
+        return eligible(p,state,pos)&&WorldSafety.harvestable(p,p.getMainHandItem(),pos)
+                &&WorldSafety.allowed(p,kind,pos)&&WorldSafety.dropPressure(p,pos);
+    }
     public WorkStep next(ServerPlayer p){
         int index=(int)cursor;BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
         BlockPos other=target==null?null:transform.map(source,target,pos);

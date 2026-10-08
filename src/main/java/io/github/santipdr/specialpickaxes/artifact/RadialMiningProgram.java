@@ -80,7 +80,7 @@ public final class RadialMiningProgram implements WorkProgram {
                 BlockState state=player.serverLevel().getBlockState(pos);
                 if(kind==ArtifactKind.HELLSPEC&&PlayerPlacedBlocks.get(player.serverLevel()).contains(pos))return false;
                 boolean geology=MiningDesigns.matrix(state)||kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state);
-                return geology&&WorldSafety.mine(player,tool,kind,pos,state);
+                return geology&&WorldSafety.mineQueued(player,tool,kind,pos,state);
             }
         };
     }

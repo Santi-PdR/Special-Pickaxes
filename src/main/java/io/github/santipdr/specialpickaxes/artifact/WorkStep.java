@@ -11,7 +11,7 @@ public interface WorkStep {
     boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind kind);
     default boolean stopOnFailure() { return false; }
     record Mine(BlockPos pos,BlockState expected) implements WorkStep {
-        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.mine(p,t,k,pos,expected); }
+        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.mineQueued(p,t,k,pos,expected); }
     }
     record Place(BlockPos pos,BlockState state) implements WorkStep {
         public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.placePaid(p,t,k,pos,state); }

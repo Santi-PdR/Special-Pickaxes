@@ -62,7 +62,7 @@ public final class DirectionalProgram implements WorkProgram {
             public boolean stopOnFailure(){return true;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                 if(!WorldSafety.directionClear(actor,tool,kind,at)||actor.serverLevel().getBlockState(at)!=old)return false;
-                return !mine||old.isAir()||WorldSafety.mine(actor,tool,kind,at,old);
+                return !mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
             }
         };
     }

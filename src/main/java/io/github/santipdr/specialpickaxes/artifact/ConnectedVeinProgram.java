@@ -56,7 +56,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
                     if(next.distSqr(origin)<=64&&seen.add(next.immutable())&&level.hasChunkAt(next)
                             &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next.immutable());
                 }
-                return WorldSafety.mine(player,tool,kind,pos,state);
+                return WorldSafety.mineQueued(player,tool,kind,pos,state);
             }
         };
     }
