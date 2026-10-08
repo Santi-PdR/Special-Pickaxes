@@ -44,9 +44,10 @@ public final class OrefallProgram implements WorkProgram {
             return new WorkStep(){
                 public BlockPos pos(){return pos;}
                 public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-                    var level=actor.serverLevel();if(!level.hasChunkAt(pos)||!WorldSafety.allowed(actor,ArtifactKind.IRIDIUM,pos))return false;
+                    var level=actor.serverLevel();if(!level.hasChunkAt(pos))return false;
                     var state=level.getBlockState(pos);
-                    if(!ArtifactOres.isOre(state)||!WorldSafety.harvestable(actor,tool,pos))return false;
+                    if(!ArtifactOres.isOre(state)||!WorldSafety.harvestable(actor,tool,pos)
+                            ||!WorldSafety.allowed(actor,ArtifactKind.IRIDIUM,pos))return false;
                     if(ores.size()<MAX_ORES){ores.add(new Ore(pos,state));level.sendParticles(actor,net.minecraft.core.particles.ParticleTypes.GLOW,false,pos.getX()+.5,pos.getY()+.5,pos.getZ()+.5,4,.18,.18,.18,.01);}
                     return false;
                 }
