@@ -13,7 +13,7 @@ import java.util.*;
 public final class DomainFields {
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class Field {
-        final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;final BlockPos center;final int radius;
+        final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
         final int mode;int minedSincePulse;long pulseReady;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final Map<UUID,Frozen> frozen=new HashMap<>();long expires;
@@ -28,6 +28,16 @@ public final class DomainFields {
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
         if((kind!=ArtifactKind.INTERREGNUM&&kind!=ArtifactKind.EVENTIDE)||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
+    }
+    public static boolean relocate(ServerPlayer p,BlockPos destination){
+        var field=FIELDS.get(p.getUUID());
+        if(field==null||field.kind!=ArtifactKind.INTERREGNUM||field.mode!=0
+                ||!WorldSafety.allowed(p,ArtifactKind.INTERREGNUM,destination))return false;
+        var previous=field.center;field.center=destination.immutable();
+        ArtifactFeedback.trace(p,field.kind,previous,field.center);
+        ArtifactFeedback.domain(p,field.kind,field.center,field.radius,Math.max(2,field.radius/2));
+        ArtifactFeedback.message(p,"domain_relocated");
+        return true;
     }
     private static void release(Field f) {
         f.frozen.forEach((id,v) -> {

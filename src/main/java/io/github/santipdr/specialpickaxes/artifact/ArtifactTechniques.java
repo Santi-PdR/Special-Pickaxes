@@ -282,7 +282,9 @@ public final class ArtifactTechniques {
             case CHOIR -> boreTunnel(player, tool, kind, 8, 32);
             case EVENTIDE -> magnetDrops(player, 16, 64);
             case CRUCIBLE -> deflectProjectiles(player, 10, 32);
-            case INTERREGNUM -> knockbackPulse(player, 8, 1.1, 24);
+            case INTERREGNUM -> ArtifactState.mode(player,kind)==1
+                    ? arrestMotion(player,player.blockPosition(),8,24)
+                    : DomainFields.relocate(player,aimed(player));
             case WORLDLOOM -> pullTarget(player, 10, .9);
             case ICARUS -> knockbackTarget(player, 7, 1.35);
             case AXIOM -> pullHostiles(player, aimed(player), 9, 24);

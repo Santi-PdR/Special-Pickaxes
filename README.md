@@ -1,8 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. El candidato **5.2.6** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles verificados. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
+Forge **1.20.1 / Java 17**. El candidato **5.2.7** lleva doce picos tier IV con dos técnicas al usarlos y una pasiva propia. En Curios conservan solo sus pasivas; no necesitan teclas extra. El tooltip queda en tres líneas y el Manual conserva los detalles verificados. La velocidad base es 64 o superior, con 32.768 de durabilidad y encantabilidad 50. Curios es opcional. Sin recetas obligatorias, minerales propios, worldgen ni energía.
 
-La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.6 es un candidato de desarrollo; no se ha validado en el modpack completo.
+La versión 5.0.0 anterior cuenta con publicación verificada. La rama 5.2.7 es un candidato de desarrollo; no se ha validado en el modpack completo.
 
 ## Catálogo
 
@@ -14,7 +14,7 @@ Exodium Starfall · Iridium Lodebreaker · Hellspec Infernal Bloom.
 - **Choir:** túnel resonante fijo 2×2, 20 bloques hacia delante; ya no repite una plantilla vieja.
 - **Eventide:** campo gravitatorio que ordena derrumbes controlados al minar piedra.
 - **Crucible:** transforma doce materiales geológicos, ahora también calcita y obsidiana; respeta menas, cofres, fluidos y bloques colocados.
-- **Stasis:** dominio 16×16 con borde visible, ayuda a compañeros dentro o te sigue como aura.
+- **Stasis:** dominio 16×16 con borde visible, ayuda a compañeros dentro o te sigue como aura; X traslada el dominio conservando su tiempo.
 - **Worldloom:** cantera esférica de radio 8, repartida por ticks.
 - **Icarus:** perforación hacia delante, partículas angelicales y Ascenso de Ícaro para movilidad.
 - **Axiom:** excava una malla radial de geología natural y conserva las menas; no detecta vetas. Su pliegue secundario sirve para combate.

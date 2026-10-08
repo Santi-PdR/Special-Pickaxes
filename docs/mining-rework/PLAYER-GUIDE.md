@@ -1,4 +1,4 @@
-# Guía del catálogo 5.2.6
+# Guía del catálogo 5.2.7
 
 R activa la habilidad principal de minería; X la técnica secundaria; C cambia de modo; I abre el
 Manual con la textura, pasiva y habilidades. Curios solo aplica las pasivas del pico equipado; no tiene botones propios. B arma una selección regional,
@@ -15,7 +15,7 @@ Al equiparlos en Curios solo se aplican sus pasivas.
 | Choir of Faults | Abre un túnel seguro 2×2 de 20 bloques hacia delante; X abre una perforación corta y segura 2×2. |
 | Eventide — La Noche que Pesa | Mantiene el campo gravitatorio; X atrae drops sueltos cercanos. |
 | Paradox Crucible | Selecciona una región y transmuta geología, incluida calcita y obsidiana; X desvía proyectiles hostiles cercanos. |
-| Crown of Stasis | Alterna dominio marcado de 16×16 y aura; el dominio también ayuda a compañeros dentro de sus límites visibles. |
+| Crown of Stasis | Alterna dominio marcado de 16×16 y aura; X traslada el dominio conservando su tiempo o detiene amenazas en modo Aura. Los compañeros reciben sus beneficios dentro del borde. |
 | Loom of the First Quarry | Excava una esfera de geología natural de radio 8; X atrae un objetivo hostil hacia ti. |
 | Tear of Icarus | Perfora hacia delante; X empuja al objetivo que miras; Caída lenta es pasiva en el aire. Sus efectos usan partículas doradas, de encantamiento y vara de End. |
 | Hollow Axiom | Excava una malla radial de roca natural y conserva las menas; X pliega un objetivo hostil hacia ti. |
