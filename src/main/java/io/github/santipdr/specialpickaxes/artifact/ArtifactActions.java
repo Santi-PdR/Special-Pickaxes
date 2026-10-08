@@ -15,15 +15,30 @@ public final class ArtifactActions {
     private static final Set<UUID> ACTIVATING=new HashSet<>();
     public static Optional<BlockPos> target(ServerPlayer p) {
         var level=p.serverLevel();Vec3 from=p.getEyePosition(),to=from.add(p.getLookAngle().scale(32));
-        BlockPos last=null;
-        for(int i=0;i<=256;i++) {
-            BlockPos pos=BlockPos.containing(from.lerp(to,i/256.0));
-            if(pos.equals(last)) continue;last=pos;
-            if(!level.hasChunkAt(pos) || level.isOutsideBuildHeight(pos)) return Optional.empty();
-            var state=level.getBlockState(pos);
-            if(state.getCollisionShape(level,pos).clip(from,to,pos)!=null) return Optional.of(pos.immutable());
+        if(!loadedRay(level,from,to))return Optional.empty();
+        var hit=level.clip(new net.minecraft.world.level.ClipContext(from,to,
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
+        return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?Optional.empty():Optional.of(hit.getBlockPos().immutable());
+    }
+    /** Check the exact voxel path first so the native raycast never requests an unloaded chunk. */
+    private static boolean loadedRay(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){
+        double dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;
+        int stepX=dx>0?1:dx<0?-1:0,stepY=dy>0?1:dy<0?-1:0,stepZ=dz>0?1:dz<0?-1:0;
+        int x=net.minecraft.core.BlockPos.containing(from).getX(),y=net.minecraft.core.BlockPos.containing(from).getY(),z=net.minecraft.core.BlockPos.containing(from).getZ();
+        var end=net.minecraft.core.BlockPos.containing(to);
+        double deltaX=stepX==0?Double.POSITIVE_INFINITY:Math.abs(1/dx),deltaY=stepY==0?Double.POSITIVE_INFINITY:Math.abs(1/dy),deltaZ=stepZ==0?Double.POSITIVE_INFINITY:Math.abs(1/dz);
+        double maxX=stepX>0?(x+1-from.x)/dx:stepX<0?(from.x-x)/-dx:Double.POSITIVE_INFINITY;
+        double maxY=stepY>0?(y+1-from.y)/dy:stepY<0?(from.y-y)/-dy:Double.POSITIVE_INFINITY;
+        double maxZ=stepZ>0?(z+1-from.z)/dz:stepZ<0?(from.z-z)/-dz:Double.POSITIVE_INFINITY;
+        for(int visited=0;visited<512;visited++){
+            var pos=new BlockPos(x,y,z);
+            if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos))return false;
+            if(x==end.getX()&&y==end.getY()&&z==end.getZ())return true;
+            if(maxX<=maxY&&maxX<=maxZ){if(maxX>1)return true;x+=stepX;maxX+=deltaX;}
+            else if(maxY<=maxZ){if(maxY>1)return true;y+=stepY;maxY+=deltaY;}
+            else {if(maxZ>1)return true;z+=stepZ;maxZ+=deltaZ;}
         }
-        return Optional.empty();
+        return false;
     }
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary) {
         if(!ACTIVATING.add(p.getUUID()))return false;
