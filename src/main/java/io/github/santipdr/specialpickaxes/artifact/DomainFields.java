@@ -14,7 +14,7 @@ public final class DomainFields {
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class Field {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
-        final int mode;int minedSincePulse;long pulseReady;
+        final int mode;int minedSincePulse;net.minecraft.world.level.block.Block pulseMaterial;long pulseReady;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius) {
@@ -73,12 +73,22 @@ public final class DomainFields {
         var field=FIELDS.get(p.getUUID());
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
-        if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool&&minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)
-                &&++field.minedSincePulse>=4&&ArtifactState.now(p)>=field.pulseReady) {
+        if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool) {
+            if(!minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)) {
+                field.pulseMaterial=null;field.minedSincePulse=0;
+                return;
+            }
+            var material=minedState.getBlock();
+            if(field.pulseMaterial!=material) {
+                field.pulseMaterial=material;
+                field.minedSincePulse=0;
+            }
+            if(++field.minedSincePulse>=4&&ArtifactState.now(p)>=field.pulseReady) {
             field.minedSincePulse=0;field.pulseReady=ArtifactState.now(p)+10;
             var pulse=ArtifactActions.gravityPulse(p,pos,minedState,field.center,field.mode);
             int added=0;for(var step:pulse)if(added<6&&WorkQueue.append(p,tool,ArtifactKind.EVENTIDE,step))added++;
             if(added>0)ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,pos,6);
+            }
         }
     }
     public static void tick() {
