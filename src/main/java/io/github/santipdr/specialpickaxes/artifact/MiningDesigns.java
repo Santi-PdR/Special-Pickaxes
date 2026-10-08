@@ -19,7 +19,7 @@ public final class MiningDesigns {
     public static List<WorkStep> selective(ServerPlayer p,BlockPos center){
         // Inspect an ellipsoid, retaining all ores and machines. Only matrix connected to a real ore is peeled.
         var candidates=new HashSet<BlockPos>();var distances=new HashMap<BlockPos,Integer>();var frontier=new ArrayDeque<BlockPos>();
-        int r=Math.min(10,ArtifactConfig.MAX_RADIUS.get());
+        int r=Math.min(12,ArtifactConfig.MAX_RADIUS.get());
         for(int x=-r;x<=r;x++)for(int y=-r/2;y<=r/2;y++)for(int z=-r;z<=r;z++){
             if(x*x+4*y*y+z*z>r*r)continue;var at=center.offset(x,y,z);if(!WorldSafety.allowed(p,ArtifactKind.AXIOM,at)||WorldSafety.barrier(p,at))continue;
             var s=p.serverLevel().getBlockState(at);
@@ -28,7 +28,7 @@ public final class MiningDesigns {
         }
         var steps=new ArrayList<WorkStep>();
         while(!frontier.isEmpty()&&steps.size()<ArtifactConfig.JOB_LIMIT.get()){
-            var at=frontier.removeFirst();int d=distances.get(at);if(d>=3)continue;
+            var at=frontier.removeFirst();int d=distances.get(at);if(d>=4)continue;
             for(var direction:Direction.values()){var next=at.relative(direction);if(candidates.remove(next)){distances.put(next,d+1);frontier.addLast(next);steps.add(new WorkStep.Mine(next,p.serverLevel().getBlockState(next)));}}
         }
         return steps;

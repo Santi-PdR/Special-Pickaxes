@@ -39,7 +39,7 @@ public final class DirectAbilities {
         var off=p.getOffhandItem();return !off.hasTag()&&off.getItem() instanceof BlockItem b&&WorldSafety.inert(b.getBlock().defaultBlockState())?b.getBlock().defaultBlockState():Blocks.STONE.defaultBlockState();
     }
     private static List<WorkStep> restore(ServerPlayer p,ArtifactKind k,BlockPos center){
-        var result=new ArrayList<WorkStep>();for(var m:ArtifactState.memories(p,k))if(m.pos().distSqr(center)<=16*16)result.add(new WorkStep.Place(m.pos(),m.state()));return result;
+        var result=new ArrayList<WorkStep>();for(var m:ArtifactState.memories(p,k))if(m.pos().distSqr(center)<=24*24)result.add(new WorkStep.Place(m.pos(),m.state()));return result;
     }
     public static List<WorkStep> vault(ServerPlayer p,BlockPos origin){return vault(p,origin,ArtifactState.mode(p,ArtifactKind.KEYSTONE)==1);}
     private static List<WorkStep> vault(ServerPlayer p,BlockPos origin,boolean supports){

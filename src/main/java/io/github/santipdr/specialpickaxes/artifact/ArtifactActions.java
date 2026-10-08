@@ -52,25 +52,25 @@ public final class ArtifactActions {
         }
         ArtifactFeedback.message(p,"mode",ArtifactState.mode(p,kind)+1);return true;
     }
-    public static int radius(ServerPlayer p,ArtifactKind kind) { return Math.min(ArtifactConfig.MAX_RADIUS.get(),8); }
+    public static int radius(ServerPlayer p,ArtifactKind kind) { return Math.min(ArtifactConfig.MAX_RADIUS.get(),10); }
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
         if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS)return MiningDesigns.drill(p,tool,kind);
-        if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),6));
+        if(kind==ArtifactKind.CRUCIBLE&&ArtifactState.mode(p,kind)==1)return WorkQueue.start(p,tool,kind,rephase(p,p.blockPosition(),radius(p,kind)));
         if(kind==ArtifactKind.PALIMPSEST) {
             var steps=new ArrayList<WorkStep>();
             var memories=ArtifactState.memories(p,kind);var aimed=target(p).orElse(p.blockPosition());
             // After mining, the ray can hit a distant wall beyond the remembered scar.
-            var center=memories.stream().anyMatch(m->m.pos().distSqr(aimed)<=16*16)?aimed:p.blockPosition();
-            for(var memory:memories)if(memory.pos().distSqr(center)<=16*16)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
+            var center=memories.stream().anyMatch(m->m.pos().distSqr(aimed)<=24*24)?aimed:p.blockPosition();
+            for(var memory:memories)if(memory.pos().distSqr(center)<=24*24)steps.add(new WorkStep.Place(memory.pos(),memory.state()));
             return WorkQueue.start(p,tool,kind,steps);
         }
 
         var target=target(p);if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
         BlockPos center=target.get();
         int r=radius(p,kind);
-        if(kind==ArtifactKind.INTERREGNUM) { if(!DomainFields.start(p,tool,kind,center,r))return false;ArtifactFeedback.ring(p,kind,center,r);return true; }
+        if(kind==ArtifactKind.INTERREGNUM) { int fieldRadius=Math.min(r,8);if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;ArtifactFeedback.ring(p,kind,center,fieldRadius);return true; }
 
 
         List<WorkStep> steps=switch(kind) {
@@ -92,7 +92,7 @@ public final class ArtifactActions {
         for(var memory:memories) {
             int mode=ArtifactState.mode(p,ArtifactKind.CHOIR);BlockPos raw=memory.pos().subtract(origin);
             BlockPos offset=mode<4?Geometry.rotate(raw,mode):mode==4?new BlockPos(-raw.getX(),raw.getY(),raw.getZ()):new BlockPos(raw.getX(),raw.getY(),-raw.getZ());
-            if(offset.distSqr(BlockPos.ZERO)<=32*32) steps.add(new WorkStep.Mine(center.offset(offset),memory.state()));
+            if(offset.distSqr(BlockPos.ZERO)<=48*48) steps.add(new WorkStep.Mine(center.offset(offset),memory.state()));
         }
         return steps;
     }
@@ -126,10 +126,10 @@ public final class ArtifactActions {
         var held=p.getOffhandItem();if(!(held.getItem() instanceof BlockItem block)) return List.of();
         var state=block.getBlock().defaultBlockState();if(!WorldSafety.inert(state) || held.hasTag()) return List.of();
         var steps=new ArrayList<WorkStep>();var forward=p.getDirection();var side=forward.getClockWise();int mode=ArtifactState.mode(p,ArtifactKind.WORLDLOOM);
-        if(mode==1){for(int z=0;z<48;z++)for(int x=-1;x<=1;x++)steps.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x),state));}
-        else if(mode==2){for(int y=1;y<=6;y++)for(int x=-4;x<=4;x++)steps.add(new WorkStep.Place(origin.relative(side,x).above(y),state));}
-        else {for(int y=0;y<=4;y++)for(int z=0;z<=6;z++)for(int x=-3;x<=3;x++){
-            if(y!=0&&y!=4&&z!=0&&z!=6&&Math.abs(x)!=3)continue;
+        if(mode==1){for(int z=0;z<80;z++)for(int x=-1;x<=1;x++)steps.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x),state));}
+        else if(mode==2){for(int y=1;y<=8;y++)for(int x=-6;x<=6;x++)steps.add(new WorkStep.Place(origin.relative(side,x).above(y),state));}
+        else {for(int y=0;y<=6;y++)for(int z=0;z<=8;z++)for(int x=-5;x<=5;x++){
+            if(y!=0&&y!=6&&z!=0&&z!=8&&Math.abs(x)!=5)continue;
             if(z==0&&x==0&&(y==1||y==2))continue;
             steps.add(new WorkStep.Place(origin.relative(forward,z).relative(side,x).above(y),state));
         }}return steps;

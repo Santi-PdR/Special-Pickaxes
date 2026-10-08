@@ -16,7 +16,7 @@ import java.util.List;
 public final class ArtifactItem extends PickaxeItem {
     public final ArtifactKind kind;
     public ArtifactItem(ArtifactKind kind) {
-        super(SpecialPickaxes.TIER,4,-2.6F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR?Rarity.EPIC:Rarity.RARE));this.kind=kind;
+        super(SpecialPickaxes.TIER,10,-2.6F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR?Rarity.EPIC:Rarity.RARE));this.kind=kind;
     }
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);
@@ -31,15 +31,15 @@ public final class ArtifactItem extends PickaxeItem {
         boolean damaged=super.hurtEnemy(stack,target,attacker);
         if(damaged&&attacker instanceof ServerPlayer player) {
             switch(kind) {
-                case PALIMPSEST -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,80,0,false,true,true));
-                case CHOIR -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,80,1,false,true,true));
-                case EVENTIDE -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.LEVITATION,30,0,false,true,true));
-                case CRUCIBLE -> target.setSecondsOnFire(5);
-                case INTERREGNUM -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,80,3,false,true,true));
-                case WORLDLOOM -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,100,1,false,true,true));
-                case ICARUS -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,100,0,false,true,true));
-                case AXIOM -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,100,0,false,true,true));
-                case WORLDBREAKER -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST,60,1,false,true,true));
+                case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,true,true)); }
+                case CHOIR -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,160,2,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,100,1,false,true,true)); }
+                case EVENTIDE -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.LEVITATION,80,1,false,true,true));
+                case CRUCIBLE -> { target.setSecondsOnFire(8); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST,100,1,false,true,true)); }
+                case INTERREGNUM -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,160,4,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,100,1,false,true,true)); }
+                case WORLDLOOM -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,3,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,0,false,true,true)); }
+                case ICARUS -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,200,0,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.JUMP,160,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED,120,1,false,true,true)); }
+                case AXIOM -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,200,0,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,100,1,false,true,true)); }
+                case WORLDBREAKER -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST,120,3,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,1,false,true,true)); }
                 default -> { }
             }
         }
