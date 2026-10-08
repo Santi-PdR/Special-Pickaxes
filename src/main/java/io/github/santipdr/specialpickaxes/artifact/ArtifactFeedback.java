@@ -1,20 +1,37 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.joml.Vector3f;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class ArtifactFeedback {
+    private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
     private ArtifactFeedback() {}
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
     }
+    private static void nearbySound(ServerPlayer p,SoundEvent sound,float volume,float pitch) {
+        var level=p.serverLevel();long now=level.getGameTime();var id=p.getUUID();var ready=SOUND_READY.get(id);
+        if(ready!=null&&now<ready)return;
+        SOUND_READY.put(id,now+ArtifactConfig.SOUND_COOLDOWN.get());
+        if(SOUND_READY.size()>1024)SOUND_READY.entrySet().removeIf(entry->entry.getValue()+1200<now);
+        var at=p.getEyePosition().add(p.getLookAngle().scale(2));
+        var packet=new ClientboundSoundPacket(Holder.direct(sound),SoundSource.PLAYERS,at.x,at.y,at.z,volume,pitch,level.getRandom().nextLong());
+        double range=ArtifactConfig.SOUND_RADIUS.get(),rangeSqr=range*range;
+        for(var listener:level.players())if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
+    }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
+        nearbySound(p,kind.sound,0.45F,0.85F+kind.ordinal()*0.04F);
         RelicEffects.emit(p,kind,"activate",p.getEyePosition().add(p.getLookAngle().scale(2)));
-        p.serverLevel().playSound(null,p.blockPosition(),kind.sound,SoundSource.PLAYERS,0.65F,0.85F+kind.ordinal()*0.04F);
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
         int rgb=kind.color;
@@ -65,7 +82,7 @@ public final class ArtifactFeedback {
     public static void cue(ServerPlayer p,String phase){
         if(!(p.getMainHandItem().getItem() instanceof ArtifactItem item))return;
         float pitch=switch(phase){case "error"->.55F;case "cancel"->.7F;case "complete"->1.25F;case "confirm"->.85F;default->1F;};
-        p.playNotifySound(item.kind.sound,SoundSource.PLAYERS,item.kind==ArtifactKind.WORLDBREAKER?.7F:.35F,pitch+(item.kind.ordinal()%4)*.04F);
+        nearbySound(p,item.kind.sound,item.kind==ArtifactKind.WORLDBREAKER?.45F:.32F,pitch+(item.kind.ordinal()%4)*.04F);
         RelicEffects.emit(p,item.kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){

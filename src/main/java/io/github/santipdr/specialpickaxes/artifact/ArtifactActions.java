@@ -82,7 +82,7 @@ public final class ArtifactActions {
             default -> List.of();
         };
         boolean started=WorkQueue.start(p,tool,kind,steps);
-        if(started) { if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
+        if(started) { if(kind==ArtifactKind.EVENTIDE&&!DomainFields.start(p,tool,kind,center,Math.min(r,8))){WorkQueue.cancel(p);return false;}if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started;
     }
     public static List<WorkStep> echo(ServerPlayer p,BlockPos center) {

@@ -25,7 +25,7 @@ public final class DomainFields {
     private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
-        if(kind!=ArtifactKind.INTERREGNUM||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
+        if((kind!=ArtifactKind.INTERREGNUM&&kind!=ArtifactKind.EVENTIDE)||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
     }
     private static void release(Field f) {
@@ -43,7 +43,7 @@ public final class DomainFields {
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
-        var f=FIELDS.get(p.getUUID());return f!=null && f.kind==ArtifactKind.INTERREGNUM && p.level().dimension()==f.dimension
+        var f=FIELDS.get(p.getUUID());return f!=null && (f.kind==ArtifactKind.INTERREGNUM||f.kind==ArtifactKind.EVENTIDE) && p.level().dimension()==f.dimension
             && p.getMainHandItem()==f.tool && ArtifactState.now(p)<=f.expires && pos.distSqr(f.center)<=f.radius*f.radius;
     }
     public static boolean frozen(Entity entity) {

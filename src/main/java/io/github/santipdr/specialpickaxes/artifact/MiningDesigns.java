@@ -26,9 +26,9 @@ public final class MiningDesigns {
             if(s.is(net.minecraftforge.common.Tags.Blocks.ORES)){frontier.add(at);distances.put(at,0);}
             else if(matrix(s))candidates.add(at);
         }
-        var steps=new ArrayList<WorkStep>();
+        var steps=new ArrayList<WorkStep>();int shellDepth=ArtifactConfig.AXIOM_DEPTH.get();
         while(!frontier.isEmpty()&&steps.size()<ArtifactConfig.JOB_LIMIT.get()){
-            var at=frontier.removeFirst();int d=distances.get(at);if(d>=4)continue;
+            var at=frontier.removeFirst();int d=distances.get(at);if(d>=shellDepth)continue;
             for(var direction:Direction.values()){var next=at.relative(direction);if(candidates.remove(next)){distances.put(next,d+1);frontier.addLast(next);steps.add(new WorkStep.Mine(next,p.serverLevel().getBlockState(next)));}}
         }
         return steps;
