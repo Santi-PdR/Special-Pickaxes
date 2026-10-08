@@ -113,8 +113,9 @@ public final class ArtifactActions {
             return started;
         }
         if(kind==ArtifactKind.HELLSPEC) {
-            var steps=MiningDesigns.hellforge(p,center);boolean started=WorkQueue.start(p,tool,kind,steps);
-            if(started){ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.message(p,"queued",steps.size());}
+            var program=new RadialMiningProgram(center,7,kind,ArtifactState.mode(p,kind),null);
+            boolean started=WorkQueue.startRegion(p,tool,kind,program);
+            if(started){ArtifactFeedback.ring(p,kind,center,7);ArtifactFeedback.message(p,"queued",program.remaining());}
             return started;
         }
 

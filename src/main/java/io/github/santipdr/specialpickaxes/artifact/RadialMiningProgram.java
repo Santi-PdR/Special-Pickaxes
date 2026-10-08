@@ -22,6 +22,7 @@ public final class RadialMiningProgram implements WorkProgram {
 
     private boolean inside(int dx,int dy,int dz){
         if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE)return dx*dx+dy*dy+dz*dz<=radius*radius;
+        if(kind==ArtifactKind.HELLSPEC)return dx*dx+dz*dz+2*dy*dy<=radius*radius;
         return !(kind==ArtifactKind.AXIOM&&mode%2==0
                 &&Math.floorMod(dx,4)==0&&Math.floorMod(dz,4)==0);
     }
@@ -57,8 +58,10 @@ public final class RadialMiningProgram implements WorkProgram {
         if(kind==ArtifactKind.CRUCIBLE)return false;
         BlockPos pos=peek();if(pos==null||!p.serverLevel().hasChunkAt(pos))return false;
         var state=p.serverLevel().getBlockState(pos);
-        return MiningDesigns.matrix(state)&&WorldSafety.allowed(p,kind,pos)
-                &&WorldSafety.harvestable(p,p.getMainHandItem(),pos)&&WorldSafety.dropPressure(p,pos);
+        if(kind==ArtifactKind.HELLSPEC&&PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        boolean geology=MiningDesigns.matrix(state)||kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state);
+        if(!geology||!WorldSafety.dropPressure(p,pos)||!WorldSafety.harvestable(p,p.getMainHandItem(),pos))return false;
+        return WorldSafety.allowed(p,kind,pos);
     }
 
     @Override public WorkStep next(ServerPlayer p){
@@ -75,7 +78,9 @@ public final class RadialMiningProgram implements WorkProgram {
             @Override public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind ignored){
                 if(!player.serverLevel().hasChunkAt(pos))return false;
                 BlockState state=player.serverLevel().getBlockState(pos);
-                return MiningDesigns.matrix(state)&&WorldSafety.mine(player,tool,kind,pos,state);
+                if(kind==ArtifactKind.HELLSPEC&&PlayerPlacedBlocks.get(player.serverLevel()).contains(pos))return false;
+                boolean geology=MiningDesigns.matrix(state)||kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state);
+                return geology&&WorldSafety.mine(player,tool,kind,pos,state);
             }
         };
     }

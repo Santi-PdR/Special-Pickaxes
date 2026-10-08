@@ -27,18 +27,6 @@ public final class MiningDesigns {
         for(int i=0;i<candidates.size()&&i<128;i++)steps.add(new WorkStep.Mine(candidates.get(i),level.getBlockState(candidates.get(i))));
         return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
     }
-    public static List<WorkStep> hellforge(ServerPlayer p,BlockPos center){
-        int radius=7,halfHeight=5;var level=p.serverLevel();var placed=PlayerPlacedBlocks.get(p.serverLevel());var steps=new ArrayList<WorkStep>();
-        for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
-            if(x*x+z*z+2*y*y>radius*radius)continue;var pos=center.offset(x,y,z);
-            if(!level.hasChunkAt(pos)||!WorldSafety.allowed(p,ArtifactKind.HELLSPEC,pos)||WorldSafety.barrier(p,pos)||placed.contains(pos))continue;
-            var state=level.getBlockState(pos);
-            if((matrix(state)||ArtifactOres.isOre(state))&&WorldSafety.harvestable(p,p.getMainHandItem(),pos))steps.add(new WorkStep.Mine(pos,state));
-        }
-        steps.sort(java.util.Comparator.comparingDouble(step->step.pos().distSqr(center)));
-        if(steps.size()>ArtifactConfig.JOB_LIMIT.get())return steps.subList(0,ArtifactConfig.JOB_LIMIT.get());
-        return steps;
-    }
     public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
