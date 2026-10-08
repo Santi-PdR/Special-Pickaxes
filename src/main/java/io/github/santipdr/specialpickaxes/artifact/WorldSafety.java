@@ -11,7 +11,7 @@ import net.minecraft.world.phys.*;
 import net.minecraftforge.common.*;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
-import java.util.Set;
+import java.util.*;
 
 /** Conservative mutation boundary. No inventories, falling blocks, machinery, arbitrary mod callbacks or ores in swaps. */
 public final class WorldSafety {
@@ -61,15 +61,26 @@ public final class WorldSafety {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(dropPressure(p,pos))return false;
+        var level=p.serverLevel();
+        Map<UUID,ItemStack> nearbyBefore=kind==ArtifactKind.IRIDIUM?dropSnapshot(level,pos):Map.of();
         var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected));
         boolean mined;
         try{mined=p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
         if(mined&&kind==ArtifactKind.IRIDIUM){
-            var glowBox=new AABB(pos).inflate(2);
-            for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,glowBox))
-                if(drop.tickCount<2){drop.setGlowingTag(true);drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",p.getUUID());}
+            for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(2))){
+                var old=nearbyBefore.get(drop.getUUID());var stack=drop.getItem();
+                if(old==null||stack.getCount()>old.getCount()||!ItemStack.isSameItemSameTags(old,stack)){
+                    drop.setGlowingTag(true);drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",p.getUUID());
+                }
+            }
         }
         return mined;
+    }
+    private static Map<UUID,ItemStack> dropSnapshot(net.minecraft.server.level.ServerLevel level,BlockPos pos){
+        var snapshot=new HashMap<UUID,ItemStack>();
+        for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(2)))
+            snapshot.put(drop.getUUID(),drop.getItem().copy());
+        return snapshot;
     }
     public static boolean dropPressure(ServerPlayer p,BlockPos pos){return p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256;}
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
