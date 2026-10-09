@@ -298,7 +298,7 @@ public final class ArtifactTechniques {
         for(var candidate:priority){var worn=target.getItemBySlot(candidate);if(!worn.isEmpty()&&worn.isDamageableItem()
                 &&worn.getDamageValue()<worn.getMaxDamage()){slot=candidate;armor=worn;break;}}
         if(slot==null)return false;
-        int before=armor.getDamageValue(),max=armor.getMaxDamage(),requested=Math.min(12,max-before);var damagedSlot=slot;
+        int before=armor.getDamageValue(),max=armor.getMaxDamage(),requested=Math.min(48,max-before);var damagedSlot=slot;
         armor.hurtAndBreak(requested,target,entity->entity.broadcastBreakEvent(damagedSlot));
         int applied=armor.isEmpty()?requested:Math.max(0,armor.getDamageValue()-before);
         if(applied<=0)return false;
