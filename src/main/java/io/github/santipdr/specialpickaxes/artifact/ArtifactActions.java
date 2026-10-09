@@ -168,11 +168,22 @@ public final class ArtifactActions {
         var forward=p.getDirection();var side=forward.getClockWise();var candidates=new ArrayList<BlockPos>();
         for(int depth=1;depth<=2;depth++)for(int lateral=-1;lateral<=1;lateral++)for(int vertical=-1;vertical<=1;vertical++) {
             var pos=broken.relative(forward,depth).relative(side,lateral).above(vertical);
-            if(!p.serverLevel().hasChunkAt(pos)||!DomainFields.contains(p,pos)||!WorldSafety.allowed(p,ArtifactKind.EVENTIDE,pos)||WorldSafety.barrier(p,pos))continue;
+            if(!p.serverLevel().hasChunkAt(pos)||!DomainFields.contains(p,pos)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)
+                    ||!WorldSafety.allowed(p,ArtifactKind.EVENTIDE,pos)||WorldSafety.barrier(p,pos))continue;
             var state=p.serverLevel().getBlockState(pos);if(state.getBlock()==material.getBlock())candidates.add(pos.immutable());
         }
         candidates.sort(Comparator.comparingDouble(pos->(mode==0?1:-1)*pos.distSqr(fieldCenter)));
-        var steps=new ArrayList<WorkStep>(6);for(var pos:candidates){steps.add(new WorkStep.Mine(pos,p.serverLevel().getBlockState(pos)));if(steps.size()==6)break;}
+        var steps=new ArrayList<WorkStep>(6);for(var pos:candidates){
+            var expected=p.serverLevel().getBlockState(pos);
+            steps.add(new WorkStep(){
+                @Override public BlockPos pos(){return pos;}
+                @Override public boolean apply(ServerPlayer actor,net.minecraft.world.item.ItemStack tool,ArtifactKind kind){
+                    return !PlayerPlacedBlocks.get(actor.serverLevel()).contains(pos)
+                            &&WorldSafety.mineQueued(actor,tool,kind,pos,expected);
+                }
+            });
+            if(steps.size()==6)break;
+        }
         return steps;
     }
     public static BlockState geologyMaterial(ServerPlayer p,int mode){

@@ -119,6 +119,10 @@ public final class DomainFields {
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
         if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool) {
+            if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) {
+                field.pulseMaterial=null;field.minedSincePulse=0;
+                return;
+            }
             if(!minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)) {
                 field.pulseMaterial=null;field.minedSincePulse=0;
                 return;
