@@ -46,6 +46,8 @@ public final class ArtifactInteraction {
         var s=selection(p);if(s==null||s.submitted||s.points.size()!=2||WorkQueue.busy(p))return;
         try{
             var volume=new SelectionVolume(s.points.get(0),s.points.get(1));
+            long snapshotBytes=RegionWork.snapshotMemoryBytesFor((int)volume.size(),net.minecraft.world.level.block.Block.BLOCK_STATE_REGISTRY.size(),false);
+            if(!WorkQueue.regionSnapshotBudgetAllows(p,snapshotBytes))return;
             var material=s.kind==ArtifactKind.CRUCIBLE?ArtifactActions.geologyMaterial(p,s.mode):net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
             var program=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,s.kind,s.mode,material);
             if(WorkQueue.startRegion(p,s.tool,s.kind,program)){s.submitted=true;ArtifactFeedback.message(p,"selection_ready");}

@@ -18,6 +18,9 @@ public final class RegionWork implements WorkProgram {
     private boolean executing;
     public long eligible,excluded;
     private final BlockState material;
+    public static long snapshotMemoryBytesFor(int size,int registeredStates,boolean hasTarget){
+        return BlockIdSnapshot.memoryBytesFor(size,registeredStates)*(hasTarget?2L:1L);
+    }
     public RegionWork(SelectionVolume a,SelectionVolume b,SelectionVolume.Transform t,ArtifactKind k,int mode,BlockState material){
         source=a;target=b;transform=t;kind=k;this.mode=mode;this.material=material;
         if(a.size()>ArtifactConfig.REGION_LIMIT.get() || a.size()<1)throw new IllegalArgumentException("volume limit");
@@ -27,6 +30,7 @@ public final class RegionWork implements WorkProgram {
         expectedTarget=b==null?null:new BlockIdSnapshot((int)a.size(),stateCount);
     }
     public long total(){return source.size();}
+    public long snapshotMemoryBytes(){return expectedSource.memoryBytes()+(expectedTarget==null?0:expectedTarget.memoryBytes());}
     public int remaining(){return (int)(total()-cursor);}
     public boolean awaiting(){return !executing && cursor==total();}
     public boolean executing(){return executing;}
@@ -83,6 +87,8 @@ public final class RegionWork implements WorkProgram {
             charIds=registeredStates>256&&registeredStates<=Character.MAX_VALUE+1?new char[size]:null;
             intIds=registeredStates>Character.MAX_VALUE+1?new int[size]:null;
         }
+        static long memoryBytesFor(int size,int registeredStates){return (long)size*(registeredStates<=256?Byte.BYTES:registeredStates<=Character.MAX_VALUE+1?Character.BYTES:Integer.BYTES);}
+        long memoryBytes(){return byteIds!=null?byteIds.length:charIds!=null?(long)charIds.length*Character.BYTES:(long)intIds.length*Integer.BYTES;}
         void set(int index,int id){
             if(byteIds!=null)byteIds[index]=(byte)id;
             else if(charIds!=null)charIds[index]=(char)id;

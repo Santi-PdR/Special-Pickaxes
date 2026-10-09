@@ -23,6 +23,7 @@ public final class ArtifactConfig {
     public static final ForgeConfigSpec.IntValue SOUND_RADIUS = B.defineInRange("audio.nearbyRadius",5,1,8);
     public static final ForgeConfigSpec.IntValue SOUND_COOLDOWN = B.defineInRange("audio.cooldownTicks",20,1,40);
     public static final ForgeConfigSpec.IntValue REGION_LIMIT=B.defineInRange("selection.maxVolume",262144,64,1048576);
+    public static final ForgeConfigSpec.IntValue REGION_MEMORY_MIB=B.defineInRange("selection.maxSnapshotMemoryMiB",128,8,1024);
     public static final ForgeConfigSpec.IntValue ACTIVE_JOBS=B.defineInRange("work.maxConcurrentJobs",32,1,128);
     public static final ForgeConfigSpec.IntValue ENCHANT_BUDGET=B.defineInRange("work.enchantedPlayerBudget",128,24,512);
     public static final ForgeConfigSpec SPEC = B.build();
