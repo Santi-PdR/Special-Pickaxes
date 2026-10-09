@@ -10,6 +10,7 @@ public final class RelicControl {
         if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
         WorkQueue.discardStale(p);
         var k=item.kind;var tool=p.getMainHandItem();
+        boolean copiedWorldbreaker=k==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill");
         if(action==Action.CANCEL)return cancel(p,k);
         // Bound packet spam without preventing an emergency cancellation.
         var data=ArtifactState.of(p,k);long now=ArtifactState.now(p);
@@ -21,6 +22,10 @@ public final class RelicControl {
             case CONFIRM:
                 return confirm(p);
             case SELECT:
+                if(copiedWorldbreaker){
+                    try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));if(ArtifactInteraction.regional(copied,ArtifactState.mode(p,copied)))return ArtifactInteraction.use(p,tool,copied,false);}
+                    catch(IllegalArgumentException invalid){return false;}
+                }
                 if(!ArtifactInteraction.regional(k,ArtifactState.mode(p,k))||WorkQueue.busy(p))return false;
                 if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
                 return ArtifactInteraction.use(p,tool,k,false);
@@ -54,7 +59,7 @@ public final class RelicControl {
                     p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
                 if(DomainFields.active(p)||CompanionActions.active(p))return cancel(p,k);
-                if(ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
+                if(!copiedWorldbreaker&&ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
                 if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p))return cancel(p,k);
