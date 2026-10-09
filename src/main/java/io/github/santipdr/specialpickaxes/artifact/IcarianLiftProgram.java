@@ -7,12 +7,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** Mines a protected, player-sized shaft upward, raising its owner one block at a time. */
 public final class IcarianLiftProgram implements WorkProgram {
-    private static final int MAX_RISE=96;
+    private static final int MAX_WORLD_RISE=384;
     private final BlockPos base;
+    private final int maxRise;
     private int rise,index;
     private boolean finished;
 
-    public IcarianLiftProgram(BlockPos base){this.base=base.immutable();}
+    public IcarianLiftProgram(BlockPos base,int maxRise){this.base=base.immutable();this.maxRise=Math.max(0,Math.min(MAX_WORLD_RISE,maxRise));}
 
     private int cells(){return rise==0?2:1;}
     private BlockPos nextPos(){
@@ -20,12 +21,12 @@ public final class IcarianLiftProgram implements WorkProgram {
         return base.above(layer);
     }
 
-    @Override public int remaining(){return finished?0:Math.max(0,MAX_RISE-rise)+cells()-index;}
+    @Override public int remaining(){return finished?0:Math.max(0,maxRise-rise)+cells()-index;}
     @Override public boolean awaiting(){return false;}
     @Override public boolean executing(){return true;}
     @Override public boolean done(){return finished;}
     @Override public void confirm(){}
-    @Override public boolean loaded(ServerPlayer p){return finished||index>=cells()||p.serverLevel().hasChunkAt(nextPos());}
+    @Override public boolean loaded(ServerPlayer p){return finished||index>=cells()||p.serverLevel().isOutsideBuildHeight(nextPos())||p.serverLevel().hasChunkAt(nextPos());}
 
     @Override public boolean backpressured(ServerPlayer p){
         if(finished||index>=cells())return false;
@@ -41,15 +42,19 @@ public final class IcarianLiftProgram implements WorkProgram {
     @Override public WorkStep next(ServerPlayer p){
         if(finished)return completed(base);
         if(index>=cells()){
-            if(rise>=MAX_RISE){finished=true;return completed(base.offset(0,rise,0));}
+            if(rise>=maxRise){finished=true;return completed(base.offset(0,rise,0));}
             int nextRise=rise+1;
-            boolean reachedSky=p.serverLevel().canSeeSky(base.offset(0,nextRise+1,0));
+            BlockPos head=base.offset(0,nextRise+1,0);
+            if(p.serverLevel().isOutsideBuildHeight(head)){finished=true;return completed(base.offset(0,rise,0));}
+            boolean reachedSky=p.serverLevel().canSeeSky(head);
             rise=nextRise;index=0;finished=reachedSky;
             return new WorkStep.Move(base.offset(0,nextRise,0));
         }
 
         BlockPos pos=nextPos();index++;
-        var level=p.serverLevel();BlockState state=level.getBlockState(pos);
+        var level=p.serverLevel();
+        if(level.isOutsideBuildHeight(pos)){finished=true;return completed(pos);}
+        BlockState state=level.getBlockState(pos);
         if(state.isAir()||state.is(net.minecraft.world.level.block.Blocks.CAVE_AIR)
                 ||state.is(net.minecraft.world.level.block.Blocks.VOID_AIR))return completed(pos);
         if(PlayerPlacedBlocks.get(level).contains(pos)||WorldSafety.barrier(p,pos)

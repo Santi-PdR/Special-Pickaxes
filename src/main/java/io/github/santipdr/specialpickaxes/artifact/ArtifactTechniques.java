@@ -144,7 +144,9 @@ public final class ArtifactTechniques {
 
     private static boolean icarianLift(ServerPlayer player,ItemStack tool) {
         if(player.isPassenger()||player.isSleeping())return false;
-        boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(player.blockPosition()));
+        BlockPos base=player.blockPosition();
+        int availableRise=player.serverLevel().getMaxBuildHeight()-base.getY()-2;
+        boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(base,availableRise));
         if(started){
             ArtifactFeedback.message(player,"icarian_lift_started");
             player.serverLevel().sendParticles(player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
