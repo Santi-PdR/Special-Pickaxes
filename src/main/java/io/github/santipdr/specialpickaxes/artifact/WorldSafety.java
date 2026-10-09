@@ -87,7 +87,7 @@ public final class WorldSafety {
     static boolean backpressuredMine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
         var level=p.serverLevel();
         return level.hasChunkAt(pos)&&level.getBlockState(pos)==expected&&harvestable(p,tool,pos)
-                &&dropPressure(p,pos)&&allowed(p,kind,pos);
+                &&allowed(p,kind,pos)&&dropPressure(p,pos);
     }
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
         return ForgeHooks.onBlockBreakEvent(p.serverLevel(),p.gameMode.getGameModeForPlayer(),p,pos)>=0;
