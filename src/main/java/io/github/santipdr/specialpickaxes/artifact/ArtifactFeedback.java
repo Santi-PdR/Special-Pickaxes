@@ -84,13 +84,14 @@ public final class ArtifactFeedback {
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
-        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.82F);
-        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),0.7F);
+        boolean stasis=kind==ArtifactKind.INTERREGNUM;
+        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),stasis?1.25F:0.82F);
+        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),stasis?1.05F:0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
         double topY=center.getY()+halfHeight+0.08;
         // A capped wireframe remains legible while bounding particle packets per field update.
         // Side loops omit corners because the front/back edges already draw them.
-        int segments=Math.max(4,Math.min(6,radius));
+        int segments=stasis?Math.max(6,Math.min(8,radius)):Math.max(4,Math.min(6,radius));
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
