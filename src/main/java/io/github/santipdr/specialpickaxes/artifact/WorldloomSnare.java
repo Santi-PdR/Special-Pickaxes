@@ -39,8 +39,10 @@ public final class WorldloomSnare {
         var iterator=BINDINGS.entrySet().iterator();
         while(iterator.hasNext()){
             var binding=iterator.next().getValue();var target=binding.target;var owner=binding.owner;var level=binding.level;
-            if(!target.isAlive()||target.isRemoved()||owner.isRemoved()||!owner.isAlive()||target.level()!=level
+            if(!target.isAlive()||target.isRemoved()||owner.isRemoved()||!owner.isAlive()||owner.serverLevel()!=level||target.level()!=level
+                    ||target.isAlliedTo(owner)||target instanceof Player other&&!owner.canHarmPlayer(other)
                     ||level.getGameTime()>=binding.expires){iterator.remove();continue;}
+            if(level.getGameTime()%5==0&&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
             BlockPos at=BlockPos.containing(binding.anchor);
             if(level.hasChunkAt(at)){
                 var box=target.getBoundingBox().move(binding.anchor.subtract(target.position()));
