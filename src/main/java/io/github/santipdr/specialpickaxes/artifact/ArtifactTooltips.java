@@ -14,8 +14,6 @@ public final class ArtifactTooltips {
                 Component.translatable("mining.short.specialpickaxes."+k.id)).withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("tooltip.specialpickaxes.x",
                 Component.translatable("alternate.specialpickaxes."+k.id)).withStyle(ChatFormatting.AQUA));
-        lines.add(Component.translatable("tooltip.specialpickaxes.passive",
-                Component.translatable("passive.specialpickaxes."+k.id)).withStyle(ChatFormatting.GREEN));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
         return actions(ItemStack.EMPTY,k,mode);
