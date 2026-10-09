@@ -64,7 +64,12 @@ public final class ArtifactInteraction {
     public static void display(ServerPlayer p,ItemStack tool,ArtifactKind kind){
         var s=selection(p);String status=WorkQueue.busy(p)?WorkQueue.status(p):s!=null?"selecting":DomainFields.active(p)?"domain":"idle";
         var tag=tool.getOrCreateTag();if(!status.equals(tag.getString("artifactStatus"))&&status.equals("ready")){p.displayClientMessage(Component.translatable("status.specialpickaxes.ready"),true);ArtifactFeedback.cue(p,"select");}
-        tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));tag.putString("artifactModeName",modeKey(kind,ArtifactState.mode(p,kind)));
+        ArtifactKind shownKind=kind;int shownMode=ArtifactState.mode(p,kind);
+        if(kind==ArtifactKind.WORLDBREAKER&&tag.contains("copiedSkill"))try{
+            var copied=ArtifactKind.byId(tag.getString("copiedSkill"));
+            if(copied!=ArtifactKind.WORLDBREAKER){shownKind=copied;shownMode=ArtifactState.mode(p,copied);tag.putInt("copiedMode",shownMode);}
+        }catch(IllegalArgumentException invalid){tag.remove("copiedSkill");tag.remove("copiedMode");}
+        tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));tag.putString("artifactModeName",modeKey(shownKind,shownMode));
         for(int i=0;i<4;i++)tag.remove("selection"+i);tag.remove("selectionDimension");tag.remove("artifactSource");tag.remove("artifactTarget");tag.remove("artifactTransform");
         if(s!=null){tag.putString("selectionDimension",s.dimension);for(int i=0;i<s.points.size();i++)tag.putLong("selection"+i,s.points.get(i).asLong());
             if(s.points.size()==2)ArtifactFeedback.box(p,kind,new SelectionVolume(s.points.get(0),s.points.get(1)),false);

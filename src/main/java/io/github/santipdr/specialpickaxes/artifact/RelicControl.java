@@ -25,6 +25,20 @@ public final class RelicControl {
                 if(ArtifactInteraction.selecting(p)){ArtifactInteraction.clear(p);ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");return true;}
                 return ArtifactInteraction.use(p,tool,k,false);
             case MODE:
+                if(k==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
+                    try{
+                        var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));
+                        if(copied!=ArtifactKind.WORLDBREAKER){
+                            if(ArtifactInteraction.modeCount(copied)<2)return false;
+                            WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
+                            int mode=ArtifactState.rotate(p,copied);
+                            tool.getOrCreateTag().putInt("copiedMode",mode);
+                            ArtifactInteraction.display(p,tool,k);
+                            ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(copied,mode)));
+                            ArtifactFeedback.cue(p,"select");return true;
+                        }
+                    }catch(IllegalArgumentException invalid){tool.getOrCreateTag().remove("copiedSkill");tool.getOrCreateTag().remove("copiedMode");}
+                }
                 if(ArtifactInteraction.modeCount(k)<2)return false;
                 WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
                 ArtifactState.rotate(p,k);tool.getOrCreateTag().putInt("artifactMode",ArtifactState.mode(p,k));ArtifactInteraction.display(p,tool,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;

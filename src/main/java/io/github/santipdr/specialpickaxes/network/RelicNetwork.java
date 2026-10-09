@@ -24,11 +24,12 @@ public final class RelicNetwork {
         if(!tool.hasTag()||!tool.getTag().hasUUID("controlIdentity")||!tool.getTag().getUUID("controlIdentity").equals(choice.toolIdentity()))return false;
         if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p)){ArtifactFeedback.message(p,"copy_busy");return false;}
         if(choice.source()==ArtifactKind.WORLDBREAKER){
-            tool.getOrCreateTag().remove("copiedSkill");
+            tool.getOrCreateTag().remove("copiedSkill");tool.getOrCreateTag().remove("copiedMode");
             ArtifactFeedback.message(p,"copy_native");return true;
         }
         if(!choice.source().playable())return false;
         tool.getOrCreateTag().putString("copiedSkill",choice.source().id);
+        tool.getOrCreateTag().putInt("copiedMode",ArtifactState.mode(p,choice.source()));
         ArtifactFeedback.message(p,"copied_skill",net.minecraft.network.chat.Component.translatable("item.specialpickaxes."+choice.source().id));return true;
     }
     public static void chooseCopy(ArtifactKind source,long sequence,java.util.UUID identity){CHANNEL.sendToServer(new CopyChoice(source,sequence,identity));}

@@ -33,10 +33,12 @@ public final class ArtifactManualScreen extends Screen {
         ItemStack icon=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());
         g.renderItem(icon,x+16,y+32);g.drawString(font,icon.getHoverName(),x+40,y+37,0xffffe3a3,false);
 
-        ItemStack active=displayStack();int mode=ArtifactTooltips.mode(active);String modeKey=ArtifactInteraction.modeKey(kind,mode);
+        ItemStack active=displayStack();ArtifactKind abilityKind=copiedKind(active);
+        int mode=abilityKind==kind?ArtifactTooltips.mode(active):active.hasTag()?active.getTag().getInt("copiedMode"):0;
+        String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
         int contentX=x+16,contentTop=y+62,contentBottom=y+h-31;
         int contentWidth=kind==ArtifactKind.WORLDBREAKER?Math.max(120,Math.min(230,w-270)):w-32;
-        List<Section> sections=sections(active,modeKey);
+        List<Section> sections=sections(active,abilityKind,mode,modeKey);
         contentHeight=measure(sections,contentWidth);
         int maxScroll=Math.max(0,contentHeight-(contentBottom-contentTop));scroll=clamp(scroll,maxScroll);
         g.enableScissor(contentX,contentTop,contentX+contentWidth,contentBottom);
@@ -52,6 +54,8 @@ public final class ArtifactManualScreen extends Screen {
             else g.drawString(font,Component.translatable("screen.specialpickaxes.copy_hand_only"),choicesX,choicesY,0xffb9d4ff,false);
             g.disableScissor();
             var selection=copied.isBlank()?Component.translatable("screen.specialpickaxes.copy_native"):Component.translatable("item.specialpickaxes."+copied);
+            if(!copied.isBlank()&&ArtifactInteraction.modeCount(abilityKind)>1)
+                selection.append(" · ").append(Component.translatable("mode.specialpickaxes."+modeKey));
             g.drawString(font,Component.translatable("screen.specialpickaxes.selected",selection),x+16,y+h-30,0xffe9c96f,false);
         }else if(contentHeight>contentBottom-contentTop){
             g.drawString(font,Component.translatable("screen.specialpickaxes.scroll"),x+w-82,y+h-18,0xffaab7c5,false);
@@ -60,25 +64,24 @@ public final class ArtifactManualScreen extends Screen {
         super.render(g,mouseX,mouseY,partial);
     }
 
-    private List<Section> sections(ItemStack stack,String modeKey){
+    private List<Section> sections(ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey){
         var result=new ArrayList<Section>();
-        int mode=ArtifactTooltips.mode(stack);
-        result.add(section("screen.specialpickaxes.main",Component.translatable("mining.identity."+kind.id+"."+modeKey),0xffd6e0e8));
-        result.add(section("manual4.how",Component.translatable("mining.how."+kind.id+"."+modeKey),0xffd6e0e8));
-        result.add(section("screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+kind.id),0xffffd079));
+        result.add(section("screen.specialpickaxes.main",Component.translatable("mining.identity."+abilityKind.id+"."+modeKey),0xffd6e0e8));
+        result.add(section("manual4.how",Component.translatable("mining.how."+abilityKind.id+"."+modeKey),0xffd6e0e8));
+        result.add(section("screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+abilityKind.id),0xffffd079));
         result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));
         result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
         var curiosInfo=new ArrayList<Component>();curiosInfo.add(Component.translatable("screen.specialpickaxes.curios_passive"));
         curiosInfo.add(Component.translatable("curios.detail.specialpickaxes."+kind.id));
         result.add(new Section(Component.translatable("screen.specialpickaxes.curios"),curiosInfo,0xffb9d4ff));
-        if(ArtifactInteraction.modeCount(kind)>1){
-            result.add(section("manual4.modes",allModes(),0xffd6e0e8));
+        if(ArtifactInteraction.modeCount(abilityKind)>1){
+            result.add(section("manual4.modes",allModes(abilityKind),0xffd6e0e8));
             result.add(section("manual4.mode",Component.translatable("mode.specialpickaxes."+modeKey),0xffffd079));
         }
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
         result.add(section("manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)),0xffd6e0e8));
-        result.add(section("manual4.limits",Component.translatable(kind==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"),0xffd6e0e8));
+        result.add(section("manual4.limits",Component.translatable(abilityKind==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"),0xffd6e0e8));
         var controls=new ArrayList<Component>();
         for(var action:ArtifactTooltips.actions(stack,kind,mode))
             controls.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
@@ -86,10 +89,15 @@ public final class ArtifactManualScreen extends Screen {
         result.add(new Section(Component.translatable("manual4.controls"),controls,0xffd6e0e8));
         return result;
     }
-    private Component allModes(){
-        var text=Component.empty();String[] modes=ArtifactInteraction.modes(kind);
+    private Component allModes(ArtifactKind modeKind){
+        var text=Component.empty();String[] modes=ArtifactInteraction.modes(modeKind);
         for(int i=0;i<modes.length;i++){if(i>0)text.append(" · ");text.append(Component.translatable("mode.specialpickaxes."+modes[i]));}
         return text;
+    }
+    private ArtifactKind copiedKind(ItemStack stack){
+        if(kind!=ArtifactKind.WORLDBREAKER||!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return kind;
+        try{return ArtifactKind.byId(stack.getTag().getString("copiedSkill"));}
+        catch(IllegalArgumentException invalid){return kind;}
     }
     private static Section section(String heading,Component body,int color){return new Section(Component.translatable(heading),List.of(body),color);}
     private int measure(List<Section> sections,int maxWidth){
