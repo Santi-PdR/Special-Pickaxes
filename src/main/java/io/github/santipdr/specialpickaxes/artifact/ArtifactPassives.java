@@ -27,15 +27,23 @@ public final class ArtifactPassives {
         }
         if(!(source.getEntity() instanceof LivingEntity attacker)||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
+        boolean retaliationAllowed=switch(kind){
+            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,ICARUS,AXIOM,EXODIUM,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
+            default -> false;
+        };
+        if(!retaliationAllowed&&switch(kind){
+            case CHOIR,CRUCIBLE,ICARUS,AXIOM,EXODIUM -> true;
+            default -> false;
+        })return;
         var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
         if(state.getLong("curiosPassiveReady")>now)return;
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
             case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);player.getFoodData().eat(1,.1F);}
             case CHOIR -> attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,60,1,true,false,true));
-            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);attacker.addEffect(new MobEffectInstance(MobEffects.WEAKNESS,60,0,true,false,true));}
+            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(MobEffects.WEAKNESS,60,0,true,false,true));}
             case CRUCIBLE -> attacker.setSecondsOnFire(3);
-            case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
+            case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
             case WORLDLOOM -> player.addEffect(new MobEffectInstance(MobEffects.REGENERATION,60,1,true,false,true));
             case ICARUS -> {
                 Vec3 away=attacker.position().subtract(player.position());
@@ -52,7 +60,7 @@ public final class ArtifactPassives {
                 attacker.hasImpulse=true;
             }
             case IRIDIUM -> player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,80,0,true,false,true));
-            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
+            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
             default -> {return;}
         }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
