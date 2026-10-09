@@ -6,73 +6,69 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
-/** Incremental Iridium prospecting and extraction. The scan and harvest both consume scheduler budget. */
+/** Center-out Iridium extraction. Each loaded ore is mined as soon as it is reached. */
 public final class OrefallProgram implements WorkProgram {
-    private record Ore(BlockPos pos,BlockState state) {}
     private static final int RADIUS=14,HALF_HEIGHT=7;
-    private static final int SCAN_SIZE=countScan();
+    private static final List<BlockPos> SCAN_OFFSETS=createScanOffsets();
     private final BlockPos center;
-    private final PriorityQueue<Ore> nearest;
-    private List<Ore> ores=List.of();
-    private int scanX=-RADIUS,scanY=-HALF_HEIGHT,scanZ=-RADIUS,scanned,oreIndex;private boolean sorted;
+    private final int limit;
+    private int scanIndex,mined;
+
     public OrefallProgram(BlockPos center){
         this.center=center.immutable();
-        this.nearest=new PriorityQueue<>(Comparator.comparingDouble(
-                (Ore ore)->ore.pos().distSqr(this.center)).reversed());
+        this.limit=Math.min(SCAN_OFFSETS.size(),ArtifactConfig.JOB_LIMIT.get());
     }
-    private static int countScan(){
-        int count=0;
+
+    private static List<BlockPos> createScanOffsets(){
+        var offsets=new ArrayList<BlockPos>();
         for(int x=-RADIUS;x<=RADIUS;x++)for(int y=-HALF_HEIGHT;y<=HALF_HEIGHT;y++)for(int z=-RADIUS;z<=RADIUS;z++)
-            if(x*x+z*z+4*y*y<=RADIUS*RADIUS)count++;
-        return count;
+            if(x*x+z*z+4*y*y<=RADIUS*RADIUS)offsets.add(new BlockPos(x,y,z));
+        offsets.sort(Comparator.comparingDouble((BlockPos pos)->pos.distSqr(BlockPos.ZERO))
+                .thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getY).thenComparingInt(BlockPos::getZ));
+        return List.copyOf(offsets);
     }
-    private BlockPos nextScanPos(){
-        while(scanY<=HALF_HEIGHT){
-            int x=scanX,y=scanY,z=scanZ;
-            if(++scanZ>RADIUS){scanZ=-RADIUS;if(++scanX>RADIUS){scanX=-RADIUS;scanY++;}}
-            if(x*x+z*z+4*y*y<=RADIUS*RADIUS){scanned++;return center.offset(x,y,z).immutable();}
-        }
-        return null;
-    }
-    @Override public int remaining(){return Math.max(0,SCAN_SIZE-scanned)+Math.max(0,(sorted?ores.size():nearest.size())-oreIndex);}
+
+    @Override public int remaining(){return Math.max(0,SCAN_OFFSETS.size()-scanIndex);}
     @Override public boolean awaiting(){return false;}
     @Override public boolean executing(){return true;}
-    @Override public boolean done(){return scanned>=SCAN_SIZE&&sorted&&oreIndex>=ores.size();}
+    @Override public boolean done(){return scanIndex>=SCAN_OFFSETS.size()||mined>=limit;}
     @Override public void confirm(){}
-    @Override public boolean loaded(ServerPlayer p){return true;} // unloaded chunks are skipped, never requested
+    @Override public boolean loaded(ServerPlayer p){return true;} // Unloaded chunks are skipped, never requested.
+    @Override public boolean reportPartial(){return false;} // Empty and protected cells are expected scan results.
     @Override public int attemptsPerTick(ItemStack tool){
-        return scanned<SCAN_SIZE?Math.max(ArtifactConfig.ORE_SCAN_BUDGET.get(),EnchantmentScaling.budget(tool)):EnchantmentScaling.budget(tool);
+        return scanIndex<SCAN_OFFSETS.size()?Math.max(ArtifactConfig.ORE_SCAN_BUDGET.get(),EnchantmentScaling.budget(tool)):EnchantmentScaling.budget(tool);
     }
     @Override public void reportProgress(ServerPlayer p){
-        if(scanned>0&&scanned<SCAN_SIZE&&p.tickCount%20==0)
-            ArtifactFeedback.message(p,"ore_scan_progress",scanned*100/SCAN_SIZE,nearest.size());
+        if(scanIndex>0&&scanIndex<SCAN_OFFSETS.size()&&p.tickCount%20==0)
+            ArtifactFeedback.message(p,"ore_harvest_progress",scanIndex*100/SCAN_OFFSETS.size(),mined);
     }
     @Override public boolean backpressured(ServerPlayer p){
-        if(!sorted||oreIndex>=ores.size())return false;
-        var ore=ores.get(oreIndex);
-        return ArtifactOres.isOre(ore.state())&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,ore.pos(),ore.state());
+        if(done())return false;
+        var pos=center.offset(SCAN_OFFSETS.get(scanIndex));
+        if(!p.serverLevel().hasChunkAt(pos))return false;
+        var state=p.serverLevel().getBlockState(pos);
+        return ArtifactOres.isOre(state)&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state);
     }
     @Override public WorkStep next(ServerPlayer p){
-        if(scanned<SCAN_SIZE){
-            var pos=nextScanPos();
-            return new WorkStep(){
-                public BlockPos pos(){return pos;}
-                public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-                    var level=actor.serverLevel();if(!level.hasChunkAt(pos))return false;
-                    var state=level.getBlockState(pos);
-                    if(!ArtifactOres.isOre(state)||!WorldSafety.harvestable(actor,tool,pos)
-                            ||!WorldSafety.allowed(actor,ArtifactKind.IRIDIUM,pos))return false;
-                    var candidate=new Ore(pos,state);int limit=Math.min(SCAN_SIZE,ArtifactConfig.JOB_LIMIT.get());
-                    if(nearest.size()<limit)nearest.add(candidate);
-                    else if(!nearest.isEmpty()&&pos.distSqr(center)<nearest.peek().pos().distSqr(center)){
-                        nearest.poll();nearest.add(candidate);
-                    }
-                    return false;
-                }
-            };
-        }
-        if(!sorted){ores=new ArrayList<>(nearest);ores.sort(Comparator.comparingDouble(ore->ore.pos().distSqr(center)));sorted=true;}
-        if(oreIndex>=ores.size())return new WorkStep(){public BlockPos pos(){return center;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return false;}};
-        var ore=ores.get(oreIndex++);return new WorkStep.Mine(ore.pos(),ore.state());
+        if(done())return empty(center);
+        var pos=center.offset(SCAN_OFFSETS.get(scanIndex++)).immutable();
+        return new WorkStep(){
+            @Override public BlockPos pos(){return pos;}
+            @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
+                var level=actor.serverLevel();
+                if(!level.hasChunkAt(pos))return false;
+                BlockState state=level.getBlockState(pos);
+                if(!ArtifactOres.isOre(state)||!WorldSafety.mineQueued(actor,tool,ArtifactKind.IRIDIUM,pos,state))return false;
+                mined++;
+                return true;
+            }
+        };
+    }
+
+    private static WorkStep empty(BlockPos pos){
+        return new WorkStep(){
+            @Override public BlockPos pos(){return pos;}
+            @Override public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind kind){return false;}
+        };
     }
 }
