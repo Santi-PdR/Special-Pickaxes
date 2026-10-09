@@ -34,10 +34,10 @@ public final class ArtifactOres {
         var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         if(key==null)return null;
         if(!isOreTagPath(key.getPath())){ORE_FAMILIES.putIfAbsent(block,NO_ORE_FAMILY);return null;}
-        String path=key.getPath();
-        for(String host:HOST_PREFIXES)
-            if(path.startsWith(host)){path=path.substring(host.length());break;}
+        String path=stripHost(key.getPath());
         if(path.endsWith("_deepslate_ore"))path=path.substring(0,path.length()-"_deepslate_ore".length())+"_ore";
+        if(path.startsWith("ores_"))path=canonicalPrefixedOre(path.substring("ores_".length()));
+        else if(path.startsWith("ore_"))path=canonicalPrefixedOre(path.substring("ore_".length()));
         family=key.getNamespace()+":"+path;
         ORE_FAMILIES.putIfAbsent(block,family);
         return ORE_FAMILIES.get(block);
@@ -46,9 +46,23 @@ public final class ArtifactOres {
     /** Datapack reloads can change tag membership, so discard the bounded registry-block cache then. */
     public static void clearCache(){ NONSTANDARD_ORES.clear(); }
 
+    private static String canonicalPrefixedOre(String material){
+        String canonical=stripHost(material);
+        if(canonical.endsWith("_deepslate"))canonical=canonical.substring(0,canonical.length()-"_deepslate".length());
+        return canonical+"_ore";
+    }
+
+    private static String stripHost(String path){
+        for(String host:HOST_PREFIXES)if(path.startsWith(host))return path.substring(host.length());
+        return path;
+    }
+
     static boolean isOreTagPath(String path) {
+        if(path==null)return false;
+        boolean prefixed=path.startsWith("ore_")&&path.length()>4||path.startsWith("ores_")&&path.length()>5;
+        if(prefixed&&(path.endsWith("_block")||path.endsWith("_blocks")))return false;
         return path.equals("ore")||path.equals("ores")||path.startsWith("ore/")||path.startsWith("ores/")
-            ||path.endsWith("_ore")||path.endsWith("_ores");
+            ||prefixed||path.endsWith("_ore")||path.endsWith("_ores");
     }
 
     private static boolean isOreTag(TagKey<Block> tag) { return isOreTagPath(tag.location().getPath()); }
@@ -61,6 +75,7 @@ public final class ArtifactOres {
 
     private static boolean isVeinFamilyTag(String path) {
         return path.startsWith("ores/")&&path.length()>6||path.startsWith("ore/")&&path.length()>4
+            ||path.startsWith("ores_")&&path.length()>5||path.startsWith("ore_")&&path.length()>4
             ||path.endsWith("_ores")&&path.length()>5||path.endsWith("_ore")&&path.length()>4;
     }
 }
