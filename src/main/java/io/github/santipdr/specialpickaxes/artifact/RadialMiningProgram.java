@@ -58,9 +58,8 @@ public final class RadialMiningProgram implements WorkProgram {
         if(kind==ArtifactKind.CRUCIBLE)return false;
         BlockPos pos=peek();if(pos==null||!p.serverLevel().hasChunkAt(pos))return false;
         var state=p.serverLevel().getBlockState(pos);
-        if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
-        boolean geology=MiningDesigns.matrix(state)||kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state);
-        if(!geology||!WorldSafety.dropPressure(p,pos)||!WorldSafety.harvestable(p,p.getMainHandItem(),pos))return false;
+        if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)||!mineableGeology(state))return false;
+        if(!WorldSafety.dropPressure(p,pos)||!WorldSafety.harvestable(p,p.getMainHandItem(),pos))return false;
         return WorldSafety.allowed(p,kind,pos);
     }
 
@@ -78,11 +77,16 @@ public final class RadialMiningProgram implements WorkProgram {
             @Override public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind ignored){
                 if(!player.serverLevel().hasChunkAt(pos))return false;
                 BlockState state=player.serverLevel().getBlockState(pos);
-                if(PlayerPlacedBlocks.get(player.serverLevel()).contains(pos))return false;
-                boolean geology=MiningDesigns.matrix(state)||kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state);
-                return geology&&WorldSafety.mineQueued(player,tool,kind,pos,state);
+                if(PlayerPlacedBlocks.get(player.serverLevel()).contains(pos)||!mineableGeology(state))return false;
+                return WorldSafety.mineQueued(player,tool,kind,pos,state);
             }
         };
+    }
+
+    /** Ordinary radial geology preserves every ore; Hellspec deliberately mines ores too. */
+    private boolean mineableGeology(BlockState state){
+        if(kind==ArtifactKind.HELLSPEC&&ArtifactOres.isOre(state))return true;
+        return MiningDesigns.matrix(state)&&!ArtifactOres.isOre(state);
     }
 
     private WorkStep transmuteAt(BlockPos pos){
