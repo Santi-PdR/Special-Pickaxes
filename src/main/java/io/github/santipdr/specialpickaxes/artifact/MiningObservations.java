@@ -21,9 +21,13 @@ public final class MiningObservations {
         capture(p,tool,kind,pos,state,true);
     }
     public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
-        if(WorkQueue.running() || PENDING.size()>=1024) return;
-        Map<UUID,ItemStack> dropsBefore=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state)?dropSnapshot(p,pos):Map.of();
-        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),dropsBefore,applyHeldMiningEffects));
+        boolean trackOreDrops=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state);
+        // Queued Iridium breaks still need drop snapshots, but never chained held-mining effects.
+        boolean queuedIridiumOre=WorkQueue.running()&&trackOreDrops;
+        if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return;
+        Map<UUID,ItemStack> dropsBefore=trackOreDrops?dropSnapshot(p,pos):Map.of();
+        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),dropsBefore,
+                applyHeldMiningEffects&&!queuedIridiumOre));
     }
     public static void flush() {
         int budget=512;
@@ -33,7 +37,7 @@ public final class MiningObservations {
                     || (o.applyHeldMiningEffects&&(p.getMainHandItem()!=o.tool||o.tool.isEmpty()))
                     || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
-                if(o.kind==ArtifactKind.IRIDIUM&&!o.dropsBefore.isEmpty())highlightNewOreDrops(p,o);
+                if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state))highlightNewOreDrops(p,o);
                 if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
