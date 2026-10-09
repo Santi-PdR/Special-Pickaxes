@@ -59,8 +59,7 @@ public final class RadialMiningProgram implements WorkProgram {
         BlockPos pos=peek();if(pos==null||!p.serverLevel().hasChunkAt(pos))return false;
         var state=p.serverLevel().getBlockState(pos);
         if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)||!mineableGeology(state))return false;
-        if(!WorldSafety.dropPressure(p,pos)||!WorldSafety.harvestable(p,p.getMainHandItem(),pos))return false;
-        return WorldSafety.allowed(p,kind,pos);
+        return WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,pos,state);
     }
 
     @Override public WorkStep next(ServerPlayer p){

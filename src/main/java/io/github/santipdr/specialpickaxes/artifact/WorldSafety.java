@@ -90,6 +90,12 @@ public final class WorldSafety {
         return snapshot;
     }
     public static boolean dropPressure(ServerPlayer p,BlockPos pos){return p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256;}
+    /** Avoid entity queries and false pauses unless this exact block is still a permitted mining target. */
+    static boolean backpressuredMine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
+        var level=p.serverLevel();
+        return level.hasChunkAt(pos)&&level.getBlockState(pos)==expected&&harvestable(p,tool,pos)
+                &&dropPressure(p,pos)&&allowed(p,kind,pos);
+    }
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
         return ForgeHooks.onBlockBreakEvent(p.serverLevel(),p.gameMode.getGameModeForPlayer(),p,pos)>=0;
     }

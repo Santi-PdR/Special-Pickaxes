@@ -47,7 +47,11 @@ public final class OrefallProgram implements WorkProgram {
         if(scanned>0&&scanned<SCAN_SIZE&&p.tickCount%20==0)
             ArtifactFeedback.message(p,"ore_scan_progress",scanned*100/SCAN_SIZE,nearest.size());
     }
-    @Override public boolean backpressured(ServerPlayer p){return sorted&&oreIndex<ores.size()&&WorldSafety.dropPressure(p,ores.get(oreIndex).pos());}
+    @Override public boolean backpressured(ServerPlayer p){
+        if(!sorted||oreIndex>=ores.size())return false;
+        var ore=ores.get(oreIndex);
+        return ArtifactOres.isOre(ore.state())&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,ore.pos(),ore.state());
+    }
     @Override public WorkStep next(ServerPlayer p){
         if(scanned<SCAN_SIZE){
             var pos=nextScanPos();

@@ -34,8 +34,9 @@ public final class SeamMiningProgram implements WorkProgram {
     @Override public boolean reportPartial(){return false;}
     @Override public boolean backpressured(ServerPlayer p){
         if(scanning||mineIndex>=candidates.size())return false;
-        var pos=candidates.get(mineIndex).pos();
-        return !PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)&&WorldSafety.dropPressure(p,pos);
+        var candidate=candidates.get(mineIndex);var pos=candidate.pos();
+        return !PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)&&MiningDesigns.seamGeology(candidate.state())
+                &&WorldSafety.backpressuredMine(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,pos,candidate.state());
     }
 
     @Override public WorkStep next(ServerPlayer p){

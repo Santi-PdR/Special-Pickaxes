@@ -9,11 +9,14 @@ import java.util.*;
 /** Bounded slice memory. Every slice is checked before excavation; any barrier terminates the entire route. */
 public final class DirectionalProgram implements WorkProgram {
     public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, RESONANT_TUNNEL }
-    private final BlockPos origin;private final Direction direction;private final Shape shape;private final int length;
+    private final BlockPos origin;private final Direction direction;private final Shape shape;private final ArtifactKind kind;private final int length;
     private int depth,index;private boolean digging,moving,finished;
     private List<BlockPos> slice;private BlockState[] expected;
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape){
-        this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;
+        this(origin,direction,shape,switch(shape){case ICARUS,ICARUS_WIDE->ArtifactKind.ICARUS;case EXODIUM_LANCE->ArtifactKind.EXODIUM;default->ArtifactKind.WORLDBREAKER;});
+    }
+    public DirectionalProgram(BlockPos origin,Direction direction,Shape shape,ArtifactKind kind){
+        this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;this.kind=kind;
         length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case RESONANT_TUNNEL->20;};
         prepare();
     }
@@ -52,7 +55,10 @@ public final class DirectionalProgram implements WorkProgram {
         if(shape==Shape.ICARUS||shape==Shape.ICARUS_WIDE){moving=true;return;}nextSlice();
     }
     private void nextSlice(){if(++depth>=length){finished=true;return;}prepare();}
-    public boolean backpressured(ServerPlayer p){return !finished&&!moving&&digging&&!expected[index].isAir()&&WorldSafety.dropPressure(p,slice.get(index));}
+    public boolean backpressured(ServerPlayer p){
+        if(finished||moving||!digging||expected[index].isAir())return false;
+        return WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,slice.get(index),expected[index]);
+    }
     public WorkStep next(ServerPlayer p){
         if(moving){var destination=origin.relative(direction,depth).below();nextSlice();return new WorkStep.Move(destination);}
         final int i=index;var at=slice.get(i);boolean mine=digging;

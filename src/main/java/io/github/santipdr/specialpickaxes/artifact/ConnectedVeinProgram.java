@@ -39,10 +39,9 @@ public final class ConnectedVeinProgram implements WorkProgram {
     @Override public boolean loaded(ServerPlayer p){return true;} // Skip unloaded neighbors instead of loading their chunks.
 
     @Override public boolean backpressured(ServerPlayer p){
-        BlockPos pos=frontier.peekFirst();if(pos==null||!p.serverLevel().hasChunkAt(pos)||!WorldSafety.dropPressure(p,pos))return false;
+        BlockPos pos=frontier.peekFirst();if(pos==null||!p.serverLevel().hasChunkAt(pos))return false;
         BlockState state=p.serverLevel().getBlockState(pos);
-        return sameOreFamily(state)&&WorldSafety.allowed(p,ArtifactKind.PALIMPSEST,pos)
-                &&!WorldSafety.barrier(p,pos)&&WorldSafety.harvestable(p,p.getMainHandItem(),pos);
+        return sameOreFamily(state)&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,pos,state);
     }
 
     @Override public WorkStep next(ServerPlayer p){

@@ -13,7 +13,7 @@ public final class MiningDesigns {
         int mode=ArtifactState.mode(p,k);
         var shape=k==ArtifactKind.CHOIR?DirectionalProgram.Shape.RESONANT_TUNNEL:k==ArtifactKind.ICARUS?(mode==1?DirectionalProgram.Shape.ICARUS_WIDE:DirectionalProgram.Shape.ICARUS):k==ArtifactKind.EXODIUM?DirectionalProgram.Shape.EXODIUM_LANCE:DirectionalProgram.Shape.values()[mode];
         var origin=k==ArtifactKind.CHOIR||k==ArtifactKind.ICARUS||k==ArtifactKind.EXODIUM?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
-        return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape));
+        return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape,k));
     }
     public static boolean orefall(ServerPlayer p,ItemStack tool,BlockPos center){
         int radius=8,halfHeight=4;var candidates=new ArrayList<BlockPos>();var level=p.serverLevel();

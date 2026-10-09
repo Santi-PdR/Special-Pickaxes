@@ -81,7 +81,8 @@ public final class WorkQueue {
             int turn=Math.min(budget,playerBudget);BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
-                if(job.region!=null?job.region.backpressured(p):job.steps.peekFirst() instanceof WorkStep.Mine mine&&WorldSafety.dropPressure(p,mine.pos())){
+                if(job.region!=null?job.region.backpressured(p):job.steps.peekFirst() instanceof WorkStep.Mine mine
+                        &&WorldSafety.backpressuredMine(p,job.tool,job.kind,mine.pos(),mine.expected())){
                     job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
                 }
                 budget--;lastAttempts++;
