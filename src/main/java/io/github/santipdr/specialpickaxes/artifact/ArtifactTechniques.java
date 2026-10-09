@@ -88,10 +88,12 @@ public final class ArtifactTechniques {
 
     private static boolean knockbackPulse(ServerPlayer player, ArtifactKind kind, int radius, double strength, int cap) {
         Vec3 center = player.position();
+        double rangeSqr=(double)radius*radius;
         int pushed = 0;
         for (LivingEntity target : EntitySelection.nearest(player.serverLevel(), LivingEntity.class,
                 player.getBoundingBox().inflate(radius), entity -> {
             if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
+                    ||entity.position().distanceToSqr(center)>rangeSqr
                     || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             return !(entity instanceof Player other) || player.canHarmPlayer(other);
         }, center, cap)) {
@@ -220,12 +222,15 @@ public final class ArtifactTechniques {
     }
 
     private static boolean deflectProjectiles(ServerPlayer player, ArtifactKind kind, int radius, int cap) {
+        Vec3 center=player.position();double rangeSqr=(double)radius*radius;
         int deflected = 0;
         for (Projectile projectile : EntitySelection.nearest(player.serverLevel(), Projectile.class,
                 player.getBoundingBox().inflate(radius),
                 entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player))
+                        &&entity.position().distanceToSqr(center)<=rangeSqr
                         && WorldSafety.allowed(player, kind, entity.blockPosition()), player.position(), cap)) {
-            Vec3 away = projectile.position().subtract(player.position()).normalize();
+            Vec3 away = projectile.position().subtract(center).normalize();
+            if(away.lengthSqr()<.01)away=player.getLookAngle().normalize();
             projectile.setDeltaMovement(away.scale(Math.max(.8, projectile.getDeltaMovement().length())));
             projectile.hasImpulse = true;
             if (++deflected >= cap) break;
