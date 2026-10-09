@@ -88,18 +88,24 @@ public final class ArtifactFeedback {
         var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
         double topY=center.getY()+halfHeight+0.08;
-        // One sample per block keeps the marked domain legible without emitting
-        // hundreds of individual particle packets for the larger fields.
-        int segments=Math.max(4,radius);
+        // A capped wireframe remains legible while bounding particle packets per field update.
+        // Side loops omit corners because the front/back edges already draw them.
+        int segments=Math.max(4,Math.min(6,radius));
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
-            p.serverLevel().sendParticles(p,dust,false,minX,y,z,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,maxX,y,z,1,0,0,0,0);
-            if(i%2==0){p.serverLevel().sendParticles(p,crown,false,x,topY,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,x,topY,maxZ,1,0,0,0,0);
-                p.serverLevel().sendParticles(p,crown,false,minX,topY,z,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,maxX,topY,z,1,0,0,0,0);}
+            if(i>0&&i<segments){
+                p.serverLevel().sendParticles(p,dust,false,minX,y,z,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,maxX,y,z,1,0,0,0,0);
+            }
+            if(i%2==0||i==segments){
+                p.serverLevel().sendParticles(p,crown,false,x,topY,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,x,topY,maxZ,1,0,0,0,0);
+                if(i>0&&i<segments){
+                    p.serverLevel().sendParticles(p,crown,false,minX,topY,z,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,maxX,topY,z,1,0,0,0,0);
+                }
+            }
         }
-        for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=5;i++)
-            p.serverLevel().sendParticles(p,i%2==0?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/6),center.getZ()+dz+0.5,1,0,0,0,0);
+        for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
+            p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);
