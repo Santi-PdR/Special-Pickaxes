@@ -78,7 +78,7 @@ public final class ArtifactActions {
         }
         ArtifactFeedback.message(p,"mode",ArtifactState.mode(p,kind)+1);return true;
     }
-    public static int radius(ServerPlayer p,ArtifactKind kind) { return Math.min(ArtifactConfig.MAX_RADIUS.get(),10); }
+    public static int radius(ServerPlayer p,ArtifactKind kind) { return ArtifactConfig.MAX_RADIUS.get(); }
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
