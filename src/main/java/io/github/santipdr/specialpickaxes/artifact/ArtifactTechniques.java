@@ -82,13 +82,13 @@ public final class ArtifactTechniques {
     private static boolean knockbackTarget(ServerPlayer player, ArtifactKind kind, double range, double strength) {
         Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
         AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
-        LivingEntity target = player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
+        LivingEntity target = EntitySelection.nearest(player.serverLevel(), LivingEntity.class, bounds, entity -> {
             if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
                     || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
             Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
             return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
-        }).stream().min(java.util.Comparator.comparingDouble(entity -> entity.distanceToSqr(player))).orElse(null);
+        }, player.position(), 1).stream().findFirst().orElse(null);
         if (target == null) return false;
         target.setDeltaMovement(target.getDeltaMovement().add(look.scale(strength).add(0, kind==ArtifactKind.ICARUS?.48:.18, 0)));
         target.hasImpulse = true;
@@ -104,11 +104,12 @@ public final class ArtifactTechniques {
     private static boolean knockbackPulse(ServerPlayer player, ArtifactKind kind, int radius, double strength, int cap) {
         Vec3 center = player.position();
         int pushed = 0;
-        for (LivingEntity target : player.serverLevel().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius), entity -> {
+        for (LivingEntity target : EntitySelection.nearest(player.serverLevel(), LivingEntity.class,
+                player.getBoundingBox().inflate(radius), entity -> {
             if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
                     || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             return !(entity instanceof Player other) || player.canHarmPlayer(other);
-        })) {
+        }, center, cap)) {
             Vec3 away = target.position().subtract(center);
             if (away.lengthSqr() < .01) continue;
             target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(strength).add(0, .25, 0)));
@@ -180,8 +181,8 @@ public final class ArtifactTechniques {
     private static boolean pullHostiles(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
         Vec3 point = Vec3.atCenterOf(center);
         int pulled = 0;
-        for (var mob : player.serverLevel().getEntitiesOfClass(Monster.class, new AABB(center).inflate(radius),
-                m -> m.isAlive() && !m.isAlliedTo(player) && WorldSafety.allowed(player, kind, m.blockPosition()))) {
+        for (var mob : EntitySelection.nearest(player.serverLevel(), Monster.class, new AABB(center).inflate(radius),
+                m -> m.isAlive() && !m.isAlliedTo(player) && WorldSafety.allowed(player, kind, m.blockPosition()), point, cap)) {
             Vec3 delta = point.subtract(mob.position());
             if (delta.lengthSqr() > .01) mob.setDeltaMovement(mob.getDeltaMovement().add(delta.normalize().scale(.6)));
             mob.hasImpulse = true;
@@ -197,13 +198,12 @@ public final class ArtifactTechniques {
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
     private static boolean faultEcho(ServerPlayer player,int radius,int cap){
         var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
-        var candidates=level.getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
+        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
             if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
                     ||!entity.onGround()||entity.isAlliedTo(player)
                     ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
-        });
-        var targets=EntitySelection.nearest(candidates,center,cap);
+        },center,cap);
         if(targets.isEmpty())return false;
         int stopped=0;
         for(var target:targets){
@@ -221,9 +221,10 @@ public final class ArtifactTechniques {
 
     private static boolean deflectProjectiles(ServerPlayer player, ArtifactKind kind, int radius, int cap) {
         int deflected = 0;
-        for (Projectile projectile : player.serverLevel().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(radius),
+        for (Projectile projectile : EntitySelection.nearest(player.serverLevel(), Projectile.class,
+                player.getBoundingBox().inflate(radius),
                 entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player))
-                        && WorldSafety.allowed(player, kind, entity.blockPosition()))) {
+                        && WorldSafety.allowed(player, kind, entity.blockPosition()), player.position(), cap)) {
             Vec3 away = projectile.position().subtract(player.position()).normalize();
             projectile.setDeltaMovement(away.scale(Math.max(.8, projectile.getDeltaMovement().length())));
             projectile.hasImpulse = true;
@@ -243,13 +244,13 @@ public final class ArtifactTechniques {
     private static LivingEntity targetInLook(ServerPlayer player, ArtifactKind kind, double range) {
         Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
         AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
-        return player.serverLevel().getEntitiesOfClass(LivingEntity.class, bounds, entity -> {
+        return EntitySelection.nearest(player.serverLevel(), LivingEntity.class, bounds, entity -> {
             if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
                     || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
             if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
             Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
             return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
-        }).stream().min(java.util.Comparator.comparingDouble(entity -> entity.distanceToSqr(player))).orElse(null);
+        }, player.position(), 1).stream().findFirst().orElse(null);
     }
 
     private static boolean blinkBehindTarget(ServerPlayer player, double range) {
@@ -291,13 +292,13 @@ public final class ArtifactTechniques {
     private static boolean seamRend(ServerPlayer player) {
         Vec3 look=player.getLookAngle().normalize(),eye=player.getEyePosition();double range=8;
         AABB bounds=player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0,0.75,1.0);
-        LivingEntity target=player.serverLevel().getEntitiesOfClass(LivingEntity.class,bounds,entity->{
+        LivingEntity target=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,bounds,entity->{
             if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
                     ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,entity.blockPosition()))return false;
             if(entity instanceof Player other&&!player.canHarmPlayer(other))return false;
             Vec3 delta=entity.getBoundingBox().getCenter().subtract(eye);
             return delta.lengthSqr()<=range*range&&delta.normalize().dot(look)>=.78&&player.hasLineOfSight(entity);
-        }).stream().min(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(player))).orElse(null);
+        },player.position(),1).stream().findFirst().orElse(null);
         if(target==null)return false;
         EquipmentSlot[] priority={EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.HEAD,EquipmentSlot.FEET};
         EquipmentSlot slot=null;ItemStack armor=ItemStack.EMPTY;
