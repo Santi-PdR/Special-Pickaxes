@@ -99,13 +99,18 @@ public final class ArtifactFeedback {
             }
         }
     }
-    public static void rootwake(ServerPlayer p,BlockPos center,int radius) {
-        sphere(p,ArtifactKind.WORLDLOOM,center,radius,0,48);
+    public static void rootwakeTunnel(ServerPlayer p,BlockPos origin,net.minecraft.core.Direction direction) {
+        var level=p.serverLevel();var green=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),1.25F);
         var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
-        int[][] directions={{1,0},{-1,0},{0,1},{0,-1}};
-        for(var direction:directions)for(int step=2;step<=radius;step+=2){
-            BlockPos at=center.offset(direction[0]*step,0,direction[1]*step);
-            if(p.serverLevel().hasChunkAt(at))p.serverLevel().sendParticles(p,vines,false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,2,.12,.12,.12,.025);
+        for(int depth:new int[]{0,12,23})for(int u=-1;u<=1;u++)for(int v=-1;v<=1;v++)if(Math.abs(u)==1||Math.abs(v)==1){
+            BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
+                case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};
+            if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+        }
+        for(int depth:new int[]{5,11,17,23})for(int u:new int[]{-4,4}){
+            BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
+                case X->c.offset(0,0,u);case Y->c.offset(u,0,0);case Z->c.offset(u,0,0);};
+            if(level.hasChunkAt(at))level.sendParticles(p,vines,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,3,.1,.1,.1,.02);
         }
     }
     /** Five bounded rings make Hellspec's core-and-petal quarry legible before it starts. */

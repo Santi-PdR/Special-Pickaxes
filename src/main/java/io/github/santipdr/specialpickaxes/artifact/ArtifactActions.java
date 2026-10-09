@@ -136,13 +136,17 @@ public final class ArtifactActions {
             if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),64);ArtifactFeedback.message(p,"nullcut_started");}
             return started;
         }
-        if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE){
+        if(kind==ArtifactKind.WORLDLOOM){
+            boolean started=MiningDesigns.rootwake(p,tool,center);
+            if(started){var look=Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z);ArtifactFeedback.rootwakeTunnel(p,center,look);ArtifactFeedback.message(p,"rootwake_started");}
+            return started;
+        }
+        if(kind==ArtifactKind.CRUCIBLE){
             var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),
                     kind==ArtifactKind.CRUCIBLE?geologyMaterial(p,ArtifactState.mode(p,kind)):null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
             if(started){
-                if(kind==ArtifactKind.WORLDLOOM){ArtifactFeedback.rootwake(p,center,r);ArtifactFeedback.message(p,"rootwake_started");}
-                else {ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
+                ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());
             }
             return started;
         }

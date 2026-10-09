@@ -15,6 +15,14 @@ public final class MiningDesigns {
         var origin=k==ArtifactKind.CHOIR||k==ArtifactKind.ICARUS||k==ArtifactKind.EXODIUM?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
         return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape,k));
     }
+    public static boolean rootwake(ServerPlayer p,ItemStack tool,BlockPos origin){
+        var level=p.serverLevel();var state=level.getBlockState(origin);
+        if(!MiningDesigns.matrix(state)||ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(level).contains(origin)
+                ||!WorldSafety.allowed(p,ArtifactKind.WORLDLOOM,origin)||!WorldSafety.harvestable(p,tool,origin))return false;
+        Direction direction=Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z);
+        return WorkQueue.startRegion(p,tool,ArtifactKind.WORLDLOOM,
+                new DirectionalProgram(origin,direction,DirectionalProgram.Shape.ROOTWAKE,ArtifactKind.WORLDLOOM));
+    }
     public static boolean orefall(ServerPlayer p,ItemStack tool,BlockPos center){
         int radius=8,halfHeight=4;var candidates=new ArrayList<BlockPos>();var level=p.serverLevel();
         for(int x=-radius;x<=radius;x++)for(int y=-halfHeight;y<=halfHeight;y++)for(int z=-radius;z<=radius;z++){
