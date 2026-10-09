@@ -19,22 +19,15 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.common.util.BlockSnapshot;
 import org.joml.Vector3f;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Bounded held-tool alternate actions. Curios equipment grants passives only. */
 public final class ArtifactTechniques {
     private ArtifactTechniques() {}
-    private static final List<BlockPos> QUENCH_OFFSETS=createQuenchOffsets();
-
-    private static List<BlockPos> createQuenchOffsets(){
-        var offsets=new ArrayList<BlockPos>(123);
-        for(int x=-3;x<=3;x++)for(int y=-3;y<=3;y++)for(int z=-3;z<=3;z++)
-            if(x*x+y*y+z*z<=9)offsets.add(new BlockPos(x,y,z));
-        offsets.sort(Comparator.comparingDouble(pos->pos.distSqr(BlockPos.ZERO)));
-        return List.copyOf(offsets);
-    }
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
         if (!tool.hasTag() || !tool.getTag().contains("copiedSkill")) {
@@ -306,21 +299,32 @@ public final class ArtifactTechniques {
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.ANY,player));
         if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
         BlockPos center=hit.getBlockPos();var focused=level.getFluidState(center);
-        if(!focused.is(net.minecraft.tags.FluidTags.LAVA)||!focused.isSource())return false;
+        if(!focused.is(net.minecraft.tags.FluidTags.LAVA))return false;
 
-        var steps=new java.util.ArrayList<WorkStep>(32);
-        // The cached order is center-out, so a source cap always favors nearby lava.
-        for(BlockPos offset:QUENCH_OFFSETS){
-            if(steps.size()>=32)break;
-            BlockPos pos=center.offset(offset);if(!level.hasChunkAt(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
+        final int cap=64,radius=4;
+        var frontier=new ArrayDeque<BlockPos>();var visited=new HashSet<Long>();var lava=new ArrayList<BlockPos>(cap);
+        frontier.add(center.immutable());visited.add(center.asLong());
+        while(!frontier.isEmpty()&&lava.size()<cap){
+            BlockPos pos=frontier.removeFirst();
+            if(pos.distSqr(center)>radius*radius||!level.hasChunkAt(pos))continue;
             var state=level.getBlockState(pos);var fluid=level.getFluidState(pos);
-            if(!fluid.is(net.minecraft.tags.FluidTags.LAVA)||!fluid.isSource()||state.hasBlockEntity())continue;
+            if(!fluid.is(net.minecraft.tags.FluidTags.LAVA)||state.hasBlockEntity()
+                    ||PlayerPlacedBlocks.get(level).contains(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
+            lava.add(pos.immutable());
+            for(Direction direction:Direction.values()){
+                BlockPos next=pos.relative(direction);
+                if(next.distSqr(center)<=radius*radius&&visited.add(next.asLong()))frontier.addLast(next);
+            }
+        }
+        if(lava.isEmpty())return false;
+        var steps=new ArrayList<WorkStep>(lava.size());
+        for(BlockPos pos:lava){
             steps.add(new WorkStep(){
                 @Override public BlockPos pos(){return pos;}
                 @Override public boolean apply(ServerPlayer actor,ItemStack held,ArtifactKind kind){
                     var current=level.getBlockState(pos);var currentFluid=level.getFluidState(pos);
-                    if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)||!currentFluid.isSource()
-                            ||current.hasBlockEntity()||!WorldSafety.allowed(actor,kind,pos)
+                    if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)
+                            ||current.hasBlockEntity()||PlayerPlacedBlocks.get(level).contains(pos)||!WorldSafety.allowed(actor,kind,pos)
                             ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,actor.gameMode.getGameModeForPlayer(),actor,pos)<0)return false;
                     var snapshot=BlockSnapshot.create(level.dimension(),level,pos);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
                     if(!level.setBlock(pos,obsidian,3))return false;
@@ -332,10 +336,9 @@ public final class ArtifactTechniques {
                 }
             });
         }
-        if(steps.isEmpty())return false;
-        int sources=steps.size();if(!WorkQueue.start(player,tool,ArtifactKind.HELLSPEC,steps))return false;
-        ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,3);
-        ArtifactFeedback.message(player,"lava_quenched",sources);return true;
+        int blocks=steps.size();if(!WorkQueue.start(player,tool,ArtifactKind.HELLSPEC,steps))return false;
+        ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,radius);
+        ArtifactFeedback.message(player,"lava_sealed",blocks);return true;
     }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
