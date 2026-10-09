@@ -15,6 +15,10 @@ import java.util.UUID;
 
 /** Short-lived root bindings created by the Worldloom's held area skill. */
 public final class WorldloomSnare {
+    private static final net.minecraft.world.level.block.state.BlockState VINE_STATE=
+            net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
+    private static final net.minecraft.core.particles.BlockParticleOption VINE_PARTICLE=
+            new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,VINE_STATE);
     private record Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,Vec3 anchor,long expires) {}
     private static final Map<UUID,Binding> BINDINGS=new HashMap<>();
     private WorldloomSnare() {}
@@ -44,9 +48,7 @@ public final class WorldloomSnare {
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
             if(level.getGameTime()%10==0){
-                var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,
-                        net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
-                level.sendParticles(owner,vines,false,binding.anchor.x,binding.anchor.y+.08,binding.anchor.z,4,.3,.06,.3,.015);
+                level.sendParticles(owner,VINE_PARTICLE,false,binding.anchor.x,binding.anchor.y+.08,binding.anchor.z,4,.3,.06,.3,.015);
             }
         }
     }
