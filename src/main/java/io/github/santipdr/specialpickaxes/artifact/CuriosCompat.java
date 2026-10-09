@@ -11,7 +11,10 @@ public final class CuriosCompat {
     private static final String API = "top.theillusivec4.curios.api.CuriosApi";
     private static final Class<?> API_CLASS = loadApi();
     private record Access(Method inventory,Method stacksHandler,Method stacks,Method slots,Method stackInSlot) {}
+    private record Cached(long tick,Equipped equipped) {}
     private static final Access ACCESS = resolveAccess();
+    /** Curios is queried by inventory ticks, combat events and the manual; cache repeated calls in one tick. */
+    private static final java.util.Map<LivingEntity,Cached> FIND_CACHE=java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
     private CuriosCompat() {}
 
     private static Class<?> loadApi(){
@@ -34,6 +37,15 @@ public final class CuriosCompat {
 
     public static Equipped find(LivingEntity entity) {
         Access methods=ACCESS;if(methods==null)return null;
+        long tick=entity.tickCount;
+        Cached cached=FIND_CACHE.get(entity);
+        if(cached!=null&&cached.tick()==tick)return cached.equipped();
+        Equipped equipped=findUncached(entity,methods);
+        FIND_CACHE.put(entity,new Cached(tick,equipped));
+        return equipped;
+    }
+
+    private static Equipped findUncached(LivingEntity entity,Access methods) {
         try {
             Object lazy = methods.inventory.invoke(null, entity);
             Object handler = lazy == null ? null : ((net.minecraftforge.common.util.LazyOptional<?>) lazy).orElse(null);
