@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -13,7 +14,7 @@ public final class RegionWork implements WorkProgram {
     public final ArtifactKind kind;
     public final int mode;
     private long cursor;
-    private final int[] expectedSource,expectedTarget;
+    private final BlockIdSnapshot expectedSource,expectedTarget;
     private boolean executing;
     public long eligible,excluded;
     private final BlockState material;
@@ -21,7 +22,9 @@ public final class RegionWork implements WorkProgram {
         source=a;target=b;transform=t;kind=k;this.mode=mode;this.material=material;
         if(a.size()>ArtifactConfig.REGION_LIMIT.get() || a.size()<1)throw new IllegalArgumentException("volume limit");
         if(b!=null && (!t.compatible(a,b)||a.overlaps(b)))throw new IllegalArgumentException("incompatible/overlapping regions");
-        expectedSource=new int[(int)a.size()];expectedTarget=b==null?null:new int[(int)a.size()];
+        int stateCount=Block.BLOCK_STATE_REGISTRY.size();
+        expectedSource=new BlockIdSnapshot((int)a.size(),stateCount);
+        expectedTarget=b==null?null:new BlockIdSnapshot((int)a.size(),stateCount);
     }
     public long total(){return source.size();}
     public int remaining(){return (int)(total()-cursor);}
@@ -41,8 +44,8 @@ public final class RegionWork implements WorkProgram {
         int index=(int)cursor;BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
         BlockPos other=target==null?null:transform.map(source,target,pos);
         BlockState second=other==null?null:level.getBlockState(other);
-        if(!executing){expectedSource[index]=net.minecraft.world.level.block.Block.getId(old);if(second!=null)expectedTarget[index]=net.minecraft.world.level.block.Block.getId(second);}
-        if(executing&&(net.minecraft.world.level.block.Block.getId(old)!=expectedSource[index]||second!=null&&net.minecraft.world.level.block.Block.getId(second)!=expectedTarget[index]))return skip(pos);
+        if(!executing){expectedSource.set(index,Block.getId(old));if(second!=null)expectedTarget.set(index,Block.getId(second));}
+        if(executing&&(Block.getId(old)!=expectedSource.get(index)||second!=null&&Block.getId(second)!=expectedTarget.get(index)))return skip(pos);
         if(!executing)return new WorkStep(){
             public BlockPos pos(){return pos;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&!WorldSafety.barrier(actor,pos)&&eligible(actor,old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1||mode==5))ok=WorldSafety.harvestable(actor,tool,pos);
@@ -68,6 +71,30 @@ public final class RegionWork implements WorkProgram {
     }
     private static WorkStep skip(BlockPos pos){return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return false;}};}
     private final java.util.Map<BlockPos,BlockState> restoration=new java.util.HashMap<>();
+
+    /** Compact exact state ids for region snapshots; retain int storage for unusually large registries. */
+    private static final class BlockIdSnapshot {
+        private final byte[] byteIds;
+        private final char[] charIds;
+        private final int[] intIds;
+
+        BlockIdSnapshot(int size,int registeredStates){
+            byteIds=registeredStates<=256?new byte[size]:null;
+            charIds=registeredStates>256&&registeredStates<=Character.MAX_VALUE+1?new char[size]:null;
+            intIds=registeredStates>Character.MAX_VALUE+1?new int[size]:null;
+        }
+        void set(int index,int id){
+            if(byteIds!=null)byteIds[index]=(byte)id;
+            else if(charIds!=null)charIds[index]=(char)id;
+            else intIds[index]=id;
+        }
+        int get(int index){
+            if(byteIds!=null)return Byte.toUnsignedInt(byteIds[index]);
+            if(charIds!=null)return charIds[index];
+            return intIds[index];
+        }
+    }
+
     public void loadMemories(ServerPlayer p){for(var m:ArtifactState.memories(p,kind))if(source.contains(m.pos()))restoration.put(m.pos(),m.state());}
     private boolean eligible(ServerPlayer p,BlockState s,BlockPos pos){
         if(kind==ArtifactKind.KEYSTONE)return arch(pos)&&s.isAir();
