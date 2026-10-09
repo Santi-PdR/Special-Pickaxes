@@ -168,13 +168,15 @@ public final class ArtifactTechniques {
 
     private static boolean nullwave(ServerPlayer player,int radius,int cap) {
         Vec3 center=player.position();double rangeSqr=(double)radius*radius;
+        // The Nullwave can protect an active quarry even if no hostile is close enough to repel.
+        boolean deflected=deflectProjectiles(player,ArtifactKind.AXIOM,radius,cap);
         var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
             if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
                     ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
                     ||!WorldSafety.allowed(player,ArtifactKind.AXIOM,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
         },center,cap);
-        if(targets.isEmpty())return false;
+        if(targets.isEmpty())return deflected;
         int repelled=0;
         for(var target:targets){
             Vec3 away=target.position().subtract(center);if(away.lengthSqr()<.01)away=new Vec3(0,0,1);
@@ -188,7 +190,7 @@ public final class ArtifactTechniques {
             double angle=i*Math.PI/8,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
             player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,x,center.y+.15,z,1,0,0,0,0);
         }
-        ArtifactFeedback.message(player,"nullwave",repelled);return true;
+        ArtifactFeedback.message(player,"nullwave",repelled);return repelled>0||deflected;
     }
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
