@@ -133,7 +133,7 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.AXIOM){
             var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),32);ArtifactFeedback.message(p,"nullcut_started");}
+            if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),64);ArtifactFeedback.message(p,"nullcut_started");}
             return started;
         }
         if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE){
