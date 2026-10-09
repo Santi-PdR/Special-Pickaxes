@@ -32,7 +32,11 @@ public final class SeamMiningProgram implements WorkProgram {
     @Override public void confirm(){}
     @Override public boolean loaded(ServerPlayer p){return true;} // Unloaded neighbors are skipped, never requested.
     @Override public boolean reportPartial(){return false;}
-    @Override public boolean backpressured(ServerPlayer p){return !scanning&&mineIndex<candidates.size()&&WorldSafety.dropPressure(p,candidates.get(mineIndex).pos());}
+    @Override public boolean backpressured(ServerPlayer p){
+        if(scanning||mineIndex>=candidates.size())return false;
+        var pos=candidates.get(mineIndex).pos();
+        return !PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)&&WorldSafety.dropPressure(p,pos);
+    }
 
     @Override public WorkStep next(ServerPlayer p){
         if(scanning&&inspected<SCAN_LIMIT&&!frontier.isEmpty()){
@@ -41,7 +45,8 @@ public final class SeamMiningProgram implements WorkProgram {
                 @Override public BlockPos pos(){return pos;}
                 @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                     var level=actor.serverLevel();
-                    if(!level.hasChunkAt(pos)||!WorldSafety.allowed(actor,ArtifactKind.SEAM_RIPPER,pos)||level.getBlockState(pos)!=material)return false;
+                    if(!level.hasChunkAt(pos)||PlayerPlacedBlocks.get(level).contains(pos)||!MiningDesigns.seamGeology(material)
+                            ||!WorldSafety.allowed(actor,ArtifactKind.SEAM_RIPPER,pos)||level.getBlockState(pos)!=material)return false;
                     boolean touchesBoundary=false;
                     for(var direction:Direction.values()){
                         var adjacent=pos.relative(direction);if(!level.hasChunkAt(adjacent))continue;
@@ -51,7 +56,8 @@ public final class SeamMiningProgram implements WorkProgram {
                     if(touchesBoundary&&candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
                     for(var direction:Direction.values()){
                         var adjacent=pos.relative(direction);
-                        if(seen.size()<SCAN_LIMIT&&level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==material&&seen.add(adjacent.immutable()))frontier.addLast(adjacent.immutable());
+                        if(seen.size()<SCAN_LIMIT&&level.hasChunkAt(adjacent)&&!PlayerPlacedBlocks.get(level).contains(adjacent)
+                                &&level.getBlockState(adjacent)==material&&seen.add(adjacent.immutable()))frontier.addLast(adjacent.immutable());
                     }
                     return false;
                 }
@@ -64,7 +70,14 @@ public final class SeamMiningProgram implements WorkProgram {
         }
         if(mineIndex>=candidates.size())return empty(origin);
         var candidate=candidates.get(mineIndex++);
-        return new WorkStep.Mine(candidate.pos(),candidate.state());
+        return new WorkStep(){
+            @Override public BlockPos pos(){return candidate.pos();}
+            @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
+                return !PlayerPlacedBlocks.get(actor.serverLevel()).contains(candidate.pos())
+                        &&MiningDesigns.seamGeology(candidate.state())
+                        &&WorldSafety.mineQueued(actor,tool,kind,candidate.pos(),candidate.state());
+            }
+        };
     }
 
     private static WorkStep empty(BlockPos pos){

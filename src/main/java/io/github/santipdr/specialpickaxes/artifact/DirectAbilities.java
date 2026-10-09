@@ -18,11 +18,11 @@ public final class DirectAbilities {
         if(k==ArtifactKind.SEAM_RIPPER){
             var target=ArtifactActions.target(p);if(target.isEmpty())return false;
             var seed=target.get();var level=p.serverLevel();var source=level.getBlockState(seed);
-            if(!WorldSafety.allowed(p,k,seed)||!WorldSafety.inert(source))return false;
+            if(!WorldSafety.allowed(p,k,seed)||!MiningDesigns.seamGeology(source)||PlayerPlacedBlocks.get(level).contains(seed))return false;
             boolean exposed=ArtifactState.mode(p,k)==1;BlockState boundary=null;
             if(!exposed){
                 var offhand=p.getOffhandItem();if(!(offhand.getItem() instanceof BlockItem item))return false;
-                boundary=item.getBlock().defaultBlockState();if(boundary.getBlock()==source.getBlock()||!WorldSafety.inert(boundary))return false;
+                boundary=item.getBlock().defaultBlockState();if(boundary.getBlock()==source.getBlock()||!MiningDesigns.seamGeology(boundary))return false;
             }
             var program=new SeamMiningProgram(seed,source,boundary,exposed,List.of(seed));
             boolean started=WorkQueue.startRegion(p,tool,k,program);
