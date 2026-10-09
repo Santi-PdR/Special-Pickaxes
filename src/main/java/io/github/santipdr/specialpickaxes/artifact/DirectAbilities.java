@@ -15,12 +15,25 @@ public final class DirectAbilities {
     public static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind k){
         if(CompanionActions.handles(k))return CompanionActions.start(p,tool,k);
         if(k==ArtifactKind.LODESTAR)return returnPath(p,tool);
+        if(k==ArtifactKind.SEAM_RIPPER){
+            var target=ArtifactActions.target(p);if(target.isEmpty())return false;
+            var seed=target.get();var level=p.serverLevel();var source=level.getBlockState(seed);
+            if(!WorldSafety.allowed(p,k,seed)||!WorldSafety.inert(source))return false;
+            boolean exposed=ArtifactState.mode(p,k)==1;BlockState boundary=null;
+            if(!exposed){
+                var offhand=p.getOffhandItem();if(!(offhand.getItem() instanceof BlockItem item))return false;
+                boundary=item.getBlock().defaultBlockState();if(boundary.getBlock()==source.getBlock()||!WorldSafety.inert(boundary))return false;
+            }
+            var program=new SeamMiningProgram(seed,source,boundary,exposed,List.of(seed));
+            boolean started=WorkQueue.startRegion(p,tool,k,program);
+            if(started){ArtifactFeedback.message(p,"seam_started");ArtifactFeedback.burst(p,k,seed,8);}
+            return started;
+        }
         var center=ArtifactActions.target(p).orElse(p.blockPosition());
         if(!WorldSafety.allowed(p,k,center))return false;
         if(k==ArtifactKind.AEGIS){int radius=Math.min(8,ArtifactConfig.MAX_RADIUS.get());DomainFields.start(p,tool,k,center,radius);ArtifactFeedback.ring(p,k,center,radius);return true;}
         List<WorkStep> steps=switch(k){
             case KEYSTONE->vault(p,center.above());
-            case SEAM_RIPPER->seam(p,center);
             case WORLDBREAKER->ArtifactState.mode(p,k)==6?convergence(p,center):ArtifactState.mode(p,k)==1?cleave(p,center):ArtifactState.mode(p,k)==4?restore(p,k,center):List.of();
             default->List.of();
         };
@@ -61,53 +74,24 @@ public final class DirectAbilities {
             if(p.serverLevel().hasChunkAt(at))result.add(new WorkStep.Mine(at,p.serverLevel().getBlockState(at)));
         }return result;
     }
-    /** Bounded flood of the interface only, not a vein or arbitrary cuboid. */
-    public static List<WorkStep> seam(ServerPlayer p,BlockPos seed){
-        var level=p.serverLevel();if(!level.hasChunkAt(seed))return List.of();var source=level.getBlockState(seed);
-        if(!WorldSafety.inert(source))return List.of();
-        boolean exposed=ArtifactState.mode(p,ArtifactKind.SEAM_RIPPER)==1;
-        var neighbor=p.getOffhandItem().getItem() instanceof BlockItem b?b.getBlock():Blocks.AIR;
-        if(!exposed&&(neighbor==Blocks.AIR||source.is(neighbor)))return List.of();
-        var pending=new ArrayDeque<BlockPos>();var visited=new HashSet<BlockPos>();var result=new ArrayList<WorkStep>();pending.add(seed);visited.add(seed);
-        while(!pending.isEmpty()&&visited.size()<=512&&result.size()<256){
-            var at=pending.removeFirst();if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,at)||level.getBlockState(at)!=source)continue;
-            boolean border=false;
-            for(var d:Direction.values()){var q=at.relative(d);if(level.hasChunkAt(q)&&(exposed?level.getBlockState(q).isAir():level.getBlockState(q).is(neighbor))){border=true;break;}}
-            if(!border)continue;result.add(new WorkStep.Mine(at,source));
-            for(var d:Direction.values()){var q=at.relative(d);if(visited.size()<512&&visited.add(q))pending.addLast(q);}
-        }return result;
-    }
     /** Counter-seam cuts the offhand-selected material from the opposite side of the same interface. */
     public static boolean counterSeam(ServerPlayer p,ItemStack tool){
         var target=ArtifactActions.target(p);if(target.isEmpty())return false;
         var level=p.serverLevel();var seed=target.get();if(!level.hasChunkAt(seed))return false;
-        var exposed=level.getBlockState(seed);if(!WorldSafety.inert(exposed))return false;
+        var exposed=level.getBlockState(seed);if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,seed)||!WorldSafety.inert(exposed))return false;
         var offhand=p.getOffhandItem();
         if(!(offhand.getItem() instanceof BlockItem item))return false;
         var seamBlock=item.getBlock();var seamState=seamBlock.defaultBlockState();
         if(seamBlock==exposed.getBlock()||!WorldSafety.inert(seamState))return false;
-        var frontier=new ArrayDeque<BlockPos>();var visited=new HashSet<BlockPos>();
+        var seeds=new ArrayList<BlockPos>();
         for(var direction:Direction.values()){
             var adjacent=seed.relative(direction);
-            if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState&&visited.add(adjacent))frontier.addLast(adjacent);
+            if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState)seeds.add(adjacent.immutable());
         }
-        var steps=new ArrayList<WorkStep>(64);int examined=0;
-        while(!frontier.isEmpty()&&examined<512&&steps.size()<256){
-            var at=frontier.removeFirst();examined++;
-            if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,at)||level.getBlockState(at)!=seamState)continue;
-            boolean touchesTarget=false;
-            for(var direction:Direction.values()){
-                var adjacent=at.relative(direction);
-                if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==exposed){touchesTarget=true;break;}
-            }
-            if(touchesTarget)steps.add(new WorkStep.Mine(at,seamState));
-            for(var direction:Direction.values()){
-                var adjacent=at.relative(direction);
-                if(visited.size()<512&&level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState&&visited.add(adjacent))frontier.addLast(adjacent);
-            }
-        }
-        boolean started=WorkQueue.start(p,tool,ArtifactKind.SEAM_RIPPER,steps);
-        if(started)ArtifactFeedback.preview(p,ArtifactKind.SEAM_RIPPER,steps);
+        if(seeds.isEmpty())return false;
+        var program=new SeamMiningProgram(seed,seamState,exposed,false,seeds);
+        boolean started=WorkQueue.startRegion(p,tool,ArtifactKind.SEAM_RIPPER,program);
+        if(started)ArtifactFeedback.burst(p,ArtifactKind.SEAM_RIPPER,seed,8);
         return started;
     }
     private static boolean returnPath(ServerPlayer p,ItemStack tool){
