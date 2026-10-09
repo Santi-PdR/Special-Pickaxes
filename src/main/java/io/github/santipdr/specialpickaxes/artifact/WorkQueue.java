@@ -67,7 +67,8 @@ public final class WorkQueue {
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
             if(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3)p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
-            int turn=Math.min(budget,EnchantmentScaling.budget(job.tool));BlockPos feedback=null;
+            int playerBudget=job.region==null?EnchantmentScaling.budget(job.tool):job.region.attemptsPerTick(job.tool);
+            int turn=Math.min(budget,playerBudget);BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
                 if(job.region!=null?job.region.backpressured(p):job.steps.peekFirst() instanceof WorkStep.Mine mine&&WorldSafety.dropPressure(p,mine.pos())){

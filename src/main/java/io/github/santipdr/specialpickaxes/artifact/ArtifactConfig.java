@@ -5,6 +5,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public final class ArtifactConfig {
     private static final ForgeConfigSpec.Builder B = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec.IntValue PER_PLAYER = B.defineInRange("work.perPlayerPerTick",8,1,16);
+    public static final ForgeConfigSpec.IntValue ORE_SCAN_BUDGET = B.defineInRange("work.oreScanPerPlayerPerTick",32,1,128);
     public static final ForgeConfigSpec.IntValue GLOBAL = B.defineInRange("work.globalPerTick",96,1,256);
     public static final ForgeConfigSpec.IntValue JOB_LIMIT = B.defineInRange("work.maxSteps",4096,32,8192);
     public static final ForgeConfigSpec.IntValue JOB_TTL = B.defineInRange("work.timeoutTicks",36000,100,144000);

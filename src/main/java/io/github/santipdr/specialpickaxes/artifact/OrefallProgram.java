@@ -37,6 +37,9 @@ public final class OrefallProgram implements WorkProgram {
     @Override public boolean done(){return scanned>=SCAN_SIZE&&sorted&&oreIndex>=ores.size();}
     @Override public void confirm(){}
     @Override public boolean loaded(ServerPlayer p){return true;} // unloaded chunks are skipped, never requested
+    @Override public int attemptsPerTick(ItemStack tool){
+        return scanned<SCAN_SIZE?Math.max(ArtifactConfig.ORE_SCAN_BUDGET.get(),EnchantmentScaling.budget(tool)):EnchantmentScaling.budget(tool);
+    }
     @Override public boolean backpressured(ServerPlayer p){return sorted&&oreIndex<ores.size()&&WorldSafety.dropPressure(p,ores.get(oreIndex).pos());}
     @Override public WorkStep next(ServerPlayer p){
         if(scanned<SCAN_SIZE){
@@ -48,7 +51,7 @@ public final class OrefallProgram implements WorkProgram {
                     var state=level.getBlockState(pos);
                     if(!ArtifactOres.isOre(state)||!WorldSafety.harvestable(actor,tool,pos)
                             ||!WorldSafety.allowed(actor,ArtifactKind.IRIDIUM,pos))return false;
-                    if(ores.size()<MAX_ORES){ores.add(new Ore(pos,state));level.sendParticles(actor,net.minecraft.core.particles.ParticleTypes.GLOW,false,pos.getX()+.5,pos.getY()+.5,pos.getZ()+.5,4,.18,.18,.18,.01);}
+                    if(ores.size()<MAX_ORES)ores.add(new Ore(pos,state));
                     return false;
                 }
             };
