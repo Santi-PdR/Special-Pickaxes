@@ -79,7 +79,7 @@ public final class DomainFields {
         var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);
         var targets=level.getEntitiesOfClass(Entity.class,bounds,e->e.isAlive()&&(e instanceof Projectile||e instanceof Monster)
                 &&!e.isAlliedTo(p)&&e.position().distanceToSqr(Vec3.atCenterOf(center))<=(double)radius*radius);
-        if(targets.size()>cap)targets.sort(Comparator.comparingDouble(e->e.distanceToSqr(Vec3.atCenterOf(center))));
+        targets=nearest(targets,Vec3.atCenterOf(center),cap);
         var frozen=new HashMap<UUID,Frozen>();int processed=0;
         for(var entity:targets){
             if(processed>=cap)break;
@@ -183,7 +183,7 @@ public final class DomainFields {
                 e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
                 && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr));
             int targetLimit=ArtifactConfig.FIELD_TARGETS.get();
-            if(entities.size()>targetLimit)entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(centerPosition)));
+            entities=nearest(entities,centerPosition,targetLimit);
             var current=f.observed;current.clear();int processed=0;
             for(var entity:entities) {
                 if(processed>=targetLimit) break;
@@ -222,6 +222,23 @@ public final class DomainFields {
             if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",centerPosition);}
         }
     }
+    /** Keep only the closest capped set without sorting every entity in a crowded field. */
+    private static <T extends Entity> List<T> nearest(List<T> candidates,Vec3 center,int limit){
+        if(limit<=0)return List.of();
+        if(candidates.size()<=limit)return candidates;
+        var farthestFirst=Comparator.<T>comparingDouble(entity->entity.distanceToSqr(center)).reversed();
+        var selected=new PriorityQueue<T>(limit,farthestFirst);
+        for(var candidate:candidates){
+            if(selected.size()<limit)selected.add(candidate);
+            else if(candidate.distanceToSqr(center)<selected.peek().distanceToSqr(center)){
+                selected.poll();selected.add(candidate);
+            }
+        }
+        var result=new ArrayList<T>(selected);
+        result.sort(Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
+        return result;
+    }
+
     private static void tickPulses(){
         var iterator=PULSES.values().iterator();
         while(iterator.hasNext()){
