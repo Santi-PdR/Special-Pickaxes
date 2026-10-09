@@ -29,8 +29,9 @@ public final class MiningObservations {
         int budget=512;
         while(budget-->0 && !PENDING.isEmpty()) {
             var o=PENDING.removeFirst();var p=o.player;
-            if(!p.isAlive() || p.isRemoved() || p.level().dimension()!=o.dimension || p.getMainHandItem()!=o.tool
-                    || o.tool.isEmpty() || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
+            if(!p.isAlive() || p.isRemoved() || p.level().dimension()!=o.dimension
+                    || (o.applyHeldMiningEffects&&(p.getMainHandItem()!=o.tool||o.tool.isEmpty()))
+                    || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&!o.dropsBefore.isEmpty())highlightNewOreDrops(p,o);
                 if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
