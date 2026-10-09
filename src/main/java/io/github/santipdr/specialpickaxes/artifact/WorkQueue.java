@@ -17,11 +17,11 @@ public final class WorkQueue {
     private static int lastAttempts;
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
-        final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long snapshotBytes;
+        final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
         int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
-            steps=new ArrayDeque<>(work);accepted=work.size();this.snapshotBytes=snapshotBytes;
+            steps=new ArrayDeque<>(work);accepted=work.size();this.reservedBytes=snapshotBytes;
         }
     }
     private WorkQueue() {}
@@ -34,7 +34,7 @@ public final class WorkQueue {
     public static int completed(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.completed;}
     public static int succeeded(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.succeeded;}
     public static boolean regionSnapshotBudgetAllows(ServerPlayer p,long snapshotBytes){
-        long used=0;for(var job:JOBS.values())used+=job.snapshotBytes;
+        long used=0;for(var job:JOBS.values())used+=job.reservedBytes;
         long limit=(long)ArtifactConfig.REGION_MEMORY_MIB.get()*1024*1024;
         if(snapshotBytes>limit-used){ArtifactFeedback.message(p,"region_memory_limit",ArtifactConfig.REGION_MEMORY_MIB.get());return false;}
         return true;
@@ -46,10 +46,11 @@ public final class WorkQueue {
         j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;}else j.paused=!j.paused;return true;}
     public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,WorkProgram region){
         if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
-        long snapshotBytes=region instanceof RegionWork snapshot?snapshot.snapshotMemoryBytes():0;
+        var memories=region instanceof RegionWork snapshot&&snapshot.needsRestoration()?ArtifactState.memories(p,kind):List.<ArtifactState.Memory>of();
+        long snapshotBytes=region instanceof RegionWork snapshot?snapshot.reservedMemoryBytes(memories):0;
         if(!regionSnapshotBudgetAllows(p,snapshotBytes))return false;
-        if(region instanceof RegionWork snapshot)snapshot.allocateSnapshots();
-        var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
+        if(region instanceof RegionWork snapshot){snapshot.allocateSnapshots();snapshot.loadMemories(memories);}
+        var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;if(!(region instanceof RegionWork))region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
     }
     public static int lastAttempts() { return lastAttempts; }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,List<WorkStep> steps) {

@@ -19,6 +19,7 @@ public final class RegionWork implements WorkProgram {
     private boolean executing;
     public long eligible,excluded;
     private final BlockState material;
+    private static final long RESTORATION_ENTRY_BYTES=96;
     public static long snapshotMemoryBytesFor(int size,int registeredStates,boolean hasTarget){
         return BlockIdSnapshot.memoryBytesFor(size,registeredStates)*(hasTarget?2L:1L);
     }
@@ -29,7 +30,12 @@ public final class RegionWork implements WorkProgram {
         registeredStates=Block.BLOCK_STATE_REGISTRY.size();
     }
     public long total(){return source.size();}
-    public long snapshotMemoryBytes(){return BlockIdSnapshot.memoryBytesFor((int)source.size(),registeredStates)*(target==null?1L:2L);}
+    public long reservedMemoryBytes(java.util.List<ArtifactState.Memory> memories){
+        long bytes=BlockIdSnapshot.memoryBytesFor((int)source.size(),registeredStates)*(target==null?1L:2L);
+        if(needsRestoration())for(var memory:memories)if(source.contains(memory.pos()))bytes+=RESTORATION_ENTRY_BYTES;
+        return bytes;
+    }
+    boolean needsRestoration(){return kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.WORLDBREAKER&&mode==4;}
     /** Allocate only after the queue has accepted this job against the shared snapshot budget. */
     void allocateSnapshots(){
         if(expectedSource!=null)return;
@@ -107,7 +113,10 @@ public final class RegionWork implements WorkProgram {
         }
     }
 
-    public void loadMemories(ServerPlayer p){for(var m:ArtifactState.memories(p,kind))if(source.contains(m.pos()))restoration.put(m.pos(),m.state());}
+    public void loadMemories(ServerPlayer p){if(needsRestoration())loadMemories(ArtifactState.memories(p,kind));}
+    void loadMemories(java.util.List<ArtifactState.Memory> memories){
+        if(needsRestoration())for(var memory:memories)if(source.contains(memory.pos()))restoration.put(memory.pos(),memory.state());
+    }
     private boolean eligible(ServerPlayer p,BlockState s,BlockPos pos){
         if(kind==ArtifactKind.KEYSTONE)return arch(pos)&&s.isAir();
         if(kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.WORLDBREAKER&&mode==4)return restoration.containsKey(pos)&&s.isAir();
