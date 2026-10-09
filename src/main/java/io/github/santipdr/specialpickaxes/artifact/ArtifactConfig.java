@@ -16,7 +16,7 @@ public final class ArtifactConfig {
     public static final ForgeConfigSpec.IntValue MEMORY_TTL = B.defineInRange("memory.lifetimeTicks",1728000,200,12096000);
     public static final ForgeConfigSpec.IntValue FIELD_TIME = B.defineInRange("domain.durationTicks",600,20,2400);
     public static final ForgeConfigSpec.IntValue FIELD_TARGETS = B.defineInRange("domain.maxEntities",24,1,64);
-    public static final ForgeConfigSpec.IntValue PALIMPSEST_VEIN_LIMIT = B.defineInRange("palimpsest.maxVeinBlocks",192,16,512);
+    public static final ForgeConfigSpec.IntValue PALIMPSEST_VEIN_LIMIT = B.defineInRange("palimpsest.maxVeinBlocks",256,16,1024);
     public static final ForgeConfigSpec.DoubleValue FIELD_FORCE = B.defineInRange("domain.force",0.4,0.01,0.5);
     public static final ForgeConfigSpec.IntValue MAX_RADIUS = B.defineInRange("geometry.maxRadius",10,3,12);
     public static final ForgeConfigSpec.IntValue BORE_LENGTH = B.defineInRange("geometry.boreLength",40,4,48);

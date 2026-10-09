@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -54,10 +53,11 @@ public final class ConnectedVeinProgram implements WorkProgram {
                 BlockState state=level.getBlockState(pos);
                 if(!sameOreFamily(state)||!WorldSafety.allowed(player,kind,pos)||WorldSafety.barrier(player,pos))return false;
                 accepted++;
-                if(accepted<limit)for(Direction direction:Direction.values()){
-                    BlockPos next=pos.relative(direction);
-                    if(next.distSqr(origin)<=64&&seen.add(next.immutable())&&level.hasChunkAt(next)
-                            &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next.immutable());
+                if(accepted<limit)for(int dx=-1;dx<=1;dx++)for(int dy=-1;dy<=1;dy++)for(int dz=-1;dz<=1;dz++){
+                    if(dx==0&&dy==0&&dz==0)continue;
+                    BlockPos next=pos.offset(dx,dy,dz).immutable();
+                    if(next.distSqr(origin)<=64&&seen.add(next)&&level.hasChunkAt(next)
+                            &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next);
                 }
                 return WorldSafety.mineQueued(player,tool,kind,pos,state);
             }
