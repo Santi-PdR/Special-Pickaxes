@@ -9,6 +9,8 @@ import java.util.*;
 
 /** Breadth-first vein mining with bounded, incremental discovery and extraction. */
 public final class ConnectedVeinProgram implements WorkProgram {
+    private static final int VEIN_RADIUS=12;
+    private static final int VEIN_RADIUS_SQUARED=VEIN_RADIUS*VEIN_RADIUS;
     private final BlockPos origin;
     private final Block ore;
     private final Set<net.minecraft.tags.TagKey<Block>> families;
@@ -56,7 +58,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
                 if(accepted<limit)for(int dx=-1;dx<=1;dx++)for(int dy=-1;dy<=1;dy++)for(int dz=-1;dz<=1;dz++){
                     if(dx==0&&dy==0&&dz==0)continue;
                     BlockPos next=pos.offset(dx,dy,dz).immutable();
-                    if(next.distSqr(origin)<=64&&seen.add(next)&&level.hasChunkAt(next)
+                    if(next.distSqr(origin)<=VEIN_RADIUS_SQUARED&&seen.add(next)&&level.hasChunkAt(next)
                             &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next);
                 }
                 return WorldSafety.mineQueued(player,tool,kind,pos,state);
