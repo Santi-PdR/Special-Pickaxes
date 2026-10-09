@@ -13,13 +13,17 @@ import java.util.*;
 /** Forge 47 invokes Item.mineBlock BEFORE removeBlock. Confirm the resulting scar at end-of-tick. */
 public final class MiningObservations {
     private record Observation(ServerPlayer player,ItemStack tool,ArtifactKind kind,BlockPos pos,
-                               BlockState state,ResourceKey<Level> dimension,long time,Map<UUID,ItemStack> dropsBefore) {}
+                               BlockState state,ResourceKey<Level> dimension,long time,Map<UUID,ItemStack> dropsBefore,
+                               boolean applyHeldMiningEffects) {}
     private static final ArrayDeque<Observation> PENDING=new ArrayDeque<>();
     private MiningObservations() {}
     public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
+        capture(p,tool,kind,pos,state,true);
+    }
+    public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
         if(WorkQueue.running() || PENDING.size()>=1024) return;
         Map<UUID,ItemStack> dropsBefore=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state)?dropSnapshot(p,pos):Map.of();
-        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),dropsBefore));
+        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),dropsBefore,applyHeldMiningEffects));
     }
     public static void flush() {
         int budget=512;
@@ -29,7 +33,7 @@ public final class MiningObservations {
                     || o.tool.isEmpty() || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&!o.dropsBefore.isEmpty())highlightNewOreDrops(p,o);
-                ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
+                if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
     }
