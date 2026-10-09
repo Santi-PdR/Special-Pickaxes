@@ -12,6 +12,13 @@ import java.util.*;
 /** No player, item entity, AI/NBT flag or block-entity ticking is changed by these fields. */
 public final class DomainFields {
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
+    private static final class StasisPulse {
+        final ServerPlayer owner;final ItemStack tool;final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
+        final Map<UUID,Frozen> frozen;final long expires;
+        StasisPulse(ServerPlayer owner,ItemStack tool,Map<UUID,Frozen> frozen,int duration){
+            this.owner=owner;this.tool=tool;this.dimension=owner.level().dimension();this.frozen=frozen;this.expires=ArtifactState.now(owner)+duration;
+        }
+    }
     private static final class Field {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
         final int mode;int minedSincePulse;net.minecraft.world.level.block.Block pulseMaterial;long pulseReady;
@@ -22,6 +29,7 @@ public final class DomainFields {
         }
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();
+    private static final Map<UUID,StasisPulse> PULSES=new HashMap<>();
     /** Membership counts keep combat-event lookups constant-time when fields overlap. */
     private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
@@ -50,6 +58,43 @@ public final class DomainFields {
         FROZEN_ENTITIES.computeIfPresent(id,(ignored,count)->count<=1?null:count-1);
     }
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }
+    private static void releaseFrozen(Map<UUID,Frozen> frozen,net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension){
+        frozen.forEach((id,value)->{
+            if(value.entity.isAlive()){
+                if(value.entity.level().dimension()==dimension){
+                    var box=value.entity.getBoundingBox().move(value.position.subtract(value.entity.position()));
+                    if(value.entity.level().noCollision(value.entity,box))value.entity.setPos(value.position);
+                }
+                value.entity.setDeltaMovement(clamp(value.velocity));
+            }
+            removeFrozenMembership(id);
+        });
+        frozen.clear();
+    }
+    private static void releasePulse(StasisPulse pulse){releaseFrozen(pulse.frozen,pulse.dimension);}
+    /** Holds a capped set of valid threats in place briefly and restores their captured momentum afterwards. */
+    public static int stasisPulse(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int cap,int duration){
+        if(kind!=ArtifactKind.INTERREGNUM||p.isRemoved()||!p.isAlive()||p.isSpectator()
+                ||!(p.getMainHandItem().getItem() instanceof ArtifactItem pick)||pick.kind!=kind)return 0;
+        var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);
+        var targets=level.getEntitiesOfClass(Entity.class,bounds,e->e.isAlive()&&(e instanceof Projectile||e instanceof Monster)
+                &&!e.isAlliedTo(p)&&e.position().distanceToSqr(Vec3.atCenterOf(center))<=(double)radius*radius);
+        if(targets.size()>cap)targets.sort(Comparator.comparingDouble(e->e.distanceToSqr(Vec3.atCenterOf(center))));
+        var frozen=new HashMap<UUID,Frozen>();int processed=0;
+        for(var entity:targets){
+            if(processed>=cap)break;
+            if(entity instanceof Projectile projectile&&projectile.getOwner()!=null
+                    &&(projectile.getOwner()==p||projectile.getOwner().isAlliedTo(p)))continue;
+            if(FROZEN_ENTITIES.containsKey(entity.getUUID())||!WorldSafety.allowed(p,kind,entity.blockPosition()))continue;
+            frozen.put(entity.getUUID(),new Frozen(entity,entity.position(),entity.getDeltaMovement()));
+            FROZEN_ENTITIES.merge(entity.getUUID(),1,Integer::sum);
+            entity.setDeltaMovement(Vec3.ZERO);entity.hasImpulse=true;processed++;
+        }
+        if(frozen.isEmpty())return 0;
+        var previous=PULSES.put(p.getUUID(),new StasisPulse(p,p.getMainHandItem(),frozen,Math.max(1,duration)));
+        if(previous!=null)releasePulse(previous);
+        return processed;
+    }
     private static void holdFrozen(net.minecraft.server.level.ServerLevel level,Field field) {
         for(var frozen:field.frozen.values())if(frozen.entity.isAlive()){
             var box=frozen.entity.getBoundingBox().move(frozen.position.subtract(frozen.entity.position()));
@@ -57,8 +102,8 @@ public final class DomainFields {
             frozen.entity.setDeltaMovement(Vec3.ZERO);frozen.entity.hasImpulse=true;
         }
     }
-    public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field); }
-    public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();FROZEN_ENTITIES.clear(); }
+    public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field);var pulse=PULSES.remove(p.getUUID());if(pulse!=null)releasePulse(pulse); }
+    public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();PULSES.values().forEach(DomainFields::releasePulse);PULSES.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
         var f=FIELDS.get(p.getUUID());if(f==null||p.level().dimension()!=f.dimension||p.getMainHandItem()!=f.tool||ArtifactState.now(p)>f.expires)return false;
@@ -92,6 +137,7 @@ public final class DomainFields {
         }
     }
     public static void tick() {
+        tickPulses();
         var iterator=FIELDS.values().iterator();
         while(iterator.hasNext()) {
             var f=iterator.next();var p=f.owner;var level=p.serverLevel();
@@ -152,6 +198,7 @@ public final class DomainFields {
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
                 } else if(f.kind==ArtifactKind.INTERREGNUM) {
                     var original=f.frozen.get(entity.getUUID());
+                    if(original==null&&FROZEN_ENTITIES.containsKey(entity.getUUID())){current.remove(entity.getUUID());processed--;continue;}
                     if(original==null) {
                         original=new Frozen(entity,entity.position(),entity.getDeltaMovement());
                         f.frozen.put(entity.getUUID(),original);
@@ -173,6 +220,21 @@ public final class DomainFields {
                 return true;
             });
             if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",centerPosition);}
+        }
+    }
+    private static void tickPulses(){
+        var iterator=PULSES.values().iterator();
+        while(iterator.hasNext()){
+            var pulse=iterator.next();var p=pulse.owner;
+            if(!p.isAlive()||p.isRemoved()||p.getMainHandItem()!=pulse.tool||pulse.tool.isEmpty()
+                    ||p.level().dimension()!=pulse.dimension||ArtifactState.now(p)>=pulse.expires){
+                releasePulse(pulse);iterator.remove();continue;
+            }
+            for(var value:pulse.frozen.values())if(value.entity.isAlive()&&value.entity.level().dimension()==pulse.dimension){
+                var box=value.entity.getBoundingBox().move(value.position.subtract(value.entity.position()));
+                if(value.entity.level().noCollision(value.entity,box))value.entity.setPos(value.position);
+                value.entity.setDeltaMovement(Vec3.ZERO);value.entity.hasImpulse=true;
+            }
         }
     }
 }

@@ -127,16 +127,9 @@ public final class ArtifactTechniques {
     }
 
     private static boolean arrestMotion(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
-        var level = player.serverLevel();
-        int stopped = 0;
-        for (Entity entity : level.getEntitiesOfClass(Entity.class, new AABB(center).inflate(radius),
-                e -> e.isAlive() && (e instanceof Projectile || e instanceof Monster) && !e.isAlliedTo(player)
-                        && WorldSafety.allowed(player, kind, e.blockPosition()))) {
-            entity.setDeltaMovement(Vec3.ZERO);
-            entity.hasImpulse = true;
-            if (++stopped >= cap) break;
-        }
+        int stopped=DomainFields.stasisPulse(player,kind,center,radius,cap,40);
         if(stopped>0)ArtifactFeedback.message(player, "motion_arrested", stopped);
+        if(stopped>0)ArtifactFeedback.burst(player,kind,center,8);
         return stopped>0;
     }
 
