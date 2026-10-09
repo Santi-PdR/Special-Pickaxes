@@ -100,10 +100,10 @@ public final class ArtifactFeedback {
         }
     }
     public static void rootwake(ServerPlayer p,BlockPos center,int radius) {
-        sphere(p,ArtifactKind.WORLDLOOM,center,radius,0,32);
+        sphere(p,ArtifactKind.WORLDLOOM,center,radius,0,48);
         var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
         int[][] directions={{1,0},{-1,0},{0,1},{0,-1}};
-        for(var direction:directions)for(int step=1;step<=4;step+=2){
+        for(var direction:directions)for(int step=2;step<=radius;step+=2){
             BlockPos at=center.offset(direction[0]*step,0,direction[1]*step);
             if(p.serverLevel().hasChunkAt(at))p.serverLevel().sendParticles(p,vines,false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,2,.12,.12,.12,.025);
         }
