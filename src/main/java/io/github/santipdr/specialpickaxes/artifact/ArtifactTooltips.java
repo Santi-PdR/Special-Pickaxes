@@ -44,7 +44,7 @@ public final class ArtifactTooltips {
         int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
         int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
         section(lines,"manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)));
-        section(lines,"manual4.limits",Component.translatable("mining.limits"));
+        section(lines,"manual4.limits",Component.translatable(k==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"));
         section(lines,"manual4.controls",Component.translatable("tooltip.specialpickaxes.controls"));
     }
     private static void section(List<Component> lines,String heading,Component body){

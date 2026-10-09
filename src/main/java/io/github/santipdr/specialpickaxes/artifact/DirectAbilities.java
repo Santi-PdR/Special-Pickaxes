@@ -77,6 +77,39 @@ public final class DirectAbilities {
             for(var d:Direction.values()){var q=at.relative(d);if(visited.size()<512&&visited.add(q))pending.addLast(q);}
         }return result;
     }
+    /** Counter-seam cuts the offhand-selected material from the opposite side of the same interface. */
+    public static boolean counterSeam(ServerPlayer p,ItemStack tool){
+        var target=ArtifactActions.target(p);if(target.isEmpty())return false;
+        var level=p.serverLevel();var seed=target.get();if(!level.hasChunkAt(seed))return false;
+        var exposed=level.getBlockState(seed);if(!WorldSafety.inert(exposed))return false;
+        var offhand=p.getOffhandItem();
+        if(!(offhand.getItem() instanceof BlockItem item))return false;
+        var seamBlock=item.getBlock();var seamState=seamBlock.defaultBlockState();
+        if(seamBlock==exposed.getBlock()||!WorldSafety.inert(seamState))return false;
+        var frontier=new ArrayDeque<BlockPos>();var visited=new HashSet<BlockPos>();
+        for(var direction:Direction.values()){
+            var adjacent=seed.relative(direction);
+            if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState&&visited.add(adjacent))frontier.addLast(adjacent);
+        }
+        var steps=new ArrayList<WorkStep>(64);int examined=0;
+        while(!frontier.isEmpty()&&examined<512&&steps.size()<256){
+            var at=frontier.removeFirst();examined++;
+            if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,at)||level.getBlockState(at)!=seamState)continue;
+            boolean touchesTarget=false;
+            for(var direction:Direction.values()){
+                var adjacent=at.relative(direction);
+                if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==exposed){touchesTarget=true;break;}
+            }
+            if(touchesTarget)steps.add(new WorkStep.Mine(at,seamState));
+            for(var direction:Direction.values()){
+                var adjacent=at.relative(direction);
+                if(visited.size()<512&&level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState&&visited.add(adjacent))frontier.addLast(adjacent);
+            }
+        }
+        boolean started=WorkQueue.start(p,tool,ArtifactKind.SEAM_RIPPER,steps);
+        if(started)ArtifactFeedback.preview(p,ArtifactKind.SEAM_RIPPER,steps);
+        return started;
+    }
     private static boolean returnPath(ServerPlayer p,ItemStack tool){
         var k=ArtifactKind.LODESTAR;var data=ArtifactState.of(p,k);
         if(ArtifactState.anchor(p,k,"a").isEmpty()){

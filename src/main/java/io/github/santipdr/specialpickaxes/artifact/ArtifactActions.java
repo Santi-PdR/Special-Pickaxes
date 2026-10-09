@@ -82,6 +82,7 @@ public final class ArtifactActions {
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
+        if(kind==ArtifactKind.SEAM_RIPPER)return DirectAbilities.activate(p,tool,kind);
         if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
             try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));return copied!=ArtifactKind.WORLDBREAKER&&primary(p,tool,copied);}
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}

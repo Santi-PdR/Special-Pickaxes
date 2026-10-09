@@ -52,6 +52,7 @@ public final class ArtifactPassives {
                 attacker.hasImpulse=true;
             }
             case IRIDIUM -> player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,80,0,true,false,true));
+            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
             default -> {return;}
         }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
@@ -75,6 +76,7 @@ public final class ArtifactPassives {
             case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
             case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
             case HELLSPEC -> grant(player, MobEffects.FIRE_RESISTANCE, 0, 80);
+            case SEAM_RIPPER -> grant(player, MobEffects.DIG_SPEED, 1, 80);
             default -> { }
         }
     }

@@ -331,6 +331,7 @@ public final class ArtifactTechniques {
             case EXODIUM -> starfold(player);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
             case HELLSPEC -> quenchLava(player,tool);
+            case SEAM_RIPPER -> DirectAbilities.counterSeam(player,tool);
             default -> false;
         };
     }

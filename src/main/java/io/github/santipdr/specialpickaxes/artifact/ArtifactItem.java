@@ -36,6 +36,7 @@ public final class ArtifactItem extends PickaxeItem {
             case CRUCIBLE->MiningDesigns.crucibleGeology(state)?128F:72F;case INTERREGNUM->96F;
             case WORLDLOOM->stone?112F:72F;case ICARUS->96F;case AXIOM->ore?112F:72F;
             case WORLDBREAKER->144F;case EXODIUM->192F;case IRIDIUM->ore?256F:80F;case HELLSPEC->ore||stone?144F:80F;
+            case SEAM_RIPPER->stone?160F:80F;
             default->64F;
         };
     }
