@@ -53,6 +53,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
                 if(!level.hasChunkAt(pos))return false;
                 BlockState state=level.getBlockState(pos);
                 if(!sameOreFamily(state)||!WorldSafety.allowed(player,kind,pos)||WorldSafety.barrier(player,pos))return false;
+                if(!WorldSafety.mineQueued(player,tool,kind,pos,state))return false;
                 accepted++;
                 if(accepted<limit)for(int dx=-1;dx<=1;dx++)for(int dy=-1;dy<=1;dy++)for(int dz=-1;dz<=1;dz++){
                     if(dx==0&&dy==0&&dz==0)continue;
@@ -60,7 +61,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
                     if(next.distSqr(origin)<=VEIN_RADIUS_SQUARED&&seen.add(next)&&level.hasChunkAt(next)
                             &&sameOreFamily(level.getBlockState(next)))frontier.addLast(next);
                 }
-                return WorldSafety.mineQueued(player,tool,kind,pos,state);
+                return true;
             }
         };
     }
