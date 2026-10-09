@@ -46,11 +46,13 @@ public final class ArtifactActions {
     }
     public static boolean useAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(p.getMainHandItem()!=tool||tool.isEmpty()||!WorldSafety.allowed(p,kind,p.blockPosition()))return false;
+        var data=ArtifactState.of(p,kind);long now=ArtifactState.now(p),ready=data.getLong("alternateReady");
+        if(ready>now){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(ready-now+19)/20));return false;}
         int cost=EnchantmentScaling.activationCost(tool,kind);
         if(!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<=cost)return false;
         if(!ArtifactSkills.use(p,tool,kind))return false;
         if(!p.isCreative())tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
+        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);data.putLong("alternateReady",now+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         return true;
     }
     private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
