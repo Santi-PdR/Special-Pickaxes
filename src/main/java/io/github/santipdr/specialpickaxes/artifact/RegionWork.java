@@ -14,7 +14,8 @@ public final class RegionWork implements WorkProgram {
     public final ArtifactKind kind;
     public final int mode;
     private long cursor;
-    private final BlockIdSnapshot expectedSource,expectedTarget;
+    private BlockIdSnapshot expectedSource,expectedTarget;
+    private final int registeredStates;
     private boolean executing;
     public long eligible,excluded;
     private final BlockState material;
@@ -25,12 +26,17 @@ public final class RegionWork implements WorkProgram {
         source=a;target=b;transform=t;kind=k;this.mode=mode;this.material=material;
         if(a.size()>ArtifactConfig.REGION_LIMIT.get() || a.size()<1)throw new IllegalArgumentException("volume limit");
         if(b!=null && (!t.compatible(a,b)||a.overlaps(b)))throw new IllegalArgumentException("incompatible/overlapping regions");
-        int stateCount=Block.BLOCK_STATE_REGISTRY.size();
-        expectedSource=new BlockIdSnapshot((int)a.size(),stateCount);
-        expectedTarget=b==null?null:new BlockIdSnapshot((int)a.size(),stateCount);
+        registeredStates=Block.BLOCK_STATE_REGISTRY.size();
     }
     public long total(){return source.size();}
-    public long snapshotMemoryBytes(){return expectedSource.memoryBytes()+(expectedTarget==null?0:expectedTarget.memoryBytes());}
+    public long snapshotMemoryBytes(){return BlockIdSnapshot.memoryBytesFor((int)source.size(),registeredStates)*(target==null?1L:2L);}
+    /** Allocate only after the queue has accepted this job against the shared snapshot budget. */
+    void allocateSnapshots(){
+        if(expectedSource!=null)return;
+        int size=(int)source.size();
+        expectedSource=new BlockIdSnapshot(size,registeredStates);
+        expectedTarget=target==null?null:new BlockIdSnapshot(size,registeredStates);
+    }
     public int remaining(){return (int)(total()-cursor);}
     public boolean awaiting(){return !executing && cursor==total();}
     public boolean executing(){return executing;}

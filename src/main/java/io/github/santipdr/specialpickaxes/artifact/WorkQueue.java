@@ -48,6 +48,7 @@ public final class WorkQueue {
         if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         long snapshotBytes=region instanceof RegionWork snapshot?snapshot.snapshotMemoryBytes():0;
         if(!regionSnapshotBudgetAllows(p,snapshotBytes))return false;
+        if(region instanceof RegionWork snapshot)snapshot.allocateSnapshots();
         var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
     }
     public static int lastAttempts() { return lastAttempts; }
