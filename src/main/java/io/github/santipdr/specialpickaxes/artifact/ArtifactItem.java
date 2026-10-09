@@ -73,7 +73,15 @@ public final class ArtifactItem extends PickaxeItem {
     }
     @Override public java.util.Map<net.minecraft.world.item.enchantment.Enchantment,Integer> getAllEnchantments(ItemStack stack){
         var result=new java.util.HashMap<net.minecraft.world.item.enchantment.Enchantment,Integer>();
-        for(var e:net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValues()){int n=getEnchantmentLevel(stack,e);if(n>0)result.put(e,n);}return result;
+        var stored=stack.getEnchantmentTags();
+        for(int i=0;i<stored.size();i++){
+            var key=net.minecraft.resources.ResourceLocation.tryParse(stored.getCompound(i).getString("id"));
+            if(key==null)continue;
+            var enchantment=net.minecraftforge.registries.ForgeRegistries.ENCHANTMENTS.getValue(key);
+            if(enchantment==null)continue;
+            int level=getEnchantmentLevel(stack,enchantment);if(level>0)result.put(enchantment,level);
+        }
+        return result;
     }
     @Override public boolean mineBlock(ItemStack tool,Level level,BlockState state,BlockPos pos,LivingEntity actor) {
         if(actor instanceof ServerPlayer p && !tool.isEmpty()) MiningObservations.capture(p,tool,kind,pos,state);
