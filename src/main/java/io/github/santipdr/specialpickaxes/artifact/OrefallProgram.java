@@ -14,6 +14,9 @@ public final class OrefallProgram implements WorkProgram {
     private final int limit;
     private int scanIndex,mined;
 
+    /** Build the center-out order during mod setup instead of on the first ability activation. */
+    public static void warmup(){SCAN_OFFSETS.size();}
+
     public OrefallProgram(BlockPos center){
         this.center=center.immutable();
         this.limit=Math.min(SCAN_OFFSETS.size(),ArtifactConfig.JOB_LIMIT.get());

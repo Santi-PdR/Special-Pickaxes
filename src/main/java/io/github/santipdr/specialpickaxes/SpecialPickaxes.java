@@ -45,6 +45,7 @@ public final class SpecialPickaxes {
             .displayItems((parameters,output) -> PICKS.values().forEach(item -> output.accept(item.get()))).build());
     }
     public SpecialPickaxes() {
+        OrefallProgram.warmup();
         io.github.santipdr.specialpickaxes.network.RelicNetwork.register();
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
