@@ -15,13 +15,14 @@ public final class ArtifactActions {
     private static final Set<UUID> ACTIVATING=new HashSet<>();
     public static Optional<BlockPos> target(ServerPlayer p) {
         var level=p.serverLevel();Vec3 from=p.getEyePosition(),to=from.add(p.getLookAngle().scale(32));
-        if(!loadedRay(level,from,to))return Optional.empty();
-        var hit=level.clip(new net.minecraft.world.level.ClipContext(from,to,
+        var loadedEnd=loadedRayEnd(level,from,to);
+        if(loadedEnd.distanceToSqr(from)<1.0E-10)return Optional.empty();
+        var hit=level.clip(new net.minecraft.world.level.ClipContext(from,loadedEnd,
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
         return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?Optional.empty():Optional.of(hit.getBlockPos().immutable());
     }
-    /** Check the exact voxel path first so the native raycast never requests an unloaded chunk. */
-    private static boolean loadedRay(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){
+    /** Clip the ray at the first unloaded voxel; a nearer loaded target remains usable. */
+    private static Vec3 loadedRayEnd(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){
         double dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;
         int stepX=dx>0?1:dx<0?-1:0,stepY=dy>0?1:dy<0?-1:0,stepZ=dz>0?1:dz<0?-1:0;
         int x=net.minecraft.core.BlockPos.containing(from).getX(),y=net.minecraft.core.BlockPos.containing(from).getY(),z=net.minecraft.core.BlockPos.containing(from).getZ();
@@ -32,13 +33,17 @@ public final class ArtifactActions {
         double maxZ=stepZ>0?(z+1-from.z)/dz:stepZ<0?(from.z-z)/-dz:Double.POSITIVE_INFINITY;
         for(int visited=0;visited<512;visited++){
             var pos=new BlockPos(x,y,z);
-            if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos))return false;
-            if(x==end.getX()&&y==end.getY()&&z==end.getZ())return true;
-            if(maxX<=maxY&&maxX<=maxZ){if(maxX>1)return true;x+=stepX;maxX+=deltaX;}
-            else if(maxY<=maxZ){if(maxY>1)return true;y+=stepY;maxY+=deltaY;}
-            else {if(maxZ>1)return true;z+=stepZ;maxZ+=deltaZ;}
+            if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos))return from;
+            if(x==end.getX()&&y==end.getY()&&z==end.getZ())return to;
+            double next=Math.min(maxX,Math.min(maxY,maxZ));
+            if(next>1)return to;
+            if(maxX<=maxY&&maxX<=maxZ){x+=stepX;maxX+=deltaX;}
+            else if(maxY<=maxZ){y+=stepY;maxY+=deltaY;}
+            else {z+=stepZ;maxZ+=deltaZ;}
+            var entered=new net.minecraft.core.BlockPos(x,y,z);
+            if(level.isOutsideBuildHeight(entered)||!level.hasChunkAt(entered))return from.add(dx*Math.max(0,next-1.0E-7),dy*Math.max(0,next-1.0E-7),dz*Math.max(0,next-1.0E-7));
         }
-        return false;
+        return to;
     }
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary) {
         if(!ACTIVATING.add(p.getUUID()))return false;
