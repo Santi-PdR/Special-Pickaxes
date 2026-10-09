@@ -197,14 +197,14 @@ public final class ArtifactTechniques {
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
     private static boolean faultEcho(ServerPlayer player,int radius,int cap){
         var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
-        var targets=level.getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
+        var candidates=level.getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
             if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
                     ||!entity.onGround()||entity.isAlliedTo(player)
                     ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
         });
+        var targets=EntitySelection.nearest(candidates,center,cap);
         if(targets.isEmpty())return false;
-        if(targets.size()>cap)targets.sort(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
         int stopped=0;
         for(var target:targets){
             if(stopped>=cap)break;
