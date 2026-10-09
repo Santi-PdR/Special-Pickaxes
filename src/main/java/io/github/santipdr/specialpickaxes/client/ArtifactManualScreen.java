@@ -15,7 +15,7 @@ public final class ArtifactManualScreen extends Screen {
     private static final int LINE_HEIGHT=10,SECTION_GAP=7;
     private final ArtifactKind kind;
     private final List<ArtifactKind> choices=Arrays.stream(ArtifactKind.playableValues()).toList();
-    private int scroll;
+    private int scroll,choiceScroll;
     private int contentHeight;
     private record Section(Component heading,List<Component> body,int color) {}
 
@@ -48,9 +48,10 @@ public final class ArtifactManualScreen extends Screen {
         if(kind==ArtifactKind.WORLDBREAKER){
             int choicesX=x+w-238,choicesY=y+50,choicesBottom=y+h-25;
             g.drawString(font,Component.translatable("screen.specialpickaxes.copy_help"),choicesX,choicesY-16,0xffdddddd,false);
+            choiceScroll=clamp(choiceScroll,Math.max(0,choices.size()*19-(choicesBottom-choicesY)));
             g.enableScissor(choicesX,choicesY,choicesX+225,choicesBottom);
             String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
-            if(canChooseCopy())drawChoices(g,choicesX,choicesY,mouseX,mouseY,copied);
+            if(canChooseCopy())drawChoices(g,choicesX,choicesY,choicesBottom,choiceScroll,mouseX,mouseY,copied);
             else g.drawString(font,Component.translatable("screen.specialpickaxes.copy_hand_only"),choicesX,choicesY,0xffb9d4ff,false);
             g.disableScissor();
             var selection=copied.isBlank()?Component.translatable("screen.specialpickaxes.copy_native"):Component.translatable("item.specialpickaxes."+copied);
@@ -115,10 +116,11 @@ public final class ArtifactManualScreen extends Screen {
         var equipped=CuriosCompat.find(player);return equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item&&item.kind==kind?equipped.stack():ItemStack.EMPTY;
     }
     private boolean canChooseCopy(){var player=Minecraft.getInstance().player;return player!=null&&player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER;}
-    private void drawChoices(GuiGraphics g,int x,int y,int mouseX,int mouseY,String copied){
+    private void drawChoices(GuiGraphics g,int x,int y,int bottom,int offset,int mouseX,int mouseY,String copied){
         for(int i=0;i<choices.size();i++){
-            int px=x,py=y+i*19;var source=choices.get(i);
-            boolean selected=source.id.equals(copied)||source==ArtifactKind.WORLDBREAKER&&copied.isBlank(),hover=mouseX>=px&&mouseX<px+225&&mouseY>=py&&mouseY<py+18;
+            int px=x,py=y+i*19-offset;var source=choices.get(i);
+            if(py+18<=y||py>=bottom)continue;
+            boolean selected=source.id.equals(copied)||source==ArtifactKind.WORLDBREAKER&&copied.isBlank(),hover=mouseX>=px&&mouseX<px+225&&mouseY>=y&&mouseY<bottom&&mouseY>=py&&mouseY<py+18;
             g.fill(px,py,px+225,py+18,selected?0xff5e4d2d:hover?0xff34485c:0xff1c2935);
             var stack=new ItemStack(SpecialPickaxes.PICKS.get(source).get());g.renderItem(stack,px+1,py+1);
             var label=source==ArtifactKind.WORLDBREAKER?Component.translatable("screen.specialpickaxes.copy_native"):stack.getHoverName();
@@ -141,14 +143,25 @@ public final class ArtifactManualScreen extends Screen {
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
     @Override public boolean mouseScrolled(double mouseX,double mouseY,double delta){
-        int x=left(),y=top(),w=panelWidth(),h=panelHeight();int paneWidth=kind==ArtifactKind.WORLDBREAKER?Math.max(120,Math.min(230,w-270)):w-32;
+        int x=left(),y=top(),w=panelWidth(),h=panelHeight();
+        if(kind==ArtifactKind.WORLDBREAKER){
+            int choicesX=x+w-238,choicesY=y+50,choicesBottom=y+h-25;
+            if(mouseX>=choicesX&&mouseX<choicesX+225&&mouseY>=choicesY&&mouseY<choicesBottom){
+                choiceScroll=clamp(choiceScroll-(int)Math.signum(delta)*38,Math.max(0,choices.size()*19-(choicesBottom-choicesY)));return true;
+            }
+        }
+        int paneWidth=kind==ArtifactKind.WORLDBREAKER?Math.max(120,Math.min(230,w-270)):w-32;
         if(mouseX>=x+16&&mouseX<x+16+paneWidth&&mouseY>=y+62&&mouseY<y+h-31){scroll=clamp(scroll-(int)Math.signum(delta)*24,Math.max(0,contentHeight-(h-93)));return true;}
         return super.mouseScrolled(mouseX,mouseY,delta);
     }
     @Override public boolean mouseClicked(double mouseX,double mouseY,int button){
         if(button==0&&kind==ArtifactKind.WORLDBREAKER&&canChooseCopy()){
-            int x=left()+panelWidth()-238,y=top()+50;
-            for(int i=0;i<choices.size();i++){int py=y+i*19;if(mouseX>=x&&mouseX<x+225&&mouseY>=py&&mouseY<py+18){RelicKeys.chooseCopy(choices.get(i));return true;}}
+            int x=left()+panelWidth()-238,y=top()+50,bottom=top()+panelHeight()-25;
+            if(mouseX>=x&&mouseX<x+225&&mouseY>=y&&mouseY<bottom){
+                int row=choiceScroll+(int)mouseY-y;
+                int index=row/19;
+                if(row%19<18&&index>=0&&index<choices.size()){RelicKeys.chooseCopy(choices.get(index));return true;}
+            }
         }
         return super.mouseClicked(mouseX,mouseY,button);
     }
