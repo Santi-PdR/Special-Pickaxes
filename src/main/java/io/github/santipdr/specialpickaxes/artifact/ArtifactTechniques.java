@@ -19,10 +19,22 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.common.util.BlockSnapshot;
 import org.joml.Vector3f;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /** Bounded held-tool alternate actions. Curios equipment grants passives only. */
 public final class ArtifactTechniques {
     private ArtifactTechniques() {}
+    private static final List<BlockPos> QUENCH_OFFSETS=createQuenchOffsets();
+
+    private static List<BlockPos> createQuenchOffsets(){
+        var offsets=new ArrayList<BlockPos>(123);
+        for(int x=-3;x<=3;x++)for(int y=-3;y<=3;y++)for(int z=-3;z<=3;z++)
+            if(x*x+y*y+z*z<=9)offsets.add(new BlockPos(x,y,z));
+        offsets.sort(Comparator.comparingDouble(pos->pos.distSqr(BlockPos.ZERO)));
+        return List.copyOf(offsets);
+    }
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
         if (!tool.hasTag() || !tool.getTag().contains("copiedSkill")) {
@@ -295,9 +307,10 @@ public final class ArtifactTechniques {
         if(!focused.is(net.minecraft.tags.FluidTags.LAVA)||!focused.isSource())return false;
 
         var steps=new java.util.ArrayList<WorkStep>(32);
-        for(int x=-3;x<=3&&steps.size()<32;x++)for(int y=-3;y<=3&&steps.size()<32;y++)for(int z=-3;z<=3&&steps.size()<32;z++){
-            if(x*x+y*y+z*z>9)continue;
-            BlockPos pos=center.offset(x,y,z);if(!level.hasChunkAt(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
+        // The cached order is center-out, so a source cap always favors nearby lava.
+        for(BlockPos offset:QUENCH_OFFSETS){
+            if(steps.size()>=32)break;
+            BlockPos pos=center.offset(offset);if(!level.hasChunkAt(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
             var state=level.getBlockState(pos);var fluid=level.getFluidState(pos);
             if(!fluid.is(net.minecraft.tags.FluidTags.LAVA)||!fluid.isSource()||state.hasBlockEntity())continue;
             steps.add(new WorkStep(){
