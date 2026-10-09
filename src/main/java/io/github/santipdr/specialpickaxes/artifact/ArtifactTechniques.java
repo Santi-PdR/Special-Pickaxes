@@ -47,8 +47,10 @@ public final class ArtifactTechniques {
     private static boolean magnetDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
         int moved = 0;
-        for (var drop : player.serverLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(radius),
-                e -> e.isAlive() && (e.getOwner() == null || player.getUUID().equals(e.getOwner())))) {
+        var drops=EntitySelection.nearest(player.serverLevel(),ItemEntity.class,player.getBoundingBox().inflate(radius),
+                e->e.isAlive()&&(e.getOwner()==null||player.getUUID().equals(e.getOwner()))
+                        &&e.position().distanceToSqr(center)<=(double)radius*radius,center,cap);
+        for (var drop : drops) {
             Vec3 delta = center.subtract(drop.position());
             if (delta.lengthSqr() < .25) continue;
             drop.setDeltaMovement(delta.normalize().scale(.65));
