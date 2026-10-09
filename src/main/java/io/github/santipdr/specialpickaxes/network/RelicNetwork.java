@@ -22,6 +22,7 @@ public final class RelicNetwork {
         SEEN.put(p.getUUID(),choice.sequence());var tool=p.getMainHandItem();
         if(!(tool.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER)return false;
         if(!tool.hasTag()||!tool.getTag().hasUUID("controlIdentity")||!tool.getTag().getUUID("controlIdentity").equals(choice.toolIdentity()))return false;
+        if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p)){ArtifactFeedback.message(p,"copy_busy");return false;}
         if(choice.source()==ArtifactKind.WORLDBREAKER){
             tool.getOrCreateTag().remove("copiedSkill");
             ArtifactFeedback.message(p,"copy_native");return true;

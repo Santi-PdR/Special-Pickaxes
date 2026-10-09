@@ -84,7 +84,13 @@ public final class ArtifactActions {
         if(!kind.playable())return false;
         if(kind==ArtifactKind.SEAM_RIPPER)return DirectAbilities.activate(p,tool,kind);
         if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
-            try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));return copied!=ArtifactKind.WORLDBREAKER&&primary(p,tool,copied);}
+            try{
+                var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));
+                if(copied==ArtifactKind.WORLDBREAKER)return false;
+                if(ArtifactInteraction.regional(copied,ArtifactState.mode(p,copied)))
+                    return ArtifactInteraction.use(p,tool,copied,false);
+                return primary(p,tool,copied);
+            }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
         if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
