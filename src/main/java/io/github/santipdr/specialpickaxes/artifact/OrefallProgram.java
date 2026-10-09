@@ -40,6 +40,10 @@ public final class OrefallProgram implements WorkProgram {
     @Override public int attemptsPerTick(ItemStack tool){
         return scanned<SCAN_SIZE?Math.max(ArtifactConfig.ORE_SCAN_BUDGET.get(),EnchantmentScaling.budget(tool)):EnchantmentScaling.budget(tool);
     }
+    @Override public void reportProgress(ServerPlayer p){
+        if(scanned>0&&scanned<SCAN_SIZE&&p.tickCount%20==0)
+            ArtifactFeedback.message(p,"ore_scan_progress",scanned*100/SCAN_SIZE,ores.size());
+    }
     @Override public boolean backpressured(ServerPlayer p){return sorted&&oreIndex<ores.size()&&WorldSafety.dropPressure(p,ores.get(oreIndex).pos());}
     @Override public WorkStep next(ServerPlayer p){
         if(scanned<SCAN_SIZE){

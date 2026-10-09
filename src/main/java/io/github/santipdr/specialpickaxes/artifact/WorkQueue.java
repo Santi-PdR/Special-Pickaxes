@@ -87,6 +87,7 @@ public final class WorkQueue {
             }
             if(feedback!=null&&p.tickCount%10==0)RelicEffects.emit(p,job.kind,"work",net.minecraft.world.phys.Vec3.atCenterOf(feedback));
             if(feedback!=null && p.tickCount%4==0) ArtifactFeedback.burst(p,job.kind,feedback,4);
+            if(job.region!=null)job.region.reportProgress(p);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
                 else {boolean partial=job.region==null||job.region.reportPartial();ArtifactFeedback.message(p,job.succeeded==0?"nothing_changed":partial&&job.succeeded<job.completed?"partial":"complete");ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);

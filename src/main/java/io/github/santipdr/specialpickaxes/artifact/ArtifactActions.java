@@ -90,7 +90,9 @@ public final class ArtifactActions {
             return started;
         }
         if(kind==ArtifactKind.IRIDIUM) {
-            var aimed=target(p);return aimed.isPresent()&&WorkQueue.startRegion(p,tool,kind,new OrefallProgram(aimed.get()));
+            var aimed=target(p);if(aimed.isEmpty())return false;
+            var program=new OrefallProgram(aimed.get());if(!WorkQueue.startRegion(p,tool,kind,program))return false;
+            ArtifactFeedback.message(p,"ore_scan_started");return true;
         }
         if(kind==ArtifactKind.PALIMPSEST) {
             var aimed=target(p);if(aimed.isEmpty())return false;
