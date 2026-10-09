@@ -24,10 +24,11 @@ public final class MiningObservations {
     }
     public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
         boolean trackOreDrops=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state);
-        // Queued Iridium breaks still need drop snapshots, but never chained held-mining effects.
+        // Queued Iridium breaks never chain held-mining effects.
         boolean queuedIridiumOre=WorkQueue.running()&&trackOreDrops;
         if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return;
-        DropSnapshot snapshot=trackOreDrops?dropSnapshot(p,pos):new DropSnapshot(Map.of(),true);
+        boolean tagDropsAtSpawn=trackOreDrops&&WorldSafety.capturesIridiumDrops();
+        DropSnapshot snapshot=trackOreDrops&&!tagDropsAtSpawn?dropSnapshot(p,pos):new DropSnapshot(Map.of(),!tagDropsAtSpawn);
         PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),snapshot.stacks(),snapshot.complete(),
                 applyHeldMiningEffects&&!queuedIridiumOre));
     }

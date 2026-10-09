@@ -23,11 +23,24 @@ public final class WorldSafety {
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK,
         Blocks.DIRT,Blocks.COARSE_DIRT,Blocks.GRASS_BLOCK,Blocks.PODZOL,Blocks.ROOTED_DIRT,Blocks.GRAVEL,Blocks.DRIPSTONE_BLOCK,Blocks.POINTED_DRIPSTONE);
     private WorldSafety() {}
-    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected){}
+    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind){}
     private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
     public static boolean changedDuringBreakEvent(ServerPlayer p,BlockPos pos){
         var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
             &&(p.getMainHandItem()!=context.tool()||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos));
+    }
+    static boolean capturesIridiumDrops(){
+        var context=NATIVE_BREAK.get();return context!=null&&context.kind()==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(context.expected());
+    }
+    public static void tagIridiumDrop(net.minecraft.world.entity.Entity entity,net.minecraft.server.level.ServerLevel level){
+        var context=NATIVE_BREAK.get();
+        if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null
+                ||context.kind()!=ArtifactKind.IRIDIUM||context.player().serverLevel()!=level
+                ||!ArtifactOres.isOre(context.expected())
+                ||!new AABB(context.pos()).inflate(1).contains(drop.position()))return;
+        drop.setGlowingTag(true);
+        drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
+        drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",context.player().getUUID());
     }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!ArtifactOres.isOre(state)
         &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL))
@@ -68,8 +81,8 @@ public final class WorldSafety {
         if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(checkDropPressure&&dropPressure(p,pos))return false;
-        // ArtifactItem.mineBlock queues the single bounded Iridium drop observation for this break.
-        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected));
+        // Keep the exact break context through item spawning so Iridium can tag only these drops.
+        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind));
         boolean mined;
         try{mined=p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
         return mined;

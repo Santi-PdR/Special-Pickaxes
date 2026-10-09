@@ -55,6 +55,7 @@ public final class SpecialPickaxes {
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::schedulePlacedBlockCleanup);
         forge.addListener(this::tagsUpdated);
         forge.addListener(this::curiosIridiumMine);
+        forge.addListener(this::entityJoin);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
         forge.addListener(this::fall);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
@@ -79,6 +80,10 @@ public final class SpecialPickaxes {
         if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem pick)||pick.kind!=ArtifactKind.IRIDIUM)return;
         if(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return;
         MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,e.getPos(),e.getState(),false);
+    }
+    private void entityJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent e){
+        if(e.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
+            WorldSafety.tagIridiumDrop(e.getEntity(),level);
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p);}}
