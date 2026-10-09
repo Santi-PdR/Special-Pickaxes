@@ -66,8 +66,10 @@ public final class SpecialPickaxes {
     private void trackPlayerPlacedBlocks(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent e){
         if(!e.isCanceled()&&e.getEntity() instanceof net.minecraft.world.entity.player.Player
                 &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
-                &&(MiningDesigns.crucibleGeology(level.getBlockState(e.getPos()))||ArtifactOres.isOre(level.getBlockState(e.getPos()))))
-            PlayerPlacedBlocks.get(level).mark(e.getPos());
+                &&level.getFluidState(e.getPos()).isEmpty()){
+            var state=level.getBlockState(e.getPos());
+            if(!state.hasBlockEntity()&&ArtifactTools.effective(state))PlayerPlacedBlocks.get(level).mark(e.getPos());
+        }
     }
     private void schedulePlacedBlockCleanup(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)

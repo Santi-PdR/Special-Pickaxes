@@ -11,7 +11,7 @@ import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/** Persistent provenance for player-placed cells, used to protect geology from Crucible edits. */
+/** Persistent provenance for player-placed, harvestable cells that mining skills must preserve. */
 public final class PlayerPlacedBlocks extends SavedData {
     private static final String DATA_NAME = "specialpickaxes_player_placed";
     private static final int CLEANUP_PER_TICK = 128;
@@ -78,7 +78,7 @@ public final class PlayerPlacedBlocks extends SavedData {
             var pos = BlockPos.of(packed);
             if (!level.hasChunkAt(pos)) continue;
             var state = level.getBlockState(pos);
-            if (state.isAir() || !ArtifactOres.isOre(state) && !MiningDesigns.crucibleGeology(state)) {
+            if (state.isAir() || state.hasBlockEntity() || !state.getFluidState().isEmpty() || !ArtifactTools.effective(state)) {
                 staleScan.remove();
                 setDirty();
             }
