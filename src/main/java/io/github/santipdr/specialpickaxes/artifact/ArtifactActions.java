@@ -22,7 +22,7 @@ public final class ArtifactActions {
         return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?Optional.empty():Optional.of(hit.getBlockPos().immutable());
     }
     /** Clip the ray at the first unloaded voxel; a nearer loaded target remains usable. */
-    private static Vec3 loadedRayEnd(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){
+    static Vec3 loadedRayEnd(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){
         double dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;
         int stepX=dx>0?1:dx<0?-1:0,stepY=dy>0?1:dy<0?-1:0,stepZ=dz>0?1:dz<0?-1:0;
         int x=net.minecraft.core.BlockPos.containing(from).getX(),y=net.minecraft.core.BlockPos.containing(from).getY(),z=net.minecraft.core.BlockPos.containing(from).getZ();
@@ -133,20 +133,23 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.AXIOM){
             var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
+            if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),32);ArtifactFeedback.message(p,"nullcut_started");}
             return started;
         }
         if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE){
             var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),
                     kind==ArtifactKind.CRUCIBLE?geologyMaterial(p,ArtifactState.mode(p,kind)):null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
+            if(started){
+                if(kind==ArtifactKind.WORLDLOOM){ArtifactFeedback.rootwake(p,center,r);ArtifactFeedback.message(p,"rootwake_started");}
+                else {ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());}
+            }
             return started;
         }
         if(kind==ArtifactKind.HELLSPEC) {
             var program=new RadialMiningProgram(center,7,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){ArtifactFeedback.ring(p,kind,center,7);ArtifactFeedback.message(p,"queued",program.remaining());}
+            if(started){ArtifactFeedback.hellBloom(p,center);ArtifactFeedback.message(p,"infernal_bloom_started");}
             return started;
         }
 

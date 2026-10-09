@@ -8,7 +8,7 @@ import java.util.*;
 
 /** Bounded slice memory. Every slice is checked before excavation; any barrier terminates the entire route. */
 public final class DirectionalProgram implements WorkProgram {
-    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, RESONANT_TUNNEL }
+    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, EXODIUM_SINK, RESONANT_TUNNEL }
     private final BlockPos origin;private final Direction direction;private final Shape shape;private final ArtifactKind kind;private final int length;
     private int depth,index;private boolean digging,moving,finished;
     private List<BlockPos> slice;private BlockState[] expected;
@@ -17,7 +17,7 @@ public final class DirectionalProgram implements WorkProgram {
     }
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape,ArtifactKind kind){
         this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;this.kind=kind;
-        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case RESONANT_TUNNEL->20;};
+        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->32;case RESONANT_TUNNEL->20;};
         prepare();
     }
     private void prepare(){
@@ -29,7 +29,7 @@ public final class DirectionalProgram implements WorkProgram {
         if(depth<0||depth>192)throw new IllegalArgumentException("slice depth");
         var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
-            case ICARUS->{w=3;h=2;}case ICARUS_WIDE->{w=4;h=3;}case EXODIUM_LANCE->{w=6;h=4;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
+            case ICARUS->{w=3;h=2;}case ICARUS_WIDE->{w=4;h=3;}case EXODIUM_LANCE->{w=6;h=4;}case EXODIUM_SINK->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
             case RESONANT_TUNNEL->{w=0;h=0;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
             case CLEAVE->{w=12;h=5;}
@@ -67,7 +67,9 @@ public final class DirectionalProgram implements WorkProgram {
             public BlockPos pos(){return at;}
             public boolean stopOnFailure(){return true;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-                if(!WorldSafety.directionClear(actor,tool,kind,at)||actor.serverLevel().getBlockState(at)!=old)return false;
+                if(!WorldSafety.directionClear(actor,tool,kind,at)||shape==Shape.EXODIUM_SINK
+                        &&(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!WorldSafety.vacant(old)&&!MiningDesigns.matrix(old)&&!ArtifactOres.isOre(old))
+                        ||actor.serverLevel().getBlockState(at)!=old)return false;
                 return !mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
             }
         };

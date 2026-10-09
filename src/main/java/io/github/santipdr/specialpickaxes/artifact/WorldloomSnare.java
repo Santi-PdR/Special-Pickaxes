@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/** Short-lived root bindings created by the Worldloom's held alternate skill. */
+/** Short-lived root bindings created by the Worldloom's held area skill. */
 public final class WorldloomSnare {
     private record Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,Vec3 anchor,long expires) {}
     private static final Map<UUID,Binding> BINDINGS=new HashMap<>();
@@ -43,8 +43,13 @@ public final class WorldloomSnare {
                 if(level.noCollision(target,box))target.setPos(binding.anchor);
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
-            if(level.getGameTime()%5==0)level.sendParticles(owner,ParticleTypes.COMPOSTER,false,
-                    binding.anchor.x,binding.anchor.y+target.getBbHeight()*.45,binding.anchor.z,3,.22,.35,.22,.01);
+            if(level.getGameTime()%5==0){
+                var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,
+                        net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
+                level.sendParticles(owner,vines,false,binding.anchor.x,binding.anchor.y+.08,binding.anchor.z,10,.34,.08,.34,.025);
+                level.sendParticles(owner,ParticleTypes.COMPOSTER,false,
+                        binding.anchor.x,binding.anchor.y+.18,binding.anchor.z,3,.2,.18,.2,.01);
+            }
         }
     }
 

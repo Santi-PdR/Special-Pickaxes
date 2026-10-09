@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -63,7 +64,8 @@ public final class ArtifactFeedback {
             case EVENTIDE->net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL;
             case CRUCIBLE->net.minecraft.core.particles.ParticleTypes.WAX_ON;
             case INTERREGNUM->net.minecraft.core.particles.ParticleTypes.END_ROD;
-            case WORLDLOOM,KEYSTONE->net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER;
+            case WORLDLOOM->net.minecraft.core.particles.ParticleTypes.COMPOSTER;
+            case KEYSTONE->net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER;
             case ICARUS->net.minecraft.core.particles.ParticleTypes.END_ROD;
             case AXIOM->net.minecraft.core.particles.ParticleTypes.SCULK_SOUL;
             case ATLAS,TESSELLATOR->net.minecraft.core.particles.ParticleTypes.PORTAL;
@@ -82,6 +84,34 @@ public final class ArtifactFeedback {
             double angle=(i/8.0)*Math.PI*2;
             burst(p,kind,center.offset((int)Math.round(Math.cos(angle)*radius),0,(int)Math.round(Math.sin(angle)*radius)),1);
         }
+    }
+    /** Compact 3D boundary preview for bounded radial mining; only the activating player receives it. */
+    public static void sphere(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int innerRadius,int points) {
+        int rgb=kind.color;var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.25F);
+        int count=Math.max(12,Math.min(64,points));
+        for(int shell=0;shell<(innerRadius>0?2:1);shell++){
+            double r=shell==0?radius:innerRadius;
+            int samples=shell==0?count:Math.max(12,count/2);
+            for(int i=0;i<samples;i++){
+                double y=1-2*(i+0.5)/samples,ring=Math.sqrt(Math.max(0,1-y*y)),angle=i*2.399963229728653;
+                double x=Math.cos(angle)*ring,z=Math.sin(angle)*ring;
+                p.serverLevel().sendParticles(p,dust,false,center.getX()+0.5+x*r,center.getY()+0.5+y*r,center.getZ()+0.5+z*r,1,0,0,0,0);
+            }
+        }
+    }
+    public static void rootwake(ServerPlayer p,BlockPos center,int radius) {
+        sphere(p,ArtifactKind.WORLDLOOM,center,radius,0,32);
+        var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
+        int[][] directions={{1,0},{-1,0},{0,1},{0,-1}};
+        for(var direction:directions)for(int step=1;step<=4;step+=2){
+            BlockPos at=center.offset(direction[0]*step,0,direction[1]*step);
+            if(p.serverLevel().hasChunkAt(at))p.serverLevel().sendParticles(p,vines,false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,2,.12,.12,.12,.025);
+        }
+    }
+    /** Five bounded rings make Hellspec's core-and-petal quarry legible before it starts. */
+    public static void hellBloom(ServerPlayer p,BlockPos center) {
+        for(int[] offset:new int[][]{{0,0},{4,0},{-4,0},{0,4},{0,-4}})
+            ring(p,ArtifactKind.HELLSPEC,center.offset(offset[0],0,offset[1]),3);
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
         boolean stasis=kind==ArtifactKind.INTERREGNUM;

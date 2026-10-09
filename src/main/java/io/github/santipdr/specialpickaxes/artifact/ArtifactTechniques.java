@@ -79,28 +79,6 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean knockbackTarget(ServerPlayer player, ArtifactKind kind, double range, double strength) {
-        Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
-        AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
-        LivingEntity target = EntitySelection.nearest(player.serverLevel(), LivingEntity.class, bounds, entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
-                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
-            if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
-            Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
-            return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
-        }, player.position(), 1).stream().findFirst().orElse(null);
-        if (target == null) return false;
-        target.setDeltaMovement(target.getDeltaMovement().add(look.scale(strength).add(0, kind==ArtifactKind.ICARUS?.48:.18, 0)));
-        target.hasImpulse = true;
-        double fx=target.getX(),fy=target.getY()+target.getBbHeight()/2,fz=target.getZ();
-        if(kind==ArtifactKind.ICARUS){
-            var feather=new DustParticleOptions(new Vector3f(1F,.86F,.58F),1.25F);
-            player.serverLevel().sendParticles(player,feather,false,fx,fy,fz,18,.38,.65,.38,.035);
-            player.serverLevel().sendParticles(player,ParticleTypes.CLOUD,false,fx,fy,fz,7,.28,.25,.28,.08);
-        }else player.serverLevel().sendParticles(player, ParticleTypes.SWEEP_ATTACK, false, fx, fy, fz, 8, .2, .2, .2, .04);
-        return true;
-    }
-
     private static boolean knockbackPulse(ServerPlayer player, ArtifactKind kind, int radius, double strength, int cap) {
         Vec3 center = player.position();
         int pushed = 0;
@@ -152,11 +130,14 @@ public final class ArtifactTechniques {
         if (level.hasChunkAt(pos)) level.sendParticles(player, color, false, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5, 3, .08, .03, .08, 0);
     }
 
-    private static boolean lift(ServerPlayer player) {
-        player.setDeltaMovement(player.getDeltaMovement().add(0, 1.05, 0));
-        player.hasImpulse = true;
-        player.serverLevel().sendParticles(player, ParticleTypes.END_ROD, false, player.getX(), player.getY(), player.getZ(), 16, .45, .2, .45, .08);
-        return true;
+    private static boolean icarianLift(ServerPlayer player,ItemStack tool) {
+        if(player.isPassenger()||player.isSleeping())return false;
+        boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(player.blockPosition()));
+        if(started){
+            ArtifactFeedback.message(player,"icarian_lift_started");
+            player.serverLevel().sendParticles(player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
+        }
+        return started;
     }
 
     private static boolean dash(ServerPlayer player, int distance) {
@@ -178,21 +159,29 @@ public final class ArtifactTechniques {
         return dash(player, distance);
     }
 
-    private static boolean pullHostiles(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
-        Vec3 point = Vec3.atCenterOf(center);
-        int pulled = 0;
-        for (var mob : EntitySelection.nearest(player.serverLevel(), Monster.class, new AABB(center).inflate(radius),
-                m -> m.isAlive() && !m.isAlliedTo(player) && WorldSafety.allowed(player, kind, m.blockPosition()), point, cap)) {
-            Vec3 delta = point.subtract(mob.position());
-            if (delta.lengthSqr() > .01) mob.setDeltaMovement(mob.getDeltaMovement().add(delta.normalize().scale(.6)));
-            mob.hasImpulse = true;
-            if (++pulled >= cap) break;
+    private static boolean nullwave(ServerPlayer player,int radius,int cap) {
+        Vec3 center=player.position();double rangeSqr=(double)radius*radius;
+        var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
+            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
+                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
+                    ||!WorldSafety.allowed(player,ArtifactKind.AXIOM,entity.blockPosition()))return false;
+            return !(entity instanceof Player other)||player.canHarmPlayer(other);
+        },center,cap);
+        if(targets.isEmpty())return false;
+        int repelled=0;
+        for(var target:targets){
+            Vec3 away=target.position().subtract(center);if(away.lengthSqr()<.01)away=new Vec3(0,0,1);
+            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(1.0).add(0,.35,0)));
+            target.hasImpulse=true;
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,60,0,true,false,true));
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,1,true,false,true));
+            ArtifactFeedback.burst(player,ArtifactKind.AXIOM,target.blockPosition(),4);repelled++;
         }
-        if(pulled>0){
-            player.serverLevel().sendParticles(player, ParticleTypes.PORTAL, false, point.x, point.y, point.z, 24, .8, .8, .8, .08);
-            ArtifactFeedback.message(player, "hollow_pulse", pulled);
+        for(int i=0;i<16;i++){
+            double angle=i*Math.PI/8,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
+            player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,x,center.y+.15,z,1,0,0,0,0);
         }
-        return pulled>0;
+        ArtifactFeedback.message(player,"nullwave",repelled);return true;
     }
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
@@ -234,34 +223,17 @@ public final class ArtifactTechniques {
         return deflected>0;
     }
 
-    private static boolean rootSnare(ServerPlayer player, double range) {
-        LivingEntity target = targetInLook(player, ArtifactKind.WORLDLOOM, range);
-        if (target == null) return false;
-        if(!WorldloomSnare.bind(player,target))return false;
-        ArtifactFeedback.message(player,"root_snared",target.getDisplayName());return true;
-    }
-
-    private static LivingEntity targetInLook(ServerPlayer player, ArtifactKind kind, double range) {
-        Vec3 look = player.getLookAngle().normalize(), eye = player.getEyePosition();
-        AABB bounds = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.25, 1.0, 1.25);
-        return EntitySelection.nearest(player.serverLevel(), LivingEntity.class, bounds, entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
-                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
-            if (entity instanceof Player other && !player.canHarmPlayer(other)) return false;
-            Vec3 delta = entity.getBoundingBox().getCenter().subtract(eye);
-            return delta.lengthSqr() <= range * range && delta.normalize().dot(look) >= .72;
-        }, player.position(), 1).stream().findFirst().orElse(null);
-    }
-
-    private static boolean blinkBehindTarget(ServerPlayer player, double range) {
-        LivingEntity target = targetInLook(player, ArtifactKind.EXODIUM, range);
-        if (target == null || player.isPassenger() || player.isSleeping()
-                || !WorldSafety.allowed(player,ArtifactKind.EXODIUM,target.blockPosition())) return false;
-        Vec3 destination = target.position().subtract(target.getLookAngle().normalize().scale(1.5));
-        BlockPos at = BlockPos.containing(destination);
-        if (!WorldSafety.allowed(player,ArtifactKind.EXODIUM,at)||!WorldSafety.freeBody(player,destination)) return false;
-        player.connection.teleport(destination.x, destination.y, destination.z, player.getYRot(), player.getXRot());
-        return true;
+    private static boolean rootSnare(ServerPlayer player,double range) {
+        Vec3 center=player.position();double rangeSqr=range*range;
+        var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(range),entity->{
+            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
+                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
+                    ||!WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,entity.blockPosition()))return false;
+            return !(entity instanceof Player other)||player.canHarmPlayer(other);
+        },center,16);
+        int bound=0;for(var target:targets)if(WorldloomSnare.bind(player,target))bound++;
+        if(bound>0)ArtifactFeedback.message(player,"root_snared",bound);
+        return bound>0;
     }
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
@@ -314,37 +286,40 @@ public final class ArtifactTechniques {
     }
 
     private static boolean quenchLava(ServerPlayer player,ItemStack tool) {
-        var level=player.serverLevel();Vec3 from=player.getEyePosition(),look=player.getLookAngle().normalize();
-        var steps=new java.util.ArrayList<WorkStep>(24);BlockPos previous=null;
-        for(int sample=1;sample<=96&&steps.size()<24;sample++){
-            Vec3 point=from.add(look.scale(sample*.25));BlockPos pos=BlockPos.containing(point);
-            if(pos.equals(previous))continue;previous=pos;
-            if(!level.hasChunkAt(pos))break;
+        var level=player.serverLevel();Vec3 from=player.getEyePosition(),to=from.add(player.getLookAngle().normalize().scale(24));
+        var end=ArtifactActions.loadedRayEnd(level,from,to);
+        var hit=level.clip(new net.minecraft.world.level.ClipContext(from,end,
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.ANY,player));
+        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
+        BlockPos center=hit.getBlockPos();var focused=level.getFluidState(center);
+        if(!focused.is(net.minecraft.tags.FluidTags.LAVA)||!focused.isSource())return false;
+
+        var steps=new java.util.ArrayList<WorkStep>(32);
+        for(int x=-3;x<=3&&steps.size()<32;x++)for(int y=-3;y<=3&&steps.size()<32;y++)for(int z=-3;z<=3&&steps.size()<32;z++){
+            if(x*x+y*y+z*z>9)continue;
+            BlockPos pos=center.offset(x,y,z);if(!level.hasChunkAt(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
             var state=level.getBlockState(pos);var fluid=level.getFluidState(pos);
-            if(fluid.is(net.minecraft.tags.FluidTags.LAVA)){
-                if(!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))break;
-                if(fluid.isSource()&&!state.hasBlockEntity())steps.add(new WorkStep(){
-                    @Override public BlockPos pos(){return pos;}
-                    @Override public boolean apply(ServerPlayer actor,ItemStack held,ArtifactKind kind){
-                        var current=level.getBlockState(pos);var currentFluid=level.getFluidState(pos);
-                        if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)||!currentFluid.isSource()
-                                ||current.hasBlockEntity()||!WorldSafety.allowed(actor,kind,pos)
-                                ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,actor.gameMode.getGameModeForPlayer(),actor,pos)<0)return false;
-                        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
-                        if(!level.setBlock(pos,obsidian,3))return false;
-                        if(ForgeEventFactory.onBlockPlace(actor,snapshot,Direction.UP)||level.getBlockState(pos)!=obsidian){
-                            if(level.hasChunkAt(pos)&&level.getBlockState(pos)==obsidian&&level.getFluidState(pos).isEmpty())snapshot.restore(true,false);
-                            return false;
-                        }
-                        level.blockUpdated(pos,Blocks.OBSIDIAN);ArtifactFeedback.burst(actor,ArtifactKind.HELLSPEC,pos,3);return true;
+            if(!fluid.is(net.minecraft.tags.FluidTags.LAVA)||!fluid.isSource()||state.hasBlockEntity())continue;
+            steps.add(new WorkStep(){
+                @Override public BlockPos pos(){return pos;}
+                @Override public boolean apply(ServerPlayer actor,ItemStack held,ArtifactKind kind){
+                    var current=level.getBlockState(pos);var currentFluid=level.getFluidState(pos);
+                    if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)||!currentFluid.isSource()
+                            ||current.hasBlockEntity()||!WorldSafety.allowed(actor,kind,pos)
+                            ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,actor.gameMode.getGameModeForPlayer(),actor,pos)<0)return false;
+                    var snapshot=BlockSnapshot.create(level.dimension(),level,pos);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
+                    if(!level.setBlock(pos,obsidian,3))return false;
+                    if(ForgeEventFactory.onBlockPlace(actor,snapshot,Direction.UP)||level.getBlockState(pos)!=obsidian){
+                        if(level.hasChunkAt(pos)&&level.getBlockState(pos)==obsidian&&level.getFluidState(pos).isEmpty())snapshot.restore(true,false);
+                        return false;
                     }
-                });
-                continue;
-            }
-            if(!fluid.isEmpty()||!state.getCollisionShape(level,pos).isEmpty())break;
+                    level.blockUpdated(pos,Blocks.OBSIDIAN);ArtifactFeedback.burst(actor,ArtifactKind.HELLSPEC,pos,3);return true;
+                }
+            });
         }
         if(steps.isEmpty())return false;
         int sources=steps.size();if(!WorkQueue.start(player,tool,ArtifactKind.HELLSPEC,steps))return false;
+        ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,3);
         ArtifactFeedback.message(player,"lava_quenched",sources);return true;
     }
 
@@ -358,10 +333,10 @@ public final class ArtifactTechniques {
                     ? arrestMotion(player,kind,player.blockPosition(),8,24)
                     : DomainFields.relocate(player,aimed(player));
             case WORLDLOOM -> rootSnare(player, 10);
-            case ICARUS -> knockbackTarget(player, kind, 7, 1.35);
-            case AXIOM -> pullHostiles(player, kind, aimed(player), 9, 24);
+            case ICARUS -> icarianLift(player,tool);
+            case AXIOM -> nullwave(player,8,24);
             case WORLDBREAKER -> echo(player, tool, 2);
-            case EXODIUM -> starfold(player);
+            case EXODIUM -> starfallSink(player,tool);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
             case HELLSPEC -> quenchLava(player,tool);
             case SEAM_RIPPER -> seamRend(player);
@@ -369,9 +344,17 @@ public final class ArtifactTechniques {
         };
     }
 
-    private static boolean starfold(ServerPlayer player){
-        if(!blinkBehindTarget(player,16))return false;
-        ArtifactFeedback.message(player,"exodium_blink");
+    private static boolean starfallSink(ServerPlayer player,ItemStack tool){
+        var aimed=ArtifactActions.target(player);if(aimed.isEmpty())return false;
+        BlockPos center=aimed.get();var level=player.serverLevel();var state=level.getBlockState(center);
+        if(!WorldSafety.allowed(player,ArtifactKind.EXODIUM,center)
+                ||PlayerPlacedBlocks.get(level).contains(center)
+                ||!MiningDesigns.matrix(state)&&!ArtifactOres.isOre(state)
+                ||!WorldSafety.harvestable(player,tool,center))return false;
+        var program=new DirectionalProgram(center,Direction.DOWN,DirectionalProgram.Shape.EXODIUM_SINK,ArtifactKind.EXODIUM);
+        if(!WorkQueue.startRegion(player,tool,ArtifactKind.EXODIUM,program))return false;
+        ArtifactFeedback.ring(player,ArtifactKind.EXODIUM,center,2);
+        ArtifactFeedback.message(player,"starfall_sink_started");
         return true;
     }
 
