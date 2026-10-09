@@ -33,6 +33,11 @@ public final class DomainFields {
     /** Membership counts keep combat-event lookups constant-time when fields overlap. */
     private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
+    private static boolean hostileProjectile(Entity entity,ServerPlayer player,boolean rejectPlayerOwned){
+        if(!(entity instanceof Projectile projectile)||projectile.getOwner()==null)return true;
+        var owner=projectile.getOwner();
+        return owner!=player&&!owner.isAlliedTo(player)&&!(rejectPlayerOwned&&owner instanceof net.minecraft.world.entity.player.Player);
+    }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
         if((kind!=ArtifactKind.INTERREGNUM&&kind!=ArtifactKind.EVENTIDE)||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
@@ -76,16 +81,15 @@ public final class DomainFields {
     public static int stasisPulse(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int cap,int duration){
         if(kind!=ArtifactKind.INTERREGNUM||p.isRemoved()||!p.isAlive()||p.isSpectator()
                 ||!(p.getMainHandItem().getItem() instanceof ArtifactItem pick)||pick.kind!=kind)return 0;
-        var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);
-        var targets=level.getEntitiesOfClass(Entity.class,bounds,e->e.isAlive()&&(e instanceof Projectile||e instanceof Monster)
-                &&!e.isAlliedTo(p)&&e.position().distanceToSqr(Vec3.atCenterOf(center))<=(double)radius*radius);
-        targets=EntitySelection.nearest(targets,Vec3.atCenterOf(center),cap);
+        var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);var fieldCenter=Vec3.atCenterOf(center);
+        var targets=EntitySelection.nearest(level,Entity.class,bounds,e->e.isAlive()&&(e instanceof Projectile||e instanceof Monster)
+                &&!e.isAlliedTo(p)&&!FROZEN_ENTITIES.containsKey(e.getUUID())
+                &&hostileProjectile(e,p,false)
+                &&e.position().distanceToSqr(fieldCenter)<=(double)radius*radius,fieldCenter,cap);
         var frozen=new HashMap<UUID,Frozen>();int processed=0;
         for(var entity:targets){
             if(processed>=cap)break;
-            if(entity instanceof Projectile projectile&&projectile.getOwner()!=null
-                    &&(projectile.getOwner()==p||projectile.getOwner().isAlliedTo(p)))continue;
-            if(FROZEN_ENTITIES.containsKey(entity.getUUID())||!WorldSafety.allowed(p,kind,entity.blockPosition()))continue;
+            if(!WorldSafety.allowed(p,kind,entity.blockPosition()))continue;
             frozen.put(entity.getUUID(),new Frozen(entity,entity.position(),entity.getDeltaMovement()));
             FROZEN_ENTITIES.merge(entity.getUUID(),1,Integer::sum);
             entity.setDeltaMovement(Vec3.ZERO);entity.hasImpulse=true;processed++;
@@ -162,7 +166,8 @@ public final class DomainFields {
             }
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%10==0){
                 var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
-                for(var ally:level.getEntitiesOfClass(ServerPlayer.class,bounds,q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()))){
+                for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,
+                        q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()),Vec3.atCenterOf(f.center),16)){
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),40,0,true,false,true));
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,80,0,true,false,true));
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,40,2,true,false,true));
@@ -183,16 +188,16 @@ public final class DomainFields {
             if((p.tickCount&1)!=0){holdFrozen(level,f);continue;}
             var centerPosition=Vec3.atCenterOf(f.center);
             double radiusSqr=(double)f.radius*f.radius;
-            var entities=level.getEntitiesOfClass(Entity.class,new AABB(f.center).inflate(f.radius),e ->
-                e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
-                && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr));
             int targetLimit=ArtifactConfig.FIELD_TARGETS.get();
-            entities=EntitySelection.nearest(entities,centerPosition,targetLimit);
+            var entities=EntitySelection.nearest(level,Entity.class,new AABB(f.center).inflate(f.radius),e ->
+                e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
+                && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr)
+                &&hostileProjectile(e,p,f.kind==ArtifactKind.AEGIS)
+                && (f.kind!=ArtifactKind.INTERREGNUM||f.frozen.containsKey(e.getUUID())||!FROZEN_ENTITIES.containsKey(e.getUUID())),
+                centerPosition,targetLimit);
             var current=f.observed;current.clear();int processed=0;
             for(var entity:entities) {
                 if(processed>=targetLimit) break;
-                if(entity instanceof Projectile projectile && projectile.getOwner()!=null
-                        && (projectile.getOwner()==p || projectile.getOwner().isAlliedTo(p) || f.kind==ArtifactKind.AEGIS && projectile.getOwner() instanceof net.minecraft.world.entity.player.Player)) continue;
                 if(!WorldSafety.allowed(p,f.kind,entity.blockPosition())) continue;
                 processed++;current.add(entity.getUUID());
                 if(f.kind==ArtifactKind.AEGIS){
@@ -202,7 +207,6 @@ public final class DomainFields {
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
                 } else if(f.kind==ArtifactKind.INTERREGNUM) {
                     var original=f.frozen.get(entity.getUUID());
-                    if(original==null&&FROZEN_ENTITIES.containsKey(entity.getUUID())){current.remove(entity.getUUID());processed--;continue;}
                     if(original==null) {
                         original=new Frozen(entity,entity.position(),entity.getDeltaMovement());
                         f.frozen.put(entity.getUUID(),original);
