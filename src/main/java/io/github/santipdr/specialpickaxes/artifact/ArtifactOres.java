@@ -74,6 +74,8 @@ public final class ArtifactOres {
     }
 
     private static boolean isVeinFamilyTag(String path) {
+        // Forge's ores_in_ground tags classify host rock, not mineral families.
+        if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
         return path.startsWith("ores/")&&path.length()>6||path.startsWith("ore/")&&path.length()>4
             ||path.startsWith("ores_")&&path.length()>5||path.startsWith("ore_")&&path.length()>4
             ||path.endsWith("_ores")&&path.length()>5||path.endsWith("_ore")&&path.length()>4;
