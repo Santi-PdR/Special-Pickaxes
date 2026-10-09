@@ -8,6 +8,8 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.AbortableIterationConsumer;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import org.joml.Vector3f;
 import java.util.HashMap;
@@ -16,9 +18,10 @@ import java.util.UUID;
 
 public final class ArtifactFeedback {
     private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
+    private static final Map<UUID,Long> LISTENER_SOUND_READY=new HashMap<>();
     private ArtifactFeedback() {}
-    public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());}
-    public static void clearSounds(){SOUND_READY.clear();}
+    public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());}
+    public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();}
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
     }
@@ -27,12 +30,21 @@ public final class ArtifactFeedback {
         if(ready!=null&&now<ready)return;
         SOUND_READY.put(id,now+ArtifactConfig.SOUND_COOLDOWN.get());
         if(SOUND_READY.size()>1024)SOUND_READY.entrySet().removeIf(entry->entry.getValue()+1200<now);
+        if(LISTENER_SOUND_READY.size()>1024)LISTENER_SOUND_READY.entrySet().removeIf(entry->entry.getValue()+1200<now);
         var at=p.getEyePosition().add(p.getLookAngle().scale(2));
         var packet=new ClientboundSoundPacket(Holder.direct(sound),SoundSource.PLAYERS,at.x,at.y,at.z,volume,pitch,level.getRandom().nextLong());
         double range=ArtifactConfig.SOUND_RADIUS.get(),rangeSqr=range*range;
         var nearby=new AABB(at.x-range,at.y-range,at.z-range,at.x+range,at.y+range,at.z+range);
-        for(var listener:level.getEntitiesOfClass(ServerPlayer.class,nearby,ServerPlayer::isAlive))
-            if(listener.distanceToSqr(at.x,at.y,at.z)<=rangeSqr)listener.connection.send(packet);
+        level.getEntities().get(EntityTypeTest.forClass(ServerPlayer.class),nearby,listener->{
+            if(!listener.isAlive()||listener.distanceToSqr(at.x,at.y,at.z)>rangeSqr)
+                return AbortableIterationConsumer.Continuation.CONTINUE;
+            var listenerId=listener.getUUID();var listenerReady=LISTENER_SOUND_READY.get(listenerId);
+            if(listener!=p&&listenerReady!=null&&now<listenerReady)
+                return AbortableIterationConsumer.Continuation.CONTINUE;
+            LISTENER_SOUND_READY.put(listenerId,now+ArtifactConfig.SOUND_COOLDOWN.get());
+            listener.connection.send(packet);
+            return AbortableIterationConsumer.Continuation.CONTINUE;
+        });
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
         sound(p,kind,"activate");
