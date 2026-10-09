@@ -74,9 +74,10 @@ public final class WorkQueue {
             var p=job.player;
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=job.tool || job.tool.isEmpty()
                     || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
+            // Keep aerial mining safe even while the same active job is paused for confirmation, chunks, or drops.
+            if(protectsFall(p))p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
-            if(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3)p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
             int playerBudget=job.region==null?EnchantmentScaling.budget(job.tool):job.region.attemptsPerTick(job.tool);
             int turn=Math.min(budget,playerBudget);BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
