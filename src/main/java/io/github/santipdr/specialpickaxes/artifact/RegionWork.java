@@ -53,7 +53,7 @@ public final class RegionWork implements WorkProgram {
         if(!executing||target!=null||kind!=ArtifactKind.WORLDBREAKER||mode!=0&&mode!=1&&mode!=5||cursor>=total())return false;
         var pos=source.at(cursor);var level=p.serverLevel();if(!level.hasChunkAt(pos))return false;
         var state=level.getBlockState(pos);
-        return eligible(p,state,pos)&&WorldSafety.backpressuredMine(p,tool,kind,pos,state);
+        return eligible(p,state,pos)&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,pos,state);
     }
     public WorkStep next(ServerPlayer p){
         int index=(int)cursor;BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
