@@ -6,6 +6,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -280,6 +281,31 @@ public final class ArtifactTechniques {
         return recalled>0;
     }
 
+    /** Rends one visible hostile's foremost intact armor seam; no damage or potion effects. */
+    private static boolean seamRend(ServerPlayer player) {
+        Vec3 look=player.getLookAngle().normalize(),eye=player.getEyePosition();double range=8;
+        AABB bounds=player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0,0.75,1.0);
+        LivingEntity target=player.serverLevel().getEntitiesOfClass(LivingEntity.class,bounds,entity->{
+            if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
+                    ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,entity.blockPosition()))return false;
+            if(entity instanceof Player other&&!player.canHarmPlayer(other))return false;
+            Vec3 delta=entity.getBoundingBox().getCenter().subtract(eye);
+            return delta.lengthSqr()<=range*range&&delta.normalize().dot(look)>=.78&&player.hasLineOfSight(entity);
+        }).stream().min(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(player))).orElse(null);
+        if(target==null)return false;
+        EquipmentSlot[] priority={EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.HEAD,EquipmentSlot.FEET};
+        EquipmentSlot slot=null;ItemStack armor=ItemStack.EMPTY;
+        for(var candidate:priority){var worn=target.getItemBySlot(candidate);if(!worn.isEmpty()&&worn.isDamageableItem()
+                &&worn.getDamageValue()<worn.getMaxDamage()){slot=candidate;armor=worn;break;}}
+        if(slot==null)return false;
+        int before=armor.getDamageValue(),max=armor.getMaxDamage(),requested=Math.min(12,max-before);var damagedSlot=slot;
+        armor.hurtAndBreak(requested,target,entity->entity.broadcastBreakEvent(damagedSlot));
+        int applied=armor.isEmpty()?requested:Math.max(0,armor.getDamageValue()-before);
+        if(applied<=0)return false;
+        ArtifactFeedback.burst(player,ArtifactKind.SEAM_RIPPER,target.blockPosition(),10);
+        return true;
+    }
+
     private static boolean quenchLava(ServerPlayer player,ItemStack tool) {
         var level=player.serverLevel();Vec3 from=player.getEyePosition(),look=player.getLookAngle().normalize();
         var steps=new java.util.ArrayList<WorkStep>(24);BlockPos previous=null;
@@ -331,7 +357,7 @@ public final class ArtifactTechniques {
             case EXODIUM -> starfold(player);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
             case HELLSPEC -> quenchLava(player,tool);
-            case SEAM_RIPPER -> DirectAbilities.counterSeam(player,tool);
+            case SEAM_RIPPER -> seamRend(player);
             default -> false;
         };
     }

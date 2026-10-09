@@ -74,26 +74,6 @@ public final class DirectAbilities {
             if(p.serverLevel().hasChunkAt(at))result.add(new WorkStep.Mine(at,p.serverLevel().getBlockState(at)));
         }return result;
     }
-    /** Counter-seam cuts the offhand-selected material from the opposite side of the same interface. */
-    public static boolean counterSeam(ServerPlayer p,ItemStack tool){
-        var target=ArtifactActions.target(p);if(target.isEmpty())return false;
-        var level=p.serverLevel();var seed=target.get();if(!level.hasChunkAt(seed))return false;
-        var exposed=level.getBlockState(seed);if(!WorldSafety.allowed(p,ArtifactKind.SEAM_RIPPER,seed)||!WorldSafety.inert(exposed))return false;
-        var offhand=p.getOffhandItem();
-        if(!(offhand.getItem() instanceof BlockItem item))return false;
-        var seamBlock=item.getBlock();var seamState=seamBlock.defaultBlockState();
-        if(seamBlock==exposed.getBlock()||!WorldSafety.inert(seamState))return false;
-        var seeds=new ArrayList<BlockPos>();
-        for(var direction:Direction.values()){
-            var adjacent=seed.relative(direction);
-            if(level.hasChunkAt(adjacent)&&level.getBlockState(adjacent)==seamState)seeds.add(adjacent.immutable());
-        }
-        if(seeds.isEmpty())return false;
-        var program=new SeamMiningProgram(seed,seamState,exposed,false,seeds);
-        boolean started=WorkQueue.startRegion(p,tool,ArtifactKind.SEAM_RIPPER,program);
-        if(started)ArtifactFeedback.burst(p,ArtifactKind.SEAM_RIPPER,seed,8);
-        return started;
-    }
     private static boolean returnPath(ServerPlayer p,ItemStack tool){
         var k=ArtifactKind.LODESTAR;var data=ArtifactState.of(p,k);
         if(ArtifactState.anchor(p,k,"a").isEmpty()){
