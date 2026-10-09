@@ -9,13 +9,16 @@ import java.util.*;
 /** Incremental Iridium prospecting and extraction. The scan and harvest both consume scheduler budget. */
 public final class OrefallProgram implements WorkProgram {
     private record Ore(BlockPos pos,BlockState state) {}
-    private static final int RADIUS=14,HALF_HEIGHT=7,MAX_ORES=192;
+    private static final int RADIUS=14,HALF_HEIGHT=7;
     private static final int SCAN_SIZE=countScan();
     private final BlockPos center;
-    private final List<Ore> ores=new ArrayList<>();
+    private final PriorityQueue<Ore> nearest;
+    private List<Ore> ores=List.of();
     private int scanX=-RADIUS,scanY=-HALF_HEIGHT,scanZ=-RADIUS,scanned,oreIndex;private boolean sorted;
     public OrefallProgram(BlockPos center){
         this.center=center.immutable();
+        this.nearest=new PriorityQueue<>(Comparator.comparingDouble(
+                (Ore ore)->ore.pos().distSqr(this.center)).reversed());
     }
     private static int countScan(){
         int count=0;
@@ -31,7 +34,7 @@ public final class OrefallProgram implements WorkProgram {
         }
         return null;
     }
-    @Override public int remaining(){return Math.max(0,SCAN_SIZE-scanned)+Math.max(0,ores.size()-oreIndex);}
+    @Override public int remaining(){return Math.max(0,SCAN_SIZE-scanned)+Math.max(0,(sorted?ores.size():nearest.size())-oreIndex);}
     @Override public boolean awaiting(){return false;}
     @Override public boolean executing(){return true;}
     @Override public boolean done(){return scanned>=SCAN_SIZE&&sorted&&oreIndex>=ores.size();}
@@ -42,7 +45,7 @@ public final class OrefallProgram implements WorkProgram {
     }
     @Override public void reportProgress(ServerPlayer p){
         if(scanned>0&&scanned<SCAN_SIZE&&p.tickCount%20==0)
-            ArtifactFeedback.message(p,"ore_scan_progress",scanned*100/SCAN_SIZE,ores.size());
+            ArtifactFeedback.message(p,"ore_scan_progress",scanned*100/SCAN_SIZE,nearest.size());
     }
     @Override public boolean backpressured(ServerPlayer p){return sorted&&oreIndex<ores.size()&&WorldSafety.dropPressure(p,ores.get(oreIndex).pos());}
     @Override public WorkStep next(ServerPlayer p){
@@ -55,12 +58,16 @@ public final class OrefallProgram implements WorkProgram {
                     var state=level.getBlockState(pos);
                     if(!ArtifactOres.isOre(state)||!WorldSafety.harvestable(actor,tool,pos)
                             ||!WorldSafety.allowed(actor,ArtifactKind.IRIDIUM,pos))return false;
-                    if(ores.size()<MAX_ORES)ores.add(new Ore(pos,state));
+                    var candidate=new Ore(pos,state);int limit=Math.min(SCAN_SIZE,ArtifactConfig.JOB_LIMIT.get());
+                    if(nearest.size()<limit)nearest.add(candidate);
+                    else if(!nearest.isEmpty()&&pos.distSqr(center)<nearest.peek().pos().distSqr(center)){
+                        nearest.poll();nearest.add(candidate);
+                    }
                     return false;
                 }
             };
         }
-        if(!sorted){ores.sort(Comparator.comparingDouble(ore->ore.pos().distSqr(center)));sorted=true;}
+        if(!sorted){ores=new ArrayList<>(nearest);ores.sort(Comparator.comparingDouble(ore->ore.pos().distSqr(center)));sorted=true;}
         if(oreIndex>=ores.size())return new WorkStep(){public BlockPos pos(){return center;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return false;}};
         var ore=ores.get(oreIndex++);return new WorkStep.Mine(ore.pos(),ore.state());
     }
