@@ -89,7 +89,15 @@ public final class WorldSafety {
             snapshot.put(drop.getUUID(),drop.getItem().copy());
         return snapshot;
     }
-    public static boolean dropPressure(ServerPlayer p,BlockPos pos){return p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new AABB(pos).inflate(8)).size()>=256;}
+    public static boolean dropPressure(ServerPlayer p,BlockPos pos){
+        int[] found={0};
+        p.serverLevel().getEntities().get(net.minecraft.world.level.entity.EntityTypeTest.forClass(net.minecraft.world.entity.item.ItemEntity.class),
+                new AABB(pos).inflate(8),drop->{
+                    if(drop.isAlive()&&++found[0]>=256)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
+                    return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
+                });
+        return found[0]>=256;
+    }
     /** Avoid entity queries and false pauses unless this exact block is still a permitted mining target. */
     static boolean backpressuredMine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
         var level=p.serverLevel();
