@@ -1,6 +1,7 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.effect.MobEffect;
@@ -25,7 +26,14 @@ public final class ArtifactPassives {
             }
             return;
         }
-        if(!(source.getEntity() instanceof LivingEntity attacker)||attacker==player||attacker.isAlliedTo(player))return;
+        LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
+        if(attacker==null){
+            Entity direct=source.getDirectEntity();
+            if(!JegProjectileCompat.isProjectile(direct))return;
+            Entity owner=JegProjectileCompat.owner(direct);
+            if(owner instanceof LivingEntity living)attacker=living;
+        }
+        if(attacker==null||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
         boolean retaliationAllowed=switch(kind){
             case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,ICARUS,AXIOM,EXODIUM,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
