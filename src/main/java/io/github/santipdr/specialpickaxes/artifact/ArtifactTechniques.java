@@ -11,11 +11,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.common.util.BlockSnapshot;
 import org.joml.Vector3f;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -285,37 +282,34 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean magmaEruption(ServerPlayer player,ItemStack tool) {
-        var level=player.serverLevel();Vec3 from=player.getEyePosition(),to=from.add(player.getLookAngle().normalize().scale(24));
-        var end=ArtifactActions.loadedRayEnd(level,from,to);
-        var hit=level.clip(new net.minecraft.world.level.ClipContext(from,end,
-                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.ANY,player));
-        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
-        BlockPos center=hit.getBlockPos();var focused=level.getFluidState(center);var old=level.getBlockState(center);
-        if(!focused.is(net.minecraft.tags.FluidTags.LAVA)||!focused.isSource()
-                ||old.hasBlockEntity()||PlayerPlacedBlocks.get(level).contains(center)
-                ||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,center)
-                ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,player.gameMode.getGameModeForPlayer(),player,center)<0)return false;
-        var snapshot=BlockSnapshot.create(level.dimension(),level,center);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
-        if(!level.setBlock(center,obsidian,3))return false;
-        if(ForgeEventFactory.onBlockPlace(player,snapshot,Direction.UP)||level.getBlockState(center)!=obsidian){
-            if(level.hasChunkAt(center)&&level.getBlockState(center)==obsidian&&level.getFluidState(center).isEmpty())snapshot.restore(true,false);
-            return false;
-        }
-        level.blockUpdated(center,Blocks.OBSIDIAN);
-        var bounds=new AABB(center).inflate(8,4,8);int affected=0;
-        var targets=EntitySelection.nearest(level,LivingEntity.class,bounds,e->e.isAlive()&&e!=player
-                &&!e.isAlliedTo(player)&&e.position().distanceToSqr(Vec3.atCenterOf(center))<=64
-                &&WorldSafety.allowed(player,ArtifactKind.HELLSPEC,e.blockPosition())
-                &&(!(e instanceof Player other)||player.canHarmPlayer(other)),Vec3.atCenterOf(center),12);
+    private static boolean magmaWave(ServerPlayer player) {
+        var level=player.serverLevel();Vec3 look=player.getLookAngle();
+        Vec3 horizontal=new Vec3(look.x,0,look.z);
+        if(horizontal.lengthSqr()<1.0E-4)return false;
+        Vec3 forward=horizontal.normalize(),origin=player.position().add(0,.8,0);
+        double range=14,halfWidth=2.75;
+        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(range,4,range),entity->{
+            if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
+                    ||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,entity.blockPosition())
+                    ||entity instanceof Player other&&!player.canHarmPlayer(other)
+                    ||!player.hasLineOfSight(entity))return false;
+            Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5,0).subtract(origin);
+            double along=delta.x*forward.x+delta.z*forward.z;
+            double across=Math.abs(delta.x*forward.z-delta.z*forward.x);
+            return along>=1&&along<=range&&across<=halfWidth&&Math.abs(delta.y)<=3.5;
+        },origin,12);
+        if(targets.isEmpty())return false;
         for(var target:targets){
-            Vec3 away=target.position().subtract(Vec3.atCenterOf(center)).normalize();
-            if(away.lengthSqr()<.01)away=player.getLookAngle().normalize();
-            target.setDeltaMovement(target.getDeltaMovement().scale(.35).add(away.scale(1.65)).add(0,.45,0));target.hasImpulse=true;
-            target.setSecondsOnFire(4);affected++;
+            target.setDeltaMovement(target.getDeltaMovement().scale(.2).add(forward.scale(1.8).add(0,.7,0)));
+            target.hasImpulse=true;target.setSecondsOnFire(4);
         }
-        ArtifactFeedback.burst(player,ArtifactKind.HELLSPEC,center,20);ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,5);
-        ArtifactFeedback.message(player,"magma_erupted",affected);return true;
+        for(int step=2;step<=12;step+=2){
+            double x=origin.x+forward.x*step,z=origin.z+forward.z*step,y=player.getY()+.15;
+            level.sendParticles(player,ParticleTypes.FLAME,false,x,y,z,7,.65,.15,.65,.025);
+            level.sendParticles(player,ParticleTypes.LAVA,false,x,y,z,2,.45,.1,.45,0);
+        }
+        ArtifactFeedback.message(player,"magma_wave",targets.size());
+        return true;
     }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
@@ -333,7 +327,7 @@ public final class ArtifactTechniques {
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfallSink(player,tool);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
-            case HELLSPEC -> magmaEruption(player,tool);
+            case HELLSPEC -> magmaWave(player);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };
