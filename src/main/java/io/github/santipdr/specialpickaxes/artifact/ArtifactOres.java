@@ -15,7 +15,7 @@ public final class ArtifactOres {
     private static final ConcurrentMap<Block,String> ORE_FAMILIES = new ConcurrentHashMap<>();
     private static final String NO_ORE_FAMILY="";
     private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
-    private static final Set<String> WORLDGEN_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant","undead_revamp2:bostrokestone");
+    private static final Set<String> WORLDGEN_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant","undead_revamp2:bostrokestone","undead_revamp2:bostroxore");
     private ArtifactOres() {}
     public static boolean isOre(BlockState state){
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
@@ -44,7 +44,7 @@ public final class ArtifactOres {
         return ORE_FAMILIES.get(block);
     }
 
-    /** Terramity worldgen registers these ore-feature outputs without an ore suffix or ore tag. */
+    /** Some worldgen ore features use mineral names without an ore suffix or ore tag. */
     private static boolean isOreBlock(net.minecraft.resources.ResourceLocation key){
         if(key==null)return false;
         if(isOreTagPath(key.getPath()))return true;
