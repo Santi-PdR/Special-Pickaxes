@@ -50,8 +50,10 @@ public final class WorldloomSnare {
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
             if(level.getGameTime()%10==0){
-                // One small owner-only packet wraps the target's feet and shins in visible roots.
+                // Keep the particle audience local to the ability and the trapped player.
                 level.sendParticles(owner,VINE_PARTICLE,false,binding.anchor.x,binding.anchor.y+.35,binding.anchor.z,8,.34,.34,.34,.015);
+                if(target instanceof ServerPlayer viewer&&viewer!=owner)
+                    level.sendParticles(viewer,VINE_PARTICLE,false,binding.anchor.x,binding.anchor.y+.35,binding.anchor.z,8,.34,.34,.34,.015);
             }
         }
     }
