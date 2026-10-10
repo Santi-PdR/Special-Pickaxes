@@ -57,7 +57,7 @@ public final class ArtifactManualScreen extends Screen {
             var selection=copied.isBlank()?Component.translatable("screen.specialpickaxes.copy_native"):Component.translatable("item.specialpickaxes."+copied);
             if(!copied.isBlank()&&ArtifactInteraction.modeCount(abilityKind)>1)
                 selection.append(" · ").append(Component.translatable("mode.specialpickaxes."+modeKey));
-            var copiedState=Component.translatable("screen.specialpickaxes.copy_mode",selection);
+            var copiedState=copied.isBlank()?selection:Component.translatable("screen.specialpickaxes.copy_mode",selection);
             g.drawString(font,Component.translatable("screen.specialpickaxes.selected",copiedState),x+16,y+h-30,0xffe9c96f,false);
         }else if(contentHeight>contentBottom-contentTop){
             g.drawString(font,Component.translatable("screen.specialpickaxes.scroll"),x+w-82,y+h-18,0xffaab7c5,false);
