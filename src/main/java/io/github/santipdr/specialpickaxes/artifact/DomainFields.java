@@ -33,10 +33,21 @@ public final class DomainFields {
     /** Membership counts keep combat-event lookups constant-time when fields overlap. */
     private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
+    private static boolean projectileEntity(Entity entity){return entity instanceof Projectile||JegProjectileCompat.isProjectile(entity);}
     private static boolean hostileProjectile(Entity entity,ServerPlayer player,boolean rejectPlayerOwned){
-        if(!(entity instanceof Projectile projectile)||projectile.getOwner()==null)return true;
-        var owner=projectile.getOwner();
+        if(!projectileEntity(entity))return true;
+        Entity owner=entity instanceof Projectile projectile?projectile.getOwner():JegProjectileCompat.shooter(entity);
+        if(owner==null)return true;
         return owner!=player&&!owner.isAlliedTo(player)&&!(rejectPlayerOwned&&owner instanceof net.minecraft.world.entity.player.Player);
+    }
+    private static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
+                                                 java.util.function.Predicate<Entity> eligible){
+        var selected=new ArrayList<Entity>();
+        selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,projectile->eligible.test(projectile),center,cap));
+        var jegType=JegProjectileCompat.entityType();
+        if(jegType!=null)selected.addAll(EntitySelection.nearest(level,jegType,bounds,eligible,center,cap));
+        selected.sort(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
+        return selected.size()>cap?new ArrayList<>(selected.subList(0,cap)):selected;
     }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
         return start(p,tool,kind,pos,radius,ArtifactConfig.FIELD_TIME.get());
@@ -85,7 +96,7 @@ public final class DomainFields {
         if(kind!=ArtifactKind.INTERREGNUM||p.isRemoved()||!p.isAlive()||p.isSpectator()
                 ||!(p.getMainHandItem().getItem() instanceof ArtifactItem pick)||pick.kind!=kind)return 0;
         var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);var fieldCenter=Vec3.atCenterOf(center);
-        var targets=EntitySelection.nearest(level,Entity.class,bounds,e->e.isAlive()&&(e instanceof Projectile||e instanceof Monster)
+        var targets=EntitySelection.nearest(level,Entity.class,bounds,e->e.isAlive()&&(projectileEntity(e)||e instanceof Monster)
                 &&!e.isAlliedTo(p)&&!FROZEN_ENTITIES.containsKey(e.getUUID())
                 &&hostileProjectile(e,p,false)
                 &&e.position().distanceToSqr(fieldCenter)<=(double)radius*radius,fieldCenter,cap);
@@ -162,9 +173,9 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.CRUCIBLE) {
                 if(p.tickCount%20==0)ArtifactFeedback.ring(p,f.kind,f.center,f.radius);
                 Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
-                var projectiles=EntitySelection.nearest(level,Projectile.class,new AABB(f.center).inflate(f.radius+24),e->e.isAlive()
+                var projectiles=projectilesNear(level,new AABB(f.center).inflate(f.radius+24),center,cap,e->e.isAlive()
                         &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
-                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()),center,cap);
+                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()));
                 for(var projectile:projectiles){
                     Vec3 away=projectile.position().subtract(p.position()).normalize();
                     if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
@@ -193,7 +204,7 @@ public final class DomainFields {
             double radiusSqr=(double)f.radius*f.radius;
             int targetLimit=ArtifactConfig.FIELD_TARGETS.get();
             var entities=EntitySelection.nearest(level,Entity.class,new AABB(f.center).inflate(f.radius),e ->
-                e.isAlive() && (e instanceof Projectile || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
+                e.isAlive() && (projectileEntity(e) || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
                 && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr)
                 &&hostileProjectile(e,p,f.kind==ArtifactKind.AEGIS)
                 && (f.kind!=ArtifactKind.INTERREGNUM||f.frozen.containsKey(e.getUUID())||!FROZEN_ENTITIES.containsKey(e.getUUID())),
