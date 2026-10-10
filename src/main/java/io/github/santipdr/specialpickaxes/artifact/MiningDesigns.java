@@ -9,6 +9,7 @@ import java.util.*;
 public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
     private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar");
+    private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay");
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
@@ -52,7 +53,16 @@ public final class MiningDesigns {
     private static boolean isModdedGeology(net.minecraft.world.level.block.state.BlockState state){
         return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{
             var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-            return key!=null&&WORLDGEN_GEOLOGY.contains(key.toString());
+            if(key==null)return false;
+            if(WORLDGEN_GEOLOGY.contains(key.toString()))return true;
+            var defaultState=block.defaultBlockState();
+            if(defaultState.hasBlockEntity()||!defaultState.getFluidState().isEmpty()||ArtifactOres.isOre(defaultState))return false;
+            String path=key.getPath().toLowerCase(java.util.Locale.ROOT);
+            if(path.endsWith("stone"))return true;
+            for(String part:path.split("_"))if(GEOLOGY_PARTS.contains(part))return true;
+            return false;
         });
     }
+    /** Tag membership can change during datapack reloads, so clear geology decisions with ore caches. */
+    public static void clearCache(){MODDED_GEOLOGY.clear();}
 }

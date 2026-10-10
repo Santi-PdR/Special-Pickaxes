@@ -75,7 +75,7 @@ public final class SpecialPickaxes {
         if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
             PlayerPlacedBlocks.scheduleCleanup(level,e.getPos());
     }
-    private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();}
+    private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();MiningDesigns.clearCache();}
     private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
