@@ -7,6 +7,7 @@ import java.util.*;
 
 /** Mining-specific plans. Resource detection never sends ore positions or outlines to the client. */
 public final class MiningDesigns {
+    private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
@@ -35,7 +36,7 @@ public final class MiningDesigns {
         for(int i=0;i<candidates.size()&&i<128;i++)steps.add(new WorkStep.Mine(candidates.get(i),level.getBlockState(candidates.get(i))));
         return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
     }
-    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.COBBLESTONE)||s.is(Blocks.COBBLED_DEEPSLATE)||s.is(Blocks.BLACKSTONE)||s.is(Blocks.POLISHED_BLACKSTONE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.SMOOTH_BASALT)||s.is(Blocks.OBSIDIAN)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
+    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.COBBLESTONE)||s.is(Blocks.COBBLED_DEEPSLATE)||s.is(Blocks.BLACKSTONE)||s.is(Blocks.POLISHED_BLACKSTONE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.SMOOTH_BASALT)||s.is(Blocks.OBSIDIAN)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE)||isModdedGeology(s);}
     public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
@@ -45,6 +46,12 @@ public final class MiningDesigns {
             ||block==Blocks.BLACKSTONE||block==Blocks.POLISHED_BLACKSTONE
             ||block==Blocks.BASALT||block==Blocks.SMOOTH_BASALT||block==Blocks.OBSIDIAN||block==Blocks.NETHERRACK||block==Blocks.END_STONE
             ||block==Blocks.DIRT||block==Blocks.COARSE_DIRT||block==Blocks.GRASS_BLOCK||block==Blocks.PODZOL||block==Blocks.ROOTED_DIRT||block==Blocks.GRAVEL
-            ||block==Blocks.DRIPSTONE_BLOCK||block==Blocks.POINTED_DRIPSTONE;
+            ||block==Blocks.DRIPSTONE_BLOCK||block==Blocks.POINTED_DRIPSTONE||isModdedGeology(s);
+    }
+    private static boolean isModdedGeology(net.minecraft.world.level.block.state.BlockState state){
+        return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{
+            var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+            return key!=null&&key.getNamespace().equals("terramity")&&key.getPath().equals("igneostone");
+        });
     }
 }

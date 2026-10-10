@@ -23,7 +23,7 @@ public final class ArtifactOres {
             ||NONSTANDARD_ORES.computeIfAbsent(state.getBlock(), block -> {
                 if(state.getTags().anyMatch(ArtifactOres::isOreTag))return true;
                 var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-                return key!=null&&isOreTagPath(key.getPath());
+                return isOreBlock(key);
             });
     }
 
@@ -33,7 +33,7 @@ public final class ArtifactOres {
         if(family!=null)return family.isEmpty()?null:family;
         var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         if(key==null)return null;
-        if(!isOreTagPath(key.getPath())){ORE_FAMILIES.putIfAbsent(block,NO_ORE_FAMILY);return null;}
+        if(!isOreBlock(key)){ORE_FAMILIES.putIfAbsent(block,NO_ORE_FAMILY);return null;}
         String path=stripHost(key.getPath());
         if(path.endsWith("_deepslate_ore"))path=path.substring(0,path.length()-"_deepslate_ore".length())+"_ore";
         if(path.startsWith("ores_"))path=canonicalPrefixedOre(path.substring("ores_".length()));
@@ -41,6 +41,14 @@ public final class ArtifactOres {
         family=key.getNamespace()+":"+path;
         ORE_FAMILIES.putIfAbsent(block,family);
         return ORE_FAMILIES.get(block);
+    }
+
+    /** Terramity worldgen registers these ore-feature outputs without an ore suffix or ore tag. */
+    private static boolean isOreBlock(net.minecraft.resources.ResourceLocation key){
+        if(key==null)return false;
+        if(isOreTagPath(key.getPath()))return true;
+        return key.getNamespace().equals("terramity")
+                &&(key.getPath().equals("brimslag")||key.getPath().equals("stellar_remnant"));
     }
 
     /** Datapack reloads can change tag membership, so discard the bounded registry-block cache then. */
