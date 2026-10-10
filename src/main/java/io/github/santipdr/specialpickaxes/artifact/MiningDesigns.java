@@ -55,10 +55,10 @@ public final class MiningDesigns {
             var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
             if(key==null)return false;
             if(WORLDGEN_GEOLOGY.contains(key.toString()))return true;
+            if(key.getNamespace().equals("minecraft"))return false;
             var defaultState=block.defaultBlockState();
             if(defaultState.hasBlockEntity()||!defaultState.getFluidState().isEmpty()||ArtifactOres.isOre(defaultState))return false;
             String path=key.getPath().toLowerCase(java.util.Locale.ROOT);
-            if(path.endsWith("stone"))return true;
             for(String part:path.split("_"))if(GEOLOGY_PARTS.contains(part))return true;
             return false;
         });
