@@ -102,9 +102,10 @@ public final class RadialMiningProgram implements WorkProgram {
         return new WorkStep(){
             @Override public BlockPos pos(){return pos;}
             @Override public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind ignored){
-                if(!player.serverLevel().hasChunkAt(pos)||PlayerPlacedBlocks.get(player.serverLevel()).contains(pos))return false;
+                if(target==null||!player.serverLevel().hasChunkAt(pos))return false;
                 BlockState old=player.serverLevel().getBlockState(pos);
-                return old!=target&&MiningDesigns.crucibleGeology(old)&&WorldSafety.transmute(player,tool,kind,pos,old,target);
+                return old.getBlock()!=target.getBlock()&&WorldSafety.crucibleSource(player,pos,old)
+                        &&WorldSafety.transmute(player,tool,kind,pos,old,target);
             }
         };
     }
