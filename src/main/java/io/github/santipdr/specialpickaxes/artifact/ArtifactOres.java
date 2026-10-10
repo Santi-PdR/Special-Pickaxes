@@ -59,6 +59,8 @@ public final class ArtifactOres {
 
     static boolean isOreTagPath(String path) {
         if(path==null)return false;
+        // Forge uses these tags for the host rock around ores, not for the ore blocks themselves.
+        if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
         boolean prefixed=path.startsWith("ore_")&&path.length()>4||path.startsWith("ores_")&&path.length()>5;
         if(prefixed&&(path.endsWith("_block")||path.endsWith("_blocks")))return false;
         return path.equals("ore")||path.equals("ores")||path.startsWith("ore/")||path.startsWith("ores/")
