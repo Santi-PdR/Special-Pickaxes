@@ -122,7 +122,9 @@ public final class RegionWork implements WorkProgram {
         if(target!=null)return WorldSafety.inert(s)||WorldSafety.vacant(s);
         if(kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&(mode==0||carve(pos));
         if(kind==ArtifactKind.WORLDBREAKER&&mode==5)return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&s.getDestroySpeed(p.serverLevel(),pos)>=0;
-        return kind==ArtifactKind.CRUCIBLE?MiningDesigns.crucibleGeology(s)&&!PlayerPlacedBlocks.get(p.serverLevel()).contains(pos):WorldSafety.inert(s);
+        if(kind==ArtifactKind.CRUCIBLE)
+            return WorldSafety.crucibleSource(p,pos,s)&&material!=null&&s.getBlock()!=material.getBlock();
+        return WorldSafety.inert(s);
     }
     /** Elliptical bore follows the selected Z axis; corners are preserved. */
     private boolean carve(BlockPos p){double x=2*(p.getX()-source.min().getX()+0.5)/source.width()-1,y=2*(p.getY()-source.min().getY()+0.5)/source.height()-1;return x*x+y*y<=1;}

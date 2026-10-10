@@ -164,7 +164,7 @@ public final class WorldSafety {
             else level.blockUpdated(pos,next.getBlock());
         }
     }
-    private static boolean crucibleSource(ServerPlayer p,BlockPos pos,BlockState state){
+    static boolean crucibleSource(ServerPlayer p,BlockPos pos,BlockState state){
         if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)||!MiningDesigns.crucibleGeology(state)
                 ||state.hasBlockEntity()||!state.getFluidState().isEmpty()||state.is(Blocks.BEDROCK)
                 ||state.getDestroySpeed(p.serverLevel(),pos)<0)return false;
