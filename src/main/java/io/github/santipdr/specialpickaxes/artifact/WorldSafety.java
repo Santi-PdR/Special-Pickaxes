@@ -37,8 +37,7 @@ public final class WorldSafety {
         var context=NATIVE_BREAK.get();
         if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null
                 ||context.kind()!=ArtifactKind.IRIDIUM||context.player().serverLevel()!=level
-                ||!ArtifactOres.isOre(context.expected())
-                ||!new AABB(context.pos()).inflate(1).contains(drop.position()))return;
+                ||!ArtifactOres.isOre(context.expected()))return;
         drop.setGlowingTag(true);
         drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
         drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",context.player().getUUID());
