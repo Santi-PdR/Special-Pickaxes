@@ -106,7 +106,7 @@ public final class WorkQueue {
             if(job.region!=null)job.region.reportProgress(p);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
-                else {boolean partial=job.region==null||job.region.reportPartial();ArtifactFeedback.message(p,job.succeeded==0?"nothing_changed":partial&&job.succeeded<job.completed?"partial":"complete");ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);
+                else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
