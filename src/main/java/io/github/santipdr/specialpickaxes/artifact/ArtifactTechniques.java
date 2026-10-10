@@ -6,7 +6,6 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -21,6 +20,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import org.joml.Vector3f;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -170,31 +170,25 @@ public final class ArtifactTechniques {
         return dash(player, distance);
     }
 
-    private static boolean nullwave(ServerPlayer player,int radius,int cap) {
-        Vec3 center=player.position();double rangeSqr=(double)radius*radius;
-        // The Nullwave can protect an active quarry even if no hostile is close enough to repel.
-        boolean deflected=deflectProjectiles(player,ArtifactKind.AXIOM,radius,cap);
-        var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
-            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
-                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
-                    ||!WorldSafety.allowed(player,ArtifactKind.AXIOM,entity.blockPosition()))return false;
-            return !(entity instanceof Player other)||player.canHarmPlayer(other);
+    /** Null Ward collapses nearby hostile shots into a player-only sculk pulse. */
+    private static boolean nullWard(ServerPlayer player,int radius,int cap) {
+        Vec3 center=player.position();double rangeSqr=(double)radius*radius;int collapsed=0;
+        var shots=EntitySelection.nearest(player.serverLevel(),Projectile.class,player.getBoundingBox().inflate(radius),projectile->{
+            var owner=projectile.getOwner();
+            return projectile.isAlive()&&(owner==null||!owner.isAlliedTo(player))
+                    &&projectile.position().distanceToSqr(center)<=rangeSqr
+                    &&WorldSafety.allowed(player,ArtifactKind.AXIOM,projectile.blockPosition());
         },center,cap);
-        if(targets.isEmpty())return deflected;
-        int repelled=0;
-        for(var target:targets){
-            Vec3 away=target.position().subtract(center);if(away.lengthSqr()<.01)away=new Vec3(0,0,1);
-            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(1.0).add(0,.35,0)));
-            target.hasImpulse=true;
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,60,0,true,false,true));
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,1,true,false,true));
-            ArtifactFeedback.burst(player,ArtifactKind.AXIOM,target.blockPosition(),4);repelled++;
+        for(var projectile:shots){
+            var point=projectile.position();
+            player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,8,.12,.12,.12,.015);
+            projectile.discard();
+            collapsed++;
         }
-        for(int i=0;i<16;i++){
-            double angle=i*Math.PI/8,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
-            player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,x,center.y+.15,z,1,0,0,0,0);
-        }
-        ArtifactFeedback.message(player,"nullwave",repelled);return repelled>0||deflected;
+        if(collapsed==0)return false;
+        ArtifactFeedback.nullWard(player,radius);
+        ArtifactFeedback.message(player,"nullward",collapsed);
+        return true;
     }
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
@@ -219,24 +213,6 @@ public final class ArtifactTechniques {
             level.sendParticles(player,ParticleTypes.ELECTRIC_SPARK,false,x,player.getY()+.08,z,1,0,0,0,0);
         }
         ArtifactFeedback.message(player,"fault_echo",stopped);return true;
-    }
-
-    private static boolean deflectProjectiles(ServerPlayer player, ArtifactKind kind, int radius, int cap) {
-        Vec3 center=player.position();double rangeSqr=(double)radius*radius;
-        int deflected = 0;
-        for (Projectile projectile : EntitySelection.nearest(player.serverLevel(), Projectile.class,
-                player.getBoundingBox().inflate(radius),
-                entity -> entity.isAlive() && (entity.getOwner() == null || !entity.getOwner().isAlliedTo(player))
-                        &&entity.position().distanceToSqr(center)<=rangeSqr
-                        && WorldSafety.allowed(player, kind, entity.blockPosition()), player.position(), cap)) {
-            Vec3 away = projectile.position().subtract(center).normalize();
-            if(away.lengthSqr()<.01)away=player.getLookAngle().normalize();
-            projectile.setDeltaMovement(away.scale(Math.max(.8, projectile.getDeltaMovement().length())));
-            projectile.hasImpulse = true;
-            if (++deflected >= cap) break;
-        }
-        if(deflected>0)ArtifactFeedback.message(player, "projectiles_deflected", deflected);
-        return deflected>0;
     }
 
     private static boolean rootSnare(ServerPlayer player,double range) {
@@ -276,78 +252,72 @@ public final class ArtifactTechniques {
         return recalled[0]>0;
     }
 
-    /** Rends one visible hostile's foremost intact armor seam; no damage or potion effects. */
-    private static boolean seamRend(ServerPlayer player) {
-        Vec3 look=player.getLookAngle().normalize(),eye=player.getEyePosition();double range=8;
-        AABB bounds=player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0,0.75,1.0);
-        LivingEntity target=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,bounds,entity->{
-            if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
-                    ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,entity.blockPosition()))return false;
-            if(entity instanceof Player other&&!player.canHarmPlayer(other))return false;
-            Vec3 delta=entity.getBoundingBox().getCenter().subtract(eye);
-            return delta.lengthSqr()<=range*range&&delta.normalize().dot(look)>=.78&&player.hasLineOfSight(entity);
-        },player.position(),1).stream().findFirst().orElse(null);
-        if(target==null)return false;
-        EquipmentSlot[] priority={EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.HEAD,EquipmentSlot.FEET};
-        EquipmentSlot slot=null;ItemStack armor=ItemStack.EMPTY;
-        for(var candidate:priority){var worn=target.getItemBySlot(candidate);if(!worn.isEmpty()&&worn.isDamageableItem()
-                &&worn.getDamageValue()<worn.getMaxDamage()){slot=candidate;armor=worn;break;}}
-        if(slot==null)return false;
-        int before=armor.getDamageValue(),max=armor.getMaxDamage(),requested=Math.min(48,max-before);var damagedSlot=slot;
-        armor.hurtAndBreak(requested,target,entity->entity.broadcastBreakEvent(damagedSlot));
-        int applied=armor.isEmpty()?requested:Math.max(0,armor.getDamageValue()-before);
-        if(applied<=0)return false;
-        ArtifactFeedback.burst(player,ArtifactKind.SEAM_RIPPER,target.blockPosition(),10);
+    /** A clear, timed projectile ward follows its owner and catches fast shots every tick. */
+    private static boolean crucibleWard(ServerPlayer player,ItemStack tool) {
+        int radius=10,duration=160;
+        if(!DomainFields.start(player,tool,ArtifactKind.CRUCIBLE,player.blockPosition(),radius,duration))return false;
+        ArtifactFeedback.ring(player,ArtifactKind.CRUCIBLE,player.blockPosition(),radius);
+        ArtifactFeedback.message(player,"crucible_ward_started");
         return true;
     }
 
-    private static boolean quenchLava(ServerPlayer player,ItemStack tool) {
+    private static boolean seamFace(ServerPlayer player,ItemStack tool) {
+        var target=ArtifactActions.target(player);if(target.isEmpty())return false;
+        var level=player.serverLevel();var origin=target.get();var state=level.getBlockState(origin);
+        if(!MiningDesigns.seamGeology(state)||PlayerPlacedBlocks.get(level).contains(origin)
+                ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,origin))return false;
+        var hit=level.clip(new net.minecraft.world.level.ClipContext(player.getEyePosition(),
+                player.getEyePosition().add(player.getLookAngle().normalize().scale(24)),
+                net.minecraft.world.level.ClipContext.Block.OUTLINE,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
+        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
+        Direction face=hit.getDirection();
+        Direction u=face.getAxis()==Direction.Axis.Y?Direction.EAST:Direction.UP;
+        Direction v=face.getAxis()==Direction.Axis.Y?Direction.SOUTH:face.getAxis()==Direction.Axis.X?Direction.SOUTH:Direction.EAST;
+        var steps=new ArrayList<WorkStep>(25);
+        for(int a=-2;a<=2;a++)for(int b=-2;b<=2;b++){
+            var pos=origin.relative(u,a).relative(v,b);if(!level.hasChunkAt(pos))continue;
+            var block=level.getBlockState(pos);
+            if(MiningDesigns.seamGeology(block)&&!PlayerPlacedBlocks.get(level).contains(pos))steps.add(new WorkStep.Mine(pos,block));
+        }
+        if(steps.isEmpty())return false;
+        steps.sort(Comparator.comparingDouble(step->step.pos().distSqr(origin)));
+        if(!WorkQueue.start(player,tool,ArtifactKind.SEAM_RIPPER,steps))return false;
+        ArtifactFeedback.preview(player,ArtifactKind.SEAM_RIPPER,steps);
+        ArtifactFeedback.message(player,"seam_face_started",steps.size());
+        return true;
+    }
+
+    private static boolean magmaEruption(ServerPlayer player,ItemStack tool) {
         var level=player.serverLevel();Vec3 from=player.getEyePosition(),to=from.add(player.getLookAngle().normalize().scale(24));
         var end=ArtifactActions.loadedRayEnd(level,from,to);
         var hit=level.clip(new net.minecraft.world.level.ClipContext(from,end,
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.ANY,player));
         if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
-        BlockPos center=hit.getBlockPos();var focused=level.getFluidState(center);
-        if(!focused.is(net.minecraft.tags.FluidTags.LAVA))return false;
-
-        final int cap=64,radius=4;
-        var frontier=new ArrayDeque<BlockPos>();var visited=new HashSet<Long>();var lava=new ArrayList<BlockPos>(cap);
-        frontier.add(center.immutable());visited.add(center.asLong());
-        while(!frontier.isEmpty()&&lava.size()<cap){
-            BlockPos pos=frontier.removeFirst();
-            if(pos.distSqr(center)>radius*radius||!level.hasChunkAt(pos))continue;
-            var state=level.getBlockState(pos);var fluid=level.getFluidState(pos);
-            if(!fluid.is(net.minecraft.tags.FluidTags.LAVA)||state.hasBlockEntity()
-                    ||PlayerPlacedBlocks.get(level).contains(pos)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,pos))continue;
-            lava.add(pos.immutable());
-            for(Direction direction:Direction.values()){
-                BlockPos next=pos.relative(direction);
-                if(next.distSqr(center)<=radius*radius&&visited.add(next.asLong()))frontier.addLast(next);
-            }
+        BlockPos center=hit.getBlockPos();var focused=level.getFluidState(center);var old=level.getBlockState(center);
+        if(!focused.is(net.minecraft.tags.FluidTags.LAVA)||!focused.isSource()
+                ||old.hasBlockEntity()||PlayerPlacedBlocks.get(level).contains(center)
+                ||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,center)
+                ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,player.gameMode.getGameModeForPlayer(),player,center)<0)return false;
+        var snapshot=BlockSnapshot.create(level.dimension(),level,center);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
+        if(!level.setBlock(center,obsidian,3))return false;
+        if(ForgeEventFactory.onBlockPlace(player,snapshot,Direction.UP)||level.getBlockState(center)!=obsidian){
+            if(level.hasChunkAt(center)&&level.getBlockState(center)==obsidian&&level.getFluidState(center).isEmpty())snapshot.restore(true,false);
+            return false;
         }
-        if(lava.isEmpty())return false;
-        var steps=new ArrayList<WorkStep>(lava.size());
-        for(BlockPos pos:lava){
-            steps.add(new WorkStep(){
-                @Override public BlockPos pos(){return pos;}
-                @Override public boolean apply(ServerPlayer actor,ItemStack held,ArtifactKind kind){
-                    var current=level.getBlockState(pos);var currentFluid=level.getFluidState(pos);
-                    if(!level.hasChunkAt(pos)||!currentFluid.is(net.minecraft.tags.FluidTags.LAVA)
-                            ||current.hasBlockEntity()||PlayerPlacedBlocks.get(level).contains(pos)||!WorldSafety.allowed(actor,kind,pos)
-                            ||net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level,actor.gameMode.getGameModeForPlayer(),actor,pos)<0)return false;
-                    var snapshot=BlockSnapshot.create(level.dimension(),level,pos);var obsidian=Blocks.OBSIDIAN.defaultBlockState();
-                    if(!level.setBlock(pos,obsidian,3))return false;
-                    if(ForgeEventFactory.onBlockPlace(actor,snapshot,Direction.UP)||level.getBlockState(pos)!=obsidian){
-                        if(level.hasChunkAt(pos)&&level.getBlockState(pos)==obsidian&&level.getFluidState(pos).isEmpty())snapshot.restore(true,false);
-                        return false;
-                    }
-                    level.blockUpdated(pos,Blocks.OBSIDIAN);ArtifactFeedback.burst(actor,ArtifactKind.HELLSPEC,pos,3);return true;
-                }
-            });
+        level.blockUpdated(center,Blocks.OBSIDIAN);
+        var bounds=new AABB(center).inflate(8,4,8);int affected=0;
+        var targets=EntitySelection.nearest(level,LivingEntity.class,bounds,e->e.isAlive()&&e!=player
+                &&!e.isAlliedTo(player)&&e.position().distanceToSqr(Vec3.atCenterOf(center))<=64
+                &&WorldSafety.allowed(player,ArtifactKind.HELLSPEC,e.blockPosition())
+                &&(!(e instanceof Player other)||player.canHarmPlayer(other)),Vec3.atCenterOf(center),12);
+        for(var target:targets){
+            Vec3 away=target.position().subtract(Vec3.atCenterOf(center)).normalize();
+            if(away.lengthSqr()<.01)away=player.getLookAngle().normalize();
+            target.setDeltaMovement(target.getDeltaMovement().scale(.35).add(away.scale(1.65)).add(0,.45,0));target.hasImpulse=true;
+            target.setSecondsOnFire(4);affected++;
         }
-        int blocks=steps.size();if(!WorkQueue.start(player,tool,ArtifactKind.HELLSPEC,steps))return false;
-        ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,radius);
-        ArtifactFeedback.message(player,"lava_sealed",blocks);return true;
+        ArtifactFeedback.burst(player,ArtifactKind.HELLSPEC,center,20);ArtifactFeedback.ring(player,ArtifactKind.HELLSPEC,center,5);
+        ArtifactFeedback.message(player,"magma_erupted",affected);return true;
     }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
@@ -355,18 +325,18 @@ public final class ArtifactTechniques {
             case PALIMPSEST -> knockbackPulse(player, kind, 6, 1.0, 24);
             case CHOIR -> faultEcho(player, 6, 4);
             case EVENTIDE -> magnetDrops(player, 16, 64);
-            case CRUCIBLE -> deflectProjectiles(player, kind, 10, 32);
+            case CRUCIBLE -> crucibleWard(player,tool);
             case INTERREGNUM -> ArtifactState.mode(player,kind)==1
                     ? arrestMotion(player,kind,player.blockPosition(),8,24)
                     : DomainFields.relocate(player,aimed(player));
             case WORLDLOOM -> rootSnare(player, 10);
             case ICARUS -> icarianLift(player,tool);
-            case AXIOM -> nullwave(player,8,24);
+            case AXIOM -> nullWard(player,8,24);
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfallSink(player,tool);
             case IRIDIUM -> recallIridiumDrops(player, 24, 96);
-            case HELLSPEC -> quenchLava(player,tool);
-            case SEAM_RIPPER -> seamRend(player);
+            case HELLSPEC -> magmaEruption(player,tool);
+            case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };
     }

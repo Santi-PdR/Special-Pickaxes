@@ -8,7 +8,7 @@ import java.util.*;
 
 /** Bounded slice memory. Every slice is checked before excavation; any barrier terminates the entire route. */
 public final class DirectionalProgram implements WorkProgram {
-    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, EXODIUM_SINK, RESONANT_TUNNEL, ROOTWAKE }
+    public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, EXODIUM_SINK, RESONANT_TUNNEL, WORLDLOOM_BORE }
     private final BlockPos origin;private final Direction direction;private final Shape shape;private final ArtifactKind kind;private final int length;
     private int depth,index;private boolean digging,moving,finished;
     private List<BlockPos> slice;private BlockState[] expected;
@@ -17,7 +17,7 @@ public final class DirectionalProgram implements WorkProgram {
     }
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape,ArtifactKind kind){
         this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;this.kind=kind;
-        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->32;case RESONANT_TUNNEL->20;case ROOTWAKE->24;};
+        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->32;case RESONANT_TUNNEL->20;case WORLDLOOM_BORE->16;};
         prepare();
     }
     private void prepare(){
@@ -31,7 +31,7 @@ public final class DirectionalProgram implements WorkProgram {
         switch(shape){
             case ICARUS->{w=3;h=2;}case ICARUS_WIDE->{w=4;h=3;}case EXODIUM_LANCE->{w=6;h=4;}case EXODIUM_SINK->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
             case RESONANT_TUNNEL->{w=0;h=0;}
-            case ROOTWAKE->{w=1;h=1;}
+            case WORLDLOOM_BORE->{w=2;h=2;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
             case CLEAVE->{w=12;h=5;}
             default->{w=Math.min(24,3+depth/3);h=Math.min(10,2+depth/10);}
@@ -45,20 +45,11 @@ public final class DirectionalProgram implements WorkProgram {
             var c=origin.relative(direction,depth);
             var pos=switch(direction.getAxis()){case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};slice.add(pos);
         }
-        if(shape==Shape.ROOTWAKE&&depth%6==5){
-            for(int u=-4;u<=4;u++)if(Math.abs(u)>1)for(int v=-1;v<=1;v++){
-                var c=origin.relative(direction,depth);
-                var pos=switch(direction.getAxis()){case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};slice.add(pos);
-            }
-        }
         return slice;
     }
     public int remaining(){
         if(finished)return 0;
-        if(shape!=Shape.ROOTWAKE)return (length-depth)*slice.size()*2;
-        int work=(slice.size()-index)*(digging?1:2);
-        for(int d=depth+1;d<length;d++)work+=(9+(d%6==5?18:0))*2;
-        return work;
+        return (length-depth)*slice.size()*2;
     }
     public boolean awaiting(){return false;}public boolean executing(){return true;}public boolean done(){return finished;}public void confirm(){}
     public boolean loaded(ServerPlayer p){return finished||p.serverLevel().hasChunkAt(moving?origin.relative(direction,depth):slice.get(index));}
@@ -70,7 +61,7 @@ public final class DirectionalProgram implements WorkProgram {
     private void nextSlice(){if(++depth>=length){finished=true;return;}prepare();}
     public boolean backpressured(ServerPlayer p){
         if(finished||moving||!digging||expected[index].isAir())return false;
-        if(shape==Shape.ROOTWAKE&&(!MiningDesigns.matrix(expected[index])||ArtifactOres.isOre(expected[index])
+        if(shape==Shape.WORLDLOOM_BORE&&(!MiningDesigns.matrix(expected[index])||ArtifactOres.isOre(expected[index])
                 ||PlayerPlacedBlocks.get(p.serverLevel()).contains(slice.get(index))))return false;
         return WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,slice.get(index),expected[index]);
     }
@@ -82,7 +73,7 @@ public final class DirectionalProgram implements WorkProgram {
             public BlockPos pos(){return at;}
             public boolean stopOnFailure(){return true;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-                if(shape==Shape.ROOTWAKE){
+                if(shape==Shape.WORLDLOOM_BORE){
                     if(!WorldSafety.allowed(actor,kind,at)||WorldSafety.barrier(actor,at))return false;
                     if(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!MiningDesigns.matrix(old)||ArtifactOres.isOre(old))return true;
                 }

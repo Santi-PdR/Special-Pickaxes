@@ -22,7 +22,7 @@ public final class ArtifactInteraction {
         case INTERREGNUM->new String[]{"domain","aura"};case WORLDLOOM->new String[]{"quarry"};
         case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"hollow_pulse"};
         case EXODIUM->new String[]{"starfall"};case IRIDIUM->new String[]{"orefall"};case HELLSPEC->new String[]{"hellforge"};
-        case SEAM_RIPPER->new String[]{"contact","exposed"};
+        case SEAM_RIPPER->new String[]{"connected"};
         case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter","region_break"};
         default->new String[]{"retired"};};}
     public static int modeCount(ArtifactKind k){return modes(k).length;}

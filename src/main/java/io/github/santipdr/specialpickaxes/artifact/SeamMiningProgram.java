@@ -14,6 +14,7 @@ public final class SeamMiningProgram implements WorkProgram {
     private final BlockPos origin;
     private final BlockState material,boundary;
     private final boolean exposedToAir;
+    private final boolean connectedOnly;
     private final ArrayDeque<BlockPos> frontier=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
     private final List<Candidate> candidates=new ArrayList<>();
@@ -21,7 +22,10 @@ public final class SeamMiningProgram implements WorkProgram {
     private boolean scanning=true;
 
     public SeamMiningProgram(BlockPos origin,BlockState material,BlockState boundary,boolean exposedToAir,Collection<BlockPos> seeds){
-        this.origin=origin.immutable();this.material=material;this.boundary=boundary;this.exposedToAir=exposedToAir;
+        this(origin,material,boundary,exposedToAir,seeds,false);
+    }
+    public SeamMiningProgram(BlockPos origin,BlockState material,BlockState boundary,boolean exposedToAir,Collection<BlockPos> seeds,boolean connectedOnly){
+        this.origin=origin.immutable();this.material=material;this.boundary=boundary;this.exposedToAir=exposedToAir;this.connectedOnly=connectedOnly;
         for(var seed:seeds)if(seen.size()<SCAN_LIMIT&&seen.add(seed.immutable()))frontier.addLast(seed.immutable());
     }
 
@@ -54,7 +58,7 @@ public final class SeamMiningProgram implements WorkProgram {
                         var neighbor=level.getBlockState(adjacent);
                         if(exposedToAir?neighbor.isAir():neighbor==boundary){touchesBoundary=true;break;}
                     }
-                    if(touchesBoundary&&candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
+                    if((connectedOnly||touchesBoundary)&&candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
                     for(var direction:Direction.values()){
                         var adjacent=pos.relative(direction);
                         if(seen.size()<SCAN_LIMIT&&level.hasChunkAt(adjacent)&&!PlayerPlacedBlocks.get(level).contains(adjacent)

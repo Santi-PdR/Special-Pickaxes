@@ -87,36 +87,54 @@ public final class ArtifactFeedback {
     }
     /** Compact 3D boundary preview for bounded radial mining; only the activating player receives it. */
     public static void sphere(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int innerRadius,int points) {
-        int rgb=kind.color;var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.25F);
-        int count=Math.max(12,Math.min(64,points));
+        int rgb=kind.color;
+        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.25F);
+        boolean hollow=kind==ArtifactKind.AXIOM;
+        var outer=hollow?new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.3F):dust;
+        var core=hollow?new DustParticleOptions(new Vector3f(.72F,.42F,1F),1.45F):dust;
+        int count=Math.max(12,Math.min(hollow?128:64,points));
         for(int shell=0;shell<(innerRadius>0?2:1);shell++){
             double r=shell==0?radius:innerRadius;
             int samples=shell==0?count:Math.max(12,count/2);
+            var color=shell==0?outer:core;
             for(int i=0;i<samples;i++){
                 double y=1-2*(i+0.5)/samples,ring=Math.sqrt(Math.max(0,1-y*y)),angle=i*2.399963229728653;
                 double x=Math.cos(angle)*ring,z=Math.sin(angle)*ring;
-                p.serverLevel().sendParticles(p,dust,false,center.getX()+0.5+x*r,center.getY()+0.5+y*r,center.getZ()+0.5+z*r,1,0,0,0,0);
+                p.serverLevel().sendParticles(p,color,false,center.getX()+0.5+x*r,center.getY()+0.5+y*r,center.getZ()+0.5+z*r,1,0,0,0,0);
             }
         }
     }
-    public static void rootwakeTunnel(ServerPlayer p,BlockPos origin,net.minecraft.core.Direction direction) {
+    public static void worldloomBore(ServerPlayer p,BlockPos origin,net.minecraft.core.Direction direction){
         var level=p.serverLevel();var green=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),1.25F);
-        var vines=new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
-        for(int depth:new int[]{0,12,23})for(int u=-1;u<=1;u++)for(int v=-1;v<=1;v++)if(Math.abs(u)==1||Math.abs(v)==1){
+        for(int depth:new int[]{0,8,15})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++)if(Math.abs(u)==2||Math.abs(v)==2){
             BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
                 case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};
             if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
-        for(int depth:new int[]{5,11,17,23})for(int u:new int[]{-4,4}){
-            BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
-                case X->c.offset(0,0,u);case Y->c.offset(u,0,0);case Z->c.offset(u,0,0);};
-            if(level.hasChunkAt(at))level.sendParticles(p,vines,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,3,.1,.1,.1,.02);
+    }
+    public static void nullWard(ServerPlayer p,int radius){
+        var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);
+        var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.35F);
+        for(int i=0;i<16;i++){
+            double angle=i*Math.PI/8;
+            p.serverLevel().sendParticles(p,soul,false,p.getX()+Math.cos(angle)*radius,p.getY()+.8,p.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
         }
     }
-    /** Five bounded rings make Hellspec's core-and-petal quarry legible before it starts. */
+    /** Bounded ember outlines make Hellspec's core-and-petal quarry legible before it starts. */
     public static void hellBloom(ServerPlayer p,BlockPos center) {
-        for(int[] offset:new int[][]{{0,0},{4,0},{-4,0},{0,4},{0,-4}})
-            ring(p,ArtifactKind.HELLSPEC,center.offset(offset[0],0,offset[1]),3);
+        var ember=new DustParticleOptions(new Vector3f(1F,.24F,.035F),1.35F);
+        var heart=new DustParticleOptions(new Vector3f(1F,.72F,.12F),1.5F);
+        int[][] offsets={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
+        for(int index=0;index<5;index++){
+            BlockPos petal=center.offset(offsets[index][0],0,offsets[index][1]);
+            var color=index==0?heart:ember;
+            for(int i=0;i<16;i++){
+                double angle=i*Math.PI/8;
+                double x=petal.getX()+.5+Math.cos(angle)*3,z=petal.getZ()+.5+Math.sin(angle)*3;
+                p.serverLevel().sendParticles(p,color,false,x,petal.getY()+.12,z,1,0,0,0,0);
+            }
+            p.serverLevel().sendParticles(p,ParticleTypes.FLAME,false,petal.getX()+.5,petal.getY()+.55,petal.getZ()+.5,3,.15,.12,.15,.015);
+        }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
         boolean stasis=kind==ArtifactKind.INTERREGNUM;

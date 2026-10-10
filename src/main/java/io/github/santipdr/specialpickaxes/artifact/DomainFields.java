@@ -21,11 +21,11 @@ public final class DomainFields {
     }
     private static final class Field {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
-        final int mode;int minedSincePulse;net.minecraft.world.level.block.Block pulseMaterial;long pulseReady;
+        final int mode;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires;
-        Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius) {
-            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get();
+        Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius,int duration) {
+            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+duration;
         }
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();
@@ -39,8 +39,11 @@ public final class DomainFields {
         return owner!=player&&!owner.isAlliedTo(player)&&!(rejectPlayerOwned&&owner instanceof net.minecraft.world.entity.player.Player);
     }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
-        if((kind!=ArtifactKind.INTERREGNUM&&kind!=ArtifactKind.EVENTIDE)||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
-        stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius));return true;
+        return start(p,tool,kind,pos,radius,ArtifactConfig.FIELD_TIME.get());
+    }
+    public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius,int duration) {
+        if((kind!=ArtifactKind.INTERREGNUM&&kind!=ArtifactKind.EVENTIDE&&kind!=ArtifactKind.CRUCIBLE)||!FIELDS.containsKey(p.getUUID())&&FIELDS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
+        stop(p);FIELDS.put(p.getUUID(),new Field(p,tool,kind,pos.immutable(),radius,duration));return true;
     }
     public static boolean relocate(ServerPlayer p,BlockPos destination){
         var field=FIELDS.get(p.getUUID());
@@ -122,33 +125,13 @@ public final class DomainFields {
         var field=FIELDS.get(p.getUUID());
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
-        if(field.kind==ArtifactKind.EVENTIDE&&p.getMainHandItem()==tool) {
-            if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) {
-                field.pulseMaterial=null;field.minedSincePulse=0;
-                return;
-            }
-            if(!minedState.is(net.minecraftforge.common.Tags.Blocks.STONE)) {
-                field.pulseMaterial=null;field.minedSincePulse=0;
-                return;
-            }
-            var material=minedState.getBlock();
-            if(field.pulseMaterial!=material) {
-                field.pulseMaterial=material;
-                field.minedSincePulse=0;
-            }
-            if(++field.minedSincePulse>=4&&ArtifactState.now(p)>=field.pulseReady) {
-            field.minedSincePulse=0;field.pulseReady=ArtifactState.now(p)+10;
-            var pulse=ArtifactActions.gravityPulse(p,pos,minedState,field.center,field.mode);
-            int added=0;for(var step:pulse)if(added<6&&WorkQueue.append(p,tool,ArtifactKind.EVENTIDE,step))added++;
-            if(added>0)ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,pos,6);
-            }
-        }
     }
     public static void tick() {
         tickPulses();
         var iterator=FIELDS.values().iterator();
         while(iterator.hasNext()) {
             var f=iterator.next();var p=f.owner;var level=p.serverLevel();
+            if(f.kind==ArtifactKind.CRUCIBLE)f.center=p.blockPosition();
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=f.tool || f.tool.isEmpty()
                     || p.level().dimension()!=f.dimension || ArtifactState.now(p)>f.expires || !WorldSafety.allowed(p,f.kind,f.center)) {
                 if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==f.tool&&p.level().dimension()==f.dimension&&ArtifactState.now(p)>f.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}
@@ -176,13 +159,33 @@ public final class DomainFields {
                     if(++supported>=16)break;
                 }
             }
+            if(f.kind==ArtifactKind.CRUCIBLE) {
+                if(p.tickCount%20==0)ArtifactFeedback.ring(p,f.kind,f.center,f.radius);
+                Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
+                var projectiles=EntitySelection.nearest(level,Projectile.class,new AABB(f.center).inflate(f.radius+24),e->e.isAlive()
+                        &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
+                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()),center,cap);
+                for(var projectile:projectiles){
+                    Vec3 away=projectile.position().subtract(p.position()).normalize();
+                    if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
+                    double speed=Math.min(4.0,Math.max(1.5,projectile.getDeltaMovement().length()));
+                    projectile.setDeltaMovement(away.scale(speed));projectile.hasImpulse=true;
+                    if(++changed>=cap)break;
+                }
+                if(changed>0&&p.tickCount%10==0)ArtifactFeedback.message(p,"projectiles_deflected",changed);
+                if(p.tickCount%4==0)for(int i=0;i<12;i++){
+                    double a=i*Math.PI/6,rad=f.radius;
+                    level.sendParticles(p,net.minecraft.core.particles.ParticleTypes.SMALL_FLAME,false,
+                            p.getX()+Math.cos(a)*rad,p.getY()+.15,p.getZ()+Math.sin(a)*rad,1,0,0,0,0);
+                }
+                continue;
+            }
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
-                continue; // Eventide shapes mining only; it never moves or damages entities.
             }
-            if(f.mode==1){if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
+            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
             if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
             // Keep already frozen entities pinned every tick, but scan for new targets every other tick.
             if((p.tickCount&1)!=0){holdFrozen(level,f);continue;}
@@ -229,6 +232,11 @@ public final class DomainFields {
             });
             if(p.tickCount%10==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",centerPosition);}
         }
+    }
+    private static boolean withinProjectilePath(Entity projectile,Vec3 center,double radiusSqr){
+        Vec3 start=projectile.position(),end=start.subtract(projectile.getDeltaMovement()),segment=end.subtract(start);
+        double length=segment.lengthSqr();double t=length<1.0e-8?0:Math.max(0,Math.min(1,center.subtract(start).dot(segment)/length));
+        return start.add(segment.scale(t)).distanceToSqr(center)<=radiusSqr;
     }
     private static void tickPulses(){
         var iterator=PULSES.values().iterator();

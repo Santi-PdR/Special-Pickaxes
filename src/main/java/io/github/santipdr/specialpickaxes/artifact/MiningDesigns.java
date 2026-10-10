@@ -15,13 +15,13 @@ public final class MiningDesigns {
         var origin=k==ArtifactKind.CHOIR||k==ArtifactKind.ICARUS||k==ArtifactKind.EXODIUM?p.blockPosition().above().relative(direction):shape==DirectionalProgram.Shape.CORE_DRILL?p.blockPosition().below():ArtifactActions.target(p).orElse(p.blockPosition().relative(direction,2));
         return WorkQueue.startRegion(p,tool,k,new DirectionalProgram(origin,direction,shape,k));
     }
-    public static boolean rootwake(ServerPlayer p,ItemStack tool,BlockPos origin){
+    public static boolean worldloomBore(ServerPlayer p,ItemStack tool,BlockPos origin){
         var level=p.serverLevel();var state=level.getBlockState(origin);
         if(!MiningDesigns.matrix(state)||ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(level).contains(origin)
                 ||!WorldSafety.allowed(p,ArtifactKind.WORLDLOOM,origin)||!WorldSafety.harvestable(p,tool,origin))return false;
         Direction direction=Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z);
         return WorkQueue.startRegion(p,tool,ArtifactKind.WORLDLOOM,
-                new DirectionalProgram(origin,direction,DirectionalProgram.Shape.ROOTWAKE,ArtifactKind.WORLDLOOM));
+                new DirectionalProgram(origin,direction,DirectionalProgram.Shape.WORLDLOOM_BORE,ArtifactKind.WORLDLOOM));
     }
     public static boolean orefall(ServerPlayer p,ItemStack tool,BlockPos center){
         int radius=8,halfHeight=4;var candidates=new ArrayList<BlockPos>();var level=p.serverLevel();
@@ -36,7 +36,7 @@ public final class MiningDesigns {
         return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
     }
     public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.COBBLESTONE)||s.is(Blocks.COBBLED_DEEPSLATE)||s.is(Blocks.BLACKSTONE)||s.is(Blocks.POLISHED_BLACKSTONE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.SMOOTH_BASALT)||s.is(Blocks.OBSIDIAN)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE);}
-    public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&WorldSafety.inert(s);}
+    public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
         if(s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL))return true;

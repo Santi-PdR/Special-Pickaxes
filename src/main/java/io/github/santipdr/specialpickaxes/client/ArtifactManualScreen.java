@@ -57,7 +57,8 @@ public final class ArtifactManualScreen extends Screen {
             var selection=copied.isBlank()?Component.translatable("screen.specialpickaxes.copy_native"):Component.translatable("item.specialpickaxes."+copied);
             if(!copied.isBlank()&&ArtifactInteraction.modeCount(abilityKind)>1)
                 selection.append(" · ").append(Component.translatable("mode.specialpickaxes."+modeKey));
-            g.drawString(font,Component.translatable("screen.specialpickaxes.selected",selection),x+16,y+h-30,0xffe9c96f,false);
+            var copiedState=Component.translatable("screen.specialpickaxes.copy_mode",selection);
+            g.drawString(font,Component.translatable("screen.specialpickaxes.selected",copiedState),x+16,y+h-30,0xffe9c96f,false);
         }else if(contentHeight>contentBottom-contentTop){
             g.drawString(font,Component.translatable("screen.specialpickaxes.scroll"),x+w-82,y+h-18,0xffaab7c5,false);
         }
@@ -130,6 +131,7 @@ public final class ArtifactManualScreen extends Screen {
                 String mode=ArtifactInteraction.modeKey(source,0);var details=new ArrayList<Component>();
                 details.add(stack.getHoverName());
                 details.add(Component.translatable("screen.specialpickaxes.main").append(": ").append(Component.translatable("mining.identity."+source.id+"."+mode)));
+                details.add(Component.translatable("manual4.how").append(": ").append(Component.translatable("mining.how."+source.id+"."+mode)));
                 if(ArtifactInteraction.modeCount(source)>1){
                     var modes=Component.empty();String[] available=ArtifactInteraction.modes(source);
                     for(int m=0;m<available.length;m++){if(m>0)modes.append(" · ");modes.append(Component.translatable("mode.specialpickaxes."+available[m]));}

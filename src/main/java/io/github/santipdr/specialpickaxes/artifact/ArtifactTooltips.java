@@ -14,6 +14,11 @@ public final class ArtifactTooltips {
                 Component.translatable("mining.short.specialpickaxes."+k.id)).withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("tooltip.specialpickaxes.x",
                 Component.translatable("alternate.specialpickaxes."+k.id)).withStyle(ChatFormatting.AQUA));
+        if(k==ArtifactKind.WORLDBREAKER&&stack.hasTag()&&stack.getTag().contains("copiedSkill")){
+            String source=stack.getTag().getString("copiedSkill");
+            try{ArtifactKind.byId(source);lines.add(Component.translatable("tooltip.specialpickaxes.copying",Component.translatable("item.specialpickaxes."+source)).withStyle(ChatFormatting.GOLD));}
+            catch(IllegalArgumentException ignored){}
+        }
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
         return actions(ItemStack.EMPTY,k,mode);

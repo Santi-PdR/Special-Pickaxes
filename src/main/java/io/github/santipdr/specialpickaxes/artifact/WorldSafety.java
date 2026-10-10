@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraftforge.common.*;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import java.util.*;
@@ -143,7 +144,8 @@ public final class WorldSafety {
         }
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
-        if(expected==next || kind==ArtifactKind.CRUCIBLE&&(!MiningDesigns.crucibleGeology(expected)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) || !inert(expected) || !inert(next) || !allowed(p,kind,pos)
+        boolean crucibleSource=kind==ArtifactKind.CRUCIBLE&&crucibleSource(p,pos,expected);
+        if(expected==next || kind==ArtifactKind.CRUCIBLE&&!crucibleSource || kind!=ArtifactKind.CRUCIBLE&&!inert(expected) || !inert(next) || !allowed(p,kind,pos)
                 || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(pos)!=expected) return false;
@@ -157,6 +159,14 @@ public final class WorldSafety {
             if(!accepted) restoreOwned(level,snapshot,pos,next);
             else level.blockUpdated(pos,next.getBlock());
         }
+    }
+    private static boolean crucibleSource(ServerPlayer p,BlockPos pos,BlockState state){
+        if(PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)||!MiningDesigns.crucibleGeology(state)
+                ||state.hasBlockEntity()||!state.getFluidState().isEmpty()||state.is(Blocks.BEDROCK)
+                ||state.getDestroySpeed(p.serverLevel(),pos)<0)return false;
+        var id=ForgeRegistries.BLOCKS.getKey(state.getBlock());
+        return id==null||!id.getNamespace().equals("securitycraft")
+                ||!(id.getPath().contains("reinforced")||id.getPath().contains("admin"));
     }
     public static boolean vacant(BlockState s) { return s.is(Blocks.AIR) || s.is(Blocks.CAVE_AIR) || s.is(Blocks.VOID_AIR); }
     public static boolean exchange(ServerPlayer p,ItemStack tool,BlockPos a,BlockPos b,BlockState sa,BlockState sb) {

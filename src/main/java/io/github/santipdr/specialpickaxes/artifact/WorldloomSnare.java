@@ -30,7 +30,7 @@ public final class WorldloomSnare {
         UUID id=target.getUUID();
         if(!BINDINGS.containsKey(id)&&BINDINGS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         var level=owner.serverLevel();var anchor=target.position();
-        BINDINGS.put(id,new Binding(target,owner,level,anchor,level.getGameTime()+50));
+        BINDINGS.put(id,new Binding(target,owner,level,anchor,level.getGameTime()+80));
         return true;
     }
 
