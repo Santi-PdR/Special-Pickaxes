@@ -145,8 +145,13 @@ public final class WorldSafety {
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
         boolean crucibleSource=kind==ArtifactKind.CRUCIBLE&&crucibleSource(p,pos,expected);
-        if(expected==next || kind==ArtifactKind.CRUCIBLE&&!crucibleSource || kind!=ArtifactKind.CRUCIBLE&&!inert(expected) || !inert(next) || !allowed(p,kind,pos)
-                || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos) || !breakPermission(p,pos)) return false;
+        boolean validSource=kind==ArtifactKind.CRUCIBLE?crucibleSource:inert(expected);
+        boolean validTool=kind==ArtifactKind.CRUCIBLE
+                ?p.getMainHandItem()==tool&&!tool.isEmpty()
+                :harvestable(p,tool,pos);
+        if(expected==next || !validSource || !inert(next) || !allowed(p,kind,pos)
+                || !validTool || p.serverLevel().getBlockState(pos)!=expected
+                || barrier(p,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
         if(level.getBlockState(pos)!=expected) return false;
         var snapshot=BlockSnapshot.create(level.dimension(),level,pos);boolean accepted=false;
