@@ -43,7 +43,12 @@ public final class WorkQueue {
         int cost=EnchantmentScaling.activationCost(j.tool,j.kind);if(!p.isCreative()&&j.tool.getMaxDamage()-j.tool.getDamageValue()<=cost)return false;
         j.tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND));if(j.region instanceof RegionWork r&&(j.kind==ArtifactKind.CHRONICLE&&r.mode==0))ArtifactState.of(p,j.kind).remove("memory");
         ArtifactState.of(p,j.kind).putLong("ready",ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get());p.getCooldowns().addCooldown(j.tool.getItem(),ArtifactConfig.COOLDOWN.get());
-        j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;}else j.paused=!j.paused;return true;}
+        j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;
+    }else if(j.paused){
+        if(j.region!=null&&!j.region.loaded(p)){ArtifactFeedback.message(p,"chunk_pause");return false;}
+        if(dropBackpressured(j,p)){ArtifactFeedback.message(p,"drop_pause");return false;}
+        j.paused=false;
+    }else j.paused=true;return true;}
     public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,WorkProgram region){
         if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         var memories=region instanceof RegionWork snapshot&&snapshot.needsRestoration()?ArtifactState.memories(p,kind):List.<ArtifactState.Memory>of();
@@ -82,8 +87,7 @@ public final class WorkQueue {
             int turn=Math.min(budget,playerBudget);BlockPos feedback=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
-                if(job.region!=null?job.region.backpressured(p):job.steps.peekFirst() instanceof WorkStep.Mine mine
-                        &&WorldSafety.backpressuredMine(p,job.tool,job.kind,mine.pos(),mine.expected())){
+                if(dropBackpressured(job,p)){
                     job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
                 }
                 budget--;lastAttempts++;
@@ -106,5 +110,12 @@ public final class WorkQueue {
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
+    }
+
+    private static boolean dropBackpressured(Job job,ServerPlayer player){
+        if(job.region!=null)return job.region.backpressured(player);
+        var next=job.steps.peekFirst();
+        return next instanceof WorkStep.Mine mine
+                &&WorldSafety.backpressuredMine(player,job.tool,job.kind,mine.pos(),mine.expected());
     }
 }
