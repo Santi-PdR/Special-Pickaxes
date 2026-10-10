@@ -131,6 +131,9 @@ public final class ArtifactActions {
             ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
         }
         if(kind==ArtifactKind.AXIOM){
+            var seed=p.serverLevel().getBlockState(center);
+            if(!MiningDesigns.matrix(seed)||ArtifactOres.isOre(seed)||PlayerPlacedBlocks.get(p.serverLevel()).contains(center)
+                    ||!WorldSafety.harvestable(p,tool,center))return false;
             var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
             if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),96);ArtifactFeedback.message(p,"nullcut_started");}
