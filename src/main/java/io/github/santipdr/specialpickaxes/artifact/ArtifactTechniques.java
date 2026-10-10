@@ -10,7 +10,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -173,12 +172,11 @@ public final class ArtifactTechniques {
     /** Null Ward collapses nearby hostile shots into a player-only sculk pulse. */
     private static boolean nullWard(ServerPlayer player,int radius,int cap) {
         Vec3 center=player.position();double rangeSqr=(double)radius*radius;int collapsed=0;
-        var shots=EntitySelection.nearest(player.serverLevel(),Projectile.class,player.getBoundingBox().inflate(radius),projectile->{
-            var owner=projectile.getOwner();
-            return projectile.isAlive()&&(owner==null||!owner.isAlliedTo(player))
+        var shots=DomainFields.projectilesNear(player.serverLevel(),player.getBoundingBox().inflate(radius),center,cap,projectile->{
+            return projectile.isAlive()&&JegProjectileCompat.hostileTo(projectile,player,false)
                     &&projectile.position().distanceToSqr(center)<=rangeSqr
                     &&WorldSafety.allowed(player,ArtifactKind.AXIOM,projectile.blockPosition());
-        },center,cap);
+        });
         for(var projectile:shots){
             var point=projectile.position();
             player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,8,.12,.12,.12,.015);

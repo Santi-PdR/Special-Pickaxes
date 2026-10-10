@@ -33,14 +33,11 @@ public final class DomainFields {
     /** Membership counts keep combat-event lookups constant-time when fields overlap. */
     private static final Map<UUID,Integer> FROZEN_ENTITIES=new HashMap<>();
     private DomainFields() {}
-    private static boolean projectileEntity(Entity entity){return entity instanceof Projectile||JegProjectileCompat.isProjectile(entity);}
+    private static boolean projectileEntity(Entity entity){return JegProjectileCompat.isProjectile(entity);}
     private static boolean hostileProjectile(Entity entity,ServerPlayer player,boolean rejectPlayerOwned){
-        if(!projectileEntity(entity))return true;
-        Entity owner=entity instanceof Projectile projectile?projectile.getOwner():JegProjectileCompat.shooter(entity);
-        if(owner==null)return true;
-        return owner!=player&&!owner.isAlliedTo(player)&&!(rejectPlayerOwned&&owner instanceof net.minecraft.world.entity.player.Player);
+        return !projectileEntity(entity)||JegProjectileCompat.hostileTo(entity,player,rejectPlayerOwned);
     }
-    private static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
+    static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
                                                  java.util.function.Predicate<Entity> eligible){
         var selected=new ArrayList<Entity>();
         selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,projectile->eligible.test(projectile),center,cap));
