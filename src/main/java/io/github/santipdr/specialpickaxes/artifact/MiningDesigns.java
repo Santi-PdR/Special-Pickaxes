@@ -8,7 +8,7 @@ import java.util.*;
 /** Mining-specific plans. Resource detection never sends ore positions or outlines to the client. */
 public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
-    private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar");
+    private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar","undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
     private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay");
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){

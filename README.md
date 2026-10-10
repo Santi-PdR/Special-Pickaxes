@@ -76,7 +76,7 @@ IDs: `palimpsest`, `fault_choir`, `eventide`, `paradox_crucible`, `interregnum`,
 - [Evidencia histórica de la versión 5.0.0](docs/mining-rework/STATUS.md)
 - [Assets archivados](asset-library/README.md)
 
-La versión 5.10.125 amplía el reconocimiento de geología de mods mediante nombres de registro habituales (piedras, basaltos, granitos, pizarras, tobas, calcitas, obsidianas, espeleotemas, gravas, tierras y arcillas). Las menas, los líquidos y los bloques con entidad quedan excluidos; el resultado se recalcula tras cada actualización de tags. El icono aprobado de Curios permanece intacto.
+La versión 5.10.126 añade las variantes superior e inferior del pilar de dripstone de Undead Revamped a la geología reconocida para minería y transmutación. La versión 5.10.125 amplía el reconocimiento de geología de mods mediante nombres de registro habituales (piedras, basaltos, granitos, pizarras, tobas, calcitas, obsidianas, espeleotemas, gravas, tierras y arcillas). Las menas, los líquidos y los bloques con entidad quedan excluidos; el resultado se recalcula tras cada actualización de tags. El icono aprobado de Curios permanece intacto.
 
 La versión 5.10.125 reconoce también `undead_revamp2:bostroxore`, una mena mundial de Undead Revamped que no usa sufijo ni tag convencional; sus drops `rawbostrox` ahora entran en la extracción de Iridium y su iluminación.
 
