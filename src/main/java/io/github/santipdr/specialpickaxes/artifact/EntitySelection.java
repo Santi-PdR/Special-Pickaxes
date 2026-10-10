@@ -13,19 +13,24 @@ import java.util.function.Predicate;
 
 /** Select nearby targets without materializing or sorting every entity in a crowded ability area. */
 final class EntitySelection {
-    private static final int MAX_INSPECTED = 1024;
+    static final int DEFAULT_INSPECTION_LIMIT = 1024;
 
     private EntitySelection() {}
 
     static <T extends Entity> List<T> nearest(ServerLevel level, Class<T> type, AABB bounds,
                                                Predicate<T> eligible, Vec3 center, int limit) {
-        if (limit <= 0) return List.of();
+        return nearest(level,type,bounds,eligible,center,limit,DEFAULT_INSPECTION_LIMIT);
+    }
+
+    static <T extends Entity> List<T> nearest(ServerLevel level, Class<T> type, AABB bounds,
+                                               Predicate<T> eligible, Vec3 center, int limit,int inspectionLimit) {
+        if (limit <= 0 || inspectionLimit <= 0) return List.of();
 
         var farthestFirst = Comparator.<T>comparingDouble(entity -> entity.distanceToSqr(center)).reversed();
         var selected = new PriorityQueue<T>(limit, farthestFirst);
         int[] inspected = {0};
         level.getEntities().get(EntityTypeTest.forClass(type), bounds, candidate -> {
-            if (++inspected[0] > MAX_INSPECTED) return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
+            if (++inspected[0] > inspectionLimit) return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
             if (eligible.test(candidate)) {
                 if (selected.size() < limit) selected.add(candidate);
                 else if (candidate.distanceToSqr(center) < selected.peek().distanceToSqr(center)) {
@@ -33,7 +38,7 @@ final class EntitySelection {
                     selected.add(candidate);
                 }
             }
-            return inspected[0] >= MAX_INSPECTED
+            return inspected[0] >= inspectionLimit
                     ? net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
                     : net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });

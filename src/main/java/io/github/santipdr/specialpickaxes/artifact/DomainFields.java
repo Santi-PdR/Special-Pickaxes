@@ -11,6 +11,7 @@ import java.util.*;
 
 /** No player, item entity, AI/NBT flag or block-entity ticking is changed by these fields. */
 public final class DomainFields {
+    private static final int FIELD_ENTITY_SCAN_BUDGET=1024;
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class StasisPulse {
         final ServerPlayer owner;final ItemStack tool;final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
@@ -39,10 +40,15 @@ public final class DomainFields {
     }
     static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
                                                  java.util.function.Predicate<Entity> eligible){
+        int totalBudget=EntitySelection.DEFAULT_INSPECTION_LIMIT*(JegProjectileCompat.entityType()==null?1:2);
+        return projectilesNear(level,bounds,center,cap,eligible,totalBudget);
+    }
+    private static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
+                                                 java.util.function.Predicate<Entity> eligible,int totalInspectionBudget){
         var selected=new ArrayList<Entity>();
-        selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,projectile->eligible.test(projectile),center,cap));
-        var jegType=JegProjectileCompat.entityType();
-        if(jegType!=null)selected.addAll(EntitySelection.nearest(level,jegType,bounds,eligible,center,cap));
+        var jegType=JegProjectileCompat.entityType();int perTypeBudget=jegType==null?totalInspectionBudget:Math.max(1,totalInspectionBudget/2);
+        selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,projectile->eligible.test(projectile),center,cap,perTypeBudget));
+        if(jegType!=null)selected.addAll(EntitySelection.nearest(level,jegType,bounds,eligible,center,cap,perTypeBudget));
         selected.sort(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
         return selected.size()>cap?new ArrayList<>(selected.subList(0,cap)):selected;
     }
@@ -200,12 +206,17 @@ public final class DomainFields {
             var centerPosition=Vec3.atCenterOf(f.center);
             double radiusSqr=(double)f.radius*f.radius;
             int targetLimit=ArtifactConfig.FIELD_TARGETS.get();
-            var entities=EntitySelection.nearest(level,Entity.class,new AABB(f.center).inflate(f.radius),e ->
-                e.isAlive() && (projectileEntity(e) || f.kind!=ArtifactKind.AEGIS && e instanceof Monster)
-                && !e.isAlliedTo(p) && (f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr)
-                &&hostileProjectile(e,p,f.kind==ArtifactKind.AEGIS)
-                && (f.kind!=ArtifactKind.INTERREGNUM||f.frozen.containsKey(e.getUUID())||!FROZEN_ENTITIES.containsKey(e.getUUID())),
-                centerPosition,targetLimit);
+            var bounds=new AABB(f.center).inflate(f.radius);
+            java.util.function.Predicate<Entity> eligible=e->e.isAlive()&&!e.isAlliedTo(p)
+                    &&(f.kind==ArtifactKind.INTERREGNUM?contains(p,e.blockPosition()):e.position().distanceToSqr(centerPosition)<=radiusSqr)
+                    &&hostileProjectile(e,p,f.kind==ArtifactKind.AEGIS)
+                    &&(f.kind!=ArtifactKind.INTERREGNUM||f.frozen.containsKey(e.getUUID())||!FROZEN_ENTITIES.containsKey(e.getUUID()));
+            // Query only relevant entity classes: dropped items and decorations must not exhaust the scan cap.
+            var candidates=new ArrayList<Entity>();
+            if(f.kind!=ArtifactKind.AEGIS)
+                candidates.addAll(EntitySelection.nearest(level,Monster.class,bounds,mob->eligible.test(mob),centerPosition,targetLimit,FIELD_ENTITY_SCAN_BUDGET/2));
+            candidates.addAll(projectilesNear(level,bounds,centerPosition,targetLimit,e->projectileEntity(e)&&eligible.test(e),FIELD_ENTITY_SCAN_BUDGET/2));
+            var entities=EntitySelection.nearest(candidates,centerPosition,targetLimit);
             var current=f.observed;current.clear();int processed=0;
             for(var entity:entities) {
                 if(processed>=targetLimit) break;
