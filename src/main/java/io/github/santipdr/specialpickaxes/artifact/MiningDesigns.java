@@ -8,6 +8,7 @@ import java.util.*;
 /** Mining-specific plans. Resource detection never sends ore positions or outlines to the client. */
 public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar");
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
@@ -51,7 +52,7 @@ public final class MiningDesigns {
     private static boolean isModdedGeology(net.minecraft.world.level.block.state.BlockState state){
         return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{
             var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-            return key!=null&&key.getNamespace().equals("terramity")&&key.getPath().equals("igneostone");
+            return key!=null&&WORLDGEN_GEOLOGY.contains(key.toString());
         });
     }
 }
