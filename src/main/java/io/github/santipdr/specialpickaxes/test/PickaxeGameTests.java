@@ -153,6 +153,17 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(melee),"the shell does not cancel ordinary melee damage");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
+        var wearer=player(h,ArtifactKind.AXIOM);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.AXIOM);
+        var mark=SpecialPickaxes.NULL_MARK.get();
+        h.assertTrue(attacker.hasEffect(mark)&&attacker.getEffect(mark).getDuration()==60,"Axiom's Curios counter applies a three-second null mark");
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(attacker,4F)),"marked attacker cannot heal during the counter");
+        h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the wearer and unmarked allies remain healable");
+        finish(h,wearer);
+    }
 
     @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);

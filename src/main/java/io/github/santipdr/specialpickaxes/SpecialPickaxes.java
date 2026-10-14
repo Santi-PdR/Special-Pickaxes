@@ -40,6 +40,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
     public static final RegistryObject<MobEffect> SEARING_SHELL=EFFECTS.register("searing_shell",SearingShellEffect::new);
+    public static final RegistryObject<MobEffect> NULL_MARK=EFFECTS.register("null_mark",NullMarkEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
@@ -59,7 +60,7 @@ public final class SpecialPickaxes {
         forge.addListener(this::tagsUpdated);
         forge.addListener(this::curiosIridiumMine);
         forge.addListener(this::entityJoin);
-        forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);
+        forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);forge.addListener(this::heal);
         forge.addListener(this::fall);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
@@ -156,6 +157,7 @@ public final class SpecialPickaxes {
             if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.onCuriosDamage(p,e,pick.kind);
         }
     }
+    private void heal(net.minecraftforge.event.entity.living.LivingHealEvent e){if(e.getEntity().hasEffect(NULL_MARK.get()))e.setCanceled(true);}
     private void fall(LivingFallEvent e){if(e.getEntity() instanceof ServerPlayer p&&WorkQueue.protectsFall(p))e.setCanceled(true);}
     private void commands(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
