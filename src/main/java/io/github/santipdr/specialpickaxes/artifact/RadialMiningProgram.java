@@ -23,12 +23,7 @@ public final class RadialMiningProgram implements WorkProgram {
     private boolean inside(int dx,int dy,int dz){
         if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE)return dx*dx+dy*dy+dz*dz<=radius*radius;
         if(kind==ArtifactKind.HELLSPEC){
-            int vertical=2*dy*dy;
-            return dx*dx+dz*dz+vertical<=9
-                    ||(dx-4)*(dx-4)+dz*dz+vertical<=9
-                    ||(dx+4)*(dx+4)+dz*dz+vertical<=9
-                    ||dx*dx+(dz-4)*(dz-4)+vertical<=9
-                    ||dx*dx+(dz+4)*(dz+4)+vertical<=9;
+            return HellspecBloomShape.contains(dx,dy,dz);
         }
         if(kind==ArtifactKind.AXIOM){
             int distance=dx*dx+dy*dy+dz*dz,inner=Math.max(0,radius-2);

@@ -147,16 +147,19 @@ public final class ArtifactFeedback {
     public static void hellBloom(ServerPlayer p,BlockPos center) {
         var ember=new DustParticleOptions(new Vector3f(1F,.24F,.035F),1.35F);
         var heart=new DustParticleOptions(new Vector3f(1F,.72F,.12F),1.5F);
-        int[][] offsets={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
-        for(int index=0;index<5;index++){
-            BlockPos petal=center.offset(offsets[index][0],0,offsets[index][1]);
-            var color=index==0?heart:ember;
-            for(int i=0;i<16;i++){
-                double angle=i*Math.PI/8;
-                double x=petal.getX()+.5+Math.cos(angle)*3,z=petal.getZ()+.5+Math.sin(angle)*3;
-                p.serverLevel().sendParticles(p,color,false,x,petal.getY()+.12,z,1,0,0,0,0);
+        var level=p.serverLevel();var outline=HellspecBloomShape.boundary();
+        int stride=Math.max(1,(outline.size()+191)/192);
+        for(int i=0;i<outline.size();i+=stride){
+            var offset=outline.get(i);var at=center.offset(offset);
+            if(level.hasChunkAt(at))level.sendParticles(p,offset.getY()==0?ember:heart,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+        }
+        int[][] cores={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
+        for(int[] offset:cores){
+            var at=center.offset(offset[0],0,offset[1]);
+            if(level.hasChunkAt(at)){
+                level.sendParticles(p,heart,false,at.getX()+.5,at.getY()+.4,at.getZ()+.5,2,.08,.1,.08,0);
+                level.sendParticles(p,ParticleTypes.FLAME,false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,2,.15,.12,.15,.015);
             }
-            p.serverLevel().sendParticles(p,ParticleTypes.FLAME,false,petal.getX()+.5,petal.getY()+.55,petal.getZ()+.5,3,.15,.12,.15,.015);
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {

@@ -424,7 +424,7 @@
   "tooltip.specialpickaxes.secondary.hellspec": "Apunta a una fuente de lava y pulsa X. La sella y provoca una erupción que quema y lanza lejos a los enemigos cercanos.",
   "mode.specialpickaxes.hellforge": "HELLFORGE",
   "mining.identity.hellspec.hellforge": "FLOR INFERNAL: una cantera de cinco pétalos.",
-  "mining.how.hellspec.hellforge": "Apunta a geología natural o una mena y pulsa R. Un contorno naranja marca una cámara central y cuatro pétalos laterales antes de excavar. Protege bloques colocados, máquinas y zonas protegidas.",
+  "mining.how.hellspec.hellforge": "Apunta a geología natural o una mena y pulsa R. Un contorno 3D naranja marca una cámara central y cuatro pétalos laterales antes de excavar. Protege bloques colocados, máquinas y zonas protegidas.",
   "message.specialpickaxes.orefall_empty": "No se encontraron menas extraíbles en el alcance.",
   "mode.specialpickaxes.calcite": "CALCITE",
   "mode.specialpickaxes.tuff": "TUFF",

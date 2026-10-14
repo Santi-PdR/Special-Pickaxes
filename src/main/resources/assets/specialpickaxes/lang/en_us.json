@@ -424,7 +424,7 @@
   "tooltip.specialpickaxes.secondary.hellspec": "Aim at a lava source and press X. It seals that source and erupts, burning and blasting nearby enemies away.",
   "mode.specialpickaxes.hellforge": "HELLFORGE",
   "mining.identity.hellspec.hellforge": "INFERNAL BLOOM: a five-petal quarry.",
-  "mining.how.hellspec.hellforge": "Aim at natural geology or an ore and press R. An orange outline marks one central chamber and four side petals before excavation begins. Player-placed blocks, machines and protected cells stay safe.",
+  "mining.how.hellspec.hellforge": "Aim at natural geology or an ore and press R. An orange 3D outline marks one central chamber and four side petals before excavation begins. Player-placed blocks, machines and protected cells stay safe.",
   "message.specialpickaxes.orefall_empty": "No harvestable ores found in range.",
   "mode.specialpickaxes.calcite": "CALCITE",
   "mode.specialpickaxes.tuff": "TUFF",
