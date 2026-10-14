@@ -126,6 +126,19 @@ public final class PickaxeGameTests {
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void worldloomCuriosCounterPulsesHeartwoodRenewal(GameTestHelper h) {
+        var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.setHealth(10F);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.WORLDLOOM);
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        h.assertTrue(wearer.hasEffect(renewal),"Worldloom's Curios counter grants its custom restorative effect");
+        h.assertTrue(wearer.getEffect(renewal).getDuration()==60,"heartwood renewal lasts three seconds");
+        h.assertTrue(renewal.isDurationEffectTick(60,0)&&!renewal.isDurationEffectTick(59,0),"healing is delivered in deliberate one-second pulses");
+        renewal.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==11F,"a renewal pulse restores one health point");
+        finish(h,wearer);
+    }
 
     @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);

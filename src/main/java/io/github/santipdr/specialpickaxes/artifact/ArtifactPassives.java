@@ -52,7 +52,7 @@ public final class ArtifactPassives {
             case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),70,0,true,false,true));}
             case CRUCIBLE -> attacker.setSecondsOnFire(3);
             case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
-            case WORLDLOOM -> player.addEffect(new MobEffectInstance(MobEffects.REGENERATION,60,1,true,false,true));
+            case WORLDLOOM -> player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),60,0,true,false,true));
             case ICARUS -> {
                 Vec3 away=attacker.position().subtract(player.position());
                 if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
