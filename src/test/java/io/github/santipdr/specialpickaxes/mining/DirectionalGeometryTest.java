@@ -10,8 +10,25 @@ class DirectionalGeometryTest {
         for(var shape:DirectionalProgram.Shape.values()){
             var section=DirectionalProgram.section(BlockPos.ZERO,Direction.SOUTH,shape,30);
             assertEquals(section.size(),new java.util.HashSet<>(section).size());
-            assertTrue(section.size()<=49*21);assertTrue(signatures.add(new java.util.HashSet<>(section)),"distinct "+shape);
+            assertTrue(section.size()<=49*21);
+            var signature=new java.util.HashSet<>(section);
+            // Worldloom's straight 5x5 bore and Worldbreaker's vertical core drill
+            // share a cross-section while their direction and length define distinct jobs.
+            assertTrue(signatures.add(signature)||shape==WORLDLOOM_BORE,"distinct "+shape);
         }
+    }
+    @Test void exodiumSinkIsAChamferedFiveByFiveShaft(){
+        var sink=new java.util.HashSet<>(DirectionalProgram.section(BlockPos.ZERO,Direction.DOWN,DirectionalProgram.Shape.EXODIUM_SINK,0));
+        var bore=new java.util.HashSet<>(DirectionalProgram.section(BlockPos.ZERO,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,0));
+        var drill=new java.util.HashSet<>(DirectionalProgram.section(BlockPos.ZERO,Direction.DOWN,DirectionalProgram.Shape.CORE_DRILL,0));
+        assertEquals(21,sink.size());
+        assertEquals(25,bore.size());
+        assertEquals(25,drill.size());
+        assertTrue(sink.stream().allMatch(p->Math.abs(p.getX())<=2&&Math.abs(p.getZ())<=2));
+        assertFalse(sink.contains(new BlockPos(-2,0,-2)));
+        assertTrue(sink.contains(BlockPos.ZERO));
+        assertTrue(bore.contains(new BlockPos(-2,2,0)));
+        assertTrue(bore.contains(BlockPos.ZERO));
     }
     @Test void carveFollowsEveryLookAxisAndIsRounded(){
         for(var d:Direction.values()){

@@ -112,6 +112,29 @@ public final class ArtifactFeedback {
             if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
+    /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
+    public static void starfallSink(ServerPlayer p,BlockPos origin){
+        var level=p.serverLevel();
+        var rim=new DustParticleOptions(new Vector3f(1F,.34F,.72F),1.35F);
+        var core=new DustParticleOptions(new Vector3f(.96F,.83F,1F),1.15F);
+        for(int depth:new int[]{0,8,16,24,31})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++){
+            if(Math.abs(u)==2&&Math.abs(v)==2)continue;
+            if(Math.abs(u)!=2&&Math.abs(v)!=2)continue;
+            var at=origin.below(depth).offset(u,0,v);
+            if(level.hasChunkAt(at))level.sendParticles(p,rim,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+        }
+        for(int depth:new int[]{0,8,16,24,31}){
+            var at=origin.below(depth);
+            if(level.hasChunkAt(at))level.sendParticles(p,core,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+        }
+    }
+    /** A short falling-star pulse marks each live Exodium excavation step without broadcasting to distant players. */
+    public static void starfallWork(ServerPlayer p,BlockPos at){
+        var level=p.serverLevel();double x=at.getX()+.5,y=at.getY()+.65,z=at.getZ()+.5;
+        var trail=new DustParticleOptions(new Vector3f(1F,.4F,.78F),1.05F);
+        level.sendParticles(p,ParticleTypes.END_ROD,false,x,y,z,1,0,.18,0,.005);
+        level.sendParticles(p,trail,false,x,y-.28,z,1,0,0,0,0);
+    }
     public static void nullWard(ServerPlayer p,int radius){
         var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);
         var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.35F);

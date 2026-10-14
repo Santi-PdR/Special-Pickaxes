@@ -10,13 +10,14 @@ SPECS=[
 ('keystone','ElementalUtilityPickaxes','hammerpickaxe'),('tessellator','CustomPickaxes','titanium_pickaxe'),
 ('aegis','ElementalUtilityPickaxes','pickaxe3'),('lodestar','PicksOfPower','seismic_pickaxe'),
 ('seam_ripper','ElementalUtilityPickaxes','pickaxe1'),('causeway','ElementalUtilityPickaxes','longpickaxe'),
-('counterseal','ElementalUtilityPickaxes','sculkpickaxe'),('covenant','UltimatePickaxes','bone_pickaxe')]
+('counterseal','ElementalUtilityPickaxes','sculkpickaxe'),('covenant','UltimatePickaxes','bone_pickaxe'),
+('exodium','Terramity','exodium_pickaxe'),('iridium','Terramity','iridium_pickaxe'),('hellspec','Terramity','hellspec_pickaxe')]
 def install(root):
  manifest=[]
  for id,folder,base in SPECS:
-  jar=next(pathlib.Path('referencias',folder).glob('*.jar'))
+  jar=pathlib.Path('docs/mining-rework/reference-archives/terramity-pickaxes.zip') if folder=='Terramity' else next(pathlib.Path('referencias',folder).glob('*.jar'))
   with zipfile.ZipFile(jar) as z:
-   name=next(n for n in z.namelist() if n.endswith('/textures/item/'+base+'.png'))
+   name=f'assets/terramity/textures/item/{base}.png' if folder=='Terramity' else next(n for n in z.namelist() if n.endswith('/textures/item/'+base+'.png'))
    raw=z.read(name);dest=root/f'assets/specialpickaxes/textures/item/{id}.png';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(raw)
    if name+'.mcmeta' in z.namelist():dest.with_suffix('.png.mcmeta').write_bytes(z.read(name+'.mcmeta'))
    else:

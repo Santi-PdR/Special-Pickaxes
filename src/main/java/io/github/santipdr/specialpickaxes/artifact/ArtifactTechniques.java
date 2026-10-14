@@ -342,7 +342,7 @@ public final class ArtifactTechniques {
                 ||!WorldSafety.harvestable(player,tool,center))return false;
         var program=new DirectionalProgram(center,Direction.DOWN,DirectionalProgram.Shape.EXODIUM_SINK,ArtifactKind.EXODIUM);
         if(!WorkQueue.startRegion(player,tool,ArtifactKind.EXODIUM,program))return false;
-        ArtifactFeedback.ring(player,ArtifactKind.EXODIUM,center,2);
+        ArtifactFeedback.starfallSink(player,center);
         ArtifactFeedback.message(player,"starfall_sink_started");
         return true;
     }

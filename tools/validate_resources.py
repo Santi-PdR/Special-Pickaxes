@@ -64,21 +64,34 @@ class Resources(unittest.TestCase):
                     self.assertIn(f"mining.how.{artifact}.{mode}", data)
 
     def test_current_controls(self):
+        source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/RelicKeys.java").read_text()
+        actions_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/RelicControl.java").read_text()
+        actions = set(re.search(r"enum Action \{([^}]+)\}", actions_source).group(1).replace(" ", "").split(","))
+        register_body = re.search(r"void register\([^)]*\)\s*\{([^}]+)\}", source).group(1)
+        excluded = set(re.findall(r"action!=RelicControl\.Action\.(\w+)", register_body))
+        registered = {"key.specialpickaxes." + action.lower() for action in actions - excluded}
+        registered.add("key.specialpickaxes.manual")
+        self.assertEqual(registered, {"key.specialpickaxes.activate", "key.specialpickaxes.mode", "key.specialpickaxes.alt_skill", "key.specialpickaxes.manual"})
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
-            self.assertEqual(len([key for key in data if key.startswith("key.specialpickaxes.")]), 7)
+            self.assertTrue(registered <= data.keys())
             for key in ["message.specialpickaxes.companion_active", "status.specialpickaxes.paused", "message.specialpickaxes.chunk_pause"]:
                 self.assertNotIn("agachado", data[key].lower())
                 self.assertNotIn("sneak", data[key].lower())
                 self.assertNotIn("usar", data[key].lower().replace("pausar", ""))
 
     def test_no_energy_and_manual_keys(self):
+        kind_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactKind.java").read_text()
+        kind_ids = dict(re.findall(r'^\s*([A-Z_]+)\("([^"]+)"', kind_source, re.M))
+        playable_case = re.search(r'playable\(\)\{return switch\(this\)\{case ([^}]+?)\->true;', kind_source).group(1)
+        playable = {kind_ids[kind] for kind in re.findall(r"\b[A-Z_]+\b", playable_case) if kind in kind_ids}
+        self.assertEqual(set(IDS), playable)
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
             self.assertFalse(any("energy" in key for key in data))
             for artifact in IDS:
-                for prefix in ["identity.", "controls.", "example."]:
-                    self.assertIn(prefix + "specialpickaxes." + artifact, data)
+                for prefix in ["item.specialpickaxes.", "tooltip.specialpickaxes.", "tooltip.specialpickaxes.secondary.", "alternate.detail.specialpickaxes.", "melee.specialpickaxes.", "passive.specialpickaxes.", "curios.detail.specialpickaxes."]:
+                    self.assertIn(prefix + artifact, data)
 
     def test_languages(self):
         languages = [json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text()) for lang in ["en_us", "es_es"]]

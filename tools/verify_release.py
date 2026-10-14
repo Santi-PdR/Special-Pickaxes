@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Verify the built release, then publish its SHA/size/commit manifest for artifact consumers."""
-import hashlib,json,os,pathlib,struct,subprocess,tomllib,zipfile
-root=pathlib.Path('.');jar=root/'build/libs/special-pickaxes-1.20.1-5.0.0.jar'
+import hashlib,json,os,pathlib,re,struct,subprocess,tomllib,zipfile
+root=pathlib.Path('.')
+version=re.search(r"^version\s*=\s*'([^']+)'",(root/'build.gradle').read_text(),re.M).group(1)
+jar=root/f'build/libs/special-pickaxes-1.20.1-{version}.jar'
 from mining_catalog import IDS as ids
 sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 with zipfile.ZipFile(jar) as z:
@@ -14,8 +16,8 @@ with zipfile.ZipFile(jar) as z:
  assert all(struct.unpack('>H',z.read(n)[6:8])[0]==61 for n in z.namelist() if n.endswith('.class'))
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
- assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==9
- assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==9
+ assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==len(ids)
+ assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==len(ids)
  assert 'io/github/santipdr/specialpickaxes/artifact/ArtifactActions.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/WorkQueue.class' in z.namelist()
 digest=hashlib.sha256(jar.read_bytes()).hexdigest()

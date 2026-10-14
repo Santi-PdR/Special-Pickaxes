@@ -16,14 +16,21 @@ public final class ArtifactOres {
     private static final String NO_ORE_FAMILY="";
     private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
     private static final Set<String> WORLDGEN_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant","undead_revamp2:bostrokestone","undead_revamp2:bostroxore");
+    // Some modpacks broaden common ore tags to include host geology. Never treat
+    // vanilla stone/soil as an ore just because it inherits one of those tags.
+    private static final Set<String> VANILLA_GEOLOGY=Set.of("stone","granite","diorite","andesite","deepslate","cobblestone","cobbled_deepslate",
+        "tuff","calcite","dripstone_block","pointed_dripstone","basalt","smooth_basalt","blackstone","polished_blackstone",
+        "dirt","coarse_dirt","grass_block","podzol","rooted_dirt","gravel","sand","red_sand","sandstone","red_sandstone",
+        "netherrack","end_stone","obsidian","clay");
     private ArtifactOres() {}
     public static boolean isOre(BlockState state){
+        var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(state.getBlock());
+        if(key!=null&&key.getNamespace().equals("minecraft")&&VANILLA_GEOLOGY.contains(key.getPath()))return false;
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
             ||state.is(BlockTags.GOLD_ORES)||state.is(BlockTags.DIAMOND_ORES)||state.is(BlockTags.REDSTONE_ORES)
             ||state.is(BlockTags.LAPIS_ORES)||state.is(BlockTags.EMERALD_ORES)||state.is(BlockTags.COPPER_ORES)
             ||NONSTANDARD_ORES.computeIfAbsent(state.getBlock(), block -> {
                 if(state.getTags().anyMatch(ArtifactOres::isOreTag))return true;
-                var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
                 return isOreBlock(key);
             });
     }
@@ -86,6 +93,9 @@ public final class ArtifactOres {
     private static boolean isVeinFamilyTag(String path) {
         // Forge's ores_in_ground tags classify host rock, not mineral families.
         if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
+        // Forge's ore_rates tags classify drop/XP rates and are shared by every
+        // mineral. They must never connect otherwise separate veins.
+        if(path.startsWith("ore_rates"))return false;
         return path.startsWith("ores/")&&path.length()>6||path.startsWith("ore/")&&path.length()>4
             ||path.startsWith("ores_")&&path.length()>5||path.startsWith("ore_")&&path.length()>4
             ||path.endsWith("_ores")&&path.length()>5||path.endsWith("_ore")&&path.length()>4;

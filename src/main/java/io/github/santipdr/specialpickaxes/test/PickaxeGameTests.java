@@ -45,8 +45,8 @@ public final class PickaxeGameTests {
     }
     private static void finish(GameTestHelper h,ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
-    @GameTest(template="empty") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
-        h.assertTrue(SpecialPickaxes.PICKS.size()==12,"twelve artifacts");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+    @GameTest(template="empty",batch="legacy_each_01") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
+        h.assertTrue(SpecialPickaxes.PICKS.size()==13,"thirteen playable pickaxes");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
         for(var kind:ArtifactKind.playableValues()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");
@@ -60,7 +60,7 @@ public final class PickaxeGameTests {
         h.assertTrue(denied && p.getInventory().countItem(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get())==1,"non-admin cannot grant");
         finish(h,p);
     }
-    @GameTest(template="empty") public static void activeControlsRequireHoldingTheMatchingPickaxe(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_02") public static void activeControlsRequireHoldingTheMatchingPickaxe(GameTestHelper h) {
         for(var kind:ArtifactKind.playableValues()){
             var p=player(h,kind);var relic=p.getMainHandItem();int damage=relic.getDamageValue();
             p.getInventory().add(relic.copy());p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
@@ -70,7 +70,7 @@ public final class PickaxeGameTests {
         }
         h.succeed();
     }
-    @GameTest(template="empty") public static void placedBlockProvenanceIsPrunedSafely(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_03") public static void placedBlockProvenanceIsPrunedSafely(GameTestHelper h) {
         var removed=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(removed,Blocks.STONE.defaultBlockState());
         var data=PlayerPlacedBlocks.get(h.getLevel());data.mark(removed);PlayerPlacedBlocks.scheduleCleanup(h.getLevel(),removed);
         h.getLevel().setBlockAndUpdate(removed,Blocks.AIR.defaultBlockState());PlayerPlacedBlocks.tickCleanup();
@@ -79,18 +79,22 @@ public final class PickaxeGameTests {
         data.mark(preserved);PlayerPlacedBlocks.scheduleCleanup(h.getLevel(),preserved);PlayerPlacedBlocks.tickCleanup();
         h.assertTrue(data.contains(preserved),"unchanged/cancelled block keeps its protection");finish(h,player(h,ArtifactKind.PALIMPSEST));
     }
-    @GameTest(template="empty") public static void palimpsestMinesOnlyItsConnectedOreVein(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_04") public static void palimpsestMinesOnlyItsConnectedOreVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);
         for(var at:List.of(pos,pos.east(),pos.above()))h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(pos.east(2),Blocks.DEEPSLATE_DIAMOND_ORE.defaultBlockState());
         var adjacentGold=pos.east(3);h.getLevel().setBlockAndUpdate(adjacentGold,Blocks.GOLD_ORE.defaultBlockState());
         var stone=pos.south();h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());
         var distant=pos.east(8);h.getLevel().setBlockAndUpdate(distant,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.assertTrue(!ArtifactOres.veinFamilies(Blocks.DIAMOND_ORE.defaultBlockState()).stream().anyMatch(Blocks.GOLD_ORE.defaultBlockState()::is),"shared rate tags do not merge separate ore veins");
+        h.assertTrue(!java.util.Objects.equals(ArtifactOres.registryOreFamily(Blocks.DIAMOND_ORE),ArtifactOres.registryOreFamily(Blocks.GOLD_ORE)),"registry ore families stay distinct");
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"vein echo activates");drain(p);
         for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"connected ore-family vein mined");
-        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE)&&h.getLevel().getBlockState(adjacentGold).is(Blocks.GOLD_ORE)&&h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"stone, adjacent different ore family, and disconnected ore preserved");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE),"stone is not part of the vein");
+        h.assertTrue(h.getLevel().getBlockState(adjacentGold).is(Blocks.GOLD_ORE),"adjacent different ore family is preserved");
+        h.assertTrue(h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"disconnected ore is preserved");finish(h,p);
     }
-    @GameTest(template="empty") public static void choirReplayMatchesState(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_05") public static void choirReplayMatchesState(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);
         for(int depth=0;depth<20;depth++)for(var pos:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.RESONANT_TUNNEL,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());
         var behind=p.blockPosition().relative(Direction.NORTH,2);h.getLevel().setBlockAndUpdate(behind,Blocks.STONE.defaultBlockState());
@@ -98,7 +102,7 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(origin.relative(Direction.SOUTH,19)).isAir(),"2x2 tunnel advances twenty blocks forward");
         h.assertTrue(h.getLevel().getBlockState(behind).is(Blocks.STONE),"tunnel leaves blocks behind untouched");finish(h,p);
     }
-    @GameTest(template="empty") public static void eventideMiningNotCombat(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_06") public static void eventideMiningNotCombat(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.getLevel().setBlockAndUpdate(center.above(),Blocks.DIAMOND_ORE.defaultBlockState());
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+2,center.getY(),center.getZ());h.getLevel().addFreshEntity(mob);
@@ -110,13 +114,13 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE)&&h.getLevel().getBlockState(center.above()).is(Blocks.DIAMOND_ORE),"activation does not perform a large quarry");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"transmutation activates");drain(p);
         h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.OBSIDIAN),"curated rephase applied");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8)).isEmpty(),"no extra drops from replacement");finish(h,p);
     }
-    @GameTest(template="empty") public static void interregnumStasisAndRelease(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);
         mob.setDeltaMovement(0.15,0,0);Vec3 start=mob.position();
@@ -126,14 +130,14 @@ public final class PickaxeGameTests {
         h.assertTrue(p.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)&&p.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==4&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"domain grants Regeneration V and Night Vision");
         DomainFields.stop(p);h.assertTrue(!DomainFields.frozen(mob) && Math.abs(mob.getDeltaMovement().x-.15)<.00001,"original momentum restored without weaponizing release");finish(h,p);
     }
-    @GameTest(template="empty") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_09") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",1);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"personal aura activates without a target block");DomainFields.tick();
         h.assertTrue(DomainFields.contains(p,p.blockPosition())&&p.hasEffect(SpecialPickaxes.DOMINION.get())&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"aura follows owner with personal effects");
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(p.getX()+1,p.getY(),p.getZ());h.getLevel().addFreshEntity(mob);mob.setDeltaMovement(.1,0,0);DomainFields.tick();
         h.assertTrue(!DomainFields.frozen(mob),"personal aura does not freeze nearby mobs");finish(h,p);
     }
-    @GameTest(template="empty") public static void stasisDomainSupportsAlliedMiners(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_10") public static void stasisDomainSupportsAlliedMiners(GameTestHelper h){
         var owner=player(h,ArtifactKind.INTERREGNUM);var ally=player(h,ArtifactKind.INTERREGNUM,"ArtifactAlly");var center=target(h);
         var team=h.getLevel().getScoreboard().addPlayerTeam("stasis_"+owner.getUUID().toString().substring(0,8));
         h.getLevel().getScoreboard().addPlayerToTeam(owner.getScoreboardName(),team);
@@ -148,14 +152,14 @@ public final class PickaxeGameTests {
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");
         DomainFields.stop(owner);finish(h,owner);
     }
-    @GameTest(template="empty") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_11") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);var stone=center.east();var ore=center.above();
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry activation");drain(p);
         h.assertTrue(h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(stone).isAir(),"scheduled quarry mines the stone sphere");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"quarry preserves ores");finish(h,p);
     }
-    @GameTest(template="empty") public static void icarusBoreAndSolidStop(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_12") public static void icarusBoreAndSolidStop(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var wall=h.absolutePos(new BlockPos(5,2,5));
         for(int x=-1;x<=1;x++) for(int y=0;y<3;y++) h.getLevel().setBlockAndUpdate(wall.offset(x,y,0),Blocks.STONE.defaultBlockState());
         var barrier=wall.offset(0,0,2);h.getLevel().setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
@@ -164,15 +168,15 @@ public final class PickaxeGameTests {
         h.assertTrue(p.getZ()>old && p.getZ()<barrier.getZ(),"advanced through excavation but not bedrock");
         h.assertTrue(h.getLevel().getBlockState(wall).isAir(),"bore excavated corridor");finish(h,p);
     }
-    @GameTest(template="empty") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
-        var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(1,0,0);var ore=center.above();
+    @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
+        var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"axiom activation");for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed");
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"hollow core and ore preserved");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void protectionRollbackAndPayment(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_14") public static void protectionRollbackAndPayment(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());
         Consumer<BlockEvent.EntityPlaceEvent> deny=e -> { if(e.getPos().equals(b)) e.setCanceled(true); };
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,deny);
@@ -185,7 +189,7 @@ public final class PickaxeGameTests {
         } finally { MinecraftForge.EVENT_BUS.unregister(deny); }
         finish(h,p);
     }
-    @GameTest(template="empty") public static void breakProtectionAndStalePlans(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_15") public static void breakProtectionAndStalePlans(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var tool=p.getMainHandItem();
         Consumer<BlockEvent.BreakEvent> deny=e -> { if(e.getPos().equals(pos)) e.setCanceled(true); };
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.BreakEvent.class,deny);
@@ -195,7 +199,7 @@ public final class PickaxeGameTests {
         var step=new WorkStep.Mine(pos,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(pos,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(!step.apply(p,tool,ArtifactKind.CHOIR),"stale plan cannot mine changed state");finish(h,p);
     }
-    @GameTest(template="empty") public static void cooldownPersistenceAndMemoryBound(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_16") public static void cooldownPersistenceAndMemoryBound(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();
         h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.INTERREGNUM,false),"first activation");
         h.assertTrue(!ArtifactActions.use(p,tool,ArtifactKind.INTERREGNUM,false),"replay blocked");
@@ -203,13 +207,17 @@ public final class PickaxeGameTests {
         var serialized=ArtifactState.root(p).copy();var other=player(h,ArtifactKind.INTERREGNUM);
         other.getPersistentData().put(ArtifactState.ROOT,serialized);
         h.assertTrue(!ArtifactActions.use(other,other.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"serialized cooldown retained");
-        for(int i=0;i<ArtifactConfig.MEMORY.get()+10;i++) ArtifactState.record(p,ArtifactKind.PALIMPSEST,new BlockPos(i,40,0),Blocks.STONE.defaultBlockState());
-        h.assertTrue(ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==ArtifactConfig.MEMORY.get(),"bounded memory");
+        var stoneState=Blocks.STONE.defaultBlockState();
+        h.assertTrue(WorldSafety.inert(stoneState),"stone qualifies for bounded inert memory: key="+net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(stoneState.getBlock())+", default="+(stoneState==stoneState.getBlock().defaultBlockState())+", fluid="+stoneState.getFluidState().isEmpty()+", bedrock="+stoneState.is(Blocks.BEDROCK)+", blockEntity="+stoneState.hasBlockEntity()+", ore="+ArtifactOres.isOre(stoneState)+", commonStone="+stoneState.is(net.minecraftforge.common.Tags.Blocks.STONE)+", dirt="+stoneState.is(net.minecraft.tags.BlockTags.DIRT)+", gravel="+stoneState.is(net.minecraftforge.common.Tags.Blocks.GRAVEL));
+        ArtifactState.record(p,ArtifactKind.PALIMPSEST,new BlockPos(0,40,0),Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactState.of(p,ArtifactKind.PALIMPSEST).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size()==1,"memory record persists before capacity test");
+        for(int i=1;i<ArtifactConfig.MEMORY.get()+10;i++) ArtifactState.record(p,ArtifactKind.PALIMPSEST,new BlockPos(i,40,0),Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==ArtifactConfig.MEMORY.get(),"bounded memory expected="+ArtifactConfig.MEMORY.get()+" actual="+ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()+" stored="+ArtifactState.of(p,ArtifactKind.PALIMPSEST).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size());
         var snapshot=ArtifactState.root(p).copy();other.getPersistentData().put(ArtifactState.ROOT,snapshot);
         h.assertTrue(ArtifactState.memories(other,ArtifactKind.PALIMPSEST).size()==ArtifactConfig.MEMORY.get(),"memory roundtrip");
         WorkQueue.cancel(other);DomainFields.stop(other);finish(h,p);
     }
-    @GameTest(template="empty") public static void schedulerBudgetsAndCancellation(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_17") public static void schedulerBudgetsAndCancellation(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var steps=new ArrayList<WorkStep>();var count=new int[]{0};
         for(int i=0;i<100;i++) steps.add(new WorkStep() {
             public BlockPos pos(){return p.blockPosition();}
@@ -221,7 +229,7 @@ public final class PickaxeGameTests {
         int previous=count[0];p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);WorkQueue.tick();
         h.assertTrue(count[0]==previous && !WorkQueue.busy(p),"switching tool cancels pending work");finish(h,p);
     }
-    @GameTest(template="empty") public static void unloadedChunkAndRestrictedBlocks(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_18") public static void unloadedChunkAndRestrictedBlocks(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var pos=new BlockPos(1000000,100,1000000);p.setPos(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5);
         h.assertTrue(!h.getLevel().hasChunkAt(pos),"fixture chunk is unloaded");
         h.assertTrue(!WorldSafety.mine(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState()),"unloaded denied");
@@ -229,7 +237,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!WorldSafety.inert(Blocks.CHEST.defaultBlockState()) && !WorldSafety.inert(Blocks.DIAMOND_ORE.defaultBlockState())
             && !WorldSafety.inert(Blocks.BEDROCK.defaultBlockState()),"protected matter categories excluded");finish(h,p);
     }
-    @GameTest(template="empty") public static void silkFortuneLootAndDurability(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_19") public static void silkFortuneLootAndDurability(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var tool=p.getMainHandItem();tool.enchant(Enchantments.SILK_TOUCH,1);
         WorkQueue.start(p,tool,ArtifactKind.CHOIR,List.of(new WorkStep.Mine(pos,Blocks.STONE.defaultBlockState())));drain(p);
         var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8));
@@ -241,18 +249,18 @@ public final class PickaxeGameTests {
         int diamonds=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(ore).inflate(0.8)).stream().mapToInt(e -> e.getItem().is(Items.DIAMOND)?e.getItem().getCount():0).sum();
         h.assertTrue(diamonds>=1 && diamonds<=4,"Fortune loot within vanilla range");finish(h,p);
     }
-    @GameTest(template="empty") public static void noUnpaidPlacementOrWallTeleport(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_20") public static void noUnpaidPlacementOrWallTeleport(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var pos=target(h);
         h.assertTrue(!WorldSafety.move(p,Vec3.atBottomCenterOf(pos)),"occupied destination rejected");
         h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState()),"occupied construction rejected");
         var air=pos.above();h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,air,Blocks.STONE.defaultBlockState()),"no free block without payment");finish(h,p);
     }
-    @GameTest(template="empty") public static void vanillaTiersRemainValid(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_21") public static void vanillaTiersRemainValid(GameTestHelper h) {
         h.assertTrue(new ItemStack(Items.DIAMOND_PICKAXE).isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState()),"artifact tier does not revoke vanilla diamond harvesting");
         h.assertTrue(new ItemStack(Items.NETHERITE_PICKAXE).isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()),"netherite remains valid");
         h.succeed();
     }
-    @GameTest(template="empty") public static void changedPaymentCannotDuplicateMatter(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_22") public static void changedPaymentCannotDuplicateMatter(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var pos=target(h).above();
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,1));
         Consumer<BlockEvent.EntityPlaceEvent> change=e -> {
@@ -267,7 +275,7 @@ public final class PickaxeGameTests {
     }
 
 
-    @GameTest(template="empty") public static void dominionSpeedIsLocal(GameTestHelper h) {
+    @GameTest(template="empty",batch="legacy_each_23") public static void dominionSpeedIsLocal(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,4);
         p.setPos(center.getX()+0.5,center.getY(),center.getZ()-2);DomainFields.tick();
@@ -280,7 +288,7 @@ public final class PickaxeGameTests {
 
 
 
-    @GameTest(template="empty") public static void multiToolAndHighEnchantments(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_24") public static void multiToolAndHighEnchantments(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();
         for(var block:List.of(Blocks.STONE,Blocks.DEEPSLATE,Blocks.OAK_LOG,Blocks.OAK_PLANKS,Blocks.DIRT,Blocks.SAND,Blocks.GRAVEL,Blocks.CLAY,Blocks.SNOW_BLOCK)){
             h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"combined harvest tool: "+block);h.assertTrue(tool.getDestroySpeed(block.defaultBlockState())>=64,"combined mining speed");
@@ -292,7 +300,7 @@ public final class PickaxeGameTests {
         }
         var fortune=new net.minecraft.nbt.CompoundTag();fortune.putString("id","minecraft:fortune");fortune.putInt("lvl",1000);tool.getEnchantmentTags().add(fortune);h.assertTrue(tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE)==1000,"Fortune 1000 not truncated to 255");finish(h,p);
     }
-    @GameTest(template="empty") public static void regionSelectionAnalysisAndPause(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_25") public static void regionSelectionAnalysisAndPause(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",6);var a=target(h);var b=a.offset(2,0,0);PlayerPlacedBlocks.get(h.getLevel()).unmark(a);PlayerPlacedBlocks.get(h.getLevel()).unmark(b);h.getLevel().setBlockAndUpdate(b,Blocks.STONE.defaultBlockState());
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"R arms selection");
         h.assertTrue(p.getMainHandItem().getDestroySpeed(Blocks.STONE.defaultBlockState())<=1F,"mining speed drops while selecting corners");
@@ -309,7 +317,7 @@ public final class PickaxeGameTests {
     }
 
 
-    @GameTest(template="empty") public static void simultaneousLargeRegionsAreBounded(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_26") public static void simultaneousLargeRegionsAreBounded(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var q=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var v=new SelectionVolume(a,a.offset(49,19,49));
         h.assertTrue(v.size()==50000,"large selection");
         for(var owner:List.of(p,q))h.assertTrue(WorkQueue.startRegion(owner,owner.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState())),"stream does not materialize/truncate large volume");
@@ -317,7 +325,7 @@ public final class PickaxeGameTests {
         WorkQueue.cancel(q);h.assertTrue(!WorkQueue.busy(q)&&WorkQueue.busy(p),"independent cancellation");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p),"tool switch cancels large work");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void regionLifecycleCancellation(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_27") public static void regionLifecycleCancellation(GameTestHelper h){
         for(int reason=0;reason<3;reason++){
             var p=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var v=new SelectionVolume(a,a.offset(10,10,10));
             WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
@@ -327,12 +335,12 @@ public final class PickaxeGameTests {
             h.assertTrue(!WorkQueue.busy(p),"logout/death/dimension cancellation "+reason);
         }h.succeed();
     }
-    @GameTest(template="empty") public static void unloadedRegionPausesWithoutLoading(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_28") public static void unloadedRegionPausesWithoutLoading(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var a=new BlockPos(1000000,60,1000000);var v=new SelectionVolume(a,a);
         h.assertTrue(!h.getLevel().hasChunkAt(a),"fixture chunk absent");WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
         WorkQueue.tick();h.assertTrue(WorkQueue.status(p).equals("paused")&&WorkQueue.remaining(p)==1&&!h.getLevel().hasChunkAt(a),"no implicit chunk load, cursor retained");finish(h,p);
     }
-    @GameTest(template="empty") public static void analyzedRegionDoesNotDestroyChangedBlocksOrMachines(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_29") public static void analyzedRegionDoesNotDestroyChangedBlocksOrMachines(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var a=target(h);var b=a.offset(1,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.CHEST.defaultBlockState());
         var v=new SelectionVolume(a,b);WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.CRUCIBLE,0,Blocks.BASALT.defaultBlockState()));
         WorkQueue.tick();h.getLevel().setBlockAndUpdate(a,Blocks.OBSIDIAN.defaultBlockState());WorkQueue.togglePause(p);drain(p);
@@ -340,14 +348,14 @@ public final class PickaxeGameTests {
     }
 
 
-    @GameTest(template="empty") public static void regionProtectionStillAppliesAfterAnalysis(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_30") public static void regionProtectionStillAppliesAfterAnalysis(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var a=target(h);var v=new SelectionVolume(a,a);
         WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new RegionWork(v,null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,0,Blocks.STONE.defaultBlockState()));WorkQueue.tick();
         Consumer<BlockEvent.BreakEvent> deny=e->{if(e.getPlayer()==p)e.setCanceled(true);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,deny);
         try{WorkQueue.togglePause(p);drain(p);h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE),"new protection still cancels after preparing");}finally{MinecraftForge.EVENT_BUS.unregister(deny);}finish(h,p);
     }
 
-    @GameTest(template="empty") public static void extremeEnchantmentGameplay(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_31") public static void extremeEnchantmentGameplay(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var pos=target(h);var tool=p.getMainHandItem();var tags=new net.minecraft.nbt.ListTag();
         for(String id:List.of("efficiency","fortune","unbreaking","mending")){var t=new net.minecraft.nbt.CompoundTag();t.putString("id","minecraft:"+id);t.putInt("lvl",id.equals("efficiency")?Integer.MAX_VALUE:1000);tags.add(t);}tool.getOrCreateTag().put("Enchantments",tags);
         float speed=p.getDigSpeed(Blocks.STONE.defaultBlockState(),pos);h.assertTrue(Float.isFinite(speed)&&speed>0,"actual vanilla/Forge extreme Efficiency is finite and positive");
@@ -358,23 +366,23 @@ public final class PickaxeGameTests {
         h.assertTrue(tool.getDamageValue()<100,"Mending 1000 repairs with actual XP pickup");finish(h,p);
     }
 
-    @GameTest(template="empty") public static void memoriesKeepDimensionsAndExpire(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_32") public static void memoriesKeepDimensionsAndExpire(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);var a=target(h);ArtifactState.record(p,ArtifactKind.PALIMPSEST,a,Blocks.STONE.defaultBlockState());
         var list=ArtifactState.of(p,ArtifactKind.PALIMPSEST).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);list.getCompound(0).putString("dim","minecraft:the_nether");
         ArtifactState.record(p,ArtifactKind.PALIMPSEST,a.offset(1,0,0),Blocks.STONE.defaultBlockState());
-        h.assertTrue(list.size()==2&&ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==1,"other dimension history preserved but not restored here");
+        h.assertTrue(list.size()==2,"cross-dimension record stays in bounded history");h.assertTrue(ArtifactState.memories(p,ArtifactKind.PALIMPSEST).size()==1,"only current-dimension memory can be restored");
         list.getCompound(0).putLong("epoch",System.currentTimeMillis()-(ArtifactConfig.MEMORY_TTL.get()+1L)*50);ArtifactState.prune(p,ArtifactKind.PALIMPSEST);
-        h.assertTrue(list.size()==1,"expired memory pruned from player-visible count");finish(h,p);
+        h.assertTrue(list.size()==1,"expired record is pruned; remaining="+list.size());finish(h,p);
     }
 
 
-    @GameTest(template="empty") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_33") public static void onlyNecessaryModesUseCorners(GameTestHelper h){
         for(var k:ArtifactKind.playableValues())for(int m=0;m<ArtifactInteraction.modeCount(k);m++){
             boolean expected=k==ArtifactKind.CRUCIBLE||k==ArtifactKind.WORLDBREAKER&&m==5;
             h.assertTrue(ArtifactInteraction.regional(k,m)==expected,"regional contract "+k+" mode "+m);
         }h.succeed();
     }
-    @GameTest(template="empty") public static void worldbreakerRegionBreakSkipsFluidsAndMachines(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_34") public static void worldbreakerRegionBreakSkipsFluidsAndMachines(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",5);
         var a=target(h);var granite=a.east();var fluid=a.east(2);var chest=a.east(3);var b=a.east(4);
         h.getLevel().setBlockAndUpdate(granite,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(fluid,Blocks.LAVA.defaultBlockState());
@@ -386,22 +394,22 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(a).isAir()&&h.getLevel().getBlockState(granite).isAir()&&h.getLevel().getBlockState(b).isAir(),"minable region geology is harvested");
         h.assertTrue(h.getLevel().getBlockState(fluid).is(Blocks.LAVA)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST),"fluid and container are preserved");finish(h,p);
     }
-    @GameTest(template="empty") public static void worldbreakerRunsCopiedMiningSkill(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_35") public static void worldbreakerRunsCopiedMiningSkill(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();var ore=target(h);
         h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);
         h.assertTrue(ArtifactActions.primary(p,tool,ArtifactKind.WORLDBREAKER),"copied Palimpsest mining skill starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(ore).isAir(),"Worldbreaker executes the selected pick's connected-ore harvest");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(ore).inflate(1)).stream().anyMatch(e->e.getItem().is(Items.DIAMOND)),"copied ability preserves the source pick's native ore drops");finish(h,p);
     }
-    @GameTest(template="empty") public static void compactAndExpandedTooltipContracts(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_36") public static void compactAndExpandedTooltipContracts(GameTestHelper h){
         for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
-            h.assertTrue(compact.size()==3&&expanded.size()>=9,"compact R/X/passive tooltip and complete manual "+k);
+            h.assertTrue(compact.size()==2&&expanded.size()>=9,"compact R/X lines and complete manual "+k);
             if(k==ArtifactKind.CRUCIBLE){var actions=ArtifactTooltips.actions(tool,k,7);h.assertTrue(!actions.contains(RelicControl.Action.SELECT)&&actions.contains(RelicControl.Action.ACTIVATE)&&!actions.contains(RelicControl.Action.CONFIRM)&&!actions.contains(RelicControl.Action.PAUSE),"R replaces separate selection, confirm, and pause keys");}
         }h.succeed();
     }
-    @GameTest(template="empty") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_37") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);
         data.putInt("charge",0);tool.getOrCreateTag().putInt("artifactCharge",999);
         ((ArtifactItem)tool.getItem()).inventoryTick(tool,h.getLevel(),p,0,true);
@@ -417,7 +425,7 @@ public final class PickaxeGameTests {
 
 
 
-    @GameTest(template="empty") public static void allRelicsKeepTripleToolAndHighLevels(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_38") public static void allRelicsKeepTripleToolAndHighLevels(GameTestHelper h){
         for(var k:ArtifactKind.playableValues()){
             var tool=new ItemStack(SpecialPickaxes.PICKS.get(k).get());
             for(var block:List.of(Blocks.STONE,Blocks.OAK_LOG,Blocks.DIRT))h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"triple tool "+k);
@@ -434,13 +442,13 @@ public final class PickaxeGameTests {
     }
 
     private static void inputReady(ServerPlayer p,ArtifactKind k){ArtifactState.of(p,k).remove("inputTick");}
-    @GameTest(template="empty") public static void semanticControlsAreServerAuthoritative(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_39") public static void semanticControlsAreServerAuthoritative(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);target(h);
         h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ACTIVATE),"stale tool packet rejected");
         h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&DomainFields.active(p),"one intent activates without selection");
         h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!DomainFields.active(p),"cancel bypasses activation cooldown");finish(h,p);
     }
-    @GameTest(template="empty") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_40") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);PlayerPlacedBlocks.get(h.getLevel()).unmark(at.east());ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));
         h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"selection key arms");
         RelicControl.corner(p,at);RelicControl.corner(p,at.east());for(int tick=0;tick<10&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
@@ -448,7 +456,7 @@ public final class PickaxeGameTests {
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"R confirms analyzed region");for(int tick=0;tick<10&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.OBSIDIAN),"confirmed region executes");finish(h,p);
     }
-    @GameTest(template="empty") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_41") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
         RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"incomplete state cannot confirm");
@@ -457,7 +465,7 @@ public final class PickaxeGameTests {
     }
 
 
-    @GameTest(template="empty") public static void changingToDirectModeLeavesNoSelector(GameTestHelper h){
+    @GameTest(template="empty",batch="legacy_each_42") public static void changingToDirectModeLeavesNoSelector(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
         RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
         inputReady(p,ArtifactKind.CRUCIBLE);RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE);

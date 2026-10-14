@@ -39,6 +39,8 @@ public final class DirectionalProgram implements WorkProgram {
         int uMin=shape==Shape.RESONANT_TUNNEL?-1:-w,uMax=shape==Shape.RESONANT_TUNNEL?0:w;
         int vMin=shape==Shape.RESONANT_TUNNEL?-1:-h,vMax=shape==Shape.RESONANT_TUNNEL?0:h;
         for(int u=uMin;u<=uMax;u++)for(int v=vMin;v<=vMax;v++){
+            // Starfall's shaft has clipped corners, giving it a distinct octagonal cut instead of a plain 5×5 bore.
+            if(shape==Shape.EXODIUM_SINK&&Math.abs(u)==2&&Math.abs(v)==2)continue;
             if(shape==Shape.CARVE&&u*u+v*v>10)continue;
             if(shape==Shape.CLEAVE&&(u*u/144.0+v*v/25.0)>1.0)continue;
             if(shape==Shape.WORLD_SHATTER&&Math.abs(u)+Math.max(0,v)*2>w)continue;

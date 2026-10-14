@@ -44,6 +44,13 @@ TIPS_EN += ['Redirect incoming hostile projectiles without changing their owners
 TIPS_ES += ['Redirige proyectiles hostiles sin cambiar su propietario.', 'Recorre de vuelta tus pasos por espacio aún despejado y cargado.', 'Retira una interfaz de materiales conectada, no la veta completa.', 'Un apoyo pagado sigue tus pasos sobre huecos; no concede vuelo.', 'Protege terreno cercano de explosiones, no a entidades del daño.', 'Sella huecos de minería manual cuando los dejas atrás, con material del inventario.']
 SEC_EN += ['Change reflection / shear','Forget route','Change contact / exposed surface','Stop companion','Stop ward','Stop sealing']
 SEC_ES += ['Alterna reflexión / desvío','Olvida la ruta','Alterna contacto / superficie expuesta','Detiene el acompañante','Detiene la protección','Detiene el sellado']
+IDS += ['exodium','iridium','hellspec']
+EN += ['Exodium Starfall','Iridium Lodebreaker','Hellspec Infernal Bloom']
+ES += ['Exodium Lluvia Estelar','Iridium Quebravetas','Hellspec Flor Infernal']
+TIPS_EN += ['Drill a marked, beveled starfall shaft through natural geology.', 'Extract nearby loaded ores from the center outward; their drops glow.', 'Carve a five-petal infernal quarry, then send a visible magma wave at nearby enemies.']
+TIPS_ES += ['Perfora un pozo estelar biselado y marcado a través de geología natural.', 'Extrae menas cargadas desde el centro hacia fuera; sus drops brillan.', 'Excava una cantera infernal de cinco pétalos y lanza una ola magmática visible a los enemigos cercanos.']
+SEC_EN += ['Open the beveled 5×5 Starfall Sink up to 32 blocks down.', 'Recall recent ore drops collected by this pick.', 'Seal lava beneath your aim and erupt it to repel nearby foes.']
+SEC_ES += ['Abre el Pozo Estelar biselado 5×5 hasta 32 bloques hacia abajo.', 'Recupera drops de mena recientes de este pico.', 'Sella lava bajo la mira y erupciónala para alejar enemigos cercanos.']
 def js(path,obj):
  p=R/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
 def png(path,pixels,w,h):
@@ -96,6 +103,6 @@ from ux4_strings import revise as revise4
 for code in ["en_us","es_es"]:
  path=R/"assets/specialpickaxes/lang"/(code+".json");data=json.loads(path.read_text());revise4(data,code=="es_es",IDS);path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
 
-# Final nine-item mining catalog supersedes the historical input tables above.
+# Final playable mining catalog supersedes the historical input tables above.
 from mining_catalog import apply as mining_catalog
 mining_catalog()

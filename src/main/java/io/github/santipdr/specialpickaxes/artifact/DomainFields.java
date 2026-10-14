@@ -213,7 +213,7 @@ public final class DomainFields {
                     &&(f.kind!=ArtifactKind.INTERREGNUM||f.frozen.containsKey(e.getUUID())||!FROZEN_ENTITIES.containsKey(e.getUUID()));
             // Query only relevant entity classes: dropped items and decorations must not exhaust the scan cap.
             var candidates=new ArrayList<Entity>();
-            if(f.kind!=ArtifactKind.AEGIS)
+            if(f.kind==ArtifactKind.INTERREGNUM)
                 candidates.addAll(EntitySelection.nearest(level,Monster.class,bounds,mob->eligible.test(mob),centerPosition,targetLimit,FIELD_ENTITY_SCAN_BUDGET/2));
             candidates.addAll(projectilesNear(level,bounds,centerPosition,targetLimit,e->projectileEntity(e)&&eligible.test(e),FIELD_ENTITY_SCAN_BUDGET/2));
             var entities=EntitySelection.nearest(candidates,centerPosition,targetLimit);
