@@ -139,6 +139,20 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.getHealth()==11F,"a renewal pulse restores one health point");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
+        var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
+        var shell=SpecialPickaxes.SEARING_SHELL.get();
+        h.assertTrue(wearer.hasEffect(shell),"Hellspec grants its named passive while held or equipped in Curios");
+        wearer.setSecondsOnFire(10);shell.applyEffectTick(wearer,0);
+        h.assertTrue(!wearer.isOnFire(),"the shell clears active burning on its pulse");
+        var fire=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().inFire(),10F);
+        var lava=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().lava(),10F);
+        var melee=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().playerAttack(wearer),10F);
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(fire),"the shell cancels tagged fire damage");
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(lava),"the shell cancels lava damage");
+        h.assertTrue(!MinecraftForge.EVENT_BUS.post(melee),"the shell does not cancel ordinary melee damage");
+        finish(h,wearer);
+    }
 
     @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);

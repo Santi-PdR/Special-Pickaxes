@@ -39,6 +39,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
+    public static final RegistryObject<MobEffect> SEARING_SHELL=EFFECTS.register("searing_shell",SearingShellEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
@@ -146,6 +147,8 @@ public final class SpecialPickaxes {
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
+        if(!e.isCanceled()&&e.getEntity().hasEffect(SEARING_SHELL.get())
+                &&e.getSource().is(net.minecraft.tags.DamageTypeTags.IS_FIRE))e.setCanceled(true);
     }
     private void hurt(LivingHurtEvent e){
         if(e.getEntity() instanceof ServerPlayer p){

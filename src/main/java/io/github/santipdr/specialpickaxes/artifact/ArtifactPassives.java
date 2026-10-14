@@ -91,7 +91,7 @@ public final class ArtifactPassives {
             case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, 80);
             case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
             case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
-            case HELLSPEC -> grant(player, MobEffects.FIRE_RESISTANCE, 0, 80);
+            case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, 80);
             case SEAM_RIPPER -> grant(player, MobEffects.DIG_SPEED, 1, 80);
             default -> { }
         }
