@@ -19,6 +19,10 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.EVENTIDE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EVENTIDE))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
+        if(kind==ArtifactKind.ICARUS
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.ICARUS)){
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
+        }
         if(kind==ArtifactKind.HELLSPEC
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.HELLSPEC))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get());
@@ -97,7 +101,10 @@ public final class ArtifactPassives {
                 grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS);
                 sustain(player);
             }
-            case ICARUS -> { if (!player.onGround()) grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS); }
+            case ICARUS -> { if (!player.onGround()){
+                grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(), 0, PASSIVE_LEASE_TICKS);
+            } }
             case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
             case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, PASSIVE_LEASE_TICKS);
             case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);

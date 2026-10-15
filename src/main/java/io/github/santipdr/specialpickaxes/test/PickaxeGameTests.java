@@ -140,6 +140,19 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_27") public static void icarusCuriosGlideBuildsSprintMomentumInAir(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);wearer.setSprinting(true);
+        ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
+        var glide=SpecialPickaxes.ICARIAN_MOMENTUM.get();
+        h.assertTrue(wearer.hasEffect(glide)&&wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"airborne Icarus Curios grants its glide effect and fall protection");
+        wearer.setDeltaMovement(0,-.2,0);glide.applyEffectTick(wearer,0);var boosted=wearer.getDeltaMovement();
+        h.assertTrue(boosted.horizontalDistanceSqr()>.0025&&Math.abs(boosted.y+.2)<.001,"sprint-gliding gains forward momentum without altering vertical control");
+        wearer.setSprinting(false);wearer.setDeltaMovement(.1,-.2,0);glide.applyEffectTick(wearer,0);
+        h.assertTrue(Math.abs(wearer.getDeltaMovement().x-.1)<.001&&Math.abs(wearer.getDeltaMovement().z)<.001,"the glide stops accelerating when sprint is released");
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.ICARUS);
+        h.assertTrue(!wearer.hasEffect(glide),"Icarian Momentum is removed when the Curios passive ends");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();
