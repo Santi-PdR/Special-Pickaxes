@@ -317,6 +317,20 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.HELLSPEC);
         h.assertTrue(wearer.hasEffect(shell),"held Hellspec keeps its own fire passive");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_36") public static void crucibleCuriosMantleIsCustomThermalWard(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);wearer.setSecondsOnFire(10);ArtifactPassives.tick(wearer,ArtifactKind.CRUCIBLE);
+        var mantle=SpecialPickaxes.CRUCIBLE_MANTLE.get();
+        h.assertTrue(wearer.hasEffect(mantle)&&wearer.getEffect(mantle).getDuration()==40,"Curios applies the named two-second Crucible Mantle lease in heat");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE),"Crucible uses its custom passive instead of a generic fire-resistance potion");
+        mantle.applyEffectTick(wearer,0);h.assertTrue(!wearer.isOnFire(),"a mantle pulse clears active burning");
+        var fire=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().inFire(),10F);
+        var lava=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().lava(),10F);
+        var melee=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().playerAttack(wearer),10F);
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(fire)&&MinecraftForge.EVENT_BUS.post(lava),"the custom mantle cancels fire and lava damage");
+        h.assertTrue(!MinecraftForge.EVENT_BUS.post(melee),"the thermal ward leaves melee damage unchanged");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CRUCIBLE);
+        h.assertTrue(!wearer.hasEffect(mantle),"the custom Curios lease clears immediately when the pick leaves its slot");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

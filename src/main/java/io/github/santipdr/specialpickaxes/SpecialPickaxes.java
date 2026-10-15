@@ -48,6 +48,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> DAWN_RESERVE=EFFECTS.register("dawn_reserve",DawnReserveEffect::new);
     public static final RegistryObject<MobEffect> SEAM_FRAY=EFFECTS.register("seam_fray",SeamFrayEffect::new);
     public static final RegistryObject<MobEffect> LODEGUARD=EFFECTS.register("lodeguard",LodeguardEffect::new);
+    public static final RegistryObject<MobEffect> CRUCIBLE_MANTLE=EFFECTS.register("crucible_mantle",CrucibleMantleEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
@@ -156,7 +157,7 @@ public final class SpecialPickaxes {
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
-        if(!e.isCanceled()&&e.getEntity().hasEffect(SEARING_SHELL.get())
+        if(!e.isCanceled()&&(e.getEntity().hasEffect(SEARING_SHELL.get())||e.getEntity().hasEffect(CRUCIBLE_MANTLE.get()))
                 &&e.getSource().is(net.minecraft.tags.DamageTypeTags.IS_FIRE))e.setCanceled(true);
     }
     private void hurt(LivingHurtEvent e){

@@ -89,6 +89,13 @@ for y in range(2,14):
  for x in range(3,13):
   if x in (3,12) or y in (2,13) or abs(x-7.5)==abs(y-7.5):pixels[y*16+x]=(138,229,255,255)
 png(Path('assets/specialpickaxes/textures/mob_effect/dominion.png'),pixels,16,16)
+ember=[(0,0,0,0)]*256
+palette={'D':(48,24,16,255),'Y':(255,197,65,255),'O':(244,105,31,255),'R':(169,42,29,255),'H':(255,235,150,255)}
+shape=['........DD......','......DDYYDD....','.....DYYOOYYD...','....DYYOHOOYYD..','....DYYOOYYRYD..','....DYYOYYRYYD..','.....DYYRRYYD...','......DYYRYD....','......DYYYD.....','.......DDD......']
+for y,row in enumerate(shape,2):
+ for x,color in enumerate(row):
+  if color!='.':ember[y*16+x]=palette[color]
+png(Path('assets/specialpickaxes/textures/mob_effect/crucible_mantle.png'),ember,16,16)
 js(Path('data/minecraft/tags/items/pickaxes.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 
 for tag in ['axes','shovels']:
