@@ -43,6 +43,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> SEARING_SHELL=EFFECTS.register("searing_shell",SearingShellEffect::new);
     public static final RegistryObject<MobEffect> NULL_MARK=EFFECTS.register("null_mark",NullMarkEffect::new);
     public static final RegistryObject<MobEffect> FAULT_RESONANCE=EFFECTS.register("fault_resonance",FaultResonanceEffect::new);
+    public static final RegistryObject<MobEffect> GRAVITIC_BALANCE=EFFECTS.register("gravitic_balance",GraviticBalanceEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
@@ -161,7 +162,14 @@ public final class SpecialPickaxes {
         }
     }
     private void heal(net.minecraftforge.event.entity.living.LivingHealEvent e){if(e.getEntity().hasEffect(NULL_MARK.get()))e.setCanceled(true);}
-    private void fall(LivingFallEvent e){if(e.getEntity() instanceof ServerPlayer p&&WorkQueue.protectsFall(p))e.setCanceled(true);}
+    private void fall(LivingFallEvent e){
+        if(!(e.getEntity() instanceof ServerPlayer p))return;
+        if(WorkQueue.protectsFall(p)){e.setCanceled(true);return;}
+        if(p.hasEffect(GRAVITIC_BALANCE.get())){
+            e.setDamageMultiplier(e.getDamageMultiplier()*.25F);
+            ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,p.blockPosition(),4);
+        }
+    }
     private void commands(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
             .then(Commands.literal("grant").then(Commands.argument("player",EntityArgument.player())

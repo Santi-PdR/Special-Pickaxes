@@ -127,6 +127,19 @@ public final class PickaxeGameTests {
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_26") public static void eventideCuriosGraviticBalanceControlsFalls(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);
+        ArtifactPassives.tick(wearer,ArtifactKind.EVENTIDE);
+        var balance=SpecialPickaxes.GRAVITIC_BALANCE.get();
+        h.assertTrue(wearer.hasEffect(balance)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"Curios grants Eventide's named descent effect instead of generic Slow Falling");
+        wearer.setDeltaMovement(0,-1,0);balance.applyEffectTick(wearer,0);
+        h.assertTrue(Math.abs(wearer.getDeltaMovement().y+.24)<.001,"the passive caps a fast fall at a controlled descent speed");
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,12F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.25F)<.001,"Eventide reduces the landing damage multiplier by 75 percent");
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EVENTIDE);
+        h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();

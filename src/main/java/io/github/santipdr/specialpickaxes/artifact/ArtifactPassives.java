@@ -16,6 +16,9 @@ public final class ArtifactPassives {
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
     public static void onCuriosUnequip(ServerPlayer player,ArtifactKind kind) {
+        if(kind==ArtifactKind.EVENTIDE
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EVENTIDE))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
         if(kind==ArtifactKind.HELLSPEC
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.HELLSPEC))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get());
@@ -87,7 +90,7 @@ public final class ArtifactPassives {
         switch (kind) {
             case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS); grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS); }
             case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
-            case EVENTIDE -> grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
+            case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, PASSIVE_LEASE_TICKS); }
             case INTERREGNUM -> grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
             case WORLDLOOM -> {
