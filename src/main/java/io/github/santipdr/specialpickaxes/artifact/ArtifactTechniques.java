@@ -200,7 +200,7 @@ public final class ArtifactTechniques {
         for(var target:targets){
             if(stopped>=cap)break;
             target.setDeltaMovement(0,Math.min(0,target.getDeltaMovement().y),0);target.hasImpulse=true;
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,2,true,false,true));
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),40,1,true,false,true));
             ArtifactFeedback.burst(player,ArtifactKind.CHOIR,target.blockPosition(),3);stopped++;
         }
         for(int i=0;i<12;i++){
