@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -79,6 +80,11 @@ public final class ArtifactFeedback {
             case COVENANT->net.minecraft.core.particles.ParticleTypes.ENCHANT;};
         if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
         p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
+    }
+    /** The Crucible sheds particles of its chosen output, making each conversion legible at a glance. */
+    public static void crucibleRephase(ServerPlayer p,BlockPos pos,net.minecraft.world.level.block.state.BlockState material){
+        var fragments=new BlockParticleOption(ParticleTypes.BLOCK,material);
+        p.serverLevel().sendParticles(p,fragments,false,pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D,5,.18D,.2D,.18D,.055D);
     }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         for(int i=0;i<8;i++) {

@@ -152,6 +152,22 @@ public final class MiningReworkGameTests {
         h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.DIORITE),"marked player placement stays unchanged");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST),"ore and inventory stay unchanged");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_34") public static void crucibleSelectionControlsTransformCalciteAndObsidian(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var a=h.absolutePos(new BlockPos(5,4,7));var b=a.east();
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",9); // Tuff
+        PlayerPlacedBlocks.get(h.getLevel()).unmark(a);PlayerPlacedBlocks.get(h.getLevel()).unmark(b);
+        h.getLevel().setBlockAndUpdate(a,Blocks.CALCITE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(b,Blocks.OBSIDIAN.defaultBlockState());
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"activate arms the real corner-selection flow");
+        h.assertTrue(RelicControl.corner(p,a)&&RelicControl.corner(p,b),"both real selection clicks are accepted");
+        for(int tick=0;tick<100&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
+        h.assertTrue(WorkQueue.status(p).equals("ready"),"Crucible analysis reaches its confirmation state");
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick"); // GameTest advances work synchronously without advancing world time.
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"the normal confirm control resumes the conversion");
+        for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.TUFF)&&h.getLevel().getBlockState(b).is(Blocks.TUFF),"calcite and obsidian both transmute to selected tuff");
+        finish(h,p);
+    }
     @GameTest(template="empty",batch="rework_each_16") public static void staleSameKindToolIntentIsRejected(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var old=p.getMainHandItem().getTag().getUUID("controlIdentity");
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.AXIOM).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());

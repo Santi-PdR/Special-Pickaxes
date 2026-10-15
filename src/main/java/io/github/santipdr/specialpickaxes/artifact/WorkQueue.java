@@ -84,7 +84,7 @@ public final class WorkQueue {
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
             int playerBudget=job.region==null?EnchantmentScaling.budget(job.tool):job.region.attemptsPerTick(job.tool);
-            int turn=Math.min(budget,playerBudget);BlockPos feedback=null;
+            int turn=Math.min(budget,playerBudget);BlockPos feedback=null;net.minecraft.world.level.block.state.BlockState feedbackMaterial=null;
             while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
                 if(dropBackpressured(job,p)){
@@ -94,7 +94,7 @@ public final class WorkQueue {
                 WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);
-                    if(ok) { feedback=step.pos();job.succeeded++; }
+                    if(ok) { feedback=step.pos();if(job.kind==ArtifactKind.CRUCIBLE&&step instanceof WorkStep.Rephase rephase)feedbackMaterial=rephase.target();job.succeeded++; }
                     else if(step.stopOnFailure()) {job.steps.clear();job.aborted=true;break;}
                 } catch(RuntimeException error) {
                     LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
@@ -105,6 +105,7 @@ public final class WorkQueue {
             if(feedback!=null && p.tickCount%4==0){
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
                 else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
+                else if(job.kind==ArtifactKind.CRUCIBLE&&feedbackMaterial!=null)ArtifactFeedback.crucibleRephase(p,feedback,feedbackMaterial);
                 else ArtifactFeedback.burst(p,job.kind,feedback,4);
             }
             if(job.region!=null)job.region.reportProgress(p);
