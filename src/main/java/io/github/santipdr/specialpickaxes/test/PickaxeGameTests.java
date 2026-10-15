@@ -183,6 +183,21 @@ public final class PickaxeGameTests {
         h.assertTrue(!enemy.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),"hostile players never receive the shared ward");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_31") public static void seamRipperCuriosFraysHostileArmor(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.SEAM_RIPPER);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
+        attacker.setItemSlot(EquipmentSlot.CHEST,new ItemStack(Items.DIAMOND_CHESTPLATE));h.getLevel().addFreshEntity(attacker);
+        double armorBefore=attacker.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.SEAM_RIPPER);
+        var fray=SpecialPickaxes.SEAM_FRAY.get();
+        h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"the Curios guard still trims the first hostile hit by 15 percent");
+        h.assertTrue(attacker.hasEffect(fray)&&attacker.getEffect(fray).getDuration()==60,"the passive applies its named three-second custom effect");
+        double armorAfter=attacker.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
+        h.assertTrue(armorBefore>0&&Math.abs(armorAfter/armorBefore-.75D)<.02D,"Seam Fray reduces armor by 25 percent for the effect duration");
+        h.assertTrue(fray.isDurationEffectTick(60,0)&&!fray.isDurationEffectTick(59,0),"the scar particles pulse every six ticks");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();

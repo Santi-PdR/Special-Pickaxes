@@ -83,7 +83,7 @@ public final class ArtifactPassives {
                 attacker.hasImpulse=true;
             }
             case IRIDIUM -> player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,80,0,true,false,true));
-            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false,true));}
+            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),60,0,true,false,true));}
             default -> {return;}
         }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
