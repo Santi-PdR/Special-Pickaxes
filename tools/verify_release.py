@@ -18,6 +18,13 @@ with zipfile.ZipFile(jar) as z:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
  assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==len(ids)
  assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==len(ids)
+ effect_ids=re.findall(r'EFFECTS\.register\("([^"]+)"',(root/'src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java').read_text())
+ assert effect_ids,'No registered mob effects found'
+ for effect_id in effect_ids:
+  icon=f'assets/specialpickaxes/textures/mob_effect/{effect_id}.png'
+  assert icon in z.namelist(),f'Missing mob effect HUD icon: {icon}'
+  image=z.read(icon)
+  assert image[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',image[16:24])==(16,16),f'Invalid mob effect HUD icon: {icon}'
  assert 'io/github/santipdr/specialpickaxes/artifact/ArtifactActions.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/WorkQueue.class' in z.namelist()
 digest=hashlib.sha256(jar.read_bytes()).hexdigest()
