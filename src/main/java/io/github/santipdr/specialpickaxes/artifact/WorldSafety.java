@@ -38,9 +38,7 @@ public final class WorldSafety {
         if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null
                 ||context.kind()!=ArtifactKind.IRIDIUM||context.player().serverLevel()!=level
                 ||!ArtifactOres.isOre(context.expected()))return;
-        drop.setGlowingTag(true);
-        drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
-        drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",context.player().getUUID());
+        OreDropHighlight.mark(drop,context.player());
     }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!ArtifactOres.isOre(state)
         &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL))

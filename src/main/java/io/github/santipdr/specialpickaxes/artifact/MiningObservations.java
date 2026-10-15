@@ -72,8 +72,7 @@ public final class MiningObservations {
             if(!drop.isAlive())return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
             var previous=o.dropsBefore.get(drop.getUUID());var stack=drop.getItem();
             if(previous==null||stack.getCount()>previous.getCount()||!ItemStack.isSameItemSameTags(previous,stack)) {
-                drop.setGlowingTag(true);drop.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
-                drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",p.getUUID());
+                OreDropHighlight.mark(drop,p);
             }
             return inspected[0]>=DROP_QUERY_LIMIT?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
                     :net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
