@@ -49,6 +49,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> SEAM_FRAY=EFFECTS.register("seam_fray",SeamFrayEffect::new);
     public static final RegistryObject<MobEffect> LODEGUARD=EFFECTS.register("lodeguard",LodeguardEffect::new);
     public static final RegistryObject<MobEffect> CRUCIBLE_MANTLE=EFFECTS.register("crucible_mantle",CrucibleMantleEffect::new);
+    public static final RegistryObject<MobEffect> WORLDBREAKER_AEGIS=EFFECTS.register("worldbreaker_aegis",WorldbreakerAegisEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));

@@ -96,6 +96,13 @@ for y,row in enumerate(shape,2):
  for x,color in enumerate(row):
   if color!='.':ember[y*16+x]=palette[color]
 png(Path('assets/specialpickaxes/textures/mob_effect/crucible_mantle.png'),ember,16,16)
+slate=[(0,0,0,0)]*256
+slate_palette={'D':(38,33,46,255),'V':(91,78,111,255),'S':(144,139,151,255),'L':(202,198,207,255),'C':(111,204,207,255)}
+shield=['.......DD.......','.....DDLLDD.....','....DVLLLLVD....','...DVLCLLLLVD...','...DVLDDDDLVD...','...DVL....LVD...','....DVL..LVD....','.....DVLLVD.....','......DVVD......','.......DD.......']
+for y,row in enumerate(shield,2):
+ for x,color in enumerate(row):
+  if color!='.':slate[y*16+x]=slate_palette[color]
+png(Path('assets/specialpickaxes/textures/mob_effect/worldbreaker_aegis.png'),slate,16,16)
 js(Path('data/minecraft/tags/items/pickaxes.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 
 for tag in ['axes','shovels']:

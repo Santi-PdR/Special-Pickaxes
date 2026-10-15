@@ -29,6 +29,9 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.CRUCIBLE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CRUCIBLE))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get());
+        if(kind==ArtifactKind.WORLDBREAKER
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDBREAKER))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
@@ -113,7 +116,7 @@ public final class ArtifactPassives {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(), 0, PASSIVE_LEASE_TICKS);
             } }
             case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
-            case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, PASSIVE_LEASE_TICKS);
+            case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
             case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
             case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
             case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
