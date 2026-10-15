@@ -19,18 +19,26 @@ public final class MiningObservations {
     private record DropSnapshot(Map<UUID,ItemStack> stacks,boolean complete) {}
     private static final ArrayDeque<Observation> PENDING=new ArrayDeque<>();
     private MiningObservations() {}
-    public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
-        capture(p,tool,kind,pos,state,true);
+    public static boolean capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
+        return capture(p,tool,kind,pos,state,true);
     }
-    public static void capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
+    public static boolean capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
         boolean trackOreDrops=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state);
         // Queued Iridium breaks never chain held-mining effects.
         boolean queuedIridiumOre=WorkQueue.running()&&trackOreDrops;
-        if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return;
+        if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return false;
         boolean tagDropsAtSpawn=trackOreDrops&&WorldSafety.capturesIridiumDrops();
         DropSnapshot snapshot=trackOreDrops&&!tagDropsAtSpawn?dropSnapshot(p,pos):new DropSnapshot(Map.of(),!tagDropsAtSpawn);
         PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),snapshot.stacks(),snapshot.complete(),
                 applyHeldMiningEffects&&!queuedIridiumOre));
+        return true;
+    }
+    /** Snapshot a vanilla break when Iridium is in Curios and another tool is held. */
+    public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state) {
+        if(curioPick.isEmpty()||!(curioPick.getItem() instanceof ArtifactItem equipped)||equipped.kind!=ArtifactKind.IRIDIUM
+                ||!ArtifactOres.isOre(state)||WorkQueue.running())return false;
+        if(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return false;
+        return capture(player,player.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state,false);
     }
     public static void flush() {
         int budget=512;

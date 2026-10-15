@@ -84,9 +84,7 @@ public final class SpecialPickaxes {
     private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
-        if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem pick)||pick.kind!=ArtifactKind.IRIDIUM)return;
-        if(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return;
-        MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,e.getPos(),e.getState(),false);
+        if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());
     }
     private void entityJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent e){
         if(e.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
