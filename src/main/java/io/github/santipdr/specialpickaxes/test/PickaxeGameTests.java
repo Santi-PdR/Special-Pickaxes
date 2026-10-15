@@ -198,6 +198,27 @@ public final class PickaxeGameTests {
         h.assertTrue(fray.isDurationEffectTick(60,0)&&!fray.isDurationEffectTick(59,0),"the scar particles pulse every six ticks");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_32") public static void worldloomSharesHeartwoodOnlyWithNearbyAllies(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM,"WorldloomBearer");
+        var ally=player(h,ArtifactKind.CHOIR,"RootedAlly");var farAlly=player(h,ArtifactKind.ICARUS,"DistantAlly");
+        var enemy=player(h,ArtifactKind.SEAM_RIPPER,"RootedEnemy");
+        var scoreboard=h.getLevel().getScoreboard();var allies=scoreboard.addPlayerTeam("roots_"+wearer.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("foes_"+enemy.getUUID().toString().substring(0,6));
+        for(var teammate:List.of(wearer,ally,farAlly))scoreboard.addPlayerToTeam(teammate.getScoreboardName(),allies);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        ally.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
+        farAlly.setPos(wearer.getX()+7,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+1,wearer.getY(),wearer.getZ());
+        for(var other:List.of(ally,farAlly,enemy))h.getLevel().addFreshEntity(other);
+        ally.setHealth(ally.getHealth()-4F);
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        h.assertTrue(ally.hasEffect(renewal)&&ally.getEffect(renewal).getDuration()==40,"nearby allied miners receive the short custom renewal lease");
+        h.assertTrue(!farAlly.hasEffect(renewal)&&!enemy.hasEffect(renewal),"the effect does not reach distant allies or enemies");
+        float before=ally.getHealth();renewal.applyEffectTick(ally,0);
+        h.assertTrue(Math.abs(ally.getHealth()-before-1F)<.001F,"the shared effect heals one health point per pulse");
+        h.assertTrue(renewal.isDurationEffectTick(40,0)&&!renewal.isDurationEffectTick(39,0),"root healing remains spaced one second apart");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();

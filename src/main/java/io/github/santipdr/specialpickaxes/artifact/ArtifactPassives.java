@@ -103,6 +103,7 @@ public final class ArtifactPassives {
             case WORLDLOOM -> {
                 grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS);
                 sustain(player);
+                shareHeartwood(player);
             }
             case ICARUS -> { if (!player.onGround()){
                 grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
@@ -140,5 +141,19 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,8,256);
         for(var ally:allies)grant(ally,MobEffects.ABSORPTION,0,PASSIVE_LEASE_TICKS);
+    }
+
+    /** Worldloom lends its slow custom healing pulses to a small, nearby allied group. */
+    private static void shareHeartwood(ServerPlayer owner){
+        var center=owner.position();double rangeSqr=25D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(5),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,4,128);
+        var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        for(var ally:allies){
+            var current=ally.getEffect(renewal);
+            if(current==null||current.getDuration()<=20)
+                ally.addEffect(new MobEffectInstance(renewal,40,0,true,false,true));
+        }
     }
 }

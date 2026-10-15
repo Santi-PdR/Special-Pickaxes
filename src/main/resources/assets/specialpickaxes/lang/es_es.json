@@ -556,7 +556,7 @@
   "curios.detail.specialpickaxes.fault_choir": "Contrafalla: el primer golpe hostil cada 8 s aplica Resonancia de Falla durante 3 s y amortigua el impulso horizontal del atacante.",
   "curios.detail.specialpickaxes.eventide": "Deuda gravitatoria: el primer golpe hostil cada 8 s causa 10% menos daño y atrapa al atacante durante 3,5 s, reduciendo su movimiento horizontal.",
   "curios.detail.specialpickaxes.paradox_crucible": "Respuesta de ceniza: el primer golpe hostil cada 8 s prende al atacante durante 3 s.",
-  "curios.detail.specialpickaxes.worldloom": "Corazón arraigado: el primer golpe hostil cada 8 s otorga Renovación de Duramen durante 3 s; cura en pulsos de medio corazón.",
+  "curios.detail.specialpickaxes.worldloom": "Pacto de Duramen: el primer golpe hostil cada 8 s otorga Renovación de Duramen durante 3 s; el aura también cura hasta 4 aliados cercanos.",
   "curios.detail.specialpickaxes.icarus": "Reverso alado: el primer golpe hostil cada 8 s lanza al atacante hacia arriba y lejos.",
   "curios.detail.specialpickaxes.hollow_axiom": "Marca nula: el primer golpe hostil cada 8 s impide que el atacante se cure durante 3 s.",
   "curios.detail.specialpickaxes.worldbreaker": "Guardia del núcleo: el primer golpe hostil cada 8 s causa 20% menos daño y otorga Absorción II durante 3 s.",
