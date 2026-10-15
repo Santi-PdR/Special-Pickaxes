@@ -758,4 +758,15 @@ public final class PickaxeGameTests {
         inputReady(p,ArtifactKind.CRUCIBLE);RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE);
         h.assertTrue(ArtifactState.mode(p,ArtifactKind.CRUCIBLE)==1&&!ArtifactInteraction.selecting(p),"direct carve cannot inherit an active corner selector");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_35") public static void worldloomRootsHoldHostilesThenReleaseCleanly(GameTestHelper h){
+        var owner=player(h,ArtifactKind.WORLDLOOM);
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
+        var anchor=mob.position();
+        h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
+        mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
+        h.assertTrue(mob.position().distanceToSqr(anchor)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"roots pull the hostile back and suppress escape momentum");
+        WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
+        h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
+        finish(h,owner);
+    }
 }

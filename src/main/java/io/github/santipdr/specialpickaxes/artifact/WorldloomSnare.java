@@ -15,6 +15,8 @@ import java.util.UUID;
 
 /** Short-lived root bindings created by the Worldloom's held area skill. */
 public final class WorldloomSnare {
+    private static final int ROOT_PULSE_TICKS=10;
+    private static final int ROOT_PARTICLES=4;
     private static final net.minecraft.world.level.block.state.BlockState VINE_STATE=
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
     private static final net.minecraft.core.particles.BlockParticleOption VINE_PARTICLE=
@@ -50,17 +52,16 @@ public final class WorldloomSnare {
                 if(level.noCollision(target,box))target.setPos(binding.anchor);
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
-            if(level.getGameTime()%10==0){
-                // The first pulse visibly climbs from the feet; later pulses coil around the trapped body.
+            if(level.getGameTime()%ROOT_PULSE_TICKS==0){
+                // Rotate a low ring around the ankles; four block fragments keep the
+                // root readable while cutting particle traffic by sixty percent.
                 long age=level.getGameTime()-binding.started;
-                double height=Math.max(.8,target.getBbHeight());
-                double rise=Math.min(1D,age/20D);
-                double yOffset=age<20?.12+height*rise:.18+height*(.5+.38*Math.sin(age*.16));
-                double angle=age*.24, x=binding.anchor.x+Math.cos(angle)*.12,z=binding.anchor.z+Math.sin(angle)*.12;
+                double angle=age*.18, x=binding.anchor.x+Math.cos(angle)*.08,z=binding.anchor.z+Math.sin(angle)*.08;
+                double y=binding.anchor.y+.08D;
                 // One bounded packet per nearby viewer keeps the animation cheap even with several roots active.
-                level.sendParticles(owner,VINE_PARTICLE,false,x,binding.anchor.y+yOffset,z,10,.3,.18,.3,.015);
+                level.sendParticles(owner,VINE_PARTICLE,false,x,y,z,ROOT_PARTICLES,.22,.035,.22,.008);
                 if(target instanceof ServerPlayer viewer&&viewer!=owner)
-                    level.sendParticles(viewer,VINE_PARTICLE,false,x,binding.anchor.y+yOffset,z,10,.3,.18,.3,.015);
+                    level.sendParticles(viewer,VINE_PARTICLE,false,x,y,z,ROOT_PARTICLES,.22,.035,.22,.008);
             }
         }
     }
