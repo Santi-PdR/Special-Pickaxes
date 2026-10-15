@@ -7,26 +7,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
-/** Incremental, bounded contact-surface search followed by scheduled extraction. */
+/** Incremental, bounded same-material geology search followed by scheduled extraction. */
 public final class SeamMiningProgram implements WorkProgram {
     private record Candidate(BlockPos pos,BlockState state) {}
     private static final int SCAN_LIMIT=512,MINING_LIMIT=256;
     private final BlockPos origin;
-    private final BlockState material,boundary;
-    private final boolean exposedToAir;
-    private final boolean connectedOnly;
+    private final BlockState material;
     private final ArrayDeque<BlockPos> frontier=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
     private final List<Candidate> candidates=new ArrayList<>();
     private int inspected,mineIndex;
     private boolean scanning=true;
 
-    public SeamMiningProgram(BlockPos origin,BlockState material,BlockState boundary,boolean exposedToAir,Collection<BlockPos> seeds){
-        this(origin,material,boundary,exposedToAir,seeds,false);
-    }
-    public SeamMiningProgram(BlockPos origin,BlockState material,BlockState boundary,boolean exposedToAir,Collection<BlockPos> seeds,boolean connectedOnly){
-        this.origin=origin.immutable();this.material=material;this.boundary=boundary;this.exposedToAir=exposedToAir;this.connectedOnly=connectedOnly;
-        for(var seed:seeds)if(seen.size()<SCAN_LIMIT&&seen.add(seed.immutable()))frontier.addLast(seed.immutable());
+    public SeamMiningProgram(BlockPos origin,BlockState material){
+        this.origin=origin.immutable();this.material=material;
+        frontier.add(this.origin);seen.add(this.origin);
     }
 
     @Override public int remaining(){return Math.max(0,(scanning?SCAN_LIMIT-inspected:0)+candidates.size()-mineIndex);}
@@ -52,13 +47,7 @@ public final class SeamMiningProgram implements WorkProgram {
                     var level=actor.serverLevel();
                     if(!level.hasChunkAt(pos)||PlayerPlacedBlocks.get(level).contains(pos)||!MiningDesigns.seamGeology(material)
                             ||!WorldSafety.allowed(actor,ArtifactKind.SEAM_RIPPER,pos)||level.getBlockState(pos)!=material)return false;
-                    boolean touchesBoundary=false;
-                    for(var direction:Direction.values()){
-                        var adjacent=pos.relative(direction);if(!level.hasChunkAt(adjacent))continue;
-                        var neighbor=level.getBlockState(adjacent);
-                        if(exposedToAir?neighbor.isAir():neighbor==boundary){touchesBoundary=true;break;}
-                    }
-                    if((connectedOnly||touchesBoundary)&&candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
+                    if(candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
                     for(var direction:Direction.values()){
                         var adjacent=pos.relative(direction);
                         if(seen.size()<SCAN_LIMIT&&level.hasChunkAt(adjacent)&&!PlayerPlacedBlocks.get(level).contains(adjacent)

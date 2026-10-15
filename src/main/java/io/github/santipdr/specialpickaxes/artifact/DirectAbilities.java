@@ -19,7 +19,7 @@ public final class DirectAbilities {
             var target=ArtifactActions.target(p);if(target.isEmpty())return false;
             var seed=target.get();var level=p.serverLevel();var source=level.getBlockState(seed);
             if(!WorldSafety.allowed(p,k,seed)||!MiningDesigns.seamGeology(source)||PlayerPlacedBlocks.get(level).contains(seed))return false;
-            var program=new SeamMiningProgram(seed,source,null,false,List.of(seed),true);
+            var program=new SeamMiningProgram(seed,source);
             boolean started=WorkQueue.startRegion(p,tool,k,program);
             if(started){ArtifactFeedback.message(p,"seam_started");ArtifactFeedback.burst(p,k,seed,8);}
             return started;

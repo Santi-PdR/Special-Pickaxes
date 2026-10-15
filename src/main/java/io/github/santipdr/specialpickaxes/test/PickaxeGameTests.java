@@ -127,6 +127,36 @@ public final class PickaxeGameTests {
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
+        var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
+        var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();
+        for(var pos:List.of(seed,sameA,sameB,mixed,ore,placed))PlayerPlacedBlocks.get(level).unmark(pos);
+        level.setBlockAndUpdate(sameA,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(sameB,Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(mixed,Blocks.GRANITE.defaultBlockState());level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        level.setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(seed));
+        h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.SEAM_RIPPER)==1,"Seam R is a single, clear ability without obsolete A/B modes");
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,false),"R starts a same-material vein with an empty offhand");
+        for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(level.getBlockState(seed).isAir()&&level.getBlockState(sameA).isAir()&&level.getBlockState(sameB).isAir(),"all connected natural stone is mined");
+        h.assertTrue(level.getBlockState(mixed).is(Blocks.GRANITE)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),"different geology and ores are preserved");
+        h.assertTrue(level.getBlockState(placed).is(Blocks.STONE),"player-placed geology is preserved");
+        PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_24") public static void seamRipperAlternateMinesTheVisibleFiveByFiveFace(GameTestHelper h) {
+        var p=player(h,ArtifactKind.SEAM_RIPPER);var center=target(h);var level=h.getLevel();
+        var east=center.east();var above=center.above();var ore=center.west();var placed=center.below();var outside=center.south();
+        for(var pos:List.of(center,east,above,ore,placed,outside))PlayerPlacedBlocks.get(level).unmark(pos);
+        level.setBlockAndUpdate(east,Blocks.TUFF.defaultBlockState());level.setBlockAndUpdate(above,Blocks.DIORITE.defaultBlockState());
+        level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(outside,Blocks.ANDESITE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));
+        h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER),"X mines a visible geology face without offhand materials");
+        for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(level.getBlockState(center).isAir()&&level.getBlockState(east).isAir()&&level.getBlockState(above).isAir(),"natural geology on the 5x5 target face is mined");
+        h.assertTrue(level.getBlockState(ore).is(Blocks.DIAMOND_ORE)&&level.getBlockState(placed).is(Blocks.STONE)&&level.getBlockState(outside).is(Blocks.ANDESITE),"ores, placed blocks and blocks beyond the face are preserved");
+        PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
+    }
     @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");
