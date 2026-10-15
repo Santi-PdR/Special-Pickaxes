@@ -1,6 +1,7 @@
 package io.github.santipdr.specialpickaxes.test;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.core.BlockPos;
@@ -213,7 +214,7 @@ public final class PickaxeGameTests {
         DomainFields.stop(owner);finish(h,owner);
     }
     @GameTest(template="empty",batch="legacy_each_11") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
-        var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);var stone=center.east();var ore=center.above();
+        var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(center);p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));var stone=center.east();var ore=center.above();
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry activation");drain(p);
         h.assertTrue(h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(stone).isAir(),"scheduled quarry mines the stone sphere");
@@ -227,6 +228,25 @@ public final class PickaxeGameTests {
         double old=p.getZ();h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.ICARUS,false),"kinetic bore activates");drain(p);
         h.assertTrue(p.getZ()>old && p.getZ()<barrier.getZ(),"advanced through excavation but not bedrock");
         h.assertTrue(h.getLevel().getBlockState(wall).isAir(),"bore excavated corridor");finish(h,p);
+    }
+    @GameTest(template="empty",batch="legacy_each_12") public static void icarianLiftReachesSkyThroughItsOwnShaft(GameTestHelper h) {
+        var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
+        for(int y=1;y<=6;y++)for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)h.getLevel().setBlockAndUpdate(base.offset(x,y,z),Blocks.STONE.defaultBlockState());
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts without a target block");
+        h.assertTrue(WorkQueue.protectsFall(p),"fall damage is protected while the lift is running");drain(p);
+        h.assertTrue(p.blockPosition().getY()>=base.getY()+5,"the lift carries its owner up the shaft toward open sky");
+        for(int y=1;y<=6;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y)).isAir(),"the central shaft is cleared through the roof");
+        h.assertTrue(h.getLevel().getBlockState(base.above().east()).is(Blocks.STONE),"the lift never widens the shaft into the roof");
+        h.assertTrue(!WorkQueue.busy(p)&&!WorkQueue.protectsFall(p),"movement protection ends with the lift job");finish(h,p);
+    }
+    @GameTest(template="empty",batch="legacy_each_12") public static void icarianLiftStopsAtProtectedBarrier(GameTestHelper h) {
+        var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
+        for(int y=1;y<=2;y++)h.getLevel().setBlockAndUpdate(base.above(y),Blocks.STONE.defaultBlockState());
+        var protectedBlock=base.above(3);h.getLevel().setBlockAndUpdate(protectedBlock,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(protectedBlock);
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a protected block");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(protectedBlock).is(Blocks.STONE),"the lift stops without breaking a player-protected block");
+        h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before pushing its owner through the barrier");
+        h.assertTrue(!WorkQueue.busy(p),"barrier stop closes the lift cleanly");PlayerPlacedBlocks.get(h.getLevel()).unmark(protectedBlock);finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();

@@ -135,6 +135,17 @@ public final class ArtifactFeedback {
         level.sendParticles(p,ParticleTypes.END_ROD,false,x,y,z,1,0,.18,0,.005);
         level.sendParticles(p,trail,false,x,y-.28,z,1,0,0,0,0);
     }
+    /** Compact landing burst confirms that Icarian Lift actually reached open sky. */
+    public static void icarianSurface(ServerPlayer p){
+        var level=p.serverLevel();double x=p.getX(),y=p.getY()+.15D,z=p.getZ();
+        var sky=new DustParticleOptions(new Vector3f(.72F,.9F,1F),1.35F);
+        for(int i=0;i<12;i++){
+            double angle=i*Math.PI/6;
+            level.sendParticles(p,sky,false,x+Math.cos(angle)*.85D,y,z+Math.sin(angle)*.85D,1,0,.35D,0,.005D);
+        }
+        level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.8D,z,8,.28D,.38D,.28D,.025D);
+        level.sendParticles(p,ParticleTypes.CLOUD,false,x,y+.1D,z,5,.35D,.05D,.35D,.015D);
+    }
     public static void nullWard(ServerPlayer p,int radius){
         var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);
         var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.35F);

@@ -12,6 +12,7 @@ public final class IcarianLiftProgram implements WorkProgram {
     private final int maxRise;
     private int rise,index;
     private boolean finished;
+    private boolean surfaced,blocked,heightCapped;
 
     public IcarianLiftProgram(BlockPos base,int maxRise){this.base=base.immutable();this.maxRise=Math.max(0,Math.min(MAX_WORLD_RISE,maxRise));}
 
@@ -26,6 +27,11 @@ public final class IcarianLiftProgram implements WorkProgram {
     @Override public boolean executing(){return true;}
     @Override public boolean done(){return finished;}
     @Override public void confirm(){}
+    public boolean surfaced(){return surfaced;}
+    public boolean blocked(){return blocked;}
+    public boolean heightCapped(){return heightCapped;}
+    private void finishAtBarrier(){finished=true;blocked=true;}
+    private void finishAtHeight(){finished=true;heightCapped=true;}
     @Override public boolean loaded(ServerPlayer p){return finished||index>=cells()||p.serverLevel().isOutsideBuildHeight(nextPos())||p.serverLevel().hasChunkAt(nextPos());}
 
     @Override public boolean backpressured(ServerPlayer p){
@@ -42,24 +48,25 @@ public final class IcarianLiftProgram implements WorkProgram {
     @Override public WorkStep next(ServerPlayer p){
         if(finished)return completed(base);
         if(index>=cells()){
-            if(rise>=maxRise){finished=true;return completed(base.offset(0,rise,0));}
+            if(rise>=maxRise){finishAtHeight();return completed(base.offset(0,rise,0));}
             int nextRise=rise+1;
             BlockPos head=base.offset(0,nextRise+1,0);
-            if(p.serverLevel().isOutsideBuildHeight(head)){finished=true;return completed(base.offset(0,rise,0));}
+            if(p.serverLevel().isOutsideBuildHeight(head)){finishAtHeight();return completed(base.offset(0,rise,0));}
             boolean reachedSky=p.serverLevel().canSeeSky(head);
-            rise=nextRise;index=0;finished=reachedSky;
+            rise=nextRise;index=0;
+            if(reachedSky){finished=true;surfaced=true;}
             return new WorkStep.Move(base.offset(0,nextRise,0));
         }
 
         BlockPos pos=nextPos();index++;
         var level=p.serverLevel();
-        if(level.isOutsideBuildHeight(pos)){finished=true;return completed(pos);}
+        if(level.isOutsideBuildHeight(pos)){finishAtHeight();return completed(pos);}
         BlockState state=level.getBlockState(pos);
         if(state.isAir()||state.is(net.minecraft.world.level.block.Blocks.CAVE_AIR)
                 ||state.is(net.minecraft.world.level.block.Blocks.VOID_AIR))return completed(pos);
         if(PlayerPlacedBlocks.get(level).contains(pos)||WorldSafety.barrier(p,pos)
                 ||!WorldSafety.harvestable(p,p.getMainHandItem(),pos)){
-            finished=true;
+            finishAtBarrier();
             return completed(pos);
         }
         return new WorkStep(){
