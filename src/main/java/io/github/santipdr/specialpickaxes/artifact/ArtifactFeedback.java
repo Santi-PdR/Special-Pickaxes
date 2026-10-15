@@ -112,6 +112,17 @@ public final class ArtifactFeedback {
             if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
+    /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
+    public static void gravityCollapse(ServerPlayer p,BlockPos center,int drops){
+        var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;
+        var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.6F);
+        level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,24,1.4,.9,1.4,.12);
+        level.sendParticles(p,core,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,14,.9,.65,.9,.015);
+        var eye=p.getEyePosition();
+        level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,eye.x,eye.y,eye.z,8,.35,.45,.35,.08);
+        ring(p,ArtifactKind.EVENTIDE,center,8);
+        message(p,"gravity_collapse",drops);
+    }
     /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
     public static void starfallSink(ServerPlayer p,BlockPos origin){
         var level=p.serverLevel();

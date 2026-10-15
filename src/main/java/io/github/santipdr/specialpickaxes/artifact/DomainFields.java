@@ -12,6 +12,9 @@ import java.util.*;
 /** No player, item entity, AI/NBT flag or block-entity ticking is changed by these fields. */
 public final class DomainFields {
     private static final int FIELD_ENTITY_SCAN_BUDGET=1024;
+    private static final int EVENTIDE_COLLAPSE_CHARGE=24;
+    private static final int EVENTIDE_COLLAPSE_RADIUS=16;
+    private static final int EVENTIDE_COLLAPSE_DROP_CAP=64;
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class StasisPulse {
         final ServerPlayer owner;final ItemStack tool;final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
@@ -24,7 +27,7 @@ public final class DomainFields {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
         final int mode;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
-        final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires;
+        final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires,collapsePullUntil;int gravityCharge;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius,int duration) {
             owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+duration;
         }
@@ -139,6 +142,27 @@ public final class DomainFields {
         var field=FIELDS.get(p.getUUID());
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
+        if(field.kind==ArtifactKind.EVENTIDE&&++field.gravityCharge>=EVENTIDE_COLLAPSE_CHARGE){
+            field.gravityCharge=0;
+            field.collapsePullUntil=ArtifactState.now(p)+60;
+            int pulled=pullDrops(field);
+            ArtifactFeedback.gravityCollapse(p,field.center,pulled);
+        }
+    }
+    private static int pullDrops(Field field){
+        var player=field.owner;var level=player.serverLevel();var center=Vec3.atCenterOf(field.center);var pullTo=player.getEyePosition();
+        var drops=EntitySelection.nearest(level,net.minecraft.world.entity.item.ItemEntity.class,
+                new AABB(field.center).inflate(EVENTIDE_COLLAPSE_RADIUS),item->item.isAlive()
+                        &&(item.getOwner()==null||player.getUUID().equals(item.getOwner()))
+                        &&item.position().distanceToSqr(center)<=(double)EVENTIDE_COLLAPSE_RADIUS*EVENTIDE_COLLAPSE_RADIUS,
+                center,EVENTIDE_COLLAPSE_DROP_CAP);
+        for(var item:drops){
+            var delta=pullTo.subtract(item.position());
+            if(delta.lengthSqr()<.04D)continue;
+            item.setDeltaMovement(item.getDeltaMovement().scale(.2D).add(delta.normalize().scale(.72D)));
+            item.hasImpulse=true;
+        }
+        return drops.size();
     }
     public static void tick() {
         tickPulses();
@@ -197,6 +221,7 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
+                if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
             }
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}

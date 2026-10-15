@@ -127,6 +127,19 @@ public final class PickaxeGameTests {
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
+        var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");
+        var drop=new ItemEntity(h.getLevel(),center.getX()+.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND,3));
+        drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);var stone=Blocks.STONE.defaultBlockState();
+        for(int i=0;i<23;i++)DomainFields.feed(p,p.getMainHandItem(),center,stone);
+        h.assertTrue(drop.getDeltaMovement().lengthSqr()<1.0E-8,"the field waits until its full mining charge");
+        DomainFields.feed(p,p.getMainHandItem(),center,stone);
+        h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the 24th block triggers a gravity collapse that pulls loose drops");
+        drop.setDeltaMovement(Vec3.ZERO);p.tickCount=5;DomainFields.tick();
+        h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the collapse keeps guiding drops during its three-second pulse");
+        h.assertTrue(DomainFields.contains(p,center),"the collapse preserves the active mining field");finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void worldloomCuriosCounterPulsesHeartwoodRenewal(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.setHealth(10F);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
