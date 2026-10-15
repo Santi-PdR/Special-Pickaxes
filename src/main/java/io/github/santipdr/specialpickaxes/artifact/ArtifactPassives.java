@@ -32,6 +32,9 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.WORLDBREAKER
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDBREAKER))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get());
+        if(isStrataFocusPick(kind)
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&isStrataFocusPick(held.kind)))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
@@ -98,8 +101,8 @@ public final class ArtifactPassives {
     public static void tick(ServerPlayer player, ArtifactKind kind) {
         grant(player, MobEffects.NIGHT_VISION, 0, PASSIVE_LEASE_TICKS);
         switch (kind) {
-            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS); grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS); }
-            case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
+            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
+            case CHOIR -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }
             case INTERREGNUM -> {
@@ -115,14 +118,18 @@ public final class ArtifactPassives {
                 grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(), 0, PASSIVE_LEASE_TICKS);
             } }
-            case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
+            case AXIOM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
-            case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
-            case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
+            case EXODIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+            case IRIDIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
-            case SEAM_RIPPER -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
+            case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             default -> { }
         }
+    }
+
+    private static boolean isStrataFocusPick(ArtifactKind kind){
+        return switch(kind){case PALIMPSEST,CHOIR,AXIOM,EXODIUM,IRIDIUM,SEAM_RIPPER->true;default->false;};
     }
 
     private static void grant(ServerPlayer player, MobEffect effect, int amplifier, int duration) {

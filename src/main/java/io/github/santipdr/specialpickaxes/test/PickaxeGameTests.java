@@ -343,6 +343,23 @@ public final class PickaxeGameTests {
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDBREAKER);
         h.assertTrue(!wearer.hasEffect(aegis),"the Curios ward clears when Worldbreaker is unequipped");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_38") public static void curiosStrataFocusReplacesHasteAndScalesMiningSpeed(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var focus=SpecialPickaxes.STRATA_FOCUS.get();
+        h.assertTrue(wearer.hasEffect(focus)&&wearer.getEffect(focus).getAmplifier()==1,"Palimpsest grants the level-two custom mining passive");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"Strata Focus replaces generic Haste");
+        var speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-89.6F)<.01F,"level two applies the same 1.4x mining-speed factor as Haste II");
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
+        h.assertTrue(!wearer.hasEffect(focus),"Strata Focus clears when its last source is unequipped");
+        ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
+        h.assertTrue(wearer.hasEffect(focus)&&wearer.getEffect(focus).getAmplifier()==0,"Choir grants the level-one custom mining passive");
+        speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-76.8F)<.01F,"level one applies the 1.2x mining-speed factor");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");
+        h.assertTrue(focus.isDurationEffectTick(40,0)&&!focus.isDurationEffectTick(39,0),"the custom aura animates on a ten-tick pulse");
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CHOIR);h.assertTrue(!wearer.hasEffect(focus),"the custom effect does not linger after Curios removal");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

@@ -50,6 +50,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> LODEGUARD=EFFECTS.register("lodeguard",LodeguardEffect::new);
     public static final RegistryObject<MobEffect> CRUCIBLE_MANTLE=EFFECTS.register("crucible_mantle",CrucibleMantleEffect::new);
     public static final RegistryObject<MobEffect> WORLDBREAKER_AEGIS=EFFECTS.register("worldbreaker_aegis",WorldbreakerAegisEffect::new);
+    public static final RegistryObject<MobEffect> STRATA_FOCUS=EFFECTS.register("strata_focus",StrataFocusEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
@@ -155,6 +156,11 @@ public final class SpecialPickaxes {
                 && p.hasEffect(DOMINION.get()) && p.getMainHandItem().isCorrectToolForDrops(e.getState())
                 && e.getNewSpeed()>0 && (!(p instanceof ServerPlayer server) || DomainFields.contains(server,p.blockPosition())))
             e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*8));
+        var focus=p.getEffect(STRATA_FOCUS.get());
+        if(focus!=null&&e.getNewSpeed()>0){
+            double multiplier=1D+.2D*(Math.min(1,focus.getAmplifier())+1D);
+            e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*multiplier));
+        }
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);

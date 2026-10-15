@@ -103,6 +103,13 @@ for y,row in enumerate(shield,2):
  for x,color in enumerate(row):
   if color!='.':slate[y*16+x]=slate_palette[color]
 png(Path('assets/specialpickaxes/textures/mob_effect/worldbreaker_aegis.png'),slate,16,16)
+strata=[(0,0,0,0)]*256
+strata_palette={'D':(28,47,60,255),'B':(50,121,147,255),'C':(110,222,239,255),'H':(211,249,255,255)}
+strata_shape=['.......DD.......','......DBBD......','.....DBCCBD.....','....DBCHCCBD....','.....DBCCBD.....','......DBBD......','.......DD.......','.....DD..DD.....','....DBB..BBD....','.....DD..DD.....']
+for y,row in enumerate(strata_shape,2):
+ for x,color in enumerate(row):
+  if color!='.':strata[y*16+x]=strata_palette[color]
+png(Path('assets/specialpickaxes/textures/mob_effect/strata_focus.png'),strata,16,16)
 js(Path('data/minecraft/tags/items/pickaxes.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 
 for tag in ['axes','shovels']:
