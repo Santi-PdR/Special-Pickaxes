@@ -318,6 +318,20 @@ public final class PickaxeGameTests {
         h.assertTrue(p.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)&&p.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==4&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"domain grants Regeneration V and Night Vision");
         DomainFields.stop(p);h.assertTrue(!DomainFields.frozen(mob) && Math.abs(mob.getDeltaMovement().x-.15)<.00001,"original momentum restored without weaponizing release");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_30") public static void stasisBoundaryPulseTravelsTheSquareAndWraps(GameTestHelper h){
+        var center=target(h);int radius=8;double side=radius*2D,perimeter=side*4D;
+        var start=ArtifactFeedback.stasisBoundaryPoint(center,radius,0);
+        var east=ArtifactFeedback.stasisBoundaryPoint(center,radius,side);
+        var north=ArtifactFeedback.stasisBoundaryPoint(center,radius,side*2D);
+        var wrapped=ArtifactFeedback.stasisBoundaryPoint(center,radius,perimeter+3D);
+        h.assertTrue(Math.abs(start.x-(center.getX()-radius+.5D))<.001&&Math.abs(start.z-(center.getZ()-radius+.5D))<.001,"pulse starts on the near corner");
+        h.assertTrue(Math.abs(east.x-(center.getX()+radius+.5D))<.001&&Math.abs(east.z-start.z)<.001,"pulse follows the first square edge");
+        h.assertTrue(Math.abs(north.x-east.x)<.001&&Math.abs(north.z-(center.getZ()+radius+.5D))<.001,"pulse follows the second square edge");
+        h.assertTrue(start.distanceToSqr(ArtifactFeedback.stasisBoundaryPoint(center,radius,perimeter))<.001,"pulse wraps cleanly around the domain");
+        h.assertTrue(wrapped.x>=center.getX()-radius+.5D&&wrapped.x<=center.getX()+radius+.5D
+                &&wrapped.z>=center.getZ()-radius+.5D&&wrapped.z<=center.getZ()+radius+.5D,"pulse remains on the marked boundary");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="legacy_each_09") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",1);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"personal aura activates without a target block");DomainFields.tick();

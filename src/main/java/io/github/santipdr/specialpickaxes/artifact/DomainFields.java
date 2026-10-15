@@ -185,6 +185,8 @@ public final class DomainFields {
                     if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
                 } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
             }
+            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%4==0)
+                ArtifactFeedback.stasisBoundaryPulse(p,f.center,f.radius);
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%10==0){
                 var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
                 for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,

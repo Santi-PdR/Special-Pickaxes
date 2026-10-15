@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
@@ -202,7 +203,7 @@ public final class ArtifactFeedback {
         double topY=center.getY()+halfHeight+0.08;
         // A capped wireframe remains legible while bounding particle packets per field update.
         // Side loops omit corners because the front/back edges already draw them.
-        int segments=stasis?Math.max(6,Math.min(8,radius)):Math.max(4,Math.min(6,radius));
+        int segments=stasis?Math.max(8,Math.min(12,radius+2)):Math.max(4,Math.min(6,radius));
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
@@ -218,6 +219,29 @@ public final class ArtifactFeedback {
         }
         for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
             p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
+    }
+    /** Moves a restrained light along Stasis's square edge without broadcasting to distant players. */
+    public static void stasisBoundaryPulse(ServerPlayer p,BlockPos center,int radius){
+        if(radius<1)return;
+        double perimeter=radius*8D,travel=p.tickCount*.15D;
+        var head=stasisBoundaryPoint(center,radius,travel);
+        var tail=stasisBoundaryPoint(center,radius,travel-1.25D);
+        var glow=new DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
+        p.serverLevel().sendParticles(p,ParticleTypes.END_ROD,false,head.x,head.y+.72D,head.z,1,0,0,0,0);
+        p.serverLevel().sendParticles(p,glow,false,head.x,head.y+.28D,head.z,2,.06D,.04D,.06D,0);
+        p.serverLevel().sendParticles(p,glow,false,tail.x,tail.y+.28D,tail.z,1,0,0,0,0);
+    }
+    public static Vec3 stasisBoundaryPoint(BlockPos center,int radius,double distance){
+        double side=radius*2D,perimeter=side*4D;
+        distance=((distance%perimeter)+perimeter)%perimeter;
+        double minX=center.getX()-radius+.5D,maxX=center.getX()+radius+.5D;
+        double minZ=center.getZ()-radius+.5D,maxZ=center.getZ()+radius+.5D;
+        double x,z;
+        if(distance<side){x=minX+distance;z=minZ;}
+        else if(distance<side*2D){x=maxX;z=minZ+(distance-side);}
+        else if(distance<side*3D){x=maxX-(distance-side*2D);z=maxZ;}
+        else{x=minX;z=maxZ-(distance-side*3D);}
+        return new Vec3(x,center.getY()+.08D,z);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);
