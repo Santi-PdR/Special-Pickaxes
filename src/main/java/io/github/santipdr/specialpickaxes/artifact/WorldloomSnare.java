@@ -19,7 +19,7 @@ public final class WorldloomSnare {
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
     private static final net.minecraft.core.particles.BlockParticleOption VINE_PARTICLE=
             new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,VINE_STATE);
-    private record Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,Vec3 anchor,long expires) {}
+    private record Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,Vec3 anchor,long started,long expires) {}
     private static final Map<UUID,Binding> BINDINGS=new HashMap<>();
     private WorldloomSnare() {}
 
@@ -30,7 +30,8 @@ public final class WorldloomSnare {
         UUID id=target.getUUID();
         if(!BINDINGS.containsKey(id)&&BINDINGS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         var level=owner.serverLevel();var anchor=target.position();
-        BINDINGS.put(id,new Binding(target,owner,level,anchor,level.getGameTime()+80));
+        long now=level.getGameTime();
+        BINDINGS.put(id,new Binding(target,owner,level,anchor,now,now+80));
         return true;
     }
 
@@ -50,10 +51,16 @@ public final class WorldloomSnare {
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
             if(level.getGameTime()%10==0){
-                // Keep the particle audience local to the ability and the trapped player.
-                level.sendParticles(owner,VINE_PARTICLE,false,binding.anchor.x,binding.anchor.y+.35,binding.anchor.z,8,.34,.34,.34,.015);
+                // The first pulse visibly climbs from the feet; later pulses coil around the trapped body.
+                long age=level.getGameTime()-binding.started;
+                double height=Math.max(.8,target.getBbHeight());
+                double rise=Math.min(1D,age/20D);
+                double yOffset=age<20?.12+height*rise:.18+height*(.5+.38*Math.sin(age*.16));
+                double angle=age*.24, x=binding.anchor.x+Math.cos(angle)*.12,z=binding.anchor.z+Math.sin(angle)*.12;
+                // One bounded packet per nearby viewer keeps the animation cheap even with several roots active.
+                level.sendParticles(owner,VINE_PARTICLE,false,x,binding.anchor.y+yOffset,z,10,.3,.18,.3,.015);
                 if(target instanceof ServerPlayer viewer&&viewer!=owner)
-                    level.sendParticles(viewer,VINE_PARTICLE,false,binding.anchor.x,binding.anchor.y+.35,binding.anchor.z,8,.34,.34,.34,.015);
+                    level.sendParticles(viewer,VINE_PARTICLE,false,x,binding.anchor.y+yOffset,z,10,.3,.18,.3,.015);
             }
         }
     }
