@@ -96,7 +96,10 @@ public final class ArtifactPassives {
             case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, PASSIVE_LEASE_TICKS); }
-            case INTERREGNUM -> grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
+            case INTERREGNUM -> {
+                grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
+                shareStasisWard(player);
+            }
             case WORLDLOOM -> {
                 grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS);
                 sustain(player);
@@ -128,5 +131,14 @@ public final class ArtifactPassives {
         if(state.getLong("rootSustainReady")>now)return;
         player.getFoodData().eat(2,.25F);
         state.putLong("rootSustainReady",now+100);
+    }
+
+    /** A Curios Stasis bearer shares a short absorption lease with at most eight nearby allies. */
+    private static void shareStasisWard(ServerPlayer owner){
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,8,256);
+        for(var ally:allies)grant(ally,MobEffects.ABSORPTION,0,PASSIVE_LEASE_TICKS);
     }
 }

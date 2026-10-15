@@ -166,6 +166,23 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.getFoodData().getFoodLevel()==14,"four visible pulses restore four food points");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_29") public static void interregnumCuriosSharesAbsorptionOnlyWithNearbyAllies(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var ally=player(h,ArtifactKind.CHOIR,"StasisAlly");
+        var armoredAlly=player(h,ArtifactKind.ICARUS,"StasisGuard");var enemy=player(h,ArtifactKind.WORLDLOOM,"StasisEnemy");
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("ward_"+wearer.getUUID().toString().substring(0,6));
+        var hostile=scoreboard.addPlayerTeam("foe_"+enemy.getUUID().toString().substring(0,6));
+        for(var teammate:List.of(wearer,ally,armoredAlly))scoreboard.addPlayerToTeam(teammate.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),hostile);
+        ally.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());armoredAlly.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+1,wearer.getY(),wearer.getZ());
+        h.getLevel().addFreshEntity(ally);h.getLevel().addFreshEntity(armoredAlly);h.getLevel().addFreshEntity(enemy);
+        armoredAlly.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,100,1,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);
+        h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),"the Curios wearer keeps its own Stasis ward");
+        h.assertTrue(ally.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION)&&ally.getEffect(net.minecraft.world.effect.MobEffects.ABSORPTION).getAmplifier()==0,"nearby allied players receive Absorption I");
+        h.assertTrue(armoredAlly.getEffect(net.minecraft.world.effect.MobEffects.ABSORPTION).getAmplifier()==1,"the aura does not downgrade a stronger allied effect");
+        h.assertTrue(!enemy.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),"hostile players never receive the shared ward");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();
