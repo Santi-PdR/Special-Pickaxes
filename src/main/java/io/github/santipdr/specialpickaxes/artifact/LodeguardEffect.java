@@ -22,8 +22,19 @@ public final class LodeguardEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(!entity.level().isClientSide&&entity.level() instanceof ServerLevel level){
-            level.sendParticles(CRYSTAL_DUST,entity.getX(),entity.getY()+entity.getBbHeight()*.58D,entity.getZ(),3,.24D,.3D,.24D,.006D);
-            if(entity.tickCount%20==0)level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD,entity.getX(),entity.getY()+entity.getBbHeight()*.7D,entity.getZ(),1,.15D,.2D,.15D,0);
+            // Keep the same three-particle budget, but arrange it as a turning
+            // crystal guard so the passive reads as a deliberate ward, not a puff.
+            double phase=entity.tickCount*.038D;
+            double radius=.38D;
+            double centerY=entity.getY()+entity.getBbHeight()*.56D;
+            for(int i=0;i<3;i++){
+                double angle=phase+i*(Math.PI*2D/3D);
+                double x=entity.getX()+Math.cos(angle)*radius;
+                double z=entity.getZ()+Math.sin(angle)*radius;
+                double y=centerY+Math.sin(angle*2D)*.09D;
+                level.sendParticles(CRYSTAL_DUST,x,y,z,1,0,0,0,0);
+            }
+            if(entity.tickCount%20==0)level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD,entity.getX(),centerY+.18D,entity.getZ(),1,0,0,0,0);
         }
     }
 
