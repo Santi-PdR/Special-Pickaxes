@@ -26,12 +26,10 @@ public final class RelicAura {
                 mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
             }
             emitHeld(mc,held);
-            return;
-        }
-        heldKind=null;
+        } else heldKind=null;
         var curio=CuriosCompat.find(mc.player);
         if(curio==null||!(curio.stack().getItem() instanceof ArtifactItem item))return;
-        emitCurios(mc,item);
+        if(held==null||held.kind!=item.kind)emitCurios(mc,item);
     }
     private static void emitHeld(Minecraft mc,ArtifactItem item){
         var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
@@ -52,10 +50,87 @@ public final class RelicAura {
         var dust=dust(item.kind,item.kind==ArtifactKind.ICARUS?0.34F:0.27F);
         ParticleOptions accent=accent(item.kind,dust);
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
+        double yaw=Math.toRadians(player.getYRot());
+        var back=new Vec3(Math.sin(yaw),0,-Math.cos(yaw));
+        var side=new Vec3(Math.cos(yaw),0,Math.sin(yaw));
         for(int i=0;i<4;i++){
             double angle=phase+i*Math.PI/2D,radius=.42D+Math.sin(phase+i*.7D)*.035D;
             double x=player.getX()+Math.cos(angle)*radius,z=player.getZ()+Math.sin(angle)*radius;
-            mc.level.addParticle(i==0?accent:dust,x,y+Math.sin(angle*2D)*.06D,z,0,.004D,0);
+            double particleY=y+Math.sin(angle*2D)*.06D;
+            ParticleOptions particle=i==0?accent:dust;
+            switch(item.kind){
+                case PALIMPSEST -> {
+                    angle=phase*.72D+i*Math.PI/2D;radius=.25D+i*.035D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.2D+i*.13D;particle=i==2?ParticleTypes.ENCHANT:dust;
+                }
+                case CHOIR -> {
+                    radius=.28D+(.12D+.03D*Math.sin(phase))*(i/2);
+                    angle=phase*.18D+i*Math.PI/2D;x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.08D+(i%2)*.18D;particle=i==0?ParticleTypes.SCULK_CHARGE_POP:dust;
+                }
+                case EVENTIDE -> {
+                    angle=-phase*.55D+i*Math.PI/2D;radius=.34D+(i%2)*.13D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.22D+i*.12D;particle=i==0?ParticleTypes.REVERSE_PORTAL:dust;
+                }
+                case CRUCIBLE -> {
+                    angle=phase*.28D+i*Math.PI/2D;radius=.31D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.12D+(i%2)*.28D;particle=i%2==0?ParticleTypes.SMALL_FLAME:dust;
+                }
+                case INTERREGNUM -> {
+                    double spin=phase*.12D,corner=(i%2==0?-.42D:.42D);
+                    double cx=corner,cz=(i<2?-.42D:.42D);
+                    x=player.getX()+cx*Math.cos(spin)-cz*Math.sin(spin);
+                    z=player.getZ()+cx*Math.sin(spin)+cz*Math.cos(spin);
+                    particleY=y+.08D+Math.sin(phase*.3D+i)*.055D;particle=i==Math.floorMod(player.tickCount/4,4)?ParticleTypes.END_ROD:dust;
+                }
+                case WORLDLOOM -> {
+                    angle=phase*.38D+i*Math.PI/2D;radius=.38D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=player.getY()+.12D+(i%2)*.12D;particle=i==0?ParticleTypes.HAPPY_VILLAGER:dust;
+                }
+                case ICARUS -> {
+                    int wing=i<2?-1:1;double feather=(i%2)*.22D+.24D;
+                    double spread=.20D+(i%2)*.22D;
+                    x=player.getX()+back.x*.24D+side.x*wing*spread;
+                    z=player.getZ()+back.z*.24D+side.z*wing*spread;
+                    particleY=y-.04D+feather+Math.sin(phase+i*.8D)*.035D;particle=i%2==0?ParticleTypes.ENCHANT:dust;
+                }
+                case AXIOM -> {
+                    angle=-phase*.62D+i*Math.PI/2D;radius=.26D+(i%2)*.15D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.12D+(i%2)*.24D;particle=i==0?ParticleTypes.SCULK_SOUL:dust;
+                }
+                case EXODIUM -> {
+                    angle=phase*.46D+i*Math.PI/2D;radius=.18D+(i%2)*.25D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.18D+(i%2)*.34D;particle=i==0?ParticleTypes.END_ROD:dust;
+                }
+                case IRIDIUM -> {
+                    angle=phase*.3D+i*Math.PI/2D;radius=.4D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.1D+(i%2)*.2D;particle=i==0?ParticleTypes.GLOW:dust;
+                }
+                case WORLDBREAKER -> {
+                    angle=phase*.36D+i*Math.PI/2D;radius=.31D+.05D*Math.sin(phase+i);
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.16D+(i%2)*.32D;particle=i==0?ParticleTypes.FIREWORK:dust;
+                }
+                case HELLSPEC -> {
+                    angle=phase*.5D+i*Math.PI/2D;radius=.28D+(i%2)*.12D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.16D+(i%2)*.28D;particle=i%2==0?ParticleTypes.FLAME:dust;
+                }
+                case SEAM_RIPPER -> {
+                    angle=phase*.22D;radius=.13D+i*.105D;
+                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
+                    particleY=y-.14D+i*.09D;particle=i==3?ParticleTypes.GLOW:dust;
+                }
+                default -> { }
+            }
+            mc.level.addParticle(particle,x,particleY,z,0,.004D,0);
         }
     }
     private static DustParticleOptions dust(ArtifactKind kind,float size){
