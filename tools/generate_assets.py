@@ -110,6 +110,13 @@ for y,row in enumerate(strata_shape,2):
  for x,color in enumerate(row):
   if color!='.':strata[y*16+x]=strata_palette[color]
 png(Path('assets/specialpickaxes/textures/mob_effect/strata_focus.png'),strata,16,16)
+stasis=[(0,0,0,0)]*256
+stasis_palette={'D':(37,30,59,255),'V':(105,79,163,255),'L':(165,136,229,255),'H':(220,204,255,255)}
+stasis_shape=['.......DD.......','.....DDVVDD.....','....DVLLLLVD....','...DVLLLLLLVD...','...DVLDDDD LVD...'.replace(' ',''),'....DVL..LVD....','.....DVLLVD.....','......DVVD......','.......DD.......']
+for y,row in enumerate(stasis_shape,3):
+ for x,color in enumerate(row):
+  if color!='.':stasis[y*16+x]=stasis_palette[color]
+png(Path('assets/specialpickaxes/textures/mob_effect/stasis_ward.png'),stasis,16,16)
 js(Path('data/minecraft/tags/items/pickaxes.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 
 for tag in ['axes','shovels']:

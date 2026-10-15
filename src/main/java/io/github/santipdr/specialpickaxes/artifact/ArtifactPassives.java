@@ -35,6 +35,9 @@ public final class ArtifactPassives {
         if(isStrataFocusPick(kind)
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&isStrataFocusPick(held.kind)))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get());
+        if(kind==ArtifactKind.INTERREGNUM
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.INTERREGNUM))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
@@ -107,6 +110,7 @@ public final class ArtifactPassives {
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }
             case INTERREGNUM -> {
                 grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(), 0, PASSIVE_LEASE_TICKS);
                 shareStasisWard(player);
             }
             case WORLDLOOM -> {
@@ -153,7 +157,10 @@ public final class ArtifactPassives {
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,8,256);
-        for(var ally:allies)grant(ally,MobEffects.ABSORPTION,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            grant(ally,MobEffects.ABSORPTION,0,PASSIVE_LEASE_TICKS);
+            grant(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,PASSIVE_LEASE_TICKS);
+        }
     }
 
     /** Worldloom lends its slow custom healing pulses to a small, nearby allied group. */
