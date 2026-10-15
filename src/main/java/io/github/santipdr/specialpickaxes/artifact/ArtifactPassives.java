@@ -62,7 +62,7 @@ public final class ArtifactPassives {
         if(state.getLong("curiosPassiveReady")>now)return;
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
-            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);player.getFoodData().eat(1,.1F);}
+            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),80,0,true,false,true));}
             case CHOIR -> attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),60,0,true,false,true));
             case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),70,0,true,false,true));}
             case CRUCIBLE -> attacker.setSecondsOnFire(3);
