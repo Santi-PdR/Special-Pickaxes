@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Small, always-on identities for every artifact. No attack-strength effects are used. */
 public final class ArtifactPassives {
+    private static final int PASSIVE_LEASE_TICKS=40;
     private ArtifactPassives() {}
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
@@ -82,24 +83,24 @@ public final class ArtifactPassives {
     }
 
     public static void tick(ServerPlayer player, ArtifactKind kind) {
-        grant(player, MobEffects.NIGHT_VISION, 0, 240);
+        grant(player, MobEffects.NIGHT_VISION, 0, PASSIVE_LEASE_TICKS);
         switch (kind) {
-            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, 80); grant(player, MobEffects.DIG_SPEED, 1, 80); }
-            case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, 80);
-            case EVENTIDE -> grant(player, MobEffects.SLOW_FALLING, 0, 80);
-            case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, 80); }
-            case INTERREGNUM -> grant(player, MobEffects.ABSORPTION, 0, 80);
+            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS); grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS); }
+            case CHOIR -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
+            case EVENTIDE -> grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
+            case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, MobEffects.FIRE_RESISTANCE, 0, PASSIVE_LEASE_TICKS); }
+            case INTERREGNUM -> grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
             case WORLDLOOM -> {
-                grant(player, MobEffects.REGENERATION, 0, 80);
+                grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS);
                 sustain(player);
             }
-            case ICARUS -> { if (!player.onGround()) grant(player, MobEffects.SLOW_FALLING, 0, 80); }
-            case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, 80);
-            case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, 80);
-            case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
-            case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, 80);
-            case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, 80);
-            case SEAM_RIPPER -> grant(player, MobEffects.DIG_SPEED, 1, 80);
+            case ICARUS -> { if (!player.onGround()) grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS); }
+            case AXIOM -> grant(player, MobEffects.DIG_SPEED, 0, PASSIVE_LEASE_TICKS);
+            case WORLDBREAKER -> grant(player, MobEffects.DAMAGE_RESISTANCE, 0, PASSIVE_LEASE_TICKS);
+            case EXODIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
+            case IRIDIUM -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
+            case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
+            case SEAM_RIPPER -> grant(player, MobEffects.DIG_SPEED, 1, PASSIVE_LEASE_TICKS);
             default -> { }
         }
     }

@@ -143,7 +143,8 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         var shell=SpecialPickaxes.SEARING_SHELL.get();
-        h.assertTrue(wearer.hasEffect(shell),"Hellspec grants its named passive while held or equipped in Curios");
+        h.assertTrue(wearer.hasEffect(shell)&&wearer.getEffect(shell).getDuration()==40,"Hellspec grants a two-second fire passive lease while held or equipped in Curios");
+        h.assertTrue(wearer.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION).getDuration()==40,"night vision also uses the short passive lease");
         wearer.setSecondsOnFire(10);shell.applyEffectTick(wearer,0);
         h.assertTrue(!wearer.isOnFire(),"the shell clears active burning on its pulse");
         var fire=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().inFire(),10F);
