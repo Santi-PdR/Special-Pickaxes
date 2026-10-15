@@ -212,10 +212,12 @@ public final class PickaxeGameTests {
         ally.setHealth(ally.getHealth()-4F);
         ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        h.assertTrue(wearer.hasEffect(renewal)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),"the Curios wearer receives Heartwood Renewal instead of generic Regeneration");
         h.assertTrue(ally.hasEffect(renewal)&&ally.getEffect(renewal).getDuration()==40,"nearby allied miners receive the short custom renewal lease");
         h.assertTrue(!farAlly.hasEffect(renewal)&&!enemy.hasEffect(renewal),"the effect does not reach distant allies or enemies");
         float before=ally.getHealth();renewal.applyEffectTick(ally,0);
         h.assertTrue(Math.abs(ally.getHealth()-before-1F)<.001F,"the shared effect heals one health point per pulse");
+        renewal.applyEffectTick(ally,0);h.assertTrue(Math.abs(ally.getHealth()-before-1F)<.001F,"refreshing the shared lease cannot accelerate its one-second heal");
         h.assertTrue(renewal.isDurationEffectTick(40,0)&&!renewal.isDurationEffectTick(39,0),"root healing remains spaced one second apart");
         finish(h,wearer);
     }
@@ -290,6 +292,7 @@ public final class PickaxeGameTests {
         h.assertTrue(renewal.isDurationEffectTick(60,0)&&!renewal.isDurationEffectTick(59,0),"healing is delivered in deliberate one-second pulses");
         renewal.applyEffectTick(wearer,0);
         h.assertTrue(wearer.getHealth()==11F,"a renewal pulse restores one health point");
+        renewal.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11F,"repeated effect refreshes cannot accelerate healing");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {

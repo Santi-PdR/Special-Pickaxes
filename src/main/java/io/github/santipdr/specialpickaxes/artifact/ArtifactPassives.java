@@ -110,7 +110,7 @@ public final class ArtifactPassives {
                 shareStasisWard(player);
             }
             case WORLDLOOM -> {
-                grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS);
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(), 0, PASSIVE_LEASE_TICKS);
                 sustain(player);
                 shareHeartwood(player);
             }
