@@ -506,6 +506,21 @@ public final class PickaxeGameTests {
         int diamonds=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(ore).inflate(0.8)).stream().mapToInt(e -> e.getItem().is(Items.DIAMOND)?e.getItem().getCount():0).sum();
         h.assertTrue(diamonds>=1 && diamonds<=4,"Fortune loot within vanilla range");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_33") public static void iridiumCuriosLodeguardHardensAfterFirstHostileHit(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.IRIDIUM);
+        var guard=SpecialPickaxes.LODEGUARD.get();var effect=wearer.getEffect(guard);
+        h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Lodeguard trims the first hit by 15 percent");
+        h.assertTrue(effect!=null&&effect.getDuration()==80,"the custom crystal ward lasts four seconds");
+        h.assertTrue(Math.abs(wearer.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4D)<.01D,"the ward adds four armor points");
+        var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,repeat,ArtifactKind.IRIDIUM);
+        h.assertTrue(repeat.getAmount()==10F&&wearer.getEffect(guard).getDuration()==80,"the eight-second cooldown prevents repeated triggers and refresh spam");
+        h.assertTrue(guard.isDurationEffectTick(80,0)&&!guard.isDurationEffectTick(79,0),"the ward's crystal effect pulses every ten ticks");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumHighlightsOnlyDropsCreatedByOreBreak(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
         var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);

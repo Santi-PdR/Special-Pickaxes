@@ -82,7 +82,7 @@ public final class ArtifactPassives {
                 attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.45).add(0,.65,0)));
                 attacker.hasImpulse=true;
             }
-            case IRIDIUM -> player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,80,0,true,false,true));
+            case IRIDIUM -> {event.setAmount(event.getAmount()*.85F);player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),80,0,true,false,true));}
             case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),60,0,true,false,true));}
             default -> {return;}
         }
