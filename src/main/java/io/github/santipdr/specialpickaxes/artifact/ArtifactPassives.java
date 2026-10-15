@@ -13,6 +13,13 @@ import net.minecraft.world.phys.Vec3;
 public final class ArtifactPassives {
     private ArtifactPassives() {}
 
+    /** Remove an always-on Curios effect as soon as its source is unequipped. */
+    public static void onCuriosUnequip(ServerPlayer player,ArtifactKind kind) {
+        if(kind==ArtifactKind.HELLSPEC
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.HELLSPEC))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get());
+    }
+
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
         if(event.getAmount()<=0)return;

@@ -154,6 +154,16 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(melee),"the shell does not cancel ordinary melee damage");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
+        var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(shell,80,0,true,false,true));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.HELLSPEC);
+        h.assertTrue(!wearer.hasEffect(shell),"Curios-only fire immunity ends when Hellspec leaves its slot");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.HELLSPEC).get()));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(shell,80,0,true,false,true));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.HELLSPEC);
+        h.assertTrue(wearer.hasEffect(shell),"held Hellspec keeps its own fire passive");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

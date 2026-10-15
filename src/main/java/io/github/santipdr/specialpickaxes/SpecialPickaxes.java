@@ -30,6 +30,7 @@ import java.util.*;
 @Mod(SpecialPickaxes.ID)
 public final class SpecialPickaxes {
     private int passiveTickClock;
+    private final Map<UUID,ArtifactKind> curiosPassives=new HashMap<>();
     public static final String ID="specialpickaxes";
     public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(4,32768,64F,12F,50,
         net.minecraft.tags.TagKey.create(Registries.BLOCK,new ResourceLocation(ID,"needs_artifact_tool")),() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
@@ -106,14 +107,17 @@ public final class SpecialPickaxes {
                 passiveTickClock=0;
                 for(var level:e.getServer().getAllLevels())for(var player:level.players()){
                     var equipped=CuriosCompat.find(player);
-                    if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.tick(player,pick.kind);
+                    ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
+                    ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
+                    if(previous!=null&&previous!=current)ArtifactPassives.onCuriosUnequip(player,previous);
+                    if(current!=null)ArtifactPassives.tick(player,current);
                 }
             }
         }
     }
-    private void stopped(ServerStoppedEvent e) { passiveTickClock=0;io.github.santipdr.specialpickaxes.network.RelicNetwork.clear();ArtifactFeedback.clearSounds();CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
+    private void stopped(ServerStoppedEvent e) { passiveTickClock=0;curiosPassives.clear();io.github.santipdr.specialpickaxes.network.RelicNetwork.clear();ArtifactFeedback.clearSounds();CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { curiosPassives.remove(p.getUUID());io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);WorkQueue.cancel(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
