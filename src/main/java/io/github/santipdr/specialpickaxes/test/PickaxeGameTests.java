@@ -260,10 +260,12 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosCounterAppliesCustomFaultResonance(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        double normalSpeed=attacker.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),8F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.CHOIR);
         var resonance=SpecialPickaxes.FAULT_RESONANCE.get();
         h.assertTrue(attacker.hasEffect(resonance)&&attacker.getEffect(resonance).getDuration()==60,"Choir's Curios counter applies its custom three-second status");
+        h.assertTrue(Math.abs(attacker.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-normalSpeed*.75D)<.001D,"Fault Resonance reduces attacker movement speed by 25 percent");
         h.assertTrue(!attacker.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN),"the passive does not fall back to generic Slowness");
         attacker.tickCount=8;attacker.setDeltaMovement(1,.4,.5);resonance.applyEffectTick(attacker,0);
         var damped=attacker.getDeltaMovement();
@@ -306,6 +308,7 @@ public final class PickaxeGameTests {
         var shell=SpecialPickaxes.SEARING_SHELL.get();
         h.assertTrue(wearer.hasEffect(shell)&&wearer.getEffect(shell).getDuration()==40,"Hellspec grants a two-second fire passive lease while held or equipped in Curios");
         h.assertTrue(wearer.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION).getDuration()==40,"night vision also uses the short passive lease");
+        h.assertTrue(shell.isDurationEffectTick(40,0)&&!shell.isDurationEffectTick(39,0),"the ember halo updates twice per second rather than every tick");
         wearer.setSecondsOnFire(10);shell.applyEffectTick(wearer,0);
         h.assertTrue(!wearer.isOnFire(),"the shell clears active burning on its pulse");
         var fire=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().inFire(),10F);

@@ -5,15 +5,22 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+
+import java.util.UUID;
 
 /** Choir's custom stagger damps momentum without applying generic vanilla Slowness. */
 public final class FaultResonanceEffect extends MobEffect {
     private static final DustParticleOptions RESONANCE=new DustParticleOptions(new Vector3f(.28F,.91F,.86F),1.15F);
 
-    public FaultResonanceEffect(){super(MobEffectCategory.HARMFUL,0x46ede0);}
+    public FaultResonanceEffect(){
+        super(MobEffectCategory.HARMFUL,0x46ede0);
+        addAttributeModifier(Attributes.MOVEMENT_SPEED,UUID.fromString("b35f7545-e903-4d4a-8b54-a78b34fcb1e2").toString(),-.25D,AttributeModifier.Operation.MULTIPLY_TOTAL);
+    }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide)return;
