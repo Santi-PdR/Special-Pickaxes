@@ -117,6 +117,13 @@ for y,row in enumerate(stasis_shape,3):
  for x,color in enumerate(row):
   if color!='.':stasis[y*16+x]=stasis_palette[color]
 png(Path('assets/specialpickaxes/textures/mob_effect/stasis_ward.png'),stasis,16,16)
+dawn=[(0,0,0,0)]*256
+dawn_palette={'D':(63,39,23,255),'O':(194,108,43,255),'G':(250,195,83,255),'H':(255,238,166,255)}
+dawn_shape=['.......DD.......','......DOOD......','.....DOGGOD.....','....DOGHHGOD....','....DOGGGGOD....','.....DOGGOD.....','......DOOD......','.....DD..DD.....','....DOO..OOD....','.....DD..DD.....']
+for y,row in enumerate(dawn_shape,2):
+ for x,color in enumerate(row):
+  if color!='.':dawn[y*16+x]=dawn_palette[color]
+png(Path('assets/specialpickaxes/textures/mob_effect/dawn_mending.png'),dawn,16,16)
 js(Path('data/minecraft/tags/items/pickaxes.json'),{'replace':False,'values':['specialpickaxes:'+id for id in IDS]})
 
 for tag in ['axes','shovels']:

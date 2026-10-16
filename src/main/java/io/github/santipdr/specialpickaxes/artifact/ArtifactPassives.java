@@ -38,6 +38,9 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.INTERREGNUM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.INTERREGNUM))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get());
+        if(kind==ArtifactKind.PALIMPSEST
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
@@ -104,7 +107,7 @@ public final class ArtifactPassives {
     public static void tick(ServerPlayer player, ArtifactKind kind) {
         grant(player, MobEffects.NIGHT_VISION, 0, PASSIVE_LEASE_TICKS);
         switch (kind) {
-            case PALIMPSEST -> { grant(player, MobEffects.REGENERATION, 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
+            case PALIMPSEST -> { grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get(), 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
             case CHOIR -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }

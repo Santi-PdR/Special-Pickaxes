@@ -52,6 +52,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> WORLDBREAKER_AEGIS=EFFECTS.register("worldbreaker_aegis",WorldbreakerAegisEffect::new);
     public static final RegistryObject<MobEffect> STRATA_FOCUS=EFFECTS.register("strata_focus",StrataFocusEffect::new);
     public static final RegistryObject<MobEffect> STASIS_WARD=EFFECTS.register("stasis_ward",StasisWardEffect::new);
+    public static final RegistryObject<MobEffect> DAWN_MENDING=EFFECTS.register("dawn_mending",DawnMendingEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
