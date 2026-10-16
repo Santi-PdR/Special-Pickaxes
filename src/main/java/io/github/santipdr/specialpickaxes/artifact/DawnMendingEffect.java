@@ -21,11 +21,15 @@ public final class DawnMendingEffect extends MobEffect {
         var data=entity.getPersistentData();
         if(data.getLong(NEXT_PULSE)>now)return;
         data.putLong(NEXT_PULSE,now+40L);
-        if(entity.getHealth()<entity.getMaxHealth())entity.heal(1F+.5F*Math.max(0,amplifier));
+        if(entity.getHealth()>=entity.getMaxHealth())return;
+        entity.heal(1F+.5F*Math.max(0,amplifier));
         if(entity.level() instanceof ServerLevel level){
-            double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.64D,z=entity.getZ();
-            level.sendParticles(DAWN_DUST,x,y,z,2,.1D,.08D,.1D,0);
-            level.sendParticles(ParticleTypes.WAX_ON,x,y+.08D,z,2,.12D,.1D,.12D,.006D);
+            double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.48D,z=entity.getZ();
+            for(int i=0;i<8;i++){
+                double angle=Math.PI*2D*i/8D;
+                level.sendParticles(DAWN_DUST,x+Math.cos(angle)*.42D,y+(i%2)*.12D,z+Math.sin(angle)*.42D,1,.025D,.04D,.025D,0);
+                if((i&1)==0)level.sendParticles(ParticleTypes.WAX_ON,x+Math.cos(angle)*.32D,y+.25D,z+Math.sin(angle)*.32D,1,.02D,.035D,.02D,.004D);
+            }
         }
     }
 
