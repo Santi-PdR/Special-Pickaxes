@@ -16,6 +16,8 @@ public final class ArtifactPassives {
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
     public static void onCuriosUnequip(ServerPlayer player,ArtifactKind kind) {
+        boolean heldArtifact=player.getMainHandItem().getItem() instanceof ArtifactItem;
+        if(!heldArtifact&&CuriosCompat.find(player)==null)player.removeEffect(MobEffects.NIGHT_VISION);
         if(kind==ArtifactKind.EVENTIDE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EVENTIDE))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());

@@ -304,14 +304,19 @@ public final class PickaxeGameTests {
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_46") public static void worldloomCuriosRenewalEndsOnUnequipButPersistsWhenHeld(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.ICARUS);var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        var wearer=player(h,ArtifactKind.ICARUS);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,true,false,true));
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
         h.assertTrue(!wearer.hasEffect(renewal),"Worldloom's Curios healing lease ends when it leaves the slot");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"the shared night vision lease ends after removing the last pick source");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDLOOM).get()));
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,true,false,true));
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
-        h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");finish(h,wearer);
+        h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");
+        h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"another pick source preserves night vision");finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
