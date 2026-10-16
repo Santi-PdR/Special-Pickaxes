@@ -552,6 +552,17 @@ public final class PickaxeGameTests {
         h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before moving the player through lava");
         h.assertTrue(!WorkQueue.busy(p),"the lava stop ends the queue and movement protection");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_45") public static void icarianLiftStopsBeforeForeignForgeFluid(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
+        h.getLevel().setBlockAndUpdate(base.above(),Blocks.STONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(base.above(2),Blocks.STONE.defaultBlockState());
+        var foreignFluid=base.above(3);h.getLevel().setBlockAndUpdate(foreignFluid,TestFluids.BLOCK.defaultBlockState());
+        h.assertTrue(TestFluids.BLOCK.defaultBlockState().getFluidState().getFluidType()==TestFluids.TYPE,"fixture is a registered non-vanilla Forge fluid");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a foreign fluid");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(foreignFluid).is(TestFluids.BLOCK),"the lift leaves a modded fluid such as diesel untouched");
+        h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before moving through the foreign fluid");
+        h.assertTrue(!WorkQueue.busy(p),"the foreign-fluid stop ends the queue cleanly");finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
