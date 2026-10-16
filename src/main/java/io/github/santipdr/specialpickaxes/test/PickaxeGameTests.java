@@ -419,6 +419,29 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.OBSIDIAN),"curated rephase applied");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8)).isEmpty(),"no extra drops from replacement");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_42") public static void crucibleRephasesCommonAndDeepGeologyButKeepsOresAndContainers(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var center=target(h);var level=h.getLevel();
+        var convertible=new LinkedHashMap<BlockPos,Block>();
+        convertible.put(center,Blocks.STONE);
+        convertible.put(center.offset(1,0,0),Blocks.OBSIDIAN);
+        convertible.put(center.offset(-1,0,0),Blocks.GRAVEL);
+        convertible.put(center.offset(0,1,0),Blocks.DIORITE);
+        convertible.put(center.offset(0,-1,0),Blocks.TUFF);
+        convertible.put(center.offset(0,0,1),Blocks.POINTED_DRIPSTONE);
+        for(var entry:convertible.entrySet()){
+            level.setBlockAndUpdate(entry.getKey(),entry.getValue().defaultBlockState());
+            PlayerPlacedBlocks.get(level).unmark(entry.getKey());
+        }
+        var chest=center.offset(2,0,0);var ore=center.offset(0,0,-1);
+        level.setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        PlayerPlacedBlocks.get(level).unmark(ore);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",8);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"calcite rephase activates");drain(p);
+        for(var entry:convertible.entrySet())h.assertTrue(level.getBlockState(entry.getKey()).is(Blocks.CALCITE),entry.getValue()+" rephases to calcite");
+        h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),"containers and ores are preserved");
+        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(center).inflate(3)).isEmpty(),"rephasing never scatters drops");finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

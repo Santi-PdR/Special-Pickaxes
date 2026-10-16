@@ -71,7 +71,7 @@ public final class RadialMiningProgram implements WorkProgram {
         BlockPos pos=peek();
         if(pos==null||scanned>=scanLimit){exhausted=true;return empty(center);}
         pending=null;scanned++;
-        if(kind==ArtifactKind.CRUCIBLE)return transmuteAt(pos);
+        if(kind==ArtifactKind.CRUCIBLE)return transmuteAt(pos,p);
         return mineAt(pos);
     }
 
@@ -93,16 +93,11 @@ public final class RadialMiningProgram implements WorkProgram {
         return MiningDesigns.matrix(state)&&!ArtifactOres.isOre(state);
     }
 
-    private WorkStep transmuteAt(BlockPos pos){
-        return new WorkStep(){
-            @Override public BlockPos pos(){return pos;}
-            @Override public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind ignored){
-                if(target==null||!player.serverLevel().hasChunkAt(pos))return false;
-                BlockState old=player.serverLevel().getBlockState(pos);
-                return old.getBlock()!=target.getBlock()&&WorldSafety.crucibleSource(player,pos,old)
-                        &&WorldSafety.transmute(player,tool,kind,pos,old,target);
-            }
-        };
+    private WorkStep transmuteAt(BlockPos pos,ServerPlayer player){
+        if(target==null||!player.serverLevel().hasChunkAt(pos))return empty(pos);
+        BlockState old=player.serverLevel().getBlockState(pos);
+        if(old.getBlock()==target.getBlock()||!WorldSafety.crucibleSource(player,pos,old))return empty(pos);
+        return new WorkStep.Rephase(pos,old,target);
     }
 
     private static WorkStep empty(BlockPos at){
