@@ -41,12 +41,20 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.PALIMPSEST
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
+        if(kind==ArtifactKind.EXODIUM
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EXODIUM))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
         if(event.getAmount()<=0)return;
         var source=event.getSource();
+        if(kind==ArtifactKind.EXODIUM&&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get())
+                &&source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)){
+            event.setAmount(event.getAmount()*.75F);
+            StarfallWardEffect.projectileImpact(player);
+        }
         if(kind==ArtifactKind.HELLSPEC) {
             if(!source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE))return;
             var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
@@ -127,7 +135,10 @@ public final class ArtifactPassives {
             } }
             case AXIOM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
-            case EXODIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+            case EXODIUM -> {
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get(), 0, PASSIVE_LEASE_TICKS);
+            }
             case IRIDIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
             case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);

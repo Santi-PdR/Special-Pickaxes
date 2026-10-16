@@ -56,6 +56,7 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty",batch="rework_each_07") public static void axiomPacketCannotExecuteTwice(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIAMOND_ORE.defaultBlockState());
+        PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
         var packet=new RelicNetwork.Intent(ArtifactKind.AXIOM,RelicControl.Action.ACTIVATE,1,p.getMainHandItem().getOrCreateTag().getUUID("controlIdentity"));
         h.assertTrue(RelicNetwork.accept(p,packet),"first press activates");
         WorkQueue.cancel(p);ArtifactState.of(p,ArtifactKind.AXIOM).remove("ready");ArtifactState.of(p,ArtifactKind.AXIOM).remove("inputTick");
@@ -89,6 +90,10 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty",batch="rework_each_12") public static void activationRejectsForgeCallbackReentry(GameTestHelper h){
         var p=player(h,ArtifactKind.AXIOM);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(at.above(),Blocks.DIAMOND_ORE.defaultBlockState());
+        PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,net.minecraft.world.phys.Vec3.atCenterOf(at));
+        h.assertTrue(ArtifactActions.target(p).filter(at::equals).isPresent(),"test player has a clear line to the intended matrix block");
+        h.assertTrue(WorldSafety.allowed(p,ArtifactKind.AXIOM,p.blockPosition())&&WorldSafety.harvestable(p,p.getMainHandItem(),at),"matrix seed passes range, claim and tool checks");
         int[] callbacks={0};java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> reenter=event->{
             if(callbacks[0]++==0)h.assertTrue(!ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"callback cannot activate recursively");
         };

@@ -392,6 +392,19 @@ public final class PickaxeGameTests {
         h.assertTrue(arrow.getDeltaMovement().x>0D,"the ward redirects a fast hostile shot outward before impact");
         h.assertTrue(DomainFields.active(wearer),"the deflection does not consume or cancel the remaining ward");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_43") public static void exodiumCuriosStarfallWardSoftensProjectileDamage(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);ArtifactPassives.tick(wearer,ArtifactKind.EXODIUM);
+        var ward=SpecialPickaxes.STARFALL_WARD.get();
+        h.assertTrue(wearer.hasEffect(ward),"Exodium Curios leases the named Starfall Ward effect");
+        var shooter=EntityType.SKELETON.create(h.getLevel());shooter.setPos(wearer.getX()+5,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+        var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
+        ArtifactPassives.onCuriosDamage(wearer,projectileHit,ArtifactKind.EXODIUM);
+        h.assertTrue(Math.abs(projectileHit.getAmount()-9F)<.001F,"the ward shaves 25 percent from projectile hits");
+        h.assertTrue(ward.isDurationEffectTick(40,0)&&!ward.isDurationEffectTick(39,0),"the orbital ward animates on a bounded half-second pulse");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
+        h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
