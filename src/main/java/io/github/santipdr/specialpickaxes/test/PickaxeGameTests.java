@@ -403,7 +403,10 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(projectileHit.getAmount()-9F)<.001F,"the ward shaves 25 percent from projectile hits");
         h.assertTrue(ward.isDurationEffectTick(40,0)&&!ward.isDurationEffectTick(39,0),"the orbital ward animates on a bounded half-second pulse");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
-        h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");finish(h,wearer);
+        h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");
+        var unwardedHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
+        ArtifactPassives.onCuriosDamage(wearer,unwardedHit,ArtifactKind.EXODIUM);
+        h.assertTrue(unwardedHit.getAmount()==12F,"the projectile guard is not retained after unequipping");finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
