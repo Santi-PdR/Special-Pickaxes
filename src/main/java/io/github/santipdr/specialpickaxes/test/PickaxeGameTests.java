@@ -382,6 +382,16 @@ public final class PickaxeGameTests {
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(mending),"Dawn Mending clears when Palimpsest leaves Curios");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_41") public static void crucibleWardDeflectsFastHostileProjectile(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var archer=EntityType.SKELETON.create(h.getLevel());
+        archer.setPos(wearer.getX()+6,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(archer);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),archer);
+        arrow.setPos(wearer.getX()+3,wearer.getY()+1,wearer.getZ());arrow.setDeltaMovement(-3D,0D,0D);h.getLevel().addFreshEntity(arrow);
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE),"the eight-second Crucible projectile ward starts");
+        DomainFields.tick();
+        h.assertTrue(arrow.getDeltaMovement().x>0D,"the ward redirects a fast hostile shot outward before impact");
+        h.assertTrue(DomainFields.active(wearer),"the deflection does not consume or cancel the remaining ward");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

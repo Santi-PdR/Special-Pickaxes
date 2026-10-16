@@ -15,6 +15,7 @@ public final class DomainFields {
     private static final int EVENTIDE_COLLAPSE_CHARGE=24;
     private static final int EVENTIDE_COLLAPSE_RADIUS=16;
     private static final int EVENTIDE_COLLAPSE_DROP_CAP=64;
+    private static final int CRUCIBLE_PROJECTILE_INSPECTION_BUDGET=256;
     private record Frozen(Entity entity,Vec3 position,Vec3 velocity) {}
     private static final class StasisPulse {
         final ServerPlayer owner;final ItemStack tool;final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
@@ -204,7 +205,7 @@ public final class DomainFields {
                 Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
                 var projectiles=projectilesNear(level,new AABB(f.center).inflate(f.radius+24),center,cap,e->e.isAlive()
                         &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
-                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()));
+                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()),CRUCIBLE_PROJECTILE_INSPECTION_BUDGET);
                 for(var projectile:projectiles){
                     Vec3 away=projectile.position().subtract(p.position()).normalize();
                     if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
