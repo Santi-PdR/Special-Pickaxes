@@ -112,7 +112,7 @@ public final class WorkQueue {
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
                 else if(job.region instanceof IcarianLiftProgram lift){
-                    String result=lift.surfaced()?"icarian_lift_surface":lift.blocked()?"icarian_lift_barrier":"icarian_lift_limit";
+                    String result=lift.surfaced()?"icarian_lift_surface":lift.fluidBlocked()?"icarian_lift_fluid":lift.blocked()?"icarian_lift_barrier":"icarian_lift_limit";
                     ArtifactFeedback.message(p,result);if(lift.surfaced())ArtifactFeedback.icarianSurface(p);ArtifactFeedback.cue(p,"complete");
                 }else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);
             } else ORDER.addLast(id);

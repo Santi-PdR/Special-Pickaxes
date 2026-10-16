@@ -598,6 +598,7 @@
   "message.specialpickaxes.icarian_lift_started": "El Ascensor Icariano abre un túnel transitable hacia arriba. Se detendrá en la superficie o ante una barrera.",
   "message.specialpickaxes.icarian_lift_surface": "El Ascensor Icariano llegó al cielo abierto.",
   "message.specialpickaxes.icarian_lift_barrier": "El Ascensor Icariano se detuvo a salvo ante una barrera.",
+  "message.specialpickaxes.icarian_lift_fluid": "El Ascensor Icariano se detuvo ante un líquido y lo dejó intacto.",
   "message.specialpickaxes.icarian_lift_limit": "El Ascensor Icariano se detuvo en el límite de altura del mundo.",
   "message.specialpickaxes.starfall_sink_started": "El Pozo Estelar marcó su ruta achaflanada 5×5 hasta 32 bloques; el pulso acompaña la perforación.",
   "message.specialpickaxes.seam_face_started": "Barrido de Falla marcó %s bloques seguros en la cara apuntada.",

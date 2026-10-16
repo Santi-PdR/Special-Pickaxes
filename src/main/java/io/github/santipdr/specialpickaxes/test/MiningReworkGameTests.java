@@ -131,9 +131,12 @@ public final class MiningReworkGameTests {
         }h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_14") public static void worldloomQuarryIsBoundedAndMiningOnly(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(5,3,7));p.setPos(p.getX(),center.getY()-1,p.getZ());h.getLevel().setBlockAndUpdate(center,Blocks.STONE.defaultBlockState());
+        var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(5,3,7));p.setPos(p.getX(),center.getY()-1,p.getZ());
         var stone=center.east();var ore=center.above();var outside=center.east(9);
+        var placed=PlayerPlacedBlocks.get(h.getLevel());for(var at:java.util.List.of(center,stone,ore,outside))placed.unmark(at);
+        h.getLevel().setBlockAndUpdate(center,Blocks.STONE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
+        p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,net.minecraft.world.phys.Vec3.atCenterOf(center));
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry starts");
         for(int tick=0;tick<1200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(stone).isAir(),"quarry mines nearby stone");

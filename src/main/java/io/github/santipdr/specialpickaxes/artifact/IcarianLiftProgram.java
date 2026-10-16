@@ -12,7 +12,7 @@ public final class IcarianLiftProgram implements WorkProgram {
     private final int maxRise;
     private int rise,index;
     private boolean finished;
-    private boolean surfaced,blocked,heightCapped;
+    private boolean surfaced,blocked,fluidBlocked,heightCapped;
 
     public IcarianLiftProgram(BlockPos base,int maxRise){this.base=base.immutable();this.maxRise=Math.max(0,Math.min(MAX_WORLD_RISE,maxRise));}
 
@@ -29,8 +29,10 @@ public final class IcarianLiftProgram implements WorkProgram {
     @Override public void confirm(){}
     public boolean surfaced(){return surfaced;}
     public boolean blocked(){return blocked;}
+    public boolean fluidBlocked(){return fluidBlocked;}
     public boolean heightCapped(){return heightCapped;}
     private void finishAtBarrier(){finished=true;blocked=true;}
+    private void finishAtFluid(){finished=true;blocked=true;fluidBlocked=true;}
     private void finishAtHeight(){finished=true;heightCapped=true;}
     @Override public boolean loaded(ServerPlayer p){return finished||index>=cells()||p.serverLevel().isOutsideBuildHeight(nextPos())||p.serverLevel().hasChunkAt(nextPos());}
 
@@ -64,6 +66,10 @@ public final class IcarianLiftProgram implements WorkProgram {
         BlockState state=level.getBlockState(pos);
         if(state.isAir()||state.is(net.minecraft.world.level.block.Blocks.CAVE_AIR)
                 ||state.is(net.minecraft.world.level.block.Blocks.VOID_AIR))return completed(pos);
+        if(!state.getFluidState().isEmpty()||!level.getFluidState(pos).isEmpty()){
+            finishAtFluid();
+            return completed(pos);
+        }
         if(PlayerPlacedBlocks.get(level).contains(pos)||WorldSafety.barrier(p,pos)
                 ||!WorldSafety.harvestable(p,p.getMainHandItem(),pos)){
             finishAtBarrier();

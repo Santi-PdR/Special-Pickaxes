@@ -598,6 +598,7 @@
   "message.specialpickaxes.icarian_lift_started": "Icarian Lift is clearing a player-sized shaft upward. It stops at the surface or first barrier.",
   "message.specialpickaxes.icarian_lift_surface": "Icarian Lift reached open sky.",
   "message.specialpickaxes.icarian_lift_barrier": "Icarian Lift stopped safely at a barrier.",
+  "message.specialpickaxes.icarian_lift_fluid": "Icarian Lift stopped before a fluid and left it untouched.",
   "message.specialpickaxes.icarian_lift_limit": "Icarian Lift stopped at the world-height limit.",
   "message.specialpickaxes.starfall_sink_started": "Starfall Sink marked its beveled 5×5 route down to 32 blocks; the drilling pulse follows the cut.",
   "message.specialpickaxes.seam_face_started": "Seam Sweep marked %s safe blocks in the target face.",

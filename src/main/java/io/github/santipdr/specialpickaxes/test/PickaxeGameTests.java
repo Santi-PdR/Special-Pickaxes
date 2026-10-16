@@ -542,6 +542,16 @@ public final class PickaxeGameTests {
         h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before pushing its owner through the barrier");
         h.assertTrue(!WorkQueue.busy(p),"barrier stop closes the lift cleanly");PlayerPlacedBlocks.get(h.getLevel()).unmark(protectedBlock);finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_44") public static void icarianLiftStopsBeforeLavaAndLeavesItUntouched(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
+        h.getLevel().setBlockAndUpdate(base.above(),Blocks.STONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(base.above(2),Blocks.STONE.defaultBlockState());
+        var lava=base.above(3);h.getLevel().setBlockAndUpdate(lava,Blocks.LAVA.defaultBlockState());
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a lava barrier");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(lava).is(Blocks.LAVA),"the lift does not mine, drain or replace lava");
+        h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before moving the player through lava");
+        h.assertTrue(!WorkQueue.busy(p),"the lava stop ends the queue and movement protection");finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
