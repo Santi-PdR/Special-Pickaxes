@@ -303,6 +303,16 @@ public final class PickaxeGameTests {
         renewal.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11F,"repeated effect refreshes cannot accelerate healing");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_46") public static void worldloomCuriosRenewalEndsOnUnequipButPersistsWhenHeld(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(!wearer.hasEffect(renewal),"Worldloom's Curios healing lease ends when it leaves the slot");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDLOOM).get()));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         var shell=SpecialPickaxes.SEARING_SHELL.get();

@@ -41,6 +41,9 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.PALIMPSEST
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
+        if(kind==ArtifactKind.WORLDLOOM
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDLOOM))
+            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get());
         if(kind==ArtifactKind.EXODIUM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EXODIUM))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
