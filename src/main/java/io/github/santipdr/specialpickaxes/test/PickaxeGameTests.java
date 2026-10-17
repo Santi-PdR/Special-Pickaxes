@@ -176,6 +176,13 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_26") public static void eventideBoundaryFlowShowsSelectedGravityPolarity(GameTestHelper h){
+        for(int edge=0;edge<4;edge++){
+            var inward=ArtifactFeedback.eventideFlowDirection(0,edge);var outward=ArtifactFeedback.eventideFlowDirection(1,edge);
+            h.assertTrue(inward.dot(outward)<-.99D,"outward field particles reverse the inward direction at boundary edge "+edge);
+        }
+        finish(h,player(h,ArtifactKind.EVENTIDE));
+    }
     @GameTest(template="empty",batch="rework_each_27") public static void icarusCuriosGlideBuildsSprintMomentumInAir(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);wearer.setSprinting(true);
         ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);

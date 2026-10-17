@@ -243,6 +243,24 @@ public final class ArtifactFeedback {
         }
         for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
             p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
+        if(kind==ArtifactKind.EVENTIDE){
+            boolean repel=(ArtifactState.mode(p,kind)&1)!=0;
+            var flow=repel?new DustParticleOptions(new Vector3f(1F,.48F,.78F),.92F):dust;
+            double midX=(minX+maxX)*.5D,midZ=(minZ+maxZ)*.5D;
+            double[] edgeX={minX,midX,maxX,midX},edgeZ={midZ,maxZ,midZ,minZ};
+            for(int edge=0;edge<4;edge++){
+                var direction=eventideFlowDirection(repel?1:0,edge);
+                for(int band=0;band<2;band++)p.serverLevel().sendParticles(p,flow,false,edgeX[edge],center.getY()+.55D+band*.8D,edgeZ[edge],
+                        0,direction.x*.12D,0,direction.z*.12D,.08D);
+            }
+        }
+    }
+    /** Unit normal for each square boundary edge, reversed for Eventide's outward polarity. */
+    public static Vec3 eventideFlowDirection(int mode,int edge){
+        Vec3 inward=switch(Math.floorMod(edge,4)){
+            case 0->new Vec3(1,0,0);case 1->new Vec3(0,0,-1);case 2->new Vec3(-1,0,0);default->new Vec3(0,0,1);
+        };
+        return (mode&1)==0?inward:inward.scale(-1D);
     }
     public static Vec3 stasisBoundaryPoint(BlockPos center,int radius,double distance){
         double side=radius*2D,perimeter=side*4D;
