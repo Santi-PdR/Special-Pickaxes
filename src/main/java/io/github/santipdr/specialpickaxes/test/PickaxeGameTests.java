@@ -585,12 +585,13 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullVeilCleansesOneDebuffPerPulse(GameTestHelper h){
         var wearer=player(h,ArtifactKind.AXIOM);
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200,0));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,320,0));
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,300,0));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.HUNGER,40,0));
         ArtifactPassives.tick(wearer,ArtifactKind.AXIOM);
         h.assertTrue(wearer.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom grants its custom passive veil while carried in Curios");
         NullVeilEffect.pulse(wearer);
-        h.assertTrue(!wearer.hasEffect(MobEffects.POISON)&&wearer.hasEffect(MobEffects.MOVEMENT_SLOWDOWN),"one shortest-duration harmful effect is cleansed per pulse");
+        h.assertTrue(!wearer.hasEffect(MobEffects.POISON)&&wearer.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)&&wearer.hasEffect(MobEffects.HUNGER),"lethal poison is prioritized over shorter control and hunger effects");
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200,0));NullVeilEffect.pulse(wearer);
         h.assertTrue(wearer.hasEffect(MobEffects.POISON),"the veil cannot cleanse another debuff before its eight-second cooldown");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.AXIOM);
