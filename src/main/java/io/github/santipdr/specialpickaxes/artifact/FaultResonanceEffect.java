@@ -28,10 +28,22 @@ public final class FaultResonanceEffect extends MobEffect {
         double damping=amplifier>0?.38D:.62D;
         entity.setDeltaMovement(motion.x*damping,motion.y,motion.z*damping);
         entity.hasImpulse=true;
-        if(entity.tickCount%8==0&&entity.level() instanceof ServerLevel level){
-            double y=entity.getY()+.12D;
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,entity.getX(),y,entity.getZ(),3,.24D,.06D,.24D,.012D);
-            level.sendParticles(RESONANCE,entity.getX(),y+.22D,entity.getZ(),2,.18D,.12D,.18D,0);
+        // A rotating torso ring is easier to read than sparks hidden at the feet,
+        // while emitting four particles every 12 ticks keeps multi-target fights light.
+        if(entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
+            double phase=entity.tickCount*.17D;
+            double centerY=entity.getY()+entity.getBbHeight()*.52D;
+            double radius=Math.max(.28D,entity.getBbWidth()*.62D);
+            for(int i=0;i<3;i++){
+                double angle=phase+i*Math.PI*2D/3D;
+                double x=entity.getX()+Math.cos(angle)*radius;
+                double z=entity.getZ()+Math.sin(angle)*radius;
+                double y=centerY+Math.sin(angle*2D)*.08D;
+                level.sendParticles(RESONANCE,x,y,z,1,0,0,0,0);
+            }
+            double sparkX=entity.getX()+Math.cos(phase)*radius;
+            double sparkZ=entity.getZ()+Math.sin(phase)*radius;
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,sparkX,centerY+.1D,sparkZ,1,0,0,0,0);
         }
     }
 
