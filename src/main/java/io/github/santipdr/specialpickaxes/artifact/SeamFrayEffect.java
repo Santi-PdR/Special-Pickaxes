@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 
 import java.util.UUID;
 
-/** Seam Ripper's Curios counter tears away a quarter of an attacker's armor briefly. */
+/** Seam Ripper's Curios counter tears away a quarter of an attacker's armor with orbiting fracture marks. */
 public final class SeamFrayEffect extends MobEffect {
     private static final DustParticleOptions SCAR_DUST=new DustParticleOptions(new Vector3f(.96F,.48F,.28F),.82F);
 
@@ -21,8 +21,16 @@ public final class SeamFrayEffect extends MobEffect {
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
-        if(!entity.level().isClientSide&&entity.level() instanceof ServerLevel level)
-            level.sendParticles(SCAR_DUST,entity.getX(),entity.getY()+entity.getBbHeight()*.55D,entity.getZ(),3,.2D,.24D,.2D,.005D);
+        if(entity.level().isClientSide||!(entity.level() instanceof ServerLevel level))return;
+        double phase=entity.tickCount*.17D;
+        double radius=Math.max(.24D,entity.getBbWidth()*.52D);
+        double centerY=entity.getY()+entity.getBbHeight()*.55D;
+        for(int shard=0;shard<3;shard++){
+            double angle=phase+shard*Math.PI*2D/3D;
+            double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
+            double y=centerY+Math.sin(angle*2D)*.11D;
+            level.sendParticles(SCAR_DUST,x,y,z,1,0,0,0,0);
+        }
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){
