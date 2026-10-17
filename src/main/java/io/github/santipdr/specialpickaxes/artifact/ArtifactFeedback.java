@@ -179,13 +179,15 @@ public final class ArtifactFeedback {
         level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.8D,z,8,.28D,.38D,.28D,.025D);
         level.sendParticles(p,ParticleTypes.CLOUD,false,x,y+.1D,z,5,.35D,.05D,.35D,.015D);
     }
-    /** Personal ascent halo: a small rotating cyan ring that never broadcasts to distant players. */
+    /** Personal ascent helix: six rising cyan points that never broadcast to distant players. */
     public static void icarianAscent(ServerPlayer p){
         var level=p.serverLevel();double phase=p.tickCount*.22D,x=p.getX(),y=p.getY()+.15D,z=p.getZ();
         var sky=new DustParticleOptions(new Vector3f(.58F,.84F,1F),1.05F);
         for(int i=0;i<6;i++){
             double angle=phase+i*Math.PI/3D;
-            level.sendParticles(p,sky,false,x+Math.cos(angle)*.48D,y+(i%3)*.27D,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
+            int risingPoint=(i+(p.tickCount/2))%6;
+            double height=.08D+risingPoint*.12D;
+            level.sendParticles(p,sky,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
         }
         level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
     }
