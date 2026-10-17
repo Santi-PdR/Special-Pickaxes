@@ -273,6 +273,19 @@ public final class PickaxeGameTests {
         h.assertTrue(renewal.isDurationEffectTick(40,0)&&!renewal.isDurationEffectTick(39,0),"root healing remains spaced one second apart");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_54") public static void worldloomAllyAuraPreservesExternalHeartwoodEffect(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM,"HeartwoodBearer");var ally=player(h,ArtifactKind.CHOIR,"ProtectedAlly");
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("heartwood_"+wearer.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(ally);
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,200,1,false,true,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        var external=ally.getEffect(renewal);
+        h.assertTrue(external!=null&&external.getDuration()==200&&external.getAmplifier()==1&&!external.isAmbient(),
+                "Heartwood ally sharing does not replace a stronger effect supplied by the server");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();

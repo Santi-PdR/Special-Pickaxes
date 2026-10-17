@@ -260,11 +260,7 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,4,128);
         var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
-        for(var ally:allies){
-            var current=ally.getEffect(renewal);
-            if(current==null||current.getDuration()<=20)
-                ally.addEffect(new MobEffectInstance(renewal,40,0,true,false,true));
-        }
+        for(var ally:allies)grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
     }
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
