@@ -691,6 +691,19 @@ public final class PickaxeGameTests {
         h.assertTrue(!focus.isDurationEffectTick(40,0)&&!focus.isDurationEffectTick(1,0),"Strata Focus does no periodic server-side aura work");
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CHOIR);h.assertTrue(!wearer.hasEffect(focus),"the custom effect does not linger after Curios removal");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_70") public static void curiosStrataTempoRequiresASuccessfulBreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);var pos=target(h);
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"an uncanceled Strata mining attempt is observed");
+        h.assertTrue(StrataFocusEffect.flushObservedBreaks()==0
+                &&StrataFocusEffect.miningTempoMultiplier(wearer)==1D,
+                "an unbroken or subsequently canceled block grants neither tempo nor a mining pulse");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"a real break is queued for end-of-tick confirmation");
+        h.assertTrue(StrataFocusEffect.flushObservedBreaks()==1
+                &&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.08D)<.001D,
+                "a confirmed break grants exactly the first eight-percent tempo charge");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_40") public static void palimpsestCuriosDawnMendingPulsesAndClears(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setHealth(10F);
         long worldTime=ArtifactState.now(wearer);wearer.getPersistentData().putLong("specialpickaxesDawnMendingAt",Long.MAX_VALUE);wearer.tickCount=10_000;
@@ -1157,6 +1170,7 @@ public final class PickaxeGameTests {
         try{h.assertTrue(WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.CHOIR,List.of(new WorkStep.Mine(queuedPos,queuedOre))),"Choir queues an ore break while Curios Iridium is equipped");WorkQueue.tick();}
         finally{MinecraftForge.EVENT_BUS.unregister(observeQueuedOre);}
         h.assertTrue(capturedDuringJob[0]&&h.getLevel().getBlockState(queuedPos).isAir(),"Curios Iridium observes ore breaks inside another pickaxe's queued ability");
+        StrataFocusEffect.flushObservedBreaks();
         var queuedDrop=new ItemEntity(h.getLevel(),queuedPos.getX()+.5,queuedPos.getY()+.25,queuedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(queuedDrop);MiningObservations.flush();
         h.assertTrue(p.getEffect(lodeSurge).getAmplifier()==2,"a queued third ore break reaches but cannot exceed three charges");
         var miningSpeed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,Blocks.STONE.defaultBlockState(),64F,pos);
