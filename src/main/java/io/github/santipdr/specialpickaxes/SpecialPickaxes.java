@@ -173,6 +173,7 @@ public final class SpecialPickaxes {
         var focus=p.getEffect(STRATA_FOCUS.get());
         if(focus!=null&&e.getNewSpeed()>0){
             double multiplier=1D+.2D*(Math.min(1,focus.getAmplifier())+1D);
+            if(p instanceof ServerPlayer server)multiplier*=StrataFocusEffect.miningTempoMultiplier(server);
             e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*multiplier));
         }
         var lodeSurge=p.getEffect(LODE_SURGE.get());

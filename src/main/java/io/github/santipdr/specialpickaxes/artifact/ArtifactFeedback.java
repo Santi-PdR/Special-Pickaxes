@@ -52,7 +52,12 @@ public final class ArtifactFeedback {
             level.sendParticles(viewer,primary,false,center.x+Math.cos(angle)*radius,
                     center.y+progress*.48D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
         }
-        if(accentCount>0)level.sendParticles(viewer,accent,false,center.x,center.y+.42D,center.z,1,0,0,0,0);
+        for(int i=0;i<Math.min(3,Math.max(0,accentCount));i++){
+            double angle=level.getGameTime()*.3D+i*Math.PI*2D/Math.max(1,accentCount);
+            double radius=.035D*i;
+            level.sendParticles(viewer,accent,false,center.x+Math.cos(angle)*radius,
+                    center.y+.42D+i*.025D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
+        }
     }
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);

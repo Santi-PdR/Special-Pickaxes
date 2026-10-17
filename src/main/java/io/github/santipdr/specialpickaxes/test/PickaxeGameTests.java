@@ -674,15 +674,19 @@ public final class PickaxeGameTests {
         h.assertTrue(!StrataFocusEffect.miningPulse(wearer,minedBlock),"rapid mining cannot spam its feedback pulse");
         pulseData.putLong("specialpickaxesStrataMiningPulseAtWorldTime",worldTime-1);wearer.tickCount=0;
         h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"the mining pulse returns after its short throttle");
+        h.assertTrue(Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.24D)<.001D,
+                "three consecutive mined blocks build the maximum 24% Strata tempo bonus");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"Strata Focus replaces generic Haste");
         var speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
-        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-89.6F)<.01F,"level two applies the same 1.4x mining-speed factor as Haste II");
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-111.104F)<.03F,"Strata Focus II and the full tempo streak compound to a 1.736x mining-speed factor");
+        pulseData.putLong("specialpickaxesStrataMiningStreakAt",worldTime-81);
+        h.assertTrue(StrataFocusEffect.miningTempoMultiplier(wearer)==1D,"the mining tempo expires after four seconds without another block");
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(focus),"Strata Focus clears when its last source is unequipped");
         ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
         h.assertTrue(wearer.hasEffect(focus)&&wearer.getEffect(focus).getAmplifier()==0,"Choir grants the level-one custom mining passive");
         speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
-        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-76.8F)<.01F,"level one applies the 1.2x mining-speed factor");
+        MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-76.8F)<.01F,"level one applies the 1.2x mining-speed factor after the streak expires");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");
         h.assertTrue(!focus.isDurationEffectTick(40,0)&&!focus.isDurationEffectTick(1,0),"Strata Focus does no periodic server-side aura work");
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CHOIR);h.assertTrue(!wearer.hasEffect(focus),"the custom effect does not linger after Curios removal");finish(h,wearer);
@@ -1157,7 +1161,8 @@ public final class PickaxeGameTests {
         h.assertTrue(p.getEffect(lodeSurge).getAmplifier()==2,"a queued third ore break reaches but cannot exceed three charges");
         var miningSpeed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,Blocks.STONE.defaultBlockState(),64F,pos);
         MinecraftForge.EVENT_BUS.post(miningSpeed);
-        h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-121.856F)<.02F,"three Lode Surge charges add 36% mining speed on top of Strata Focus II");
+        h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-131.60448F)<.03F,
+                "three Lode Surge charges and the first Strata tempo charge compound on Strata Focus II");
         h.assertTrue(lodeSurge.isDurationEffectTick(72,2)&&!lodeSurge.isDurationEffectTick(71,2),"the charge-scaled orbit animates every twelve ticks");
         lodeSurge.applyEffectTick(p,2);
         h.assertTrue(queuedDrop.isCurrentlyGlowing()&&queuedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"queued ability ore drops receive the Curios highlight without held-tool mining effects");
