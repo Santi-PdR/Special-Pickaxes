@@ -413,6 +413,19 @@ public final class PickaxeGameTests {
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CRUCIBLE);
         h.assertTrue(!wearer.hasEffect(mantle),"the custom Curios lease clears immediately when the pick leaves its slot");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_51") public static void crucibleCuriosCounterShearsAttackTempo(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),8F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.CRUCIBLE);
+        var shear=SpecialPickaxes.PHASE_SHEAR.get();
+        h.assertTrue(hit.getAmount()==8F&&attacker.hasEffect(shear)&&attacker.getEffect(shear).getDuration()==40&&!attacker.isOnFire(),"Crucible applies its distinct two-second Phase Shear without duplicating Hellspec's burn");
+        var pvpTarget=player(h,ArtifactKind.PALIMPSEST,"PhaseShearTarget");
+        double normalAttackSpeed=pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+        pvpTarget.addEffect(new net.minecraft.world.effect.MobEffectInstance(shear,40,0,true,false,true));
+        h.assertTrue(Math.abs(pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)-normalAttackSpeed*.75D)<.001D,"Phase Shear slows player attack speed by 25 percent");
+        h.assertTrue(!pvpTarget.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"Phase Shear does not grant Strength");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_37") public static void worldbreakerCuriosAegisAddsCustomArmorAndAnchor(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDBREAKER);ArtifactPassives.tick(wearer,ArtifactKind.WORLDBREAKER);
         var aegis=SpecialPickaxes.WORLDBREAKER_AEGIS.get();
@@ -641,8 +654,13 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
         var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();
+        // GameTest reuses world coordinates; remove any stale provenance from an earlier fixture.
+        var placed=PlayerPlacedBlocks.get(p.serverLevel());placed.unmark(center);placed.unmark(matrix);placed.unmark(ore);
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false),"axiom activation");for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        var rayTarget=ArtifactActions.target(p);var seed=h.getLevel().getBlockState(center);
+        boolean allowed=WorldSafety.allowed(p,ArtifactKind.AXIOM,center),harvestable=WorldSafety.harvestable(p,p.getMainHandItem(),center);
+        boolean activated=ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false);
+        h.assertTrue(activated,"axiom activation (ray="+rayTarget+", center="+center+", allowed="+allowed+", matrix="+MiningDesigns.matrix(seed)+", ore="+ArtifactOres.isOre(seed)+", placed="+PlayerPlacedBlocks.get(p.serverLevel()).contains(center)+", harvestable="+harvestable+")");for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed");
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"hollow core and ore preserved");finish(h,p);
     }
