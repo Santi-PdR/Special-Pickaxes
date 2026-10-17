@@ -799,8 +799,12 @@ public final class PickaxeGameTests {
         var miningSpeed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(ally,Blocks.STONE.defaultBlockState(),64,target(h));
         MinecraftForge.EVENT_BUS.post(miningSpeed);
         h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-102.4F)<.01F,"custom Stasis Resonance grants the same 1.6x mining speed with an ordinary correct pick");
-        h.assertTrue(SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(40,0)
-                &&!SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(39,0),"Stasis visuals pulse only every ten ticks");
+        var miningFlash=target(h);
+        h.assertTrue(StasisResonanceEffect.miningPulse(ally,miningFlash),"breaking a block creates a personal Stasis mining flash");
+        h.assertTrue(!StasisResonanceEffect.miningPulse(ally,miningFlash),"the visual pulse is throttled against particle spam");
+        ally.tickCount+=5;
+        h.assertTrue(StasisResonanceEffect.miningPulse(ally,miningFlash),"the mining flash returns after its five-tick cooldown");
+        h.assertTrue(!SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(40,0),"the custom potion performs no idle tick animation work");
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");
         DomainFields.stop(owner);finish(h,owner);
     }

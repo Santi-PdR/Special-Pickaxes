@@ -364,7 +364,7 @@
   "combat.specialpickaxes.hollow_axiom": "On hit: Glowing for 10s and Weakness II for 5s.",
   "combat.specialpickaxes.worldbreaker": "On hit: Resistance II for 5s.",
   "mining.identity.interregnum.domain": "DOMAIN: a marked 16×16×8 Stasis field that supports nearby teammates.",
-  "mining.how.interregnum.domain": "Aim at a location and activate. Its visible border marks the 16×16×8 field. Inside, you gain mining speed ×8, Regeneration V, Absorption IV, Resistance II, food restoration and Night Vision. Up to 16 nearby teammates gain custom Stasis Resonance (1.6× mining speed), Regeneration II, food restoration and Night Vision.",
+  "mining.how.interregnum.domain": "Aim at a location and activate. Its visible border marks the 16×16×8 field. Inside, you gain mining speed ×8, Regeneration V, Absorption IV, Resistance II, food restoration and Night Vision. Up to 16 nearby teammates gain custom Stasis Resonance (1.6× mining speed), Regeneration II, food restoration and Night Vision; a violet flash marks each block they mine.",
   "mining.identity.interregnum.aura": "AURA: carry Stasis with you.",
   "mining.how.interregnum.aura": "Activate without aiming at a block. The small aura follows only you and grants ×8 mining speed, Night Vision and one food point every five seconds. It does not freeze mobs.",
   "mode.specialpickaxes.domain": "DOMAIN",

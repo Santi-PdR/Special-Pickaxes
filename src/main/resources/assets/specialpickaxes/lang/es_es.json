@@ -364,7 +364,7 @@
   "combat.specialpickaxes.hollow_axiom": "Al golpear: Brillo durante 10 s y Debilidad II durante 5 s.",
   "combat.specialpickaxes.worldbreaker": "Al golpear: Resistencia II durante 5 s.",
   "mining.identity.interregnum.domain": "DOMINIO: campo Stasis marcado de 16×16×8 que ayuda a compañeros.",
-  "mining.how.interregnum.domain": "Apunta al sitio y activa. El borde visible marca el campo de 16×16×8. Dentro recibes velocidad minera ×8, Regeneración V, Absorción IV, Resistencia II, recuperación de comida y Visión nocturna. Hasta 16 compañeros cercanos reciben Resonancia de Stasis personalizada (1,6× velocidad minera), Regeneración II, recuperación de comida y Visión nocturna.",
+  "mining.how.interregnum.domain": "Apunta al sitio y activa. El borde visible marca el campo de 16×16×8. Dentro recibes velocidad minera ×8, Regeneración V, Absorción IV, Resistencia II, recuperación de comida y Visión nocturna. Hasta 16 compañeros cercanos reciben Resonancia de Stasis personalizada (1,6× velocidad minera), Regeneración II, recuperación de comida y Visión nocturna; un destello violeta marca cada bloque que minan.",
   "mining.identity.interregnum.aura": "AURA: lleva Stasis contigo.",
   "mining.how.interregnum.aura": "Activa sin apuntar a un bloque. El aura pequeña te sigue solo a ti y da velocidad minera ×8, Visión nocturna y un punto de comida cada cinco segundos. No congela criaturas.",
   "mode.specialpickaxes.domain": "DOMAIN",
