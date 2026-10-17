@@ -18,6 +18,7 @@ import org.joml.Vector3f;
 public final class RelicAura {
     private static final int MAX_VISIBLE_CURIO_AURAS=6;
     private static final int MAX_CURIO_CANDIDATES=12;
+    private static final int MAX_INSPECTED_NEARBY_PLAYERS=128;
     private static final double VISIBLE_CURIO_RADIUS_SQR=24D*24D;
     private static ArtifactKind heldKind;
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
@@ -38,11 +39,13 @@ public final class RelicAura {
 
         // Render nearby wearers on this client too, so a Curios passive has a readable
         // team-facing signature without introducing server packets or an unbounded scan.
-        var nearbyPlayers=mc.level.getEntitiesOfClass(Player.class,mc.player.getBoundingBox().inflate(24D),viewer->
-                viewer!=mc.player&&!viewer.isSpectator()&&!viewer.isInvisibleTo(mc.player)
-                        &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR);
         var farthestFirst=java.util.Comparator.<Player>comparingDouble(viewer->viewer.distanceToSqr(mc.player)).reversed();
         var nearest=new java.util.PriorityQueue<Player>(MAX_CURIO_CANDIDATES,farthestFirst);
+        var nearbyPlayers=new java.util.ArrayList<Player>(MAX_INSPECTED_NEARBY_PLAYERS);
+        mc.level.getEntities(net.minecraft.world.level.entity.EntityTypeTest.forClass(Player.class),
+                mc.player.getBoundingBox().inflate(24D),viewer->viewer!=mc.player&&!viewer.isSpectator()
+                        &&!viewer.isInvisibleTo(mc.player)&&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR,
+                nearbyPlayers,MAX_INSPECTED_NEARBY_PLAYERS);
         for(var viewer:nearbyPlayers){
             if(nearest.size()<MAX_CURIO_CANDIDATES)nearest.add(viewer);
             else if(viewer.distanceToSqr(mc.player)<nearest.peek().distanceToSqr(mc.player)){
