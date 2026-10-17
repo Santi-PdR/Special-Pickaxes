@@ -10,14 +10,15 @@ import org.joml.Vector3f;
 
 /** Palimpsest's passive gives controlled healing pulses instead of vanilla Regeneration. */
 public final class DawnMendingEffect extends MobEffect {
-    private static final String NEXT_PULSE="specialpickaxesDawnMendingAt";
+    private static final String NEXT_PULSE="specialpickaxesDawnMendingAtWorldTime";
     private static final DustParticleOptions DAWN_DUST=new DustParticleOptions(new Vector3f(1F,.72F,.28F),.82F);
 
     public DawnMendingEffect(){super(MobEffectCategory.BENEFICIAL,0xf3b950);}
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide)return;
-        long now=entity.tickCount;
+        // Persist cadence against the world clock; player tickCount resets on respawn.
+        long now=entity.level().getGameTime();
         var data=entity.getPersistentData();
         if(data.getLong(NEXT_PULSE)>now)return;
         data.putLong(NEXT_PULSE,now+40L);

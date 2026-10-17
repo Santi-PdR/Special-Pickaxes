@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 
 /** Exodium's Curios passive catches projectiles in a short-lived stellar veil. */
 public final class StarfallWardEffect extends MobEffect {
-    private static final String NEXT_FLASH="specialpickaxesStarfallFlashAt";
+    private static final String NEXT_FLASH="specialpickaxesStarfallFlashAtWorldTime";
     private static final DustParticleOptions STARDUST=new DustParticleOptions(new Vector3f(1F,.36F,.79F),.82F);
 
     public StarfallWardEffect(){super(MobEffectCategory.BENEFICIAL,0xf65dc0);}
@@ -66,7 +66,7 @@ public final class StarfallWardEffect extends MobEffect {
     /** A brief, low-count flash confirms the Curios ward caught a hostile shot. */
     public static void projectileImpact(ServerPlayer wearer){
         if(wearer.level().isClientSide||!(wearer.level() instanceof ServerLevel level))return;
-        long now=wearer.tickCount;var data=wearer.getPersistentData();
+        long now=ArtifactState.now(wearer);var data=wearer.getPersistentData();
         if(data.getLong(NEXT_FLASH)>now)return;
         data.putLong(NEXT_FLASH,now+5L);
         double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.56D,z=wearer.getZ();

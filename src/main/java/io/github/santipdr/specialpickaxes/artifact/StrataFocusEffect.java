@@ -11,7 +11,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 public final class StrataFocusEffect extends MobEffect {
     private static final net.minecraft.core.particles.DustParticleOptions MINING_GLEAM=
             new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.48F,.92F,1F),1.05F);
-    private static final String NEXT_MINING_PULSE="specialpickaxesStrataMiningPulseAt";
+    private static final String NEXT_MINING_PULSE="specialpickaxesStrataMiningPulseAtWorldTime";
 
     public StrataFocusEffect(){super(MobEffectCategory.BENEFICIAL,0x52bdd8);}
 
@@ -19,7 +19,7 @@ public final class StrataFocusEffect extends MobEffect {
     public static boolean miningPulse(ServerPlayer player,BlockPos pos){
         if(!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get())
                 ||!(player.level() instanceof ServerLevel level))return false;
-        long now=player.tickCount;var data=player.getPersistentData();
+        long now=ArtifactState.now(player);var data=player.getPersistentData();
         if(data.getLong(NEXT_MINING_PULSE)>now)return false;
         data.putLong(NEXT_MINING_PULSE,now+6L);
         double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;

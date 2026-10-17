@@ -14,19 +14,20 @@ import org.joml.Vector3f;
 /** Icarus' Curios passive turns a sprint-jump into a controlled, visible aerial glide. */
 public final class IcarianMomentumEffect extends MobEffect {
     private static final DustParticleOptions WING_GLEAM=new DustParticleOptions(new Vector3f(.98F,.82F,.48F),.72F);
-    private static final String LANDING_READY="specialpickaxesIcarianLandingReady";
+    private static final String LANDING_READY="specialpickaxesIcarianLandingReadyAtWorldTime";
     public IcarianMomentumEffect(){super(MobEffectCategory.BENEFICIAL,0xffc057);}
 
     /** Turns a meaningful protected landing into a short forward rebound, once every two seconds. */
     public static boolean convertLanding(ServerPlayer player,float fallDistance){
-        if(fallDistance<5F||player.getPersistentData().getLong(LANDING_READY)>player.tickCount)return false;
+        long now=ArtifactState.now(player);
+        if(fallDistance<5F||player.getPersistentData().getLong(LANDING_READY)>now)return false;
         Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
         if(forward.lengthSqr()<.001D){Vec3 motion=player.getDeltaMovement();forward=new Vec3(motion.x,0,motion.z);}
         if(forward.lengthSqr()<.001D)return false;
         forward=forward.normalize();double kick=Math.min(.62D,.38D+(fallDistance-5F)*.025D);
         Vec3 motion=player.getDeltaMovement();
         player.setDeltaMovement(motion.x+forward.x*kick,Math.max(.12D,motion.y),motion.z+forward.z*kick);
-        player.hasImpulse=true;player.getPersistentData().putLong(LANDING_READY,player.tickCount+40L);
+        player.hasImpulse=true;player.getPersistentData().putLong(LANDING_READY,now+40L);
         return true;
     }
 

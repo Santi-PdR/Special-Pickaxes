@@ -232,13 +232,17 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_67") public static void icarusProtectedLandingConvertsIntoCooledWingRebound(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS,"IcarusLanding");wearer.setYRot(0);wearer.setDeltaMovement(0,0,0);
+        wearer.getPersistentData().putLong("specialpickaxesIcarianLandingReady",Long.MAX_VALUE);
+        long worldTime=ArtifactState.now(wearer);wearer.tickCount=10_000;
         h.assertTrue(!IcarianMomentumEffect.convertLanding(wearer,4F),"short drops do not trigger a rebound");
         h.assertTrue(IcarianMomentumEffect.convertLanding(wearer,8F),"an eight-block protected landing becomes a forward glide kick");
         var first=wearer.getDeltaMovement();
         h.assertTrue(first.horizontalDistanceSqr()>.2D&&first.y>=.12D&&wearer.hasImpulse,"the landing adds forward and upward momentum");
-        wearer.setDeltaMovement(0,0,0);
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesIcarianLandingReadyAtWorldTime")==worldTime+40,
+                "the landing lockout uses persistent world time instead of the resettable entity clock");
+        wearer.setDeltaMovement(0,0,0);wearer.tickCount=0;
         h.assertTrue(!IcarianMomentumEffect.convertLanding(wearer,12F)&&wearer.getDeltaMovement().horizontalDistanceSqr()==0D,
-                "the two-second landing cooldown prevents rebound chaining");
+                "the two-second world-time cooldown prevents rebound chaining after a tick reset");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_28") public static void palimpsestCuriosCounterRestoresFoodInDawnPulses(GameTestHelper h){
@@ -640,10 +644,13 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var focus=SpecialPickaxes.STRATA_FOCUS.get();
         h.assertTrue(wearer.hasEffect(focus)&&wearer.getEffect(focus).getAmplifier()==1,"Palimpsest grants the level-two custom mining passive");
-        var minedBlock=target(h);
+        var minedBlock=target(h);var pulseData=wearer.getPersistentData();long worldTime=ArtifactState.now(wearer);
+        pulseData.putLong("specialpickaxesStrataMiningPulseAt",Long.MAX_VALUE);wearer.tickCount=10_000;
         h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"Strata Focus flashes at a mined block");
+        h.assertTrue(pulseData.getLong("specialpickaxesStrataMiningPulseAtWorldTime")==worldTime+6,
+                "Strata's throttled mining animation is scheduled on world time");
         h.assertTrue(!StrataFocusEffect.miningPulse(wearer,minedBlock),"rapid mining cannot spam its feedback pulse");
-        wearer.tickCount+=6;
+        pulseData.putLong("specialpickaxesStrataMiningPulseAtWorldTime",worldTime-1);wearer.tickCount=0;
         h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"the mining pulse returns after its short throttle");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"Strata Focus replaces generic Haste");
         var speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
@@ -660,13 +667,17 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_40") public static void palimpsestCuriosDawnMendingPulsesAndClears(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setHealth(10F);
+        long worldTime=ArtifactState.now(wearer);wearer.getPersistentData().putLong("specialpickaxesDawnMendingAt",Long.MAX_VALUE);wearer.tickCount=10_000;
         ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var mending=SpecialPickaxes.DAWN_MENDING.get();
         h.assertTrue(wearer.hasEffect(mending)&&wearer.getEffect(mending).getDuration()==40,"Palimpsest grants its named Curios healing passive");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),"Dawn Mending replaces generic Regeneration");
         h.assertTrue(wearer.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&wearer.getEffect(SpecialPickaxes.STRATA_FOCUS.get()).getAmplifier()==1,"Palimpsest keeps Strata Focus II while healing");
         mending.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11F,"a dawn pulse heals one point");
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesDawnMendingAtWorldTime")==worldTime+40,
+                "Dawn Mending's two-second healing cadence survives a player tick reset");
         mending.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11F,"effect refreshes cannot speed up the pulse");
-        wearer.tickCount+=40;mending.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==12F,"a second pulse is available after two seconds");
+        wearer.getPersistentData().putLong("specialpickaxesDawnMendingAtWorldTime",worldTime-1);wearer.tickCount=0;
+        mending.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==12F,"a second pulse is available when its world-time cooldown expires");
         h.assertTrue(mending.isDurationEffectTick(40,0)&&!mending.isDurationEffectTick(39,0),"the potion effect uses a two-second pulse cadence");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(mending),"Dawn Mending clears when Palimpsest leaves Curios");finish(h,wearer);
@@ -713,11 +724,13 @@ public final class PickaxeGameTests {
         var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
         ArtifactPassives.onCuriosDamage(wearer,projectileHit,ArtifactKind.EXODIUM);
         h.assertTrue(Math.abs(projectileHit.getAmount()-9F)<.001F,"a shot that bypasses the catch still deals 25 percent less damage");
-        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==6,"the first projectile catch flashes even when it lands between five-tick boundaries");
-        wearer.tickCount=2;StarfallWardEffect.projectileImpact(wearer);
-        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==6,"repeated hits inside five ticks share one visual pulse");
-        wearer.tickCount=6;StarfallWardEffect.projectileImpact(wearer);
-        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==11,"the ward flashes again once its visual cooldown expires");
+        var flashData=wearer.getPersistentData();long worldTime=ArtifactState.now(wearer);
+        flashData.putLong("specialpickaxesStarfallFlashAt",Long.MAX_VALUE);StarfallWardEffect.projectileImpact(wearer);
+        h.assertTrue(flashData.getLong("specialpickaxesStarfallFlashAtWorldTime")==worldTime+5,"the first projectile catch flashes even when it lands between five-tick boundaries");
+        wearer.tickCount=0;StarfallWardEffect.projectileImpact(wearer);
+        h.assertTrue(flashData.getLong("specialpickaxesStarfallFlashAtWorldTime")==worldTime+5,"repeated hits inside five ticks share one visual pulse after an entity tick reset");
+        flashData.putLong("specialpickaxesStarfallFlashAtWorldTime",worldTime-1);StarfallWardEffect.projectileImpact(wearer);
+        h.assertTrue(flashData.getLong("specialpickaxesStarfallFlashAtWorldTime")==worldTime+5,"the ward flashes again once its world-time visual cooldown expires");
         h.assertTrue(ward.isDurationEffectTick(40,0)&&ward.isDurationEffectTick(38,0)&&!ward.isDurationEffectTick(39,0),"the ward checks trajectories every two ticks while visual effects stay separately throttled");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
         h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");
@@ -906,9 +919,13 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.post(miningSpeed);
         h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-102.4F)<.01F,"custom Stasis Resonance grants the same 1.6x mining speed with an ordinary correct pick");
         var miningFlash=target(h);
+        var pulseData=ally.getPersistentData();long worldTime=ArtifactState.now(ally);
+        pulseData.putLong("specialpickaxesStasisResonancePulseAt",Long.MAX_VALUE);ally.tickCount=10_000;
         h.assertTrue(StasisResonanceEffect.miningPulse(ally,miningFlash),"breaking a block creates a personal Stasis mining flash");
+        h.assertTrue(pulseData.getLong("specialpickaxesStasisResonancePulseAtWorldTime")==worldTime+5,
+                "the teammate mining animation uses the same persistent world clock");
         h.assertTrue(!StasisResonanceEffect.miningPulse(ally,miningFlash),"the visual pulse is throttled against particle spam");
-        ally.tickCount+=5;
+        pulseData.putLong("specialpickaxesStasisResonancePulseAtWorldTime",worldTime-1);ally.tickCount=0;
         h.assertTrue(StasisResonanceEffect.miningPulse(ally,miningFlash),"the mining flash returns after its five-tick cooldown");
         h.assertTrue(!SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(40,0),"the custom potion performs no idle tick animation work");
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");

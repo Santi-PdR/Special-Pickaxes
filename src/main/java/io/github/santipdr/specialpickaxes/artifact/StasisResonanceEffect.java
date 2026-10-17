@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 
 /** Stasis shares a named mining cadence with teammates instead of generic Haste. */
 public final class StasisResonanceEffect extends MobEffect {
-    private static final String NEXT_MINING_PULSE="specialpickaxesStasisResonancePulseAt";
+    private static final String NEXT_MINING_PULSE="specialpickaxesStasisResonancePulseAtWorldTime";
     private static final DustParticleOptions VIOLET_DUST=new DustParticleOptions(new Vector3f(.67F,.47F,1F),.82F);
 
     public StasisResonanceEffect(){super(MobEffectCategory.BENEFICIAL,0xa88bff);}
@@ -20,7 +20,7 @@ public final class StasisResonanceEffect extends MobEffect {
     public static boolean miningPulse(ServerPlayer player,BlockPos broken){
         if(player.level().isClientSide||!(player.level() instanceof ServerLevel level)
                 ||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get()))return false;
-        long now=player.tickCount;var data=player.getPersistentData();
+        long now=ArtifactState.now(player);var data=player.getPersistentData();
         if(data.getLong(NEXT_MINING_PULSE)>now)return false;
         data.putLong(NEXT_MINING_PULSE,now+5L);
         double x=broken.getX()+.5D,y=broken.getY()+.62D,z=broken.getZ()+.5D;
