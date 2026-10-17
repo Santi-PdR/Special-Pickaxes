@@ -145,6 +145,16 @@ public final class ArtifactFeedback {
         ring(p,ArtifactKind.EVENTIDE,center,8);
         message(p,"gravity_collapse",drops);
     }
+    /** Personal, capped tethers make Eventide's loose-drop pull easy to follow without particle spam. */
+    public static void gravityTether(ServerPlayer p,Vec3 from,Vec3 to){
+        var level=p.serverLevel();
+        var violet=new DustParticleOptions(new Vector3f(.66F,.48F,.96F),1.05F);
+        for(int i=1;i<=2;i++){
+            double t=i/3D;var point=from.lerp(to,t).add(0,Math.sin(t*Math.PI)*.2D,0);
+            level.sendParticles(p,violet,false,point.x,point.y,point.z,1,0,0,0,0);
+            if(i==2)level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
     /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
     public static void starfallSink(ServerPlayer p,BlockPos origin){
         var level=p.serverLevel();

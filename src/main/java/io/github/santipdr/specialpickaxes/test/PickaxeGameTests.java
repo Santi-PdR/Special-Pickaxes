@@ -396,6 +396,13 @@ public final class PickaxeGameTests {
         h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the collapse keeps guiding drops during its three-second pulse");
         h.assertTrue(DomainFields.contains(p,center),"the collapse preserves the active mining field");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_61") public static void eventideAlternateTethersLooseDropsToItsOwner(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE,"EventideTether");var level=h.getLevel();
+        var drop=new ItemEntity(level,p.getX()+5D,p.getY()+.5D,p.getZ(),new ItemStack(Items.AMETHYST_SHARD));
+        drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"Eventide's alternate catches nearby loose drops");
+        h.assertTrue(drop.getDeltaMovement().x<-.5D,"the tether pulls its target toward the wearer");finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void worldloomCuriosCounterPulsesHeartwoodRenewal(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.setHealth(10F);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

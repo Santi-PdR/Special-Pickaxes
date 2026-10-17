@@ -42,13 +42,14 @@ public final class ArtifactTechniques {
 
     private static boolean magnetDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
-        int moved = 0;
+        int moved = 0,visualized=0;
         var drops=EntitySelection.nearest(player.serverLevel(),ItemEntity.class,player.getBoundingBox().inflate(radius),
                 e->e.isAlive()&&(e.getOwner()==null||player.getUUID().equals(e.getOwner()))
                         &&e.position().distanceToSqr(center)<=(double)radius*radius,center,cap);
         for (var drop : drops) {
             Vec3 delta = center.subtract(drop.position());
             if (delta.lengthSqr() < .25) continue;
+            if(visualized<12){ArtifactFeedback.gravityTether(player,drop.position(),center);visualized++;}
             drop.setDeltaMovement(delta.normalize().scale(.65));
             drop.hasImpulse = true;
             if (++moved >= cap) break;
