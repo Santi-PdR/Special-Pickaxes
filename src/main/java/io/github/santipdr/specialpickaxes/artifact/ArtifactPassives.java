@@ -120,7 +120,7 @@ public final class ArtifactPassives {
                     if(horizontalSqr>.04D&&attacker.distanceToSqr(player)<=144D){
                         Vec3 tug=new Vec3(toward.x,0,toward.z).normalize().scale(.32D);
                         attacker.setDeltaMovement(attacker.getDeltaMovement().add(tug));attacker.hasImpulse=true;
-                        ArtifactFeedback.burst(player,kind,attacker.blockPosition(),4);
+                        ArtifactFeedback.gravityTether(player,attacker.position().add(0,.5D,0),player.getEyePosition());
                     }
                 }
             }

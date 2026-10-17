@@ -145,7 +145,7 @@ public final class ArtifactFeedback {
         ring(p,ArtifactKind.EVENTIDE,center,8);
         message(p,"gravity_collapse",drops);
     }
-    /** Personal, capped tethers make Eventide's loose-drop pull easy to follow without particle spam. */
+    /** Personal, capped tethers mark Eventide's Curios counter and drop pull without particle spam. */
     public static void gravityTether(ServerPlayer p,Vec3 from,Vec3 to){
         var level=p.serverLevel();
         var violet=new DustParticleOptions(new Vector3f(.66F,.48F,.96F),1.05F);
