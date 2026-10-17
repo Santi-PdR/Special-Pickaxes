@@ -62,15 +62,22 @@ public final class ArtifactPassives {
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
+        onCuriosDamage(player,event,kind,false);
+    }
+
+    /** Applies Exodium's shared ward even when the protected teammate has no Curios relic equipped. */
+    public static boolean onSharedStarfallGuard(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event){
+        if(event.getAmount()<=0||!event.getSource().is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)
+                ||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get()))return false;
+        event.setAmount(event.getAmount()*.75F);
+        StarfallWardEffect.projectileImpact(player);
+        return true;
+    }
+
+    public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind,boolean sharedGuardApplied) {
         if(event.getAmount()<=0)return;
         var source=event.getSource();
-        boolean starfallGuarded=false;
-        if(source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)
-                &&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get())){
-            event.setAmount(event.getAmount()*.75F);
-            StarfallWardEffect.projectileImpact(player);
-            starfallGuarded=true;
-        }
+        boolean starfallGuarded=sharedGuardApplied||onSharedStarfallGuard(player,event);
         if(kind==ArtifactKind.EXODIUM&&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get())
                 &&source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)){
             if(!starfallGuarded)event.setAmount(event.getAmount()*.75F);

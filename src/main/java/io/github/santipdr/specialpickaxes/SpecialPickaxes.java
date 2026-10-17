@@ -178,8 +178,10 @@ public final class SpecialPickaxes {
     }
     private void hurt(LivingHurtEvent e){
         if(e.getEntity() instanceof ServerPlayer p){
+            boolean sharedStarfallGuard=ArtifactPassives.onSharedStarfallGuard(p,e);
             var equipped=CuriosCompat.find(p);
-            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)ArtifactPassives.onCuriosDamage(p,e,pick.kind);
+            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)
+                ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
         }
     }
     private void heal(net.minecraftforge.event.entity.living.LivingHealEvent e){if(e.getEntity().hasEffect(NULL_MARK.get()))e.setCanceled(true);}
