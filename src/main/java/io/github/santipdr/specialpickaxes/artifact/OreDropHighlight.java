@@ -30,7 +30,8 @@ public final class OreDropHighlight {
             if(now!=sparkBudgetTick){sparkBudgetTick=now;sparkBurstsThisTick=0;}
             if(sparkBurstsThisTick<MAX_SPARK_BURSTS_PER_TICK){
                 sparkBurstsThisTick++;
-                level.sendParticles(SPARK,drop.getX(),drop.getY()+drop.getBbHeight()*.5D,drop.getZ(),5,.12D,.12D,.12D,.015D);
+                // Sparkles are Curios feedback for the wearer; the entity glow itself remains visible to everyone.
+                level.sendParticles(owner,SPARK,false,drop.getX(),drop.getY()+drop.getBbHeight()*.5D,drop.getZ(),5,.12D,.12D,.12D,.015D);
             }
         }
         return fresh;
