@@ -304,7 +304,10 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,4,128);
         var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
-        for(var ally:allies)grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
+            sustain(ally);
+        }
     }
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){

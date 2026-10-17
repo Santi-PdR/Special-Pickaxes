@@ -277,6 +277,7 @@ public final class PickaxeGameTests {
         scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
         ally.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
         farAlly.setPos(wearer.getX()+7,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+1,wearer.getY(),wearer.getZ());
+        ally.getFoodData().setFoodLevel(0);farAlly.getFoodData().setFoodLevel(0);enemy.getFoodData().setFoodLevel(0);
         for(var other:List.of(ally,farAlly,enemy))h.getLevel().addFreshEntity(other);
         ally.setHealth(ally.getHealth()-4F);
         ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
@@ -285,6 +286,10 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(renewal)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),"the Curios wearer receives Heartwood Renewal instead of generic Regeneration");
         h.assertTrue(ally.hasEffect(renewal)&&ally.getEffect(renewal).getDuration()==40,"nearby allied miners receive the short custom renewal lease");
         h.assertTrue(!farAlly.hasEffect(renewal)&&!enemy.hasEffect(renewal),"the effect does not reach distant allies or enemies");
+        h.assertTrue(ally.getFoodData().getFoodLevel()==2,"Heartwood shares its first two-point food pulse with a nearby ally");
+        h.assertTrue(farAlly.getFoodData().getFoodLevel()==0&&enemy.getFoodData().getFoodLevel()==0,"food support stays inside the allied aura");
+        h.assertTrue(ArtifactState.of(ally,ArtifactKind.WORLDLOOM).getLong("rootSustainReady")==ArtifactState.now(ally)+100,
+                "each supported ally gets an independent five-second food cooldown");
         float before=ally.getHealth();renewal.applyEffectTick(ally,0);
         h.assertTrue(Math.abs(ally.getHealth()-before-1F)<.001F,"the shared effect heals one health point per pulse");
         renewal.applyEffectTick(ally,0);h.assertTrue(Math.abs(ally.getHealth()-before-1F)<.001F,"refreshing the shared lease cannot accelerate its one-second heal");
