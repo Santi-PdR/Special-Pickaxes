@@ -122,10 +122,15 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.EVENTIDE);
         h.assertTrue(hit.getAmount()==9F,"gravity debt still trims the triggering hit by ten percent");
         h.assertTrue(attacker.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"Curios retaliation applies its named snare");
+        h.assertTrue(attacker.getDeltaMovement().x<-.3D,"nearby attackers are tugged toward Eventide's wearer");
         var tether=attacker.getEffect(SpecialPickaxes.GRAVITIC_TETHER.get());
         h.assertTrue(tether.getDuration()==70,"snare lasts three and a half seconds");
         attacker.setDeltaMovement(1,.25,0);SpecialPickaxes.GRAVITIC_TETHER.get().applyEffectTick(attacker,0);
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
+        var distantWearer=player(h,ArtifactKind.EVENTIDE,"EventideTestTwo");var distant=EntityType.SKELETON.create(h.getLevel());distant.setPos(distantWearer.getX()+14,distantWearer.getY(),distantWearer.getZ());h.getLevel().addFreshEntity(distant);
+        var distantHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(distantWearer,h.getLevel().damageSources().mobAttack(distant),10F);
+        ArtifactPassives.onCuriosDamage(distantWearer,distantHit,ArtifactKind.EVENTIDE);
+        h.assertTrue(distant.getDeltaMovement().equals(Vec3.ZERO),"gravity debt does not yank a distant attacker across the field");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_47") public static void interregnumCuriosCounterUsesStrongerGraviticTether(GameTestHelper h){

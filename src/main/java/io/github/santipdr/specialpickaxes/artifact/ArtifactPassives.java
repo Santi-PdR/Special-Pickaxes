@@ -95,7 +95,18 @@ public final class ArtifactPassives {
                 event.setAmount(event.getAmount()*.85F);
                 grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),0,60);
             }
-            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),0,70);}
+            case EVENTIDE -> {
+                event.setAmount(event.getAmount()*.9F);
+                if(retaliationAllowed){
+                    grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),0,70);
+                    Vec3 toward=player.position().subtract(attacker.position());double horizontalSqr=toward.x*toward.x+toward.z*toward.z;
+                    if(horizontalSqr>.04D&&attacker.distanceToSqr(player)<=144D){
+                        Vec3 tug=new Vec3(toward.x,0,toward.z).normalize().scale(.32D);
+                        attacker.setDeltaMovement(attacker.getDeltaMovement().add(tug));attacker.hasImpulse=true;
+                        ArtifactFeedback.burst(player,kind,attacker.blockPosition(),4);
+                    }
+                }
+            }
             case CRUCIBLE -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
             case HELLSPEC -> {
                 event.setAmount(event.getAmount()*.8F);
