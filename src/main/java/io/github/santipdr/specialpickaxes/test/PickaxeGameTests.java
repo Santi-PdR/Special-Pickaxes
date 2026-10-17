@@ -352,13 +352,12 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_46") public static void worldloomCuriosRenewalEndsOnUnequipButPersistsWhenHeld(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
         ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
         h.assertTrue(!wearer.hasEffect(renewal),"Worldloom's Curios healing lease ends when it leaves the slot");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"the shared night vision lease ends after removing the last pick source");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDLOOM).get()));
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,true,false,true));
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
         h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");
@@ -403,11 +402,11 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(shell,80,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.HELLSPEC);
         h.assertTrue(!wearer.hasEffect(shell),"Curios-only fire immunity ends when Hellspec leaves its slot");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.HELLSPEC).get()));
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(shell,80,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.HELLSPEC);
         h.assertTrue(wearer.hasEffect(shell),"held Hellspec keeps its own fire passive");finish(h,wearer);
     }
@@ -479,6 +478,19 @@ public final class PickaxeGameTests {
         h.assertTrue(mending.isDurationEffectTick(40,0)&&!mending.isDurationEffectTick(39,0),"the potion effect uses a two-second pulse cadence");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(mending),"Dawn Mending clears when Palimpsest leaves Curios");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_53") public static void customCuriosLeasePreservesExternalEffectAndOnlyClearsItsOwn(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var mending=SpecialPickaxes.DAWN_MENDING.get();
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(mending,20,0,false,true,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var external=wearer.getEffect(mending);
+        h.assertTrue(external!=null&&external.getDuration()==20&&!external.isAmbient()&&external.isVisible(),"a short externally applied custom effect is not refreshed by the pick passive");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
+        external=wearer.getEffect(mending);
+        h.assertTrue(external!=null&&external.getDuration()==20&&!external.isAmbient(),"unequipping Curios preserves an external custom effect");
+        wearer.removeEffect(mending);ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var owned=wearer.getEffect(mending);
+        h.assertTrue(owned!=null&&owned.getDuration()==40&&owned.isAmbient()&&!owned.isVisible(),"the pick still grants its own recognizable effect lease");
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
+        h.assertTrue(!wearer.hasEffect(mending),"the effect lease is removed once its last pick source is unequipped");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_41") public static void crucibleWardDeflectsFastHostileProjectile(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CRUCIBLE);var archer=EntityType.SKELETON.create(h.getLevel());

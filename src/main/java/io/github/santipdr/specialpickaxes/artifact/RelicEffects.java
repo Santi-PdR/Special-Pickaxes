@@ -39,6 +39,12 @@ public final class RelicEffects {
                 case WORLDBREAKER->{x=Math.cos(a)*(1+t);y=Math.sin(a*3)*.4;z=Math.sin(a)*(1+t);}
                 default->{x=Math.cos(a);y=t*.6;z=Math.sin(a);}
             }
+            // Give completion a distinct rising helix instead of replaying the activation silhouette.
+            // Particle count and global budget stay unchanged; only their positions differ.
+            if(phase.equals("complete")){
+                double radius=.2D+t*.62D,angle=a+Math.PI/4D;
+                x=Math.cos(angle)*radius;y=.12D+t*.95D;z=Math.sin(angle)*radius;
+            }
             if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
             else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }

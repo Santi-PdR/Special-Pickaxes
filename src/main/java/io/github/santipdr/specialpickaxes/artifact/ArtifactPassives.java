@@ -23,35 +23,35 @@ public final class ArtifactPassives {
         if(!heldArtifact&&CuriosCompat.find(player)==null)clearNightVisionLease(player);
         if(kind==ArtifactKind.EVENTIDE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EVENTIDE))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
         if(kind==ArtifactKind.ICARUS
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.ICARUS)){
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
         }
         if(kind==ArtifactKind.HELLSPEC
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.HELLSPEC))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get());
         if(kind==ArtifactKind.CRUCIBLE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CRUCIBLE))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get());
         if(kind==ArtifactKind.WORLDBREAKER
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDBREAKER))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get());
         if(isStrataFocusPick(kind)
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&isStrataFocusPick(held.kind)))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get());
         if(kind==ArtifactKind.INTERREGNUM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.INTERREGNUM))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get());
         if(kind==ArtifactKind.PALIMPSEST
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
         if(kind==ArtifactKind.WORLDLOOM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDLOOM))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get());
         if(kind==ArtifactKind.EXODIUM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EXODIUM))
-            player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
@@ -140,7 +140,7 @@ public final class ArtifactPassives {
             }
             case ICARUS -> {
                 if(!player.onGround())grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
-                else player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
+                else removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
             }
             case AXIOM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
@@ -160,9 +160,27 @@ public final class ArtifactPassives {
     }
 
     private static void grant(ServerPlayer player, MobEffect effect, int amplifier, int duration) {
-        var current = player.getEffect(effect);
-        if (current == null || current.getAmplifier() < amplifier || current.getAmplifier() == amplifier && current.getDuration() <= 40)
-            player.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false, true));
+        var current=player.getEffect(effect);var data=player.getPersistentData();String key=passiveLeaseKey(effect);
+        boolean owned=data.getBoolean(key);
+        if(owned&&(current==null||!isPassiveLease(current))){data.remove(key);owned=false;}
+        if(current==null){
+            player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+            data.putBoolean(key,true);
+        }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
+            player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+        }
+    }
+
+    private static String passiveLeaseKey(MobEffect effect){
+        return "specialpickaxesPassiveLease:"+net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getKey(effect);
+    }
+
+    private static void removeLease(ServerPlayer player,MobEffect effect){
+        var data=player.getPersistentData();String key=passiveLeaseKey(effect);
+        if(!data.getBoolean(key))return;
+        var current=player.getEffect(effect);
+        if(current!=null&&isPassiveLease(current))player.removeEffect(effect);
+        data.remove(key);
     }
 
     /** Keeps Curios absorption from replacing a potion supplied by the server or another mod. */
@@ -179,7 +197,7 @@ public final class ArtifactPassives {
     }
 
     private static boolean isAbsorptionLease(MobEffectInstance effect){
-        return effect.getAmplifier()==0&&effect.isAmbient()&&!effect.isVisible()&&effect.showIcon();
+        return effect.getAmplifier()==0&&isPassiveLease(effect);
     }
 
     /** Keeps the shared passive from replacing or removing a server/mod-owned Night Vision effect. */
@@ -205,7 +223,11 @@ public final class ArtifactPassives {
     }
 
     private static boolean isNightVisionLease(MobEffectInstance effect){
-        return effect.getAmplifier()==0&&effect.isAmbient()&&!effect.isVisible()&&effect.showIcon();
+        return effect.getAmplifier()==0&&isPassiveLease(effect);
+    }
+
+    private static boolean isPassiveLease(MobEffectInstance effect){
+        return effect.isAmbient()&&!effect.isVisible()&&effect.showIcon();
     }
 
     private static void sustain(ServerPlayer player){
