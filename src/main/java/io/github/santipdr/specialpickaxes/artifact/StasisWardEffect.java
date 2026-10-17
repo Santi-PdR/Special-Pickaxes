@@ -15,6 +15,7 @@ import java.util.UUID;
 /** Interregnum's Curios ward anchors its bearer and nearby allies in a calm field. */
 public final class StasisWardEffect extends MobEffect {
     private static final DustParticleOptions STASIS_DUST=new DustParticleOptions(new Vector3f(.63F,.47F,.94F),.72F);
+    private static final DustParticleOptions STASIS_CORE=new DustParticleOptions(new Vector3f(.48F,.86F,1F),.62F);
 
     public StasisWardEffect(){
         super(MobEffectCategory.BENEFICIAL,0x9f78ef);
@@ -23,14 +24,16 @@ public final class StasisWardEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity.level() instanceof ServerLevel level))return;
-        double phase=entity.tickCount*.055D;
-        double y=entity.getY()+entity.getBbHeight()*.42D;
-        for(int i=0;i<2;i++){
-            double angle=phase+i*Math.PI;
-            double x=entity.getX()+Math.cos(angle)*.34D,z=entity.getZ()+Math.sin(angle)*.34D;
-            level.sendParticles(STASIS_DUST,x,y+Math.sin(angle*2D)*.06D,z,1,0,0,0,0);
+        double phase=entity.tickCount*.08D;
+        double centerY=entity.getY()+entity.getBbHeight()*.48D;
+        for(int i=0;i<3;i++){
+            double angle=phase+i*Math.PI*2D/3D;
+            double radius=.36D+Math.sin(phase+i*1.9D)*.045D;
+            double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
+            double y=centerY+Math.sin(phase*1.6D+i*Math.PI*2D/3D)*.12D;
+            level.sendParticles((i&1)==0?STASIS_CORE:STASIS_DUST,x,y,z,1,0,0,0,0);
         }
-        if(entity.tickCount%20==0)level.sendParticles(ParticleTypes.REVERSE_PORTAL,entity.getX(),y,entity.getZ(),1,.12D,.1D,.12D,.005D);
+        if(entity.tickCount%30==0)level.sendParticles(ParticleTypes.REVERSE_PORTAL,entity.getX(),centerY,entity.getZ(),1,.08D,.08D,.08D,.003D);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

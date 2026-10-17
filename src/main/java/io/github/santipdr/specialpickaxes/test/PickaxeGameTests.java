@@ -263,6 +263,13 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(stasis),"the wearer loses the custom Curios ward when Stasis is unequipped");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_66") public static void stasisWardEffectKeepsHalfSecondParticleCadence(GameTestHelper h){
+        var ward=SpecialPickaxes.STASIS_WARD.get();
+        h.assertTrue(ward.isDurationEffectTick(40,0)&&ward.isDurationEffectTick(30,0)
+                &&!ward.isDurationEffectTick(39,0)&&!ward.isDurationEffectTick(29,0),
+                "the animated Curios ward emits its three-fragment orbit only every ten ticks");
+        finish(h,player(h,ArtifactKind.INTERREGNUM));
+    }
     @GameTest(template="empty",batch="rework_each_31") public static void seamRipperCuriosFraysHostileArmor(GameTestHelper h){
         var wearer=player(h,ArtifactKind.SEAM_RIPPER);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
