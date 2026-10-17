@@ -308,14 +308,13 @@ public final class ArtifactTechniques {
             return along>=1&&along<=range&&across<=halfWidth&&Math.abs(delta.y)<=3.5;
         },origin,12);
         if(targets.isEmpty())return false;
+        ArtifactFeedback.magmaWave(player,forward,range,halfWidth);
         for(var target:targets){
             target.setDeltaMovement(target.getDeltaMovement().scale(.2).add(forward.scale(1.8).add(0,.7,0)));
             target.hasImpulse=true;target.setSecondsOnFire(4);
-        }
-        for(int step=2;step<=12;step+=2){
-            double x=origin.x+forward.x*step,z=origin.z+forward.z*step,y=player.getY()+.15;
-            level.sendParticles(player,ParticleTypes.FLAME,false,x,y,z,7,.65,.15,.65,.025);
-            level.sendParticles(player,ParticleTypes.LAVA,false,x,y,z,2,.45,.1,.45,0);
+            target.hurt(level.damageSources().playerAttack(player),3F);
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),60,0,true,false,true));
         }
         ArtifactFeedback.message(player,"magma_wave",targets.size());
         return true;

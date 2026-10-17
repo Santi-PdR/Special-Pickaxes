@@ -232,6 +232,19 @@ public final class ArtifactFeedback {
             }
         }
     }
+    /** A bounded player-only advancing fan makes the non-mining Hellspec attack readable. */
+    public static void magmaWave(ServerPlayer p,Vec3 forward,double range,double halfWidth){
+        var level=p.serverLevel();var right=new Vec3(-forward.z,0,forward.x);var origin=p.position().add(0,.16D,0);
+        for(int step=2;step<=range;step+=2){
+            double spread=halfWidth*step/range;
+            for(int lane=-1;lane<=1;lane++){
+                var point=origin.add(forward.scale(step)).add(right.scale(spread*lane));
+                if(!level.hasChunkAt(BlockPos.containing(point)))continue;
+                level.sendParticles(p,ParticleTypes.FLAME,false,point.x,point.y,point.z,2,.08D,.03D,.08D,.006D);
+                if(lane==0)level.sendParticles(p,ParticleTypes.LAVA,false,point.x,point.y,point.z,1,.04D,.02D,.04D,.002D);
+            }
+        }
+    }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
         if(kind==ArtifactKind.INTERREGNUM){io.github.santipdr.specialpickaxes.network.RelicNetwork.showStasisBoundary(p,center,radius,halfHeight);return;}
         if(kind==ArtifactKind.EVENTIDE){eventideDomain(p,center,radius);return;}

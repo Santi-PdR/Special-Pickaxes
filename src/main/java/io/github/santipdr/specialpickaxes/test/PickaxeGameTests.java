@@ -552,6 +552,28 @@ public final class PickaxeGameTests {
         h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire(),"the eight-second cooldown prevents repeated reductions and ignitions");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaWaveBrandsOnlyHostileTargets(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");wearer.setYRot(0);
+        var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(wearer.getX(),wearer.getY(),wearer.getZ()+4);h.getLevel().addFreshEntity(enemy);
+        var ally=player(h,ArtifactKind.CHOIR,"MagmaAlly");ally.setPos(wearer.getX()+1,wearer.getY(),wearer.getZ()+4);
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("magma_"+wearer.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);h.getLevel().addFreshEntity(ally);
+        float health=enemy.getHealth();
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC),"Magma Wave launches when a hostile target is in its forward fan");
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();
+        h.assertTrue(enemy.getHealth()<=health-2.9F,"the wave deals its direct impact damage, subject to armor mitigation");
+        h.assertTrue(enemy.hasEffect(brand),"the wave applies the custom Magma Brand");
+        h.assertTrue(enemy.getEffect(brand).getDuration()>=59,"Magma Brand remains active for nearly its full three-second lease");
+        h.assertTrue(enemy.isOnFire()&&enemy.getDeltaMovement().z>.5D&&enemy.hasImpulse,
+                "the impact ignites and drives the target forward with the advancing wave");
+        h.assertTrue(ally.getHealth()==ally.getMaxHealth()&&!ally.hasEffect(brand),"the wave ignores allied players");
+        h.runAfterDelay(22,()->{
+            float beforePulse=enemy.getHealth();brand.applyEffectTick(enemy,0);
+            h.assertTrue(enemy.getHealth()<beforePulse,"Magma Brand deals its custom pulse separately from ordinary fire ticks");
+            h.assertTrue(brand.isDurationEffectTick(60,0)&&!brand.isDurationEffectTick(59,0),"Magma Brand uses a one-second effect cadence");
+            finish(h,wearer);
+        });
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         var shell=SpecialPickaxes.SEARING_SHELL.get();

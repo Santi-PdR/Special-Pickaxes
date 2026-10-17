@@ -42,6 +42,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_GRASP=EFFECTS.register("heartwood_grasp",HeartwoodGraspEffect::new);
     public static final RegistryObject<MobEffect> SEARING_SHELL=EFFECTS.register("searing_shell",SearingShellEffect::new);
+    public static final RegistryObject<MobEffect> MAGMA_BRAND=EFFECTS.register("magma_brand",MagmaBrandEffect::new);
     public static final RegistryObject<MobEffect> NULL_MARK=EFFECTS.register("null_mark",NullMarkEffect::new);
     public static final RegistryObject<MobEffect> NULL_VEIL=EFFECTS.register("null_veil",NullVeilEffect::new);
     public static final RegistryObject<MobEffect> FAULT_RESONANCE=EFFECTS.register("fault_resonance",FaultResonanceEffect::new);

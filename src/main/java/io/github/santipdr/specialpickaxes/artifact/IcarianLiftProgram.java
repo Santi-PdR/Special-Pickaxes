@@ -54,7 +54,11 @@ public final class IcarianLiftProgram implements WorkProgram {
             int nextRise=rise+1;
             BlockPos head=base.offset(0,nextRise+1,0);
             if(p.serverLevel().isOutsideBuildHeight(head)){finishAtHeight();return completed(base.offset(0,rise,0));}
-            boolean reachedSky=p.serverLevel().canSeeSky(head);
+            // Skylight can reach deep into a narrow shaft after only its first block is cleared.
+            // Do not call that the surface until the player's feet have reached the local terrain top.
+            int surfaceY=p.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,
+                    base.getX(),base.getZ());
+            boolean reachedSky=p.serverLevel().canSeeSky(head)&&base.getY()+nextRise>=surfaceY;
             rise=nextRise;index=0;
             if(reachedSky){finished=true;surfaced=true;}
             return new WorkStep.Move(base.offset(0,nextRise,0));
