@@ -1311,6 +1311,13 @@ public final class PickaxeGameTests {
         h.assertTrue(copiedLines.size()==3&&ArtifactTooltips.copyModeKey(copied).equals("calcite"),"Worldbreaker tooltip identifies the copied Crucible and its current Calcite mode");
         h.succeed();
     }
+    @GameTest(template="empty",batch="legacy_each_36") public static void pickaxeSoundsUseFiveBlockPlayerCenteredRadius(GameTestHelper h){
+        var player=Vec3.ZERO;var forwardedSound=player.add(0,1.6D,2D);
+        h.assertTrue(ArtifactFeedback.withinSoundRadius(player,new Vec3(0,0,5),5D),"a listener at five blocks remains in range");
+        h.assertTrue(!ArtifactFeedback.withinSoundRadius(player,new Vec3(0,0,6),5D)
+                &&forwardedSound.distanceTo(new Vec3(0,0,6))<5D,"the forward sound offset cannot extend the five-block listener radius");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="legacy_each_37") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);
         data.putInt("charge",0);tool.getOrCreateTag().putInt("artifactCharge",999);

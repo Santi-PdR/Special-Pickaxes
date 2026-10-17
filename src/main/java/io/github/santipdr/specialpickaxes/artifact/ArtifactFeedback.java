@@ -37,10 +37,10 @@ public final class ArtifactFeedback {
         if(LISTENER_SOUND_READY.size()>1024)LISTENER_SOUND_READY.entrySet().removeIf(entry->entry.getValue()+1200<now);
         var at=p.getEyePosition().add(p.getLookAngle().scale(2));
         var packet=new ClientboundSoundPacket(Holder.direct(sound),SoundSource.PLAYERS,at.x,at.y,at.z,volume,pitch,level.getRandom().nextLong());
-        double range=ArtifactConfig.SOUND_RADIUS.get(),rangeSqr=range*range;
-        var nearby=new AABB(at.x-range,at.y-range,at.z-range,at.x+range,at.y+range,at.z+range);
+        double range=ArtifactConfig.SOUND_RADIUS.get();var origin=p.position();
+        var nearby=new AABB(origin.x-range,origin.y-range,origin.z-range,origin.x+range,origin.y+range,origin.z+range);
         level.getEntities().get(EntityTypeTest.forClass(ServerPlayer.class),nearby,listener->{
-            if(!listener.isAlive()||listener.distanceToSqr(at.x,at.y,at.z)>rangeSqr)
+            if(!listener.isAlive()||!withinSoundRadius(origin,listener.position(),range))
                 return AbortableIterationConsumer.Continuation.CONTINUE;
             var listenerId=listener.getUUID();var listenerReady=LISTENER_SOUND_READY.get(listenerId);
             if(listener!=p&&listenerReady!=null&&now<listenerReady)
@@ -49,6 +49,10 @@ public final class ArtifactFeedback {
             listener.connection.send(packet);
             return AbortableIterationConsumer.Continuation.CONTINUE;
         });
+    }
+    /** Radius is measured from the activating player, not the forward-offset sound source. */
+    public static boolean withinSoundRadius(Vec3 player,Vec3 listener,double radius){
+        return radius>=0&&player.distanceToSqr(listener)<=radius*radius;
     }
     public static void sound(ServerPlayer p,ArtifactKind kind) {
         sound(p,kind,"activate");
