@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '5.10.241'
+version = '5.10.242'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -36,6 +36,23 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.register('verifyMobEffectIcons') {
+    group = 'verification'
+    description = 'Ensures every registered custom mob effect has a source texture icon.'
+    inputs.file('src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java')
+    inputs.dir('src/main/resources/assets/specialpickaxes/textures/mob_effect')
+    doLast {
+        def source = file('src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java').text
+        def effectIds = (source =~ /EFFECTS\.register\("([^"]+)"/).collect { it[1] }
+        def iconDirectory = file('src/main/resources/assets/specialpickaxes/textures/mob_effect')
+        def missing = effectIds.findAll { id -> !new File(iconDirectory, "${id}.png").isFile() }
+        if (effectIds.isEmpty() || !missing.isEmpty()) {
+            throw new GradleException("Custom mob effect icons missing: ${missing ?: 'no effects found'}")
+        }
+        logger.lifecycle("Verified ${effectIds.size()} custom mob effect icons.")
+    }
+}
+tasks.named('check').configure { dependsOn tasks.named('verifyMobEffectIcons') }
 tasks.named('processResources', ProcessResources).configure {
     def replaceProperties = [mod_version: project.version]
     inputs.properties replaceProperties
