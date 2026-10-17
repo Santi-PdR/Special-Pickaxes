@@ -14,6 +14,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
@@ -692,6 +693,15 @@ public final class PickaxeGameTests {
         for(int y=1;y<=6;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y)).isAir(),"the central shaft is cleared through the roof");
         h.assertTrue(h.getLevel().getBlockState(base.above().east()).is(Blocks.STONE),"the lift never widens the shaft into the roof");
         h.assertTrue(!WorkQueue.busy(p)&&!WorkQueue.protectsFall(p),"movement protection ends with the lift job");finish(h,p);
+    }
+    @GameTest(template="empty",batch="legacy_each_12") public static void coreDrillFallProtectionContinuesUntilLanding(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",3);p.setOnGround(false);
+        var origin=p.blockPosition().below();h.getLevel().setBlockAndUpdate(origin,Blocks.BEDROCK.defaultBlockState());
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new DirectionalProgram(origin,Direction.DOWN,DirectionalProgram.Shape.CORE_DRILL)),"Core Drill job starts");
+        h.assertTrue(WorkQueue.protectsFall(p),"Core Drill immediately protects its descent");drain(p);
+        h.assertTrue(!WorkQueue.busy(p)&&WorkQueue.protectsFall(p),"protection remains after mining ends while the player is airborne");
+        h.assertTrue(p.hasEffect(MobEffects.SLOW_FALLING),"Slow Falling remains refreshed for the descent");
+        p.setOnGround(true);WorkQueue.tick();h.assertTrue(!WorkQueue.protectsFall(p),"landing releases the temporary fall guard");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_12") public static void icarianLiftStopsAtProtectedBarrier(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();

@@ -20,6 +20,7 @@ public final class DirectionalProgram implements WorkProgram {
         length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->32;case RESONANT_TUNNEL->20;case WORLDLOOM_BORE->16;};
         prepare();
     }
+    public boolean isCoreDrill(){return shape==Shape.CORE_DRILL;}
     private void prepare(){
         slice=section(origin,direction,shape,depth);
         expected=new BlockState[slice.size()];index=0;digging=false;moving=false;

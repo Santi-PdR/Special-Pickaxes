@@ -12,9 +12,15 @@ import java.util.*;
 /** Round-robin global budget. Failed/skipped candidates also consume budget; no unbounded work on one tick. */
 public final class WorkQueue {
     private static final Map<UUID,Job> JOBS=new HashMap<>();
+    private static final Map<UUID,FallGuard> CORE_DRILL_GUARDS=new HashMap<>();
     private static final ArrayDeque<UUID> ORDER=new ArrayDeque<>();
     private static boolean running;
     private static int lastAttempts;
+    private static final long CORE_DRILL_LANDING_GRACE=600;
+    private static final class FallGuard {
+        final ServerPlayer player;final ResourceKey<Level> dimension;long expires;
+        FallGuard(ServerPlayer player,long expires){this.player=player;this.dimension=player.level().dimension();this.expires=expires;}
+    }
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
@@ -26,7 +32,13 @@ public final class WorkQueue {
     }
     private WorkQueue() {}
     public static boolean running() { return running; }
-    public static boolean protectsFall(ServerPlayer p){var job=JOBS.get(p.getUUID());return job!=null&&job.tool==p.getMainHandItem()&&(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3);}
+    public static boolean protectsFall(ServerPlayer p){
+        var guard=CORE_DRILL_GUARDS.get(p.getUUID());
+        if(guard!=null&&guard.player==p&&p.isAlive()&&!p.isRemoved()&&p.level().dimension()==guard.dimension&&ArtifactState.now(p)<=guard.expires)return true;
+        var job=JOBS.get(p.getUUID());return job!=null&&job.tool==p.getMainHandItem()&&(job.kind==ArtifactKind.ICARUS||job.kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,job.kind)==3);
+    }
+    /** Remove player-bound descent state on logout, death replacement, or dimension travel. */
+    public static void forget(ServerPlayer p){CORE_DRILL_GUARDS.remove(p.getUUID());}
     public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&(p.getMainHandItem()!=j.tool||p.level().dimension()!=j.dimension||!p.isAlive()))cancel(p);}
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
     public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
@@ -55,7 +67,9 @@ public final class WorkQueue {
         long snapshotBytes=region instanceof RegionWork snapshot?snapshot.reservedMemoryBytes(memories):0;
         if(!regionSnapshotBudgetAllows(p,snapshotBytes))return false;
         if(region instanceof RegionWork snapshot){snapshot.allocateSnapshots();snapshot.loadMemories(memories);}
-        var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;if(!(region instanceof RegionWork))region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());return true;
+        var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;if(!(region instanceof RegionWork))region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());
+        if(kind==ArtifactKind.WORLDBREAKER&&region instanceof DirectionalProgram directional&&directional.isCoreDrill())CORE_DRILL_GUARDS.put(p.getUUID(),new FallGuard(p,ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE));
+        return true;
     }
     public static int lastAttempts() { return lastAttempts; }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,List<WorkStep> steps) {
@@ -70,7 +84,7 @@ public final class WorkQueue {
         job.steps.add(step);job.accepted++;return true;
     }
     public static void cancel(ServerPlayer p) { JOBS.remove(p.getUUID());ORDER.remove(p.getUUID()); }
-    public static void clear() { JOBS.clear();ORDER.clear();running=false;lastAttempts=0; }
+    public static void clear() { JOBS.clear();CORE_DRILL_GUARDS.clear();ORDER.clear();running=false;lastAttempts=0; }
     public static void tick() {
         if(running)return; // Forge callbacks cannot recursively consume this or another job.
         int budget=ArtifactConfig.GLOBAL.get();lastAttempts=0;int turns=ORDER.size(),initial=turns,visited=0;
@@ -118,6 +132,18 @@ public final class WorkQueue {
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
+        tickCoreDrillGuards();
+    }
+
+    private static void tickCoreDrillGuards(){
+        var iterator=CORE_DRILL_GUARDS.entrySet().iterator();
+        while(iterator.hasNext()){
+            var entry=iterator.next();var guard=entry.getValue();var p=guard.player;
+            if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=guard.dimension||ArtifactState.now(p)>guard.expires||p.onGround()) {iterator.remove();continue;}
+            var job=JOBS.get(entry.getKey());
+            if(job!=null&&job.kind==ArtifactKind.WORLDBREAKER&&job.region instanceof DirectionalProgram directional&&directional.isCoreDrill())guard.expires=ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE;
+            p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
+        }
     }
 
     private static boolean dropBackpressured(Job job,ServerPlayer player){
