@@ -583,6 +583,20 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the wearer and unmarked allies remain healable");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullVeilCleansesOneDebuffPerPulse(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.AXIOM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200,0));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,300,0));
+        ArtifactPassives.tick(wearer,ArtifactKind.AXIOM);
+        h.assertTrue(wearer.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom grants its custom passive veil while carried in Curios");
+        NullVeilEffect.pulse(wearer);
+        h.assertTrue(!wearer.hasEffect(MobEffects.POISON)&&wearer.hasEffect(MobEffects.MOVEMENT_SLOWDOWN),"one shortest-duration harmful effect is cleansed per pulse");
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200,0));NullVeilEffect.pulse(wearer);
+        h.assertTrue(wearer.hasEffect(MobEffects.POISON),"the veil cannot cleanse another debuff before its eight-second cooldown");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.AXIOM);
+        h.assertTrue(!wearer.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"the custom passive expires when Axiom leaves Curios and the hand");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void choirCuriosFaultCounterGuardsAndStaggers(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);

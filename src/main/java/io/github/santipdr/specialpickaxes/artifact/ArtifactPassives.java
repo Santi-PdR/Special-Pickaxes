@@ -46,6 +46,9 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.PALIMPSEST
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
+        if(kind==ArtifactKind.AXIOM
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.AXIOM))
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get());
         if(kind==ArtifactKind.WORLDLOOM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.WORLDLOOM))
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get());
@@ -145,7 +148,10 @@ public final class ArtifactPassives {
                 if(!player.onGround())grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
                 else removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
             }
-            case AXIOM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
+            case AXIOM -> {
+                grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(),0,PASSIVE_LEASE_TICKS);
+                grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get(),0,PASSIVE_LEASE_TICKS);
+            }
             case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
             case EXODIUM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
