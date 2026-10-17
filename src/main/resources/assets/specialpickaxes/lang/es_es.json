@@ -548,7 +548,7 @@
   "mining.identity.paradox_crucible.gravel": "TRANSFORMAR: Grava",
   "mining.how.paradox_crucible.gravel": "Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la geología natural de la región a grava.",
   "message.specialpickaxes.domain_relocated": "Desplazaste el dominio de Stasis; su duración restante se conserva.",
-  "curios.detail.specialpickaxes.interregnum": "Comparte Absorción I y la Égida de Stasis (+15% de resistencia al retroceso) con hasta 8 aliados a 6 bloques. Reflejo de Stasis reduce el primer golpe hostil cada 8 s un 15% y ralentiza al atacante durante 2 s.",
+  "curios.detail.specialpickaxes.interregnum": "Comparte Absorción I y la Égida de Stasis (+15% de resistencia al retroceso) con hasta 8 aliados a 6 bloques. Reflejo de Stasis reduce el primer golpe cada 8 s un 15% y aplica un Lazo Gravitatorio reforzado durante 2 s.",
   "curios.detail.specialpickaxes.iridium": "Guardia de veta: el primer golpe hostil cada 8 s inflige 15% menos daño y da +4 de armadura durante 4 s. Los drops de mena también brillan.",
   "message.specialpickaxes.root_snared": "Las raíces atraparon a %s enemigos cercanos durante 4 s.",
   "message.specialpickaxes.fault_echo": "La resonancia frenó el impulso de %s enemigos.",

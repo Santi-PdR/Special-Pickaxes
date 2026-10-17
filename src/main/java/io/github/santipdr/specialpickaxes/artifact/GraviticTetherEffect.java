@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-/** A short, readable gravity snare used by Eventide's Curios-only counter. */
+/** A short, readable gravity snare used by Eventide and Stasis Curios counters. */
 public final class GraviticTetherEffect extends MobEffect {
     private static final DustParticleOptions TETHER_DUST = new DustParticleOptions(new Vector3f(.56F,.34F,.92F),.8F);
 

@@ -548,7 +548,7 @@
   "mining.identity.paradox_crucible.gravel": "TRANSMUTE: Gravel",
   "mining.how.paradox_crucible.gravel": "Select two corners, wait for the analysis, then confirm. Changes only natural geology in the region to gravel.",
   "message.specialpickaxes.domain_relocated": "Stasis Domain shifted; its remaining duration is preserved.",
-  "curios.detail.specialpickaxes.interregnum": "Absorption I and Stasis Ward (+15% knockback resistance) are shared with up to 8 allies within 6 blocks. Stasis Reflex also reduces the first hostile hit every 8 s by 15% and slows its attacker for 2 s.",
+  "curios.detail.specialpickaxes.interregnum": "Absorption I and Stasis Ward (+15% knockback resistance) are shared with up to 8 allies within 6 blocks. Stasis Reflex trims the first hit every 8 s by 15% and applies a stronger Gravitic Tether for 2 s.",
   "curios.detail.specialpickaxes.iridium": "Lodeguard: the first hostile hit every 8 s deals 15% less damage and grants +4 armor for 4 s. Mined ore drops also glow.",
   "message.specialpickaxes.root_snared": "Quarry roots ensnared %s nearby enemies for 4 s.",
   "message.specialpickaxes.fault_echo": "The resonance checked the momentum of %s enemies.",

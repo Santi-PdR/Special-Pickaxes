@@ -127,6 +127,19 @@ public final class PickaxeGameTests {
         h.assertTrue(attacker.getDeltaMovement().x<.7&&attacker.getDeltaMovement().y==.25,"snare damps horizontal escape while preserving vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_47") public static void interregnumCuriosCounterUsesStrongerGraviticTether(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.INTERREGNUM);
+        var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
+        h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Stasis Reflex trims its triggering hostile hit by fifteen percent");
+        h.assertTrue(attacker.hasEffect(tether)&&attacker.getEffect(tether).getDuration()==40&&attacker.getEffect(tether).getAmplifier()==1,"Stasis applies the stronger two-second Gravitic Tether");
+        h.assertTrue(!attacker.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN),"Stasis Reflex uses the custom tether instead of generic Slowness");
+        attacker.setDeltaMovement(1,.25,0);tether.applyEffectTick(attacker,1);
+        h.assertTrue(Math.abs(attacker.getDeltaMovement().x-.60)<.001&&Math.abs(attacker.getDeltaMovement().y-.25)<.001,"Stasis Tether damps horizontal escape without changing vertical movement");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_26") public static void eventideCuriosGraviticBalanceControlsFalls(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);
         ArtifactPassives.tick(wearer,ArtifactKind.EVENTIDE);
