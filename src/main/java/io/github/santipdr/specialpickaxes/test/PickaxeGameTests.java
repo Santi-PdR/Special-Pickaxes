@@ -206,6 +206,10 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_27") public static void icarusCuriosGlideBuildsSprintMomentumInAir(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);wearer.setSprinting(true);
+        var trail=IcarianMomentumEffect.glideTrailForward(new Vec3(1,0,0),new Vec3(0,0,1));
+        h.assertTrue(trail.x>.99D&&Math.abs(trail.z)<.001D,"the feather wake follows travel when the wearer looks sideways");
+        var fallback=IcarianMomentumEffect.glideTrailForward(Vec3.ZERO,new Vec3(0,0,-1));
+        h.assertTrue(fallback.z<-.99D,"a near-stationary glide uses facing direction for its wake");
         ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
         var glide=SpecialPickaxes.ICARIAN_MOMENTUM.get();
         h.assertTrue(wearer.hasEffect(glide)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"airborne Icarus Curios grants its named glide effect without generic Slow Falling");

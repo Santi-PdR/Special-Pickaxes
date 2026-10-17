@@ -45,6 +45,14 @@ public final class IcarianMomentumEffect extends MobEffect {
         }
     }
 
+    /** Keeps the feather wake aligned with actual travel, even when the wearer looks aside mid-glide. */
+    public static Vec3 glideTrailForward(Vec3 motion,Vec3 look){
+        Vec3 travel=new Vec3(motion.x,0,motion.z);
+        if(travel.lengthSqr()>.0025D)return travel.normalize();
+        Vec3 facing=new Vec3(look.x,0,look.z);
+        return facing.lengthSqr()>.001D?facing.normalize():new Vec3(0,0,1);
+    }
+
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||entity.onGround())return;
         Vec3 motion=entity.getDeltaMovement();
@@ -58,18 +66,17 @@ public final class IcarianMomentumEffect extends MobEffect {
             }
         }
         if(entity instanceof Player player&&player.isSprinting()&&entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
-            Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
-            if(forward.lengthSqr()>.001D){
-                forward=forward.normalize();Vec3 right=new Vec3(-forward.z,0,forward.x);
-                double shoulderY=entity.getY()+entity.getBbHeight()*.56D;
-                for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
-                    double span=.24D+feather*.19D,trail=.08D+feather*.13D;
-                    double x=entity.getX()+right.x*side*span-forward.x*trail;
-                    double z=entity.getZ()+right.z*side*span-forward.z*trail;
-                    double y=shoulderY+(2-feather)*.035D;
-                    level.sendParticles(WING_GLEAM,x,y,z,1,0,0,0,0);
-                    if(feather==2)level.sendParticles(ParticleTypes.END_ROD,x,y,z,1,0,0,0,0);
-                }
+            Vec3 forward=glideTrailForward(player.getDeltaMovement(),player.getLookAngle());
+            Vec3 right=new Vec3(-forward.z,0,forward.x);
+            double speed=Math.min(.8D,player.getDeltaMovement().horizontalDistance());
+            double shoulderY=entity.getY()+entity.getBbHeight()*.56D;
+            for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
+                double span=(.24D+feather*.19D)*(1D+speed*.22D),trail=.08D+feather*.13D+speed*.12D;
+                double x=entity.getX()+right.x*side*span-forward.x*trail;
+                double z=entity.getZ()+right.z*side*span-forward.z*trail;
+                double y=shoulderY+(2-feather)*.035D;
+                level.sendParticles(WING_GLEAM,x,y,z,1,0,0,0,0);
+                if(feather==2)level.sendParticles(ParticleTypes.END_ROD,x,y,z,1,0,0,0,0);
             }
         }
     }
