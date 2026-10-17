@@ -34,13 +34,15 @@ public final class HeartwoodGraspEffect extends MobEffect {
         if(entity.tickCount%10==0&&entity.level() instanceof ServerLevel level){
             double phase=entity.tickCount*.16D;
             double radius=Math.max(.24D,entity.getBbWidth()*.48D);
-            double y=entity.getY()+.12D;
             for(int i=0;i<4;i++){
                 double angle=phase+i*Math.PI*.5D;
                 double x=entity.getX()+Math.cos(angle)*radius;
                 double z=entity.getZ()+Math.sin(angle)*radius;
+                // Each mote climbs to the next band, making the four-pulse wrap legible as roots.
+                double rise=((entity.tickCount/10L+i)%4L)*.16D;
+                double y=entity.getY()+.1D+rise;
                 level.sendParticles(ROOTS,x,y,z,1,.015D,.025D,.015D,.003D);
-                if((i&1)==0)level.sendParticles(HEARTWOOD,x,y+.24D,z,1,0,.02D,0,0);
+                if((i&1)==0)level.sendParticles(HEARTWOOD,x,y+.08D,z,1,0,.02D,0,0);
             }
         }
     }
