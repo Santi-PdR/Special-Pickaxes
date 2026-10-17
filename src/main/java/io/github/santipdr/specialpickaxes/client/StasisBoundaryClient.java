@@ -43,15 +43,17 @@ public final class StasisBoundaryClient {
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null){BOUNDARIES.clear();return;}
         BOUNDARIES.entrySet().removeIf(entry->clientTicks-entry.getValue().lastSeen()>45);
-        if(mc.isPaused())return;
+        if(mc.isPaused()||clientTicks%4!=0)return;
         for(var boundary:BOUNDARIES.values()){
             if(!boundary.dimension().equals(mc.level.dimension().location()))continue;
             var center=boundary.center();int radius=boundary.radius();
             if(mc.player.distanceToSqr(center.getX()+.5D,center.getY()+.5D,center.getZ()+.5D)>(48D+radius)*(48D+radius))continue;
-            var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,clientTicks*.15D);
+            double phase=clientTicks*.15D;
+            var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
+            double bob=Math.sin(phase*.7D)*.12D;
             var glow=new net.minecraft.core.particles.DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
-            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+.72D,head.z,0,.015D,0);
-            mc.level.addParticle(glow,head.x,head.y+.28D,head.z,0,.005D,0);
+            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+.72D+bob,head.z,0,.015D,0);
+            mc.level.addParticle(glow,head.x,head.y+.28D+bob,head.z,0,.005D,0);
         }
     }
 
@@ -68,9 +70,11 @@ public final class StasisBoundaryClient {
                         center.getX()+radius+1D,center.getY()+height+1D,center.getZ()+radius+1D);
                 // Cool cyan edges mark the actual buff volume; a moving gold bead shows the field is alive.
                 LevelRenderer.renderLineBox(pose,lines,box,.42F,.78F,1F,.62F);
-                var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,(clientTicks+event.getPartialTick())*.15D);
-                LevelRenderer.renderLineBox(pose,lines,new AABB(head.x-.07D,center.getY()-height,head.z-.07D,
-                        head.x+.07D,center.getY()-height+.16D,head.z+.07D),.98F,.8F,.36F,.95F);
+                double phase=(clientTicks+event.getPartialTick())*.15D;
+                var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
+                double markerY=center.getY()-height+.08D+Math.sin(phase*.7D)*.12D;
+                LevelRenderer.renderLineBox(pose,lines,new AABB(head.x-.07D,markerY,head.z-.07D,
+                        head.x+.07D,markerY+.16D,head.z+.07D),.98F,.8F,.36F,.95F);
             }
             buffers.endBatch(RenderType.lines());
         }finally{pose.popPose();}
