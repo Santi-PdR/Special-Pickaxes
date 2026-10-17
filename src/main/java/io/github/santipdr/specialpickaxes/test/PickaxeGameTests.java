@@ -1123,20 +1123,24 @@ public final class PickaxeGameTests {
         inputReady(p,ArtifactKind.CRUCIBLE);RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE);
         h.assertTrue(ArtifactState.mode(p,ArtifactKind.CRUCIBLE)==1&&!ArtifactInteraction.selecting(p),"direct carve cannot inherit an active corner selector");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_35") public static void worldloomRootsHoldHostilesThenReleaseCleanly(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_35",timeoutTicks=120) public static void worldloomRootsHoldHostilesThenReleaseCleanly(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
         var anchor=mob.position();
         h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
         mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
-        h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"roots telegraph for three seconds without freezing the target");
+        h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"roots mark the target without immediately freezing it");
         h.runAfterDelay(60,()->{
             WorldloomSnare.tick();
-            var caughtPosition=mob.position();mob.setPos(caughtPosition.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
-            h.assertTrue(mob.position().distanceToSqr(caughtPosition)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"closing roots pin the hostile for four seconds");
-            WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
-            h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
-            finish(h,owner);
+            h.assertTrue(mob.getDeltaMovement().lengthSqr()>.001D,"the target can still move after three seconds of telegraph");
+            h.runAfterDelay(20,()->{
+                WorldloomSnare.tick();
+                var caughtPosition=mob.position();mob.setPos(caughtPosition.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
+                h.assertTrue(mob.position().distanceToSqr(caughtPosition)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"closing roots pin the hostile after four seconds for four seconds");
+                WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
+                h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
+                finish(h,owner);
+            });
         });
     }
 }

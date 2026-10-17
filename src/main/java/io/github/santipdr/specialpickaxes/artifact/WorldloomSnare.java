@@ -15,7 +15,7 @@ import java.util.UUID;
 
 /** Telegraphing root snares created by the Worldloom's held area skill. */
 public final class WorldloomSnare {
-    private static final int WINDUP_TICKS=60;
+    private static final int WINDUP_TICKS=80;
     private static final int ROOT_DURATION_TICKS=80;
     private static final int ROOT_PULSE_TICKS=10;
     private static final int ROOT_PARTICLES=4;
@@ -80,7 +80,7 @@ public final class WorldloomSnare {
         }
     }
 
-    /** The ankle ring tightens over three seconds, giving targets a visible escape window. */
+    /** The ankle ring tightens over four seconds, giving targets a readable escape window. */
     private static void emitWindup(Binding binding,long age){
         double progress=Math.min(1D,Math.max(0D,age/(double)WINDUP_TICKS));
         double radius=.18D+.48D*progress,angle=age*.16D;
