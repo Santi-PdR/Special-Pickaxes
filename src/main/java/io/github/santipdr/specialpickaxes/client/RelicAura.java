@@ -38,9 +38,18 @@ public final class RelicAura {
 
         // Render nearby wearers on this client too, so a Curios passive has a readable
         // team-facing signature without introducing server packets or an unbounded scan.
-        var candidates=mc.level.getEntitiesOfClass(Player.class,mc.player.getBoundingBox().inflate(24D),viewer->
+        var nearbyPlayers=mc.level.getEntitiesOfClass(Player.class,mc.player.getBoundingBox().inflate(24D),viewer->
                 viewer!=mc.player&&!viewer.isSpectator()&&!viewer.isInvisibleTo(mc.player)
                         &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR);
+        var farthestFirst=java.util.Comparator.<Player>comparingDouble(viewer->viewer.distanceToSqr(mc.player)).reversed();
+        var nearest=new java.util.PriorityQueue<Player>(MAX_CURIO_CANDIDATES,farthestFirst);
+        for(var viewer:nearbyPlayers){
+            if(nearest.size()<MAX_CURIO_CANDIDATES)nearest.add(viewer);
+            else if(viewer.distanceToSqr(mc.player)<nearest.peek().distanceToSqr(mc.player)){
+                nearest.poll();nearest.add(viewer);
+            }
+        }
+        var candidates=new java.util.ArrayList<Player>(nearest);
         candidates.sort(java.util.Comparator.comparingDouble(viewer->viewer.distanceToSqr(mc.player)));
         var nearby=new java.util.ArrayList<java.util.Map.Entry<Player,ArtifactItem>>();
         int visibleHeld=0;
