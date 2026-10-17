@@ -4,6 +4,7 @@ import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.*;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +30,7 @@ public final class RelicAura {
                 var action=RelicControl.Action.ACTIVATE;
                 mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
             }
-            emitHeld(mc,held);
+            emitHeld(mc,mc.player,held,mc.player.getMainHandItem());
         } else heldKind=null;
         var curio=CuriosCompat.find(mc.player);
         if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
@@ -42,21 +43,26 @@ public final class RelicAura {
                         &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR);
         candidates.sort(java.util.Comparator.comparingDouble(viewer->viewer.distanceToSqr(mc.player)));
         var nearby=new java.util.ArrayList<java.util.Map.Entry<Player,ArtifactItem>>();
+        int visibleHeld=0;
         for(int i=0;i<Math.min(MAX_CURIO_CANDIDATES,candidates.size());i++){
             var viewer=candidates.get(i);
+            ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
+            if(heldRelic!=null&&visibleHeld<MAX_VISIBLE_CURIO_AURAS){
+                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleHeld++;
+            }
             var equipped=CuriosCompat.find(viewer);
             if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem item))continue;
-            if(viewer.getMainHandItem().getItem() instanceof ArtifactItem inHand&&inHand.kind==item.kind)continue;
+            if(heldRelic!=null&&heldRelic.kind==item.kind)continue;
             nearby.add(java.util.Map.entry(viewer,item));
         }
         nearby.sort(java.util.Comparator.comparingDouble(entry->entry.getKey().distanceToSqr(mc.player)));
         for(int i=0;i<Math.min(MAX_VISIBLE_CURIO_AURAS,nearby.size());i++)
             emitCurios(mc,nearby.get(i).getKey(),nearby.get(i).getValue());
     }
-    private static void emitHeld(Minecraft mc,ArtifactItem item){
-        var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
-        var hand=mc.player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
-        double angle=mc.player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(mc.player.getMainHandItem())*0.22;
+    private static void emitHeld(Minecraft mc,Player player,ArtifactItem item,ItemStack tool){
+        var look=player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
+        var hand=player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
+        double angle=player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(tool)*0.22;
         var dust=dust(item.kind,0.3F);
         ParticleOptions accent=accent(item.kind,dust);
         for(int i=0;i<3;i++){
