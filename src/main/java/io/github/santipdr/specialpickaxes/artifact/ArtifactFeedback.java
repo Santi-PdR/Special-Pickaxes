@@ -41,8 +41,18 @@ public final class ArtifactFeedback {
     }
     private static void emitMiningPulse(ServerPlayer viewer,net.minecraft.server.level.ServerLevel level,Vec3 center,
                                         ParticleOptions primary,int primaryCount,ParticleOptions accent,int accentCount){
-        level.sendParticles(viewer,primary,false,center.x,center.y,center.z,primaryCount,.2D,.2D,.2D,.012D);
-        if(accentCount>0)level.sendParticles(viewer,accent,false,center.x,center.y,center.z,accentCount,.1D,.12D,.1D,.008D);
+        // A few deliberate points read as a rising cut through the block, while the former
+        // random cloud looked identical for Stasis and Strata and cost more particle packets.
+        int motes=Math.min(3,Math.max(0,primaryCount));
+        double phase=level.getGameTime()*.22D+center.x*.71D+center.z*.39D;
+        for(int i=0;i<motes;i++){
+            double progress=(i+1D)/(motes+1D);
+            double angle=phase+progress*Math.PI*1.4D;
+            double radius=.12D+progress*.38D;
+            level.sendParticles(viewer,primary,false,center.x+Math.cos(angle)*radius,
+                    center.y+progress*.48D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
+        }
+        if(accentCount>0)level.sendParticles(viewer,accent,false,center.x,center.y+.42D,center.z,1,0,0,0,0);
     }
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
