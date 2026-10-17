@@ -218,6 +218,7 @@ public final class ArtifactFeedback {
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
         boolean stasis=kind==ArtifactKind.INTERREGNUM;
+        if(stasis){io.github.santipdr.specialpickaxes.network.RelicNetwork.showStasisBoundary(p,center,radius,halfHeight);return;}
         int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),stasis?1.25F:0.82F);
         var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),stasis?1.05F:0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
@@ -240,21 +241,6 @@ public final class ArtifactFeedback {
         }
         for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
             p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
-    }
-    /** Moves a restrained light along Stasis's square edge without broadcasting to distant players. */
-    public static void stasisBoundaryPulse(ServerPlayer p,BlockPos center,int radius,int halfHeight){
-        if(radius<1)return;
-        var level=p.serverLevel();double perimeter=radius*8D,travel=p.tickCount*.15D;
-        var head=stasisBoundaryPoint(center,radius,travel);
-        var tail=stasisBoundaryPoint(center,radius,travel-1.25D);
-        var glow=new DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
-        level.sendParticles(ParticleTypes.END_ROD,head.x,head.y+.72D,head.z,1,0,0,0,0);
-        level.sendParticles(glow,head.x,head.y+.28D,head.z,2,.06D,.04D,.06D,0);
-        level.sendParticles(glow,tail.x,tail.y+.28D,tail.z,1,0,0,0,0);
-        // Nearby teammates can read the same boundary that contains their shared domain buffs.
-        double topY=center.getY()+halfHeight+.08D;
-        level.sendParticles(glow,head.x,topY,head.z,1,0,0,0,0);
-        level.sendParticles(glow,head.x,head.y+halfHeight*.5D,head.z,1,0,0,0,0);
     }
     public static Vec3 stasisBoundaryPoint(BlockPos center,int radius,double distance){
         double side=radius*2D,perimeter=side*4D;

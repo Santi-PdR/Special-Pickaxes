@@ -18,6 +18,7 @@ public final class SelectionRenderer {
     @SubscribeEvent public static void render(RenderLevelStageEvent e){
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_PARTICLES)return;
         var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
+        StasisBoundaryClient.render(e,mc);
         var tool=mc.player.getMainHandItem();if(!(tool.getItem() instanceof ArtifactItem)||!tool.hasTag())return;
         var tag=tool.getTag();if(!tag.getString("selectionDimension").equals(mc.level.dimension().location().toString()))return;
         var pose=e.getPoseStack();var camera=e.getCamera().getPosition();pose.pushPose();pose.translate(-camera.x,-camera.y,-camera.z);

@@ -127,7 +127,7 @@ public final class DomainFields {
             frozen.entity.setDeltaMovement(Vec3.ZERO);frozen.entity.hasImpulse=true;
         }
     }
-    public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null) release(field);var pulse=PULSES.remove(p.getUUID());if(pulse!=null)releasePulse(pulse); }
+    public static void stop(ServerPlayer p) { var field=FIELDS.remove(p.getUUID());if(field!=null){if(field.kind==ArtifactKind.INTERREGNUM)io.github.santipdr.specialpickaxes.network.RelicNetwork.clearStasisBoundary(p,field.center,field.radius,Math.max(2,field.radius/2),field.dimension);release(field);}var pulse=PULSES.remove(p.getUUID());if(pulse!=null)releasePulse(pulse); }
     public static void clear() { FIELDS.values().forEach(DomainFields::release);FIELDS.clear();PULSES.values().forEach(DomainFields::releasePulse);PULSES.clear();FROZEN_ENTITIES.clear(); }
     public static boolean active(ServerPlayer p){return FIELDS.containsKey(p.getUUID());}
     public static boolean contains(ServerPlayer p,BlockPos pos) {
@@ -174,6 +174,7 @@ public final class DomainFields {
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=f.tool || f.tool.isEmpty()
                     || p.level().dimension()!=f.dimension || ArtifactState.now(p)>f.expires || !WorldSafety.allowed(p,f.kind,f.center)) {
                 if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==f.tool&&p.level().dimension()==f.dimension&&ArtifactState.now(p)>f.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}
+                if(f.kind==ArtifactKind.INTERREGNUM)io.github.santipdr.specialpickaxes.network.RelicNetwork.clearStasisBoundary(p,f.center,f.radius,Math.max(2,f.radius/2),f.dimension);
                 release(f);iterator.remove();continue;
             }
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition())) {
@@ -186,8 +187,6 @@ public final class DomainFields {
                     if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
                 } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
             }
-            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%4==0)
-                ArtifactFeedback.stasisBoundaryPulse(p,f.center,f.radius,Math.max(2,f.radius/2));
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%10==0){
                 var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
                 for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,
@@ -228,7 +227,7 @@ public final class DomainFields {
                 if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
             }
-            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,p.blockPosition(),2,2);continue;}
+            if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0){f.center=p.blockPosition().immutable();ArtifactFeedback.domain(p,f.kind,f.center,2,2);}continue;}
             if(p.tickCount%20==0)ArtifactFeedback.domain(p,f.kind,f.center,f.radius,Math.max(2,f.radius/2));
             // Keep already frozen entities pinned every tick, but scan for new targets every other tick.
             if((p.tickCount&1)!=0){holdFrozen(level,f);continue;}
