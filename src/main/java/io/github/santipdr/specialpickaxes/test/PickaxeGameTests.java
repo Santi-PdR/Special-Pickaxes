@@ -418,6 +418,21 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the pickaxe wearer is not caught by its own mark");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_65") public static void interregnumHeldHitAppliesCustomStasisCrush(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM,"InterregnumStrike");var target=EntityType.ZOMBIE.create(h.getLevel());
+        target.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(target);
+        double speedBefore=target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
+        var tool=wearer.getMainHandItem();
+        h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,wearer),"Interregnum can apply its melee signature");
+        var crush=SpecialPickaxes.STASIS_CRUSH.get();
+        h.assertTrue(target.hasEffect(crush)&&target.getEffect(crush).getDuration()==160,"the hit applies eight seconds of custom Stasis Crush");
+        h.assertTrue(target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)<speedBefore*.36D
+                &&!target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                &&!target.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"Stasis Crush applies its strong movement cut without generic control effects");
+        target.setDeltaMovement(1D,.25D,0D);target.tickCount=8;crush.applyEffectTick(target,0);
+        h.assertTrue(Math.abs(target.getDeltaMovement().x-.38D)<.001D&&target.getDeltaMovement().y==.25D,"stasis damps horizontal escape while preserving vertical motion");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");
