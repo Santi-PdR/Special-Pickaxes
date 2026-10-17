@@ -1175,4 +1175,12 @@ public final class PickaxeGameTests {
             });
         });
     }
+    @GameTest(template="empty",batch="rework_each_57") public static void worldloomRootVisualPulsesAreEvenlyStaggered(GameTestHelper h){
+        int[] pulsesByTick=new int[10];
+        for(int entityId=0;entityId<40;entityId++)for(int tick=0;tick<10;tick++)
+            if(WorldloomSnare.visualPulseAt(tick,entityId))pulsesByTick[tick]++;
+        for(int tick=0;tick<pulsesByTick.length;tick++)
+            h.assertTrue(pulsesByTick[tick]==4,"40 simultaneous roots spread into four visual pulses per tick; tick "+tick);
+        h.succeed();
+    }
 }

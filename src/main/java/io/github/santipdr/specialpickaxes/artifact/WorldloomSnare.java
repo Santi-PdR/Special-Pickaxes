@@ -62,7 +62,9 @@ public final class WorldloomSnare {
             if(now%5==0&&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
             long age=now-binding.started;
             if(binding.anchor==null){
-                if(now%ROOT_PULSE_TICKS==0)emitWindup(binding,age);
+                // Roots cast together would send every telegraph in the same server tick.
+                // Spread each target's pulse across the interval without reducing its cadence.
+                if(pulseDue(binding,now))emitWindup(binding,age);
                 if(age>=WINDUP_TICKS){
                     binding.anchor=target.position();
                     binding.expires=now+ROOT_DURATION_TICKS;
@@ -76,8 +78,17 @@ public final class WorldloomSnare {
                 if(level.noCollision(target,box))target.setPos(binding.anchor);
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
-            if(now%ROOT_PULSE_TICKS==0)emitCaughtPulse(binding,age);
+            if(pulseDue(binding,now))emitCaughtPulse(binding,age);
         }
+    }
+
+    private static boolean pulseDue(Binding binding,long now){
+        return visualPulseAt(now,binding.target.getId());
+    }
+
+    /** Deterministic entity phase spreads simultaneous root visuals across the pulse interval. */
+    public static boolean visualPulseAt(long now,int entityId){
+        return Math.floorMod(Math.floorMod(now,ROOT_PULSE_TICKS)+Math.floorMod(entityId,ROOT_PULSE_TICKS),ROOT_PULSE_TICKS)==0;
     }
 
     /** The ankle ring tightens over four seconds, giving targets a readable escape window. */
