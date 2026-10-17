@@ -1006,6 +1006,25 @@ public final class PickaxeGameTests {
         h.assertTrue(queuedDrop.isCurrentlyGlowing()&&queuedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"queued ability ore drops receive the Curios highlight without held-tool mining effects");
         h.assertTrue(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CHOIR,"Curios ore tracking leaves the held pickaxe unchanged");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_60") public static void iridiumRecallReachesThirtyTwoBlocksAndOnlyPullsOwnedOreDrops(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM,"IridiumRecall");var level=h.getLevel();var origin=wearer.position();
+        var near=new ItemEntity(level,origin.x+10D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
+        near.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);near.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+        var beyond=new ItemEntity(level,origin.x+34D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
+        beyond.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);beyond.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+        var unrelated=new ItemEntity(level,origin.x+8D,origin.y+.5D,origin.z,new ItemStack(Items.ROTTEN_FLESH));
+        unrelated.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
+        unrelated.getPersistentData().putUUID("specialpickaxesIridiumOwner",UUID.randomUUID());
+        level.addFreshEntity(near);level.addFreshEntity(unrelated);
+        var center=wearer.getEyePosition();
+        h.assertTrue(ArtifactTechniques.isIridiumRecallTarget(wearer,near,center,32D),"an owned ore drop inside 32 blocks is eligible");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,center,32D),"an owned ore drop outside 32 blocks is excluded");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,center,32D),"another player's ore drop is excluded");
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM),"Iridium recall activates without requiring a target block");
+        h.assertTrue(near.getDeltaMovement().x<-.5D,"an owned ore drop in the active test zone accelerates to the wearer");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,wearer.getEyePosition(),32D),"the 32-block exclusion remains in force after recalling nearby loot");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,wearer.getEyePosition(),32D),"a nearby drop owned by someone else remains excluded after recall");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_20") public static void noUnpaidPlacementOrWallTeleport(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var pos=target(h);
         h.assertTrue(!WorldSafety.move(p,Vec3.atBottomCenterOf(pos)),"occupied destination rejected");

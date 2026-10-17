@@ -523,7 +523,7 @@
   "alternate.detail.specialpickaxes.hollow_axiom": "Press X to consume up to 24 hostile projectiles within 8 blocks. Each shot collapses into sculk sparks; allies are ignored.",
   "alternate.detail.specialpickaxes.worldbreaker": "Uses the copied pickaxe’s X skill. The selected pickaxe is shown on the item and in Copy Mode in this Manual.",
   "alternate.detail.specialpickaxes.exodium": "Aim at natural geology and press X. Opens a beveled, octagonal 5×5 shaft up to 32 blocks down. Its outline marks the route; it mines ores and stops at placed blocks, fluids or barriers.",
-  "alternate.detail.specialpickaxes.iridium": "Glows and pulls up to 96 recent drops from your Iridium-mined ores within 24 blocks.",
+  "alternate.detail.specialpickaxes.iridium": "Pulls up to 96 recent drops from your Iridium-mined ores within 32 blocks. The nearest 24 leave a brief teal spark trail; other players' loot is ignored.",
   "alternate.detail.specialpickaxes.hellspec": "Press X to send a visible 14-block wave forward. It launches and ignites up to 12 hostile targets in its path for 4 seconds; it does not alter blocks or fluids.",
   "melee.specialpickaxes.palimpsest": "On hit: Regeneration II for 10 s and Absorption II for 8 s.",
   "melee.specialpickaxes.fault_choir": "On hit: Weakness III for 8 s and Slowness II for 5 s.",

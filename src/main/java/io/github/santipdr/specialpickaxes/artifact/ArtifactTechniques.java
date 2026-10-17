@@ -225,26 +225,34 @@ public final class ArtifactTechniques {
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
-        int[] recalled = {0}, inspected = {0};
+        int[] recalled = {0}, inspected = {0}, visualized = {0};
         // Stop without materializing the full ItemEntity list around a dense farm.
         player.serverLevel().getEntities().get(net.minecraft.world.level.entity.EntityTypeTest.forClass(ItemEntity.class),
                 player.getBoundingBox().inflate(radius), item -> {
             if(++inspected[0]>4096)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
-            if(!item.isAlive()||!item.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop")
-                    ||!item.getPersistentData().hasUUID("specialpickaxesIridiumOwner")
-                    ||!player.getUUID().equals(item.getPersistentData().getUUID("specialpickaxesIridiumOwner")))
+            if(!isIridiumRecallTarget(player,item,center,radius))
                 return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
             Vec3 delta = center.subtract(item.position());
             item.setGlowingTag(true);
             if(delta.lengthSqr()<.25)return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
             item.setDeltaMovement(item.getDeltaMovement().scale(.2).add(delta.normalize().scale(.85)));
             item.hasImpulse=true;
+            if(visualized[0]<24){ArtifactFeedback.burst(player,ArtifactKind.IRIDIUM,item.blockPosition(),4);visualized[0]++;}
             if(++recalled[0]>=cap)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
             return inspected[0]>=4096?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
                     :net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });
         if(recalled[0]>0)ArtifactFeedback.message(player,"ore_drops_recalled",recalled[0]);
         return recalled[0]>0;
+    }
+
+    /** Shared eligibility rule for the spatial query and its radius/ownership regression tests. */
+    public static boolean isIridiumRecallTarget(ServerPlayer player,ItemEntity item,Vec3 center,double radius){
+        var data=item.getPersistentData();
+        return item.isAlive()&&data.getBoolean("specialpickaxesIridiumOreDrop")
+                &&data.hasUUID("specialpickaxesIridiumOwner")
+                &&player.getUUID().equals(data.getUUID("specialpickaxesIridiumOwner"))
+                &&item.position().distanceToSqr(center)<=radius*radius;
     }
 
     /** A clear, timed projectile ward follows its owner and catches fast shots every tick. */
@@ -326,7 +334,7 @@ public final class ArtifactTechniques {
             case AXIOM -> nullWard(player,8,24);
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfallSink(player,tool);
-            case IRIDIUM -> recallIridiumDrops(player, 24, 96);
+            case IRIDIUM -> recallIridiumDrops(player, 32, 96);
             case HELLSPEC -> magmaWave(player);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;

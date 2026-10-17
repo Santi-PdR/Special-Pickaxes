@@ -523,7 +523,7 @@
   "alternate.detail.specialpickaxes.hollow_axiom": "Pulsa X para absorber hasta 24 proyectiles hostiles en 8 bloques. Cada disparo colapsa en chispas de sculk; ignora a los aliados.",
   "alternate.detail.specialpickaxes.worldbreaker": "Usa la habilidad X del pico copiado. El objeto y este Manual muestran qué pico está copiado.",
   "alternate.detail.specialpickaxes.exodium": "Apunta a geología natural y pulsa X. Abre un pozo achaflanado, de sección octogonal 5×5, hasta 32 bloques hacia abajo. El contorno marca la ruta; extrae menas y se detiene ante bloques colocados, fluidos o barreras.",
-  "alternate.detail.specialpickaxes.iridium": "Ilumina y atrae hasta 96 drops recientes de tus menas minadas con Iridium en 24 bloques.",
+  "alternate.detail.specialpickaxes.iridium": "Atrae hasta 96 drops recientes de tus menas minadas con Iridium en 32 bloques. Los 24 más cercanos dejan una estela turquesa breve; ignora el botín de otros jugadores.",
   "alternate.detail.specialpickaxes.hellspec": "Pulsa X para lanzar una onda visible de 14 bloques hacia delante. Impulsa y prende hasta 12 enemigos en su trayectoria durante 4 s; no altera bloques ni líquidos.",
   "melee.specialpickaxes.palimpsest": "Al golpear: Regeneración II durante 10 s y Absorción II durante 8 s.",
   "melee.specialpickaxes.fault_choir": "Al golpear: Debilidad III durante 8 s y Lentitud II durante 5 s.",
