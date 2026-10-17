@@ -94,7 +94,7 @@ public final class SpecialPickaxes {
     }
     private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();MiningDesigns.clearCache();}
     private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
-        if(e.isCanceled()||WorkQueue.running()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
+        if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());
     }

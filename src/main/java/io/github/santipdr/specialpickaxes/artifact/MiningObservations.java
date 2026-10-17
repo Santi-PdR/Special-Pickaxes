@@ -36,7 +36,7 @@ public final class MiningObservations {
     /** Snapshot a vanilla break when Iridium is in Curios and another tool is held. */
     public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state) {
         if(curioPick.isEmpty()||!(curioPick.getItem() instanceof ArtifactItem equipped)||equipped.kind!=ArtifactKind.IRIDIUM
-                ||!ArtifactOres.isOre(state)||WorkQueue.running())return false;
+                ||!ArtifactOres.isOre(state))return false;
         if(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return false;
         return capture(player,player.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state,false);
     }

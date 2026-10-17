@@ -733,6 +733,17 @@ public final class PickaxeGameTests {
         h.getLevel().setBlockAndUpdate(moddedPos,Blocks.AIR.defaultBlockState());
         var moddedDrop=new ItemEntity(h.getLevel(),moddedPos.getX()+.5,moddedPos.getY()+.25,moddedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(moddedDrop);MiningObservations.flush();
         h.assertTrue(moddedDrop.isCurrentlyGlowing()&&moddedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"tagged foreign ore drops receive the same Iridium highlight");
+        var queuedPos=pos.east(10);var queuedOre=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(queuedPos,queuedOre);
+        var capturedDuringJob=new boolean[1];java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> observeQueuedOre=event->{
+            if(event.getPlayer()==p&&event.getPos().equals(queuedPos))capturedDuringJob[0]=WorkQueue.running()
+                    &&MiningObservations.captureCuriosIridium(p,curioIridium,queuedPos,queuedOre);
+        };
+        MinecraftForge.EVENT_BUS.addListener(observeQueuedOre);
+        try{h.assertTrue(WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.CHOIR,List.of(new WorkStep.Mine(queuedPos,queuedOre))),"Choir queues an ore break while Curios Iridium is equipped");WorkQueue.tick();}
+        finally{MinecraftForge.EVENT_BUS.unregister(observeQueuedOre);}
+        h.assertTrue(capturedDuringJob[0]&&h.getLevel().getBlockState(queuedPos).isAir(),"Curios Iridium observes ore breaks inside another pickaxe's queued ability");
+        var queuedDrop=new ItemEntity(h.getLevel(),queuedPos.getX()+.5,queuedPos.getY()+.25,queuedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(queuedDrop);MiningObservations.flush();
+        h.assertTrue(queuedDrop.isCurrentlyGlowing()&&queuedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"queued ability ore drops receive the Curios highlight without held-tool mining effects");
         h.assertTrue(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CHOIR,"Curios ore tracking leaves the held pickaxe unchanged");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_20") public static void noUnpaidPlacementOrWallTeleport(GameTestHelper h) {
