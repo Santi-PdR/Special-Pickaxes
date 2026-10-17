@@ -133,6 +133,17 @@ public final class PickaxeGameTests {
         h.assertTrue(distant.getDeltaMovement().equals(Vec3.ZERO),"gravity debt does not yank a distant attacker across the field");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_63") public static void eventideHeldHitUsesGraviticTetherInsteadOfLevitation(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE,"EventideStrike");var target=EntityType.ZOMBIE.create(h.getLevel());
+        target.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(target);
+        var tool=wearer.getMainHandItem();
+        h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,wearer),"Eventide's pickaxe can apply its melee signature");
+        var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
+        h.assertTrue(target.hasEffect(tether)&&target.getEffect(tether).getAmplifier()==1
+                &&target.getEffect(tether).getDuration()==80,"the hit applies four seconds of stronger custom Gravitic Tether");
+        h.assertTrue(target.getDeltaMovement().x<-.4D&&!target.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION),"the hit visibly tugs its target without vanilla Levitation");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_47") public static void interregnumCuriosCounterUsesStrongerGraviticTether(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

@@ -52,7 +52,15 @@ public final class ArtifactItem extends PickaxeItem {
             switch(kind) {
                 case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,true,true)); }
                 case CHOIR -> ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),1,100);
-                case EVENTIDE -> target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.LEVITATION,80,1,false,true,true));
+                case EVENTIDE -> {
+                    ArtifactPassives.grantCombatEffect(target,SpecialPickaxes.GRAVITIC_TETHER.get(),1,80);
+                    var toward=player.position().subtract(target.position());double horizontalSqr=toward.x*toward.x+toward.z*toward.z;
+                    if(horizontalSqr>.04D&&target.distanceToSqr(player)<=144D){
+                        var tug=new net.minecraft.world.phys.Vec3(toward.x,0,toward.z).normalize().scale(.45D);
+                        target.setDeltaMovement(target.getDeltaMovement().add(tug));target.hasImpulse=true;
+                        ArtifactFeedback.gravityTether(player,target.position().add(0,.5D,0),player.getEyePosition());
+                    }
+                }
                 case CRUCIBLE -> target.setSecondsOnFire(8);
                 case INTERREGNUM -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,160,4,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,100,1,false,true,true)); }
                 case WORLDLOOM -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,3,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,0,false,true,true)); }
