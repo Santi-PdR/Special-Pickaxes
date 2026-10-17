@@ -380,8 +380,14 @@ public final class PickaxeGameTests {
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.WORLDLOOM);
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        var grasp=SpecialPickaxes.HEARTWOOD_GRASP.get();
         h.assertTrue(wearer.hasEffect(renewal),"Worldloom's Curios counter grants its custom restorative effect");
+        h.assertTrue(Math.abs(hit.getAmount()-9F)<.001F&&attacker.hasEffect(grasp),"the counter softens one hostile hit and roots its attacker");
         h.assertTrue(wearer.getEffect(renewal).getDuration()==60,"heartwood renewal lasts three seconds");
+        h.assertTrue(attacker.getEffect(grasp).getDuration()==60&&grasp.isDurationEffectTick(60,0),"Heartwood Grasp lasts three seconds and pulses while active");
+        attacker.setDeltaMovement(1D,.25D,-.5D);grasp.applyEffectTick(attacker,0);
+        h.assertTrue(Math.abs(attacker.getDeltaMovement().x-.58D)<.001D&&Math.abs(attacker.getDeltaMovement().z+.29D)<.001D
+                &&Math.abs(attacker.getDeltaMovement().y-.25D)<.001D,"roots damp horizontal escape while preserving vertical movement");
         h.assertTrue(renewal.isDurationEffectTick(60,0)&&!renewal.isDurationEffectTick(59,0),"healing is delivered in deliberate one-second pulses");
         renewal.applyEffectTick(wearer,0);
         h.assertTrue(wearer.getHealth()==11F,"a renewal pulse restores one health point");

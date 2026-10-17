@@ -79,7 +79,7 @@ public final class ArtifactPassives {
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
         boolean retaliationAllowed=switch(kind){
-            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
+            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
             default -> false;
         };
         if(!retaliationAllowed&&switch(kind){
@@ -105,7 +105,11 @@ public final class ArtifactPassives {
                 }
             }
             case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),1,40);}
-            case WORLDLOOM -> grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),0,60);
+            case WORLDLOOM -> {
+                event.setAmount(event.getAmount()*.9F);
+                grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),0,60);
+                if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_GRASP.get(),0,60);
+            }
             case ICARUS -> {
                 Vec3 away=attacker.position().subtract(player.position());
                 if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
