@@ -383,6 +383,18 @@ public final class PickaxeGameTests {
         h.assertTrue(nearby.hasEffect(resonance)&&nearby.getEffect(resonance).getAmplifier()==1,"the active Fault Echo applies the stronger resonance pulse");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_62") public static void choirHeldHitUsesCustomFaultResonance(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR,"ChoirStrike");var target=EntityType.ZOMBIE.create(h.getLevel());
+        target.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(target);
+        var tool=wearer.getMainHandItem();
+        h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,wearer),"Choir's equipped pickaxe can trigger its strike effect");
+        var resonance=SpecialPickaxes.FAULT_RESONANCE.get();
+        h.assertTrue(target.hasEffect(resonance)&&target.getEffect(resonance).getAmplifier()==1
+                &&target.getEffect(resonance).getDuration()==100,"the strike applies five seconds of stronger custom Fault Resonance");
+        h.assertTrue(!target.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS)
+                &&!target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN),"the strike no longer falls back to generic Weakness and Slowness");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");

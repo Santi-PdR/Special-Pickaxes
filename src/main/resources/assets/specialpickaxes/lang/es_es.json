@@ -526,7 +526,7 @@
   "alternate.detail.specialpickaxes.iridium": "Atrae hasta 96 drops recientes de tus menas minadas con Iridium en 32 bloques. Los 24 más cercanos dejan una estela turquesa breve; ignora el botín de otros jugadores.",
   "alternate.detail.specialpickaxes.hellspec": "Pulsa X para lanzar una onda visible de 14 bloques hacia delante. Impulsa y prende hasta 12 enemigos en su trayectoria durante 4 s; no altera bloques ni líquidos.",
   "melee.specialpickaxes.palimpsest": "Al golpear: Regeneración II durante 10 s y Absorción II durante 8 s.",
-  "melee.specialpickaxes.fault_choir": "Al golpear: Debilidad III durante 8 s y Lentitud II durante 5 s.",
+  "melee.specialpickaxes.fault_choir": "Al golpear: Resonancia de Falla II durante 5 s. Amortigua el movimiento y el impulso horizontal.",
   "melee.specialpickaxes.eventide": "Al golpear: aplica Levitación II durante 4 s.",
   "melee.specialpickaxes.paradox_crucible": "Al golpear: prende fuego al objetivo durante 8 s.",
   "melee.specialpickaxes.interregnum": "Al golpear: Lentitud V durante 8 s y Debilidad II durante 5 s.",

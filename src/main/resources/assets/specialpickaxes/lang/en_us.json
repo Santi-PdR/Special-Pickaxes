@@ -526,7 +526,7 @@
   "alternate.detail.specialpickaxes.iridium": "Pulls up to 96 recent drops from your Iridium-mined ores within 32 blocks. The nearest 24 leave a brief teal spark trail; other players' loot is ignored.",
   "alternate.detail.specialpickaxes.hellspec": "Press X to send a visible 14-block wave forward. It launches and ignites up to 12 hostile targets in its path for 4 seconds; it does not alter blocks or fluids.",
   "melee.specialpickaxes.palimpsest": "On hit: Regeneration II for 10 s and Absorption II for 8 s.",
-  "melee.specialpickaxes.fault_choir": "On hit: Weakness III for 8 s and Slowness II for 5 s.",
+  "melee.specialpickaxes.fault_choir": "On hit: Fault Resonance II for 5 s. It damps movement and horizontal momentum.",
   "melee.specialpickaxes.eventide": "On hit: Levitation II for 4 s.",
   "melee.specialpickaxes.paradox_crucible": "On hit: sets the target on fire for 8 s.",
   "melee.specialpickaxes.interregnum": "On hit: Slowness V for 8 s and Weakness II for 5 s.",

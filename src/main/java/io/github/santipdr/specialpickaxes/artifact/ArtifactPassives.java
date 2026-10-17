@@ -217,7 +217,7 @@ public final class ArtifactPassives {
     }
 
     /** Combat passives never replace an effect supplied by a server, potion or another relic. */
-    private static void grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
+    public static void grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
         var current=target.getEffect(effect);var data=target.getPersistentData();String key=combatLeaseKey(effect);
         boolean owned=data.getBoolean(key)||data.getBoolean(passiveLeaseKey(effect));
         if(effect==MobEffects.ABSORPTION&&data.getBoolean(ABSORPTION_LEASE)&&current!=null&&isAbsorptionLease(current))owned=true;
