@@ -17,7 +17,7 @@ public final class RelicEffects {
             case CRUCIBLE->ParticleTypes.SMALL_FLAME;case INTERREGNUM->ParticleTypes.END_ROD;
             case WORLDLOOM->ParticleTypes.COMPOSTER;case ICARUS->ParticleTypes.END_ROD;
             case AXIOM->ParticleTypes.SCULK_SOUL;case ATLAS->ParticleTypes.ENCHANT;
-            case WORLDBREAKER->ParticleTypes.FIREWORK;case CHRONICLE->ParticleTypes.GLOW;
+            case WORLDBREAKER->phase.equals("fall_guard")?ParticleTypes.END_ROD:ParticleTypes.FIREWORK;case CHRONICLE->ParticleTypes.GLOW;
             case EXODIUM->ParticleTypes.END_ROD;case IRIDIUM->ParticleTypes.GLOW;case HELLSPEC->ParticleTypes.FLAME;
             case KEYSTONE->ParticleTypes.WAX_ON;case TESSELLATOR->ParticleTypes.SCRAPE;
             case AEGIS->ParticleTypes.ELECTRIC_SPARK;case LODESTAR->ParticleTypes.NAUTILUS;
@@ -36,7 +36,7 @@ public final class RelicEffects {
                 case ICARUS,SEAM_RIPPER,CHOIR->{x=Math.cos(a*2)*.3;y=Math.sin(a*2)*.3;z=t*2;}
                 case PALIMPSEST,COVENANT->{x=(i%3-1)*(1-t);y=t;z=(i%4-1.5)*(1-t);}
                 case INTERREGNUM,CHRONICLE,LODESTAR->{x=Math.cos(a);y=Math.sin(a);z=0;}
-                case WORLDBREAKER->{x=Math.cos(a)*(1+t);y=Math.sin(a*3)*.4;z=Math.sin(a)*(1+t);}
+                case WORLDBREAKER->{if(phase.equals("fall_guard")){x=Math.cos(a)*.52;y=t*1.7;z=Math.sin(a)*.52;}else{x=Math.cos(a)*(1+t);y=Math.sin(a*3)*.4;z=Math.sin(a)*(1+t);}}
                 default->{x=Math.cos(a);y=t*.6;z=Math.sin(a);}
             }
             // Give completion a distinct rising helix instead of replaying the activation silhouette.

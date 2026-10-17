@@ -143,6 +143,7 @@ public final class WorkQueue {
             var job=JOBS.get(entry.getKey());
             if(job!=null&&job.kind==ArtifactKind.WORLDBREAKER&&job.region instanceof DirectionalProgram directional&&directional.isCoreDrill())guard.expires=ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE;
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
+            if(job==null&&p.tickCount%10==0)RelicEffects.emit(p,ArtifactKind.WORLDBREAKER,"fall_guard",p.position());
         }
     }
 
