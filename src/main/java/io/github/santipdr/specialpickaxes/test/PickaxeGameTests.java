@@ -1111,6 +1111,16 @@ public final class PickaxeGameTests {
         h.assertTrue(new ItemStack(Items.NETHERITE_PICKAXE).isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()),"netherite remains valid");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_68") public static void everyArtifactOutclassesExodiumAndKeepsFastMultiToolHarvest(GameTestHelper h){
+        h.assertTrue(SpecialPickaxes.TIER.getLevel()>4,"the artifact tier exceeds Terramity Exodium's tier IV");
+        for(var kind:ArtifactKind.playableValues()){
+            var tool=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());
+            h.assertTrue(tool.isCorrectToolForDrops(Blocks.DEEPSLATE.defaultBlockState())
+                    &&tool.isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()),kind.id+" harvests stone and ore at tier V");
+            h.assertTrue(tool.getDestroySpeed(Blocks.DEEPSLATE.defaultBlockState())>=64F,kind.id+" keeps OP mining speed");
+        }
+        finish(h,player(h,ArtifactKind.WORLDBREAKER));
+    }
     @GameTest(template="empty",batch="legacy_each_22") public static void changedPaymentCannotDuplicateMatter(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var pos=target(h).above();
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,1));
