@@ -2,7 +2,7 @@ package io.github.santipdr.specialpickaxes.client;
 
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.ArtifactFeedback;
-import io.github.santipdr.specialpickaxes.network.RelicNetwork;
+import io.github.santipdr.specialpickaxes.network.StasisBoundaryMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
@@ -29,7 +29,7 @@ public final class StasisBoundaryClient {
 
     private StasisBoundaryClient(){}
 
-    public static void receive(RelicNetwork.StasisBoundary update){
+    public static void receive(StasisBoundaryMessage update){
         if(!update.visible()){BOUNDARIES.remove(update.owner());return;}
         var dimension=ResourceLocation.tryParse(update.dimension());
         if(dimension==null||update.radius()<1||update.radius()>16||update.halfHeight()<1||update.halfHeight()>16)return;
