@@ -865,6 +865,14 @@ public final class PickaxeGameTests {
                 &&wrapped.z>=center.getZ()-radius+.5D&&wrapped.z<=center.getZ()+radius+.5D,"pulse remains on the marked boundary");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_30") public static void movingStasisDomainReplacesItsOldBoundary(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);var oldEdge=center.west(8);var destination=center.east(5);
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,8),"Stasis domain starts at its original center");
+        h.assertTrue(DomainFields.contains(p,oldEdge),"the original field includes its outer edge");
+        h.assertTrue(DomainFields.relocate(p,destination),"the active domain relocates");
+        h.assertTrue(DomainFields.contains(p,destination)&&!DomainFields.contains(p,oldEdge),"the live influence follows the new center and drops the previous boundary");
+        DomainFields.stop(p);finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_09") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",1);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"personal aura activates without a target block");DomainFields.tick();

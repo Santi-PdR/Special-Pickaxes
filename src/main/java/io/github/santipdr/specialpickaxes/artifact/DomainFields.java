@@ -67,7 +67,9 @@ public final class DomainFields {
         var field=FIELDS.get(p.getUUID());
         if(field==null||field.kind!=ArtifactKind.INTERREGNUM||field.mode!=0
                 ||!WorldSafety.allowed(p,ArtifactKind.INTERREGNUM,destination))return false;
-        var previous=field.center;field.center=destination.immutable();
+        var previous=field.center;
+        io.github.santipdr.specialpickaxes.network.RelicNetwork.clearStasisBoundary(p,previous,field.radius,Math.max(2,field.radius/2),field.dimension);
+        field.center=destination.immutable();
         ArtifactFeedback.trace(p,field.kind,previous,field.center);
         ArtifactFeedback.domain(p,field.kind,field.center,field.radius,Math.max(2,field.radius/2));
         ArtifactFeedback.message(p,"domain_relocated");
