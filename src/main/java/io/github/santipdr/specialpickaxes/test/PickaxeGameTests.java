@@ -286,6 +286,28 @@ public final class PickaxeGameTests {
                 "Heartwood ally sharing does not replace a stronger effect supplied by the server");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_55") public static void curiosCombatEffectsPreserveExternalEffects(GameTestHelper h){
+        var choir=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());
+        attacker.setPos(choir.getX()+2,choir.getY(),choir.getZ());h.getLevel().addFreshEntity(attacker);
+        var resonance=SpecialPickaxes.FAULT_RESONANCE.get();
+        attacker.addEffect(new net.minecraft.world.effect.MobEffectInstance(resonance,200,1,false,true,true));
+        var choirHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(choir,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(choir,choirHit,ArtifactKind.CHOIR);
+        var externalResonance=attacker.getEffect(resonance);
+        h.assertTrue(externalResonance!=null&&externalResonance.getDuration()==200&&externalResonance.getAmplifier()==1&&!externalResonance.isAmbient(),
+                "Choir's Curios counter does not replace an externally supplied stronger resonance");
+
+        var worldbreaker=player(h,ArtifactKind.WORLDBREAKER);var secondAttacker=EntityType.ZOMBIE.create(h.getLevel());
+        secondAttacker.setPos(worldbreaker.getX()+2,worldbreaker.getY(),worldbreaker.getZ());h.getLevel().addFreshEntity(secondAttacker);
+        worldbreaker.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,1,false,true,true));
+        var breakerHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(worldbreaker,h.getLevel().damageSources().mobAttack(secondAttacker),10F);
+        ArtifactPassives.onCuriosDamage(worldbreaker,breakerHit,ArtifactKind.WORLDBREAKER);
+        var externalAbsorption=worldbreaker.getEffect(net.minecraft.world.effect.MobEffects.ABSORPTION);
+        h.assertTrue(Math.abs(breakerHit.getAmount()-8F)<.001F,"Worldbreaker still reduces its triggering Curios hit");
+        h.assertTrue(externalAbsorption!=null&&externalAbsorption.getDuration()==240&&externalAbsorption.getAmplifier()==1&&!externalAbsorption.isAmbient(),
+                "Worldbreaker's Absorption II never shortens an externally supplied Absorption effect");
+        finish(h,choir);
+    }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();

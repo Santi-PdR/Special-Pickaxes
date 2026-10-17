@@ -87,10 +87,10 @@ public final class ArtifactPassives {
         if(state.getLong("curiosPassiveReady")>now)return;
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
-            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),80,0,true,false,true));}
-            case CHOIR -> attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),60,0,true,false,true));
-            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),70,0,true,false,true));}
-            case CRUCIBLE -> attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),40,0,true,false,true));
+            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),0,80);}
+            case CHOIR -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),0,60);
+            case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),0,70);}
+            case CRUCIBLE -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
             case HELLSPEC -> {
                 event.setAmount(event.getAmount()*.8F);
                 if(retaliationAllowed){
@@ -98,24 +98,24 @@ public final class ArtifactPassives {
                     ArtifactFeedback.burst(player,kind,attacker.blockPosition(),8);
                 }
             }
-            case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),40,1,true,false,true));}
-            case WORLDLOOM -> player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),60,0,true,false,true));
+            case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),1,40);}
+            case WORLDLOOM -> grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),0,60);
             case ICARUS -> {
                 Vec3 away=attacker.position().subtract(player.position());
                 if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
                 attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.8).add(0,.25,0)));
                 attacker.hasImpulse=true;
             }
-            case AXIOM -> attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),60,0,true,false,true));
-            case WORLDBREAKER -> {event.setAmount(event.getAmount()*.8F);player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,60,1,true,false,true));}
+            case AXIOM -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),0,60);
+            case WORLDBREAKER -> {event.setAmount(event.getAmount()*.8F);grantCombatEffect(player,MobEffects.ABSORPTION,1,60);}
             case EXODIUM -> {
                 Vec3 away=attacker.position().subtract(player.position());
                 if(away.lengthSqr()<.01)away=new Vec3(-player.getLookAngle().x,0,-player.getLookAngle().z);
                 attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.45).add(0,.65,0)));
                 attacker.hasImpulse=true;
             }
-            case IRIDIUM -> {event.setAmount(event.getAmount()*.85F);player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),80,0,true,false,true));}
-            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),60,0,true,false,true));}
+            case IRIDIUM -> {event.setAmount(event.getAmount()*.85F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),0,80);}
+            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),0,60);}
             default -> {return;}
         }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
@@ -169,6 +169,25 @@ public final class ArtifactPassives {
         }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
             player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
         }
+    }
+
+    /** Combat passives never replace an effect supplied by a server, potion or another relic. */
+    private static void grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
+        var current=target.getEffect(effect);var data=target.getPersistentData();String key=combatLeaseKey(effect);
+        boolean owned=data.getBoolean(key)||data.getBoolean(passiveLeaseKey(effect));
+        if(effect==MobEffects.ABSORPTION&&data.getBoolean(ABSORPTION_LEASE)&&current!=null&&isAbsorptionLease(current))owned=true;
+        if(owned&&(current==null||!isPassiveLease(current))){data.remove(key);owned=false;}
+        if(current==null){
+            target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+            data.putBoolean(key,true);
+        }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
+            target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+            data.putBoolean(key,true);
+        }
+    }
+
+    private static String combatLeaseKey(MobEffect effect){
+        return "specialpickaxesCuriosCombatLease:"+net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getKey(effect);
     }
 
     private static String passiveLeaseKey(MobEffect effect){
