@@ -232,7 +232,7 @@ public final class ArtifactFeedback {
             }
         }
     }
-    /** A bounded player-only advancing fan makes the non-mining Hellspec attack readable. */
+    /** A bounded advancing fan lets nearby players read the non-mining Hellspec attack. */
     public static void magmaWave(ServerPlayer p,Vec3 forward,double range,double halfWidth){
         var level=p.serverLevel();var right=new Vec3(-forward.z,0,forward.x);var origin=p.position().add(0,.16D,0);
         for(int step=2;step<=range;step+=2){
@@ -240,8 +240,8 @@ public final class ArtifactFeedback {
             for(int lane=-1;lane<=1;lane++){
                 var point=origin.add(forward.scale(step)).add(right.scale(spread*lane));
                 if(!level.hasChunkAt(BlockPos.containing(point)))continue;
-                level.sendParticles(p,ParticleTypes.FLAME,false,point.x,point.y,point.z,2,.08D,.03D,.08D,.006D);
-                if(lane==0)level.sendParticles(p,ParticleTypes.LAVA,false,point.x,point.y,point.z,1,.04D,.02D,.04D,.002D);
+                level.sendParticles(ParticleTypes.FLAME,point.x,point.y,point.z,2,.08D,.03D,.08D,.006D);
+                if(lane==0)level.sendParticles(ParticleTypes.LAVA,point.x,point.y,point.z,1,.04D,.02D,.04D,.002D);
             }
         }
     }
