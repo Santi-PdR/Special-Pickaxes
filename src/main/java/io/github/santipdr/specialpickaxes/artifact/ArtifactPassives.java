@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 /** Small, always-on identities for every artifact. No attack-strength effects are used. */
 public final class ArtifactPassives {
     private static final int PASSIVE_LEASE_TICKS=40;
+    private static final int ALLY_AURA_SCAN_TICKS=10;
     private ArtifactPassives() {}
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
@@ -172,6 +173,7 @@ public final class ArtifactPassives {
 
     /** A Curios Stasis bearer shares a short absorption lease with at most eight nearby allies. */
     private static void shareStasisWard(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.INTERREGNUM,"stasisAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
@@ -184,6 +186,7 @@ public final class ArtifactPassives {
 
     /** Worldloom lends its slow custom healing pulses to a small, nearby allied group. */
     private static void shareHeartwood(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.WORLDLOOM,"heartwoodAuraScanAt"))return;
         var center=owner.position();double rangeSqr=25D;
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(5),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
@@ -194,5 +197,12 @@ public final class ArtifactPassives {
             if(current==null||current.getDuration()<=20)
                 ally.addEffect(new MobEffectInstance(renewal,40,0,true,false,true));
         }
+    }
+
+    private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
+        var state=ArtifactState.of(owner,kind);long now=ArtifactState.now(owner);
+        if(state.getLong(key)>now)return false;
+        state.putLong(key,now+ALLY_AURA_SCAN_TICKS);
+        return true;
     }
 }
