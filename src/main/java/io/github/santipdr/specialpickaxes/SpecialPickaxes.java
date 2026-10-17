@@ -50,6 +50,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> DAWN_RESERVE=EFFECTS.register("dawn_reserve",DawnReserveEffect::new);
     public static final RegistryObject<MobEffect> SEAM_FRAY=EFFECTS.register("seam_fray",SeamFrayEffect::new);
     public static final RegistryObject<MobEffect> LODEGUARD=EFFECTS.register("lodeguard",LodeguardEffect::new);
+    public static final RegistryObject<MobEffect> LODE_SURGE=EFFECTS.register("lode_surge",LodeSurgeEffect::new);
     public static final RegistryObject<MobEffect> STARFALL_WARD=EFFECTS.register("starfall_ward",StarfallWardEffect::new);
     public static final RegistryObject<MobEffect> STARFALL_GUARD=EFFECTS.register("starfall_guard",StarfallGuardEffect::new);
     public static final RegistryObject<MobEffect> CRUCIBLE_MANTLE=EFFECTS.register("crucible_mantle",CrucibleMantleEffect::new);
@@ -171,6 +172,11 @@ public final class SpecialPickaxes {
         var focus=p.getEffect(STRATA_FOCUS.get());
         if(focus!=null&&e.getNewSpeed()>0){
             double multiplier=1D+.2D*(Math.min(1,focus.getAmplifier())+1D);
+            e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*multiplier));
+        }
+        var lodeSurge=p.getEffect(LODE_SURGE.get());
+        if(lodeSurge!=null&&e.getNewSpeed()>0){
+            double multiplier=1D+.12D*(Math.min(2,lodeSurge.getAmplifier())+1D);
             e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*multiplier));
         }
         if(p.hasEffect(STASIS_RESONANCE.get())&&e.getNewSpeed()>0&&p.getMainHandItem().isCorrectToolForDrops(e.getState()))

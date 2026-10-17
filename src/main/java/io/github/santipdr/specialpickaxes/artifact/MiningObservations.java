@@ -48,7 +48,10 @@ public final class MiningObservations {
                     || (o.applyHeldMiningEffects&&(p.getMainHandItem()!=o.tool||o.tool.isEmpty()))
                     || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
-                if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)&&o.dropsBeforeComplete)highlightNewOreDrops(p,o);
+                if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)){
+                    ArtifactPassives.lodeSurge(p,o.pos);
+                    if(o.dropsBeforeComplete)highlightNewOreDrops(p,o);
+                }
                 if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }

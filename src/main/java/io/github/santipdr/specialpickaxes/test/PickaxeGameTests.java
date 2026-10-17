@@ -1051,6 +1051,8 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumHighlightsOnlyDropsCreatedByOreBreak(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
+        ArtifactPassives.tick(p,ArtifactKind.IRIDIUM);
+        var lodeSurge=SpecialPickaxes.LODE_SURGE.get();
         var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
         var unrelated=new ItemEntity(h.getLevel(),pos.getX()+.3,pos.getY()+.2,pos.getZ()+.3,new ItemStack(Items.ROTTEN_FLESH));
         h.getLevel().addFreshEntity(unrelated);var curioIridium=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());
@@ -1059,6 +1061,8 @@ public final class PickaxeGameTests {
         h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
         var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND,2));h.getLevel().addFreshEntity(drop);
         MiningObservations.flush();
+        h.assertTrue(p.hasEffect(lodeSurge)&&p.getEffect(lodeSurge).getAmplifier()==0&&p.getEffect(lodeSurge).getDuration()==80,
+                "the first Curios ore break starts a four-second Lode Surge");
         h.assertTrue(drop.isCurrentlyGlowing()&&drop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"new ore loot gets Iridium's glow tag");
         h.assertTrue(drop.getPersistentData().hasUUID("specialpickaxesIridiumOwner")&&drop.getPersistentData().getUUID("specialpickaxesIridiumOwner").equals(p.getUUID()),"only the wearer owns the recalled drop");
         h.assertTrue(!OreDropHighlight.mark(drop,p),"a repeated observation does not replay the sparkle burst");
@@ -1067,6 +1071,7 @@ public final class PickaxeGameTests {
         h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,moddedPos,moddedOre),"Iridium observes a foreign ore identified only by its modded ore-family tag");
         h.getLevel().setBlockAndUpdate(moddedPos,Blocks.AIR.defaultBlockState());
         var moddedDrop=new ItemEntity(h.getLevel(),moddedPos.getX()+.5,moddedPos.getY()+.25,moddedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(moddedDrop);MiningObservations.flush();
+        h.assertTrue(p.getEffect(lodeSurge).getAmplifier()==1,"a second foreign ore break builds the second speed charge");
         h.assertTrue(moddedDrop.isCurrentlyGlowing()&&moddedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"tagged foreign ore drops receive the same Iridium highlight");
         var queuedPos=pos.east(10);var queuedOre=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(queuedPos,queuedOre);
         var capturedDuringJob=new boolean[1];java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> observeQueuedOre=event->{
@@ -1078,6 +1083,12 @@ public final class PickaxeGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(observeQueuedOre);}
         h.assertTrue(capturedDuringJob[0]&&h.getLevel().getBlockState(queuedPos).isAir(),"Curios Iridium observes ore breaks inside another pickaxe's queued ability");
         var queuedDrop=new ItemEntity(h.getLevel(),queuedPos.getX()+.5,queuedPos.getY()+.25,queuedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(queuedDrop);MiningObservations.flush();
+        h.assertTrue(p.getEffect(lodeSurge).getAmplifier()==2,"a queued third ore break reaches but cannot exceed three charges");
+        var miningSpeed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(p,Blocks.STONE.defaultBlockState(),64F,pos);
+        MinecraftForge.EVENT_BUS.post(miningSpeed);
+        h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-121.856F)<.02F,"three Lode Surge charges add 36% mining speed on top of Strata Focus II");
+        h.assertTrue(lodeSurge.isDurationEffectTick(72,2)&&!lodeSurge.isDurationEffectTick(71,2),"the charge-scaled orbit animates every twelve ticks");
+        lodeSurge.applyEffectTick(p,2);
         h.assertTrue(queuedDrop.isCurrentlyGlowing()&&queuedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"queued ability ore drops receive the Curios highlight without held-tool mining effects");
         h.assertTrue(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CHOIR,"Curios ore tracking leaves the held pickaxe unchanged");finish(h,p);
     }

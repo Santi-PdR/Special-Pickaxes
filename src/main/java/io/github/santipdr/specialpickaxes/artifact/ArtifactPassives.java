@@ -8,6 +8,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.BlockPos;
 
 /** Small, always-on identities for every artifact. No attack-strength effects are used. */
 public final class ArtifactPassives {
@@ -198,6 +199,17 @@ public final class ArtifactPassives {
             case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             default -> { }
         }
+    }
+
+    /** Successive Iridium ore breaks build up to three short mining-speed charges. */
+    public static int lodeSurge(ServerPlayer player,BlockPos pos){
+        var state=ArtifactState.of(player,ArtifactKind.IRIDIUM);long now=ArtifactState.now(player);
+        int stacks=now<=state.getLong("lodeSurgeExpires")
+                ?Math.min(3,state.getInt("lodeSurgeStacks")+1):1;
+        state.putInt("lodeSurgeStacks",stacks);state.putLong("lodeSurgeExpires",now+80L);
+        grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get(),stacks-1,80);
+        LodeSurgeEffect.oreBreakPulse(player,pos,stacks);
+        return stacks;
     }
 
     private static boolean isStrataFocusPick(ArtifactKind kind){
