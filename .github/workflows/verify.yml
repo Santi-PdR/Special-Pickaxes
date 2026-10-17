@@ -32,7 +32,14 @@ jobs:
           set -o pipefail
           ./gradlew build test --stacktrace 2>&1 | tee build/verification-build.log
       - run: python3 tools/verify_release.py
-      - run: python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar | tee build/verification-security.log
+      - id: mod-version
+        run: |
+          python3 - <<'PY'
+          import os,re
+          version=re.search(r"^version\s*=\s*'([^']+)'",open('build.gradle').read(),re.M).group(1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('value='+version+'\n')
+          PY
+      - run: python3 tools/scan_secrets.py "build/libs/$(python3 -c 'import json; print(json.load(open("build/RELEASE.json"))["file"])')" | tee build/verification-security.log
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
@@ -80,7 +87,7 @@ jobs:
         if: success() && steps.publication.outputs.approved == 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: special-pickaxes-5.0.0-verified
+          name: special-pickaxes-${{ steps.mod-version.outputs.value }}-verified
           path: |
             build/libs/*.jar
             build/RELEASE.json

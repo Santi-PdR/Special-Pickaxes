@@ -35,6 +35,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ref: ${{ steps.review.outputs.source }}
+      - id: mod-version
+        run: |
+          python3 - <<'PY'
+          import os,re
+          version=re.search(r"^version\s*=\s*'([^']+)'",open('build.gradle').read(),re.M).group(1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('value='+version+'\n')
+          PY
       - name: Reproduce the exact already validated binary
         run: ./gradlew build --stacktrace
       - run: python3 tools/verify_release.py
@@ -42,8 +49,9 @@ jobs:
         env:
           EXPECTED_SHA256: ${{ steps.review.outputs.expected_sha256 }}
         run: |
-          echo "$EXPECTED_SHA256  build/libs/special-pickaxes-1.20.1-5.0.0.jar" | sha256sum --check --strict
-          python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar
+          JAR="build/libs/$(python3 -c 'import json; print(json.load(open("build/RELEASE.json"))["file"])')"
+          echo "$EXPECTED_SHA256  $JAR" | sha256sum --check --strict
+          python3 tools/scan_secrets.py "$JAR"
           cp "$RUNNER_TEMP/visual-review.json" build/VISUAL-REVIEW.json
       - name: Export approved binary for verifiable retrieval
         run: python3 tools/ci_evidence.py
@@ -52,7 +60,7 @@ jobs:
           PUBLISH_BINARY: 'true'
       - uses: actions/upload-artifact@v6
         with:
-          name: special-pickaxes-5.0.0-verified
+          name: special-pickaxes-${{ steps.mod-version.outputs.value }}-verified
           path: |
             build/libs/*.jar
             build/RELEASE.json
