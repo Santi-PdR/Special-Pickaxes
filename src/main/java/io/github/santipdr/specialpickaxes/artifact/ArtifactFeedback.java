@@ -81,6 +81,17 @@ public final class ArtifactFeedback {
         if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
         p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }
+    /** A short private scar links adjacent Seam Ripper breaks so the player can follow the vein. */
+    public static void seamTrail(ServerPlayer p,BlockPos from,BlockPos to) {
+        if(from==null||to==null||from.distSqr(to)>5D)return;
+        var start=Vec3.atCenterOf(from).add(0,.62D,0);var end=Vec3.atCenterOf(to).add(0,.62D,0);
+        var scar=new DustParticleOptions(new Vector3f(.98F,.54F,.31F),.72F);
+        for(int i=1;i<=3;i++){
+            var point=start.lerp(end,i/4D);
+            var particle=i==2?ParticleTypes.SCRAPE:scar;
+            p.serverLevel().sendParticles(p,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
     /** The Crucible sheds particles of its chosen output, making each conversion legible at a glance. */
     public static void crucibleRephase(ServerPlayer p,BlockPos pos,net.minecraft.world.level.block.state.BlockState material){
         var fragments=new BlockParticleOption(ParticleTypes.BLOCK,material);

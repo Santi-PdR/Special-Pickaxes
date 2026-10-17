@@ -609,7 +609,7 @@
   "screen.specialpickaxes.copy_mode": "MODO COPIA · %s",
   "tooltip.specialpickaxes.copying": "Copiando: %s",
   "mining.identity.seam_ripper.connected": "VETA CONECTADA: extrae un filón geológico del mismo material.",
-  "mining.how.seam_ripper.connected": "Apunta a piedra natural y pulsa R. El pico sigue solo bloques conectados de ese material exacto, hasta 256. Conserva menas, bloques colocados, fluidos y máquinas.",
+  "mining.how.seam_ripper.connected": "Apunta a piedra natural y pulsa R. El pico sigue solo bloques conectados de ese material exacto, hasta 256. Un rastro luminoso une brevemente los bloques cercanos para seguir la veta. Conserva menas, bloques colocados, fluidos y máquinas.",
   "mode.specialpickaxes.connected": "CONNECTED",
   "message.specialpickaxes.nullward": "La Égida Nula absorbió %s disparos hostiles.",
   "message.specialpickaxes.magma_wave": "La Onda Magmática alcanzó a %s enemigos.",

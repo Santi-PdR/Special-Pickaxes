@@ -24,7 +24,7 @@ public final class WorkQueue {
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
-        int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
+        int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;BlockPos lastFeedback;
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();this.reservedBytes=snapshotBytes;
@@ -120,7 +120,11 @@ public final class WorkQueue {
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
                 else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
                 else if(job.kind==ArtifactKind.CRUCIBLE&&feedbackMaterial!=null)ArtifactFeedback.crucibleRephase(p,feedback,feedbackMaterial);
-                else ArtifactFeedback.burst(p,job.kind,feedback,4);
+                else {
+                    if(job.kind==ArtifactKind.SEAM_RIPPER&&job.lastFeedback!=null)ArtifactFeedback.seamTrail(p,job.lastFeedback,feedback);
+                    ArtifactFeedback.burst(p,job.kind,feedback,4);
+                }
+                if(job.kind==ArtifactKind.SEAM_RIPPER)job.lastFeedback=feedback.immutable();
             }
             if(job.region!=null)job.region.reportProgress(p);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {

@@ -609,7 +609,7 @@
   "screen.specialpickaxes.copy_mode": "COPY MODE · %s",
   "tooltip.specialpickaxes.copying": "Copying: %s",
   "mining.identity.seam_ripper.connected": "CONNECTED SEAM: mine a same-material geological vein.",
-  "mining.how.seam_ripper.connected": "Aim at natural stone and press R. The pickaxe follows only connected blocks of that exact material, up to 256. Ores, placed blocks, fluids and machines are preserved.",
+  "mining.how.seam_ripper.connected": "Aim at natural stone and press R. The pickaxe follows only connected blocks of that exact material, up to 256. A brief glowing scar links nearby breaks so you can follow the route. Ores, placed blocks, fluids and machines are preserved.",
   "mode.specialpickaxes.connected": "CONNECTED",
   "message.specialpickaxes.nullward": "Null Ward absorbed %s hostile shots.",
   "message.specialpickaxes.magma_wave": "The Magma Wave struck %s nearby enemies.",
