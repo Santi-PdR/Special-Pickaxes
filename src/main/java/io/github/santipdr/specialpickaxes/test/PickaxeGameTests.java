@@ -528,6 +528,29 @@ public final class PickaxeGameTests {
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDBREAKER);
         h.assertTrue(!wearer.hasEffect(aegis),"the Curios ward clears when Worldbreaker is unequipped");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_58") public static void worldbreakerCuriosAegisProtectsThreeNearestAllies(GameTestHelper h){
+        var owner=player(h,ArtifactKind.WORLDBREAKER,"AegisBearer");
+        var allies=List.of(player(h,ArtifactKind.CHOIR,"AegisOne"),player(h,ArtifactKind.ICARUS,"AegisTwo"),
+                player(h,ArtifactKind.WORLDLOOM,"AegisThree"),player(h,ArtifactKind.PALIMPSEST,"AegisFour"));
+        var distant=player(h,ArtifactKind.AXIOM,"AegisDistant");var enemy=player(h,ArtifactKind.SEAM_RIPPER,"AegisEnemy");
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("aegis_"+owner.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("foes_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(owner.getScoreboardName(),team);
+        for(var ally:allies)scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(distant.getScoreboardName(),team);scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        for(int i=0;i<allies.size();i++)allies.get(i).setPos(owner.getX()+i+1,owner.getY(),owner.getZ());
+        distant.setPos(owner.getX()+6,owner.getY(),owner.getZ());enemy.setPos(owner.getX()+1,owner.getY(),owner.getZ());
+        var participants=new ArrayList<ServerPlayer>();participants.add(owner);participants.addAll(allies);participants.add(distant);participants.add(enemy);
+        for(var participant:participants)h.getLevel().addFreshEntity(participant);
+        ArtifactPassives.tick(owner,ArtifactKind.WORLDBREAKER);var aegis=SpecialPickaxes.WORLDBREAKER_AEGIS.get();
+        for(int i=0;i<3;i++)h.assertTrue(allies.get(i).hasEffect(aegis)
+                &&Math.abs(allies.get(i).getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4D)<.01D,
+                "one of the three closest allies receives the armor ward");
+        h.assertTrue(!allies.get(3).hasEffect(aegis)&&!distant.hasEffect(aegis)&&!enemy.hasEffect(aegis),
+                "the formation aura excludes the fourth, distant and hostile players");
+        h.assertTrue(!allies.get(0).hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),
+                "the owner's combat counter does not spread its absorption burst");finish(h,owner);
+    }
     @GameTest(template="empty",batch="rework_each_38") public static void curiosStrataFocusReplacesHasteAndScalesMiningSpeed(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var focus=SpecialPickaxes.STRATA_FOCUS.get();

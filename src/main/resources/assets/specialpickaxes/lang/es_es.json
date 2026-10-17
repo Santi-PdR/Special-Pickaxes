@@ -559,7 +559,7 @@
   "curios.detail.specialpickaxes.worldloom": "Renovación de Duramen cura 1 punto de vida por segundo y restaura 2 de comida cada 5 s; comparte ambos pulsos con hasta 4 aliados a 5 bloques. El primer golpe hostil cada 8 s causa 10% menos daño y enraíza al atacante durante 3 s con lianas visibles que frenan su movimiento.",
   "curios.detail.specialpickaxes.icarus": "Impulso icario amortigua la caída, reduce a la mitad su daño y acelera el planeo al esprintar. Reverso alado lanza al primer atacante cada 8 s.",
   "curios.detail.specialpickaxes.hollow_axiom": "Velo Nulo elimina un efecto dañino cada 8 s con un pulso visible: prioriza Veneno y Wither, después los efectos de control. Marca Nula: el primer golpe hostil cada 8 s impide que el atacante se cure durante 3 s.",
-  "curios.detail.specialpickaxes.worldbreaker": "Guardia del núcleo: el primer golpe hostil cada 8 s causa 20% menos daño y otorga Absorción II durante 3 s.",
+  "curios.detail.specialpickaxes.worldbreaker": "Égida del núcleo da al portador +4 de armadura y 30% de resistencia al retroceso; comparte esa protección con hasta 3 aliados a 5 bloques. El primer golpe hostil cada 8 s hace 20% menos daño y otorga Absorción II al portador durante 3 s.",
   "curios.detail.specialpickaxes.exodium": "Manto Estelar atrapa cada 3 s un proyectil hostil cuya trayectoria va a impactarte; si uno atraviesa el manto, inflige 25% menos daño. Pliegue Estelar lanza al primer atacante hostil cada 8 s.",
   "curios.detail.specialpickaxes.hellspec": "Manto de ceniza: bloquea fuego y lava. El primer golpe hostil cada 8 s hace 20% menos daño e incendia al atacante durante 3 s. En el calor giran brasas.",
   "screen.specialpickaxes.copy_native": "Técnicas propias de Worldbreaker",

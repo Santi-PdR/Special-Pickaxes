@@ -167,7 +167,10 @@ public final class ArtifactPassives {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(),0,PASSIVE_LEASE_TICKS);
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get(),0,PASSIVE_LEASE_TICKS);
             }
-            case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
+            case WORLDBREAKER -> {
+                grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(),0,PASSIVE_LEASE_TICKS);
+                shareWorldbreakerAegis(player);
+            }
             case EXODIUM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get(), 0, PASSIVE_LEASE_TICKS);
@@ -308,6 +311,17 @@ public final class ArtifactPassives {
             grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
             sustain(ally);
         }
+    }
+
+    /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */
+    private static void shareWorldbreakerAegis(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.WORLDBREAKER,"worldbreakerAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=25D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(5),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var aegis=io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get();
+        for(var ally:allies)grant(ally,aegis,0,PASSIVE_LEASE_TICKS);
     }
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
