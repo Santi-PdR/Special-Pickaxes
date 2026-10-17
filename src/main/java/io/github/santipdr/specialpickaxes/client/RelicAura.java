@@ -4,6 +4,7 @@ import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -14,6 +15,9 @@ import org.joml.Vector3f;
 /** Cosmetic-only hand and Curios signatures. Never sends gameplay packets. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class RelicAura {
+    private static final int MAX_VISIBLE_CURIO_AURAS=6;
+    private static final int MAX_CURIO_CANDIDATES=12;
+    private static final double VISIBLE_CURIO_RADIUS_SQR=24D*24D;
     private static ArtifactKind heldKind;
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
@@ -28,8 +32,26 @@ public final class RelicAura {
             emitHeld(mc,held);
         } else heldKind=null;
         var curio=CuriosCompat.find(mc.player);
-        if(curio==null||!(curio.stack().getItem() instanceof ArtifactItem item))return;
-        if(held==null||held.kind!=item.kind)emitCurios(mc,item);
+        if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
+                &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item);
+
+        // Render nearby wearers on this client too, so a Curios passive has a readable
+        // team-facing signature without introducing server packets or an unbounded scan.
+        var candidates=mc.level.getEntitiesOfClass(Player.class,mc.player.getBoundingBox().inflate(24D),viewer->
+                viewer!=mc.player&&!viewer.isSpectator()&&!viewer.isInvisibleTo(mc.player)
+                        &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR);
+        candidates.sort(java.util.Comparator.comparingDouble(viewer->viewer.distanceToSqr(mc.player)));
+        var nearby=new java.util.ArrayList<java.util.Map.Entry<Player,ArtifactItem>>();
+        for(int i=0;i<Math.min(MAX_CURIO_CANDIDATES,candidates.size());i++){
+            var viewer=candidates.get(i);
+            var equipped=CuriosCompat.find(viewer);
+            if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem item))continue;
+            if(viewer.getMainHandItem().getItem() instanceof ArtifactItem inHand&&inHand.kind==item.kind)continue;
+            nearby.add(java.util.Map.entry(viewer,item));
+        }
+        nearby.sort(java.util.Comparator.comparingDouble(entry->entry.getKey().distanceToSqr(mc.player)));
+        for(int i=0;i<Math.min(MAX_VISIBLE_CURIO_AURAS,nearby.size());i++)
+            emitCurios(mc,nearby.get(i).getKey(),nearby.get(i).getValue());
     }
     private static void emitHeld(Minecraft mc,ArtifactItem item){
         var look=mc.player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
@@ -45,8 +67,8 @@ public final class RelicAura {
         }
     }
     /** A restrained rotating belt halo makes the Curios passive visible without suggesting an active skill. */
-    private static void emitCurios(Minecraft mc,ArtifactItem item){
-        var player=mc.player;double phase=player.tickCount*0.075D+item.kind.ordinal()*0.61D;
+    private static void emitCurios(Minecraft mc,Player player,ArtifactItem item){
+        double phase=player.tickCount*0.075D+item.kind.ordinal()*0.61D;
         var dust=dust(item.kind,item.kind==ArtifactKind.ICARUS?0.34F:0.27F);
         ParticleOptions accent=accent(item.kind,dust);
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
