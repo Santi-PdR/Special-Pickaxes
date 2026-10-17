@@ -1,10 +1,10 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. La versión instalada para pruebas es **5.10.251**: trece picos tier IV con dos técnicas al usarlos y pasivas propias. En Curios conservan solo sus pasivas; no necesitan teclas extra. El manual reúne las instrucciones completas y los objetos mantienen descripciones breves. Las excavaciones se procesan por ticks, vuelven a validar cada bloque y respetan menas, fluidos, máquinas, zonas protegidas y bloques colocados. Las búsquedas de entidades, drops y jugadores tienen límites para mantener el coste del servidor controlado. Curios es opcional.
+Forge **1.20.1 / Java 17**. La próxima versión de prueba es **5.10.252**: trece picos tier IV con dos técnicas al usarlos y pasivas propias. En Curios conservan solo sus pasivas; no necesitan teclas extra. El manual reúne las instrucciones completas y los objetos mantienen descripciones breves. Las excavaciones se procesan por ticks, vuelven a validar cada bloque y respetan menas, fluidos, máquinas, zonas protegidas y bloques colocados. Las búsquedas de entidades, drops y jugadores tienen límites para mantener el coste del servidor controlado. Curios es opcional.
 
 R activa, confirma, pausa o reanuda; X usa la técnica secundaria; C cambia el modo disponible e I abre el manual. Worldbreaker permite elegir visualmente otro pico desde el manual y muestra cuál está copiando. El sonido de habilidades se limita a jugadores cercanos y tiene enfriamiento por emisor y oyente.
 
-La versión 5.10.251 pasó la compilación limpia y los 125 GameTests de Forge. El JAR contiene Magma Brand y está instalado en la instancia `test-1`; el cliente no se ha validado con el modpack completo.
+La versión 5.10.252 alinea la animación de Onda Magmática con la altura real del impacto y muestra el abanico a los jugadores cercanos. La versión 5.10.251 pasó la compilación limpia y los 125 GameTests de Forge. El JAR contiene Magma Brand y está instalado en la instancia `test-1`; el cliente no se ha validado con el modpack completo.
 El análisis del Paradox Crucible usa ahora las mismas restricciones de seguridad que la transformación real y omite los bloques que ya coinciden con el material seleccionado; así no promete cambios que luego fallarán ni reporta falsamente “Nothing changed”.
 La habilidad radial del Crucible ahora filtra materiales iguales al resultado y comprueba las mismas protecciones que el modo de selección antes de intentar transmutar.
 

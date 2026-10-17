@@ -234,7 +234,7 @@ public final class ArtifactFeedback {
     }
     /** A bounded advancing fan lets nearby players read the non-mining Hellspec attack. */
     public static void magmaWave(ServerPlayer p,Vec3 forward,double range,double halfWidth){
-        var level=p.serverLevel();var right=new Vec3(-forward.z,0,forward.x);var origin=p.position().add(0,.16D,0);
+        var level=p.serverLevel();var right=new Vec3(-forward.z,0,forward.x);var origin=p.position().add(0,.8D,0);
         for(int step=2;step<=range;step+=2){
             double spread=halfWidth*step/range;
             for(int lane=-1;lane<=1;lane++){
