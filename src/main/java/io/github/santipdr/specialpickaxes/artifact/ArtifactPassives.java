@@ -135,10 +135,10 @@ public final class ArtifactPassives {
                 sustain(player);
                 shareHeartwood(player);
             }
-            case ICARUS -> { if (!player.onGround()){
-                grant(player, MobEffects.SLOW_FALLING, 0, PASSIVE_LEASE_TICKS);
-                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(), 0, PASSIVE_LEASE_TICKS);
-            } }
+            case ICARUS -> {
+                if(!player.onGround())grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
+                else player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
+            }
             case AXIOM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
             case WORLDBREAKER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(), 0, PASSIVE_LEASE_TICKS);
             case EXODIUM -> {

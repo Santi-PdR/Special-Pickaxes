@@ -157,13 +157,22 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.CHOIR);wearer.setOnGround(false);wearer.setSprinting(true);
         ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
         var glide=SpecialPickaxes.ICARIAN_MOMENTUM.get();
-        h.assertTrue(wearer.hasEffect(glide)&&wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"airborne Icarus Curios grants its glide effect and fall protection");
+        h.assertTrue(wearer.hasEffect(glide)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"airborne Icarus Curios grants its named glide effect without generic Slow Falling");
         wearer.setDeltaMovement(0,-.2,0);glide.applyEffectTick(wearer,0);var boosted=wearer.getDeltaMovement();
         h.assertTrue(boosted.horizontalDistanceSqr()>.0025&&Math.abs(boosted.y+.2)<.001,"sprint-gliding gains forward momentum without altering vertical control");
         wearer.setSprinting(false);wearer.setDeltaMovement(.1,-.2,0);glide.applyEffectTick(wearer,0);
         h.assertTrue(Math.abs(wearer.getDeltaMovement().x-.1)<.001&&Math.abs(wearer.getDeltaMovement().z)<.001,"the glide stops accelerating when sprint is released");
+        wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);
+        h.assertTrue(Math.abs(wearer.getDeltaMovement().y+.36)<.001,"Icarian Momentum caps a fast descent at a controlled speed");
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,16F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.5F)<.001,"Icarian Momentum cuts fall damage in half while active");
+        wearer.setOnGround(true);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
+        h.assertTrue(!wearer.hasEffect(glide),"touchdown ends the airborne Curios passive promptly");
+        wearer.setOnGround(false);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,200,0,false,false,true));
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.ICARUS);
         h.assertTrue(!wearer.hasEffect(glide),"Icarian Momentum is removed when the Curios passive ends");
+        h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"unequipping Icarus preserves Slow Falling supplied by another source");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_28") public static void palimpsestCuriosCounterRestoresFoodInDawnPulses(GameTestHelper h){

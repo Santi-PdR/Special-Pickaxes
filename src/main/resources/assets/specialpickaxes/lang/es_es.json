@@ -557,7 +557,7 @@
   "curios.detail.specialpickaxes.eventide": "Deuda gravitatoria: el primer golpe hostil cada 8 s causa 10% menos daño y atrapa al atacante durante 3,5 s, reduciendo su movimiento horizontal.",
   "curios.detail.specialpickaxes.paradox_crucible": "Respuesta de ceniza: el primer golpe hostil cada 8 s prende al atacante durante 3 s.",
   "curios.detail.specialpickaxes.worldloom": "Renovación de Duramen cura 1 punto de vida por segundo, recupera una porción de alimento cada 5 s y se comparte con hasta 4 aliados a 5 bloques. El primer golpe hostil cada 8 s también activa el aura curativa.",
-  "curios.detail.specialpickaxes.icarus": "Reverso alado: el primer golpe hostil cada 8 s lanza al atacante hacia arriba y lejos.",
+  "curios.detail.specialpickaxes.icarus": "Impulso icario amortigua la caída, reduce a la mitad su daño y acelera el planeo al esprintar. Reverso alado lanza al primer atacante cada 8 s.",
   "curios.detail.specialpickaxes.hollow_axiom": "Marca nula: el primer golpe hostil cada 8 s impide que el atacante se cure durante 3 s.",
   "curios.detail.specialpickaxes.worldbreaker": "Guardia del núcleo: el primer golpe hostil cada 8 s causa 20% menos daño y otorga Absorción II durante 3 s.",
   "curios.detail.specialpickaxes.exodium": "Pliegue estelar: el primer golpe hostil cada 8 s lanza al atacante hacia arriba y lejos.",

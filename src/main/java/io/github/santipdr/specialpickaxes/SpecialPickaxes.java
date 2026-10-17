@@ -184,6 +184,10 @@ public final class SpecialPickaxes {
             e.setDamageMultiplier(e.getDamageMultiplier()*.25F);
             ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,p.blockPosition(),4);
         }
+        if(p.hasEffect(ICARIAN_MOMENTUM.get())){
+            e.setDamageMultiplier(e.getDamageMultiplier()*.5F);
+            ArtifactFeedback.burst(p,ArtifactKind.ICARUS,p.blockPosition(),4);
+        }
     }
     private void commands(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))

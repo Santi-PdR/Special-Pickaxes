@@ -557,7 +557,7 @@
   "curios.detail.specialpickaxes.eventide": "Gravity Debt: the first hostile hit every 8 s deals 10% less damage and snares the attacker for 3.5 s, damping horizontal movement.",
   "curios.detail.specialpickaxes.paradox_crucible": "Ash Retort: the first hostile hit every 8 s ignites its attacker for 3 s.",
   "curios.detail.specialpickaxes.worldloom": "Heartwood Renewal heals 1 health each second, restores one food shank every 5 s, and is shared with up to 4 allies within 5 blocks. The first hostile hit every 8 s also triggers the healing aura.",
-  "curios.detail.specialpickaxes.icarus": "Wing Reversal: the first hostile hit every 8 s launches its attacker away and upward.",
+  "curios.detail.specialpickaxes.icarus": "Icarian Momentum cushions descent, halves fall damage and builds sprint-glide speed. Wing Reversal launches the first hostile attacker every 8 s.",
   "curios.detail.specialpickaxes.hollow_axiom": "Null Mark: the first hostile hit every 8 s prevents its attacker from healing for 3 s.",
   "curios.detail.specialpickaxes.worldbreaker": "Core Guard: the first hostile hit every 8 s deals 20% less damage and grants Absorption II for 3 s.",
   "curios.detail.specialpickaxes.exodium": "Starfold: the first hostile hit every 8 s throws its attacker upward and away.",
