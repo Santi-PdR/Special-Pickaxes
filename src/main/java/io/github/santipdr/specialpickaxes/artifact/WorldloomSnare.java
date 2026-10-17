@@ -13,15 +13,28 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/** Short-lived root bindings created by the Worldloom's held area skill. */
+/** Telegraphing root snares created by the Worldloom's held area skill. */
 public final class WorldloomSnare {
+    private static final int WINDUP_TICKS=60;
+    private static final int ROOT_DURATION_TICKS=80;
     private static final int ROOT_PULSE_TICKS=10;
     private static final int ROOT_PARTICLES=4;
     private static final net.minecraft.world.level.block.state.BlockState VINE_STATE=
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
     private static final net.minecraft.core.particles.BlockParticleOption VINE_PARTICLE=
             new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK,VINE_STATE);
-    private record Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,Vec3 anchor,long started,long expires) {}
+    private static final class Binding {
+        final LivingEntity target;
+        final ServerPlayer owner;
+        final ServerLevel level;
+        final long started;
+        Vec3 anchor;
+        long expires;
+
+        Binding(LivingEntity target,ServerPlayer owner,ServerLevel level,long started){
+            this.target=target;this.owner=owner;this.level=level;this.started=started;
+        }
+    }
     private static final Map<UUID,Binding> BINDINGS=new HashMap<>();
     private WorldloomSnare() {}
 
@@ -31,9 +44,9 @@ public final class WorldloomSnare {
         if(target instanceof Player other&&!owner.canHarmPlayer(other))return false;
         UUID id=target.getUUID();
         if(!BINDINGS.containsKey(id)&&BINDINGS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
-        var level=owner.serverLevel();var anchor=target.position();
+        var level=owner.serverLevel();
         long now=level.getGameTime();
-        BINDINGS.put(id,new Binding(target,owner,level,anchor,now,now+80));
+        BINDINGS.put(id,new Binding(target,owner,level,now));
         return true;
     }
 
@@ -42,28 +55,62 @@ public final class WorldloomSnare {
         var iterator=BINDINGS.entrySet().iterator();
         while(iterator.hasNext()){
             var binding=iterator.next().getValue();var target=binding.target;var owner=binding.owner;var level=binding.level;
+            long now=level.getGameTime();
             if(!target.isAlive()||target.isRemoved()||owner.isRemoved()||!owner.isAlive()||owner.serverLevel()!=level||target.level()!=level
                     ||target.isAlliedTo(owner)||target instanceof Player other&&!owner.canHarmPlayer(other)
-                    ||level.getGameTime()>=binding.expires){iterator.remove();continue;}
-            if(level.getGameTime()%5==0&&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
+                    ||binding.expires>0&&now>=binding.expires){iterator.remove();continue;}
+            if(now%5==0&&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
+            long age=now-binding.started;
+            if(binding.anchor==null){
+                if(now%ROOT_PULSE_TICKS==0)emitWindup(binding,age);
+                if(age>=WINDUP_TICKS){
+                    binding.anchor=target.position();
+                    binding.expires=now+ROOT_DURATION_TICKS;
+                    emitCatch(binding);
+                }
+                continue;
+            }
             BlockPos at=BlockPos.containing(binding.anchor);
             if(level.hasChunkAt(at)){
                 var box=target.getBoundingBox().move(binding.anchor.subtract(target.position()));
                 if(level.noCollision(target,box))target.setPos(binding.anchor);
             }
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
-            if(level.getGameTime()%ROOT_PULSE_TICKS==0){
-                // Rotate a low ring around the ankles; four block fragments keep the
-                // root readable while cutting particle traffic by sixty percent.
-                long age=level.getGameTime()-binding.started;
-                double angle=age*.18, x=binding.anchor.x+Math.cos(angle)*.08,z=binding.anchor.z+Math.sin(angle)*.08;
-                double y=binding.anchor.y+.08D;
-                // One bounded packet per nearby viewer keeps the animation cheap even with several roots active.
-                level.sendParticles(owner,VINE_PARTICLE,false,x,y,z,ROOT_PARTICLES,.22,.035,.22,.008);
-                if(target instanceof ServerPlayer viewer&&viewer!=owner)
-                    level.sendParticles(viewer,VINE_PARTICLE,false,x,y,z,ROOT_PARTICLES,.22,.035,.22,.008);
-            }
+            if(now%ROOT_PULSE_TICKS==0)emitCaughtPulse(binding,age);
         }
+    }
+
+    /** The ankle ring tightens over three seconds, giving targets a visible escape window. */
+    private static void emitWindup(Binding binding,long age){
+        double progress=Math.min(1D,Math.max(0D,age/(double)WINDUP_TICKS));
+        double radius=.18D+.48D*progress,angle=age*.16D;
+        double x=binding.target.getX(),y=binding.target.getY()+.08D,z=binding.target.getZ();
+        emit(binding,x+Math.cos(angle)*radius,y,z+Math.sin(angle)*radius,ROOT_PARTICLES,.08D,.025D,.08D,.004D);
+        emit(binding,x+Math.cos(angle+Math.PI)*radius,y,z+Math.sin(angle+Math.PI)*radius,ROOT_PARTICLES,.08D,.025D,.08D,.004D);
+        if(progress>.55D){
+            double rise=(progress-.55D)*.42D;
+            emit(binding,x+Math.cos(angle)*radius*.72D,y+rise,z+Math.sin(angle)*radius*.72D,2,.035D,.04D,.035D,.002D);
+        }
+    }
+
+    private static void emitCatch(Binding binding){
+        double x=binding.anchor.x,y=binding.anchor.y+.12D,z=binding.anchor.z;
+        for(int i=0;i<8;i++){
+            double angle=i*Math.PI/4D;
+            emit(binding,x+Math.cos(angle)*.34D,y,z+Math.sin(angle)*.34D,2,.035D,.12D,.035D,.006D);
+        }
+    }
+
+    private static void emitCaughtPulse(Binding binding,long age){
+        double angle=age*.22D,x=binding.anchor.x,y=binding.anchor.y+.08D,z=binding.anchor.z;
+        emit(binding,x+Math.cos(angle)*.12D,y,z+Math.sin(angle)*.12D,ROOT_PARTICLES,.18D,.035D,.18D,.006D);
+    }
+
+    private static void emit(Binding binding,double x,double y,double z,int count,double dx,double dy,double dz,double speed){
+        // One bounded particle packet per nearby viewer keeps several simultaneous roots inexpensive.
+        binding.level.sendParticles(binding.owner,VINE_PARTICLE,false,x,y,z,count,dx,dy,dz,speed);
+        if(binding.target instanceof ServerPlayer viewer&&viewer!=binding.owner)
+            binding.level.sendParticles(viewer,VINE_PARTICLE,false,x,y,z,count,dx,dy,dz,speed);
     }
 
     public static void forget(ServerPlayer owner){BINDINGS.values().removeIf(binding->binding.owner==owner);}

@@ -1072,9 +1072,14 @@ public final class PickaxeGameTests {
         var anchor=mob.position();
         h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
         mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
-        h.assertTrue(mob.position().distanceToSqr(anchor)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"roots pull the hostile back and suppress escape momentum");
-        WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
-        h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
-        finish(h,owner);
+        h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"roots telegraph for three seconds without freezing the target");
+        h.runAfterDelay(60,()->{
+            WorldloomSnare.tick();
+            var caughtPosition=mob.position();mob.setPos(caughtPosition.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
+            h.assertTrue(mob.position().distanceToSqr(caughtPosition)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"closing roots pin the hostile for four seconds");
+            WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
+            h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
+            finish(h,owner);
+        });
     }
 }
