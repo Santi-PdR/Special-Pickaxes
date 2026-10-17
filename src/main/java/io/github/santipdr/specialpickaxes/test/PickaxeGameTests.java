@@ -178,7 +178,7 @@ public final class PickaxeGameTests {
         armoredAlly.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,100,1,true,false,true));
         ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);
         var stasis=SpecialPickaxes.STASIS_WARD.get();
-        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.INTERREGNUM).getLong("stasisAuraScanAt")==ArtifactState.now(wearer)+10,"the Stasis ally search is throttled to once per ten ticks");
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.INTERREGNUM).getLong("stasisAuraScanAt")==ArtifactState.now(wearer)+20,"the Stasis ally search is throttled to once per twenty ticks");
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),"the Curios wearer keeps its own Stasis ward");
         h.assertTrue(wearer.hasEffect(stasis)&&ally.hasEffect(stasis)&&armoredAlly.hasEffect(stasis),"the custom visual ward reaches the wearer and nearby allies");
         h.assertTrue(Math.abs(ally.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.15D)<.001D,"Stasis Ward anchors allies against knockback");
@@ -219,7 +219,7 @@ public final class PickaxeGameTests {
         ally.setHealth(ally.getHealth()-4F);
         ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
-        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).getLong("heartwoodAuraScanAt")==ArtifactState.now(wearer)+10,"the Heartwood ally search is throttled to once per ten ticks");
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).getLong("heartwoodAuraScanAt")==ArtifactState.now(wearer)+20,"the Heartwood ally search is throttled to once per twenty ticks");
         h.assertTrue(wearer.hasEffect(renewal)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),"the Curios wearer receives Heartwood Renewal instead of generic Regeneration");
         h.assertTrue(ally.hasEffect(renewal)&&ally.getEffect(renewal).getDuration()==40,"nearby allied miners receive the short custom renewal lease");
         h.assertTrue(!farAlly.hasEffect(renewal)&&!enemy.hasEffect(renewal),"the effect does not reach distant allies or enemies");

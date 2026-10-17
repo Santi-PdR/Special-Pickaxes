@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 /** Small, always-on identities for every artifact. No attack-strength effects are used. */
 public final class ArtifactPassives {
     private static final int PASSIVE_LEASE_TICKS=40;
-    private static final int ALLY_AURA_SCAN_TICKS=10;
+    private static final int ALLY_AURA_SCAN_TICKS=20;
     private ArtifactPassives() {}
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
