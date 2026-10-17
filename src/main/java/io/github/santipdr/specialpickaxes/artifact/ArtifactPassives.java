@@ -62,15 +62,9 @@ public final class ArtifactPassives {
             event.setAmount(event.getAmount()*.75F);
             StarfallWardEffect.projectileImpact(player);
         }
-        if(kind==ArtifactKind.HELLSPEC) {
-            if(!source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE))return;
-            var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
-            if(state.getLong("curiosPassiveReady")<=now){
-                state.putLong("curiosPassiveReady",now+80);event.setAmount(event.getAmount()*.35F);
-                ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
-            }
-            return;
-        }
+        // The Searing Shell already cancels fire and lava at LivingAttackEvent;
+        // its Curios counter is reserved for hostile non-fire hits.
+        if(kind==ArtifactKind.HELLSPEC&&source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE))return;
         LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
         if(attacker==null){
             Entity direct=source.getDirectEntity();
@@ -81,7 +75,7 @@ public final class ArtifactPassives {
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
         boolean retaliationAllowed=switch(kind){
-            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,ICARUS,AXIOM,EXODIUM,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
+            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
             default -> false;
         };
         if(!retaliationAllowed&&switch(kind){
@@ -96,6 +90,13 @@ public final class ArtifactPassives {
             case CHOIR -> attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),60,0,true,false,true));
             case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),70,0,true,false,true));}
             case CRUCIBLE -> attacker.setSecondsOnFire(3);
+            case HELLSPEC -> {
+                event.setAmount(event.getAmount()*.8F);
+                if(retaliationAllowed){
+                    attacker.setSecondsOnFire(3);
+                    ArtifactFeedback.burst(player,kind,attacker.blockPosition(),8);
+                }
+            }
             case INTERREGNUM -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)attacker.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),40,1,true,false,true));}
             case WORLDLOOM -> player.addEffect(new MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(),60,0,true,false,true));
             case ICARUS -> {

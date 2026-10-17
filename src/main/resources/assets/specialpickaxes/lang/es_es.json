@@ -561,7 +561,7 @@
   "curios.detail.specialpickaxes.hollow_axiom": "Marca nula: el primer golpe hostil cada 8 s impide que el atacante se cure durante 3 s.",
   "curios.detail.specialpickaxes.worldbreaker": "Guardia del núcleo: el primer golpe hostil cada 8 s causa 20% menos daño y otorga Absorción II durante 3 s.",
   "curios.detail.specialpickaxes.exodium": "Pliegue estelar: el primer golpe hostil cada 8 s lanza al atacante hacia arriba y lejos.",
-  "curios.detail.specialpickaxes.hellspec": "Manto de ceniza: el Caparazón Ígneo bloquea el fuego y la lava. En el calor aparece un halo de brasas giratorio.",
+  "curios.detail.specialpickaxes.hellspec": "Manto de ceniza: bloquea fuego y lava. El primer golpe hostil cada 8 s hace 20% menos daño e incendia al atacante durante 3 s. En el calor giran brasas.",
   "screen.specialpickaxes.copy_native": "Técnicas propias de Worldbreaker",
   "screen.specialpickaxes.copy_native_help": "Quita la copia y restaura los seis modos de minería propios del Rompemundos.",
   "message.specialpickaxes.copy_native": "Worldbreaker volvió a sus técnicas y modos nativos.",

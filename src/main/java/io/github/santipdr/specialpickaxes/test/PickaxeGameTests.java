@@ -362,6 +362,17 @@ public final class PickaxeGameTests {
         external=wearer.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
         h.assertTrue(external!=null&&external.getDuration()==6000&&!external.isAmbient(),"unequipping the last pick preserves Night Vision supplied elsewhere");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_50") public static void hellspecCuriosCinderRetortAnswersHostileHitsOncePerCooldown(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var attacker=EntityType.ZOMBIE.create(h.getLevel());
+        attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.HELLSPEC);
+        h.assertTrue(Math.abs(hit.getAmount()-8F)<.001F&&attacker.getRemainingFireTicks()>=60,"Cinder Retort reduces the first hostile hit by 20 percent and ignites its attacker");
+        attacker.clearFire();var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,repeat,ArtifactKind.HELLSPEC);
+        h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire(),"the eight-second cooldown prevents repeated reductions and ignitions");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         var shell=SpecialPickaxes.SEARING_SHELL.get();
