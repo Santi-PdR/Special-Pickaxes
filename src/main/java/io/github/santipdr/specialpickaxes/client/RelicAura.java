@@ -88,6 +88,11 @@ public final class RelicAura {
     private static void emitCurios(Minecraft mc,Player player,ArtifactItem item){
         double phase=player.tickCount*0.075D+item.kind.ordinal()*0.61D;
         var dust=dust(item.kind,item.kind==ArtifactKind.ICARUS?0.34F:0.27F);
+        int lodeCharges=0;
+        if(item.kind==ArtifactKind.IRIDIUM){
+            var surge=player.getEffect(SpecialPickaxes.LODE_SURGE.get());
+            if(surge!=null)lodeCharges=Math.min(3,surge.getAmplifier()+1);
+        }
         ParticleOptions accent=accent(item.kind,dust);
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
         double yaw=Math.toRadians(player.getYRot());
@@ -149,9 +154,9 @@ public final class RelicAura {
                     particleY=y-.18D+(i%2)*.34D;particle=i==0?ParticleTypes.END_ROD:dust;
                 }
                 case IRIDIUM -> {
-                    angle=phase*.3D+i*Math.PI/2D;radius=.4D;
+                    angle=phase*.3D+i*Math.PI/2D;radius=.4D+(i<lodeCharges ? .08D : 0D);
                     x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
-                    particleY=y-.1D+(i%2)*.2D;particle=i==0?ParticleTypes.GLOW:dust;
+                    particleY=y-.1D+(i%2)*.2D;particle=i==3?ParticleTypes.END_ROD:(i<lodeCharges?ParticleTypes.GLOW:dust);
                 }
                 case WORLDBREAKER -> {
                     angle=phase*.36D+i*Math.PI/2D;radius=.31D+.05D*Math.sin(phase+i);
