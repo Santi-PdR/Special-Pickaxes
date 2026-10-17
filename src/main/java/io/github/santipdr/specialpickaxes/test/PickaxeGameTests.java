@@ -723,6 +723,7 @@ public final class PickaxeGameTests {
         var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),archer);
         arrow.setPos(wearer.getX()+3,wearer.getY()+1,wearer.getZ());arrow.setDeltaMovement(-3D,0D,0D);h.getLevel().addFreshEntity(arrow);
         h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE),"the eight-second Crucible projectile ward starts");
+        ArtifactFeedback.crucibleWardOrbit(wearer,10);
         DomainFields.tick();
         h.assertTrue(arrow.getDeltaMovement().x>0D,"the ward redirects a fast hostile shot outward before impact");
         h.assertTrue(DomainFields.active(wearer),"the deflection does not consume or cancel the remaining ward");finish(h,wearer);

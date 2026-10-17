@@ -133,6 +133,18 @@ public final class ArtifactFeedback {
         var fragments=new BlockParticleOption(ParticleTypes.BLOCK,material);
         p.serverLevel().sendParticles(p,fragments,false,pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D,5,.18D,.2D,.18D,.055D);
     }
+    /** A slow double-height orbit marks the projectile ward while spending fewer particle packets. */
+    public static void crucibleWardOrbit(ServerPlayer p,int radius){
+        var level=p.serverLevel();double phase=level.getGameTime()*.075D;
+        for(int i=0;i<8;i++){
+            double angle=phase+i*Math.PI/4D;
+            int band=i&1;double r=Math.max(1,radius-band*.8D);
+            double x=p.getX()+Math.cos(angle)*r,z=p.getZ()+Math.sin(angle)*r;
+            double y=p.getY()+.18D+band*1.05D+Math.sin(angle*2D)*.08D;
+            level.sendParticles(p,(i&2)==0?ParticleTypes.SMALL_FLAME:ParticleTypes.WAX_ON,
+                    false,x,y,z,1,0,.015D,0,.002D);
+        }
+    }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         for(int i=0;i<8;i++) {
             double angle=(i/8.0)*Math.PI*2;

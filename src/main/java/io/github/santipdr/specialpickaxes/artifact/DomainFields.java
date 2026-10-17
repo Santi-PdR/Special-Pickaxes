@@ -216,11 +216,7 @@ public final class DomainFields {
                     if(++changed>=cap)break;
                 }
                 if(changed>0&&p.tickCount%10==0)ArtifactFeedback.message(p,"projectiles_deflected",changed);
-                if(p.tickCount%4==0)for(int i=0;i<12;i++){
-                    double a=i*Math.PI/6,rad=f.radius;
-                    level.sendParticles(p,net.minecraft.core.particles.ParticleTypes.SMALL_FLAME,false,
-                            p.getX()+Math.cos(a)*rad,p.getY()+.15,p.getZ()+Math.sin(a)*rad,1,0,0,0,0);
-                }
+                if(p.tickCount%8==0)ArtifactFeedback.crucibleWardOrbit(p,f.radius);
                 continue;
             }
             if(f.kind==ArtifactKind.EVENTIDE) {
