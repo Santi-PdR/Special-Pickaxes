@@ -73,7 +73,7 @@ public final class SpecialPickaxes {
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::trackPlayerPlacedBlocks);
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::schedulePlacedBlockCleanup);
         forge.addListener(this::tagsUpdated);
-        forge.addListener(this::curiosIridiumMine);
+        forge.addListener(this::curiosMiningFeedback);
         forge.addListener(this::entityJoin);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);forge.addListener(this::heal);
         forge.addListener(this::fall);
@@ -95,8 +95,10 @@ public final class SpecialPickaxes {
             PlayerPlacedBlocks.scheduleCleanup(level,e.getPos());
     }
     private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();MiningDesigns.clearCache();}
-    private void curiosIridiumMine(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
-        if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p)||!ArtifactOres.isOre(e.getState()))return;
+    private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
+        if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
+        StrataFocusEffect.miningPulse(p,e.getPos());
+        if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());
     }

@@ -501,6 +501,11 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         ArtifactPassives.tick(wearer,ArtifactKind.PALIMPSEST);var focus=SpecialPickaxes.STRATA_FOCUS.get();
         h.assertTrue(wearer.hasEffect(focus)&&wearer.getEffect(focus).getAmplifier()==1,"Palimpsest grants the level-two custom mining passive");
+        var minedBlock=target(h);
+        h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"Strata Focus flashes at a mined block");
+        h.assertTrue(!StrataFocusEffect.miningPulse(wearer,minedBlock),"rapid mining cannot spam its feedback pulse");
+        wearer.tickCount+=6;
+        h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"the mining pulse returns after its short throttle");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"Strata Focus replaces generic Haste");
         var speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
         MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-89.6F)<.01F,"level two applies the same 1.4x mining-speed factor as Haste II");
