@@ -311,6 +311,9 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
+        var trail=new ArrayList<BlockPos>();for(int i=0;i<8;i++)trail.add(seed.east(i));
+        h.assertTrue(ArtifactFeedback.seamTrail(p,trail)==4,"a vein pulse draws at most four recent adjacent links");
+        h.assertTrue(ArtifactFeedback.seamTrail(p,List.of(seed,seed.offset(10,0,0)))==0,"the private trail skips distant, disconnected breaks");
         var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();
         for(var pos:List.of(seed,sameA,sameB,mixed,ore,placed))PlayerPlacedBlocks.get(level).unmark(pos);
         level.setBlockAndUpdate(sameA,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(sameB,Blocks.STONE.defaultBlockState());

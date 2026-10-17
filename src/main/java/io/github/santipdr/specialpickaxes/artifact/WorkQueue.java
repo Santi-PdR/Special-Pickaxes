@@ -24,7 +24,8 @@ public final class WorkQueue {
     private static final class Job {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
-        int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;BlockPos lastFeedback;
+        int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
+        final ArrayDeque<BlockPos> seamTrailPoints=new ArrayDeque<>(5);
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();this.reservedBytes=snapshotBytes;
@@ -108,7 +109,12 @@ public final class WorkQueue {
                 WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);
-                    if(ok) { feedback=step.pos();if(job.kind==ArtifactKind.CRUCIBLE&&step instanceof WorkStep.Rephase rephase)feedbackMaterial=rephase.target();job.succeeded++; }
+                    if(ok) {
+                        feedback=step.pos();
+                        if(job.kind==ArtifactKind.CRUCIBLE&&step instanceof WorkStep.Rephase rephase)feedbackMaterial=rephase.target();
+                        if(job.kind==ArtifactKind.SEAM_RIPPER){job.seamTrailPoints.addLast(feedback.immutable());while(job.seamTrailPoints.size()>5)job.seamTrailPoints.removeFirst();}
+                        job.succeeded++;
+                    }
                     else if(step.stopOnFailure()) {job.steps.clear();job.aborted=true;break;}
                 } catch(RuntimeException error) {
                     LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
@@ -121,10 +127,9 @@ public final class WorkQueue {
                 else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
                 else if(job.kind==ArtifactKind.CRUCIBLE&&feedbackMaterial!=null)ArtifactFeedback.crucibleRephase(p,feedback,feedbackMaterial);
                 else {
-                    if(job.kind==ArtifactKind.SEAM_RIPPER&&job.lastFeedback!=null)ArtifactFeedback.seamTrail(p,job.lastFeedback,feedback);
+                    if(job.kind==ArtifactKind.SEAM_RIPPER)ArtifactFeedback.seamTrail(p,List.copyOf(job.seamTrailPoints));
                     ArtifactFeedback.burst(p,job.kind,feedback,4);
                 }
-                if(job.kind==ArtifactKind.SEAM_RIPPER)job.lastFeedback=feedback.immutable();
             }
             if(job.region!=null)job.region.reportProgress(p);
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
