@@ -16,9 +16,25 @@ public final class ArtifactTooltips {
                 Component.translatable("alternate.specialpickaxes."+k.id)).withStyle(ChatFormatting.AQUA));
         if(k==ArtifactKind.WORLDBREAKER&&stack.hasTag()&&stack.getTag().contains("copiedSkill")){
             String source=stack.getTag().getString("copiedSkill");
-            try{ArtifactKind.byId(source);lines.add(Component.translatable("tooltip.specialpickaxes.copying",Component.translatable("item.specialpickaxes."+source)).withStyle(ChatFormatting.GOLD));}
+            try{
+                var copied=ArtifactKind.byId(source);var pickName=Component.translatable("item.specialpickaxes."+source);
+                String mode=copyModeKey(stack,copied);
+                lines.add((mode.isEmpty()?Component.translatable("tooltip.specialpickaxes.copying",pickName)
+                        :Component.translatable("tooltip.specialpickaxes.copying_mode",pickName,Component.translatable("mode.specialpickaxes."+mode)))
+                        .withStyle(ChatFormatting.GOLD));
+            }
             catch(IllegalArgumentException ignored){}
         }
+    }
+    /** The compact tooltip and manual read the exact copied mode saved on this tool. */
+    public static String copyModeKey(ItemStack stack){
+        if(!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return "";
+        try{return copyModeKey(stack,ArtifactKind.byId(stack.getTag().getString("copiedSkill")));}
+        catch(IllegalArgumentException invalid){return "";}
+    }
+    private static String copyModeKey(ItemStack stack,ArtifactKind copied){
+        return copied==ArtifactKind.WORLDBREAKER||ArtifactInteraction.modeCount(copied)<2?""
+                :ArtifactInteraction.modeKey(copied,stack.getTag().getInt("copiedMode"));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
         return actions(ItemStack.EMPTY,k,mode);

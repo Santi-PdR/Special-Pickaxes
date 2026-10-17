@@ -1304,7 +1304,12 @@ public final class PickaxeGameTests {
             ArtifactTooltips.compact(tool,k,compact);ArtifactTooltips.expanded(tool,k,expanded);
             h.assertTrue(compact.size()==2&&expanded.size()>=9,"compact R/X lines and complete manual "+k);
             if(k==ArtifactKind.CRUCIBLE){var actions=ArtifactTooltips.actions(tool,k,7);h.assertTrue(!actions.contains(RelicControl.Action.SELECT)&&actions.contains(RelicControl.Action.ACTIVATE)&&!actions.contains(RelicControl.Action.CONFIRM)&&!actions.contains(RelicControl.Action.PAUSE),"R replaces separate selection, confirm, and pause keys");}
-        }h.succeed();
+        }
+        var copied=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());
+        copied.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);copied.getOrCreateTag().putInt("copiedMode",8);
+        var copiedLines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.compact(copied,ArtifactKind.WORLDBREAKER,copiedLines);
+        h.assertTrue(copiedLines.size()==3&&ArtifactTooltips.copyModeKey(copied).equals("calcite"),"Worldbreaker tooltip identifies the copied Crucible and its current Calcite mode");
+        h.succeed();
     }
     @GameTest(template="empty",batch="legacy_each_37") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);

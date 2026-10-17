@@ -613,6 +613,7 @@
   "message.specialpickaxes.crucible_ward_started": "Crucible Ward active for 8 seconds. Hostile shots will be deflected around you.",
   "screen.specialpickaxes.copy_mode": "COPY MODE · %s",
   "tooltip.specialpickaxes.copying": "Copying: %s",
+  "tooltip.specialpickaxes.copying_mode": "Copying: %s · %s",
   "mining.identity.seam_ripper.connected": "CONNECTED SEAM: mine a same-material geological vein.",
   "mining.how.seam_ripper.connected": "Aim at natural stone and press R. The pickaxe follows only connected blocks of that exact material, up to 256. A brief glowing scar links nearby breaks so you can follow the route. Ores, placed blocks, fluids and machines are preserved.",
   "mode.specialpickaxes.connected": "CONNECTED",
