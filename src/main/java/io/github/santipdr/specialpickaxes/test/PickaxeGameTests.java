@@ -140,6 +140,18 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(attacker.getDeltaMovement().x-.60)<.001&&Math.abs(attacker.getDeltaMovement().y-.25)<.001,"Stasis Tether damps horizontal escape without changing vertical movement");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_52") public static void interregnumAbsorptionLeasePreservesExternalEffects(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var absorption=net.minecraft.world.effect.MobEffects.ABSORPTION;
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(absorption,200,1,false,true,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);var current=wearer.getEffect(absorption);
+        h.assertTrue(current!=null&&current.getDuration()==200&&current.getAmplifier()==1&&!current.isAmbient(),"Stasis does not replace a stronger server-owned Absorption potion");
+        wearer.removeEffect(absorption);ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);current=wearer.getEffect(absorption);
+        h.assertTrue(current!=null&&current.getDuration()==40&&current.getAmplifier()==0&&current.isAmbient()&&!current.isVisible(),"Stasis supplies and refreshes its own short Absorption lease when no external effect exists");
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(absorption,100,0,false,true,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);current=wearer.getEffect(absorption);
+        h.assertTrue(current!=null&&current.getDuration()==100&&current.getAmplifier()==0&&!current.isAmbient()&&current.isVisible(),"a later external Absorption potion takes ownership and is not refreshed by the Curios lease");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_48") public static void iridiumRecognizesForeignOresButNotBroadlyTaggedHostRock(GameTestHelper h){
         h.assertTrue(ArtifactOres.isOre(TestOres.NAMED_ORE.defaultBlockState()),"foreign conventional *_ore registry names qualify as ore");
         h.assertTrue(ArtifactOres.isOre(TestOres.TAGGED_ORE.defaultBlockState()),"foreign ore-family tags classify ores without ore in their registry name");

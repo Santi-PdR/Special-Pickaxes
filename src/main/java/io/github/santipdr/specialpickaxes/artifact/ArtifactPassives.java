@@ -14,6 +14,7 @@ public final class ArtifactPassives {
     private static final int PASSIVE_LEASE_TICKS=40;
     private static final int ALLY_AURA_SCAN_TICKS=20;
     private static final String NIGHT_VISION_LEASE="specialpickaxesNightVisionLease";
+    private static final String ABSORPTION_LEASE="specialpickaxesInterregnumAbsorptionLease";
     private ArtifactPassives() {}
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
@@ -128,7 +129,7 @@ public final class ArtifactPassives {
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }
             case INTERREGNUM -> {
-                grant(player, MobEffects.ABSORPTION, 0, PASSIVE_LEASE_TICKS);
+                grantAbsorption(player,PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(), 0, PASSIVE_LEASE_TICKS);
                 shareStasisWard(player);
             }
@@ -162,6 +163,23 @@ public final class ArtifactPassives {
         var current = player.getEffect(effect);
         if (current == null || current.getAmplifier() < amplifier || current.getAmplifier() == amplifier && current.getDuration() <= 40)
             player.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false, true));
+    }
+
+    /** Keeps Curios absorption from replacing a potion supplied by the server or another mod. */
+    private static void grantAbsorption(ServerPlayer player,int duration){
+        var current=player.getEffect(MobEffects.ABSORPTION);var data=player.getPersistentData();
+        boolean owned=data.getBoolean(ABSORPTION_LEASE);
+        if(owned&&(current==null||!isAbsorptionLease(current))){data.remove(ABSORPTION_LEASE);owned=false;}
+        if(current==null){
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,duration,0,true,false,true));
+            data.putBoolean(ABSORPTION_LEASE,true);
+        }else if(owned&&current.getAmplifier()==0&&current.getDuration()<=duration){
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,duration,0,true,false,true));
+        }
+    }
+
+    private static boolean isAbsorptionLease(MobEffectInstance effect){
+        return effect.getAmplifier()==0&&effect.isAmbient()&&!effect.isVisible()&&effect.showIcon();
     }
 
     /** Keeps the shared passive from replacing or removing a server/mod-owned Night Vision effect. */
@@ -207,7 +225,7 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,8,256);
         for(var ally:allies){
-            grant(ally,MobEffects.ABSORPTION,0,PASSIVE_LEASE_TICKS);
+            grantAbsorption(ally,PASSIVE_LEASE_TICKS);
             grant(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,PASSIVE_LEASE_TICKS);
         }
     }
