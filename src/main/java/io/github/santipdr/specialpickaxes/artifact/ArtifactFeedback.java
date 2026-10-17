@@ -244,17 +244,17 @@ public final class ArtifactFeedback {
     /** Moves a restrained light along Stasis's square edge without broadcasting to distant players. */
     public static void stasisBoundaryPulse(ServerPlayer p,BlockPos center,int radius,int halfHeight){
         if(radius<1)return;
-        double perimeter=radius*8D,travel=p.tickCount*.15D;
+        var level=p.serverLevel();double perimeter=radius*8D,travel=p.tickCount*.15D;
         var head=stasisBoundaryPoint(center,radius,travel);
         var tail=stasisBoundaryPoint(center,radius,travel-1.25D);
         var glow=new DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
-        p.serverLevel().sendParticles(p,ParticleTypes.END_ROD,false,head.x,head.y+.72D,head.z,1,0,0,0,0);
-        p.serverLevel().sendParticles(p,glow,false,head.x,head.y+.28D,head.z,2,.06D,.04D,.06D,0);
-        p.serverLevel().sendParticles(p,glow,false,tail.x,tail.y+.28D,tail.z,1,0,0,0,0);
-        // Matching markers above the base make the square read as a bounded volume, not a floor outline.
+        level.sendParticles(ParticleTypes.END_ROD,head.x,head.y+.72D,head.z,1,0,0,0,0);
+        level.sendParticles(glow,head.x,head.y+.28D,head.z,2,.06D,.04D,.06D,0);
+        level.sendParticles(glow,tail.x,tail.y+.28D,tail.z,1,0,0,0,0);
+        // Nearby teammates can read the same boundary that contains their shared domain buffs.
         double topY=center.getY()+halfHeight+.08D;
-        p.serverLevel().sendParticles(p,glow,false,head.x,topY,head.z,1,0,0,0,0);
-        p.serverLevel().sendParticles(p,glow,false,head.x,head.y+halfHeight*.5D,head.z,1,0,0,0,0);
+        level.sendParticles(glow,head.x,topY,head.z,1,0,0,0,0);
+        level.sendParticles(glow,head.x,head.y+halfHeight*.5D,head.z,1,0,0,0,0);
     }
     public static Vec3 stasisBoundaryPoint(BlockPos center,int radius,double distance){
         double side=radius*2D,perimeter=side*4D;
