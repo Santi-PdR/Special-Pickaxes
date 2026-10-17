@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '5.10.236'
+version = '5.10.237'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -23,6 +23,7 @@ minecraft {
         }
         server { args '--nogui' }
         gameTestServer {
+            workingDirectory project.file("build/gametest-${project.version}")
             property 'specialpickaxes.testFluids', 'true'
             property 'specialpickaxes.testOres', 'true'
             property 'forge.enabledGameTestNamespaces', 'specialpickaxes'
@@ -51,7 +52,7 @@ jar {
 }
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     doFirst {
-        def properties = file('run/server.properties')
+        def properties = file("build/gametest-${project.version}/server.properties")
         properties.parentFile.mkdirs()
         if (!properties.exists()) properties.text = 'spawn-protection=0\n'
     }

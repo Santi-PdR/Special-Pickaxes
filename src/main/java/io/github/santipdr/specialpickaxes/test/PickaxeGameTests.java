@@ -406,6 +406,18 @@ public final class PickaxeGameTests {
                 &&!target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN),"the strike no longer falls back to generic Weakness and Slowness");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_64") public static void axiomHeldHitAppliesHealingNullMark(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.AXIOM,"AxiomStrike");var target=EntityType.ZOMBIE.create(h.getLevel());
+        target.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(target);
+        var tool=wearer.getMainHandItem();
+        h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,wearer),"Axiom's pickaxe can apply its melee signature");
+        var mark=SpecialPickaxes.NULL_MARK.get();
+        h.assertTrue(target.hasEffect(mark)&&target.getEffect(mark).getDuration()==100,"the strike applies five seconds of the custom healing lock");
+        h.assertTrue(target.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING)&&!target.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"the hit keeps its visible mark without generic Weakness");
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(target,4F)),"Null Mark blocks recovery from potions or healing skills");
+        h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the pickaxe wearer is not caught by its own mark");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");

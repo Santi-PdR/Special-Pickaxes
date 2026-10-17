@@ -65,7 +65,11 @@ public final class ArtifactItem extends PickaxeItem {
                 case INTERREGNUM -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,160,4,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,100,1,false,true,true)); }
                 case WORLDLOOM -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,3,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,0,false,true,true)); }
                 case ICARUS -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,200,0,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.JUMP,160,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED,120,1,false,true,true)); }
-                case AXIOM -> { target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,200,0,false,true,true)); target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS,100,1,false,true,true)); }
+                case AXIOM -> {
+                    target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,200,0,false,true,true));
+                    ArtifactPassives.grantCombatEffect(target,SpecialPickaxes.NULL_MARK.get(),0,100);
+                    ArtifactFeedback.burst(player,kind,target.blockPosition(),8);
+                }
                 case WORLDBREAKER -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,1,false,true,true));
                 default -> { }
             }
