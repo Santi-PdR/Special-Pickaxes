@@ -640,6 +640,40 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosDamage(wearer,unwardedHit,ArtifactKind.EXODIUM);
         h.assertTrue(unwardedHit.getAmount()==12F,"the projectile guard is not retained after unequipping");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_59") public static void exodiumSharesStarfallGuardWithThreeNearbyAllies(GameTestHelper h){
+        var owner=player(h,ArtifactKind.EXODIUM,"StarfallBearer");
+        var allies=List.of(player(h,ArtifactKind.CHOIR,"StarfallOne"),player(h,ArtifactKind.ICARUS,"StarfallTwo"),
+                player(h,ArtifactKind.WORLDLOOM,"StarfallThree"),player(h,ArtifactKind.PALIMPSEST,"StarfallFour"));
+        var distant=player(h,ArtifactKind.AXIOM,"StarfallDistant");var enemy=player(h,ArtifactKind.SEAM_RIPPER,"StarfallEnemy");
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("starfall_"+owner.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("stfoes_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(owner.getScoreboardName(),team);
+        for(var ally:allies)scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(distant.getScoreboardName(),team);scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        for(int i=0;i<allies.size();i++)allies.get(i).setPos(owner.getX()+i+1,owner.getY(),owner.getZ());
+        distant.setPos(owner.getX()+7,owner.getY(),owner.getZ());enemy.setPos(owner.getX()+1,owner.getY(),owner.getZ());
+        var participants=new ArrayList<ServerPlayer>();participants.add(owner);participants.addAll(allies);participants.add(distant);participants.add(enemy);
+        for(var participant:participants)h.getLevel().addFreshEntity(participant);
+        ArtifactPassives.tick(owner,ArtifactKind.EXODIUM);var guard=SpecialPickaxes.STARFALL_GUARD.get();
+        for(int i=0;i<3;i++)h.assertTrue(allies.get(i).hasEffect(guard),"one of the three closest teammates receives the projectile guard");
+        h.assertTrue(!allies.get(3).hasEffect(guard)&&!distant.hasEffect(guard)&&!enemy.hasEffect(guard),
+                "the aura excludes the fourth teammate, distant players and enemies");
+        var shooter=EntityType.SKELETON.create(h.getLevel());h.getLevel().addFreshEntity(shooter);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+        var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(allies.get(0),h.getLevel().damageSources().arrow(arrow,shooter),10F);
+        ArtifactPassives.onCuriosDamage(allies.get(0),projectileHit,ArtifactKind.MERIDIAN);
+        h.assertTrue(Math.abs(projectileHit.getAmount()-7.5F)<.001F,"the shared passive reduces projectile damage by 25 percent");
+        var meleeHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(allies.get(0),h.getLevel().damageSources().mobAttack(shooter),10F);
+        ArtifactPassives.onCuriosDamage(allies.get(0),meleeHit,ArtifactKind.MERIDIAN);
+        h.assertTrue(meleeHit.getAmount()==10F,"Starfall Guard does not reduce melee damage");
+        var wearer=player(h,ArtifactKind.EXODIUM);wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(guard,40,0));
+        ArtifactPassives.tick(wearer,ArtifactKind.EXODIUM);
+        var oneReduction=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),10F);
+        ArtifactPassives.onCuriosDamage(wearer,oneReduction,ArtifactKind.EXODIUM);
+        h.assertTrue(Math.abs(oneReduction.getAmount()-7.5F)<.001F,"overlapping wearer and team wards never stack their projectile reduction");
+        h.assertTrue(guard.isDurationEffectTick(40,0)&&!guard.isDurationEffectTick(39,0),"the shared effect uses a low-cost two-particle pulse every ten ticks");
+        finish(h,owner);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullMarkSuppressesHealing(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.AXIOM);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

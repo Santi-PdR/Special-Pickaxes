@@ -51,6 +51,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> SEAM_FRAY=EFFECTS.register("seam_fray",SeamFrayEffect::new);
     public static final RegistryObject<MobEffect> LODEGUARD=EFFECTS.register("lodeguard",LodeguardEffect::new);
     public static final RegistryObject<MobEffect> STARFALL_WARD=EFFECTS.register("starfall_ward",StarfallWardEffect::new);
+    public static final RegistryObject<MobEffect> STARFALL_GUARD=EFFECTS.register("starfall_guard",StarfallGuardEffect::new);
     public static final RegistryObject<MobEffect> CRUCIBLE_MANTLE=EFFECTS.register("crucible_mantle",CrucibleMantleEffect::new);
     public static final RegistryObject<MobEffect> PHASE_SHEAR=EFFECTS.register("phase_shear",PhaseShearEffect::new);
     public static final RegistryObject<MobEffect> WORLDBREAKER_AEGIS=EFFECTS.register("worldbreaker_aegis",WorldbreakerAegisEffect::new);

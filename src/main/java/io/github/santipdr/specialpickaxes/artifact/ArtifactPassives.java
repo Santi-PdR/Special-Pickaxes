@@ -55,15 +55,25 @@ public final class ArtifactPassives {
         if(kind==ArtifactKind.EXODIUM
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EXODIUM))
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
+        if(kind==ArtifactKind.EXODIUM
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EXODIUM))
+            removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get());
     }
 
     /** Curios-only defensive signatures. Each relic can answer one hostile hit every eight seconds. */
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind) {
         if(event.getAmount()<=0)return;
         var source=event.getSource();
+        boolean starfallGuarded=false;
+        if(source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)
+                &&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get())){
+            event.setAmount(event.getAmount()*.75F);
+            StarfallWardEffect.projectileImpact(player);
+            starfallGuarded=true;
+        }
         if(kind==ArtifactKind.EXODIUM&&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get())
                 &&source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)){
-            event.setAmount(event.getAmount()*.75F);
+            if(!starfallGuarded)event.setAmount(event.getAmount()*.75F);
             StarfallWardEffect.projectileImpact(player);
         }
         // The Searing Shell already cancels fire and lava at LivingAttackEvent;
@@ -174,6 +184,7 @@ public final class ArtifactPassives {
             case EXODIUM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get(), 0, PASSIVE_LEASE_TICKS);
+                shareStarfallGuard(player);
             }
             case IRIDIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
@@ -322,6 +333,17 @@ public final class ArtifactPassives {
                 center,3,128);
         var aegis=io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get();
         for(var ally:allies)grant(ally,aegis,0,PASSIVE_LEASE_TICKS);
+    }
+
+    /** Exodium lends a lighter projectile ward to at most three nearby teammates. */
+    private static void shareStarfallGuard(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.EXODIUM,"starfallAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var guard=io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get();
+        for(var ally:allies)grant(ally,guard,0,PASSIVE_LEASE_TICKS);
     }
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
