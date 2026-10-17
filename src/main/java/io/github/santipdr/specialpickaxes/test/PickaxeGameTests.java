@@ -793,8 +793,14 @@ public final class PickaxeGameTests {
         h.assertTrue(ally.hasEffect(SpecialPickaxes.STASIS_WARD.get())
                 &&Math.abs(ally.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.15D)<.001D,
                 "Stasis Ward shares its custom 15% knockback resistance with allied miners");
-        h.assertTrue(ally.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED).getAmplifier()==2
-                &&ally.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==1,"ally receives Haste III and Regeneration II");
+        h.assertTrue(ally.hasEffect(SpecialPickaxes.STASIS_RESONANCE.get())&&!ally.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED)
+                &&ally.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==1,"ally receives custom Stasis Resonance and Regeneration II instead of generic Haste");
+        ally.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        var miningSpeed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(ally,Blocks.STONE.defaultBlockState(),64,target(h));
+        MinecraftForge.EVENT_BUS.post(miningSpeed);
+        h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-102.4F)<.01F,"custom Stasis Resonance grants the same 1.6x mining speed with an ordinary correct pick");
+        h.assertTrue(SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(40,0)
+                &&!SpecialPickaxes.STASIS_RESONANCE.get().isDurationEffectTick(39,0),"Stasis visuals pulse only every ten ticks");
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");
         DomainFields.stop(owner);finish(h,owner);
     }

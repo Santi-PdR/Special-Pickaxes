@@ -57,6 +57,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> WORLDBREAKER_AEGIS=EFFECTS.register("worldbreaker_aegis",WorldbreakerAegisEffect::new);
     public static final RegistryObject<MobEffect> STRATA_FOCUS=EFFECTS.register("strata_focus",StrataFocusEffect::new);
     public static final RegistryObject<MobEffect> STASIS_WARD=EFFECTS.register("stasis_ward",StasisWardEffect::new);
+    public static final RegistryObject<MobEffect> STASIS_RESONANCE=EFFECTS.register("stasis_resonance",StasisResonanceEffect::new);
     public static final RegistryObject<MobEffect> DAWN_MENDING=EFFECTS.register("dawn_mending",DawnMendingEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
     static {
@@ -170,6 +171,8 @@ public final class SpecialPickaxes {
             double multiplier=1D+.2D*(Math.min(1,focus.getAmplifier())+1D);
             e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*multiplier));
         }
+        if(p.hasEffect(STASIS_RESONANCE.get())&&e.getNewSpeed()>0&&p.getMainHandItem().isCorrectToolForDrops(e.getState()))
+            e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*1.6D));
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);
