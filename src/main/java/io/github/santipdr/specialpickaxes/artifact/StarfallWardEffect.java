@@ -81,6 +81,8 @@ public final class StarfallWardEffect extends MobEffect {
     private static void emitImpact(ServerPlayer viewer,ServerLevel level,double x,double y,double z){
         level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y,z,3,.2D,.18D,.2D,.015D);
         level.sendParticles(viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
+        // One bounded spark burst gives the catch a readable, star-shaped snap without a particle loop.
+        level.sendParticles(viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%2==0;}
