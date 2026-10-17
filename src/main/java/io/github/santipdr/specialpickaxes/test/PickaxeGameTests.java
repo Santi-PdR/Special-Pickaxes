@@ -519,7 +519,7 @@ public final class PickaxeGameTests {
         speed=new net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed(wearer,Blocks.STONE.defaultBlockState(),64,target(h));
         MinecraftForge.EVENT_BUS.post(speed);h.assertTrue(Math.abs(speed.getNewSpeed()-76.8F)<.01F,"level one applies the 1.2x mining-speed factor");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");
-        h.assertTrue(focus.isDurationEffectTick(40,0)&&!focus.isDurationEffectTick(39,0),"the custom aura animates on a ten-tick pulse");
+        h.assertTrue(!focus.isDurationEffectTick(40,0)&&!focus.isDurationEffectTick(1,0),"Strata Focus does no periodic server-side aura work");
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CHOIR);h.assertTrue(!wearer.hasEffect(focus),"the custom effect does not linger after Curios removal");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_40") public static void palimpsestCuriosDawnMendingPulsesAndClears(GameTestHelper h){
