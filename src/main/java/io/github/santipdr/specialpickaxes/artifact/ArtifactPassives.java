@@ -13,12 +13,13 @@ import net.minecraft.world.phys.Vec3;
 public final class ArtifactPassives {
     private static final int PASSIVE_LEASE_TICKS=40;
     private static final int ALLY_AURA_SCAN_TICKS=20;
+    private static final String NIGHT_VISION_LEASE="specialpickaxesNightVisionLease";
     private ArtifactPassives() {}
 
     /** Remove an always-on Curios effect as soon as its source is unequipped. */
     public static void onCuriosUnequip(ServerPlayer player,ArtifactKind kind) {
         boolean heldArtifact=player.getMainHandItem().getItem() instanceof ArtifactItem;
-        if(!heldArtifact&&CuriosCompat.find(player)==null)player.removeEffect(MobEffects.NIGHT_VISION);
+        if(!heldArtifact&&CuriosCompat.find(player)==null)clearNightVisionLease(player);
         if(kind==ArtifactKind.EVENTIDE
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.EVENTIDE))
             player.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
@@ -119,7 +120,7 @@ public final class ArtifactPassives {
     }
 
     public static void tick(ServerPlayer player, ArtifactKind kind) {
-        grant(player, MobEffects.NIGHT_VISION, 0, PASSIVE_LEASE_TICKS);
+        grantNightVision(player);
         switch (kind) {
             case PALIMPSEST -> { grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get(), 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
             case CHOIR -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
@@ -160,6 +161,32 @@ public final class ArtifactPassives {
         var current = player.getEffect(effect);
         if (current == null || current.getAmplifier() < amplifier || current.getAmplifier() == amplifier && current.getDuration() <= 40)
             player.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false, true));
+    }
+
+    /** Keeps the shared passive from replacing or removing a server/mod-owned Night Vision effect. */
+    private static void grantNightVision(ServerPlayer player){
+        var current=player.getEffect(MobEffects.NIGHT_VISION);var data=player.getPersistentData();
+        boolean owned=data.getBoolean(NIGHT_VISION_LEASE);
+        if(owned&&(current==null||current.getDuration()>PASSIVE_LEASE_TICKS||!isNightVisionLease(current))){
+            data.remove(NIGHT_VISION_LEASE);owned=false;
+        }
+        if(current==null){
+            player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,PASSIVE_LEASE_TICKS,0,true,false,true));
+            data.putBoolean(NIGHT_VISION_LEASE,true);
+        }else if(owned&&current.getDuration()<=PASSIVE_LEASE_TICKS){
+            player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,PASSIVE_LEASE_TICKS,0,true,false,true));
+        }
+    }
+
+    private static void clearNightVisionLease(ServerPlayer player){
+        var data=player.getPersistentData();var current=player.getEffect(MobEffects.NIGHT_VISION);
+        if(data.getBoolean(NIGHT_VISION_LEASE)&&current!=null&&current.getDuration()<=PASSIVE_LEASE_TICKS&&isNightVisionLease(current))
+            player.removeEffect(MobEffects.NIGHT_VISION);
+        data.remove(NIGHT_VISION_LEASE);
+    }
+
+    private static boolean isNightVisionLease(MobEffectInstance effect){
+        return effect.getAmplifier()==0&&effect.isAmbient()&&!effect.isVisible()&&effect.showIcon();
     }
 
     private static void sustain(ServerPlayer player){

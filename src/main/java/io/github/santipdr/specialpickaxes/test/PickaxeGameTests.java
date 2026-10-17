@@ -341,7 +341,7 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.ICARUS);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,60,0,true,false,true));
-        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
         h.assertTrue(!wearer.hasEffect(renewal),"Worldloom's Curios healing lease ends when it leaves the slot");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"the shared night vision lease ends after removing the last pick source");
@@ -351,6 +351,16 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
         h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"another pick source preserves night vision");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_49") public static void pickaxeUnequipPreservesExternalNightVision(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,6000,0,false,true,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
+        var external=wearer.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+        h.assertTrue(external!=null&&external.getDuration()==6000&&!external.isAmbient(),"a long server-owned Night Vision effect is not replaced by the pick passive");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.CHOIR);
+        external=wearer.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+        h.assertTrue(external!=null&&external.getDuration()==6000&&!external.isAmbient(),"unequipping the last pick preserves Night Vision supplied elsewhere");finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
