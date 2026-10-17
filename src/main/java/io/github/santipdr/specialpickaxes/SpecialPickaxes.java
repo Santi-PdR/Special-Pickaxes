@@ -199,7 +199,9 @@ public final class SpecialPickaxes {
         }
         if(p.hasEffect(ICARIAN_MOMENTUM.get())){
             e.setDamageMultiplier(e.getDamageMultiplier()*.5F);
-            ArtifactFeedback.burst(p,ArtifactKind.ICARUS,p.blockPosition(),4);
+            if(e.getDistance()>=5F&&IcarianMomentumEffect.convertLanding(p,e.getDistance()))
+                IcarianMomentumEffect.landingPulse(p);
+            else ArtifactFeedback.burst(p,ArtifactKind.ICARUS,p.blockPosition(),4);
         }
     }
     private void commands(RegisterCommandsEvent e) {

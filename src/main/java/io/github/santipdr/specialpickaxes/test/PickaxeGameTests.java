@@ -226,6 +226,17 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"unequipping Icarus preserves Slow Falling supplied by another source");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_67") public static void icarusProtectedLandingConvertsIntoCooledWingRebound(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS,"IcarusLanding");wearer.setYRot(0);wearer.setDeltaMovement(0,0,0);
+        h.assertTrue(!IcarianMomentumEffect.convertLanding(wearer,4F),"short drops do not trigger a rebound");
+        h.assertTrue(IcarianMomentumEffect.convertLanding(wearer,8F),"an eight-block protected landing becomes a forward glide kick");
+        var first=wearer.getDeltaMovement();
+        h.assertTrue(first.horizontalDistanceSqr()>.2D&&first.y>=.12D&&wearer.hasImpulse,"the landing adds forward and upward momentum");
+        wearer.setDeltaMovement(0,0,0);
+        h.assertTrue(!IcarianMomentumEffect.convertLanding(wearer,12F)&&wearer.getDeltaMovement().horizontalDistanceSqr()==0D,
+                "the two-second landing cooldown prevents rebound chaining");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_28") public static void palimpsestCuriosCounterRestoresFoodInDawnPulses(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.getFoodData().setFoodLevel(10);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
