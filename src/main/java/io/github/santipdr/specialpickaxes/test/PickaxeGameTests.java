@@ -583,6 +583,15 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the wearer and unmarked allies remain healable");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="legacy_each_06") public static void choirCuriosFaultCounterGuardsAndStaggers(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.CHOIR);
+        h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Choir's Curios counter reduces its triggering hostile hit by 15 percent");
+        h.assertTrue(attacker.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"the counter staggers its attacker with the custom resonance effect");
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.CHOIR).getLong("curiosPassiveReady")==ArtifactState.now(wearer)+160,"defensive and retaliatory effects share one eight-second cooldown");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellBloomTelegraphMatchesItsThreeDimensionalMiningShape(GameTestHelper h) {
         h.assertTrue(HellspecBloomShape.contains(0,0,0)&&HellspecBloomShape.contains(4,0,0),"the core and all petal centers are mined");
         h.assertTrue(HellspecBloomShape.contains(0,2,0)&&HellspecBloomShape.contains(0,-2,0),"the bloom has two-block vertical depth");

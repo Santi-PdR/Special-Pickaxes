@@ -88,7 +88,10 @@ public final class ArtifactPassives {
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
             case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),0,80);}
-            case CHOIR -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),0,60);
+            case CHOIR -> {
+                event.setAmount(event.getAmount()*.85F);
+                grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),0,60);
+            }
             case EVENTIDE -> {event.setAmount(event.getAmount()*.9F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),0,70);}
             case CRUCIBLE -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
             case HELLSPEC -> {

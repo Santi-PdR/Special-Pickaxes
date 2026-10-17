@@ -553,7 +553,7 @@
   "message.specialpickaxes.root_snared": "Las raíces de la cantera se cierran alrededor de %s objetivos; los atraparán en 3 s.",
   "message.specialpickaxes.fault_echo": "La resonancia frenó el impulso de %s enemigos.",
   "curios.detail.specialpickaxes.palimpsest": "Remiendo del Alba cura 1 punto de vida cada 2 s. El primer golpe hostil cada 8 s se reduce un 10%; luego la Reserva del Alba restaura hasta 4 puntos de comida en 4 s.",
-  "curios.detail.specialpickaxes.fault_choir": "Contrafalla: el primer golpe hostil cada 8 s aplica Resonancia de Falla durante 3 s, reduce un 25% la velocidad del atacante y amortigua su impulso horizontal.",
+  "curios.detail.specialpickaxes.fault_choir": "Contrafalla: cada 8 s, el primer golpe hostil te hace un 15% menos de daño y aplica Resonancia de Falla durante 3 s al atacante; reduce su velocidad un 25% y amortigua su impulso horizontal.",
   "curios.detail.specialpickaxes.eventide": "Deuda gravitatoria: el primer golpe hostil cada 8 s causa 10% menos daño y atrapa al atacante durante 3,5 s, reduciendo su movimiento horizontal.",
   "curios.detail.specialpickaxes.paradox_crucible": "Réquiem Paradojal: el primer golpe hostil cada 8 s aplica Cizalla de Fase y reduce un 25% la velocidad de ataque del agresor durante 2 s.",
   "curios.detail.specialpickaxes.worldloom": "Renovación de Duramen cura 1 punto de vida por segundo y emite un pulso verde solo si la cura funciona; recupera una porción de alimento cada 5 s con un destello de hojas y se comparte con hasta 4 aliados a 5 bloques. El primer golpe hostil cada 8 s también activa el aura curativa.",
