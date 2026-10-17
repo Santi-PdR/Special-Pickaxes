@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "pickaxe_compat_test:raw_gem", "required": false }
+  ]
+}

@@ -26,6 +26,9 @@ public final class ArtifactOres {
     public static boolean isOre(BlockState state){
         var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(state.getBlock());
         if(key!=null&&key.getNamespace().equals("minecraft")&&VANILLA_GEOLOGY.contains(key.getPath()))return false;
+        // Some packs accidentally fold forge:ore_bearing_ground into forge:ores.
+        // Keep ore-host geology out even if a broad aggregate includes it.
+        if(state.getTags().anyMatch(tag->isOreHostTagPath(tag.location().getPath())))return false;
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
             ||state.is(BlockTags.GOLD_ORES)||state.is(BlockTags.DIAMOND_ORES)||state.is(BlockTags.REDSTONE_ORES)
             ||state.is(BlockTags.LAPIS_ORES)||state.is(BlockTags.EMERALD_ORES)||state.is(BlockTags.COPPER_ORES)
@@ -74,12 +77,17 @@ public final class ArtifactOres {
 
     static boolean isOreTagPath(String path) {
         if(path==null)return false;
-        // Forge uses these tags for the host rock around ores, not for the ore blocks themselves.
+        // Forge's ores_in_ground tags describe ore generation hosts, not mineral families.
         if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
+        if(isOreHostTagPath(path))return false;
         boolean prefixed=path.startsWith("ore_")&&path.length()>4||path.startsWith("ores_")&&path.length()>5;
         if(prefixed&&(path.endsWith("_block")||path.endsWith("_blocks")))return false;
         return path.equals("ore")||path.equals("ores")||path.startsWith("ore/")||path.startsWith("ores/")
             ||prefixed||path.endsWith("_ore")||path.endsWith("_ores");
+    }
+
+    private static boolean isOreHostTagPath(String path){
+        return path.equals("ore_bearing_ground")||path.startsWith("ore_bearing_ground/")||path.startsWith("ore_bearing_ground_");
     }
 
     private static boolean isOreTag(TagKey<Block> tag) { return isOreTagPath(tag.location().getPath()); }
@@ -91,7 +99,7 @@ public final class ArtifactOres {
     }
 
     private static boolean isVeinFamilyTag(String path) {
-        // Forge's ores_in_ground tags classify host rock, not mineral families.
+        // Forge's ores_in_ground tags describe ore generation hosts, not mineral families.
         if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
         // Forge's ore_rates tags classify drop/XP rates and are shared by every
         // mineral. They must never connect otherwise separate veins.
