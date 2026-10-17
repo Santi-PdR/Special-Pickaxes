@@ -398,6 +398,18 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"another pick source preserves night vision");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_56",timeoutTicks=140) public static void worldloomCuriosFoodPulseIsSpacedFiveSeconds(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.getFoodData().setFoodLevel(10);
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==12,"Worldloom restores two food points on its first Curios pulse");
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==12,"repeated passive ticks cannot accelerate food restoration");
+        h.runAfterDelay(100,()->{
+            ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+            h.assertTrue(wearer.getFoodData().getFoodLevel()==14,"the next food pulse arrives after five seconds");
+            finish(h,wearer);
+        });
+    }
     @GameTest(template="empty",batch="rework_each_49") public static void pickaxeUnequipPreservesExternalNightVision(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,6000,0,false,true,true));

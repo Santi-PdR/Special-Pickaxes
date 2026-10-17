@@ -256,6 +256,7 @@ public final class ArtifactPassives {
         if(state.getLong("rootSustainReady")>now)return;
         player.getFoodData().eat(2,.25F);
         state.putLong("rootSustainReady",now+100);
+        HeartwoodRenewalEffect.foodPulse(player);
     }
 
     /** A Curios Stasis bearer shares a short absorption lease with at most eight nearby allies. */
