@@ -219,15 +219,15 @@ public final class ArtifactFeedback {
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
-        boolean stasis=kind==ArtifactKind.INTERREGNUM;
-        if(stasis){io.github.santipdr.specialpickaxes.network.RelicNetwork.showStasisBoundary(p,center,radius,halfHeight);return;}
-        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),stasis?1.25F:0.82F);
-        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),stasis?1.05F:0.7F);
+        if(kind==ArtifactKind.INTERREGNUM){io.github.santipdr.specialpickaxes.network.RelicNetwork.showStasisBoundary(p,center,radius,halfHeight);return;}
+        if(kind==ArtifactKind.EVENTIDE){eventideDomain(p,center,radius);return;}
+        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.82F);
+        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
         double topY=center.getY()+halfHeight+0.08;
         // A capped wireframe remains legible while bounding particle packets per field update.
         // Side loops omit corners because the front/back edges already draw them.
-        int segments=stasis?Math.max(8,Math.min(12,radius+2)):Math.max(4,Math.min(6,radius));
+        int segments=Math.max(4,Math.min(6,radius));
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
@@ -243,22 +243,34 @@ public final class ArtifactFeedback {
         }
         for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
             p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
-        if(kind==ArtifactKind.EVENTIDE){
-            boolean repel=(ArtifactState.mode(p,kind)&1)!=0;
-            var flow=repel?new DustParticleOptions(new Vector3f(1F,.48F,.78F),.92F):dust;
-            double midX=(minX+maxX)*.5D,midZ=(minZ+maxZ)*.5D;
-            double[] edgeX={minX,midX,maxX,midX},edgeZ={midZ,maxZ,midZ,minZ};
-            for(int edge=0;edge<4;edge++){
-                var direction=eventideFlowDirection(repel?1:0,edge);
-                for(int band=0;band<2;band++)p.serverLevel().sendParticles(p,flow,false,edgeX[edge],center.getY()+.55D+band*.8D,edgeZ[edge],
-                        0,direction.x*.12D,0,direction.z*.12D,.08D);
-            }
+    }
+    /** Three great circles match Eventide's actual spherical influence radius. */
+    private static void eventideDomain(ServerPlayer p,BlockPos center,int radius){
+        int color=ArtifactKind.EVENTIDE.color;
+        var boundary=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),.9F);
+        boolean repel=(ArtifactState.mode(p,ArtifactKind.EVENTIDE)&1)!=0;
+        var flow=repel?new DustParticleOptions(new Vector3f(1F,.48F,.78F),.98F):boundary;
+        for(int plane=0;plane<3;plane++)for(int i=0;i<24;i++){
+            Vec3 point=eventideSpherePoint(center,radius,plane,Math.PI*2D*i/24D);
+            p.serverLevel().sendParticles(p,boundary,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+        Vec3 origin=Vec3.atCenterOf(center);
+        for(int axis=0;axis<6;axis++){
+            Vec3 normal=eventideFlowDirection(0,axis);
+            Vec3 point=origin.add(normal.scale(radius)),velocity=eventideFlowDirection(repel?1:0,axis).scale(.12D);
+            p.serverLevel().sendParticles(p,flow,false,point.x,point.y,point.z,0,velocity.x,velocity.y,velocity.z,.08D);
         }
     }
-    /** Unit normal for each square boundary edge, reversed for Eventide's outward polarity. */
-    public static Vec3 eventideFlowDirection(int mode,int edge){
-        Vec3 inward=switch(Math.floorMod(edge,4)){
-            case 0->new Vec3(1,0,0);case 1->new Vec3(0,0,-1);case 2->new Vec3(-1,0,0);default->new Vec3(0,0,1);
+    /** Samples one of the field's three great circles. Every point lies exactly on its influence sphere. */
+    public static Vec3 eventideSpherePoint(BlockPos center,int radius,int plane,double angle){
+        Vec3 origin=Vec3.atCenterOf(center);double x=Math.cos(angle)*radius,y=Math.sin(angle)*radius,z=0D;
+        return origin.add(switch(Math.floorMod(plane,3)){case 0->new Vec3(x,y,0);case 1->new Vec3(x,0,y);default->new Vec3(0,x,y);});
+    }
+    /** Unit radial normal for each principal point on the gravity sphere, reversed for outward polarity. */
+    public static Vec3 eventideFlowDirection(int mode,int axis){
+        Vec3 inward=switch(Math.floorMod(axis,6)){
+            case 0->new Vec3(1,0,0);case 1->new Vec3(-1,0,0);case 2->new Vec3(0,1,0);
+            case 3->new Vec3(0,-1,0);case 4->new Vec3(0,0,1);default->new Vec3(0,0,-1);
         };
         return (mode&1)==0?inward:inward.scale(-1D);
     }

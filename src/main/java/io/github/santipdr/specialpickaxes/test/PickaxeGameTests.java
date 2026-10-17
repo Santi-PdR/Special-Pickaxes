@@ -182,9 +182,14 @@ public final class PickaxeGameTests {
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_26") public static void eventideBoundaryFlowShowsSelectedGravityPolarity(GameTestHelper h){
-        for(int edge=0;edge<4;edge++){
-            var inward=ArtifactFeedback.eventideFlowDirection(0,edge);var outward=ArtifactFeedback.eventideFlowDirection(1,edge);
-            h.assertTrue(inward.dot(outward)<-.99D,"outward field particles reverse the inward direction at boundary edge "+edge);
+        for(int axis=0;axis<6;axis++){
+            var inward=ArtifactFeedback.eventideFlowDirection(0,axis);var outward=ArtifactFeedback.eventideFlowDirection(1,axis);
+            h.assertTrue(inward.dot(outward)<-.99D,"outward field particles reverse the inward direction at sphere axis "+axis);
+        }
+        var center=new BlockPos(13,26,-7);double radius=8D;
+        for(int plane=0;plane<3;plane++)for(int sample=0;sample<24;sample++){
+            var point=ArtifactFeedback.eventideSpherePoint(center,8,plane,Math.PI*2D*sample/24D);
+            h.assertTrue(Math.abs(point.distanceTo(Vec3.atCenterOf(center))-radius)<1.0E-6D,"Eventide's visual wireframe stays on its true spherical radius");
         }
         finish(h,player(h,ArtifactKind.EVENTIDE));
     }
