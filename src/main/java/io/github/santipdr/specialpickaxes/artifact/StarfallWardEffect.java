@@ -36,9 +36,18 @@ public final class StarfallWardEffect extends MobEffect {
         long now=wearer.tickCount;var data=wearer.getPersistentData();
         if(data.getLong(NEXT_FLASH)>now)return;
         data.putLong(NEXT_FLASH,now+5L);
-        double y=wearer.getY()+wearer.getBbHeight()*.56D;
-        level.sendParticles(wearer,ParticleTypes.END_ROD,false,wearer.getX(),y,wearer.getZ(),3,.2D,.18D,.2D,.015D);
-        level.sendParticles(wearer,STARDUST,false,wearer.getX(),y,wearer.getZ(),5,.3D,.24D,.3D,.01D);
+        double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.56D,z=wearer.getZ();
+        emitImpact(wearer,level,x,y,z);
+        var center=wearer.position();
+        var nearby=EntitySelection.nearest(level,ServerPlayer.class,wearer.getBoundingBox().inflate(8D),
+                listener->listener!=wearer&&listener.isAlive()&&listener.distanceToSqr(center)<=64D,
+                center,8,128);
+        for(var listener:nearby)emitImpact(listener,level,x,y,z);
+    }
+
+    private static void emitImpact(ServerPlayer viewer,ServerLevel level,double x,double y,double z){
+        level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y,z,3,.2D,.18D,.2D,.015D);
+        level.sendParticles(viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}
