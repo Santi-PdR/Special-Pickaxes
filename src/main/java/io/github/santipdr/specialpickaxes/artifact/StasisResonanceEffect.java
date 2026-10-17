@@ -23,9 +23,7 @@ public final class StasisResonanceEffect extends MobEffect {
         long now=ArtifactState.now(player);var data=player.getPersistentData();
         if(data.getLong(NEXT_MINING_PULSE)>now)return false;
         data.putLong(NEXT_MINING_PULSE,now+5L);
-        double x=broken.getX()+.5D,y=broken.getY()+.62D,z=broken.getZ()+.5D;
-        level.sendParticles(player,VIOLET_DUST,false,x,y,z,5,.2D,.22D,.2D,.015D);
-        level.sendParticles(player,ParticleTypes.REVERSE_PORTAL,false,x,y,z,2,.1D,.16D,.1D,.008D);
+        ArtifactFeedback.nearbyMiningPulse(player,broken,VIOLET_DUST,5,ParticleTypes.REVERSE_PORTAL,2);
         return true;
     }
 

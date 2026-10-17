@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -26,6 +27,23 @@ public final class ArtifactFeedback {
     private ArtifactFeedback() {}
     public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());}
     public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();}
+    /** Curios mining flashes reach the wearer and at most three close observers. */
+    public static void nearbyMiningPulse(ServerPlayer wearer,BlockPos pos,ParticleOptions primary,int primaryCount,
+                                         ParticleOptions accent,int accentCount){
+        var level=wearer.serverLevel();double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;
+        var center=new Vec3(x,y,z);
+        emitMiningPulse(wearer,level,center,primary,primaryCount,accent,accentCount);
+        var nearby=EntitySelection.nearest(level,ServerPlayer.class,new AABB(x,y,z,x,y,z).inflate(12D),
+                viewer->viewer!=wearer&&viewer.isAlive()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(wearer)
+                        &&viewer.distanceToSqr(center)<=144D,
+                center,3,128);
+        for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
+    }
+    private static void emitMiningPulse(ServerPlayer viewer,net.minecraft.server.level.ServerLevel level,Vec3 center,
+                                        ParticleOptions primary,int primaryCount,ParticleOptions accent,int accentCount){
+        level.sendParticles(viewer,primary,false,center.x,center.y,center.z,primaryCount,.2D,.2D,.2D,.012D);
+        if(accentCount>0)level.sendParticles(viewer,accent,false,center.x,center.y,center.z,accentCount,.1D,.12D,.1D,.008D);
+    }
     public static void message(ServerPlayer p,String key,Object... values) {
         p.displayClientMessage(Component.translatable("message.specialpickaxes."+key,values),true);
     }

@@ -22,9 +22,7 @@ public final class StrataFocusEffect extends MobEffect {
         long now=ArtifactState.now(player);var data=player.getPersistentData();
         if(data.getLong(NEXT_MINING_PULSE)>now)return false;
         data.putLong(NEXT_MINING_PULSE,now+6L);
-        double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;
-        level.sendParticles(player,MINING_GLEAM,false,x,y,z,4,.22D,.2D,.22D,.015D);
-        level.sendParticles(player,ParticleTypes.GLOW,false,x,y,z,1,.08D,.12D,.08D,.01D);
+        ArtifactFeedback.nearbyMiningPulse(player,pos,MINING_GLEAM,4,ParticleTypes.GLOW,1);
         return true;
     }
 }
