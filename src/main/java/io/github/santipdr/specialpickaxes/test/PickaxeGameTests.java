@@ -490,9 +490,15 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(attacker.getDeltaMovement().x-.58D)<.001D&&Math.abs(attacker.getDeltaMovement().z+.29D)<.001D
                 &&Math.abs(attacker.getDeltaMovement().y-.25D)<.001D,"roots damp horizontal escape while preserving vertical movement");
         h.assertTrue(renewal.isDurationEffectTick(60,0)&&!renewal.isDurationEffectTick(59,0),"healing is delivered in deliberate one-second pulses");
+        var pulseData=wearer.getPersistentData();long worldTime=wearer.level().getGameTime();
+        pulseData.putLong("specialpickaxesHeartwoodPulseAt",Long.MAX_VALUE);
+        wearer.tickCount=10_000;
         renewal.applyEffectTick(wearer,0);
         h.assertTrue(wearer.getHealth()==11F,"a renewal pulse restores one health point");
-        renewal.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11F,"repeated effect refreshes cannot accelerate healing");
+        h.assertTrue(pulseData.getLong("specialpickaxesHeartwoodPulseAtWorldTime")==worldTime+20,
+                "the heal cooldown is persisted against world time, so reconnects or respawns cannot strand it");
+        wearer.tickCount=0;renewal.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==11F,"repeated effect refreshes cannot accelerate healing after an entity tick reset");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_46") public static void worldloomCuriosRenewalEndsOnUnequipButPersistsWhenHeld(GameTestHelper h){

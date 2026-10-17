@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 
 /** Worldloom's Curios counter heals in visible, deliberately spaced root pulses. */
 public final class HeartwoodRenewalEffect extends MobEffect {
-    private static final String NEXT_PULSE="specialpickaxesHeartwoodPulseAt";
+    private static final String NEXT_PULSE="specialpickaxesHeartwoodPulseAtWorldTime";
     private static final DustParticleOptions HEARTWOOD_DUST=new DustParticleOptions(new Vector3f(.32F,.88F,.38F),.92F);
     public HeartwoodRenewalEffect() {
         super(MobEffectCategory.BENEFICIAL,0x83d86e);
@@ -20,7 +20,9 @@ public final class HeartwoodRenewalEffect extends MobEffect {
     @Override
     public void applyEffectTick(LivingEntity entity,int amplifier) {
         if(entity.level().isClientSide)return;
-        long now=entity.tickCount;
+        // Entity tickCount can reset when a player reconnects or respawns. World time
+        // keeps the persisted cooldown stable across those entity lifecycles.
+        long now=entity.level().getGameTime();
         var data=entity.getPersistentData();
         if(data.getLong(NEXT_PULSE)>now)return;
         data.putLong(NEXT_PULSE,now+20L);
