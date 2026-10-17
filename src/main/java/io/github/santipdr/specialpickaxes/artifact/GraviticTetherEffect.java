@@ -23,8 +23,20 @@ public final class GraviticTetherEffect extends MobEffect {
         double drag=Math.max(.35D,.68D-amplifier*.08D);
         entity.setDeltaMovement(motion.x*drag,motion.y,motion.z*drag);
         entity.hasImpulse=true;
-        if(entity.tickCount%8==0&&entity.level() instanceof ServerLevel level)
-            level.sendParticles(TETHER_DUST,entity.getX(),entity.getY()+entity.getBbHeight()*.55D,entity.getZ(),2,.18D,.22D,.18D,.01D);
+        // Two counter-rotating filaments read as a tether and cost fewer particles
+        // than the old scattered burst (2 every 12 ticks instead of every 8).
+        if(entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
+            double phase=entity.tickCount*.19D;
+            double centerY=entity.getY()+entity.getBbHeight()*.52D;
+            double radius=Math.max(.26D,entity.getBbWidth()*.56D);
+            for(int i=0;i<2;i++){
+                double angle=phase+i*Math.PI;
+                double x=entity.getX()+Math.cos(angle)*radius;
+                double z=entity.getZ()+Math.sin(angle)*radius;
+                double y=centerY+Math.sin(phase+i*Math.PI)*.18D;
+                level.sendParticles(TETHER_DUST,x,y,z,1,0,0,0,0);
+            }
+        }
     }
 
     @Override
