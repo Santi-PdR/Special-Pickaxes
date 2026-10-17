@@ -10,6 +10,15 @@ public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
     private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar","undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
     private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay");
+    private static final Set<net.minecraft.world.level.block.Block> VANILLA_GEOLOGY=Set.of(
+            Blocks.STONE,Blocks.COBBLESTONE,Blocks.MOSSY_COBBLESTONE,Blocks.STONE_BRICKS,Blocks.MOSSY_STONE_BRICKS,Blocks.CRACKED_STONE_BRICKS,Blocks.CHISELED_STONE_BRICKS,
+            Blocks.GRANITE,Blocks.POLISHED_GRANITE,Blocks.DIORITE,Blocks.POLISHED_DIORITE,Blocks.ANDESITE,Blocks.POLISHED_ANDESITE,
+            Blocks.DEEPSLATE,Blocks.COBBLED_DEEPSLATE,Blocks.POLISHED_DEEPSLATE,Blocks.DEEPSLATE_BRICKS,Blocks.CRACKED_DEEPSLATE_BRICKS,Blocks.DEEPSLATE_TILES,Blocks.CRACKED_DEEPSLATE_TILES,Blocks.CHISELED_DEEPSLATE,
+            Blocks.BLACKSTONE,Blocks.POLISHED_BLACKSTONE,Blocks.POLISHED_BLACKSTONE_BRICKS,Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS,Blocks.CHISELED_POLISHED_BLACKSTONE,
+            Blocks.TUFF,Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.NETHERRACK,Blocks.END_STONE,Blocks.DRIPSTONE_BLOCK,Blocks.POINTED_DRIPSTONE,
+            Blocks.DIRT,Blocks.COARSE_DIRT,Blocks.ROOTED_DIRT,Blocks.GRASS_BLOCK,Blocks.PODZOL,Blocks.GRAVEL,Blocks.SAND,Blocks.RED_SAND,Blocks.CLAY,
+            Blocks.SANDSTONE,Blocks.CHISELED_SANDSTONE,Blocks.CUT_SANDSTONE,Blocks.SMOOTH_SANDSTONE,
+            Blocks.RED_SANDSTONE,Blocks.CHISELED_RED_SANDSTONE,Blocks.CUT_RED_SANDSTONE,Blocks.SMOOTH_RED_SANDSTONE);
     private MiningDesigns(){}
     public static boolean drill(ServerPlayer p,ItemStack tool,ArtifactKind k){
         var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
@@ -38,17 +47,12 @@ public final class MiningDesigns {
         for(int i=0;i<candidates.size()&&i<128;i++)steps.add(new WorkStep.Mine(candidates.get(i),level.getBlockState(candidates.get(i))));
         return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
     }
-    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||s.is(Blocks.GRANITE)||s.is(Blocks.DIORITE)||s.is(Blocks.ANDESITE)||s.is(Blocks.DEEPSLATE)||s.is(Blocks.COBBLESTONE)||s.is(Blocks.COBBLED_DEEPSLATE)||s.is(Blocks.BLACKSTONE)||s.is(Blocks.POLISHED_BLACKSTONE)||s.is(Blocks.NETHERRACK)||s.is(Blocks.END_STONE)||s.is(Blocks.TUFF)||s.is(Blocks.CALCITE)||s.is(Blocks.BASALT)||s.is(Blocks.SMOOTH_BASALT)||s.is(Blocks.OBSIDIAN)||s.is(Blocks.DRIPSTONE_BLOCK)||s.is(Blocks.POINTED_DRIPSTONE)||isModdedGeology(s);}
+    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);}
     public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
         if(s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL))return true;
-        var block=s.getBlock();return block==Blocks.STONE||block==Blocks.COBBLESTONE||block==Blocks.DEEPSLATE||block==Blocks.COBBLED_DEEPSLATE
-            ||block==Blocks.GRANITE||block==Blocks.DIORITE||block==Blocks.ANDESITE||block==Blocks.TUFF||block==Blocks.CALCITE
-            ||block==Blocks.BLACKSTONE||block==Blocks.POLISHED_BLACKSTONE
-            ||block==Blocks.BASALT||block==Blocks.SMOOTH_BASALT||block==Blocks.OBSIDIAN||block==Blocks.NETHERRACK||block==Blocks.END_STONE
-            ||block==Blocks.DIRT||block==Blocks.COARSE_DIRT||block==Blocks.GRASS_BLOCK||block==Blocks.PODZOL||block==Blocks.ROOTED_DIRT||block==Blocks.GRAVEL
-            ||block==Blocks.DRIPSTONE_BLOCK||block==Blocks.POINTED_DRIPSTONE||isModdedGeology(s);
+        return VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);
     }
     private static boolean isModdedGeology(net.minecraft.world.level.block.state.BlockState state){
         return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{

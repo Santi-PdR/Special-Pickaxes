@@ -814,19 +814,32 @@ public final class PickaxeGameTests {
         convertible.put(center.offset(0,1,0),Blocks.DIORITE);
         convertible.put(center.offset(0,-1,0),Blocks.TUFF);
         convertible.put(center.offset(0,0,1),Blocks.POINTED_DRIPSTONE);
+        convertible.put(center.offset(2,0,0),Blocks.POLISHED_GRANITE);
+        convertible.put(center.offset(-2,0,0),Blocks.CUT_SANDSTONE);
+        convertible.put(center.offset(0,0,2),Blocks.CLAY);
         for(var entry:convertible.entrySet()){
             level.setBlockAndUpdate(entry.getKey(),entry.getValue().defaultBlockState());
             PlayerPlacedBlocks.get(level).unmark(entry.getKey());
         }
-        var chest=center.offset(2,0,0);var ore=center.offset(0,0,-1);
+        var chest=center.offset(4,0,0);var ore=center.offset(0,0,-2);var placed=center.offset(0,2,0);
+        var bedrock=center.offset(0,-2,0);var fluid=center.offset(0,0,-3);
         level.setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());
         level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        level.setBlockAndUpdate(placed,Blocks.CALCITE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
+        level.setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());
+        level.setBlockAndUpdate(fluid,Blocks.WATER.defaultBlockState());
         PlayerPlacedBlocks.get(level).unmark(ore);
+        h.assertTrue(MiningDesigns.matrix(Blocks.POLISHED_GRANITE.defaultBlockState())
+                &&MiningDesigns.matrix(Blocks.CUT_SANDSTONE.defaultBlockState())
+                &&MiningDesigns.matrix(Blocks.CLAY.defaultBlockState()),"shared mining designs recognize polished rock, sandstone and clay as geology");
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",8);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"calcite rephase activates");drain(p);
         for(var entry:convertible.entrySet())h.assertTrue(level.getBlockState(entry.getKey()).is(Blocks.CALCITE),entry.getValue()+" rephases to calcite");
         h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),"containers and ores are preserved");
-        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(center).inflate(3)).isEmpty(),"rephasing never scatters drops");finish(h,p);
+        h.assertTrue(level.getBlockState(placed).is(Blocks.CALCITE)&&level.getBlockState(bedrock).is(Blocks.BEDROCK)&&level.getBlockState(fluid).is(Blocks.WATER),"player-placed geology, bedrock and fluids are preserved");
+        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(center).inflate(5)).isEmpty(),"rephasing never scatters drops");
+        PlayerPlacedBlocks.get(level).unmark(placed);
+        finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
