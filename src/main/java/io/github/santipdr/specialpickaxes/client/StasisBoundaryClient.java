@@ -23,6 +23,8 @@ import java.util.UUID;
 /** Locally rendered Stasis domains: one small sync packet replaces recurring boundary particle packets. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class StasisBoundaryClient {
+    private static final net.minecraft.core.particles.DustParticleOptions BOUNDARY_GLOW=
+            new net.minecraft.core.particles.DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
     private record Boundary(ResourceLocation dimension,BlockPos center,int radius,int halfHeight,long lastSeen){}
     private static final Map<UUID,Boundary> BOUNDARIES=new HashMap<>();
     private static long clientTicks;
@@ -51,9 +53,8 @@ public final class StasisBoundaryClient {
             double phase=clientTicks*.15D;
             var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
             double bob=Math.sin(phase*.7D)*.12D;
-            var glow=new net.minecraft.core.particles.DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
             mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+.72D+bob,head.z,0,.015D,0);
-            mc.level.addParticle(glow,head.x,head.y+.28D+bob,head.z,0,.005D,0);
+            mc.level.addParticle(BOUNDARY_GLOW,head.x,head.y+.28D+bob,head.z,0,.005D,0);
         }
     }
 

@@ -20,6 +20,8 @@ public final class RelicAura {
     private static final int MAX_CURIO_CANDIDATES=12;
     private static final int MAX_INSPECTED_NEARBY_PLAYERS=128;
     private static final double VISIBLE_CURIO_RADIUS_SQR=24D*24D;
+    private static final java.util.Map<ArtifactKind,DustParticleOptions> HELD_DUST=dustPalette(.3F,.3F);
+    private static final java.util.Map<ArtifactKind,DustParticleOptions> CURIOS_DUST=dustPalette(.27F,.34F);
     private static ArtifactKind heldKind;
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
@@ -75,7 +77,7 @@ public final class RelicAura {
         var look=player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
         var hand=player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
         double angle=player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(tool)*0.22;
-        var dust=dust(item.kind,0.3F);
+        var dust=HELD_DUST.get(item.kind);
         ParticleOptions accent=accent(item.kind,dust);
         for(int i=0;i<3;i++){
             double orbit=angle+i*Math.PI*2/3,radius=0.055+i*0.022;
@@ -87,7 +89,7 @@ public final class RelicAura {
     /** A restrained rotating belt halo makes the Curios passive visible without suggesting an active skill. */
     private static void emitCurios(Minecraft mc,Player player,ArtifactItem item){
         double phase=player.tickCount*0.075D+item.kind.ordinal()*0.61D;
-        var dust=dust(item.kind,item.kind==ArtifactKind.ICARUS?0.34F:0.27F);
+        var dust=CURIOS_DUST.get(item.kind);
         int lodeCharges=0;
         if(item.kind==ArtifactKind.IRIDIUM){
             var surge=player.getEffect(SpecialPickaxes.LODE_SURGE.get());
@@ -178,9 +180,14 @@ public final class RelicAura {
             mc.level.addParticle(particle,x,particleY,z,0,.004D,0);
         }
     }
-    private static DustParticleOptions dust(ArtifactKind kind,float size){
-        int color=kind==ArtifactKind.ICARUS?0xffe8c6:kind.color;
-        return new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),size);
+    private static java.util.Map<ArtifactKind,DustParticleOptions> dustPalette(float size,float icarusSize){
+        var palette=new java.util.EnumMap<ArtifactKind,DustParticleOptions>(ArtifactKind.class);
+        for(var kind:ArtifactKind.values()){
+            int color=kind==ArtifactKind.ICARUS?0xffe8c6:kind.color;float particleSize=kind==ArtifactKind.ICARUS?icarusSize:size;
+            palette.put(kind,new DustParticleOptions(
+                    new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),particleSize));
+        }
+        return java.util.Map.copyOf(palette);
     }
     private static ParticleOptions accent(ArtifactKind kind,ParticleOptions fallback){
         return switch(kind){
