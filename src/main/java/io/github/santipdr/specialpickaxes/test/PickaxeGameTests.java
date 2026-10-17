@@ -431,9 +431,15 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(ward),"Exodium Curios leases the named Starfall Ward effect");
         var shooter=EntityType.SKELETON.create(h.getLevel());shooter.setPos(wearer.getX()+5,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
         var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+        wearer.tickCount=1;
         var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
         ArtifactPassives.onCuriosDamage(wearer,projectileHit,ArtifactKind.EXODIUM);
         h.assertTrue(Math.abs(projectileHit.getAmount()-9F)<.001F,"the ward shaves 25 percent from projectile hits");
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==6,"the first projectile catch flashes even when it lands between five-tick boundaries");
+        wearer.tickCount=2;StarfallWardEffect.projectileImpact(wearer);
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==6,"repeated hits inside five ticks share one visual pulse");
+        wearer.tickCount=6;StarfallWardEffect.projectileImpact(wearer);
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==11,"the ward flashes again once its visual cooldown expires");
         h.assertTrue(ward.isDurationEffectTick(40,0)&&!ward.isDurationEffectTick(39,0),"the orbital ward animates on a bounded half-second pulse");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
         h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");
