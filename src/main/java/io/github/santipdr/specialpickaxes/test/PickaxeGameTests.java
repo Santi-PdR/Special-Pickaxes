@@ -692,6 +692,9 @@ public final class PickaxeGameTests {
         h.assertTrue(DomainFields.start(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,center,8),"team stasis starts");
         DomainFields.tick();
         h.assertTrue(ally.hasEffect(SpecialPickaxes.DOMINION.get())&&ally.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"ally receives the domain identity effects");
+        h.assertTrue(ally.hasEffect(SpecialPickaxes.STASIS_WARD.get())
+                &&Math.abs(ally.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.15D)<.001D,
+                "Stasis Ward shares its custom 15% knockback resistance with allied miners");
         h.assertTrue(ally.getEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED).getAmplifier()==2
                 &&ally.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==1,"ally receives Haste III and Regeneration II");
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");

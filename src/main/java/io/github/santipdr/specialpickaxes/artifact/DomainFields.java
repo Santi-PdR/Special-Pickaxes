@@ -193,6 +193,7 @@ public final class DomainFields {
                 for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,
                         q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()),Vec3.atCenterOf(f.center),16)){
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),40,0,true,false,true));
+                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),40,0,true,false,true));
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,80,0,true,false,true));
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,40,2,true,false,true));
                     ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,40,1,true,false,true));

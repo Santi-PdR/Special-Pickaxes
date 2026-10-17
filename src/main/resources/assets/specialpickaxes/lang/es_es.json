@@ -323,7 +323,7 @@
   "mining.how.paradox_crucible.proximity": "Activa una vez para transformar la matriz natural cercana. Piedra, pizarra, basalto u obsidiana en la secundaria eligen el resultado. No genera menas, drops ni experiencia.",
   "mode.specialpickaxes.proximity": "PROXIMIDAD",
   "mining.identity.interregnum.stasis": "Mina a velocidad extrema dentro de una estasis local.",
-  "mining.how.interregnum.stasis": "Apunta al frente de trabajo y activa. Minar dentro sostiene el campo; ralentiza las interrupciones cercanas. Cancelar libera el campo.",
+  "mining.how.interregnum.stasis": "Apunta al frente de trabajo y activa. Minar dentro sostiene el campo; ralentiza las interrupciones cercanas. Los aliados dentro reciben Prisa III, Regeneración II, Égida de Stasis (+15% de resistencia al retroceso), Visión nocturna y pulsos de comida. Cancelar libera el campo.",
   "mining.identity.worldloom.shelter": "Construye un refugio pagando materiales.",
   "mining.how.worldloom.shelter": "Pon un bloque de construcción compatible en la secundaria. Apunta a la base; la vista previa sigue tu orientación. Activa para colocar un refugio en secuencia, consumiendo bloques del inventario.",
   "mining.identity.worldloom.bridge": "Construye un puente pagando materiales.",

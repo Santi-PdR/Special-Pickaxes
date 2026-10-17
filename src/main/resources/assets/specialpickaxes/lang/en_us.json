@@ -323,7 +323,7 @@
   "mining.how.paradox_crucible.proximity": "Activate once to transform nearby natural matrix. Offhand stone, deepslate, basalt or obsidian chooses the result. No ore, loot or experience is created.",
   "mode.specialpickaxes.proximity": "PROXIMITY",
   "mining.identity.interregnum.stasis": "Mine at extreme speed inside local stasis.",
-  "mining.how.interregnum.stasis": "Aim at your worksite and activate. Mine inside the field to sustain it; nearby interruptions are slowed. Cancel releases the field.",
+  "mining.how.interregnum.stasis": "Aim at your worksite and activate. Mine inside the field to sustain it; nearby interruptions are slowed. Allied miners inside receive Haste III, Regeneration II, Stasis Ward (+15% knockback resistance), Night Vision and food pulses. Cancel releases the field.",
   "mining.identity.worldloom.shelter": "Build a paid shelter facing your direction.",
   "mining.how.worldloom.shelter": "Hold a supported building block in your offhand. Aim at the base; the preview follows your facing. Activate to place the shelter in sequence, consuming inventory blocks.",
   "mining.identity.worldloom.bridge": "Build a paid bridge facing your direction.",
