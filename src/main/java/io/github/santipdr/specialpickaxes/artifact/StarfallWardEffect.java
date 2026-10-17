@@ -22,6 +22,7 @@ public final class StarfallWardEffect extends MobEffect {
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer wearer)||!(entity.level() instanceof ServerLevel level))return;
         tryCatchIncoming(wearer,level);
+        if(entity.tickCount%10!=0)return;
         double phase=entity.tickCount*.045D;
         double y=entity.getY()+entity.getBbHeight()*.56D;
         for(int i=0;i<4;i++){
@@ -82,5 +83,5 @@ public final class StarfallWardEffect extends MobEffect {
         level.sendParticles(viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
     }
 
-    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}
+    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%2==0;}
 }

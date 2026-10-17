@@ -588,7 +588,7 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==6,"repeated hits inside five ticks share one visual pulse");
         wearer.tickCount=6;StarfallWardEffect.projectileImpact(wearer);
         h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAt")==11,"the ward flashes again once its visual cooldown expires");
-        h.assertTrue(ward.isDurationEffectTick(40,0)&&!ward.isDurationEffectTick(39,0),"the orbital ward animates on a bounded half-second pulse");
+        h.assertTrue(ward.isDurationEffectTick(40,0)&&ward.isDurationEffectTick(38,0)&&!ward.isDurationEffectTick(39,0),"the ward checks trajectories every two ticks while visual effects stay separately throttled");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
         h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");
         var unwardedHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
