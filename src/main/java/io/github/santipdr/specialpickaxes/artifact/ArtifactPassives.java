@@ -173,7 +173,10 @@ public final class ArtifactPassives {
         grantNightVision(player);
         switch (kind) {
             case PALIMPSEST -> { grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get(), 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
-            case CHOIR -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
+            case CHOIR -> {
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
+                shareChoirMiningFocus(player);
+            }
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }
             case INTERREGNUM -> {
@@ -350,6 +353,17 @@ public final class ArtifactPassives {
             grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
             sustain(ally);
         }
+    }
+
+    /** Choir lends its progressive mining rhythm to a bounded group of nearby teammates. */
+    private static void shareChoirMiningFocus(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.CHOIR,"choirMiningAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var focus=io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get();
+        for(var ally:allies)grant(ally,focus,0,PASSIVE_LEASE_TICKS);
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */

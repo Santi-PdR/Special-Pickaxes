@@ -423,6 +423,31 @@ public final class PickaxeGameTests {
         h.assertTrue(nearby.hasEffect(resonance)&&nearby.getEffect(resonance).getAmplifier()==1,"the active Fault Echo applies the stronger resonance pulse");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosSharesMiningFocusOnlyWithNearbyTeammates(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR,"ChoirBearer");
+        var ally=player(h,ArtifactKind.PALIMPSEST,"ChoirAlly");var enemy=player(h,ArtifactKind.PALIMPSEST,"ChoirEnemy");
+        var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("choir_"+wearer.getUUID().toString().substring(0,6));
+        var hostile=scoreboard.addPlayerTeam("foe_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),hostile);
+        ally.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
+        h.getLevel().addFreshEntity(ally);h.getLevel().addFreshEntity(enemy);
+        ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
+        var focus=SpecialPickaxes.STRATA_FOCUS.get();
+        h.assertTrue(ally.hasEffect(focus)&&ally.getEffect(focus).getAmplifier()==0&&ally.getEffect(focus).getDuration()==40,
+                "Choir lends its passive mining focus to a teammate within six blocks");
+        h.assertTrue(!enemy.hasEffect(focus),"the mining rhythm does not leak to a nearby hostile player");
+        var scanAt=ArtifactState.of(wearer,ArtifactKind.CHOIR).getLong("choirMiningAuraScanAt");
+        ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.CHOIR).getLong("choirMiningAuraScanAt")==scanAt,
+                "the nearby-player search is throttled to once every twenty ticks");
+        var mined=h.absolutePos(new BlockPos(4,1,4));h.getLevel().setBlockAndUpdate(mined,Blocks.AIR.defaultBlockState());
+        h.assertTrue(StrataFocusEffect.miningPulse(ally,mined)
+                &&Math.abs(StrataFocusEffect.miningTempoMultiplier(ally)-1.08D)<.001D,
+                "the ally builds a personal mining streak with the shared passive");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_62") public static void choirHeldHitUsesCustomFaultResonance(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR,"ChoirStrike");var target=EntityType.ZOMBIE.create(h.getLevel());
         target.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(target);
