@@ -784,6 +784,8 @@ public final class PickaxeGameTests {
         h.assertTrue(unwardedHit.getAmount()==12F,"the projectile guard is not retained after unequipping");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_71",timeoutTicks=80) public static void exodiumStarfallCatchRechargesAfterThirtyTicks(GameTestHelper h){
+        h.assertTrue(StarfallWardEffect.chargeProgress(100,130)==0D&&StarfallWardEffect.chargeProgress(115,130)==.5D
+                &&StarfallWardEffect.chargeProgress(130,130)==1D,"the Starfall orbit visibly refills with its thirty-tick catch cooldown");
         var wearer=player(h,ArtifactKind.EXODIUM);var shooter=EntityType.SKELETON.create(h.getLevel());
         shooter.setPos(wearer.getX()+6,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
         var first=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
