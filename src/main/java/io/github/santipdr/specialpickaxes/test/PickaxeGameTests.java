@@ -758,8 +758,8 @@ public final class PickaxeGameTests {
         outgoing.setPos(wearer.getX()-3,wearer.getY()+.9D,wearer.getZ());outgoing.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(outgoing);
         h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&outgoing.isAlive(),"Starfall leaves projectiles travelling away from the wearer untouched");
         var incoming=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
-        incoming.setPos(wearer.getX()+3,wearer.getY()+.9D,wearer.getZ());incoming.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(incoming);
-        h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!incoming.isAlive(),"Starfall catches an enemy shot travelling through the wearer's path");
+        incoming.setPos(wearer.getX()+9,wearer.getY()+.9D,wearer.getZ());incoming.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(incoming);
+        h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!incoming.isAlive(),"Starfall catches a hostile shot up to ten blocks along the wearer's path");
         var followup=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
         followup.setPos(wearer.getX()+3,wearer.getY()+.9D,wearer.getZ());followup.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(followup);
         h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&followup.isAlive(),"the 3-second catch cooldown prevents projectile spam");
@@ -774,7 +774,7 @@ public final class PickaxeGameTests {
         h.assertTrue(flashData.getLong("specialpickaxesStarfallFlashAtWorldTime")==worldTime+5,"repeated hits inside five ticks share one visual pulse after an entity tick reset");
         flashData.putLong("specialpickaxesStarfallFlashAtWorldTime",worldTime-1);StarfallWardEffect.projectileImpact(wearer);
         h.assertTrue(flashData.getLong("specialpickaxesStarfallFlashAtWorldTime")==worldTime+5,"the ward flashes again once its world-time visual cooldown expires");
-        h.assertTrue(ward.isDurationEffectTick(40,0)&&ward.isDurationEffectTick(38,0)&&!ward.isDurationEffectTick(39,0),"the ward checks trajectories every two ticks while visual effects stay separately throttled");
+        h.assertTrue(ward.isDurationEffectTick(39,0)&&ward.isDurationEffectTick(36,0)&&!ward.isDurationEffectTick(38,0),"the ward checks trajectories every three ticks while its visual orbit stays separately throttled");
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.EXODIUM);
         h.assertTrue(!wearer.hasEffect(ward),"Starfall Ward clears when Exodium leaves Curios and the hand");
         var unwardedHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);

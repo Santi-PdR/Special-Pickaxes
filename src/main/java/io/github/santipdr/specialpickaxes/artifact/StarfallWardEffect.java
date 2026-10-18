@@ -14,6 +14,8 @@ import org.joml.Vector3f;
 
 /** Exodium's Curios passive catches projectiles in a short-lived stellar veil. */
 public final class StarfallWardEffect extends MobEffect {
+    private static final double SCAN_RADIUS=10D;
+    private static final double PREDICTION_DISTANCE=10D;
     private static final String NEXT_FLASH="specialpickaxesStarfallFlashAtWorldTime";
     private static final DustParticleOptions STARDUST=new DustParticleOptions(new Vector3f(1F,.36F,.79F),.82F);
 
@@ -22,7 +24,7 @@ public final class StarfallWardEffect extends MobEffect {
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer wearer)||!(entity.level() instanceof ServerLevel level))return;
         tryCatchIncoming(wearer,level);
-        if(entity.tickCount%10!=0)return;
+        if(entity.tickCount%12!=0)return;
         double phase=entity.tickCount*.045D;
         double y=entity.getY()+entity.getBbHeight()*.56D;
         for(int i=0;i<4;i++){
@@ -31,7 +33,7 @@ public final class StarfallWardEffect extends MobEffect {
             level.sendParticles(wearer,STARDUST,false,entity.getX()+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.08D,
                     entity.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
         }
-        if(entity.tickCount%20==0)
+        if(entity.tickCount%24==0)
             level.sendParticles(wearer,ParticleTypes.END_ROD,false,entity.getX(),y+.18D,entity.getZ(),1,.04D,.08D,.04D,.005D);
     }
 
@@ -40,7 +42,7 @@ public final class StarfallWardEffect extends MobEffect {
         var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
         if(state.getLong("starfallCatchReady")>now)return false;
         Vec3 center=wearer.position().add(0,wearer.getBbHeight()*.5D,0);
-        var incoming=EntitySelection.nearest(level,Entity.class,wearer.getBoundingBox().inflate(8D),shot->
+        var incoming=EntitySelection.nearest(level,Entity.class,wearer.getBoundingBox().inflate(SCAN_RADIUS),shot->
                 isIncomingHostile(shot,wearer,center),center,1,256);
         if(incoming.isEmpty())return false;
         Entity shot=incoming.get(0);
@@ -59,7 +61,7 @@ public final class StarfallWardEffect extends MobEffect {
         if(motion.lengthSqr()<.01D)return false;
         Vec3 toward=center.subtract(shot.position()),direction=motion.normalize();
         double along=toward.dot(direction);
-        if(along<=0D||along>8D)return false;
+        if(along<=0D||along>PREDICTION_DISTANCE)return false;
         return toward.subtract(direction.scale(along)).lengthSqr()<=1.25D*1.25D;
     }
 
@@ -85,5 +87,5 @@ public final class StarfallWardEffect extends MobEffect {
         level.sendParticles(viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
     }
 
-    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%2==0;}
+    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%3==0;}
 }
