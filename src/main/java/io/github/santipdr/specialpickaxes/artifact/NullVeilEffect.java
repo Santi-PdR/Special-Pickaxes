@@ -16,6 +16,7 @@ import java.util.Comparator;
 public final class NullVeilEffect extends MobEffect {
     private static final int COOLDOWN=160;
     private static final DustParticleOptions NULL_DUST=new DustParticleOptions(new Vector3f(.48F,.95F,.72F),.8F);
+    private static final DustParticleOptions NULL_HIGHLIGHT=new DustParticleOptions(new Vector3f(.72F,1F,.9F),.58F);
 
     public NullVeilEffect(){super(MobEffectCategory.BENEFICIAL,0x9df5c2);}
 
@@ -33,12 +34,14 @@ public final class NullVeilEffect extends MobEffect {
                         .thenComparing(Comparator.comparingInt(MobEffectInstance::getDuration).reversed())).orElse(null);
         if(harmful==null||!player.removeEffect(harmful.getEffect()))return;
         state.putLong("nullVeilReady",now+COOLDOWN);
-        ServerLevel level=player.serverLevel();double phase=player.tickCount*.11D,cx=player.getX(),cz=player.getZ(),cy=player.getY()+player.getBbHeight()*.52D;
-        for(int i=0;i<8;i++){
-            double angle=phase+i*Math.PI/4D,radius=.32D+i*.018D;
-            level.sendParticles(NULL_DUST,cx+Math.cos(angle)*radius,cy+(i%2)*.16D,cz+Math.sin(angle)*radius,1,0,0,0,0);
+        ServerLevel level=player.serverLevel();double phase=player.tickCount*.11D,cx=player.getX(),cz=player.getZ(),baseY=player.getY();
+        // Three interleaved strands make the cleanse read as a rising veil instead of a flat spark.
+        for(int i=0;i<24;i++){
+            double progress=i/23D,angle=phase+progress*Math.PI*3D,radius=.38D+.12D*progress;
+            double x=cx+Math.cos(angle)*radius,z=cz+Math.sin(angle)*radius,y=baseY+.12D+progress*(player.getBbHeight()*.82D);
+            level.sendParticles(i%3==0?NULL_HIGHLIGHT:NULL_DUST,x,y,z,1,0,0,0,0);
         }
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,cx,cy,cz,4,.12D,.18D,.12D,.015D);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,cx,baseY+player.getBbHeight()*.54D,cz,7,.16D,.28D,.16D,.012D);
     }
 
     private static int priority(MobEffect effect){
