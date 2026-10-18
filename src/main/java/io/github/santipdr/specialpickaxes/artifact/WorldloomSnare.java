@@ -114,6 +114,18 @@ public final class WorldloomSnare {
             double angle=i*Math.PI/4D;
             emit(binding,x+Math.cos(angle)*.34D,y,z+Math.sin(angle)*.34D,2,.035D,.12D,.035D,.006D);
         }
+        // Four short vine columns make the catch read as roots closing around a body,
+        // while keeping this one-shot cue small even when several targets are caught.
+        for(int i=0;i<4;i++){
+            var point=catchVinePoint(binding.anchor,i);
+            emit(binding,point.x,point.y,point.z,2,.025D,.48D,.025D,.006D);
+        }
+    }
+
+    /** Center point for one of the four brief vertical vine columns on a successful catch. */
+    public static Vec3 catchVinePoint(Vec3 anchor,int quadrant){
+        double angle=Math.floorMod(quadrant,4)*Math.PI*.5D;
+        return anchor.add(Math.cos(angle)*.34D,.58D,Math.sin(angle)*.34D);
     }
 
     private static void emitCaughtPulse(Binding binding,long age){

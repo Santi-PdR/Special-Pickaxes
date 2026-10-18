@@ -1527,4 +1527,17 @@ public final class PickaxeGameTests {
             h.assertTrue(pulsesByTick[tick]==4,"40 simultaneous roots spread into four visual pulses per tick; tick "+tick);
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_57") public static void worldloomCatchVinesFormFourColumnsAroundTheTarget(GameTestHelper h){
+        var anchor=new net.minecraft.world.phys.Vec3(4.25D,12D,-3.5D);
+        for(int i=0;i<4;i++){
+            var point=WorldloomSnare.catchVinePoint(anchor,i);
+            h.assertTrue(Math.abs(point.y-(anchor.y+.58D))<.001D,"catch vine rises from the target's feet");
+            h.assertTrue(Math.abs(point.distanceToSqr(anchor)-(.34D*.34D+.58D*.58D))<.001D,
+                    "four catch columns keep a consistent radius and height");
+        }
+        var first=WorldloomSnare.catchVinePoint(anchor,0);var opposite=WorldloomSnare.catchVinePoint(anchor,2);
+        h.assertTrue(Math.abs(first.x-opposite.x)>.67D&&Math.abs(first.z-opposite.z)<.001D,
+                "opposing vines visibly enclose the target instead of stacking at one point");
+        h.succeed();
+    }
 }
