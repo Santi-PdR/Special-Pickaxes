@@ -626,8 +626,10 @@ public final class PickaxeGameTests {
         h.assertTrue(hit.getAmount()==8F&&attacker.hasEffect(shear)&&attacker.getEffect(shear).getDuration()==40&&!attacker.isOnFire(),"Crucible applies its distinct two-second Phase Shear without duplicating Hellspec's burn");
         var pvpTarget=player(h,ArtifactKind.PALIMPSEST,"PhaseShearTarget");
         double normalAttackSpeed=pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+        double normalMovementSpeed=pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);
         pvpTarget.addEffect(new net.minecraft.world.effect.MobEffectInstance(shear,40,0,true,false,true));
         h.assertTrue(Math.abs(pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)-normalAttackSpeed*.75D)<.001D,"Phase Shear slows player attack speed by 25 percent");
+        h.assertTrue(Math.abs(pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-normalMovementSpeed*.85D)<.001D,"Phase Shear also slows escape movement by 15 percent");
         h.assertTrue(!pvpTarget.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"Phase Shear does not grant Strength");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_37") public static void worldbreakerCuriosAegisAddsCustomArmorAndAnchor(GameTestHelper h){

@@ -125,7 +125,10 @@ public final class ArtifactPassives {
                     }
                 }
             }
-            case CRUCIBLE -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
+            case CRUCIBLE -> {
+                grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
+                PhaseShearEffect.impactPulse(attacker);
+            }
             case HELLSPEC -> {
                 event.setAmount(event.getAmount()*.8F);
                 if(retaliationAllowed){
