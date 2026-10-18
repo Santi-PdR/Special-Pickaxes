@@ -154,7 +154,13 @@ public final class ArtifactPassives {
                 attacker.hasImpulse=true;
             }
             case IRIDIUM -> {event.setAmount(event.getAmount()*.85F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),0,80);}
-            case SEAM_RIPPER -> {event.setAmount(event.getAmount()*.85F);if(retaliationAllowed)grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),0,60);}
+            case SEAM_RIPPER -> {
+                event.setAmount(event.getAmount()*.85F);
+                if(retaliationAllowed){
+                    grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.SEAM_FRAY.get(),0,60);
+                    SeamFrayEffect.impactPulse(attacker);
+                }
+            }
             default -> {return;}
         }
         ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
