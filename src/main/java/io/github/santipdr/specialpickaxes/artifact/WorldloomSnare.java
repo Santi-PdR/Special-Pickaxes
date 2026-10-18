@@ -94,10 +94,14 @@ public final class WorldloomSnare {
     /** The ankle ring tightens over four seconds, giving targets a readable escape window. */
     private static void emitWindup(Binding binding,long age){
         double progress=Math.min(1D,Math.max(0D,age/(double)WINDUP_TICKS));
-        double radius=.18D+.48D*progress,angle=age*.16D;
+        double radius=.22D+.48D*progress,angle=age*.16D;
         double x=binding.target.getX(),y=binding.target.getY()+.08D,z=binding.target.getZ();
-        emit(binding,x+Math.cos(angle)*radius,y,z+Math.sin(angle)*radius,ROOT_PARTICLES,.08D,.025D,.08D,.004D);
-        emit(binding,x+Math.cos(angle+Math.PI)*radius,y,z+Math.sin(angle+Math.PI)*radius,ROOT_PARTICLES,.08D,.025D,.08D,.004D);
+        // Four moving anchors make the closing circle readable from every side while
+        // keeping the same pulse interval and bounded particle count per target.
+        for(int i=0;i<4;i++){
+            double spoke=angle+i*Math.PI*.5D;
+            emit(binding,x+Math.cos(spoke)*radius,y,z+Math.sin(spoke)*radius,2,.055D,.035D,.055D,.004D);
+        }
         if(progress>.55D){
             double rise=(progress-.55D)*.42D;
             emit(binding,x+Math.cos(angle)*radius*.72D,y+rise,z+Math.sin(angle)*radius*.72D,2,.035D,.04D,.035D,.002D);
@@ -118,10 +122,9 @@ public final class WorldloomSnare {
     }
 
     private static void emit(Binding binding,double x,double y,double z,int count,double dx,double dy,double dz,double speed){
-        // One bounded particle packet per nearby viewer keeps several simultaneous roots inexpensive.
-        binding.level.sendParticles(binding.owner,VINE_PARTICLE,false,x,y,z,count,dx,dy,dz,speed);
-        if(binding.target instanceof ServerPlayer viewer&&viewer!=binding.owner)
-            binding.level.sendParticles(viewer,VINE_PARTICLE,false,x,y,z,count,dx,dy,dz,speed);
+        // The server's normal tracking range delivers the effect to nearby viewers
+        // without iterating every player in the level or sending it across dimensions.
+        binding.level.sendParticles(VINE_PARTICLE,x,y,z,count,dx,dy,dz,speed);
     }
 
     public static void forget(ServerPlayer owner){BINDINGS.values().removeIf(binding->binding.owner==owner);}
