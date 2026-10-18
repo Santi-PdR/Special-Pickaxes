@@ -25,10 +25,13 @@ public final class HeartwoodRenewalEffect extends MobEffect {
         long now=entity.level().getGameTime();
         var data=entity.getPersistentData();
         if(data.getLong(NEXT_PULSE)>now)return;
-        data.putLong(NEXT_PULSE,now+20L);
+        if(entity.getHealth()>=entity.getMaxHealth())return;
         float before=entity.getHealth();
-        if(before<entity.getMaxHealth())entity.heal(1.0F+Math.max(0,amplifier)*.5F);
-        if(entity.getHealth()>before&&entity.level() instanceof ServerLevel level)healBloom(level,entity);
+        entity.heal(1.0F+Math.max(0,amplifier)*.5F);
+        // A blocked heal is not a Heartwood pulse: preserve both its cooldown and visuals.
+        if(entity.getHealth()<=before)return;
+        data.putLong(NEXT_PULSE,now+20L);
+        if(entity.level() instanceof ServerLevel level)healBloom(level,entity);
     }
 
     /** Green mineral-like motes confirm a real heal without emitting idle particles at full health. */

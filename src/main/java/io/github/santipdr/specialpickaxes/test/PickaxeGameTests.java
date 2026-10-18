@@ -740,6 +740,19 @@ public final class PickaxeGameTests {
                 "the pulse heals and starts its cooldown as soon as healing is allowed");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_73") public static void heartwoodRenewalKeepsItsPulseWhenAnotherEffectBlocksHealing(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.setHealth(10F);
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();var data=wearer.getPersistentData();long now=ArtifactState.now(wearer);
+        data.putLong("specialpickaxesHeartwoodPulseAtWorldTime",now-1L);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.NULL_MARK.get(),100,0));
+        renewal.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==10F,"Null Mark blocks Heartwood Renewal without changing health");
+        h.assertTrue(data.getLong("specialpickaxesHeartwoodPulseAtWorldTime")==now-1L,"a vetoed heal does not consume Heartwood's pulse");
+        wearer.removeEffect(SpecialPickaxes.NULL_MARK.get());renewal.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==11F&&data.getLong("specialpickaxesHeartwoodPulseAtWorldTime")==now+20L,
+                "Heartwood heals and starts its one-second cadence once healing is allowed");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_53") public static void customCuriosLeasePreservesExternalEffectAndOnlyClearsItsOwn(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var mending=SpecialPickaxes.DAWN_MENDING.get();
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(mending,20,0,false,true,true));
