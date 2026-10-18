@@ -762,7 +762,9 @@ public final class PickaxeGameTests {
         h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!incoming.isAlive(),"Starfall catches a hostile shot up to ten blocks along the wearer's path");
         var followup=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
         followup.setPos(wearer.getX()+3,wearer.getY()+.9D,wearer.getZ());followup.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(followup);
-        h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&followup.isAlive(),"the 3-second catch cooldown prevents projectile spam");
+        h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&followup.isAlive(),"the 1.5-second catch cooldown prevents projectile spam");
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.EXODIUM).getLong("starfallCatchReady")==ArtifactState.now(wearer)+30,
+                "a successful catch starts a thirty-tick recharge");
         var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
         var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
         ArtifactPassives.onCuriosDamage(wearer,projectileHit,ArtifactKind.EXODIUM);
@@ -780,6 +782,24 @@ public final class PickaxeGameTests {
         var unwardedHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().arrow(arrow,shooter),12F);
         ArtifactPassives.onCuriosDamage(wearer,unwardedHit,ArtifactKind.EXODIUM);
         h.assertTrue(unwardedHit.getAmount()==12F,"the projectile guard is not retained after unequipping");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_71",timeoutTicks=80) public static void exodiumStarfallCatchRechargesAfterThirtyTicks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);var shooter=EntityType.SKELETON.create(h.getLevel());
+        shooter.setPos(wearer.getX()+6,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
+        var first=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+        first.setPos(wearer.getX()+9,wearer.getY()+.9D,wearer.getZ());first.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(first);
+        h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!first.isAlive(),"Starfall catches the first incoming shot");
+        h.runAfterDelay(29,()->{
+            var early=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+            early.setPos(wearer.getX()+9,wearer.getY()+.9D,wearer.getZ());early.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(early);
+            h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&early.isAlive(),"the ward remains charged until the full thirty ticks elapse");
+            early.discard();
+            h.runAfterDelay(1,()->{
+                var ready=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+                ready.setPos(wearer.getX()+9,wearer.getY()+.9D,wearer.getZ());ready.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(ready);
+                h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!ready.isAlive(),"Starfall catches again as soon as the thirty-tick recharge completes");finish(h,wearer);
+            });
+        });
     }
     @GameTest(template="empty",batch="rework_each_59") public static void exodiumSharesStarfallGuardWithThreeNearbyAllies(GameTestHelper h){
         var owner=player(h,ArtifactKind.EXODIUM,"StarfallBearer");

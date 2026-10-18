@@ -560,7 +560,7 @@
   "curios.detail.specialpickaxes.icarus": "Icarian Momentum cushions descent, halves fall damage and builds sprint-glide speed. Falls of 5+ blocks rebound into a forward wing-kick (2 s cooldown). Wing Reversal launches the first hostile attacker every 8 s.",
   "curios.detail.specialpickaxes.hollow_axiom": "Null Veil clears one harmful effect every 8 s with a visible pulse, prioritizing Poison and Wither, then control effects. Null Mark: the first hostile hit every 8 s prevents its attacker from healing for 3 s.",
   "curios.detail.specialpickaxes.worldbreaker": "Core Aegis gives its wearer +4 armor and 30% knockback resistance, sharing that ward with up to 3 allies within 5 blocks. The first hostile hit every 8 s deals 20% less damage and grants Absorption II to the wearer for 3 s.",
-  "curios.detail.specialpickaxes.exodium": "Starfall Ward catches one hostile projectile on your path every 3 s and softens shots that get through by 25%. It shares a lighter 25% projectile guard with up to 3 nearby allies. Starfold launches the first hostile attacker every 8 s.",
+  "curios.detail.specialpickaxes.exodium": "Starfall Ward catches one hostile projectile on your path every 1.5 s and softens shots that get through by 25%. It shares a lighter 25% projectile guard with up to 3 nearby allies. Starfold launches the first hostile attacker every 8 s.",
   "curios.detail.specialpickaxes.hellspec": "Cinder Mantle: blocks fire and lava. The first hostile hit every 8 s is reduced by 20% and ignites its attacker for 3 s. Embers orbit in heat.",
   "screen.specialpickaxes.copy_native": "Worldbreaker native techniques",
   "screen.specialpickaxes.copy_native_help": "Clear the copy and restore Worldbreaker’s six built-in mining modes.",

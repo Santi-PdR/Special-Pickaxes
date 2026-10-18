@@ -16,6 +16,7 @@ import org.joml.Vector3f;
 public final class StarfallWardEffect extends MobEffect {
     private static final double SCAN_RADIUS=10D;
     private static final double PREDICTION_DISTANCE=10D;
+    private static final int CATCH_COOLDOWN_TICKS=30;
     private static final String NEXT_FLASH="specialpickaxesStarfallFlashAtWorldTime";
     private static final DustParticleOptions STARDUST=new DustParticleOptions(new Vector3f(1F,.36F,.79F),.82F);
 
@@ -47,7 +48,7 @@ public final class StarfallWardEffect extends MobEffect {
         if(incoming.isEmpty())return false;
         Entity shot=incoming.get(0);
         shot.discard();
-        state.putLong("starfallCatchReady",now+60L);
+        state.putLong("starfallCatchReady",now+CATCH_COOLDOWN_TICKS);
         projectileImpact(wearer);
         return true;
     }
