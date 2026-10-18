@@ -26,9 +26,10 @@ public final class StrataFocusEffect extends MobEffect {
 
     public StrataFocusEffect(){super(MobEffectCategory.BENEFICIAL,0x52bdd8);}
 
-    /** Defer Curios streak credit until Forge and other mods have finished this block break. */
+    /** Defer Curios mining feedback until Forge and other mods have finished this block break. */
     public static boolean observeBreak(ServerPlayer player,BlockPos pos){
-        if(!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get())
+        if((!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get())
+                &&!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get()))
                 ||PENDING_BREAKS.size()>=MAX_PENDING_BREAKS)return false;
         PENDING_BREAKS.addLast(new PendingBreak(player,pos.immutable(),player.level().dimension(),ArtifactState.now(player)));
         return true;
@@ -42,8 +43,11 @@ public final class StrataFocusEffect extends MobEffect {
             long now=ArtifactState.now(player);
             if(!player.isAlive()||player.isRemoved()||!player.level().dimension().equals(pending.dimension())
                     ||now<pending.time()||now-pending.time()>2L||!player.serverLevel().hasChunkAt(pending.pos()))continue;
-            if(player.serverLevel().getBlockState(pending.pos()).isAir()
-                    &&miningPulse(player,pending.pos()))processed++;
+            if(player.serverLevel().getBlockState(pending.pos()).isAir()){
+                miningPulse(player,pending.pos());
+                StasisResonanceEffect.miningPulse(player,pending.pos());
+                processed++;
+            }
         }
         return processed;
     }

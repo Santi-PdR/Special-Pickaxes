@@ -693,15 +693,18 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_70") public static void curiosStrataTempoRequiresASuccessfulBreak(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);var pos=target(h);
+        var stasis=SpecialPickaxes.STASIS_RESONANCE.get();wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(stasis,40,0,true,false,true));
         h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"an uncanceled Strata mining attempt is observed");
         h.assertTrue(StrataFocusEffect.flushObservedBreaks()==0
-                &&StrataFocusEffect.miningTempoMultiplier(wearer)==1D,
-                "an unbroken or subsequently canceled block grants neither tempo nor a mining pulse");
+                &&StrataFocusEffect.miningTempoMultiplier(wearer)==1D
+                &&!wearer.getPersistentData().contains("specialpickaxesStasisResonancePulseAtWorldTime"),
+                "an unbroken or subsequently canceled block grants neither tempo nor a Stasis mining pulse");
         h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
         h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"a real break is queued for end-of-tick confirmation");
         h.assertTrue(StrataFocusEffect.flushObservedBreaks()==1
-                &&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.08D)<.001D,
-                "a confirmed break grants exactly the first eight-percent tempo charge");
+                &&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.08D)<.001D
+                &&wearer.getPersistentData().contains("specialpickaxesStasisResonancePulseAtWorldTime"),
+                "a confirmed break grants the first Strata charge and its Stasis pulse");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_40") public static void palimpsestCuriosDawnMendingPulsesAndClears(GameTestHelper h){

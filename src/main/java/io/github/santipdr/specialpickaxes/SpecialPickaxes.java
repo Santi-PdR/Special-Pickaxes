@@ -104,7 +104,6 @@ public final class SpecialPickaxes {
     private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
         StrataFocusEffect.observeBreak(p,e.getPos());
-        StasisResonanceEffect.miningPulse(p,e.getPos());
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());
