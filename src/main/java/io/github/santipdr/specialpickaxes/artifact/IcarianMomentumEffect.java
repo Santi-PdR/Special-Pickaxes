@@ -57,7 +57,7 @@ public final class IcarianMomentumEffect extends MobEffect {
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||entity.onGround())return;
         Vec3 motion=entity.getDeltaMovement();
-        if(motion.y<-.36D){entity.setDeltaMovement(motion.x,-.36D,motion.z);entity.hasImpulse=true;}
+        if(!entity.isFallFlying()&&motion.y<-.36D){entity.setDeltaMovement(motion.x,-.36D,motion.z);entity.hasImpulse=true;}
         if(entity instanceof Player player&&player.isSprinting()){
             Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
             if(forward.lengthSqr()>.001D){

@@ -219,6 +219,9 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(wearer.getDeltaMovement().x-.1)<.001&&Math.abs(wearer.getDeltaMovement().z)<.001,"the glide stops accelerating when sprint is released");
         wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);
         h.assertTrue(Math.abs(wearer.getDeltaMovement().y+.36)<.001,"Icarian Momentum caps a fast descent at a controlled speed");
+        wearer.startFallFlying();wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.isFallFlying()&&Math.abs(wearer.getDeltaMovement().y+1.2)<.001,
+                "Icarian Momentum preserves intentional Elytra dives instead of clamping their vertical speed");
         var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,16F,1F);MinecraftForge.EVENT_BUS.post(fall);
         h.assertTrue(Math.abs(fall.getDamageMultiplier()-.5F)<.001,"Icarian Momentum cuts fall damage in half while active");
         wearer.setOnGround(true);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
