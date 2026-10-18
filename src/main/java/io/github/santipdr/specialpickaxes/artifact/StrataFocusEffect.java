@@ -67,6 +67,7 @@ public final class StrataFocusEffect extends MobEffect {
         int streak=previous>0&&now>=last&&now-last<=STREAK_WINDOW_TICKS
                 ?Math.min(3,previous+1):1;
         data.putInt(MINING_STREAK,streak);data.putLong(MINING_STREAK_AT,now);
+        if(previous<3&&streak==3)ArtifactFeedback.strataTempoPeak(player);
         if(data.getLong(NEXT_MINING_PULSE)>now)return false;
         data.putLong(NEXT_MINING_PULSE,now+6L);
         ArtifactFeedback.nearbyMiningPulse(player,pos,MINING_GLEAM,4,ParticleTypes.GLOW,streak);

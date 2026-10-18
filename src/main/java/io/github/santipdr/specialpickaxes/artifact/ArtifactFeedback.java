@@ -39,6 +39,18 @@ public final class ArtifactFeedback {
                 center,3,128);
         for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
     }
+    /** A private, one-shot halo marks the transition into the full Strata tempo bonus. */
+    public static void strataTempoPeak(ServerPlayer wearer){
+        var level=wearer.serverLevel();double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.52D,z=wearer.getZ();
+        double phase=level.getGameTime()*.08D;
+        var rim=new DustParticleOptions(new Vector3f(.35F,.9F,1F),1.08F);
+        for(int i=0;i<8;i++){
+            double angle=phase+i*Math.PI/4D,radius=.48D;
+            level.sendParticles(wearer,rim,false,x+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.035D,
+                    z+Math.sin(angle)*radius,1,0,0,0,0);
+        }
+        level.sendParticles(wearer,ParticleTypes.GLOW,false,x,y+.12D,z,2,.08D,.12D,.08D,.004D);
+    }
     private static void emitMiningPulse(ServerPlayer viewer,net.minecraft.server.level.ServerLevel level,Vec3 center,
                                         ParticleOptions primary,int primaryCount,ParticleOptions accent,int accentCount){
         // A few deliberate points read as a rising cut through the block, while the former
