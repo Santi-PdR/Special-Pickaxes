@@ -727,6 +727,19 @@ public final class PickaxeGameTests {
         wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(mending),"Dawn Mending clears when Palimpsest leaves Curios");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_72") public static void dawnMendingKeepsItsPulseWhenAnotherEffectBlocksHealing(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setHealth(10F);
+        var mending=SpecialPickaxes.DAWN_MENDING.get();var data=wearer.getPersistentData();long now=ArtifactState.now(wearer);
+        data.putLong("specialpickaxesDawnMendingAtWorldTime",now-1L);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.NULL_MARK.get(),100,0));
+        mending.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==10F,"Null Mark blocks Dawn Mending without changing health");
+        h.assertTrue(data.getLong("specialpickaxesDawnMendingAtWorldTime")==now-1L,"a vetoed heal does not consume Dawn Mending's cooldown");
+        wearer.removeEffect(SpecialPickaxes.NULL_MARK.get());mending.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==11F&&data.getLong("specialpickaxesDawnMendingAtWorldTime")==now+40L,
+                "the pulse heals and starts its cooldown as soon as healing is allowed");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_53") public static void customCuriosLeasePreservesExternalEffectAndOnlyClearsItsOwn(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var mending=SpecialPickaxes.DAWN_MENDING.get();
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(mending,20,0,false,true,true));

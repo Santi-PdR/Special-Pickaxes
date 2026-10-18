@@ -21,9 +21,13 @@ public final class DawnMendingEffect extends MobEffect {
         long now=entity.level().getGameTime();
         var data=entity.getPersistentData();
         if(data.getLong(NEXT_PULSE)>now)return;
-        data.putLong(NEXT_PULSE,now+40L);
         if(entity.getHealth()>=entity.getMaxHealth())return;
+        float before=entity.getHealth();
         entity.heal(1F+.5F*Math.max(0,amplifier));
+        // Other relics (for example Null Mark) or server rules may veto the heal.
+        // Do not spend the pulse or show a false healing bloom unless health changed.
+        if(entity.getHealth()<=before)return;
+        data.putLong(NEXT_PULSE,now+40L);
         if(entity.level() instanceof ServerLevel level){
             double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.48D,z=entity.getZ();
             for(int i=0;i<8;i++){
