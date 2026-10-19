@@ -16,12 +16,18 @@ public final class CurioAuraGeometry {
         return origin.add(Math.cos(angle)*radius,rise,Math.sin(angle)*radius);
     }
 
-    /** Eight mirrored feather points give Icarus a small, animated pair of folded wings. */
+    /** Eight mirrored feather points define Icarus' compact wing silhouette. */
     public static Vec3 icarusFeatherPoint(Vec3 origin,double yawRadians,double phase,int sample){
+        return icarusFeatherPoint(origin,yawRadians,phase,sample,true);
+    }
+
+    /** The wings fold at rest and spread into a stronger wind-catching flap while soaring. */
+    public static Vec3 icarusFeatherPoint(Vec3 origin,double yawRadians,double phase,int sample,boolean soaring){
         int index=Math.floorMod(sample,8),feather=index%4,wing=index<4?-1:1;
-        double span=.2D+feather*.15D;
-        double trail=.12D+feather*.07D;
-        double flap=Math.sin(phase+feather*.42D)*(.035D+feather*.015D);
+        double spread=soaring?1.45D:.72D;
+        double span=(.2D+feather*.15D)*spread;
+        double trail=.12D+feather*.07D+(soaring?feather*.035D:0D);
+        double flap=Math.sin(phase+feather*.42D)*(soaring?.09D+feather*.035D:.022D+feather*.01D);
         Vec3 back=new Vec3(Math.sin(yawRadians),0,-Math.cos(yawRadians));
         Vec3 side=new Vec3(Math.cos(yawRadians),0,Math.sin(yawRadians));
         return origin.add(back.scale(trail)).add(side.scale(wing*span))
