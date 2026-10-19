@@ -257,6 +257,27 @@ public final class ArtifactFeedback {
             if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
+    /** A compact resonant ripple marks every other completed cross-section of Choir's tunnel. */
+    public static boolean resonantTunnelPulseDue(int depth){return depth>=0&&depth<20&&(depth&1)==0;}
+    public static void resonantTunnelPulse(ServerPlayer p,BlockPos first,net.minecraft.core.Direction direction,int depth){
+        if(!resonantTunnelPulseDue(depth))return;
+        var level=p.serverLevel();double cx=first.getX()+.5D,cy=first.getY()+.5D,cz=first.getZ()+.5D;
+        double ax=0,ay=0,az=0,bx=0,by=0,bz=0;
+        switch(direction.getAxis()){
+            case X->{cy+=.5D;cz+=.5D;ay=1; bz=1;}
+            case Y->{cx+=.5D;cz+=.5D;ax=1; bz=1;}
+            case Z->{cx+=.5D;cy+=.5D;ax=1; by=1;}
+        }
+        double phase=level.getGameTime()*.32D+depth*.37D;
+        var cyan=new DustParticleOptions(new Vector3f(.24F,.9F,1F),.78F);
+        for(int i=0;i<2;i++){
+            double angle=phase+i*Math.PI;
+            level.sendParticles(p,cyan,false,cx+ax*Math.cos(angle)*.24D+bx*Math.sin(angle)*.24D,
+                    cy+ay*Math.cos(angle)*.24D+by*Math.sin(angle)*.24D,
+                    cz+az*Math.cos(angle)*.24D+bz*Math.sin(angle)*.24D,1,0,0,0,0);
+        }
+        if(depth%5==0)level.sendParticles(p,ParticleTypes.SCULK_CHARGE_POP,false,cx,cy,cz,1,.02D,.02D,.02D,.004D);
+    }
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
     public static void gravityCollapse(ServerPlayer p,BlockPos center,int drops){
         var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;

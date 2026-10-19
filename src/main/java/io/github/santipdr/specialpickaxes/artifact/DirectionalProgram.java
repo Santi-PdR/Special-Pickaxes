@@ -70,7 +70,7 @@ public final class DirectionalProgram implements WorkProgram {
     }
     public WorkStep next(ServerPlayer p){
         if(moving){var destination=origin.relative(direction,depth).below();nextSlice();return new WorkStep.Move(destination);}
-        final int i=index;var at=slice.get(i);boolean mine=digging;
+        final int i=index,sliceDepth=depth;var at=slice.get(i);boolean mine=digging;
         if(!mine)expected[i]=p.serverLevel().getBlockState(at);var old=expected[i];advance();
         return new WorkStep(){
             public BlockPos pos(){return at;}
@@ -83,7 +83,10 @@ public final class DirectionalProgram implements WorkProgram {
                 if(!WorldSafety.directionClear(actor,tool,kind,at)||shape==Shape.EXODIUM_SINK
                         &&(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!WorldSafety.vacant(old)&&!MiningDesigns.matrix(old)&&!ArtifactOres.isOre(old))
                         ||actor.serverLevel().getBlockState(at)!=old)return false;
-                return !mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
+                boolean succeeded=!mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
+                if(succeeded&&mine&&i==0&&kind==ArtifactKind.CHOIR)
+                    ArtifactFeedback.resonantTunnelPulse(actor,at,direction,sliceDepth);
+                return succeeded;
             }
         };
     }
