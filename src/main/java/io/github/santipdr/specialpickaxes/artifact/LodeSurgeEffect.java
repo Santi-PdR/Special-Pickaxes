@@ -37,8 +37,14 @@ public final class LodeSurgeEffect extends MobEffect {
         double y=player.getY()+player.getBbHeight()*.55D;
         for(int i=0;i<motes;i++){
             double angle=phase+i*(Math.PI*2D/motes);
-            level.sendParticles(player,(i&1)==0?MINT:AMBER,false,
-                    player.getX()+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.08D,
+            double progress=i/(double)Math.max(1,motes-1);
+            // Each added ore charge lifts the orbit into a short helix; the final bright
+            // mote marks the full surge without increasing its particle count or cadence.
+            double lift=(progress-.5D)*charge*.12D;
+            double helix=Math.sin(angle*2D+phase*.35D)*(.025D+charge*.018D);
+            var particle=charge==2&&i==motes-1?ParticleTypes.END_ROD:((i+charge)&1)==0?MINT:AMBER;
+            level.sendParticles(player,particle,false,
+                    player.getX()+Math.cos(angle)*radius,y+lift+helix,
                     player.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
         }
     }
