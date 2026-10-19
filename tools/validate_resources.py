@@ -63,6 +63,21 @@ class Resources(unittest.TestCase):
                     self.assertIn(f"mining.identity.{artifact}.{mode}", data)
                     self.assertIn(f"mining.how.{artifact}.{mode}", data)
 
+    def test_choir_manual_matches_live_tunnel(self):
+        for lang in ["en_us", "es_es"]:
+            data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
+            self.assertIn("2×2", data["identity.specialpickaxes.fault_choir"])
+            self.assertIn("20", data["identity.specialpickaxes.fault_choir"])
+            self.assertIn("2×2", data["play4.fault_choir"])
+            self.assertIn("20", data["play4.fault_choir"])
+            self.assertNotIn("replay", data["identity.specialpickaxes.fault_choir"].lower())
+            self.assertNotIn("repite", data["identity.specialpickaxes.fault_choir"].lower())
+            combat_term = "Fault Resonance" if lang == "en_us" else "Resonancia de Falla"
+            self.assertIn(combat_term, data["combat.specialpickaxes.fault_choir"])
+            self.assertFalse(any(key.startswith(("mining.identity.fault_choir.rotate", "mining.identity.fault_choir.mirror",
+                                                 "mining.how.fault_choir.rotate", "mining.how.fault_choir.mirror"))
+                                 for key in data))
+
     def test_current_controls(self):
         source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/RelicKeys.java").read_text()
         actions_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/RelicControl.java").read_text()
