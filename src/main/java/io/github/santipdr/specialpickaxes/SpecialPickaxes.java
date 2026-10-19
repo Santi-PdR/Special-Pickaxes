@@ -96,6 +96,7 @@ public final class SpecialPickaxes {
         forge.addListener(this::entityJoin);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);forge.addListener(this::heal);
         forge.addListener(this::fall);
+        forge.addListener(StarfallWardEffect::interceptImpact);
         forge.addListener(this::explosion);forge.addListener(this::dimension);forge.addListener(this::leftClick);forge.addListener(this::commands);forge.addListener(this::stopped);forge.addListener(this::missing);
     }
     private void protectPhysicalLimit(net.minecraftforge.event.level.BlockEvent.BreakEvent e){

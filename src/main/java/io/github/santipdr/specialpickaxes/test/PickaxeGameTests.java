@@ -845,6 +845,15 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(ward),"Exodium Curios leases the named Starfall Ward effect");
         wearer.tickCount=1;
         var shooter=EntityType.SKELETON.create(h.getLevel());shooter.setPos(wearer.getX()+5,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
+        var impactShot=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
+        impactShot.setPos(wearer.getX()+1,wearer.getY()+.9D,wearer.getZ());h.getLevel().addFreshEntity(impactShot);
+        var impactEvent=new net.minecraftforge.event.entity.ProjectileImpactEvent(impactShot,
+                new net.minecraft.world.phys.EntityHitResult(wearer,wearer.position()));
+        h.assertTrue(StarfallWardEffect.interceptImpact(impactEvent)
+                        &&impactEvent.getImpactResult()==net.minecraftforge.event.entity.ProjectileImpactEvent.ImpactResult.STOP_AT_CURRENT_NO_DAMAGE
+                        &&!impactShot.isAlive(),
+                "Starfall cancels and catches a hostile projectile at exact player impact");
+        ArtifactState.of(wearer,ArtifactKind.EXODIUM).putLong("starfallCatchReady",ArtifactState.now(wearer));
         var outgoing=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
         outgoing.setPos(wearer.getX()-3,wearer.getY()+.9D,wearer.getZ());outgoing.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(outgoing);
         h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&outgoing.isAlive(),"Starfall leaves projectiles travelling away from the wearer untouched");

@@ -9,7 +9,10 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import org.joml.Vector3f;
 
 /** Exodium's Curios passive catches projectiles in a short-lived stellar veil. */
@@ -49,11 +52,34 @@ public final class StarfallWardEffect extends MobEffect {
         var incoming=EntitySelection.nearest(level,Entity.class,wearer.getBoundingBox().inflate(SCAN_RADIUS),shot->
                 isIncomingHostile(shot,wearer,center),center,1,256);
         if(incoming.isEmpty())return false;
-        Entity shot=incoming.get(0);
-        shot.discard();
-        state.putLong("starfallCatchReady",now+CATCH_COOLDOWN_TICKS);
-        projectileImpact(wearer);
-        return true;
+        return consumeCatch(wearer,incoming.get(0));
+    }
+
+    /** Catch exact entity impacts as a final guard for bullets that cross the scan between ticks. */
+    public static boolean interceptImpact(ProjectileImpactEvent event){
+        if(!(event.getRayTraceResult() instanceof EntityHitResult hit)
+                ||!(hit.getEntity() instanceof ServerPlayer wearer)
+                ||!wearer.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get()))return false;
+        Projectile shot=event.getProjectile();
+        if(!isHostileTo(shot,wearer))return false;
+        var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
+        if(state.getLong("starfallCatchReady")>now)return false;
+        event.setImpactResult(ProjectileImpactEvent.ImpactResult.STOP_AT_CURRENT_NO_DAMAGE);
+        return consumeCatch(wearer,shot);
+    }
+
+    private static boolean consumeCatch(ServerPlayer wearer,Entity shot){
+        var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
+        if(state.getLong("starfallCatchReady")>now)return false;
+        shot.discard();state.putLong("starfallCatchReady",now+CATCH_COOLDOWN_TICKS);
+        projectileImpact(wearer);return true;
+    }
+
+    private static boolean isHostileTo(Entity shot,ServerPlayer wearer){
+        if(!JegProjectileCompat.isProjectile(shot)||shot==wearer||!shot.isAlive())return false;
+        Entity owner=JegProjectileCompat.owner(shot);
+        if(owner==wearer||owner!=null&&owner.isAlliedTo(wearer))return false;
+        return !(owner instanceof Player other)||wearer.canHarmPlayer(other);
     }
 
     /** Visual charge fraction: the orbit contracts after a catch and expands as the ward recharges. */
