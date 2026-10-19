@@ -2,6 +2,7 @@ package io.github.santipdr.specialpickaxes.client;
 
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.ArtifactFeedback;
+import io.github.santipdr.specialpickaxes.artifact.StasisBoundaryGeometry;
 import io.github.santipdr.specialpickaxes.network.StasisBoundaryMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -71,6 +72,11 @@ public final class StasisBoundaryClient {
                         center.getX()+radius+1D,center.getY()+height+1D,center.getZ()+radius+1D);
                 // Cool cyan edges mark the actual buff volume; a moving gold bead shows the field is alive.
                 LevelRenderer.renderLineBox(pose,lines,box,.42F,.78F,1F,.62F);
+                for(int corner=0;corner<4;corner++){
+                    var point=StasisBoundaryGeometry.upperCorner(center,radius,height,corner);
+                    LevelRenderer.renderLineBox(pose,lines,new AABB(point.x-.055D,point.y-.08D,point.z-.055D,
+                            point.x+.055D,point.y+.08D,point.z+.055D),.98F,.8F,.36F,.68F);
+                }
                 double phase=(clientTicks+event.getPartialTick())*.15D;
                 var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
                 double markerY=center.getY()-height+.08D+Math.sin(phase*.7D)*.12D;

@@ -1028,6 +1028,21 @@ public final class PickaxeGameTests {
                 &&wrapped.z>=center.getZ()-radius+.5D&&wrapped.z<=center.getZ()+radius+.5D,"pulse remains on the marked boundary");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_78") public static void stasisUpperMarkersMatchTheFourDomainCorners(GameTestHelper h){
+        var center=new BlockPos(3,10,-4);int radius=8,halfHeight=6;var corners=new HashSet<Vec3>();
+        for(int i=0;i<4;i++){
+            var point=StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,i);corners.add(point);
+            h.assertTrue(point.y==center.getY()+halfHeight+1D,"corner markers sit on the domain's top edge");
+            h.assertTrue(Math.abs(point.x-(center.getX()+.5D))==radius+.5D
+                            &&Math.abs(point.z-(center.getZ()+.5D))==radius+.5D,
+                    "each marker sits at a horizontal corner of the bounded field");
+        }
+        h.assertTrue(corners.size()==4,"all four upper corners get a distinct marker position");
+        h.assertTrue(StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,4)
+                        .equals(StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,0)),
+                "corner indices wrap deterministically");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_30") public static void movingStasisDomainReplacesItsOldBoundary(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);var oldEdge=center.west(8);var destination=center.east(5);
         h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,8),"Stasis domain starts at its original center");
