@@ -1053,6 +1053,18 @@ public final class PickaxeGameTests {
         h.assertTrue(StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,4)
                         .equals(StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,0)),
                 "corner indices wrap deterministically");
+        var midpoints=new HashSet<Vec3>();
+        for(int edge=0;edge<4;edge++){
+            var point=StasisBoundaryGeometry.upperEdgeMidpoint(center,radius,halfHeight,edge);midpoints.add(point);
+            h.assertTrue(point.y==center.getY()+halfHeight+1D,"edge ticks sit on the upper domain boundary");
+            h.assertTrue((edge%2==0?Math.abs(point.z-(center.getZ()+.5D))==radius+.5D
+                            :Math.abs(point.x-(center.getX()+.5D))==radius+.5D),
+                    "each tick sits at the midpoint of one distinct horizontal edge");
+        }
+        h.assertTrue(midpoints.size()==4,"all four upper edges get their own marker");
+        h.assertTrue(StasisBoundaryGeometry.upperEdgeMidpoint(center,radius,halfHeight,0).equals(
+                        StasisBoundaryGeometry.upperEdgeMidpoint(center,radius,halfHeight,4)),
+                "edge indices wrap deterministically");
         h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_30") public static void movingStasisDomainReplacesItsOldBoundary(GameTestHelper h){

@@ -70,14 +70,20 @@ public final class StasisBoundaryClient {
                 if(mc.player.distanceToSqr(center.getX()+.5D,center.getY()+.5D,center.getZ()+.5D)>(48D+radius)*(48D+radius))continue;
                 var box=new AABB(center.getX()-radius,center.getY()-height,center.getZ()-radius,
                         center.getX()+radius+1D,center.getY()+height+1D,center.getZ()+radius+1D);
-                // Cool cyan edges mark the actual buff volume; a moving gold bead shows the field is alive.
-                LevelRenderer.renderLineBox(pose,lines,box,.42F,.78F,1F,.62F);
+                // Cool cyan edges mark the actual buff volume; a small alpha wave keeps long edges legible.
+                double phase=(clientTicks+event.getPartialTick())*.15D;
+                float edgeAlpha=.72F+(float)(.06D*(.5D+.5D*Math.sin(phase*.35D)));
+                LevelRenderer.renderLineBox(pose,lines,box,.42F,.78F,1F,edgeAlpha);
                 for(int corner=0;corner<4;corner++){
                     var point=StasisBoundaryGeometry.upperCorner(center,radius,height,corner);
                     LevelRenderer.renderLineBox(pose,lines,new AABB(point.x-.055D,point.y-.08D,point.z-.055D,
-                            point.x+.055D,point.y+.08D,point.z+.055D),.98F,.8F,.36F,.68F);
+                            point.x+.055D,point.y+.08D,point.z+.055D),.98F,.8F,.36F,.8F);
                 }
-                double phase=(clientTicks+event.getPartialTick())*.15D;
+                for(int edge=0;edge<4;edge++){
+                    var point=StasisBoundaryGeometry.upperEdgeMidpoint(center,radius,height,edge);
+                    LevelRenderer.renderLineBox(pose,lines,new AABB(point.x-.045D,point.y-.015D,point.z-.045D,
+                            point.x+.045D,point.y+.11D,point.z+.045D),.72F,.9F,1F,.82F);
+                }
                 var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
                 double markerY=center.getY()-height+.08D+Math.sin(phase*.7D)*.12D;
                 LevelRenderer.renderLineBox(pose,lines,new AABB(head.x-.07D,markerY,head.z-.07D,
