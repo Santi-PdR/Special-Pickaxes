@@ -1179,6 +1179,16 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed");
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"hollow core and ore preserved");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_80") public static void axiomNullcutFeedbackFlowsTowardItsPreservedCore(GameTestHelper h){
+        var shell=new net.minecraft.core.BlockPos(6,8,-2);var core=new net.minecraft.core.BlockPos(1,2,3);
+        var inward=ArtifactFeedback.axiomNullcutDirection(shell,core);
+        var toward=Vec3.atCenterOf(core).subtract(Vec3.atCenterOf(shell));
+        h.assertTrue(Math.abs(inward.lengthSqr()-1D)<1.0E-6D&&inward.dot(toward)>0D,
+                "Nullcut's sculk streak points from the mined shell toward the preserved core");
+        h.assertTrue(ArtifactFeedback.axiomNullcutDirection(core,core).equals(new Vec3(0,1,0)),
+                "the visual pulse remains finite if its source coincides with the core");
+        h.succeed();
+    }
 
     @GameTest(template="empty",batch="legacy_each_14") public static void protectionRollbackAndPayment(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(3,0,0);h.getLevel().setBlockAndUpdate(b,Blocks.DEEPSLATE.defaultBlockState());

@@ -126,6 +126,7 @@ public final class WorkQueue {
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
                 else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
                 else if(job.kind==ArtifactKind.IRIDIUM)ArtifactFeedback.iridiumLodePulse(p,feedback);
+                else if(job.kind==ArtifactKind.AXIOM&&job.region instanceof RadialMiningProgram radial)ArtifactFeedback.axiomNullcutPulse(p,feedback,radial.center());
                 else if(job.kind==ArtifactKind.CRUCIBLE&&feedbackMaterial!=null)ArtifactFeedback.crucibleRephase(p,feedback,feedbackMaterial);
                 else {
                     if(job.kind==ArtifactKind.SEAM_RIPPER)ArtifactFeedback.seamTrail(p,List.copyOf(job.seamTrailPoints));

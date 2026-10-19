@@ -20,6 +20,8 @@ public final class RadialMiningProgram implements WorkProgram {
         this.scanLimit=Math.min(ArtifactConfig.JOB_LIMIT.get(),countCandidates());
     }
 
+    public BlockPos center(){return center;}
+
     private boolean inside(int dx,int dy,int dz){
         if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE)return dx*dx+dy*dy+dz*dz<=radius*radius;
         if(kind==ArtifactKind.HELLSPEC){

@@ -176,6 +176,23 @@ public final class ArtifactFeedback {
         }
         level.sendParticles(p,ParticleTypes.GLOW,false,x,y+.24D,z,1,0,0,0,0);
     }
+    /** Nullcut fragments stream from each removed shell block toward the core it preserves. */
+    public static void axiomNullcutPulse(ServerPlayer p,BlockPos mined,BlockPos core){
+        var level=p.serverLevel();var source=Vec3.atCenterOf(mined).add(0,.16D,0);var nucleus=Vec3.atCenterOf(core).add(0,.16D,0);
+        Vec3 inward=axiomNullcutDirection(mined,core);
+        var cyan=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.08F);
+        for(int streak=0;streak<2;streak++){
+            var point=source.lerp(nucleus,streak*.28D);
+            level.sendParticles(p,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,0,
+                    inward.x,inward.y,inward.z,.045D);
+        }
+        level.sendParticles(p,cyan,false,source.x,source.y,source.z,2,.08D,.08D,.08D,0);
+    }
+    /** Unit direction from the shell fragment back toward the protected nucleus. */
+    public static Vec3 axiomNullcutDirection(BlockPos mined,BlockPos core){
+        Vec3 inward=Vec3.atCenterOf(core).subtract(Vec3.atCenterOf(mined));
+        return inward.lengthSqr()<1.0E-8D?new Vec3(0,1,0):inward.normalize();
+    }
     /** A short private scar marks the midpoint between adjacent Seam Ripper breaks. */
     public static boolean seamTrail(ServerPlayer p,BlockPos from,BlockPos to) {
         if(from==null||to==null||from.distSqr(to)>5D)return false;
