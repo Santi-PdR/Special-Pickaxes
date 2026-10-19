@@ -1545,6 +1545,8 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_36") public static void pickaxeSoundsUseFiveBlockPlayerCenteredRadius(GameTestHelper h){
         var player=Vec3.ZERO;var forwardedSound=player.add(0,1.6D,2D);
+        h.assertTrue(ArtifactConfig.SOUND_RADIUS.get()==5&&ArtifactConfig.SOUND_COOLDOWN.get()>=20,
+                "sound configuration cannot exceed five blocks or play more often than once per second");
         h.assertTrue(ArtifactFeedback.withinSoundRadius(player,new Vec3(0,0,5),5D),"a listener at five blocks remains in range");
         h.assertTrue(!ArtifactFeedback.withinSoundRadius(player,new Vec3(0,0,6),5D)
                 &&forwardedSound.distanceTo(new Vec3(0,0,6))<5D,"the forward sound offset cannot extend the five-block listener radius");
