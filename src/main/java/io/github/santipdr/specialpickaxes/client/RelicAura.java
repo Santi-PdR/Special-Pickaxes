@@ -4,6 +4,7 @@ import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.*;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -22,10 +23,17 @@ public final class RelicAura {
     private static final double VISIBLE_CURIO_RADIUS_SQR=24D*24D;
     private static final java.util.Map<ArtifactKind,DustParticleOptions> HELD_DUST=dustPalette(.3F,.3F);
     private static final java.util.Map<ArtifactKind,DustParticleOptions> CURIOS_DUST=dustPalette(.27F,.34F);
+    private record NearbyCurio(Player player,ArtifactItem relic){}
     private static ArtifactKind heldKind;
+    private static Player scanOwner;
+    private static Level scanLevel;
+    private static int lastNearbyScanTick=Integer.MIN_VALUE;
+    private static java.util.List<Player> nearbyCandidates=java.util.List.of();
+    private static java.util.List<NearbyCurio> nearbyCurios=java.util.List.of();
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
-        if(mc.player==null||mc.level==null){heldKind=null;return;}
+        if(mc.player==null||mc.level==null){heldKind=null;clearNearbyCache();return;}
+        if(scanOwner!=mc.player||scanLevel!=mc.level){clearNearbyCache();scanOwner=mc.player;scanLevel=mc.level;}
         if(mc.isPaused()||mc.options.hideGui||mc.player.tickCount%4!=0)return;
         ArtifactItem held=mc.player.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
         if(held!=null){
@@ -39,8 +47,28 @@ public final class RelicAura {
         if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
                 &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item);
 
-        // Render nearby wearers on this client too, so a Curios passive has a readable
-        // team-facing signature without introducing server packets or an unbounded scan.
+        // Aura animation still updates every four ticks; costly nearby-player and Curios
+        // inventory lookups refresh every eight ticks and remain strictly client-side.
+        if(CurioAuraSchedule.due(mc.player.tickCount,lastNearbyScanTick))
+            refreshNearbyWearers(mc);
+        int visibleHeld=0;
+        for(var viewer:nearbyCandidates){
+            if(!visibleToLocal(mc,viewer))continue;
+            ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
+            if(heldRelic!=null&&visibleHeld<MAX_VISIBLE_CURIO_AURAS){
+                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleHeld++;
+            }
+        }
+        int visibleCurios=0;
+        for(var entry:nearbyCurios){
+            if(!visibleToLocal(mc,entry.player()))continue;
+            ArtifactItem heldRelic=entry.player().getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
+            if(heldRelic!=null&&heldRelic.kind==entry.relic().kind)continue;
+            emitCurios(mc,entry.player(),entry.relic());
+            if(++visibleCurios>=MAX_VISIBLE_CURIO_AURAS)break;
+        }
+    }
+    private static void refreshNearbyWearers(Minecraft mc){
         var farthestFirst=java.util.Comparator.<Player>comparingDouble(viewer->viewer.distanceToSqr(mc.player)).reversed();
         var nearest=new java.util.PriorityQueue<Player>(MAX_CURIO_CANDIDATES,farthestFirst);
         var nearbyPlayers=new java.util.ArrayList<Player>(MAX_INSPECTED_NEARBY_PLAYERS);
@@ -56,22 +84,22 @@ public final class RelicAura {
         }
         var candidates=new java.util.ArrayList<Player>(nearest);
         candidates.sort(java.util.Comparator.comparingDouble(viewer->viewer.distanceToSqr(mc.player)));
-        var nearby=new java.util.ArrayList<java.util.Map.Entry<Player,ArtifactItem>>();
-        int visibleHeld=0;
-        for(int i=0;i<Math.min(MAX_CURIO_CANDIDATES,candidates.size());i++){
-            var viewer=candidates.get(i);
-            ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
-            if(heldRelic!=null&&visibleHeld<MAX_VISIBLE_CURIO_AURAS){
-                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleHeld++;
-            }
+        var wearers=new java.util.ArrayList<NearbyCurio>(MAX_CURIO_CANDIDATES);
+        for(var viewer:candidates){
             var equipped=CuriosCompat.find(viewer);
-            if(equipped==null||!(equipped.stack().getItem() instanceof ArtifactItem item))continue;
-            if(heldRelic!=null&&heldRelic.kind==item.kind)continue;
-            nearby.add(java.util.Map.entry(viewer,item));
+            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)wearers.add(new NearbyCurio(viewer,item));
         }
-        nearby.sort(java.util.Comparator.comparingDouble(entry->entry.getKey().distanceToSqr(mc.player)));
-        for(int i=0;i<Math.min(MAX_VISIBLE_CURIO_AURAS,nearby.size());i++)
-            emitCurios(mc,nearby.get(i).getKey(),nearby.get(i).getValue());
+        nearbyCandidates=java.util.List.copyOf(candidates);
+        nearbyCurios=java.util.List.copyOf(wearers);
+        lastNearbyScanTick=mc.player.tickCount;
+    }
+    private static boolean visibleToLocal(Minecraft mc,Player viewer){
+        return !viewer.isRemoved()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(mc.player)
+                &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR;
+    }
+    private static void clearNearbyCache(){
+        scanOwner=null;scanLevel=null;lastNearbyScanTick=Integer.MIN_VALUE;
+        nearbyCandidates=java.util.List.of();nearbyCurios=java.util.List.of();
     }
     private static void emitHeld(Minecraft mc,Player player,ArtifactItem item,ItemStack tool){
         var look=player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();

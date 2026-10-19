@@ -37,6 +37,12 @@ public final class PickaxeGameTests {
         h.assertTrue(Arrays.stream(buckets).allMatch(count->count==100),"Curios scans distribute evenly across all ten ticks");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_75") public static void cosmeticCuriosAuraScanUsesEightTickCadence(GameTestHelper h){
+        h.assertTrue(CurioAuraSchedule.due(40,Integer.MIN_VALUE),"the first nearby aura scan starts immediately");
+        h.assertTrue(!CurioAuraSchedule.due(47,40)&&CurioAuraSchedule.due(48,40),"the visual scan refreshes every eight ticks");
+        h.assertTrue(CurioAuraSchedule.due(1,200),"a fresh client level or wrapped tick counter refreshes immediately");
+        h.succeed();
+    }
 
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
