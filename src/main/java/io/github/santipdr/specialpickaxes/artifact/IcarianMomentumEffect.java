@@ -54,6 +54,13 @@ public final class IcarianMomentumEffect extends MobEffect {
         return facing.lengthSqr()>.001D?facing.normalize():new Vec3(0,0,1);
     }
 
+    /** Sprinting while looking up turns Icarus' glide into a slow, capped ascent. */
+    public static Vec3 guidedLift(Vec3 motion,Vec3 look,boolean sprinting,boolean fallFlying){
+        if(!sprinting||fallFlying||look.y<.55D)return motion;
+        double lift=.30D+Math.min(.10D,(look.y-.55D)*.22D);
+        return new Vec3(motion.x,Math.min(.22D,motion.y+lift),motion.z);
+    }
+
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||entity.onGround())return;
         Vec3 motion=entity.getDeltaMovement();
@@ -65,6 +72,10 @@ public final class IcarianMomentumEffect extends MobEffect {
                 if(horizontal.lengthSqr()>.64D)horizontal=horizontal.normalize().scale(.8D);
                 player.setDeltaMovement(horizontal.x,motion.y,horizontal.z);
             }
+        }
+        if(entity instanceof Player player){
+            Vec3 before=player.getDeltaMovement();Vec3 lifted=guidedLift(before,player.getLookAngle(),player.isSprinting(),player.isFallFlying());
+            if(lifted.y!=before.y){player.setDeltaMovement(lifted);player.hasImpulse=true;}
         }
         if(entity instanceof Player player&&player.isSprinting()&&entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
             Vec3 forward=glideTrailForward(player.getDeltaMovement(),player.getLookAngle());

@@ -226,8 +226,17 @@ public final class PickaxeGameTests {
         ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
         var glide=SpecialPickaxes.ICARIAN_MOMENTUM.get();
         h.assertTrue(wearer.hasEffect(glide)&&!wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"airborne Icarus Curios grants its named glide effect without generic Slow Falling");
-        wearer.setDeltaMovement(0,-.2,0);glide.applyEffectTick(wearer,0);var boosted=wearer.getDeltaMovement();
-        h.assertTrue(boosted.horizontalDistanceSqr()>.0025&&Math.abs(boosted.y+.2)<.001,"sprint-gliding gains forward momentum without altering vertical control");
+        Vec3 falling=new Vec3(.1D,-.2D,.2D);
+        h.assertTrue(IcarianMomentumEffect.guidedLift(falling,new Vec3(0,.54D,0),true,false).equals(falling),"looking below the updraft threshold does not alter vertical movement");
+        h.assertTrue(IcarianMomentumEffect.guidedLift(falling,new Vec3(0,.8D,0),false,false).equals(falling)
+                        &&IcarianMomentumEffect.guidedLift(falling,new Vec3(0,.8D,0),true,true).equals(falling),
+                "the updraft requires sprinting and does not interfere with Elytra flight");
+        var lifted=IcarianMomentumEffect.guidedLift(falling,new Vec3(0,.8D,0),true,false);
+        h.assertTrue(lifted.y>falling.y&&lifted.x==falling.x&&lifted.z==falling.z,"looking up while sprinting converts the glide into a controlled ascent");
+        h.assertTrue(IcarianMomentumEffect.guidedLift(new Vec3(0,.18D,0),new Vec3(0,1D,0),true,false).y==.22D,
+                "the updraft caps upward velocity instead of allowing unlimited flight speed");
+        wearer.setXRot(-45F);wearer.setDeltaMovement(0,-.2,0);glide.applyEffectTick(wearer,0);var boosted=wearer.getDeltaMovement();
+        h.assertTrue(boosted.horizontalDistanceSqr()>.0025&&boosted.y>-.2,"sprint-gliding gains forward momentum and updraft when the wearer looks up");
         wearer.setSprinting(false);wearer.setDeltaMovement(.1,-.2,0);glide.applyEffectTick(wearer,0);
         h.assertTrue(Math.abs(wearer.getDeltaMovement().x-.1)<.001&&Math.abs(wearer.getDeltaMovement().z)<.001,"the glide stops accelerating when sprint is released");
         wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);
