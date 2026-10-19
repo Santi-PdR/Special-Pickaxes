@@ -126,9 +126,8 @@ public final class RelicAura {
         ParticleOptions accent=accent(item.kind,dust);
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
         double yaw=Math.toRadians(player.getYRot());
-        var back=new Vec3(Math.sin(yaw),0,-Math.cos(yaw));
-        var side=new Vec3(Math.cos(yaw),0,Math.sin(yaw));
-        for(int i=0;i<4;i++){
+        int auraPoints=item.kind==ArtifactKind.ICARUS?8:4;
+        for(int i=0;i<auraPoints;i++){
             double angle=phase+i*Math.PI/2D,radius=.42D+Math.sin(phase+i*.7D)*.035D;
             double x=player.getX()+Math.cos(angle)*radius,z=player.getZ()+Math.sin(angle)*radius;
             double particleY=y+Math.sin(angle*2D)*.06D;
@@ -167,11 +166,10 @@ public final class RelicAura {
                     particle=i==Math.floorMod(player.tickCount/8,4)?ParticleTypes.CHERRY_LEAVES:dust;
                 }
                 case ICARUS -> {
-                    int wing=i<2?-1:1;double feather=(i%2)*.22D+.24D;
-                    double spread=.20D+(i%2)*.22D;
-                    x=player.getX()+back.x*.24D+side.x*wing*spread;
-                    z=player.getZ()+back.z*.24D+side.z*wing*spread;
-                    particleY=y-.04D+feather+Math.sin(phase+i*.8D)*.035D;particle=i%2==0?ParticleTypes.ENCHANT:dust;
+                    var point=CurioAuraGeometry.icarusFeatherPoint(new Vec3(player.getX(),y,player.getZ()),yaw,phase,i);
+                    x=point.x;particleY=point.y;z=point.z;
+                    int feather=i%4;
+                    particle=feather==3?ParticleTypes.END_ROD:feather==0?ParticleTypes.ENCHANT:dust;
                 }
                 case AXIOM -> {
                     angle=-phase*.62D+i*Math.PI/2D;radius=.26D+(i%2)*.15D;

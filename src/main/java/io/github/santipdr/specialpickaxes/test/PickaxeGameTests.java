@@ -1600,6 +1600,25 @@ public final class PickaxeGameTests {
         h.assertTrue(highest-lowest>.45D&&highest-lowest<.9D,"the passive reads as a rising spiral rather than a flat orbit");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_78") public static void icarusCuriosAuraFormsMirroredAnimatedWings(GameTestHelper h){
+        var origin=new Vec3(2D,5D,-3D);double widest=0D;
+        for(int feather=0;feather<4;feather++){
+            var left=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,feather);
+            var right=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,feather+4);
+            h.assertTrue(Math.abs((left.x-origin.x)+(right.x-origin.x))<1.0E-6D
+                            &&Math.abs(left.z-right.z)<1.0E-6D&&Math.abs(left.y-right.y)<1.0E-6D,
+                    "left and right Icarus feathers mirror across the wearer");
+            h.assertTrue(left.z<origin.z,"Icarus feathers trail behind the wearer's facing direction");
+            double span=Math.abs(left.x-origin.x);
+            h.assertTrue(span>widest,"outer feathers widen the wing silhouette");widest=span;
+        }
+        var flapped=CurioAuraGeometry.icarusFeatherPoint(origin,0D,Math.PI/2D,0);
+        h.assertTrue(Math.abs(flapped.y-CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,0).y)>.03D,
+                "the Icarus wing points change height through the flap cycle");
+        h.assertTrue(CurioAuraGeometry.icarusFeatherPoint(origin,Math.PI/2D,0D,0).x>origin.x,
+                "the wings rotate with the wearer's facing direction");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_77") public static void curiosWardAuraTargetsOnlyThreeNearbyObservers(GameTestHelper h){
         var owner=player(h,ArtifactKind.INTERREGNUM,"WardOwner");var level=h.getLevel();var observers=new ArrayList<ServerPlayer>();
         for(int i=1;i<=5;i++){
