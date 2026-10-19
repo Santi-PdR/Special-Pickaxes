@@ -39,7 +39,7 @@ public final class OrefallProgram implements WorkProgram {
     @Override public boolean loaded(ServerPlayer p){return true;} // Unloaded chunks are skipped, never requested.
     @Override public boolean reportPartial(){return false;} // Empty and protected cells are expected scan results.
     @Override public int attemptsPerTick(ItemStack tool){
-        return scanIndex<SCAN_OFFSETS.size()?Math.max(ArtifactConfig.ORE_SCAN_BUDGET.get(),EnchantmentScaling.budget(tool)):EnchantmentScaling.budget(tool);
+        return Math.max(1,ArtifactConfig.ORE_SCAN_BUDGET.get());
     }
     @Override public void reportProgress(ServerPlayer p){
         if(scanIndex>0&&scanIndex<SCAN_OFFSETS.size()&&p.tickCount%20==0)

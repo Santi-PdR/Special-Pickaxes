@@ -1612,4 +1612,17 @@ public final class PickaxeGameTests {
         h.assertTrue(!audience.contains(observers.get(3))&&!audience.contains(observers.get(4)),"observers outside the three nearest do not receive repeated aura packets");
         finish(h,owner);
     }
+    @GameTest(template="empty",batch="rework_each_78") public static void iridiumOrefallHonorsConfiguredScanBudgetWithExtremeEfficiency(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM,"BudgetIridium");var tool=wearer.getMainHandItem();var center=target(h);
+        var enchantments=new net.minecraft.nbt.ListTag();var efficiency=new net.minecraft.nbt.CompoundTag();
+        efficiency.putString("id","minecraft:efficiency");efficiency.putInt("lvl",100000);enchantments.add(efficiency);tool.getOrCreateTag().put("Enchantments",enchantments);
+        int configured=ArtifactConfig.ORE_SCAN_BUDGET.get();ArtifactConfig.ORE_SCAN_BUDGET.set(5);
+        try{
+            var program=new OrefallProgram(center);
+            h.assertTrue(program.attemptsPerTick(tool)==5,"scan workload follows the server budget instead of scaling with Efficiency");
+            h.assertTrue(WorkQueue.startRegion(wearer,tool,ArtifactKind.IRIDIUM,program),"Iridium starts its bounded Orefall scan");
+            WorkQueue.tick();
+            h.assertTrue(WorkQueue.lastAttempts()==5,"one server tick inspects no more than five scan positions");
+        }finally{ArtifactConfig.ORE_SCAN_BUDGET.set(configured);finish(h,wearer);}
+    }
 }
