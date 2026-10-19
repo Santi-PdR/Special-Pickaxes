@@ -163,6 +163,19 @@ public final class ArtifactFeedback {
         if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
         p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }
+    /** Iridium's ore extraction gets a distinct, private resonance spiral instead of the shared burst. */
+    public static void iridiumLodePulse(ServerPlayer p,BlockPos pos){
+        var level=p.serverLevel();double phase=level.getGameTime()*.24D;
+        var cyan=new DustParticleOptions(new Vector3f(.42F,.94F,1F),1.12F);
+        var pearl=new DustParticleOptions(new Vector3f(.9F,1F,1F),.82F);
+        double x=pos.getX()+.5D,y=pos.getY()+.52D,z=pos.getZ()+.5D;
+        for(int i=0;i<5;i++){
+            double progress=i/4D,angle=phase+progress*Math.PI*1.7D,radius=.08D+progress*.29D;
+            level.sendParticles(p,(i&1)==0?cyan:pearl,false,x+Math.cos(angle)*radius,
+                    y-.2D+progress*.42D,z+Math.sin(angle)*radius,1,0,0,0,0);
+        }
+        level.sendParticles(p,ParticleTypes.GLOW,false,x,y+.24D,z,1,0,0,0,0);
+    }
     /** A short private scar marks the midpoint between adjacent Seam Ripper breaks. */
     public static boolean seamTrail(ServerPlayer p,BlockPos from,BlockPos to) {
         if(from==null||to==null||from.distSqr(to)>5D)return false;

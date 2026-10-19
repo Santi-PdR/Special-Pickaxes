@@ -1625,4 +1625,21 @@ public final class PickaxeGameTests {
             h.assertTrue(WorkQueue.lastAttempts()==5,"one server tick inspects no more than five scan positions");
         }finally{ArtifactConfig.ORE_SCAN_BUDGET.set(configured);finish(h,wearer);}
     }
+    @GameTest(template="empty",batch="rework_each_79") public static void iridiumOrefallMinesNearbyVanillaAndForeignOresButStopsAtBedrock(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM,"OrefallTester");var level=h.getLevel();var center=target(h);var foreign=center.east();var barrier=center.above();
+        PlayerPlacedBlocks.get(level).unmark(center);PlayerPlacedBlocks.get(level).unmark(foreign);PlayerPlacedBlocks.get(level).unmark(barrier);
+        level.setBlockAndUpdate(center,Blocks.DIAMOND_ORE.defaultBlockState());
+        level.setBlockAndUpdate(foreign,TestOres.NAMED_ORE.defaultBlockState());
+        level.setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
+        int configured=ArtifactConfig.ORE_SCAN_BUDGET.get();ArtifactConfig.ORE_SCAN_BUDGET.set(32);
+        try{
+            h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM,new OrefallProgram(center)),
+                    "Iridium starts a center-out ore scan");
+            WorkQueue.tick();
+            h.assertTrue(level.getBlockState(center).isAir()&&level.getBlockState(foreign).isAir(),
+                    "one bounded pulse harvests nearby vanilla and registry-named modded ores");
+            h.assertTrue(level.getBlockState(barrier).is(Blocks.BEDROCK)&&WorkQueue.succeeded(wearer)==2,
+                    "Orefall ignores bedrock while counting only successful ore breaks");
+        }finally{ArtifactConfig.ORE_SCAN_BUDGET.set(configured);finish(h,wearer);}
+    }
 }
