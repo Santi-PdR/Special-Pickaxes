@@ -96,5 +96,6 @@ public final class StarfallWardEffect extends MobEffect {
         level.sendParticles(viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
     }
 
-    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%3==0;}
+    /** Check trajectories every server tick so fast modded rounds cannot cross the ward between scans. */
+    @Override public boolean isDurationEffectTick(int duration,int amplifier){return true;}
 }
