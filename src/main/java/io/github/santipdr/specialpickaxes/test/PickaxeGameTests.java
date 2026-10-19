@@ -31,6 +31,13 @@ import java.util.function.Consumer;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class PickaxeGameTests {
+    @GameTest(template="empty",batch="rework_each_74") public static void curiosPassiveLookupsAreEvenlySharded(GameTestHelper h){
+        int[] buckets=new int[10];
+        for(int i=0;i<1000;i++)buckets[SpecialPickaxes.curiosPassiveBucket(new UUID(0L,i))]++;
+        h.assertTrue(Arrays.stream(buckets).allMatch(count->count==100),"Curios scans distribute evenly across all ten ticks");
+        h.succeed();
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }

@@ -29,8 +29,10 @@ import java.util.*;
 
 @Mod(SpecialPickaxes.ID)
 public final class SpecialPickaxes {
+    private static final int PASSIVE_SCAN_BUCKETS=10;
     private int passiveTickClock;
     private final Map<UUID,ArtifactKind> curiosPassives=new HashMap<>();
+    private final List<Map<UUID,ServerPlayer>> passiveScanBuckets=createPassiveScanBuckets();
     public static final String ID="specialpickaxes";
     public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(5,32768,64F,12F,50,
         net.minecraft.tags.TagKey.create(Registries.BLOCK,new ResourceLocation(ID,"needs_artifact_tool")),() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
@@ -63,6 +65,17 @@ public final class SpecialPickaxes {
     public static final RegistryObject<MobEffect> STASIS_RESONANCE=EFFECTS.register("stasis_resonance",StasisResonanceEffect::new);
     public static final RegistryObject<MobEffect> DAWN_MENDING=EFFECTS.register("dawn_mending",DawnMendingEffect::new);
     public static final Map<ArtifactKind,RegistryObject<Item>> PICKS=new LinkedHashMap<>();
+    private static List<Map<UUID,ServerPlayer>> createPassiveScanBuckets(){
+        var buckets=new ArrayList<Map<UUID,ServerPlayer>>(PASSIVE_SCAN_BUCKETS);
+        for(int i=0;i<PASSIVE_SCAN_BUCKETS;i++)buckets.add(new HashMap<>());
+        return buckets;
+    }
+    /** Stable sharding spreads Curios inventory lookups evenly across the existing ten-tick interval. */
+    public static int curiosPassiveBucket(UUID playerId){return Math.floorMod(playerId.hashCode(),PASSIVE_SCAN_BUCKETS);}
+    private void trackPassivePlayer(ServerPlayer player){passiveScanBuckets.get(curiosPassiveBucket(player.getUUID())).put(player.getUUID(),player);}
+    private void untrackPassivePlayer(ServerPlayer player){
+        UUID id=player.getUUID();passiveScanBuckets.get(curiosPassiveBucket(id)).remove(id);curiosPassives.remove(id);
+    }
     static {
         for(var kind:ArtifactKind.playableValues()) PICKS.put(kind,ITEMS.register(kind.id,() -> new ArtifactItem(kind)));
         TABS.register("artifacts",() -> CreativeModeTab.builder().title(Component.translatable("itemGroup.specialpickaxes"))
@@ -123,23 +136,25 @@ public final class SpecialPickaxes {
     private void tick(TickEvent.ServerTickEvent e) {
         if(e.phase==TickEvent.Phase.END) {
             StrataFocusEffect.flushObservedBreaks();MiningObservations.flush();PlayerPlacedBlocks.tickCleanup();WorkQueue.tick();DomainFields.tick();CompanionActions.tick();WorldloomSnare.tick();
-            if(++passiveTickClock>=10){
-                passiveTickClock=0;
-                for(var level:e.getServer().getAllLevels())for(var player:level.players()){
-                    var equipped=CuriosCompat.find(player);
-                    ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
-                    ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
-                    if(previous!=null&&previous!=current)ArtifactPassives.onCuriosUnequip(player,previous);
-                    if(current!=null)ArtifactPassives.tick(player,current);
-                }
+            passiveTickClock=(passiveTickClock+1)%PASSIVE_SCAN_BUCKETS;
+            var due=passiveScanBuckets.get(passiveTickClock).entrySet().iterator();
+            while(due.hasNext()){
+                var entry=due.next();var player=entry.getValue();
+                if(player.isRemoved()){due.remove();curiosPassives.remove(entry.getKey());continue;}
+                var equipped=CuriosCompat.find(player);
+                ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
+                ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
+                if(previous!=null&&previous!=current)ArtifactPassives.onCuriosUnequip(player,previous);
+                if(current!=null)ArtifactPassives.tick(player,current);
             }
         }
     }
-    private void stopped(ServerStoppedEvent e) { passiveTickClock=0;curiosPassives.clear();io.github.santipdr.specialpickaxes.network.RelicNetwork.clear();ArtifactFeedback.clearSounds();CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();StrataFocusEffect.clearPending();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
+    private void stopped(ServerStoppedEvent e) { passiveTickClock=0;curiosPassives.clear();passiveScanBuckets.forEach(Map::clear);io.github.santipdr.specialpickaxes.network.RelicNetwork.clear();ArtifactFeedback.clearSounds();CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();StrataFocusEffect.clearPending();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();DomainFields.clear();WorldloomSnare.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { curiosPassives.remove(p.getUUID());io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { untrackPassivePlayer(p);io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
+        if(e.getEntity() instanceof ServerPlayer replacement)trackPassivePlayer(replacement);
         var old=e.getOriginal().getPersistentData().getCompound(ArtifactState.ROOT);
         var clean=old.copy();
         for(var kind:ArtifactKind.values()) {
@@ -149,12 +164,12 @@ public final class SpecialPickaxes {
         if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) for(var kind:ArtifactKind.playableValues()) {
+        if(e.getEntity() instanceof ServerPlayer p) { trackPassivePlayer(p);for(var kind:ArtifactKind.playableValues()) {
             ArtifactState.prune(p,kind);
             var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
             long ticks=Math.max(state.getLong("ready"),state.getLong("alternateReady"))-now;
             if(ticks>0) p.getCooldowns().addCooldown(PICKS.get(kind).get(),(int)Math.min(ticks,Integer.MAX_VALUE));
-        }
+        } }
     }
     private void speed(PlayerEvent.BreakSpeed e) {
         var p=e.getEntity();
