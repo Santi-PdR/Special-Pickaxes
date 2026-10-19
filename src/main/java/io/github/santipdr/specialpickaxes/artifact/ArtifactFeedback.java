@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class ArtifactFeedback {
+    public record AuraParticle(ParticleOptions particle,Vec3 position,int count,double dx,double dy,double dz,double speed) {}
     private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
     private static final Map<UUID,Long> LISTENER_SOUND_READY=new HashMap<>();
     private ArtifactFeedback() {}
@@ -38,6 +39,25 @@ public final class ArtifactFeedback {
                         &&viewer.distanceToSqr(center)<=144D,
                 center,3,128);
         for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
+    }
+    /** Persistent Curios auras are sent only to the bearer and three visible players within twelve blocks. */
+    public static void nearbyWardPulse(ServerPlayer wearer,List<AuraParticle> particles){
+        if(particles.isEmpty())return;
+        var level=wearer.serverLevel();var audience=nearbyWardAudience(wearer);
+        for(var viewer:audience)for(var sample:particles){
+            var at=sample.position();
+            level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,sample.count(),
+                    sample.dx(),sample.dy(),sample.dz(),sample.speed());
+        }
+    }
+    /** Includes the bearer and chooses at most three nearby, non-spectating observers. */
+    public static List<ServerPlayer> nearbyWardAudience(ServerPlayer wearer){
+        var center=wearer.position();var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
+        var nearby=EntitySelection.nearest(wearer.serverLevel(),ServerPlayer.class,wearer.getBoundingBox().inflate(12D),
+                viewer->viewer!=wearer&&viewer.isAlive()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(wearer)
+                        &&viewer.distanceToSqr(center)<=144D,
+                center,3,128);
+        audience.addAll(nearby);return List.copyOf(audience);
     }
     /** Tempo tiers recolor the mining cut so Curios' sustained-break bonus is readable without extra ticks. */
     public static void strataTempoPulse(ServerPlayer wearer,BlockPos pos,int streak){

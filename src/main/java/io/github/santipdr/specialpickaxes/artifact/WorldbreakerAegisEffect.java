@@ -2,6 +2,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.UUID;
+import java.util.ArrayList;
 
 /** Worldbreaker's Curios passive anchors its wearer with a visible orbit of slate shards. */
 public final class WorldbreakerAegisEffect extends MobEffect {
@@ -26,14 +28,18 @@ public final class WorldbreakerAegisEffect extends MobEffect {
         if(entity.level().isClientSide||!(entity.level() instanceof ServerLevel level))return;
         double phase=entity.tickCount*.045D;
         double centerY=entity.getY()+entity.getBbHeight()*.52D;
+        var particles=new ArrayList<ArtifactFeedback.AuraParticle>(4);
         for(int i=0;i<4;i++){
             double angle=phase+i*Math.PI*.5D;
             double radius=.43D+Math.sin(angle*2D)*.035D;
             double x=entity.getX()+Math.cos(angle)*radius;
             double z=entity.getZ()+Math.sin(angle)*radius;
             double y=centerY+Math.sin(angle*2D)*.11D;
-            level.sendParticles(SLATE_SHARD,x,y,z,1,0,0,0,.012D);
+            particles.add(new ArtifactFeedback.AuraParticle(SLATE_SHARD,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,.012D));
         }
+        if(entity instanceof ServerPlayer wearer)ArtifactFeedback.nearbyWardPulse(wearer,particles);
+        else for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
+                sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

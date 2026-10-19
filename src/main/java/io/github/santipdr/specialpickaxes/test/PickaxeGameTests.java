@@ -1600,4 +1600,16 @@ public final class PickaxeGameTests {
         h.assertTrue(highest-lowest>.45D&&highest-lowest<.9D,"the passive reads as a rising spiral rather than a flat orbit");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_77") public static void curiosWardAuraTargetsOnlyThreeNearbyObservers(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM,"WardOwner");var level=h.getLevel();var observers=new ArrayList<ServerPlayer>();
+        for(int i=1;i<=5;i++){
+            var observer=player(h,ArtifactKind.WORLDBREAKER,"WardViewer"+i);
+            observer.setPos(owner.getX()+i,owner.getY(),owner.getZ());level.addFreshEntity(observer);observers.add(observer);
+        }
+        var audience=ArtifactFeedback.nearbyWardAudience(owner);
+        h.assertTrue(audience.size()==4&&audience.get(0)==owner,"ward auras include their bearer and cap observers at three");
+        for(int i=0;i<3;i++)h.assertTrue(audience.contains(observers.get(i)),"the three nearest observers see the passive ward");
+        h.assertTrue(!audience.contains(observers.get(3))&&!audience.contains(observers.get(4)),"observers outside the three nearest do not receive repeated aura packets");
+        finish(h,owner);
+    }
 }
