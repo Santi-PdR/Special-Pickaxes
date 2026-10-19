@@ -39,16 +39,28 @@ public final class ArtifactFeedback {
                 center,3,128);
         for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
     }
+    /** Tempo tiers recolor the mining cut so Curios' sustained-break bonus is readable without extra ticks. */
+    public static void strataTempoPulse(ServerPlayer wearer,BlockPos pos,int streak){
+        int tier=Math.max(1,Math.min(3,streak));
+        DustParticleOptions cut=switch(tier){
+            case 1->new DustParticleOptions(new Vector3f(.32F,.78F,1F),.82F);
+            case 2->new DustParticleOptions(new Vector3f(.36F,1F,.78F),.96F);
+            default->new DustParticleOptions(new Vector3f(1F,.82F,.42F),1.12F);
+        };
+        nearbyMiningPulse(wearer,pos,cut,3,tier==3?ParticleTypes.END_ROD:ParticleTypes.GLOW,tier);
+    }
     /** A private, one-shot halo marks the transition into the full Strata tempo bonus. */
     public static void strataTempoPeak(ServerPlayer wearer){
         var level=wearer.serverLevel();double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.52D,z=wearer.getZ();
         double phase=level.getGameTime()*.08D;
-        var rim=new DustParticleOptions(new Vector3f(.35F,.9F,1F),1.08F);
-        for(int i=0;i<8;i++){
-            double angle=phase+i*Math.PI/4D,radius=.48D;
-            level.sendParticles(wearer,rim,false,x+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.035D,
-                    z+Math.sin(angle)*radius,1,0,0,0,0);
+        var cyan=new DustParticleOptions(new Vector3f(.35F,.9F,1F),.92F);
+        var gold=new DustParticleOptions(new Vector3f(1F,.82F,.42F),1.18F);
+        for(int i=0;i<12;i++){
+            double progress=i/11D,angle=phase+progress*Math.PI*2D,radius=.34D+progress*.22D;
+            level.sendParticles(wearer,(i&1)==0?gold:cyan,false,x+Math.cos(angle)*radius,
+                    y-.22D+progress*.58D,z+Math.sin(angle)*radius,1,0,0,0,0);
         }
+        level.sendParticles(wearer,ParticleTypes.END_ROD,false,x,y+.36D,z,2,.06D,.08D,.06D,.006D);
         level.sendParticles(wearer,ParticleTypes.GLOW,false,x,y+.12D,z,2,.08D,.12D,.08D,.004D);
     }
     private static void emitMiningPulse(ServerPlayer viewer,net.minecraft.server.level.ServerLevel level,Vec3 center,

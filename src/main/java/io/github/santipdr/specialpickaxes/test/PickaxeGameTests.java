@@ -699,6 +699,7 @@ public final class PickaxeGameTests {
         var minedBlock=target(h);var pulseData=wearer.getPersistentData();long worldTime=ArtifactState.now(wearer);
         pulseData.putLong("specialpickaxesStrataMiningPulseAt",Long.MAX_VALUE);wearer.tickCount=10_000;
         h.assertTrue(StrataFocusEffect.miningPulse(wearer,minedBlock),"Strata Focus flashes at a mined block");
+        h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the escalating mining visuals never grant Strength");
         h.assertTrue(pulseData.getLong("specialpickaxesStrataMiningPulseAtWorldTime")==worldTime+6,
                 "Strata's throttled mining animation is scheduled on world time");
         h.assertTrue(!StrataFocusEffect.miningPulse(wearer,minedBlock),"rapid mining cannot spam its feedback pulse");
