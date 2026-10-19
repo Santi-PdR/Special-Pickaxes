@@ -12,6 +12,8 @@ import org.joml.Vector3f;
 
 /** Iridium's successive ore breaks resonate into a short, capped mining-speed surge. */
 public final class LodeSurgeEffect extends MobEffect {
+    private static final String NEXT_PEAK_MEAL="specialpickaxesLodePeakMealAt";
+    private static final int PEAK_MEAL_COOLDOWN_TICKS=40;
     private static final DustParticleOptions MINT=new DustParticleOptions(new Vector3f(.34F,.96F,.78F),.78F);
     private static final DustParticleOptions AMBER=new DustParticleOptions(new Vector3f(1F,.72F,.32F),.68F);
 
@@ -27,7 +29,10 @@ public final class LodeSurgeEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer player)||!(entity.level() instanceof ServerLevel level))return;
-        int charge=Math.min(2,amplifier),motes=2+charge;
+        int charge=Math.min(2,amplifier);
+        if(charge==2)feedAtPeak(player,level,player.getY()+player.getBbHeight()*.55D);
+        if(player.tickCount%12!=0)return;
+        int motes=2+charge;
         double phase=player.tickCount*.12D,radius=.3D+charge*.055D;
         double y=player.getY()+player.getBbHeight()*.55D;
         for(int i=0;i<motes;i++){
@@ -38,5 +43,14 @@ public final class LodeSurgeEffect extends MobEffect {
         }
     }
 
-    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%12==0;}
+    /** A full ore streak restores one food point at most every two seconds. */
+    private static void feedAtPeak(ServerPlayer player,ServerLevel level,double y){
+        var food=player.getFoodData();if(food.getFoodLevel()>=20)return;
+        long now=level.getGameTime();var data=player.getPersistentData();
+        if(data.getLong(NEXT_PEAK_MEAL)>now)return;
+        food.eat(1,.2F);data.putLong(NEXT_PEAK_MEAL,now+PEAK_MEAL_COOLDOWN_TICKS);
+        level.sendParticles(player,AMBER,false,player.getX(),y+.12D,player.getZ(),2,.08D,.1D,.08D,.008D);
+    }
+
+    @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%4==0;}
 }

@@ -1339,7 +1339,12 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.post(miningSpeed);
         h.assertTrue(Math.abs(miningSpeed.getNewSpeed()-131.60448F)<.03F,
                 "three Lode Surge charges and the first Strata tempo charge compound on Strata Focus II");
-        h.assertTrue(lodeSurge.isDurationEffectTick(72,2)&&!lodeSurge.isDurationEffectTick(71,2),"the charge-scaled orbit animates every twelve ticks");
+        h.assertTrue(lodeSurge.isDurationEffectTick(72,2)&&lodeSurge.isDurationEffectTick(68,2)
+                        &&!lodeSurge.isDurationEffectTick(71,2),"the peak nourishment checks every four ticks without increasing the twelve-tick orbit cadence");
+        p.getFoodData().setFoodLevel(10);lodeSurge.applyEffectTick(p,2);
+        h.assertTrue(p.getFoodData().getFoodLevel()==11,"a full Curios Lode Surge restores one food point");
+        lodeSurge.applyEffectTick(p,2);
+        h.assertTrue(p.getFoodData().getFoodLevel()==11,"peak nourishment cannot pulse again during the same tick");
         lodeSurge.applyEffectTick(p,2);
         h.assertTrue(queuedDrop.isCurrentlyGlowing()&&queuedDrop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"queued ability ore drops receive the Curios highlight without held-tool mining effects");
         h.assertTrue(p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.CHOIR,"Curios ore tracking leaves the held pickaxe unchanged");finish(h,p);
