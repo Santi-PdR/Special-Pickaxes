@@ -162,9 +162,9 @@ public final class RelicAura {
                     particleY=y+.08D+Math.sin(phase*.3D+i)*.055D;particle=i==Math.floorMod(player.tickCount/4,4)?ParticleTypes.END_ROD:dust;
                 }
                 case WORLDLOOM -> {
-                    angle=phase*.38D+i*Math.PI/2D;radius=.38D;
-                    x=player.getX()+Math.cos(angle)*radius;z=player.getZ()+Math.sin(angle)*radius;
-                    particleY=player.getY()+.12D+(i%2)*.12D;particle=i==0?ParticleTypes.HAPPY_VILLAGER:dust;
+                    var point=CurioAuraGeometry.worldloomVinePoint(new Vec3(player.getX(),player.getY(),player.getZ()),phase*.38D,i);
+                    x=point.x;particleY=point.y;z=point.z;
+                    particle=i==Math.floorMod(player.tickCount/8,4)?ParticleTypes.CHERRY_LEAVES:dust;
                 }
                 case ICARUS -> {
                     int wing=i<2?-1:1;double feather=(i%2)*.22D+.24D;

@@ -1590,4 +1590,14 @@ public final class PickaxeGameTests {
                 "opposing vines visibly enclose the target instead of stacking at one point");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_76") public static void worldloomCuriosAuraClimbsAsACompactVineSpiral(GameTestHelper h){
+        var origin=new net.minecraft.world.phys.Vec3(2D,5D,-3D);double lowest=Double.MAX_VALUE,highest=Double.MIN_VALUE;
+        for(int i=0;i<4;i++){
+            var point=CurioAuraGeometry.worldloomVinePoint(origin,1.2D,i);double horizontal=Math.hypot(point.x-origin.x,point.z-origin.z);
+            lowest=Math.min(lowest,point.y-origin.y);highest=Math.max(highest,point.y-origin.y);
+            h.assertTrue(horizontal>=.12D&&horizontal<=.29D,"Worldloom's Curios leaves stay close to the wearer");
+        }
+        h.assertTrue(highest-lowest>.45D&&highest-lowest<.9D,"the passive reads as a rising spiral rather than a flat orbit");
+        h.succeed();
+    }
 }
