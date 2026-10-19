@@ -670,7 +670,10 @@ public final class PickaxeGameTests {
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),8F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.CRUCIBLE);
         var shear=SpecialPickaxes.PHASE_SHEAR.get();
-        h.assertTrue(hit.getAmount()==8F&&attacker.hasEffect(shear)&&attacker.getEffect(shear).getDuration()==40&&!attacker.isOnFire(),"Crucible applies its distinct two-second Phase Shear without duplicating Hellspec's burn");
+        h.assertTrue(Math.abs(hit.getAmount()-6.8F)<.001F&&attacker.hasEffect(shear)&&attacker.getEffect(shear).getDuration()==40&&!attacker.isOnFire(),"Crucible's phase shift trims the first hit by 15% and applies its two-second Phase Shear without duplicating Hellspec's burn");
+        var repeatHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),8F);
+        ArtifactPassives.onCuriosDamage(wearer,repeatHit,ArtifactKind.CRUCIBLE);
+        h.assertTrue(repeatHit.getAmount()==8F,"Crucible's 15% phase reduction and Phase Shear share one eight-second passive cooldown");
         var pvpTarget=player(h,ArtifactKind.PALIMPSEST,"PhaseShearTarget");
         double normalAttackSpeed=pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
         double normalMovementSpeed=pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED);

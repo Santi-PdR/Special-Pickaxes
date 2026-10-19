@@ -126,6 +126,7 @@ public final class ArtifactPassives {
                 }
             }
             case CRUCIBLE -> {
+                event.setAmount(event.getAmount()*.85F);
                 grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.PHASE_SHEAR.get(),0,40);
                 PhaseShearEffect.impactPulse(attacker);
             }
