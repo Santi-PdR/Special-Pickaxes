@@ -520,6 +520,15 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"Eventide's alternate catches nearby loose drops");
         h.assertTrue(drop.getDeltaMovement().x<-.5D,"the tether pulls its target toward the wearer");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_62") public static void eventideTetherUsesVisibleSpiralPath(GameTestHelper h){
+        var from=new Vec3(0,0,0);var to=new Vec3(0,4,0);var middle=ArtifactFeedback.gravityTetherPoint(from,to,.5D);
+        h.assertTrue(middle.distanceToSqr(from.lerp(to,.5D))>.02D&&middle.distanceToSqr(from.lerp(to,.5D))<.04D,
+                "the gravity tether curls visibly around its pull path without drifting far from the target line");
+        h.assertTrue(ArtifactFeedback.gravityTetherPoint(from,to,0D).distanceToSqr(from)<1.0E-8D
+                        &&ArtifactFeedback.gravityTetherPoint(from,to,1D).distanceToSqr(to)<1.0E-8D,
+                "the spiral converges cleanly at both tether endpoints");
+        finish(h,player(h,ArtifactKind.EVENTIDE,"EventideArc"));
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void worldloomCuriosCounterPulsesHeartwoodRenewal(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.setHealth(10F);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);

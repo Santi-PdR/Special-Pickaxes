@@ -222,11 +222,21 @@ public final class ArtifactFeedback {
     public static void gravityTether(ServerPlayer p,Vec3 from,Vec3 to){
         var level=p.serverLevel();
         var violet=new DustParticleOptions(new Vector3f(.66F,.48F,.96F),1.05F);
-        for(int i=1;i<=2;i++){
-            double t=i/3D;var point=from.lerp(to,t).add(0,Math.sin(t*Math.PI)*.2D,0);
+        for(int i=1;i<=4;i++){
+            var point=gravityTetherPoint(from,to,i/5D);
             level.sendParticles(p,violet,false,point.x,point.y,point.z,1,0,0,0,0);
-            if(i==2)level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,point.x,point.y,point.z,1,0,0,0,0);
+            if((i&1)==0)level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,point.x,point.y,point.z,1,0,0,0,0);
         }
+        level.sendParticles(p,ParticleTypes.END_ROD,false,to.x,to.y,to.z,1,0,0,0,0);
+    }
+    /** A short, bounded spiral lets Eventide's pull read as a deliberate gravity path. */
+    public static Vec3 gravityTetherPoint(Vec3 from,Vec3 to,double progress){
+        double t=Math.max(0D,Math.min(1D,progress));Vec3 delta=to.subtract(from);
+        if(delta.lengthSqr()<1.0E-8D)return from;
+        Vec3 forward=delta.normalize(),axis=Math.abs(forward.y)<.9D?new Vec3(0,1,0):new Vec3(1,0,0);
+        Vec3 side=forward.cross(axis).normalize(),up=forward.cross(side).normalize();
+        double radius=Math.sin(Math.PI*t)*.18D,angle=t*Math.PI*2D;
+        return from.lerp(to,t).add(side.scale(Math.cos(angle)*radius)).add(up.scale(Math.sin(angle)*radius));
     }
     /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
     public static void starfallSink(ServerPlayer p,BlockPos origin){
