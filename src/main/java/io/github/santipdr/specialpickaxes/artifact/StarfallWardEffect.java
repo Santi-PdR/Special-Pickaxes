@@ -49,7 +49,7 @@ public final class StarfallWardEffect extends MobEffect {
         var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
         if(state.getLong("starfallCatchReady")>now)return false;
         Vec3 center=wearer.position().add(0,wearer.getBbHeight()*.5D,0);
-        var incoming=EntitySelection.nearest(level,Entity.class,wearer.getBoundingBox().inflate(SCAN_RADIUS),shot->
+        var incoming=JegProjectileCompat.nearest(level,wearer.getBoundingBox().inflate(SCAN_RADIUS),shot->
                 isIncomingHostile(shot,wearer,center),center,1,256);
         if(incoming.isEmpty())return false;
         return consumeCatch(wearer,incoming.get(0));

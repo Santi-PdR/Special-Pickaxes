@@ -2,8 +2,14 @@ package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /** Optional Just Enough Guns adapter; the mod remains usable when JEG is absent. */
 final class JegProjectileCompat {
@@ -24,6 +30,15 @@ final class JegProjectileCompat {
     }
     @SuppressWarnings("unchecked")
     static Class<Entity> entityType(){return TYPE==null?null:(Class<Entity>)(Class<?>)TYPE;}
+    /** Query projectile entity types directly so fast wards do not inspect every nearby mob/item each tick. */
+    static List<Entity> nearest(ServerLevel level,AABB bounds,Predicate<Entity> eligible,Vec3 center,int limit,int inspectionLimit){
+        var candidates=new ArrayList<Entity>();
+        candidates.addAll(EntitySelection.nearest(level,Projectile.class,bounds,shot->eligible.test(shot),center,limit,inspectionLimit));
+        var jegType=entityType();
+        if(jegType!=null&&!Projectile.class.isAssignableFrom(jegType))
+            candidates.addAll(EntitySelection.nearest(level,jegType,bounds,shot->eligible.test(shot),center,limit,inspectionLimit));
+        return EntitySelection.nearest(candidates,center,limit);
+    }
     static boolean isProjectile(Entity entity){return entity instanceof Projectile||TYPE!=null&&TYPE.isInstance(entity);}
     static Entity owner(Entity entity){
         if(entity instanceof Projectile projectile)return projectile.getOwner();
