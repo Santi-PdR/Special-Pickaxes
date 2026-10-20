@@ -694,6 +694,15 @@ public final class PickaxeGameTests {
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(melee),"the shell does not cancel ordinary melee damage");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_86") public static void hellspecHeatHaloKeepsItsCompactNineParticleShape(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var halo=SearingShellEffect.heatHaloParticles(wearer,120);
+        long flames=halo.stream().filter(sample->sample.particle()==net.minecraft.core.particles.ParticleTypes.FLAME).count();
+        long lava=halo.stream().filter(sample->sample.particle()==net.minecraft.core.particles.ParticleTypes.LAVA).count();
+        h.assertTrue(halo.size()==9&&flames==6&&lava==3,"the local thermal halo keeps six flame motes and three lava sparks");
+        h.assertTrue(halo.stream().allMatch(sample->sample.position().distanceTo(wearer.position().add(0,wearer.getBbHeight()*.52D,0))<.42D),
+                "all heat motes stay close to the wearer instead of expanding into a world-scale burst");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();
         ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
