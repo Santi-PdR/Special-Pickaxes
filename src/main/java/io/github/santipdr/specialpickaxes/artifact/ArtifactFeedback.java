@@ -8,6 +8,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -26,14 +27,16 @@ public final class ArtifactFeedback {
     public record AuraParticle(ParticleOptions particle,Vec3 position,int count,double dx,double dy,double dz,double speed) {}
     private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
     private static final Map<UUID,Long> LISTENER_SOUND_READY=new HashMap<>();
+    private record WardAudienceCache(ServerLevel level,long tick,Vec3 center,List<ServerPlayer> audience) {}
+    private static final Map<UUID,WardAudienceCache> WARD_AUDIENCE_CACHE=new HashMap<>();
     private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
-    public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());}
-    public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();}
+    public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());WARD_AUDIENCE_CACHE.remove(player.getUUID());}
+    public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();WARD_AUDIENCE_CACHE.clear();}
     /** Curios mining flashes reach the wearer and at most three close observers. */
     public static void nearbyMiningPulse(ServerPlayer wearer,BlockPos pos,ParticleOptions primary,int primaryCount,
                                          ParticleOptions accent,int accentCount){
@@ -65,12 +68,18 @@ public final class ArtifactFeedback {
     }
     /** Includes the bearer and chooses at most three nearby, non-spectating observers. */
     public static List<ServerPlayer> nearbyWardAudience(ServerPlayer wearer){
-        var center=wearer.position();var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
-        var nearby=EntitySelection.nearest(wearer.serverLevel(),ServerPlayer.class,wearer.getBoundingBox().inflate(12D),
+        var level=wearer.serverLevel();var center=wearer.position();long tick=level.getGameTime();
+        var previous=WARD_AUDIENCE_CACHE.get(wearer.getUUID());
+        if(previous!=null&&previous.level()==level&&previous.tick()==tick&&previous.center().distanceToSqr(center)<1.0E-6D)
+            return previous.audience();
+        var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
+        var nearby=EntitySelection.nearest(level,ServerPlayer.class,wearer.getBoundingBox().inflate(12D),
                 viewer->viewer!=wearer&&viewer.isAlive()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(wearer)
                         &&viewer.distanceToSqr(center)<=144D,
                 center,3,128);
-        audience.addAll(nearby);return List.copyOf(audience);
+        audience.addAll(nearby);var result=List.copyOf(audience);
+        WARD_AUDIENCE_CACHE.put(wearer.getUUID(),new WardAudienceCache(level,tick,center,result));
+        return result;
     }
     /** Worldbreaker's defensive Curios proc flashes a compact slate shield on the side of the incoming hit. */
     public static void worldbreakerAegisImpact(ServerPlayer wearer,Vec3 attacker){

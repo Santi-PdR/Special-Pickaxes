@@ -1749,9 +1749,12 @@ public final class PickaxeGameTests {
             observer.setPos(owner.getX()+i,owner.getY(),owner.getZ());level.addFreshEntity(observer);observers.add(observer);
         }
         var audience=ArtifactFeedback.nearbyWardAudience(owner);
+        h.assertTrue(audience==ArtifactFeedback.nearbyWardAudience(owner),"multiple aura pulses in one tick reuse the wearer's nearby-player scan");
         h.assertTrue(audience.size()==4&&audience.get(0)==owner,"ward auras include their bearer and cap observers at three");
         for(int i=0;i<3;i++)h.assertTrue(audience.contains(observers.get(i)),"the three nearest observers see the passive ward");
         h.assertTrue(!audience.contains(observers.get(3))&&!audience.contains(observers.get(4)),"observers outside the three nearest do not receive repeated aura packets");
+        owner.setPos(owner.getX()+.25D,owner.getY(),owner.getZ());
+        h.assertTrue(audience!=ArtifactFeedback.nearbyWardAudience(owner),"moving the bearer invalidates the audience cache immediately");
         finish(h,owner);
     }
     @GameTest(template="empty",batch="rework_each_78") public static void iridiumOrefallHonorsConfiguredScanBudgetWithExtremeEfficiency(GameTestHelper h){
