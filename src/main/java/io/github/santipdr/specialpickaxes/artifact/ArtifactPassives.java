@@ -239,18 +239,21 @@ public final class ArtifactPassives {
         state.putInt("lodeSurgeStacks",stacks);state.putLong("lodeSurgeExpires",now+80L);
         grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get(),stacks-1,80);
         LodeSurgeEffect.oreBreakPulse(player,pos,stacks);
-        if(shareWithAllies)shareLodeSurge(player,stacks);
+        if(shareWithAllies)shareLodeSurge(player,pos,stacks);
         return stacks;
     }
 
-    private static void shareLodeSurge(ServerPlayer owner,int stacks){
+    private static void shareLodeSurge(ServerPlayer owner,BlockPos ore,int stacks){
         if(!allyAuraScanDue(owner,ArtifactKind.IRIDIUM,"iridiumLodeAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                         ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var surge=io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get();
-        for(var ally:allies)grantCombatEffect(ally,surge,stacks-1,80);
+        for(var ally:allies){
+            grantCombatEffect(ally,surge,stacks-1,80);
+            LodeSurgeEffect.sharedOrePulse(owner,ally,ore,stacks);
+        }
     }
 
     private static boolean isStrataFocusPick(ArtifactKind kind){

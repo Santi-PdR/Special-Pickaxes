@@ -27,6 +27,19 @@ public final class LodeSurgeEffect extends MobEffect {
         if(stacks==3)level.sendParticles(player,ParticleTypes.GLOW,false,x,y,z,1,.05D,.08D,.05D,.008D);
     }
 
+    /** The bounded Curios handoff is drawn only for the wearer and the teammate receiving it. */
+    public static void sharedOrePulse(ServerPlayer owner,ServerPlayer ally,BlockPos ore,int stacks){
+        if(owner.level()!=ally.level()||!(owner.level() instanceof ServerLevel level))return;
+        var start=new net.minecraft.world.phys.Vec3(ore.getX()+.5D,ore.getY()+.58D,ore.getZ()+.5D);
+        var end=ally.position().add(0,ally.getBbHeight()*.58D,0);
+        for(int i=1;i<=4;i++){
+            var point=start.lerp(end,i/5D);
+            level.sendParticles(owner,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+        if(stacks>=3)level.sendParticles(ally,ParticleTypes.GLOW,false,end.x,end.y,end.z,1,.04D,.04D,.04D,.005D);
+    }
+
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer player)||!(entity.level() instanceof ServerLevel level))return;
         int charge=Math.min(2,amplifier);
