@@ -193,6 +193,26 @@ public final class ArtifactFeedback {
         nearbySound(p,kind.sound,phase.equals("alternate")?0.2F:0.25F,0.85F+kind.ordinal()*0.04F);
         RelicEffects.emit(p,kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
+    /** A private helix confirms which passive profile has entered the Curios slot. */
+    public static void curiosAttunement(ServerPlayer player,ArtifactKind kind){
+        var level=player.serverLevel();int rgb=kind.color;
+        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),.92F);
+        Vec3 origin=player.position().add(0,.12D,0);long phase=level.getGameTime();
+        for(int i=0;i<12;i++){
+            Vec3 point=curiosAttunementPoint(origin,i,phase);
+            level.sendParticles(player,i==11?ParticleTypes.GLOW:dust,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+        for(int i=0;i<8;i++){
+            double angle=phase*.08D+i*Math.PI/4D;
+            level.sendParticles(player,dust,false,origin.x+Math.cos(angle)*.48D,origin.y,origin.z+Math.sin(angle)*.48D,1,0,0,0,0);
+        }
+    }
+    /** Stable sample geometry for the Curios attunement helix; all points stay within half a block. */
+    public static Vec3 curiosAttunementPoint(Vec3 origin,int sample,long phase){
+        int index=Math.floorMod(sample,12);double progress=index/11D;
+        double angle=phase*.08D+index*Math.PI*2D/5D,radius=.18D+progress*.28D;
+        return origin.add(Math.cos(angle)*radius,progress*.92D,Math.sin(angle)*radius);
+    }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
         int rgb=kind.color;
         var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.3F);

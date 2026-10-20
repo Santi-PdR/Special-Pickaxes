@@ -145,7 +145,10 @@ public final class SpecialPickaxes {
                 var equipped=CuriosCompat.find(player);
                 ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
                 ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
-                if(previous!=null&&previous!=current)ArtifactPassives.onCuriosUnequip(player,previous);
+                if(previous!=current){
+                    if(previous!=null)ArtifactPassives.onCuriosUnequip(player,previous);
+                    if(current!=null)ArtifactFeedback.curiosAttunement(player,current);
+                }
                 if(current!=null)ArtifactPassives.tick(player,current);
             }
         }

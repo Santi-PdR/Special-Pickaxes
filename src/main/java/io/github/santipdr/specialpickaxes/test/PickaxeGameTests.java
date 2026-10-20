@@ -31,6 +31,18 @@ import java.util.function.Consumer;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class PickaxeGameTests {
+    @GameTest(template="empty",batch="rework_each_84") public static void curiosAttunementHelixStaysTightAndDistinct(GameTestHelper h){
+        var origin=new net.minecraft.world.phys.Vec3(3D,20D,-4D);var first=ArtifactFeedback.curiosAttunementPoint(origin,0,120L);
+        boolean distinct=true;
+        for(int i=0;i<12;i++){
+            var point=ArtifactFeedback.curiosAttunementPoint(origin,i,120L);
+            double radius=Math.sqrt(Math.pow(point.x-origin.x,2D)+Math.pow(point.z-origin.z,2D));
+            h.assertTrue(radius>=.17D&&radius<=.47D&&point.y>=origin.y&&point.y<=origin.y+.92D,
+                    "Curios attunement sample stays within its compact personal helix");
+            if(i>0&&point.distanceToSqr(first)<1.0E-6D)distinct=false;
+        }
+        h.assertTrue(distinct,"all twelve equip cue samples occupy distinct positions");h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_74") public static void curiosPassiveLookupsAreEvenlySharded(GameTestHelper h){
         int[] buckets=new int[10];
         for(int i=0;i<1000;i++)buckets[SpecialPickaxes.curiosPassiveBucket(new UUID(0L,i))]++;
