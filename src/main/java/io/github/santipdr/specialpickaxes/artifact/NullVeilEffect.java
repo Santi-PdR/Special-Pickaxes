@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -10,6 +9,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 /** Axiom's Curios veil erases one harmful effect in a restrained eight-second pulse. */
@@ -34,14 +34,18 @@ public final class NullVeilEffect extends MobEffect {
                         .thenComparing(Comparator.comparingInt(MobEffectInstance::getDuration).reversed())).orElse(null);
         if(harmful==null||!player.removeEffect(harmful.getEffect()))return;
         state.putLong("nullVeilReady",now+COOLDOWN);
-        ServerLevel level=player.serverLevel();double phase=player.tickCount*.11D,cx=player.getX(),cz=player.getZ(),baseY=player.getY();
+        double phase=player.tickCount*.11D,cx=player.getX(),cz=player.getZ(),baseY=player.getY();
+        var particles=new ArrayList<ArtifactFeedback.AuraParticle>(31);
         // Three interleaved strands make the cleanse read as a rising veil instead of a flat spark.
         for(int i=0;i<24;i++){
             double progress=i/23D,angle=phase+progress*Math.PI*3D,radius=.38D+.12D*progress;
             double x=cx+Math.cos(angle)*radius,z=cz+Math.sin(angle)*radius,y=baseY+.12D+progress*(player.getBbHeight()*.82D);
-            level.sendParticles(i%3==0?NULL_HIGHLIGHT:NULL_DUST,x,y,z,1,0,0,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(i%3==0?NULL_HIGHLIGHT:NULL_DUST,
+                    new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
         }
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,cx,baseY+player.getBbHeight()*.54D,cz,7,.16D,.28D,.16D,.012D);
+        particles.add(new ArtifactFeedback.AuraParticle(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
+                new net.minecraft.world.phys.Vec3(cx,baseY+player.getBbHeight()*.54D,cz),7,.16D,.28D,.16D,.012D));
+        ArtifactFeedback.nearbyWardPulse(player,particles);
     }
 
     private static int priority(MobEffect effect){
