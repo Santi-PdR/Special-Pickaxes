@@ -28,7 +28,7 @@ public final class StarfallWardEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer wearer)||!(entity.level() instanceof ServerLevel level))return;
-        tryCatchIncoming(wearer,level);
+        if(shouldPredictiveScan(entity.tickCount,entity.getId()))tryCatchIncoming(wearer,level);
         if(entity.tickCount%12!=0)return;
         long now=ArtifactState.now(wearer),readyAt=ArtifactState.of(wearer,ArtifactKind.EXODIUM).getLong("starfallCatchReady");
         double charge=chargeProgress(now,readyAt);
@@ -86,6 +86,9 @@ public final class StarfallWardEffect extends MobEffect {
     public static double chargeProgress(long now,long readyAt){
         return readyAt<=now?1D:1D-Math.min(1D,(readyAt-now)/(double)CATCH_COOLDOWN_TICKS);
     }
+
+    /** Stagger prediction scans across bearers; exact ProjectileImpactEvent interception remains per-impact. */
+    public static boolean shouldPredictiveScan(int tickCount,int entityId){return ((tickCount+entityId)&1)==0;}
 
     private static boolean isIncomingHostile(Entity shot,ServerPlayer wearer,Vec3 center){
         if(!JegProjectileCompat.isProjectile(shot)||shot==wearer||!shot.isAlive())return false;

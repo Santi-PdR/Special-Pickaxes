@@ -841,6 +841,17 @@ public final class PickaxeGameTests {
         h.assertTrue(arrow.getDeltaMovement().x>0D,"the ward redirects a fast hostile shot outward before impact");
         h.assertTrue(DomainFields.active(wearer),"the deflection does not consume or cancel the remaining ward");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_80") public static void starfallPredictionScansAreStaggeredAcrossPlayers(GameTestHelper h){
+        for(int entityId=0;entityId<12;entityId++){
+            int scans=0;
+            for(int tick=0;tick<40;tick++)if(StarfallWardEffect.shouldPredictiveScan(tick,entityId))scans++;
+            h.assertTrue(scans==20,"each bearer performs ten prediction scans per second, half the prior broadphase cost");
+        }
+        for(int tick=0;tick<40;tick++)
+            h.assertTrue(StarfallWardEffect.shouldPredictiveScan(tick,1)!=StarfallWardEffect.shouldPredictiveScan(tick,2),
+                    "adjacent entity IDs scan on opposite ticks instead of spiking the same server tick");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_43") public static void exodiumCuriosStarfallWardSoftensProjectileDamage(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EXODIUM);ArtifactPassives.tick(wearer,ArtifactKind.EXODIUM);
         var ward=SpecialPickaxes.STARFALL_WARD.get();
