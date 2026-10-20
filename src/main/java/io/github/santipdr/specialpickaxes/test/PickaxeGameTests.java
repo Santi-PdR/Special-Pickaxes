@@ -1113,6 +1113,14 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_78") public static void stasisUpperMarkersMatchTheFourDomainCorners(GameTestHelper h){
         var center=new BlockPos(3,10,-4);int radius=8,halfHeight=6;var corners=new HashSet<Vec3>();
+        var moving=StasisBoundaryGeometry.upperPerimeterPoint(center,radius,halfHeight,0D);
+        h.assertTrue(moving.y==center.getY()+halfHeight+1D
+                        &&Math.abs(moving.x-(center.getX()-radius+.5D))<.001D
+                        &&Math.abs(moving.z-(center.getZ()-radius+.5D))<.001D,
+                "the moving Stasis marker follows the square on its actual upper boundary");
+        var movingEast=StasisBoundaryGeometry.upperPerimeterPoint(center,radius,halfHeight,radius*2D);
+        h.assertTrue(movingEast.y==moving.y&&Math.abs(movingEast.x-(center.getX()+radius+.5D))<.001D,
+                "the upper pulse stays on the top plane as it passes the east edge");
         for(int i=0;i<4;i++){
             var point=StasisBoundaryGeometry.upperCorner(center,radius,halfHeight,i);corners.add(point);
             h.assertTrue(point.y==center.getY()+halfHeight+1D,"corner markers sit on the domain's top edge");

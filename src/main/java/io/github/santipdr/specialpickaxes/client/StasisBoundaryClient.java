@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.client;
 
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
-import io.github.santipdr.specialpickaxes.artifact.ArtifactFeedback;
 import io.github.santipdr.specialpickaxes.artifact.StasisBoundaryGeometry;
 import io.github.santipdr.specialpickaxes.network.StasisBoundaryMessage;
 import net.minecraft.client.Minecraft;
@@ -49,13 +48,13 @@ public final class StasisBoundaryClient {
         if(mc.isPaused()||clientTicks%4!=0)return;
         for(var boundary:BOUNDARIES.values()){
             if(!boundary.dimension().equals(mc.level.dimension().location()))continue;
-            var center=boundary.center();int radius=boundary.radius();
+            var center=boundary.center();int radius=boundary.radius(),height=boundary.halfHeight();
             if(mc.player.distanceToSqr(center.getX()+.5D,center.getY()+.5D,center.getZ()+.5D)>(48D+radius)*(48D+radius))continue;
             double phase=clientTicks*.15D;
-            var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
-            double bob=Math.sin(phase*.7D)*.12D;
-            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+.72D+bob,head.z,0,.015D,0);
-            mc.level.addParticle(BOUNDARY_GLOW,head.x,head.y+.28D+bob,head.z,0,.005D,0);
+            var head=StasisBoundaryGeometry.upperPerimeterPoint(center,radius,height,phase);
+            double bob=Math.sin(phase*.7D)*.045D;
+            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+bob,head.z,0,.008D,0);
+            mc.level.addParticle(BOUNDARY_GLOW,head.x,head.y-.08D+bob,head.z,0,.003D,0);
         }
     }
 
@@ -84,10 +83,10 @@ public final class StasisBoundaryClient {
                     LevelRenderer.renderLineBox(pose,lines,new AABB(point.x-.045D,point.y-.015D,point.z-.045D,
                             point.x+.045D,point.y+.11D,point.z+.045D),.72F,.9F,1F,.82F);
                 }
-                var head=ArtifactFeedback.stasisBoundaryPoint(center,radius,phase);
-                double markerY=center.getY()-height+.08D+Math.sin(phase*.7D)*.12D;
-                LevelRenderer.renderLineBox(pose,lines,new AABB(head.x-.07D,markerY,head.z-.07D,
-                        head.x+.07D,markerY+.16D,head.z+.07D),.98F,.8F,.36F,.95F);
+                var head=StasisBoundaryGeometry.upperPerimeterPoint(center,radius,height,phase);
+                double markerY=head.y+Math.sin(phase*.7D)*.045D;
+                LevelRenderer.renderLineBox(pose,lines,new AABB(head.x-.07D,markerY-.08D,head.z-.07D,
+                        head.x+.07D,markerY+.08D,head.z+.07D),.98F,.8F,.36F,.95F);
             }
             buffers.endBatch(RenderType.lines());
         }finally{pose.popPose();}

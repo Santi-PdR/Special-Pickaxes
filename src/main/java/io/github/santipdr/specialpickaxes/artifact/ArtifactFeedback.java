@@ -552,16 +552,7 @@ public final class ArtifactFeedback {
         return (mode&1)==0?inward:inward.scale(-1D);
     }
     public static Vec3 stasisBoundaryPoint(BlockPos center,int radius,double distance){
-        double side=radius*2D,perimeter=side*4D;
-        distance=((distance%perimeter)+perimeter)%perimeter;
-        double minX=center.getX()-radius+.5D,maxX=center.getX()+radius+.5D;
-        double minZ=center.getZ()-radius+.5D,maxZ=center.getZ()+radius+.5D;
-        double x,z;
-        if(distance<side){x=minX+distance;z=minZ;}
-        else if(distance<side*2D){x=maxX;z=minZ+(distance-side);}
-        else if(distance<side*3D){x=maxX-(distance-side*2D);z=maxZ;}
-        else{x=minX;z=maxZ-(distance-side*3D);}
-        return new Vec3(x,center.getY()+.08D,z);
+        return StasisBoundaryGeometry.perimeterPoint(center,radius,distance,center.getY()+.08D);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
         int stride=Math.max(1,steps.size()/24);
