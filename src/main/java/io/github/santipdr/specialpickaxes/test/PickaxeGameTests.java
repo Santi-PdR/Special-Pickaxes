@@ -672,9 +672,19 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(shell),"held Hellspec keeps its own fire passive");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_36") public static void crucibleCuriosMantleIsCustomThermalWard(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.CRUCIBLE);ArtifactPassives.tick(wearer,ArtifactKind.CRUCIBLE);
+        var wearer=player(h,ArtifactKind.CRUCIBLE,"CrucibleBearer");
+        var ally=player(h,ArtifactKind.PALIMPSEST,"CrucibleAlly");var enemy=player(h,ArtifactKind.PALIMPSEST,"CrucibleEnemy");
+        var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("crucible_"+wearer.getUUID().toString().substring(0,6));
+        var hostile=scoreboard.addPlayerTeam("foe_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),hostile);
+        ally.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
+        h.getLevel().addFreshEntity(ally);h.getLevel().addFreshEntity(enemy);
+        ArtifactPassives.tick(wearer,ArtifactKind.CRUCIBLE);
         var mantle=SpecialPickaxes.CRUCIBLE_MANTLE.get();
         h.assertTrue(wearer.hasEffect(mantle)&&wearer.getEffect(mantle).getDuration()==40,"Curios pre-leases the named two-second Crucible Mantle before the wearer enters heat");
+        h.assertTrue(ally.hasEffect(mantle)&&!enemy.hasEffect(mantle),"Crucible shares its thermal ward with nearby teammates and never hostiles");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE),"Crucible uses its custom passive instead of a generic fire-resistance potion");
         wearer.setSecondsOnFire(10);
         mantle.applyEffectTick(wearer,0);h.assertTrue(!wearer.isOnFire(),"a mantle pulse clears active burning");

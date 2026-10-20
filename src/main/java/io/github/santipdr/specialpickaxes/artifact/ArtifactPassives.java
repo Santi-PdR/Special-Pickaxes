@@ -184,7 +184,10 @@ public final class ArtifactPassives {
             }
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
             // Keep the thermal ward leased before contact so its attack hook can cancel the first lava/fire tick.
-            case CRUCIBLE -> grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(),0,PASSIVE_LEASE_TICKS);
+            case CRUCIBLE -> {
+                grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(),0,PASSIVE_LEASE_TICKS);
+                shareCrucibleMantle(player);
+            }
             case INTERREGNUM -> {
                 grantAbsorption(player,PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(), 0, PASSIVE_LEASE_TICKS);
@@ -396,6 +399,17 @@ public final class ArtifactPassives {
                 center,3,128);
         var veil=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get();
         for(var ally:allies)grant(ally,veil,0,PASSIVE_LEASE_TICKS);
+    }
+
+    /** Crucible lends its predictive fire-and-lava ward to a bounded nearby allied group. */
+    private static void shareCrucibleMantle(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.CRUCIBLE,"crucibleMantleAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var mantle=io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get();
+        for(var ally:allies)grant(ally,mantle,0,PASSIVE_LEASE_TICKS);
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */
