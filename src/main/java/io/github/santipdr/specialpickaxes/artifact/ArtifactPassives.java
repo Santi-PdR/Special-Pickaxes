@@ -136,6 +136,7 @@ public final class ArtifactPassives {
                 event.setAmount(event.getAmount()*.8F);
                 if(retaliationAllowed){
                     attacker.setSecondsOnFire(3);
+                    grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),0,40);
                     ArtifactFeedback.burst(player,kind,attacker.blockPosition(),8);
                 }
             }

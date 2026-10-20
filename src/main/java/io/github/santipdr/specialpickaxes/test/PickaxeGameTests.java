@@ -615,10 +615,12 @@ public final class PickaxeGameTests {
         attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.HELLSPEC);
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();
         h.assertTrue(Math.abs(hit.getAmount()-8F)<.001F&&attacker.getRemainingFireTicks()>=60,"Cinder Retort reduces the first hostile hit by 20 percent and ignites its attacker");
+        h.assertTrue(attacker.hasEffect(brand)&&attacker.getEffect(brand).getDuration()==40,"Cinder Retort adds a two-second custom Magma Brand");
         attacker.clearFire();var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,repeat,ArtifactKind.HELLSPEC);
-        h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire(),"the eight-second cooldown prevents repeated reductions and ignitions");
+        h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire()&&attacker.getEffect(brand).getDuration()==40,"the eight-second cooldown prevents repeated reductions, ignitions and brand refreshes");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaWaveBrandsOnlyHostileTargets(GameTestHelper h){
