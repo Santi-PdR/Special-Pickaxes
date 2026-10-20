@@ -28,7 +28,7 @@ public final class DomainFields {
         final ServerPlayer owner;final ItemStack tool;final ArtifactKind kind;BlockPos center;final int radius;
         final int mode;
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
-        final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires,collapsePullUntil;int gravityCharge;
+        final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires,collapsePullUntil,lastWardCueTick=-5;int gravityCharge;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius,int duration) {
             owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+duration;
         }
@@ -203,7 +203,7 @@ public final class DomainFields {
                 }
             }
             if(f.kind==ArtifactKind.CRUCIBLE) {
-                if(p.tickCount%20==0)ArtifactFeedback.ring(p,f.kind,f.center,f.radius);
+                if(p.tickCount%20==0)ArtifactFeedback.crucibleWardBoundary(p,f.radius);
                 Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
                 var projectiles=projectilesNear(level,new AABB(f.center).inflate(f.radius+24),center,cap,e->e.isAlive()
                         &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
@@ -213,6 +213,8 @@ public final class DomainFields {
                     if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
                     double speed=Math.min(4.0,Math.max(1.5,projectile.getDeltaMovement().length()));
                     projectile.setDeltaMovement(away.scale(speed));projectile.hasImpulse=true;
+                    long now=ArtifactState.now(p);
+                    if(now-f.lastWardCueTick>=5){ArtifactFeedback.crucibleDeflect(p,projectile.position());f.lastWardCueTick=now;}
                     if(++changed>=cap)break;
                 }
                 if(changed>0&&p.tickCount%10==0)ArtifactFeedback.message(p,"projectiles_deflected",changed);

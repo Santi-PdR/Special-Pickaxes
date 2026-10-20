@@ -224,6 +224,23 @@ public final class ArtifactFeedback {
                     false,x,y,z,1,0,.015D,0,.002D);
         }
     }
+    /** A small moving double rail makes the full ward radius readable once per second. */
+    public static void crucibleWardBoundary(ServerPlayer p,int radius){
+        var level=p.serverLevel();double phase=level.getGameTime()*.035D;
+        for(int i=0;i<8;i++){
+            double angle=phase+i*Math.PI/4D;
+            double x=p.getX()+Math.cos(angle)*radius,z=p.getZ()+Math.sin(angle)*radius;
+            var particle=(i&1)==0?ParticleTypes.END_ROD:ParticleTypes.WAX_ON;
+            level.sendParticles(p,particle,false,x,p.getY()+.12D,z,1,0,0,0,0);
+            level.sendParticles(p,particle,false,x,p.getY()+1.8D,z,1,0,0,0,0);
+        }
+    }
+    /** One wearer-only interception spark, rate-limited by the active ward field. */
+    public static void crucibleDeflect(ServerPlayer p,Vec3 impact){
+        var level=p.serverLevel();
+        level.sendParticles(p,ParticleTypes.END_ROD,false,impact.x,impact.y,impact.z,3,.035D,.035D,.035D,.012D);
+        level.sendParticles(p,ParticleTypes.WAX_ON,false,impact.x,impact.y,impact.z,2,.045D,.045D,.045D,.008D);
+    }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         for(int i=0;i<8;i++) {
             double angle=(i/8.0)*Math.PI*2;
