@@ -715,7 +715,20 @@ public final class PickaxeGameTests {
         h.assertTrue(SearingShellEffect.miningSpeedMultiplier(hot)==SearingShellEffect.thermalMiningMultiplier()
                         &&SearingShellEffect.thermalMiningMultiplier()==1.35D,
                 "nearby heat raises effective mining speed by 35 percent");
-        finish(h,cold);finish(h,hot);
+        var campfireBearer=player(h,ArtifactKind.HELLSPEC,"HellspecCampfireTest");
+        campfireBearer.setPos(cold.getX()+10D,cold.getY(),cold.getZ());
+        campfireBearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.SEARING_SHELL.get(),100,0,true,false,true));
+        h.getLevel().setBlockAndUpdate(campfireBearer.blockPosition().offset(0,0,2),Blocks.CAMPFIRE.defaultBlockState());
+        h.assertTrue(SearingShellEffect.miningSpeedMultiplier(campfireBearer)==1.35D,
+                "campfires count as nearby heat sources for the mining passive");
+
+        var cauldronBearer=player(h,ArtifactKind.HELLSPEC,"HellspecCauldronTest");
+        cauldronBearer.setPos(cold.getX()+20D,cold.getY(),cold.getZ());
+        cauldronBearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.SEARING_SHELL.get(),100,0,true,false,true));
+        h.getLevel().setBlockAndUpdate(cauldronBearer.blockPosition().offset(0,0,2),Blocks.LAVA_CAULDRON.defaultBlockState());
+        h.assertTrue(SearingShellEffect.miningSpeedMultiplier(cauldronBearer)==1.35D,
+                "lava cauldrons count as nearby heat sources for the mining passive");
+        finish(h,cold);finish(h,hot);finish(h,campfireBearer);finish(h,cauldronBearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();

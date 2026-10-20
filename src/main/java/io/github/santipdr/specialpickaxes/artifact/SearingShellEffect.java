@@ -36,6 +36,7 @@ public final class SearingShellEffect extends MobEffect {
         scan: for(BlockPos pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2))){
             var state=level.getBlockState(pos);
             if(state.is(Blocks.FIRE)||state.is(Blocks.SOUL_FIRE)||state.is(Blocks.MAGMA_BLOCK)
+                    ||state.is(Blocks.CAMPFIRE)||state.is(Blocks.SOUL_CAMPFIRE)||state.is(Blocks.LAVA_CAULDRON)
                     ||state.getFluidState().is(FluidTags.LAVA)) {hot=true;break scan;}
         }
         data.putLong(THERMAL_SCAN_TICK,now);data.putBoolean(THERMAL_SCAN_RESULT,hot);
