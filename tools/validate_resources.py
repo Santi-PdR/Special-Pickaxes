@@ -107,6 +107,41 @@ class Resources(unittest.TestCase):
             for artifact in IDS:
                 for prefix in ["item.specialpickaxes.", "tooltip.specialpickaxes.", "tooltip.specialpickaxes.secondary.", "alternate.detail.specialpickaxes.", "melee.specialpickaxes.", "passive.specialpickaxes.", "curios.detail.specialpickaxes."]:
                     self.assertIn(prefix + artifact, data)
+                    self.assertTrue(data[prefix + artifact].strip(), f"{lang}: empty {prefix + artifact}")
+
+    def test_playable_pickaxe_manual_coverage(self):
+        required_prefixes = [
+            "item.specialpickaxes.",
+            "tooltip.specialpickaxes.",
+            "tooltip.specialpickaxes.secondary.",
+            "mining.short.specialpickaxes.",
+            "alternate.specialpickaxes.",
+            "alternate.detail.specialpickaxes.",
+            "melee.specialpickaxes.",
+            "passive.specialpickaxes.",
+            "curios.detail.specialpickaxes.",
+        ]
+        locales = {
+            lang: json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
+            for lang in ["en_us", "es_es"]
+        }
+        for artifact in IDS:
+            for lang, data in locales.items():
+                for prefix in required_prefixes:
+                    key = prefix + artifact
+                    self.assertIn(key, data, f"{lang}: missing {key}")
+                    self.assertTrue(data[key].strip(), f"{lang}: empty {key}")
+
+                for mode in MODES[artifact]:
+                    for key in [
+                        f"mining.identity.{artifact}.{mode}",
+                        f"mining.how.{artifact}.{mode}",
+                        f"mode.specialpickaxes.{mode}",
+                    ]:
+                        self.assertIn(key, data, f"{lang}: missing {key}")
+                        self.assertTrue(data[key].strip(), f"{lang}: empty {key}")
+
+        self.assertEqual(set(locales["en_us"]), set(locales["es_es"]))
 
     def test_languages(self):
         languages = [json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text()) for lang in ["en_us", "es_es"]]

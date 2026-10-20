@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '5.10.321'
+version = '5.10.322'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -52,7 +52,16 @@ tasks.register('verifyMobEffectIcons') {
         logger.lifecycle("Verified ${effectIds.size()} custom mob effect icons.")
     }
 }
-tasks.named('check').configure { dependsOn tasks.named('verifyMobEffectIcons') }
+tasks.register('validateResourceCatalog', Exec) {
+    group = 'verification'
+    description = 'Validates translations, mining modes, assets and pickaxe manuals.'
+    inputs.files(fileTree('src/main/resources'), file('tools/validate_resources.py'), file('tools/mining_catalog.py'))
+    commandLine 'python3', 'tools/validate_resources.py'
+}
+tasks.named('check').configure {
+    dependsOn tasks.named('verifyMobEffectIcons')
+    dependsOn tasks.named('validateResourceCatalog')
+}
 tasks.named('processResources', ProcessResources).configure {
     def replaceProperties = [mod_version: project.version]
     inputs.properties replaceProperties
