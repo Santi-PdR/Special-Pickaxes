@@ -11,9 +11,11 @@ import org.joml.Vector3f;
 public final class OreDropHighlight {
     private static final String ORE_DROP="specialpickaxesIridiumOreDrop";
     private static final String OWNER="specialpickaxesIridiumOwner";
+    private static final String NEXT_LODE_SENSE="specialpickaxesLodeSenseNextAt";
     private static final int MAX_SPARK_BURSTS_PER_TICK=32;
     private static final int PASSIVE_PULL_RADIUS=6;
     private static final int PASSIVE_PULL_TARGETS=12;
+    private static final int PASSIVE_PULL_INTERVAL=10;
     private static final DustParticleOptions SPARK=new DustParticleOptions(new Vector3f(.32F,.95F,.82F),.72F);
     private static long sparkBudgetTick=Long.MIN_VALUE;
     private static int sparkBurstsThisTick;
@@ -42,7 +44,10 @@ public final class OreDropHighlight {
 
     /** Curios' Lode Sense gathers only ore drops marked to this wearer, without scanning veins. */
     public static int drawNearbyDrops(ServerPlayer owner){
-        var level=owner.serverLevel();var center=owner.position().add(0,owner.getBbHeight()*.55D,0);
+        var level=owner.serverLevel();long now=level.getGameTime();var data=owner.getPersistentData();
+        if(data.getLong(NEXT_LODE_SENSE)>now)return 0;
+        data.putLong(NEXT_LODE_SENSE,now+PASSIVE_PULL_INTERVAL);
+        var center=owner.position().add(0,owner.getBbHeight()*.55D,0);
         var targets=EntitySelection.nearest(level,ItemEntity.class,owner.getBoundingBox().inflate(PASSIVE_PULL_RADIUS),
                 item->ArtifactTechniques.isIridiumRecallTarget(owner,item,center,PASSIVE_PULL_RADIUS),
                 center,PASSIVE_PULL_TARGETS,256);

@@ -1421,6 +1421,9 @@ public final class PickaxeGameTests {
         Vec3 unmarkedMotion=unmarked.getDeltaMovement(),foreignMotion=foreign.getDeltaMovement(),distantMotion=distant.getDeltaMovement();
         ArtifactPassives.tick(wearer,ArtifactKind.IRIDIUM);
         h.assertTrue(owned.getDeltaMovement().x<-.2D&&owned.hasImpulse,"Iridium's passive draws its own glowing ore toward the wearer");
+        Vec3 firstPull=owned.getDeltaMovement();
+        h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&owned.getDeltaMovement().equals(firstPull),
+                "duplicate passive calls in the same tick neither rescan nor stack extra pull force");
         h.assertTrue(unmarked.getDeltaMovement().equals(unmarkedMotion),"the passive leaves ordinary item drops untouched");
         h.assertTrue(foreign.getDeltaMovement().equals(foreignMotion),"the passive leaves another wearer's marked drops untouched");
         h.assertTrue(distant.getDeltaMovement().equals(distantMotion),"the passive leaves owned ore beyond six blocks untouched");finish(h,wearer);
