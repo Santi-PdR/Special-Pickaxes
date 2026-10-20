@@ -102,7 +102,7 @@ public final class RelicAura {
         nearbyCandidates=java.util.List.of();nearbyCurios=java.util.List.of();
     }
     private static void emitHeld(Minecraft mc,Player player,ArtifactItem item,ItemStack tool){
-        var look=player.getLookAngle();var side=look.cross(new Vec3(0,1,0)).normalize();
+        var look=player.getLookAngle();var side=CurioAuraGeometry.handSide(look);
         var hand=player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
         double angle=player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(tool)*0.22;
         var dust=HELD_DUST.get(item.kind);

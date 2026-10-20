@@ -6,6 +6,14 @@ import net.minecraft.world.phys.Vec3;
 public final class CurioAuraGeometry {
     private CurioAuraGeometry() {}
 
+    /** Stable horizontal hand-orbit axis, including when the wearer aims straight up or down. */
+    public static Vec3 handSide(Vec3 look){
+        double horizontalSqr=look.x*look.x+look.z*look.z;
+        if(horizontalSqr<1.0E-8D)return new Vec3(1D,0D,0D);
+        double inverseLength=1D/Math.sqrt(horizontalSqr);
+        return new Vec3(-look.z*inverseLength,0D,look.x*inverseLength);
+    }
+
     /** Four drifting leaves climb in a compact helix around Worldloom's wearer. */
     public static Vec3 worldloomVinePoint(Vec3 origin,double phase,int sample){
         int index=Math.floorMod(sample,4);

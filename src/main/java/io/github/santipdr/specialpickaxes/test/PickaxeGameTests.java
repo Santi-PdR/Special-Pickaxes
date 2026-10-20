@@ -1667,6 +1667,18 @@ public final class PickaxeGameTests {
         h.assertTrue(highest-lowest>.45D&&highest-lowest<.9D,"the passive reads as a rising spiral rather than a flat orbit");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_79") public static void heldAuraKeepsAValidOrbitWhenLookingVertically(GameTestHelper h){
+        var upward=CurioAuraGeometry.handSide(new Vec3(0D,1D,0D));
+        var downward=CurioAuraGeometry.handSide(new Vec3(0D,-1D,0D));
+        var horizontal=CurioAuraGeometry.handSide(new Vec3(0D,0D,-1D));
+        for(var side:List.of(upward,downward,horizontal))
+            h.assertTrue(Double.isFinite(side.x)&&Double.isFinite(side.y)&&Double.isFinite(side.z)
+                            &&Math.abs(side.lengthSqr()-1D)<1.0E-6D,
+                    "held relic particle orbit uses a finite unit side vector at vertical and horizontal aim");
+        h.assertTrue(Math.abs(upward.x-1D)<1.0E-6D&&Math.abs(downward.x-1D)<1.0E-6D,
+                "vertical aim uses the deterministic fallback axis");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_78") public static void icarusCuriosAuraFormsMirroredAnimatedWings(GameTestHelper h){
         var origin=new Vec3(2D,5D,-3D);double widest=0D;
         for(int feather=0;feather<4;feather++){
