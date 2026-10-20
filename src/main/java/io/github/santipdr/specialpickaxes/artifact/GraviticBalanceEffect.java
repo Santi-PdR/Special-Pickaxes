@@ -9,6 +9,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+
 /** Eventide's Curios passive bends a fast fall into a controlled descent. */
 public final class GraviticBalanceEffect extends MobEffect {
     private static final DustParticleOptions GRAVITY_DUST=new DustParticleOptions(new Vector3f(.63F,.42F,.96F),.78F);
@@ -38,15 +40,17 @@ public final class GraviticBalanceEffect extends MobEffect {
         if(entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
             double phase=entity.tickCount*.075D;
             double centerY=entity.getY()+entity.getBbHeight()*.5D;
+            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(4);
             for(int i=0;i<3;i++){
                 double angle=phase+i*Math.PI*2D/3D;
                 double x=entity.getX()+Math.cos(angle)*.34D;
                 double z=entity.getZ()+Math.sin(angle)*.34D;
                 double y=centerY+Math.sin(angle*2D)*.08D;
-                level.sendParticles(GRAVITY_DUST,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(GRAVITY_DUST,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
             }
-            if(entity.tickCount%24==0)
-                level.sendParticles(ParticleTypes.REVERSE_PORTAL,entity.getX(),centerY,entity.getZ(),1,.04D,.08D,.04D,.005D);
+            if(entity.tickCount%24==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.REVERSE_PORTAL,
+                    new net.minecraft.world.phys.Vec3(entity.getX(),centerY,entity.getZ()),1,.04D,.08D,.04D,.005D));
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 

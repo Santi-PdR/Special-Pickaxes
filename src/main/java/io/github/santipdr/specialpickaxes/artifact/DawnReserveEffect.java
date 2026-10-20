@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,8 +21,15 @@ public final class DawnReserveEffect extends MobEffect {
         player.getFoodData().eat(1,.35F);
         if(entity.level() instanceof ServerLevel level){
             double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.62D,z=entity.getZ();
-            level.sendParticles(ParticleTypes.WAX_ON,x,y,z,6,.26D,.2D,.26D,.025D);
-            level.sendParticles(DAWN,x,y+.16D,z,3,.2D,.18D,.2D,0);
+            if(entity instanceof ServerPlayer wearer){
+                var particles=java.util.List.of(
+                        new ArtifactFeedback.AuraParticle(ParticleTypes.WAX_ON,new net.minecraft.world.phys.Vec3(x,y,z),6,.26D,.2D,.26D,.025D),
+                        new ArtifactFeedback.AuraParticle(DAWN,new net.minecraft.world.phys.Vec3(x,y+.16D,z),3,.2D,.18D,.2D,0));
+                ArtifactFeedback.nearbyWardPulse(wearer,particles);
+            }else{
+                level.sendParticles(ParticleTypes.WAX_ON,x,y,z,6,.26D,.2D,.26D,.025D);
+                level.sendParticles(DAWN,x,y+.16D,z,3,.2D,.18D,.2D,0);
+            }
         }
     }
 

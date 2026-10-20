@@ -8,6 +8,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+
 /** Palimpsest's passive gives controlled healing pulses instead of vanilla Regeneration. */
 public final class DawnMendingEffect extends MobEffect {
     private static final String NEXT_PULSE="specialpickaxesDawnMendingAtWorldTime";
@@ -30,11 +32,15 @@ public final class DawnMendingEffect extends MobEffect {
         data.putLong(NEXT_PULSE,now+40L);
         if(entity.level() instanceof ServerLevel level){
             double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.48D,z=entity.getZ();
+            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(12);
             for(int i=0;i<8;i++){
                 double angle=Math.PI*2D*i/8D;
-                level.sendParticles(DAWN_DUST,x+Math.cos(angle)*.42D,y+(i%2)*.12D,z+Math.sin(angle)*.42D,1,.025D,.04D,.025D,0);
-                if((i&1)==0)level.sendParticles(ParticleTypes.WAX_ON,x+Math.cos(angle)*.32D,y+.25D,z+Math.sin(angle)*.32D,1,.02D,.035D,.02D,.004D);
+                particles.add(new ArtifactFeedback.AuraParticle(DAWN_DUST,
+                        new net.minecraft.world.phys.Vec3(x+Math.cos(angle)*.42D,y+(i%2)*.12D,z+Math.sin(angle)*.42D),1,.025D,.04D,.025D,0));
+                if((i&1)==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.WAX_ON,
+                        new net.minecraft.world.phys.Vec3(x+Math.cos(angle)*.32D,y+.25D,z+Math.sin(angle)*.32D),1,.02D,.035D,.02D,.004D));
             }
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 

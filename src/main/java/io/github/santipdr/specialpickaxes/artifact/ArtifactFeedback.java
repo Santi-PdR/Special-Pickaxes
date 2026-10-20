@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -54,6 +55,13 @@ public final class ArtifactFeedback {
             level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,sample.count(),
                     sample.dx(),sample.dy(),sample.dz(),sample.speed());
         }
+    }
+    /** Sends player auras to a capped local audience, while keeping mob debuffs visible to normal trackers. */
+    public static void entityAuraPulse(net.minecraft.server.level.ServerLevel level,LivingEntity entity,List<AuraParticle> particles){
+        if(particles.isEmpty())return;
+        if(entity instanceof ServerPlayer wearer){nearbyWardPulse(wearer,particles);return;}
+        for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
+                sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
     }
     /** Includes the bearer and chooses at most three nearby, non-spectating observers. */
     public static List<ServerPlayer> nearbyWardAudience(ServerPlayer wearer){

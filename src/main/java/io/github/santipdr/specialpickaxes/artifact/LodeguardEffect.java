@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /** Iridium's Curios counter hardens its wearer in a visible, short-lived crystal ward. */
@@ -27,14 +28,17 @@ public final class LodeguardEffect extends MobEffect {
             double phase=entity.tickCount*.038D;
             double radius=.38D;
             double centerY=entity.getY()+entity.getBbHeight()*.56D;
+            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(4);
             for(int i=0;i<3;i++){
                 double angle=phase+i*(Math.PI*2D/3D);
                 double x=entity.getX()+Math.cos(angle)*radius;
                 double z=entity.getZ()+Math.sin(angle)*radius;
                 double y=centerY+Math.sin(angle*2D)*.09D;
-                level.sendParticles(CRYSTAL_DUST,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(CRYSTAL_DUST,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
             }
-            if(entity.tickCount%20==0)level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD,entity.getX(),centerY+.18D,entity.getZ(),1,0,0,0,0);
+            if(entity.tickCount%20==0)particles.add(new ArtifactFeedback.AuraParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,
+                    new net.minecraft.world.phys.Vec3(entity.getX(),centerY+.18D,entity.getZ()),1,0,0,0,0));
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 

@@ -82,14 +82,16 @@ public final class IcarianMomentumEffect extends MobEffect {
             Vec3 right=new Vec3(-forward.z,0,forward.x);
             double speed=Math.min(.8D,player.getDeltaMovement().horizontalDistance());
             double shoulderY=entity.getY()+entity.getBbHeight()*.56D;
+            var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(8);
             for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
                 double span=(.24D+feather*.19D)*(1D+speed*.22D),trail=.08D+feather*.13D+speed*.12D;
                 double x=entity.getX()+right.x*side*span-forward.x*trail;
                 double z=entity.getZ()+right.z*side*span-forward.z*trail;
                 double y=shoulderY+(2-feather)*.035D;
-                level.sendParticles(WING_GLEAM,x,y,z,1,0,0,0,0);
-                if(feather==2)level.sendParticles(ParticleTypes.END_ROD,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(WING_GLEAM,new Vec3(x,y,z),1,0,0,0,0));
+                if(feather==2)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.END_ROD,new Vec3(x,y,z),1,0,0,0,0));
             }
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 
