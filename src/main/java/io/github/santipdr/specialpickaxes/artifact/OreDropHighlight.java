@@ -16,6 +16,7 @@ public final class OreDropHighlight {
     private static final int PASSIVE_PULL_RADIUS=6;
     private static final int PASSIVE_PULL_TARGETS=12;
     private static final int PASSIVE_PULL_INTERVAL=10;
+    private static final int MAX_PULL_TRAILS=4;
     private static final DustParticleOptions SPARK=new DustParticleOptions(new Vector3f(.32F,.95F,.82F),.72F);
     private static long sparkBudgetTick=Long.MIN_VALUE;
     private static int sparkBurstsThisTick;
@@ -51,7 +52,7 @@ public final class OreDropHighlight {
         var targets=EntitySelection.nearest(level,ItemEntity.class,owner.getBoundingBox().inflate(PASSIVE_PULL_RADIUS),
                 item->ArtifactTechniques.isIridiumRecallTarget(owner,item,center,PASSIVE_PULL_RADIUS),
                 center,PASSIVE_PULL_TARGETS,256);
-        int moved=0;
+        int moved=0,trails=0;
         for(var item:targets){
             Vec3 delta=center.subtract(item.position());double distanceSqr=delta.lengthSqr();
             if(distanceSqr<.64D)continue; // Leave items inside vanilla pickup reach alone.
@@ -59,7 +60,15 @@ public final class OreDropHighlight {
             Vec3 motion=item.getDeltaMovement().scale(.55D).add(pull);
             if(motion.lengthSqr()>.36D)motion=motion.normalize().scale(.6D);
             item.setDeltaMovement(motion);item.hasImpulse=true;moved++;
+            if(trails<MAX_PULL_TRAILS){emitLodeSenseTrail(owner,item.position(),center);trails++;}
         }
         return moved;
+    }
+
+    /** A faint, wearer-only stitch makes Lode Sense legible without broadcasting trails to the area. */
+    private static void emitLodeSenseTrail(ServerPlayer owner,Vec3 drop,Vec3 wearer){
+        var level=owner.serverLevel();Vec3 stitch=drop.lerp(wearer,.42D);
+        level.sendParticles(owner,SPARK,false,drop.x,drop.y+.12D,drop.z,2,.035D,.035D,.035D,.006D);
+        level.sendParticles(owner,SPARK,false,stitch.x,stitch.y,stitch.z,1,0,0,0,0);
     }
 }
