@@ -58,6 +58,7 @@ public final class ArtifactActions {
         if(!ArtifactSkills.use(p,tool,kind))return false;
         if(!p.isCreative())tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);data.putLong("alternateReady",now+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
+        ArtifactFeedback.sound(p,kind,"alternate");
         return true;
     }
     private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
