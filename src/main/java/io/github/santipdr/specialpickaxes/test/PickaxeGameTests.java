@@ -1405,6 +1405,26 @@ public final class PickaxeGameTests {
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,wearer.getEyePosition(),32D),"the 32-block exclusion remains in force after recalling nearby loot");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,wearer.getEyePosition(),32D),"a nearby drop owned by someone else remains excluded after recall");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_82") public static void iridiumPassiveGathersOnlyItsNearbyMinedOre(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR,"IridiumLodeSense");var level=h.getLevel();var origin=wearer.position();
+        var owned=new ItemEntity(level,origin.x+4D,origin.y+.3D,origin.z,new ItemStack(Items.DIAMOND));
+        owned.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
+        owned.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+        var unmarked=new ItemEntity(level,origin.x+3D,origin.y+.3D,origin.z,new ItemStack(Items.EMERALD));
+        var foreign=new ItemEntity(level,origin.x+2D,origin.y+.3D,origin.z,new ItemStack(Items.DIAMOND));
+        foreign.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
+        foreign.getPersistentData().putUUID("specialpickaxesIridiumOwner",UUID.randomUUID());
+        var distant=new ItemEntity(level,origin.x+7D,origin.y+.3D,origin.z,new ItemStack(Items.DIAMOND));
+        distant.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
+        distant.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+        level.addFreshEntity(owned);level.addFreshEntity(unmarked);level.addFreshEntity(foreign);level.addFreshEntity(distant);
+        Vec3 unmarkedMotion=unmarked.getDeltaMovement(),foreignMotion=foreign.getDeltaMovement(),distantMotion=distant.getDeltaMovement();
+        ArtifactPassives.tick(wearer,ArtifactKind.IRIDIUM);
+        h.assertTrue(owned.getDeltaMovement().x<-.2D&&owned.hasImpulse,"Iridium's passive draws its own glowing ore toward the wearer");
+        h.assertTrue(unmarked.getDeltaMovement().equals(unmarkedMotion),"the passive leaves ordinary item drops untouched");
+        h.assertTrue(foreign.getDeltaMovement().equals(foreignMotion),"the passive leaves another wearer's marked drops untouched");
+        h.assertTrue(distant.getDeltaMovement().equals(distantMotion),"the passive leaves owned ore beyond six blocks untouched");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_20") public static void noUnpaidPlacementOrWallTeleport(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var pos=target(h);
         h.assertTrue(!WorldSafety.move(p,Vec3.atBottomCenterOf(pos)),"occupied destination rejected");

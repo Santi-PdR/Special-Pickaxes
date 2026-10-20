@@ -210,7 +210,10 @@ public final class ArtifactPassives {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get(), 0, PASSIVE_LEASE_TICKS);
                 shareStarfallGuard(player);
             }
-            case IRIDIUM -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+            case IRIDIUM -> {
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+                OreDropHighlight.drawNearbyDrops(player);
+            }
             case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
             case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             default -> { }
