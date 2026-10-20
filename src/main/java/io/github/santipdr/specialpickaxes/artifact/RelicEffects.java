@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 import net.minecraft.core.particles.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 /** Short spatial signatures. A shared global packet budget is independent of gameplay throughput. */
 public final class RelicEffects {
@@ -11,6 +12,7 @@ public final class RelicEffects {
     public static void emit(ServerPlayer p,ArtifactKind k,String phase,Vec3 center){
         long now=ArtifactState.now(p);if(tick!=now){tick=now;remaining=256;}
         int count=k==ArtifactKind.WORLDBREAKER?24:16;if(remaining<count)return;remaining-=count;
+        if(k==ArtifactKind.ICARUS){emitIcarianWings(p,phase,center,count);return;}
         ParticleOptions particle=switch(k){
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
             case EVENTIDE->ParticleTypes.REVERSE_PORTAL;case MERIDIAN->ParticleTypes.PORTAL;
@@ -48,5 +50,30 @@ public final class RelicEffects {
             if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
             else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }
+    }
+
+    /** Paired feather trails give Icarus a wing silhouette while keeping its old 16-particle budget. */
+    private static void emitIcarianWings(ServerPlayer player,String phase,Vec3 center,int count){
+        var level=player.serverLevel();
+        var pearl=new DustParticleOptions(new Vector3f(.78F,.91F,1F),1.02F);
+        var gold=new DustParticleOptions(new Vector3f(1F,.78F,.39F),.86F);
+        double phaseOffset=phase.equals("alternate")?-.18D:phase.equals("complete")?.22D:0D;
+        for(int i=0;i<count;i++){
+            Vec3 point=icarianWingPoint(center,i,phaseOffset);
+            ParticleOptions feather=(i/2)%3==0?gold:pearl;
+            level.sendParticles(player,feather,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+        if(phase.equals("complete"))level.sendParticles(player,ParticleTypes.END_ROD,false,
+                center.x,center.y+.72D,center.z,2,.035D,.11D,.035D,.004D);
+    }
+
+    /** Sample geometry for the paired, swept-back Icarus wing trails. */
+    public static Vec3 icarianWingPoint(Vec3 center,int sample,double phaseOffset){
+        int index=Math.floorMod(sample,16);int feather=index/2;
+        double side=(index&1)==0?-1D:1D,progress=feather/7D;
+        double spread=.16D+progress*.78D;
+        double lift=.12D+Math.sin(progress*Math.PI)*.34D;
+        double sweep=.42D-progress*.84D+phaseOffset;
+        return center.add(side*spread,lift,sweep);
     }
 }
