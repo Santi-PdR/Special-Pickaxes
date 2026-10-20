@@ -202,6 +202,7 @@ public final class ArtifactPassives {
             case AXIOM -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(),0,PASSIVE_LEASE_TICKS);
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get(),0,PASSIVE_LEASE_TICKS);
+                shareNullVeil(player);
             }
             case WORLDBREAKER -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(),0,PASSIVE_LEASE_TICKS);
@@ -384,6 +385,17 @@ public final class ArtifactPassives {
             grant(ally,focus,0,PASSIVE_LEASE_TICKS);
             ArtifactFeedback.choirMiningLink(owner,ally);
         }
+    }
+
+    /** Axiom lends its custom debuff-cleanse aura to a small nearby allied group. */
+    private static void shareNullVeil(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.AXIOM,"axiomNullVeilAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var veil=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get();
+        for(var ally:allies)grant(ally,veil,0,PASSIVE_LEASE_TICKS);
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */

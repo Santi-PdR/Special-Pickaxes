@@ -990,12 +990,24 @@ public final class PickaxeGameTests {
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void axiomCuriosNullVeilCleansesOneDebuffPerPulse(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.AXIOM);
+        var wearer=player(h,ArtifactKind.AXIOM,"AxiomBearer");
+        var ally=player(h,ArtifactKind.PALIMPSEST,"AxiomAlly");var enemy=player(h,ArtifactKind.PALIMPSEST,"AxiomEnemy");
+        var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("axiom_"+wearer.getUUID().toString().substring(0,6));
+        var hostile=scoreboard.addPlayerTeam("foe_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),hostile);
+        ally.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());enemy.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());
+        h.getLevel().addFreshEntity(ally);h.getLevel().addFreshEntity(enemy);
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,320,0));
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,300,0));
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.HUNGER,40,0));
+        ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.WITHER,320,0));
         ArtifactPassives.tick(wearer,ArtifactKind.AXIOM);
         h.assertTrue(wearer.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom grants its custom passive veil while carried in Curios");
+        h.assertTrue(ally.hasEffect(SpecialPickaxes.NULL_VEIL.get())&&!enemy.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom shares the passive cleanse only with nearby teammates");
+        NullVeilEffect.pulse(ally);
+        h.assertTrue(!ally.hasEffect(MobEffects.WITHER),"a nearby ally receives Axiom's custom visible cleanse pulse");
         NullVeilEffect.pulse(wearer);
         h.assertTrue(!wearer.hasEffect(MobEffects.POISON)&&wearer.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)&&wearer.hasEffect(MobEffects.HUNGER),"lethal poison is prioritized over shorter control and hunger effects");
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200,0));NullVeilEffect.pulse(wearer);
