@@ -167,7 +167,8 @@ public final class ArtifactPassives {
             }
             default -> {return;}
         }
-        ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
+        if(kind==ArtifactKind.WORLDBREAKER)ArtifactFeedback.worldbreakerAegisImpact(player,attacker.position());
+        else ArtifactFeedback.burst(player,kind,player.blockPosition(),4);
     }
 
     public static void tick(ServerPlayer player, ArtifactKind kind) {

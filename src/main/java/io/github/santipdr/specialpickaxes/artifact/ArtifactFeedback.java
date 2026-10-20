@@ -28,6 +28,8 @@ public final class ArtifactFeedback {
     private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
+    private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
+            net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
     public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());}
     public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();}
@@ -61,6 +63,26 @@ public final class ArtifactFeedback {
                         &&viewer.distanceToSqr(center)<=144D,
                 center,3,128);
         audience.addAll(nearby);return List.copyOf(audience);
+    }
+    /** Worldbreaker's defensive Curios proc flashes a compact slate shield on the side of the incoming hit. */
+    public static void worldbreakerAegisImpact(ServerPlayer wearer,Vec3 attacker){
+        var level=wearer.serverLevel();var eyeLine=wearer.position().add(0,wearer.getBbHeight()*.54D,0);
+        var towards=attacker.subtract(eyeLine);var horizontal=new Vec3(towards.x,0,towards.z);
+        if(horizontal.lengthSqr()<1.0E-6D)horizontal=new Vec3(0,0,1);
+        else horizontal=horizontal.normalize();
+        var side=new Vec3(-horizontal.z,0,horizontal.x);var audience=nearbyWardAudience(wearer);
+        for(int i=0;i<6;i++){
+            var point=worldbreakerAegisShardPoint(eyeLine,horizontal,side,i);
+            for(var viewer:audience)level.sendParticles(viewer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,
+                    1,.018D,.018D,.018D,.008D);
+        }
+        for(var viewer:audience)level.sendParticles(viewer,ParticleTypes.END_ROD,false,
+                eyeLine.x+horizontal.x*.45D,eyeLine.y,eyeLine.z+horizontal.z*.45D,2,.035D,.08D,.035D,.004D);
+    }
+    public static Vec3 worldbreakerAegisShardPoint(Vec3 center,Vec3 towards,Vec3 side,int sample){
+        int index=Math.floorMod(sample,6);double across=(index%3-1)*.2D;
+        double height=(index/3==0?-.12D:.12D);
+        return center.add(towards.scale(.47D)).add(side.scale(across)).add(0,height,0);
     }
     /** Tempo tiers recolor the mining cut so Curios' sustained-break bonus is readable without extra ticks. */
     public static void strataTempoPulse(ServerPlayer wearer,BlockPos pos,int streak){

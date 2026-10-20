@@ -693,6 +693,16 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(pvpTarget.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)-normalMovementSpeed*.85D)<.001D,"Phase Shear also slows escape movement by 15 percent");
         h.assertTrue(!pvpTarget.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"Phase Shear does not grant Strength");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_81") public static void worldbreakerAegisImpactFormsADirectionalSlateShield(GameTestHelper h){
+        var center=new Vec3(2D,8D,-3D);var towards=new Vec3(1D,0D,0D);var side=new Vec3(0D,0D,1D);
+        var left=ArtifactFeedback.worldbreakerAegisShardPoint(center,towards,side,0);
+        var middle=ArtifactFeedback.worldbreakerAegisShardPoint(center,towards,side,1);
+        var right=ArtifactFeedback.worldbreakerAegisShardPoint(center,towards,side,2);
+        var upper=ArtifactFeedback.worldbreakerAegisShardPoint(center,towards,side,5);
+        h.assertTrue(left.x>.4D&&middle.x>.4D&&right.x>.4D,"the ward forms between its bearer and an attacker to the east");
+        h.assertTrue(left.z<middle.z&&middle.z<right.z,"the three shards fan across the incoming side");
+        h.assertTrue(upper.y>middle.y,"the shield has two visible vertical bands");h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_37") public static void worldbreakerCuriosAegisAddsCustomArmorAndAnchor(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDBREAKER);ArtifactPassives.tick(wearer,ArtifactKind.WORLDBREAKER);
         var aegis=SpecialPickaxes.WORLDBREAKER_AEGIS.get();
