@@ -291,32 +291,39 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean magmaWave(ServerPlayer player) {
-        var level=player.serverLevel();Vec3 look=player.getLookAngle();
-        Vec3 horizontal=new Vec3(look.x,0,look.z);
-        if(horizontal.lengthSqr()<1.0E-4)return false;
-        Vec3 forward=horizontal.normalize(),origin=player.position().add(0,.8,0);
-        double range=14,halfWidth=2.75;
-        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(range,4,range),entity->{
+    private static boolean magmaEruption(ServerPlayer player) {
+        var aimed=ArtifactActions.target(player);
+        return aimed.isPresent()&&magmaEruptionAt(player,aimed.get());
+    }
+
+    /** Hellspec X erupts at the aimed ground point; it affects entities only and never edits blocks. */
+    public static boolean magmaEruptionAt(ServerPlayer player,BlockPos centerBlock) {
+        var level=player.serverLevel();var center=centerBlock.immutable();
+        if(!level.hasChunkAt(center)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,center))return false;
+        Vec3 origin=new Vec3(center.getX()+.5D,center.getY()+.65D,center.getZ()+.5D);
+        double radius=5D;
+        var targets=EntitySelection.nearest(level,LivingEntity.class,
+                new net.minecraft.world.phys.AABB(center).inflate(radius,4D,radius),entity->{
             if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
                     ||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,entity.blockPosition())
                     ||entity instanceof Player other&&!player.canHarmPlayer(other)
                     ||!player.hasLineOfSight(entity))return false;
-            Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5,0).subtract(origin);
-            double along=delta.x*forward.x+delta.z*forward.z;
-            double across=Math.abs(delta.x*forward.z-delta.z*forward.x);
-            return along>=1&&along<=range&&across<=halfWidth&&Math.abs(delta.y)<=3.5;
-        },origin,12);
+            Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5D,0).subtract(origin);
+            return delta.x*delta.x+delta.z*delta.z<=radius*radius&&Math.abs(delta.y)<=4D;
+        },origin,8,512);
         if(targets.isEmpty())return false;
-        ArtifactFeedback.magmaWave(player,forward,range,halfWidth);
+        ArtifactFeedback.magmaEruption(player,center,targets);
         for(var target:targets){
-            target.setDeltaMovement(target.getDeltaMovement().scale(.2).add(forward.scale(1.8).add(0,.7,0)));
-            target.hasImpulse=true;target.setSecondsOnFire(4);
-            target.hurt(level.damageSources().playerAttack(player),3F);
+            Vec3 away=target.position().subtract(origin);Vec3 horizontal=new Vec3(away.x,0,away.z);
+            if(horizontal.lengthSqr()<1.0E-4D)horizontal=new Vec3(0,0,1);
+            else horizontal=horizontal.normalize();
+            target.setDeltaMovement(target.getDeltaMovement().scale(.2D).add(horizontal.scale(.38D)).add(0,.95D,0));
+            target.hasImpulse=true;target.setSecondsOnFire(3);
+            target.hurt(level.damageSources().playerAttack(player),5F);
             target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),60,0,true,false,true));
+                    io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),80,0,true,false,true));
         }
-        ArtifactFeedback.message(player,"magma_wave",targets.size());
+        ArtifactFeedback.message(player,"magma_eruption",targets.size());
         return true;
     }
 
@@ -335,7 +342,7 @@ public final class ArtifactTechniques {
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfallSink(player,tool);
             case IRIDIUM -> recallIridiumDrops(player, 32, 96);
-            case HELLSPEC -> magmaWave(player);
+            case HELLSPEC -> magmaEruption(player);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };

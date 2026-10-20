@@ -623,27 +623,34 @@ public final class PickaxeGameTests {
         h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire()&&attacker.getEffect(brand).getDuration()==40,"the eight-second cooldown prevents repeated reductions, ignitions and brand refreshes");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaWaveBrandsOnlyHostileTargets(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");wearer.setYRot(0);
-        var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(wearer.getX(),wearer.getY(),wearer.getZ()+4);h.getLevel().addFreshEntity(enemy);
-        var ally=player(h,ArtifactKind.CHOIR,"MagmaAlly");ally.setPos(wearer.getX()+1,wearer.getY(),wearer.getZ()+4);
+    @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaEruptionOnlyBrandsNearbyHostilesAndLeavesBlocksUntouched(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");var center=target(h);
+        var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(center.getX()+1.5D,center.getY()+1,center.getZ()+.5D);h.getLevel().addFreshEntity(enemy);
+        var farEnemy=EntityType.ZOMBIE.create(h.getLevel());farEnemy.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+7.5D);h.getLevel().addFreshEntity(farEnemy);
+        var ally=player(h,ArtifactKind.CHOIR,"MagmaAlly");ally.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+2.5D);
         var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("magma_"+wearer.getUUID().toString().substring(0,6));
         scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);h.getLevel().addFreshEntity(ally);
-        float health=enemy.getHealth();
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC),"Magma Wave launches when a hostile target is in its forward fan");
+        float health=enemy.getHealth();var floor=h.getLevel().getBlockState(center);
+        h.assertTrue(ArtifactTechniques.magmaEruptionAt(wearer,center),"X erupts at the selected block when a hostile is in range");
         var brand=SpecialPickaxes.MAGMA_BRAND.get();
-        h.assertTrue(enemy.getHealth()<=health-2.9F,"the wave deals its direct impact damage, subject to armor mitigation");
-        h.assertTrue(enemy.hasEffect(brand),"the wave applies the custom Magma Brand");
-        h.assertTrue(enemy.getEffect(brand).getDuration()>=59,"Magma Brand remains active for nearly its full three-second lease");
-        h.assertTrue(enemy.isOnFire()&&enemy.getDeltaMovement().z>.5D&&enemy.hasImpulse,
-                "the impact ignites and drives the target forward with the advancing wave");
-        h.assertTrue(ally.getHealth()==ally.getMaxHealth()&&!ally.hasEffect(brand),"the wave ignores allied players");
-        h.runAfterDelay(22,()->{
-            float beforePulse=enemy.getHealth();brand.applyEffectTick(enemy,0);
-            h.assertTrue(enemy.getHealth()<beforePulse,"Magma Brand deals its custom pulse separately from ordinary fire ticks");
-            h.assertTrue(brand.isDurationEffectTick(60,0)&&!brand.isDurationEffectTick(59,0),"Magma Brand uses a one-second effect cadence");
-            finish(h,wearer);
-        });
+        h.assertTrue(enemy.getHealth()<=health-4.9F,"the eruption deals 5 direct damage");
+        h.assertTrue(enemy.hasEffect(brand)&&enemy.getEffect(brand).getDuration()==80,"the eruption applies its four-second custom Magma Brand");
+        h.assertTrue(enemy.isOnFire()&&enemy.getDeltaMovement().y>.8D&&enemy.hasImpulse,"the visible eruption lifts and ignites its target");
+        h.assertTrue(ally.getHealth()==ally.getMaxHealth()&&!ally.hasEffect(brand),"allied players remain unharmed");
+        h.assertTrue(!farEnemy.hasEffect(brand)&&farEnemy.getHealth()==farEnemy.getMaxHealth(),"the 5-block eruption radius is enforced");
+        h.assertTrue(h.getLevel().getBlockState(center)==floor,"the effect does not alter the aimed block");
+        float beforePulse=enemy.getHealth();brand.applyEffectTick(enemy,0);
+        h.assertTrue(enemy.getHealth()<beforePulse,"Magma Brand deals its custom pulse separately from ordinary fire ticks");
+        h.assertTrue(brand.isDurationEffectTick(80,0)&&!brand.isDurationEffectTick(79,0),"Magma Brand uses a one-second effect cadence");
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_83") public static void hellspecMagmaEruptionCapsTargets(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaCapBearer");var center=target(h);var targets=new ArrayList<LivingEntity>();
+        for(int i=0;i<10;i++){var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+.5D);h.getLevel().addFreshEntity(enemy);targets.add(enemy);}
+        h.assertTrue(ArtifactTechniques.magmaEruptionAt(wearer,center),"the eruption resolves with a crowded target cluster");
+        long branded=targets.stream().filter(target->target.hasEffect(SpecialPickaxes.MAGMA_BRAND.get())).count();
+        h.assertTrue(branded==8,"one eruption affects at most eight hostiles regardless of entity pile size");
+        finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);

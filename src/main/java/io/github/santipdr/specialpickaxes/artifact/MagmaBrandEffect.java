@@ -6,7 +6,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 
-/** Hellspec's Magma Wave leaves a short, visible brand that pulses with custom magma damage. */
+/** Hellspec's eruption and Cinder Retort leave a visible brand with custom magma damage. */
 public final class MagmaBrandEffect extends MobEffect {
     public MagmaBrandEffect(){super(MobEffectCategory.HARMFUL,0xff5428);}
 

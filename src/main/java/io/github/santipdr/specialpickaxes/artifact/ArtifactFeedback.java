@@ -482,17 +482,28 @@ public final class ArtifactFeedback {
             }
         }
     }
-    /** A bounded advancing fan lets nearby players read the non-mining Hellspec attack. */
-    public static void magmaWave(ServerPlayer p,Vec3 forward,double range,double halfWidth){
-        var level=p.serverLevel();var right=new Vec3(-forward.z,0,forward.x);var origin=p.position().add(0,.8D,0);
-        for(int step=2;step<=range;step+=2){
-            double spread=halfWidth*step/range;
-            for(int lane=-1;lane<=1;lane++){
-                var point=origin.add(forward.scale(step)).add(right.scale(spread*lane));
-                if(!level.hasChunkAt(BlockPos.containing(point)))continue;
-                level.sendParticles(ParticleTypes.FLAME,point.x,point.y,point.z,2,.08D,.03D,.08D,.006D);
-                if(lane==0)level.sendParticles(ParticleTypes.LAVA,point.x,point.y,point.z,1,.04D,.02D,.04D,.002D);
-            }
+    /** A compact ring and five rising vents make the chosen eruption point unambiguous. */
+    public static void magmaEruption(ServerPlayer p,BlockPos center,List<LivingEntity> targets){
+        var level=p.serverLevel();double cx=center.getX()+.5D,cy=center.getY()+.16D,cz=center.getZ()+.5D;
+        var ring=new DustParticleOptions(new Vector3f(1F,.22F,.025F),1.08F);
+        var core=new DustParticleOptions(new Vector3f(1F,.72F,.12F),1.3F);
+        for(int i=0;i<16;i++){
+            double angle=i*Math.PI/8D,x=cx+Math.cos(angle)*4.35D,z=cz+Math.sin(angle)*4.35D;
+            if(!level.hasChunkAt(BlockPos.containing(x,cy,z)))continue;
+            level.sendParticles(ring,x,cy,z,1,0,0,0,0);
+            if((i&3)==0)level.sendParticles(ParticleTypes.SMOKE,x,cy+.12D,z,1,.025D,.08D,.025D,.002D);
+        }
+        for(int i=0;i<5;i++){
+            double angle=i*Math.PI*2D/5D,x=cx+Math.cos(angle)*1.75D,z=cz+Math.sin(angle)*1.75D;
+            if(!level.hasChunkAt(BlockPos.containing(x,cy,z)))continue;
+            level.sendParticles(core,x,cy+.2D,z,2,.08D,.08D,.08D,.004D);
+            level.sendParticles(ParticleTypes.FLAME,x,cy+.65D,z,5,.12D,.72D,.12D,.018D);
+            level.sendParticles(ParticleTypes.LAVA,x,cy+.85D,z,2,.08D,.5D,.08D,.006D);
+        }
+        for(var target:targets){
+            double x=target.getX(),y=target.getY()+target.getBbHeight()*.35D,z=target.getZ();
+            level.sendParticles(ParticleTypes.FLAME,x,y,z,6,.16D,.3D,.16D,.018D);
+            level.sendParticles(ParticleTypes.LAVA,x,y-.18D,z,2,.1D,.18D,.1D,.006D);
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
