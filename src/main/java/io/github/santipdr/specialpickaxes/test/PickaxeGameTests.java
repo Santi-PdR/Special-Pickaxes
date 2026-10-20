@@ -672,10 +672,11 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(shell),"held Hellspec keeps its own fire passive");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_36") public static void crucibleCuriosMantleIsCustomThermalWard(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.CRUCIBLE);wearer.setSecondsOnFire(10);ArtifactPassives.tick(wearer,ArtifactKind.CRUCIBLE);
+        var wearer=player(h,ArtifactKind.CRUCIBLE);ArtifactPassives.tick(wearer,ArtifactKind.CRUCIBLE);
         var mantle=SpecialPickaxes.CRUCIBLE_MANTLE.get();
-        h.assertTrue(wearer.hasEffect(mantle)&&wearer.getEffect(mantle).getDuration()==40,"Curios applies the named two-second Crucible Mantle lease in heat");
+        h.assertTrue(wearer.hasEffect(mantle)&&wearer.getEffect(mantle).getDuration()==40,"Curios pre-leases the named two-second Crucible Mantle before the wearer enters heat");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.FIRE_RESISTANCE),"Crucible uses its custom passive instead of a generic fire-resistance potion");
+        wearer.setSecondsOnFire(10);
         mantle.applyEffectTick(wearer,0);h.assertTrue(!wearer.isOnFire(),"a mantle pulse clears active burning");
         var fire=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().inFire(),10F);
         var lava=new net.minecraftforge.event.entity.living.LivingAttackEvent(wearer,h.getLevel().damageSources().lava(),10F);

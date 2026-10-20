@@ -183,7 +183,8 @@ public final class ArtifactPassives {
                 shareChoirMiningFocus(player);
             }
             case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
-            case CRUCIBLE -> { if (player.isOnFire() || player.isInLava()) grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(), 0, PASSIVE_LEASE_TICKS); }
+            // Keep the thermal ward leased before contact so its attack hook can cancel the first lava/fire tick.
+            case CRUCIBLE -> grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(),0,PASSIVE_LEASE_TICKS);
             case INTERREGNUM -> {
                 grantAbsorption(player,PASSIVE_LEASE_TICKS);
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(), 0, PASSIVE_LEASE_TICKS);
