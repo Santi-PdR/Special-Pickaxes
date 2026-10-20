@@ -201,6 +201,10 @@ public final class SpecialPickaxes {
         }
         if(p.hasEffect(STASIS_RESONANCE.get())&&e.getNewSpeed()>0&&p.getMainHandItem().isCorrectToolForDrops(e.getState()))
             e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*1.6D));
+        if(p instanceof ServerPlayer server&&p.hasEffect(SEARING_SHELL.get())&&e.getNewSpeed()>0&&ArtifactTools.effective(e.getState())){
+            double thermal=SearingShellEffect.miningSpeedMultiplier(server);
+            if(thermal>1D)e.setNewSpeed(EnchantmentScaling.finiteSpeed((double)e.getNewSpeed()*thermal));
+        }
     }
     private void attack(LivingAttackEvent e) {
         if(DomainFields.frozen(e.getSource().getDirectEntity())) e.setCanceled(true);

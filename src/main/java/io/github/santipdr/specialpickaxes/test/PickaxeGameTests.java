@@ -703,6 +703,20 @@ public final class PickaxeGameTests {
                 "all heat motes stay close to the wearer instead of expanding into a world-scale burst");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_87") public static void hellspecCuriosShellAddsMiningTempoNearHeat(GameTestHelper h){
+        var cold=player(h,ArtifactKind.HELLSPEC,"HellspecColdTest");
+        cold.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.SEARING_SHELL.get(),100,0,true,false,true));
+        h.assertTrue(SearingShellEffect.miningSpeedMultiplier(cold)==1D,"the shell gives no mining bonus away from nearby heat");
+
+        var hot=player(h,ArtifactKind.HELLSPEC,"HellspecHotTest");
+        hot.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.SEARING_SHELL.get(),100,0,true,false,true));
+        h.getLevel().setBlockAndUpdate(hot.blockPosition().offset(2,0,0),Blocks.MAGMA_BLOCK.defaultBlockState());
+        h.assertTrue(SearingShellEffect.nearbyHeat(hot),"magma within the compact scan activates the thermal passive");
+        h.assertTrue(SearingShellEffect.miningSpeedMultiplier(hot)==SearingShellEffect.thermalMiningMultiplier()
+                        &&SearingShellEffect.thermalMiningMultiplier()==1.35D,
+                "nearby heat raises effective mining speed by 35 percent");
+        finish(h,cold);finish(h,hot);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();
         ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);

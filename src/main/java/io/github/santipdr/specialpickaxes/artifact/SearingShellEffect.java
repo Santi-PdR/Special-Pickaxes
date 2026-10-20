@@ -1,8 +1,11 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,9 +15,34 @@ import java.util.ArrayList;
 
 /** Hellspec's fireproof passive with a small ember tell while the wearer burns or swims in lava. */
 public final class SearingShellEffect extends MobEffect {
+    private static final String THERMAL_SCAN_TICK="specialpickaxesThermalMiningScanTick";
+    private static final String THERMAL_SCAN_RESULT="specialpickaxesThermalMiningScanResult";
+    private static final double THERMAL_MINING_MULTIPLIER=1.35D;
     public SearingShellEffect() {
         super(MobEffectCategory.BENEFICIAL,0xf35a39);
     }
+
+    /** Near heat, Hellspec's Curios shell tempers ordinary mining into a short, strong passive bonus. */
+    public static double miningSpeedMultiplier(ServerPlayer player){
+        if(!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get())||!nearbyHeat(player))return 1D;
+        return THERMAL_MINING_MULTIPLIER;
+    }
+
+    /** Checks a compact 5×3×5 area at most once per player per server tick. */
+    public static boolean nearbyHeat(ServerPlayer player){
+        var level=player.serverLevel();long now=level.getGameTime();var data=player.getPersistentData();
+        if(data.contains(THERMAL_SCAN_TICK)&&data.getLong(THERMAL_SCAN_TICK)==now)return data.getBoolean(THERMAL_SCAN_RESULT);
+        BlockPos origin=player.blockPosition();boolean hot=false;
+        scan: for(BlockPos pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2))){
+            var state=level.getBlockState(pos);
+            if(state.is(Blocks.FIRE)||state.is(Blocks.SOUL_FIRE)||state.is(Blocks.MAGMA_BLOCK)
+                    ||state.getFluidState().is(FluidTags.LAVA)) {hot=true;break scan;}
+        }
+        data.putLong(THERMAL_SCAN_TICK,now);data.putBoolean(THERMAL_SCAN_RESULT,hot);
+        return hot;
+    }
+
+    public static double thermalMiningMultiplier(){return THERMAL_MINING_MULTIPLIER;}
 
     @Override
     public void applyEffectTick(LivingEntity entity,int amplifier) {
