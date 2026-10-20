@@ -375,9 +375,12 @@ public final class ArtifactPassives {
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,8,256);
+        var ward=io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get();
         for(var ally:allies){
+            boolean newlyAnchored=!ally.hasEffect(ward);
             grantAbsorption(ally,PASSIVE_LEASE_TICKS);
-            grant(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,PASSIVE_LEASE_TICKS);
+            grant(ally,ward,0,PASSIVE_LEASE_TICKS);
+            if(newlyAnchored)ArtifactFeedback.stasisWardLink(owner,ally);
         }
     }
 
