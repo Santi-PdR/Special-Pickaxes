@@ -23,6 +23,7 @@ public final class StarfallWardEffect extends MobEffect {
     private static final String NEXT_FLASH="specialpickaxesStarfallFlashAtWorldTime";
     private static final DustParticleOptions STARDUST=new DustParticleOptions(new Vector3f(1F,.36F,.79F),.82F);
     private static final DustParticleOptions RECHARGING_DUST=new DustParticleOptions(new Vector3f(.58F,.38F,.88F),.64F);
+    private static final DustParticleOptions GUARD_DUST=new DustParticleOptions(new Vector3f(.96F,.72F,1F),.72F);
 
     public StarfallWardEffect(){super(MobEffectCategory.BENEFICIAL,0xf65dc0);}
 
@@ -123,6 +124,24 @@ public final class StarfallWardEffect extends MobEffect {
         level.sendParticles(viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
         // One bounded spark burst gives the catch a readable, star-shaped snap without a particle loop.
         level.sendParticles(viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
+    }
+
+    /** The shared damage-reduction ward gets a distinct, smaller flash under the same per-player throttle. */
+    public static void guardImpact(ServerPlayer protectedPlayer){
+        if(protectedPlayer.level().isClientSide||!(protectedPlayer.level() instanceof ServerLevel level))return;
+        long now=ArtifactState.now(protectedPlayer);var data=protectedPlayer.getPersistentData();
+        if(data.getLong(NEXT_FLASH)>now)return;
+        data.putLong(NEXT_FLASH,now+5L);
+        double x=protectedPlayer.getX(),y=protectedPlayer.getY()+protectedPlayer.getBbHeight()*.55D,z=protectedPlayer.getZ();
+        double phase=level.getGameTime()*.18D;
+        for(var viewer:ArtifactFeedback.nearbyWardAudience(protectedPlayer)){
+            for(int i=0;i<6;i++){
+                double angle=phase+i*Math.PI/3D;
+                level.sendParticles(viewer,GUARD_DUST,false,x+Math.cos(angle)*.48D,y+Math.sin(angle*2D)*.08D,
+                        z+Math.sin(angle)*.48D,1,0,0,0,0);
+            }
+            level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y,z,2,.09D,.12D,.09D,.008D);
+        }
     }
 
     /** Check trajectories every server tick so fast modded rounds cannot cross the ward between scans. */

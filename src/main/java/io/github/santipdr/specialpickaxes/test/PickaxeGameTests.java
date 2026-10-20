@@ -957,6 +957,12 @@ public final class PickaxeGameTests {
         var projectileHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(allies.get(0),h.getLevel().damageSources().arrow(arrow,shooter),10F);
         h.assertTrue(ArtifactPassives.onSharedStarfallGuard(allies.get(0),projectileHit),"the shared ward applies with no Curios relic equipped");
         h.assertTrue(Math.abs(projectileHit.getAmount()-7.5F)<.001F,"the shared passive reduces projectile damage by 25 percent");
+        long flashUntil=allies.get(0).getPersistentData().getLong("specialpickaxesStarfallFlashAtWorldTime");
+        h.assertTrue(flashUntil>ArtifactState.now(allies.get(0)),"shared projectile protection produces a visual cue");
+        var rapidHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(allies.get(0),h.getLevel().damageSources().arrow(arrow,shooter),10F);
+        h.assertTrue(ArtifactPassives.onSharedStarfallGuard(allies.get(0),rapidHit)
+                &&allies.get(0).getPersistentData().getLong("specialpickaxesStarfallFlashAtWorldTime")==flashUntil,
+                "rapid projectile hits remain protected without repeating the visual flash");
         var meleeHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(allies.get(0),h.getLevel().damageSources().mobAttack(shooter),10F);
         h.assertTrue(!ArtifactPassives.onSharedStarfallGuard(allies.get(0),meleeHit),"the shared ward ignores melee damage");
         h.assertTrue(meleeHit.getAmount()==10F,"Starfall Guard does not reduce melee damage");

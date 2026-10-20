@@ -73,7 +73,7 @@ public final class ArtifactPassives {
         if(event.getAmount()<=0||!event.getSource().is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)
                 ||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get()))return false;
         event.setAmount(event.getAmount()*.75F);
-        StarfallWardEffect.projectileImpact(player);
+        StarfallWardEffect.guardImpact(player);
         return true;
     }
 
