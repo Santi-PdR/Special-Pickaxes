@@ -75,6 +75,18 @@ public final class ArtifactFeedback {
             level.sendParticles(ally,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
+    /** A compact close-range ripple marks Stasis' eight-second shared counter. */
+    public static void stasisReflexImpact(ServerPlayer protectedPlayer){
+        var level=protectedPlayer.serverLevel();var audience=nearbyWardAudience(protectedPlayer);
+        double phase=level.getGameTime()*.13D,x=protectedPlayer.getX(),y=protectedPlayer.getY()+.72D,z=protectedPlayer.getZ();
+        for(int i=0;i<8;i++){
+            double angle=phase+i*Math.PI/4D,radius=.42D+(i%2)*.13D;
+            double px=x+Math.cos(angle)*radius,pz=z+Math.sin(angle)*radius;
+            for(var viewer:audience)level.sendParticles(viewer,(i&1)==0?STASIS_LINK:ParticleTypes.REVERSE_PORTAL,
+                    false,px,y+(i%3)*.08D,pz,1,0,0,0,0);
+        }
+        for(var viewer:audience)level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y+.16D,z,2,.05D,.1D,.05D,.003D);
+    }
     /** Persistent Curios auras are sent only to the bearer and three visible players within twelve blocks. */
     public static void nearbyWardPulse(ServerPlayer wearer,List<AuraParticle> particles){
         if(particles.isEmpty())return;

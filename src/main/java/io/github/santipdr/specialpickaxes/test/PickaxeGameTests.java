@@ -173,9 +173,10 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_47") public static void interregnumCuriosCounterUsesStrongerGraviticTether(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_WARD.get(),100,0,true,false,true));
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
-        ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.INTERREGNUM);
+        StasisWardEffect.answerHostileHit(wearer,hit);
         var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
         h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Stasis Reflex trims its triggering hostile hit by fifteen percent");
         h.assertTrue(attacker.hasEffect(tether)&&attacker.getEffect(tether).getDuration()==40&&attacker.getEffect(tether).getAmplifier()==1,"Stasis applies the stronger two-second Gravitic Tether");
@@ -183,6 +184,19 @@ public final class PickaxeGameTests {
         attacker.setDeltaMovement(1,.25,0);tether.applyEffectTick(attacker,1);
         h.assertTrue(Math.abs(attacker.getDeltaMovement().x-.60)<.001&&Math.abs(attacker.getDeltaMovement().y-.25)<.001,"Stasis Tether damps horizontal escape without changing vertical movement");
         finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_85") public static void sharedStasisWardAnswersHostileHitsForAllies(GameTestHelper h){
+        var protectedAlly=player(h,ArtifactKind.CHOIR,"StasisProtectedAlly");
+        protectedAlly.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_WARD.get(),100,0,true,false,true));
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(protectedAlly.getX()+2,protectedAlly.getY(),protectedAlly.getZ());h.getLevel().addFreshEntity(attacker);
+        var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(protectedAlly,h.getLevel().damageSources().mobAttack(attacker),10F);
+        h.assertTrue(StasisWardEffect.answerHostileHit(protectedAlly,first)&&Math.abs(first.getAmount()-8.5F)<.001F,
+                "a Curios ally protected by Stasis receives the same fifteen-percent first-hit guard");
+        h.assertTrue(attacker.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"the shared ward returns a Gravitic Tether to the hostile attacker");
+        var second=new net.minecraftforge.event.entity.living.LivingHurtEvent(protectedAlly,h.getLevel().damageSources().mobAttack(attacker),10F);
+        h.assertTrue(!StasisWardEffect.answerHostileHit(protectedAlly,second)&&second.getAmount()==10F,
+                "each protected ally has an independent eight-second reflex cooldown");
+        finish(h,protectedAlly);
     }
     @GameTest(template="empty",batch="rework_each_52") public static void interregnumAbsorptionLeasePreservesExternalEffects(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);var absorption=net.minecraft.world.effect.MobEffects.ABSORPTION;

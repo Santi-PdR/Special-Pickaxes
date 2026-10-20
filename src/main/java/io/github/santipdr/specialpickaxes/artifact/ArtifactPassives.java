@@ -79,6 +79,8 @@ public final class ArtifactPassives {
 
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind,boolean sharedGuardApplied) {
         if(event.getAmount()<=0)return;
+        // Interregnum's independent Stasis Ward handler also protects its Curios allies.
+        if(kind==ArtifactKind.INTERREGNUM)return;
         var source=event.getSource();
         boolean starfallGuarded=sharedGuardApplied||onSharedStarfallGuard(player,event);
         if(kind==ArtifactKind.EXODIUM&&player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get())

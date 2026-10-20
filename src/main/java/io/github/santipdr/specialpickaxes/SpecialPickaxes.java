@@ -209,9 +209,10 @@ public final class SpecialPickaxes {
     }
     private void hurt(LivingHurtEvent e){
         if(e.getEntity() instanceof ServerPlayer p){
+            StasisWardEffect.answerHostileHit(p,e);
             boolean sharedStarfallGuard=ArtifactPassives.onSharedStarfallGuard(p,e);
             var equipped=CuriosCompat.find(p);
-            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick)
+            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind!=ArtifactKind.INTERREGNUM)
                 ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
         }
     }

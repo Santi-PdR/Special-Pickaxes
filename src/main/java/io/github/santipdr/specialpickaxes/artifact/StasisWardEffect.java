@@ -7,8 +7,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -22,6 +24,29 @@ public final class StasisWardEffect extends MobEffect {
     public StasisWardEffect(){
         super(MobEffectCategory.BENEFICIAL,0x9f78ef);
         addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,UUID.fromString("7ad59033-6f29-465b-a95b-8fedb5d866c4").toString(),.15D,AttributeModifier.Operation.ADDITION);
+    }
+
+    /** The shared ward protects its bearer from one hostile strike and answers with a gravity tether. */
+    public static boolean answerHostileHit(ServerPlayer protectedPlayer,LivingHurtEvent event){
+        if(event.getAmount()<=0||!protectedPlayer.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get()))return false;
+        LivingEntity attacker=event.getSource().getEntity() instanceof LivingEntity living?living:null;
+        if(attacker==null){
+            var direct=event.getSource().getDirectEntity();
+            if(JegProjectileCompat.isProjectile(direct)){
+                var owner=JegProjectileCompat.owner(direct);
+                if(owner instanceof LivingEntity living)attacker=living;
+            }
+        }
+        if(attacker==null||attacker==protectedPlayer||attacker.isAlliedTo(protectedPlayer))return false;
+        if(attacker instanceof Player other&&!protectedPlayer.canHarmPlayer(other))return false;
+        if(!WorldSafety.allowed(protectedPlayer,ArtifactKind.INTERREGNUM,attacker.blockPosition()))return false;
+        long now=ArtifactState.now(protectedPlayer);var data=protectedPlayer.getPersistentData();
+        if(data.getLong("specialpickaxesStasisReflexReadyAt")>now)return false;
+        data.putLong("specialpickaxesStasisReflexReadyAt",now+160L);
+        event.setAmount(event.getAmount()*.85F);
+        ArtifactPassives.grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),1,40);
+        ArtifactFeedback.stasisReflexImpact(protectedPlayer);
+        return true;
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){

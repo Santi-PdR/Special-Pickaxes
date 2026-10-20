@@ -521,7 +521,7 @@
   "mining.identity.paradox_crucible.gravel": "TRANSFORMAR: Grava",
   "mining.how.paradox_crucible.gravel": "Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la geología natural de la región a grava.",
   "message.specialpickaxes.domain_relocated": "Desplazaste el dominio de Stasis; su duración restante se conserva.",
-  "curios.detail.specialpickaxes.interregnum": "Comparte Absorción I y la Égida de Stasis (+15% de resistencia al retroceso) con hasta 8 aliados a 6 bloques. Reflejo de Stasis reduce el primer golpe cada 8 s un 15% y aplica un Lazo Gravitatorio reforzado durante 2 s.",
+  "curios.detail.specialpickaxes.interregnum": "Comparte Absorción I y la Égida de Stasis (+15% al retroceso) con hasta 8 aliados a 6 bloques. Cada portador protegido reduce el primer golpe hostil cada 8 s un 15% y devuelve un Lazo Gravitatorio reforzado durante 2 s.",
   "curios.detail.specialpickaxes.iridium": "Oleada de veta: menas seguidas acumulan hasta 3 cargas (+12% de velocidad de minado cada una) durante 4 s y comparten la carga actual con hasta 3 compañeros cercanos; la carga del grupo se actualiza una vez por segundo. A máxima carga, cada portador recupera 1 de comida cada 2 s. Los drops de las menas que picas brillan y se acercan desde 6 bloques. Guardia de veta: el primer golpe hostil cada 8 s inflige 15% menos daño y da +4 de armadura durante 4 s.",
   "message.specialpickaxes.root_snared": "Las raíces de la cantera se cierran alrededor de %s objetivos; los atraparán en 4 s.",
   "message.specialpickaxes.fault_echo": "La resonancia frenó el impulso de %s enemigos.",
