@@ -420,7 +420,7 @@
   "screen.specialpickaxes.passive": "PASSIVE",
   "screen.specialpickaxes.main": "PRIMARY SKILL",
   "screen.specialpickaxes.alternate": "ALTERNATE SKILL",
-  "screen.specialpickaxes.curios": "CURIOS SKILLS",
+  "screen.specialpickaxes.curios": "CURIOS PASSIVES",
   "passive.specialpickaxes.palimpsest": "Night Vision · Strata Focus II · Dawn Mending (1 hp/2 s) · mining streak: +8–24% / 4 s",
   "passive.specialpickaxes.fault_choir": "Night Vision · Strata Focus I · shares the mining rhythm with up to 3 teammates within 6 blocks",
   "passive.specialpickaxes.eventide": "Night Vision · Gravitic Balance: controlled descent and 75% less fall damage",

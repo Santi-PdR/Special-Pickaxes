@@ -32,6 +32,7 @@ public final class ArtifactFeedback {
     private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
+    private static final DustParticleOptions CHOIR_LINK=new DustParticleOptions(new Vector3f(.28F,.91F,.86F),.68F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
@@ -48,6 +49,18 @@ public final class ArtifactFeedback {
                         &&viewer.distanceToSqr(center)<=144D,
                 center,3,128);
         for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
+    }
+    /** Choir's Curios mining share is shown as a quiet, wearer-and-ally-only thread once per aura scan. */
+    public static void choirMiningLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.58D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.58D,0);
+        for(int i=1;i<=3;i++){
+            Vec3 point=start.lerp(end,i/4D);
+            level.sendParticles(wearer,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
     }
     /** Persistent Curios auras are sent only to the bearer and three visible players within twelve blocks. */
     public static void nearbyWardPulse(ServerPlayer wearer,List<AuraParticle> particles){

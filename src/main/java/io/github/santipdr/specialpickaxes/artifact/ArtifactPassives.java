@@ -379,7 +379,10 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var focus=io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get();
-        for(var ally:allies)grant(ally,focus,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            grant(ally,focus,0,PASSIVE_LEASE_TICKS);
+            ArtifactFeedback.choirMiningLink(owner,ally);
+        }
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */
