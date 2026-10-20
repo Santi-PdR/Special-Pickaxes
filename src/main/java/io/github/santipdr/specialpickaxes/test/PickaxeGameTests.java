@@ -182,6 +182,14 @@ public final class PickaxeGameTests {
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(absorption,100,0,false,true,true));
         ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);current=wearer.getEffect(absorption);
         h.assertTrue(current!=null&&current.getDuration()==100&&current.getAmplifier()==0&&!current.isAmbient()&&current.isVisible(),"a later external Absorption potion takes ownership and is not refreshed by the Curios lease");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.INTERREGNUM);current=wearer.getEffect(absorption);
+        h.assertTrue(current!=null&&current.getDuration()==100&&!current.isAmbient(),"unequipping Stasis preserves the external replacement potion");
+        var leaseOwner=player(h,ArtifactKind.INTERREGNUM,"StasisLeaseOwner");ArtifactPassives.tick(leaseOwner,ArtifactKind.INTERREGNUM);
+        h.assertTrue(leaseOwner.hasEffect(absorption),"Stasis first grants its own absorption lease when no external potion exists");
+        leaseOwner.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        ArtifactPassives.onCuriosUnequip(leaseOwner,ArtifactKind.INTERREGNUM);
+        h.assertTrue(!leaseOwner.hasEffect(absorption),"unequipping Stasis immediately clears its owned absorption lease");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_48") public static void iridiumRecognizesForeignOresButNotBroadlyTaggedHostRock(GameTestHelper h){

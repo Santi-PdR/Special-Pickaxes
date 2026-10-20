@@ -42,8 +42,10 @@ public final class ArtifactPassives {
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&isStrataFocusPick(held.kind)))
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get());
         if(kind==ArtifactKind.INTERREGNUM
-                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.INTERREGNUM))
+                &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.INTERREGNUM)){
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get());
+            clearAbsorptionLease(player);
+        }
         if(kind==ArtifactKind.PALIMPSEST
                 &&!(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.PALIMPSEST))
             removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get());
@@ -288,6 +290,14 @@ public final class ArtifactPassives {
 
     private static boolean isAbsorptionLease(MobEffectInstance effect){
         return effect.getAmplifier()==0&&isPassiveLease(effect);
+    }
+
+    /** Remove only the Absorption instance granted by the Curios passive, preserving any server replacement. */
+    private static void clearAbsorptionLease(ServerPlayer player){
+        var data=player.getPersistentData();if(!data.getBoolean(ABSORPTION_LEASE))return;
+        var current=player.getEffect(MobEffects.ABSORPTION);
+        if(current!=null&&isAbsorptionLease(current))player.removeEffect(MobEffects.ABSORPTION);
+        data.remove(ABSORPTION_LEASE);
     }
 
     /** Keeps the shared passive from replacing or removing a server/mod-owned Night Vision effect. */
