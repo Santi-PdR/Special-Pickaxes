@@ -78,7 +78,10 @@ public final class DirectionalProgram implements WorkProgram {
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                 if(shape==Shape.WORLDLOOM_BORE){
                     if(!WorldSafety.allowed(actor,kind,at)||WorldSafety.barrier(actor,at))return false;
-                    if(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!MiningDesigns.matrix(old)||ArtifactOres.isOre(old))return true;
+                    if(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!MiningDesigns.matrix(old)||ArtifactOres.isOre(old)){
+                        if(mine&&i==0)ArtifactFeedback.worldloomBoreProgress(actor,origin.relative(direction,sliceDepth),direction,sliceDepth);
+                        return true;
+                    }
                 }
                 if(!WorldSafety.directionClear(actor,tool,kind,at)||shape==Shape.EXODIUM_SINK
                         &&(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!WorldSafety.vacant(old)&&!MiningDesigns.matrix(old)&&!ArtifactOres.isOre(old))
@@ -86,6 +89,8 @@ public final class DirectionalProgram implements WorkProgram {
                 boolean succeeded=!mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
                 if(succeeded&&mine&&i==0&&kind==ArtifactKind.CHOIR)
                     ArtifactFeedback.resonantTunnelPulse(actor,at,direction,sliceDepth);
+                else if(succeeded&&mine&&i==0&&shape==Shape.WORLDLOOM_BORE)
+                    ArtifactFeedback.worldloomBoreProgress(actor,origin.relative(direction,sliceDepth),direction,sliceDepth);
                 return succeeded;
             }
         };

@@ -25,6 +25,9 @@ public final class ArtifactFeedback {
     public record AuraParticle(ParticleOptions particle,Vec3 position,int count,double dx,double dy,double dz,double speed) {}
     private static final Map<UUID,Long> SOUND_READY=new HashMap<>();
     private static final Map<UUID,Long> LISTENER_SOUND_READY=new HashMap<>();
+    private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
+            net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
+    private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
     private ArtifactFeedback() {}
     public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());}
     public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();}
@@ -240,6 +243,22 @@ public final class ArtifactFeedback {
         var level=p.serverLevel();
         level.sendParticles(p,ParticleTypes.END_ROD,false,impact.x,impact.y,impact.z,3,.035D,.035D,.035D,.012D);
         level.sendParticles(p,ParticleTypes.WAX_ON,false,impact.x,impact.y,impact.z,2,.045D,.045D,.045D,.008D);
+    }
+    /** A bounded vine spiral advances around the rim once per successful Worldloom tunnel slice. */
+    public static void worldloomBoreProgress(ServerPlayer p,BlockPos section,net.minecraft.core.Direction direction,int depth){
+        var level=p.serverLevel();double phase=depth*.31D+level.getGameTime()*.035D;
+        double cx=section.getX()+.5D,cy=section.getY()+.5D,cz=section.getZ()+.5D;
+        for(int i=0;i<4;i++){
+            double angle=phase+i*Math.PI*.5D,a=Math.cos(angle)*2.12D,b=Math.sin(angle)*2.12D;
+            double x=cx,y=cy,z=cz;
+            switch(direction.getAxis()){
+                case X->{y+=b;z+=a;}
+                case Y->{x+=a;z+=b;}
+                case Z->{x+=a;y+=b;}
+            }
+            level.sendParticles(p,WORLDLOOM_ROOT,false,x,y,z,1,0,.018D,0,.002D);
+            if(i==0||depth%4==3)level.sendParticles(p,WORLDLOOM_GLEAM,false,x,y,z,1,0,0,0,0);
+        }
     }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
         for(int i=0;i<8;i++) {
