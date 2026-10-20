@@ -1361,8 +1361,16 @@ public final class PickaxeGameTests {
         h.assertTrue(guard.isDurationEffectTick(80,0)&&!guard.isDurationEffectTick(79,0),"the ward's crystal effect pulses every ten ticks");
         finish(h,wearer);
     }
-    @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumHighlightsOnlyDropsCreatedByOreBreak(GameTestHelper h) {
-        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
+    @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumSharesLodeSurgeAndHighlightsOnlyOreDrops(GameTestHelper h) {
+        var p=player(h,ArtifactKind.CHOIR,"LodeBearer");var ally=player(h,ArtifactKind.CHOIR,"LodeAlly");
+        var enemy=player(h,ArtifactKind.CHOIR,"LodeEnemy");var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("lode_"+p.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("lfoe_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(p.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        ally.setPos(p.getX()+3,p.getY(),p.getZ());enemy.setPos(p.getX()+2,p.getY(),p.getZ());
+        h.getLevel().addFreshEntity(ally);h.getLevel().addFreshEntity(enemy);
+        var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
         ArtifactPassives.tick(p,ArtifactKind.IRIDIUM);
         var lodeSurge=SpecialPickaxes.LODE_SURGE.get();
         var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
@@ -1375,6 +1383,8 @@ public final class PickaxeGameTests {
         MiningObservations.flush();
         h.assertTrue(p.hasEffect(lodeSurge)&&p.getEffect(lodeSurge).getAmplifier()==0&&p.getEffect(lodeSurge).getDuration()==80,
                 "the first Curios ore break starts a four-second Lode Surge");
+        h.assertTrue(ally.hasEffect(lodeSurge)&&ally.getEffect(lodeSurge).getAmplifier()==0&&!enemy.hasEffect(lodeSurge),
+                "Curios shares the active ore rhythm with nearby teammates, never hostiles");
         h.assertTrue(drop.isCurrentlyGlowing()&&drop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"new ore loot gets Iridium's glow tag");
         h.assertTrue(drop.getPersistentData().hasUUID("specialpickaxesIridiumOwner")&&drop.getPersistentData().getUUID("specialpickaxesIridiumOwner").equals(p.getUUID()),"only the wearer owns the recalled drop");
         h.assertTrue(!OreDropHighlight.mark(drop,p),"a repeated observation does not replay the sparkle burst");
