@@ -296,6 +296,18 @@ public final class ArtifactFeedback {
         if(depth%5==0)level.sendParticles(p,ParticleTypes.SCULK_CHARGE_POP,false,cx,cy,cz,1,.02D,.02D,.02D,.004D);
     }
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
+    public static void gravityChargePulse(ServerPlayer p,BlockPos center,int charge){
+        var level=p.serverLevel();int tier=Math.max(1,Math.min(3,charge/6));int color=ArtifactKind.EVENTIDE.color;
+        var mote=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),.78F+tier*.16F);
+        double phase=level.getGameTime()*.11D,cx=center.getX()+.5D,cy=center.getY()+.12D,cz=center.getZ()+.5D;
+        int count=3+tier*2;
+        for(int i=0;i<count;i++){
+            double progress=(i+1D)/count,angle=phase+progress*Math.PI*2D*tier,radius=.42D*(1D-progress);
+            double x=cx+Math.cos(angle)*radius,z=cz+Math.sin(angle)*radius,y=cy+progress*.78D;
+            level.sendParticles(p,(i&1)==0?mote:ParticleTypes.REVERSE_PORTAL,false,x,y,z,1,0,0,0,0);
+        }
+    }
+    /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
     public static void gravityCollapse(ServerPlayer p,BlockPos center,int drops){
         var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;
         var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.6F);

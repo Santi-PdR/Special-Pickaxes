@@ -145,11 +145,16 @@ public final class DomainFields {
         var field=FIELDS.get(p.getUUID());
         if(field==null||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
-        if(field.kind==ArtifactKind.EVENTIDE&&++field.gravityCharge>=EVENTIDE_COLLAPSE_CHARGE){
-            field.gravityCharge=0;
-            field.collapsePullUntil=ArtifactState.now(p)+60;
-            int pulled=pullDrops(field);
-            ArtifactFeedback.gravityCollapse(p,field.center,pulled);
+        if(field.kind==ArtifactKind.EVENTIDE){
+            field.gravityCharge++;
+            if(field.gravityCharge>=EVENTIDE_COLLAPSE_CHARGE){
+                field.gravityCharge=0;
+                field.collapsePullUntil=ArtifactState.now(p)+60;
+                int pulled=pullDrops(field);
+                ArtifactFeedback.gravityCollapse(p,field.center,pulled);
+            } else if(field.gravityCharge%6==0) {
+                ArtifactFeedback.gravityChargePulse(p,field.center,field.gravityCharge);
+            }
         }
     }
     private static int pullDrops(Field field){
