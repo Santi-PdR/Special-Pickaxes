@@ -1651,6 +1651,11 @@ public final class PickaxeGameTests {
         copied.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);copied.getOrCreateTag().putInt("copiedMode",8);
         var copiedLines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.compact(copied,ArtifactKind.WORLDBREAKER,copiedLines);
         h.assertTrue(copiedLines.size()==3&&ArtifactTooltips.copyModeKey(copied).equals("calcite"),"Worldbreaker tooltip identifies the copied Crucible and its current Calcite mode");
+        h.assertTrue(ArtifactSkills.feedbackKind(copied,ArtifactKind.WORLDBREAKER)==ArtifactKind.CRUCIBLE,
+                "Worldbreaker copies the selected pick's single audio and particle signature");
+        copied.getOrCreateTag().putString("copiedSkill","invalid");
+        h.assertTrue(ArtifactSkills.feedbackKind(copied,ArtifactKind.WORLDBREAKER)==ArtifactKind.WORLDBREAKER,
+                "invalid copied state falls back to Worldbreaker's own feedback safely");
         h.succeed();
     }
     @GameTest(template="empty",batch="legacy_each_36") public static void pickaxeSoundsUseFiveBlockPlayerCenteredRadius(GameTestHelper h){
