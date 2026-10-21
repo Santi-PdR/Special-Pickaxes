@@ -703,6 +703,16 @@ public final class PickaxeGameTests {
                 "all heat motes stay close to the wearer instead of expanding into a world-scale burst");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_89") public static void hellspecThermalMiningWindowGetsQuietVisibleHalo(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var halo=SearingShellEffect.thermalMiningHaloParticles(wearer,140);
+        long embers=halo.stream().filter(sample->sample.particle() instanceof net.minecraft.core.particles.DustParticleOptions).count();
+        long flames=halo.stream().filter(sample->sample.particle()==net.minecraft.core.particles.ParticleTypes.SMALL_FLAME).count();
+        var center=wearer.position().add(0,wearer.getBbHeight()*.56D,0);
+        h.assertTrue(halo.size()==5&&embers==3&&flames==2,"the active heat-mining bonus uses a small, mixed ember halo");
+        h.assertTrue(halo.stream().allMatch(sample->sample.position().distanceTo(center)<.4D),
+                "the thermal cue stays tightly around its bearer instead of spreading through the mine");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_87") public static void hellspecCuriosShellAddsMiningTempoNearHeat(GameTestHelper h){
         var cold=player(h,ArtifactKind.HELLSPEC,"HellspecColdTest");
         cold.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.SEARING_SHELL.get(),100,0,true,false,true));

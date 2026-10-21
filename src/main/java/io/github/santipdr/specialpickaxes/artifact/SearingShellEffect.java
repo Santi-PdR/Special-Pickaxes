@@ -1,6 +1,7 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,12 +13,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import org.joml.Vector3f;
 
 /** Hellspec's fireproof passive with a small ember tell while the wearer burns or swims in lava. */
 public final class SearingShellEffect extends MobEffect {
     private static final String THERMAL_SCAN_TICK="specialpickaxesThermalMiningScanTick";
     private static final String THERMAL_SCAN_RESULT="specialpickaxesThermalMiningScanResult";
     private static final double THERMAL_MINING_MULTIPLIER=1.35D;
+    private static final DustParticleOptions THERMAL_EMBER=new DustParticleOptions(new Vector3f(.98F,.34F,.12F),.72F);
     public SearingShellEffect() {
         super(MobEffectCategory.BENEFICIAL,0xf35a39);
     }
@@ -55,7 +58,23 @@ public final class SearingShellEffect extends MobEffect {
             if(entity instanceof ServerPlayer wearer)ArtifactFeedback.nearbyWardPulse(wearer,halo);
             else for(var sample:halo){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
                     sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+        }else if(entity instanceof ServerPlayer wearer&&entity.tickCount%20==0&&nearbyHeat(wearer)){
+            ArtifactFeedback.nearbyWardPulse(wearer,thermalMiningHaloParticles(wearer,entity.tickCount));
         }
+    }
+
+    /** A quiet five-mote ring marks the +35% mining window without looking like damage feedback. */
+    public static ArrayList<ArtifactFeedback.AuraParticle> thermalMiningHaloParticles(LivingEntity entity,int tick){
+        double phase=tick*.11D,radius=Math.max(.3D,entity.getBbWidth()*.48D);
+        double centerY=entity.getY()+entity.getBbHeight()*.56D;
+        var particles=new ArrayList<ArtifactFeedback.AuraParticle>(5);
+        for(int i=0;i<5;i++){
+            double angle=phase+Math.PI*2D*i/5D;
+            double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
+            var mote=(i&1)==0?THERMAL_EMBER:ParticleTypes.SMALL_FLAME;
+            particles.add(new ArtifactFeedback.AuraParticle(mote,new Vec3(x,centerY+Math.sin(angle*2D)*.035D,z),1,0,.012D,0,.001D));
+        }
+        return particles;
     }
 
     /** Six flames and three lava sparks retain the halo silhouette with a bounded local audience. */
