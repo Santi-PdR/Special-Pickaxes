@@ -222,7 +222,10 @@ public final class ArtifactPassives {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
                 OreDropHighlight.drawNearbyDrops(player);
             }
-            case HELLSPEC -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
+            case HELLSPEC -> {
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
+                shareSearingShell(player);
+            }
             case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
             default -> { }
         }
@@ -434,6 +437,17 @@ public final class ArtifactPassives {
                 center,3,128);
         var mantle=io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get();
         for(var ally:allies)grant(ally,mantle,0,PASSIVE_LEASE_TICKS);
+    }
+
+    /** Hellspec lends its fireproof shell and heat-fed mining tempo to a small allied group. */
+    private static void shareSearingShell(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.HELLSPEC,"hellspecSearingAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var shell=io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get();
+        for(var ally:allies)grant(ally,shell,0,PASSIVE_LEASE_TICKS);
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */

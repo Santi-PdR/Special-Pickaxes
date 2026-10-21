@@ -730,6 +730,24 @@ public final class PickaxeGameTests {
                 "lava cauldrons count as nearby heat sources for the mining passive");
         finish(h,cold);finish(h,hot);finish(h,campfireBearer);finish(h,cauldronBearer);
     }
+    @GameTest(template="empty",batch="rework_each_88") public static void hellspecCuriosSharesFireproofMiningShellWithAllies(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC,"HellspecAuraOwner");
+        var ally=player(h,ArtifactKind.PALIMPSEST,"HellspecAuraAlly");
+        var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("hellspec_"+owner.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(owner.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(owner.getX()+3D,owner.getY(),owner.getZ());
+        h.getLevel().addFreshEntity(owner);h.getLevel().addFreshEntity(ally);
+        ArtifactPassives.tick(owner,ArtifactKind.HELLSPEC);
+        var shell=SpecialPickaxes.SEARING_SHELL.get();
+        h.assertTrue(owner.hasEffect(shell)&&ally.hasEffect(shell),"Hellspec shares its leased fireproof shell with a nearby teammate");
+        h.getLevel().setBlockAndUpdate(ally.blockPosition().offset(0,0,2),Blocks.SOUL_CAMPFIRE.defaultBlockState());
+        h.assertTrue(SearingShellEffect.miningSpeedMultiplier(ally)==1.35D,
+                "the shared shell also grants its 35 percent mining tempo near a soul campfire");
+        var lava=new net.minecraftforge.event.entity.living.LivingAttackEvent(ally,h.getLevel().damageSources().lava(),4F);
+        h.assertTrue(MinecraftForge.EVENT_BUS.post(lava),"shared Searing Shell cancels lava damage for the ally");
+        finish(h,owner);finish(h,ally);
+    }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecCuriosShellEndsWhenUnequippedButSurvivesInHand(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.ICARUS);var shell=SpecialPickaxes.SEARING_SHELL.get();
         ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
