@@ -14,6 +14,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import org.joml.Vector3f;
+import java.util.ArrayList;
 
 /** Exodium's Curios passive catches projectiles in a short-lived stellar veil. */
 public final class StarfallWardEffect extends MobEffect {
@@ -33,16 +34,7 @@ public final class StarfallWardEffect extends MobEffect {
         if(entity.tickCount%12!=0)return;
         long now=ArtifactState.now(wearer),readyAt=ArtifactState.of(wearer,ArtifactKind.EXODIUM).getLong("starfallCatchReady");
         double charge=chargeProgress(now,readyAt);
-        double phase=entity.tickCount*.045D;
-        double y=entity.getY()+entity.getBbHeight()*.56D;
-        for(int i=0;i<4;i++){
-            double angle=phase+i*Math.PI*.5D;
-            double radius=.22D+charge*.16D+(i%2)*.035D;
-            level.sendParticles(wearer,charge>=1D?STARDUST:RECHARGING_DUST,false,entity.getX()+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.08D,
-                    entity.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
-        }
-        if(charge>=1D&&entity.tickCount%24==0)
-            level.sendParticles(wearer,ParticleTypes.END_ROD,false,entity.getX(),y+.18D,entity.getZ(),1,.04D,.08D,.04D,.005D);
+        ArtifactFeedback.nearbyWardPulse(wearer,orbitParticles(entity,entity.tickCount,charge));
     }
 
     /** Starfall catches one hostile shot whose current path would pass through the wearer's body. */
@@ -86,6 +78,24 @@ public final class StarfallWardEffect extends MobEffect {
     /** Visual charge fraction: the orbit contracts after a catch and expands as the ward recharges. */
     public static double chargeProgress(long now,long readyAt){
         return readyAt<=now?1D:1D-Math.min(1D,(readyAt-now)/(double)CATCH_COOLDOWN_TICKS);
+    }
+
+    /** The four-point charge orbit is visible to the bearer and nearby teammates who share the ward. */
+    public static ArrayList<ArtifactFeedback.AuraParticle> orbitParticles(LivingEntity wearer,int tick,double charge){
+        double boundedCharge=Math.max(0D,Math.min(1D,charge));
+        double phase=tick*.045D,y=wearer.getY()+wearer.getBbHeight()*.56D;
+        var particles=new ArrayList<ArtifactFeedback.AuraParticle>(5);
+        for(int i=0;i<4;i++){
+            double angle=phase+i*Math.PI*.5D;
+            double radius=.22D+boundedCharge*.16D+(i%2)*.035D;
+            particles.add(new ArtifactFeedback.AuraParticle(boundedCharge>=1D?STARDUST:RECHARGING_DUST,
+                    new Vec3(wearer.getX()+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.08D,
+                            wearer.getZ()+Math.sin(angle)*radius),1,0,0,0,0));
+        }
+        if(boundedCharge>=1D&&tick%24==0)
+            particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.END_ROD,
+                    new Vec3(wearer.getX(),y+.18D,wearer.getZ()),1,.04D,.08D,.04D,.005D));
+        return particles;
     }
 
     /** Stagger prediction scans across bearers; exact ProjectileImpactEvent interception remains per-impact. */

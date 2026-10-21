@@ -1044,6 +1044,19 @@ public final class PickaxeGameTests {
             });
         });
     }
+    @GameTest(template="empty",batch="rework_each_90") public static void exodiumSharedStarfallOrbitKeepsItsSmallLocalShape(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);
+        var charging=StarfallWardEffect.orbitParticles(wearer,120,.5D);
+        var ready=StarfallWardEffect.orbitParticles(wearer,120,1D);
+        h.assertTrue(charging.size()==4&&charging.stream().allMatch(sample->sample.particle() instanceof net.minecraft.core.particles.DustParticleOptions),
+                "a recharging shared ward keeps its four-point violet orbit");
+        h.assertTrue(ready.size()==5&&ready.stream().filter(sample->sample.particle()==net.minecraft.core.particles.ParticleTypes.END_ROD).count()==1,
+                "a ready shared ward adds only its occasional center spark");
+        var center=wearer.position().add(0,wearer.getBbHeight()*.56D,0);
+        h.assertTrue(ready.stream().allMatch(sample->sample.position().distanceTo(center)<.5D),
+                "team-visible Starfall motes stay tight around the bearer");
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_59") public static void exodiumSharesStarfallGuardWithThreeNearbyAllies(GameTestHelper h){
         var owner=player(h,ArtifactKind.EXODIUM,"StarfallBearer");
         var allies=List.of(player(h,ArtifactKind.CHOIR,"StarfallOne"),player(h,ArtifactKind.ICARUS,"StarfallTwo"),

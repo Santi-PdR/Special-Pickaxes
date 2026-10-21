@@ -1,6 +1,8 @@
 # Special Pickaxes — mining rework
 
-Forge **1.20.1 / Java 17**. La versión instalada para pruebas es **5.10.275**: trece picos tier V con dos técnicas al usarlos y pasivas propias. En Curios conservan solo sus pasivas; no necesitan teclas extra. El manual reúne las instrucciones completas y los objetos mantienen descripciones breves. Las excavaciones se procesan por ticks, vuelven a validar cada bloque y respetan menas, fluidos, máquinas, zonas protegidas y bloques colocados. Las búsquedas de entidades, drops y jugadores tienen límites para mantener el coste del servidor controlado. Curios es opcional.
+Forge **1.20.1 / Java 17**. La versión instalada para pruebas es **5.10.335**: trece picos tier V con dos técnicas al usarlos y pasivas propias. En Curios conservan solo sus pasivas; no necesitan teclas extra. El manual reúne las instrucciones completas y los objetos mantienen descripciones breves. Las excavaciones se procesan por ticks, vuelven a validar cada bloque y respetan menas, fluidos, máquinas, zonas protegidas y bloques colocados. Las búsquedas de entidades, drops y jugadores tienen límites para mantener el coste del servidor controlado. Curios es opcional.
+
+La versión **5.10.335** hace visible el polvo estelar de la guardia de Exodium también para compañeros cercanos que la reciben. Conserva cuatro partículas por órbita y solo añade una chispa central ocasional al recargarse. La **5.10.334** muestra un anillo pequeño de brasas para el portador y jugadores cercanos mientras el Caparazón Ígneo da su bonus de minería cerca del calor. La **5.10.333** extendió ese caparazón —protección contra fuego y lava más 35 % de velocidad de minería junto a fuentes de calor— a hasta tres compañeros a seis bloques. El rastreo de compañeros para esta última aura corre cada 20 ticks; todas las partículas están limitadas a una audiencia local.
 
 R activa, confirma, pausa o reanuda; X usa la técnica secundaria; C cambia el modo disponible e I abre el manual. Worldbreaker permite elegir visualmente otro pico desde el manual y muestra cuál está copiando. El sonido de habilidades se limita a jugadores cercanos y tiene enfriamiento por emisor y oyente.
 
@@ -48,7 +50,7 @@ cargan chunks y mantienen la protección si otro mod cancela el evento de rotura
 ## Referencia de nivel
 
 La instancia `ghouls` trae Terramity 0.9.8. Su Exodium Pickaxe es tier IV, velocidad
-20, durabilidad 8.124 y encantabilidad 50. Los picos Special Pickaxes usan tier IV,
+20, durabilidad 8.124 y encantabilidad 50. Los picos Special Pickaxes usan tier V,
 velocidad base 64 o mayor, durabilidad 32.768 y encantabilidad 50; la habilidad de
 herramienta permite extraer bloques picables y menas con tags de Forge.
 

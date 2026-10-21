@@ -6,7 +6,7 @@ modId="specialpickaxes"
 version="${mod_version}"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
-description='''Thirteen tier-IV mining pickaxes with custom abilities, safe scheduled excavation, modded geology support and referenced Terramity textures.'''
+description='''Thirteen tier-V mining pickaxes with custom abilities, safe scheduled excavation, modded geology support and referenced Terramity textures.'''
 [[dependencies.specialpickaxes]]
 modId="forge"
 mandatory=true
