@@ -441,10 +441,11 @@ public final class ArtifactFeedback {
             if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
-    /** A compact resonant ripple marks every other completed cross-section of Choir's tunnel. */
+    /** A restrained perimeter ripple marks every other completed cross-section of Choir's tunnel. */
     public static boolean resonantTunnelPulseDue(int depth){return depth>=0&&depth<20&&(depth&1)==0;}
+    public static int resonantTunnelParticleCount(int depth){return resonantTunnelPulseDue(depth)?4+(depth%5==0?1:0):0;}
     public static void resonantTunnelPulse(ServerPlayer p,BlockPos first,net.minecraft.core.Direction direction,int depth){
-        if(!resonantTunnelPulseDue(depth))return;
+        if(resonantTunnelParticleCount(depth)==0)return;
         var level=p.serverLevel();double cx=first.getX()+.5D,cy=first.getY()+.5D,cz=first.getZ()+.5D;
         double ax=0,ay=0,az=0,bx=0,by=0,bz=0;
         switch(direction.getAxis()){
@@ -453,12 +454,12 @@ public final class ArtifactFeedback {
             case Z->{cx+=.5D;cy+=.5D;ax=1; by=1;}
         }
         double phase=level.getGameTime()*.32D+depth*.37D;
-        var cyan=new DustParticleOptions(new Vector3f(.24F,.9F,1F),.78F);
-        for(int i=0;i<2;i++){
-            double angle=phase+i*Math.PI;
-            level.sendParticles(p,cyan,false,cx+ax*Math.cos(angle)*.24D+bx*Math.sin(angle)*.24D,
-                    cy+ay*Math.cos(angle)*.24D+by*Math.sin(angle)*.24D,
-                    cz+az*Math.cos(angle)*.24D+bz*Math.sin(angle)*.24D,1,0,0,0,0);
+        var cyan=new DustParticleOptions(new Vector3f(.24F,.9F,1F),.72F);
+        for(int i=0;i<4;i++){
+            double angle=phase+i*Math.PI*.5D;
+            level.sendParticles(p,cyan,false,cx+ax*Math.cos(angle)*.34D+bx*Math.sin(angle)*.34D,
+                    cy+ay*Math.cos(angle)*.34D+by*Math.sin(angle)*.34D,
+                    cz+az*Math.cos(angle)*.34D+bz*Math.sin(angle)*.34D,1,0,0,0,0);
         }
         if(depth%5==0)level.sendParticles(p,ParticleTypes.SCULK_CHARGE_POP,false,cx,cy,cz,1,.02D,.02D,.02D,.004D);
     }

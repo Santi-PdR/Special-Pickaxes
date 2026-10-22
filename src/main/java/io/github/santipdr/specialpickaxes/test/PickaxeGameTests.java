@@ -182,6 +182,8 @@ public final class PickaxeGameTests {
         var behind=p.blockPosition().relative(Direction.NORTH,2);h.getLevel().setBlockAndUpdate(behind,Blocks.STONE.defaultBlockState());
         h.assertTrue(java.util.stream.IntStream.range(0,20).filter(ArtifactFeedback::resonantTunnelPulseDue).count()==10
                 &&!ArtifactFeedback.resonantTunnelPulseDue(20),"the private tunnel ripple is capped at ten samples for the 20-block route");
+        h.assertTrue(java.util.stream.IntStream.range(0,20).map(ArtifactFeedback::resonantTunnelParticleCount).sum()==42
+                &&ArtifactFeedback.resonantTunnelParticleCount(20)==0,"the four-point tunnel outline stays targeted and below 42 particles per full bore");
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"forward resonance tunnel starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(origin.relative(Direction.SOUTH,19)).isAir(),"2x2 tunnel advances twenty blocks forward");
         h.assertTrue(h.getLevel().getBlockState(behind).is(Blocks.STONE),"tunnel leaves blocks behind untouched");finish(h,p);
