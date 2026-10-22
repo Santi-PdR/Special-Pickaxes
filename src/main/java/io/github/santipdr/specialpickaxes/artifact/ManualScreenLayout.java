@@ -9,7 +9,7 @@ public final class ManualScreenLayout {
         public int right(){return x+width;}
         public int bottom(){return y+height;}
     }
-    public record Layout(Box panel,Box content,Box picker,int footerY,boolean pickerVisible){}
+    public record Layout(Box panel,Box content,Box picker,Box firstColumn,Box secondColumn,int footerY,boolean pickerVisible,boolean twoColumns){}
 
     /** Maps a horizontally scrolled icon strip click to a pick, ignoring each cell's trailing gap. */
     public static int choiceIndexAt(int localX,int pixelScroll,int cellWidth,int choiceCount){
@@ -32,6 +32,10 @@ public final class ManualScreenLayout {
         int desiredContentY=pickerVisible?top+74:top+48;
         int contentY=Math.min(footerTop,desiredContentY);
         Box content=new Box(contentX,contentY,contentWidth,Math.max(0,footerTop-contentY));
-        return new Layout(panel,content,picker,top+Math.max(0,height-20),pickerVisible);
+        boolean twoColumns=contentWidth>=600;
+        int columnWidth=Math.max(0,(contentWidth-10)/2);
+        Box firstColumn=twoColumns?new Box(contentX,contentY,columnWidth,content.height()):content;
+        Box secondColumn=twoColumns?new Box(contentX+columnWidth+10,contentY,columnWidth,content.height()):new Box(content.right(),contentY,0,content.height());
+        return new Layout(panel,content,picker,firstColumn,secondColumn,top+Math.max(0,height-20),pickerVisible,twoColumns);
     }
 }

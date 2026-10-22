@@ -18,8 +18,8 @@ public final class ArtifactManualScreen extends Screen {
     private final Map<ArtifactKind,ItemStack> choiceIcons=new EnumMap<>(ArtifactKind.class);
     private int scroll,choiceScroll,contentHeight,layoutWidth=-1;
     private String layoutFingerprint="";
-    private List<Card> cards=List.of();
-    private record Section(Component heading,List<Component> body,int color) {}
+    private List<Card> leftCards=List.of(),rightCards=List.of();
+    private record Section(String key,Component heading,List<Component> body,int color) {}
     private record Card(Section section,List<net.minecraft.util.FormattedCharSequence> lines,int height) {}
 
     public ArtifactManualScreen(ArtifactKind kind){super(Component.translatable("screen.specialpickaxes.manual"));this.kind=kind;this.headerIcon=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());}
@@ -50,13 +50,18 @@ public final class ArtifactManualScreen extends Screen {
         int mode=abilityKind==kind?ArtifactTooltips.mode(active):active.hasTag()?active.getTag().getInt("copiedMode"):0;
         String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
         var content=layout.content();int contentX=content.x(),contentTop=content.y(),contentBottom=content.bottom(),contentWidth=content.width();
-        ensureCards(contentWidth,active,abilityKind,mode,modeKey,contentTop,contentBottom);
+        boolean twoColumns=layout.twoColumns();
+        ensureCards(contentWidth,twoColumns,active,abilityKind,mode,modeKey,contentTop,contentBottom);
         int contentRight=content.right();
         int maxScroll=Math.max(0,contentHeight-content.height());
         scroll=clamp(scroll,maxScroll);
         if(content.width()>0&&content.height()>0){
             g.enableScissor(contentX,contentTop,contentRight,contentBottom);
-            drawCards(g,contentX,contentTop-scroll,contentWidth,contentTop,contentBottom);
+            if(twoColumns){
+                var first=layout.firstColumn();var second=layout.secondColumn();
+                drawCards(g,leftCards,first.x(),contentTop-scroll,first.width(),contentTop,contentBottom);
+                drawCards(g,rightCards,second.x(),contentTop-scroll,second.width(),contentTop,contentBottom);
+            }else drawCards(g,leftCards,contentX,contentTop-scroll,contentWidth,contentTop,contentBottom);
             g.disableScissor();
             drawScrollBar(g,contentRight+2,contentTop,contentBottom,maxScroll);
         }
@@ -85,7 +90,7 @@ public final class ArtifactManualScreen extends Screen {
         result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
         var curiosInfo=new ArrayList<Component>();curiosInfo.add(Component.translatable("screen.specialpickaxes.curios_passive"));
         curiosInfo.add(Component.translatable("curios.detail.specialpickaxes."+kind.id));
-        result.add(new Section(Component.translatable("screen.specialpickaxes.curios"),curiosInfo,0xffb9d4ff));
+        result.add(new Section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios"),curiosInfo,0xffb9d4ff));
         if(ArtifactInteraction.modeCount(abilityKind)>1){
             result.add(section("manual4.modes",allModes(abilityKind),0xffd6e0e8));
             result.add(section("manual4.mode",Component.translatable("mode.specialpickaxes."+modeKey),0xffffd079));
@@ -97,31 +102,39 @@ public final class ArtifactManualScreen extends Screen {
         var controls=new ArrayList<Component>();
         for(var action:ArtifactTooltips.actions(stack,kind,mode))controls.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
         controls.add(Component.translatable("key.specialpickaxes.manual").append(": I"));
-        result.add(new Section(Component.translatable("manual4.controls"),controls,0xffd6e0e8));
+        result.add(new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffd6e0e8));
         return result;
     }
 
-    private void ensureCards(int maxWidth,ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey,int viewportTop,int viewportBottom){
+    private void ensureCards(int maxWidth,boolean twoColumns,ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey,int viewportTop,int viewportBottom){
         var tag=stack.getTag();
         String fingerprint=kind+"|"+abilityKind+"|"+mode+"|"+modeKey+"|"
                 +(tag==null?"":tag.getInt("artifactActivationCost")+":"+tag.getInt("artifactCooldown")+":"+tag.getString("copiedSkill")+":"+tag.getInt("copiedMode"));
+        fingerprint+="|"+twoColumns;
         if(layoutWidth==maxWidth&&fingerprint.equals(layoutFingerprint))return;
         layoutWidth=maxWidth;layoutFingerprint=fingerprint;
-        if(maxWidth<32){cards=List.of();contentHeight=0;scroll=0;return;}
+        if(maxWidth<32){leftCards=List.of();rightCards=List.of();contentHeight=0;scroll=0;return;}
         List<Section> sections=sections(stack,abilityKind,mode,modeKey);
-        var next=new ArrayList<Card>();int total=0;
-        int bodyWidth=Math.max(0,maxWidth-18);
+        var left=new ArrayList<Card>();var right=new ArrayList<Card>();int leftHeight=0,rightHeight=0;
+        int cardWidth=twoColumns?Math.max(0,(maxWidth-10)/2):maxWidth;
+        int bodyWidth=Math.max(0,cardWidth-18);
         for(var section:sections){
             var lines=new ArrayList<net.minecraft.util.FormattedCharSequence>();
             for(var body:section.body)lines.addAll(font.split(body,bodyWidth));
             int height=18+Math.max(1,lines.size())*LINE_HEIGHT+7;
-            next.add(new Card(section,List.copyOf(lines),height));total+=height+5;
+            Card card=new Card(section,List.copyOf(lines),height);
+            boolean onLeft=!twoColumns||switch(section.key){
+                case "screen.specialpickaxes.main","manual4.how","screen.specialpickaxes.alternate","manual4.modes","manual4.mode"->true;
+                default->false;
+            };
+            if(onLeft){left.add(card);leftHeight+=height+5;}else{right.add(card);rightHeight+=height+5;}
         }
-        cards=List.copyOf(next);contentHeight=Math.max(0,total-5);
+        leftCards=List.copyOf(left);rightCards=List.copyOf(right);
+        contentHeight=Math.max(0,Math.max(leftHeight,rightHeight)-5);
         scroll=clamp(scroll,Math.max(0,contentHeight-Math.max(0,viewportBottom-viewportTop)));
     }
 
-    private void drawCards(GuiGraphics g,int x,int y,int cardWidth,int viewportTop,int viewportBottom){
+    private void drawCards(GuiGraphics g,List<Card> cards,int x,int y,int cardWidth,int viewportTop,int viewportBottom){
         int cursor=y;
         for(Card card:cards){
             int cardBottom=cursor+card.height;
@@ -183,7 +196,7 @@ public final class ArtifactManualScreen extends Screen {
         if(kind!=ArtifactKind.WORLDBREAKER||!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return kind;
         try{return ArtifactKind.byId(stack.getTag().getString("copiedSkill"));}catch(IllegalArgumentException invalid){return kind;}
     }
-    private static Section section(String heading,Component body,int color){return new Section(Component.translatable(heading),List.of(body),color);}
+    private static Section section(String heading,Component body,int color){return new Section(heading,Component.translatable(heading),List.of(body),color);}
     private ItemStack displayStack(){
         var player=Minecraft.getInstance().player;if(player==null)return ItemStack.EMPTY;
         var hand=player.getMainHandItem();if(hand.getItem() instanceof ArtifactItem item&&item.kind==kind)return hand;
@@ -222,7 +235,7 @@ public final class ArtifactManualScreen extends Screen {
         return super.mouseClicked(mouseX,mouseY,button);
     }
     @Override public void removed(){
-        super.removed();cards=List.of();choiceIcons.clear();layoutFingerprint="";layoutWidth=-1;
+        super.removed();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutFingerprint="";layoutWidth=-1;
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
 }

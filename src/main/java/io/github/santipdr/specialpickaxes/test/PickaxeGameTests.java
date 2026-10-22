@@ -86,6 +86,11 @@ public final class PickaxeGameTests {
                 h.assertTrue(content.width()>=0&&content.height()>=0,"manual content has nonnegative dimensions");
                 h.assertTrue(content.x()>=panel.x()&&content.right()<=panel.right()&&content.y()>=panel.y()&&content.bottom()<=panel.bottom(),"manual content stays inside its panel");
                 h.assertTrue(layout.footerY()>=panel.y()&&layout.footerY()<=panel.bottom(),"manual footer stays inside its panel");
+                if(layout.twoColumns()){
+                    var first=layout.firstColumn();var second=layout.secondColumn();
+                    h.assertTrue(first.x()>=content.x()&&first.right()<second.x()&&second.right()<=content.right(),"wide manual columns remain separated inside the content viewport");
+                    h.assertTrue(first.y()==second.y()&&first.height()==second.height()&&first.bottom()<=content.bottom(),"manual columns share one aligned, clipped scroll viewport");
+                }else h.assertTrue(layout.firstColumn().equals(content)&&layout.secondColumn().width()==0,"narrow manual uses one content column");
                 if(layout.pickerVisible())h.assertTrue(picker.width()>0&&picker.height()>0&&picker.bottom()<=content.y()&&picker.right()<=panel.right(),"copy picker stays above, and separate from, scroll content");
             }
         }
