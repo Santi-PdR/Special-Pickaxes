@@ -1346,6 +1346,26 @@ public final class PickaxeGameTests {
         h.assertTrue(ally.getFoodData().getFoodLevel()>0,"ally receives gradual food restoration");
         DomainFields.stop(owner);finish(h,owner);
     }
+    @GameTest(template="empty",batch="rework_each_93") public static void stasisDomainPreservesExternalPotionEffects(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM,"StasisLeaseOwner");var ally=player(h,ArtifactKind.CHOIR,"StasisLeaseAlly");
+        var team=h.getLevel().getScoreboard().addPlayerTeam("stasislease_"+owner.getUUID().toString().substring(0,7));
+        h.getLevel().getScoreboard().addPlayerToTeam(owner.getScoreboardName(),team);h.getLevel().getScoreboard().addPlayerToTeam(ally.getScoreboardName(),team);
+        var center=target(h);ally.setPos(center.getX()+1.5D,center.getY(),center.getZ()+.5D);h.getLevel().addFreshEntity(ally);
+        var externalRegeneration=new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,0,false,true,true);
+        var externalDominion=new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.DOMINION.get(),200,1,false,true,true);
+        ally.addEffect(externalRegeneration);owner.addEffect(externalDominion);
+        h.assertTrue(DomainFields.start(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,center,8),"the Stasis domain starts around both players");
+        DomainFields.tick();
+        h.assertTrue(ally.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION)==externalRegeneration
+                        &&externalRegeneration.getDuration()==200&&externalRegeneration.getAmplifier()==0,
+                "the ally's external regeneration remains untouched when Stasis offers a stronger tier");
+        h.assertTrue(owner.getEffect(SpecialPickaxes.DOMINION.get())==externalDominion&&externalDominion.getDuration()==200,
+                "the owner's external Dominion effect is not replaced by the domain lease");
+        DomainFields.stop(owner);
+        h.assertTrue(owner.getEffect(SpecialPickaxes.DOMINION.get())==externalDominion,
+                "stopping Stasis clears only its own Dominion lease and preserves the external effect");
+        finish(h,owner);
+    }
     @GameTest(template="empty",batch="legacy_each_11") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(center);p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));var stone=center.east();var ore=center.above();
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());

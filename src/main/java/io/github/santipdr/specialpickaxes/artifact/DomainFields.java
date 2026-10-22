@@ -80,7 +80,7 @@ public final class DomainFields {
             if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity));
             removeFrozenMembership(id);
         });
-        f.frozen.clear();f.owner.removeEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
+        f.frozen.clear();ArtifactPassives.clearCombatEffectLease(f.owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
     }
     private static void removeFrozenMembership(UUID id) {
         FROZEN_ENTITIES.computeIfPresent(id,(ignored,count)->count<=1?null:count-1);
@@ -185,12 +185,12 @@ public final class DomainFields {
                 release(f);iterator.remove();continue;
             }
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition())) {
-                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),12,0,false,true,true));
-                p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,40,0,false,true,true));
+                ArtifactPassives.grantCombatEffect(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,12);
+                ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,40);
                 if(f.mode==0){
-                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,12,4,false,true,true));
-                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,40,3,false,true,true));
-                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,12,1,false,true,true));
+                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.REGENERATION,4,12);
+                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.ABSORPTION,3,40);
+                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,1,12);
                     if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
                 } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
             }
@@ -198,11 +198,11 @@ public final class DomainFields {
                 var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
                 for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,
                         q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()),Vec3.atCenterOf(f.center),16)){
-                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),40,0,true,false,true));
-                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),40,0,true,false,true));
-                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,80,0,true,false,true));
-                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get(),40,0,true,false,true));
-                    ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,40,1,true,false,true));
+                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,40);
+                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,40);
+                    ArtifactPassives.grantCombatEffect(ally,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,80);
+                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get(),0,40);
+                    ArtifactPassives.grantCombatEffect(ally,net.minecraft.world.effect.MobEffects.REGENERATION,1,40);
                     if(ally.tickCount%100==0)ally.getFoodData().eat(1,0.2F);
                     if(++supported>=16)break;
                 }

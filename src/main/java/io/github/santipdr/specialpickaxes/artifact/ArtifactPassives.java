@@ -295,6 +295,15 @@ public final class ArtifactPassives {
         }
     }
 
+    /** Clears only a combat/passive lease owned by this mod, preserving potion and server effects. */
+    public static void clearCombatEffectLease(LivingEntity target,MobEffect effect){
+        var data=target.getPersistentData();String key=combatLeaseKey(effect);
+        if(!data.getBoolean(key))return;
+        var current=target.getEffect(effect);
+        if(current!=null&&isPassiveLease(current))target.removeEffect(effect);
+        data.remove(key);
+    }
+
     private static String combatLeaseKey(MobEffect effect){
         return "specialpickaxesCuriosCombatLease:"+net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getKey(effect);
     }
