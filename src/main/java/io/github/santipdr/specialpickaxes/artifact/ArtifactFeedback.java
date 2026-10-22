@@ -29,6 +29,7 @@ public final class ArtifactFeedback {
     private static final Map<UUID,Long> LISTENER_SOUND_READY=new HashMap<>();
     private record WardAudienceCache(ServerLevel level,long tick,Vec3 center,List<ServerPlayer> audience) {}
     private static final Map<UUID,WardAudienceCache> WARD_AUDIENCE_CACHE=new HashMap<>();
+    private static final RelicParticleBudget AURA_PARTICLE_BUDGET=new RelicParticleBudget(4096);
     private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
@@ -117,6 +118,8 @@ public final class ArtifactFeedback {
     public static void nearbyWardPulse(ServerPlayer wearer,List<AuraParticle> particles){
         if(particles.isEmpty())return;
         var level=wearer.serverLevel();var audience=nearbyWardAudience(wearer);
+        int particleCount=particleCount(particles);
+        if(!reserveAuraParticles(level.getServer().getTickCount(),particleCount,audience.size()))return;
         for(var viewer:audience)for(var sample:particles){
             var at=sample.position();
             level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,sample.count(),
@@ -127,8 +130,19 @@ public final class ArtifactFeedback {
     public static void entityAuraPulse(net.minecraft.server.level.ServerLevel level,LivingEntity entity,List<AuraParticle> particles){
         if(particles.isEmpty())return;
         if(entity instanceof ServerPlayer wearer){nearbyWardPulse(wearer,particles);return;}
+        if(!reserveAuraParticles(level.getServer().getTickCount(),particleCount(particles),1))return;
         for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
                 sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+    }
+    private static int particleCount(List<AuraParticle> particles){
+        long total=0;for(var sample:particles)total+=Math.max(1,sample.count());
+        return (int)Math.min(Integer.MAX_VALUE,total);
+    }
+    /** Reserves a whole aura for its full audience; denied cosmetics never affect the underlying effect. */
+    public static boolean reserveAuraParticles(long serverTick,int particles,int audienceSize){
+        if(particles<=0||audienceSize<=0)return false;
+        long total=(long)particles*audienceSize;
+        return total<=Integer.MAX_VALUE&&AURA_PARTICLE_BUDGET.tryReserve(serverTick,(int)total);
     }
     /** Includes the bearer and chooses at most three nearby, non-spectating observers. */
     public static List<ServerPlayer> nearbyWardAudience(ServerPlayer wearer){

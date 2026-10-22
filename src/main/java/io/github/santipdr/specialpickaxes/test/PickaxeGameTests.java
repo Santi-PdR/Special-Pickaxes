@@ -70,6 +70,14 @@ public final class PickaxeGameTests {
         h.assertTrue(budget.tryReserve(41,24),"the particle allowance refreshes on the next server tick");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_95") public static void curiosAuraBudgetCountsEveryNearbyViewer(GameTestHelper h){
+        long tick=Long.MAX_VALUE;
+        h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,256,4),"the full four-player audience reserves 1024 particle instances");
+        h.assertTrue(!ArtifactFeedback.reserveAuraParticles(tick,769,4),"an aura that would exceed the shared 4096 cap is skipped whole");
+        h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,256,4),"later pulses fit while capacity remains");
+        h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick-1,1024,4),"the shared aura allowance refreshes next tick");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_86") public static void compactManualGridMapsScrolledPixelsToTheVisiblePick(GameTestHelper h){
         h.assertTrue(ManualChoiceGrid.indexAt(1,0,36,3,40,21)==3,
                 "a 36-pixel scroll starts on the partially visible second row, not row 37");
