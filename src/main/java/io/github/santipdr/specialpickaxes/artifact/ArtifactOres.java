@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /** Vanilla/common ore tags, modded ore tags and conventional registry names. */
 public final class ArtifactOres {
-    private static final ConcurrentMap<Block,Boolean> NONSTANDARD_ORES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Block,Boolean> ORE_CLASSIFICATION = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Block,String> ORE_FAMILIES = new ConcurrentHashMap<>();
     private static final String NO_ORE_FAMILY="";
     private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
@@ -24,18 +24,19 @@ public final class ArtifactOres {
         "netherrack","end_stone","obsidian","clay");
     private ArtifactOres() {}
     public static boolean isOre(BlockState state){
-        var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(state.getBlock());
+        return ORE_CLASSIFICATION.computeIfAbsent(state.getBlock(),ArtifactOres::classify);
+    }
+    private static boolean classify(Block block){
+        var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         if(key!=null&&key.getNamespace().equals("minecraft")&&VANILLA_GEOLOGY.contains(key.getPath()))return false;
         // Some packs accidentally fold forge:ore_bearing_ground into forge:ores.
         // Keep ore-host geology out even if a broad aggregate includes it.
+        var state=block.defaultBlockState();
         if(state.getTags().anyMatch(tag->isOreHostTagPath(tag.location().getPath())))return false;
         return state.is(net.minecraftforge.common.Tags.Blocks.ORES)||state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)
             ||state.is(BlockTags.GOLD_ORES)||state.is(BlockTags.DIAMOND_ORES)||state.is(BlockTags.REDSTONE_ORES)
             ||state.is(BlockTags.LAPIS_ORES)||state.is(BlockTags.EMERALD_ORES)||state.is(BlockTags.COPPER_ORES)
-            ||NONSTANDARD_ORES.computeIfAbsent(state.getBlock(), block -> {
-                if(state.getTags().anyMatch(ArtifactOres::isOreTag))return true;
-                return isOreBlock(key);
-            });
+            ||state.getTags().anyMatch(ArtifactOres::isOreTag)||isOreBlock(key);
     }
 
     /** Stable family fallback for conventional host-rock variants such as tin_ore/deepslate_tin_ore. */
@@ -61,8 +62,8 @@ public final class ArtifactOres {
         return WORLDGEN_ORES.contains(key.toString());
     }
 
-    /** Datapack reloads can change tag membership, so discard the bounded registry-block cache then. */
-    public static void clearCache(){ NONSTANDARD_ORES.clear(); }
+    /** Datapack reloads can change tag membership, so discard cached classifications then. */
+    public static void clearCache(){ ORE_CLASSIFICATION.clear(); }
 
     private static String canonicalPrefixedOre(String material){
         String canonical=stripHost(material);
