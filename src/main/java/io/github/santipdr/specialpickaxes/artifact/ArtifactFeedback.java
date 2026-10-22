@@ -34,6 +34,7 @@ public final class ArtifactFeedback {
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
     private static final DustParticleOptions CHOIR_LINK=new DustParticleOptions(new Vector3f(.28F,.91F,.86F),.68F);
     private static final DustParticleOptions STASIS_LINK=new DustParticleOptions(new Vector3f(.67F,.82F,1F),.72F);
+    private static final DustParticleOptions GRAVITY_LINK=new DustParticleOptions(new Vector3f(.72F,.55F,1F),.76F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
@@ -73,6 +74,18 @@ public final class ArtifactFeedback {
             Vec3 point=StasisWardLinkGeometry.point(start,end,i);
             level.sendParticles(wearer,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
             level.sendParticles(ally,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
+    /** A single bowed violet thread marks Eventide sharing its controlled-fall ward with an ally. */
+    public static void graviticBalanceLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
+        for(int i=1;i<=5;i++){
+            Vec3 point=GraviticBalanceLinkGeometry.point(start,end,i);
+            level.sendParticles(wearer,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */

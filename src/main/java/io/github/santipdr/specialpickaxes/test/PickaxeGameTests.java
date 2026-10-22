@@ -265,6 +265,19 @@ public final class PickaxeGameTests {
         var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(allies.get(0),12F,1F);MinecraftForge.EVENT_BUS.post(fall);
         h.assertTrue(Math.abs(fall.getDamageMultiplier()-.25F)<.001F,"a shared bearer takes 75 percent less fall damage");finish(h,owner);
     }
+    @GameTest(template="empty",batch="rework_each_92") public static void eventideAllyLinkFollowsABoundedBowedArc(GameTestHelper h){
+        var start=new net.minecraft.world.phys.Vec3(-4D,2D,3D);var end=new net.minecraft.world.phys.Vec3(5D,5D,-2D);
+        for(int sample=1;sample<=5;sample++){
+            var point=GraviticBalanceLinkGeometry.point(start,end,sample);double t=sample/6D;
+            var linear=start.lerp(end,t);
+            h.assertTrue(Double.isFinite(point.x)&&Double.isFinite(point.y)&&Double.isFinite(point.z),"the shared gravity thread stays finite");
+            h.assertTrue(point.distanceTo(linear)<.5D,"each gravity thread point stays within the compact bowed arc");
+            if(sample==3)h.assertTrue(point.y>linear.y+.25D,"the middle of the ally link rises visibly above its straight path");
+        }
+        var low=GraviticBalanceLinkGeometry.point(start,end,1);var clampedLow=GraviticBalanceLinkGeometry.point(start,end,0);
+        var high=GraviticBalanceLinkGeometry.point(start,end,5);var clampedHigh=GraviticBalanceLinkGeometry.point(start,end,99);
+        h.assertTrue(low.equals(clampedLow)&&high.equals(clampedHigh),"invalid particle sample indices clamp to the five bounded interior points");h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_26") public static void eventideBoundaryFlowShowsSelectedGravityPolarity(GameTestHelper h){
         for(int axis=0;axis<6;axis++){
             var inward=ArtifactFeedback.eventideFlowDirection(0,axis);var outward=ArtifactFeedback.eventideFlowDirection(1,axis);

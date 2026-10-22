@@ -1,4 +1,4 @@
-# Compatibilidad del catálogo 5.10.336
+# Compatibilidad del catálogo 5.10.337
 
 La referencia local es `/home/Santipdr/.sklauncher/instances/ghouls/mods/`, no
 una integración certificada. Hay Forge 1.20.1, Terramity 0.9.8, Create, Relics,

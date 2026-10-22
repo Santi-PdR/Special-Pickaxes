@@ -400,7 +400,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var balance=io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get();
-        for(var ally:allies)grant(ally,balance,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyAnchored=!ally.hasEffect(balance);
+            grant(ally,balance,0,PASSIVE_LEASE_TICKS);
+            if(newlyAnchored)ArtifactFeedback.graviticBalanceLink(owner,ally);
+        }
     }
 
     /** Worldloom lends its slow custom healing pulses to a small, nearby allied group. */
