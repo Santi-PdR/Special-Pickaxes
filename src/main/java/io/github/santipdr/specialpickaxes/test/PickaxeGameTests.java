@@ -470,21 +470,23 @@ public final class PickaxeGameTests {
                 "Worldbreaker's Absorption II never shortens an externally supplied Absorption effect");
         finish(h,choir);
     }
-    @GameTest(template="empty",batch="rework_each_23") public static void seamRipperMinesAnEasySameMaterialVein(GameTestHelper h) {
+    @GameTest(template="empty",batch="rework_each_23") public static void seamRipperFollowsSameMaterialVeinsAcrossDiagonals(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var seed=target(h);var level=h.getLevel();
         var trail=new ArrayList<BlockPos>();for(int i=0;i<8;i++)trail.add(seed.east(i));
         h.assertTrue(ArtifactFeedback.seamTrail(p,trail)==4,"a vein pulse draws at most four recent adjacent links");
         h.assertTrue(ArtifactFeedback.seamTrail(p,List.of(seed,seed.offset(10,0,0)))==0,"the private trail skips distant, disconnected breaks");
-        var sameA=seed.east();var sameB=sameA.east();var mixed=seed.west();var ore=seed.below();var placed=seed.above();
-        for(var pos:List.of(seed,sameA,sameB,mixed,ore,placed))PlayerPlacedBlocks.get(level).unmark(pos);
+        var sameA=seed.east();var sameB=sameA.east();var diagonal=seed.offset(1,1,1);var mixed=seed.west();var ore=seed.below();var placed=seed.above();
+        for(var pos:List.of(seed,sameA,sameB,diagonal,mixed,ore,placed))PlayerPlacedBlocks.get(level).unmark(pos);
         level.setBlockAndUpdate(sameA,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(sameB,Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(diagonal,Blocks.STONE.defaultBlockState());
         level.setBlockAndUpdate(mixed,Blocks.GRANITE.defaultBlockState());level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         level.setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(seed));
         h.assertTrue(ArtifactInteraction.modeCount(ArtifactKind.SEAM_RIPPER)==1,"Seam R is a single, clear ability without obsolete A/B modes");
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,false),"R starts a same-material vein with an empty offhand");
         for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(level.getBlockState(seed).isAir()&&level.getBlockState(sameA).isAir()&&level.getBlockState(sameB).isAir(),"all connected natural stone is mined");
+        h.assertTrue(level.getBlockState(seed).isAir()&&level.getBlockState(sameA).isAir()&&level.getBlockState(sameB).isAir()
+                        &&level.getBlockState(diagonal).isAir(),"connected natural stone, including a block touching only at a 3D corner, is mined");
         h.assertTrue(level.getBlockState(mixed).is(Blocks.GRANITE)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),"different geology and ores are preserved");
         h.assertTrue(level.getBlockState(placed).is(Blocks.STONE),"player-placed geology is preserved");
         PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
