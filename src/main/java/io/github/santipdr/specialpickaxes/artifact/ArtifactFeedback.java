@@ -30,6 +30,8 @@ public final class ArtifactFeedback {
     private record WardAudienceCache(ServerLevel level,long tick,Vec3 center,List<ServerPlayer> audience) {}
     private static final Map<UUID,WardAudienceCache> WARD_AUDIENCE_CACHE=new HashMap<>();
     private static final RelicParticleBudget AURA_PARTICLE_BUDGET=new RelicParticleBudget(4096);
+    private static final int MAX_ENTITY_AURA_VIEWERS=8;
+    private static final int ENTITY_AURA_VIEW_RADIUS=24;
     private static final BlockParticleOption WORLDLOOM_ROOT=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState());
     private static final DustParticleOptions WORLDLOOM_GLEAM=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),.86F);
@@ -126,13 +128,22 @@ public final class ArtifactFeedback {
                     sample.dx(),sample.dy(),sample.dz(),sample.speed());
         }
     }
-    /** Sends player auras to a capped local audience, while keeping mob debuffs visible to normal trackers. */
+    /** Sends player auras to a capped local audience, while bounding mob-effect particles by viewers too. */
     public static void entityAuraPulse(net.minecraft.server.level.ServerLevel level,LivingEntity entity,List<AuraParticle> particles){
         if(particles.isEmpty())return;
         if(entity instanceof ServerPlayer wearer){nearbyWardPulse(wearer,particles);return;}
-        if(!reserveAuraParticles(level.getServer().getTickCount(),particleCount(particles),1))return;
-        for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
+        var audience=entityAuraAudience(level,entity);
+        if(audience.isEmpty()||!reserveAuraParticles(level.getServer().getTickCount(),particleCount(particles),audience.size()))return;
+        for(var viewer:audience)for(var sample:particles){var at=sample.position();level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,
                 sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+    }
+    /** Selects at most eight nearest visible players inside 24 blocks for a mob's cosmetic pulse. */
+    public static List<ServerPlayer> entityAuraAudience(ServerLevel level,LivingEntity entity){
+        Vec3 center=entity.position();double rangeSqr=(double)ENTITY_AURA_VIEW_RADIUS*ENTITY_AURA_VIEW_RADIUS;
+        return EntitySelection.nearest(level,ServerPlayer.class,entity.getBoundingBox().inflate(ENTITY_AURA_VIEW_RADIUS),
+                viewer->viewer.isAlive()&&!viewer.isSpectator()&&!entity.isInvisibleTo(viewer)
+                        &&viewer.distanceToSqr(center)<=rangeSqr,
+                center,MAX_ENTITY_AURA_VIEWERS,512);
     }
     private static int particleCount(List<AuraParticle> particles){
         long total=0;for(var sample:particles)total+=Math.max(1,sample.count());

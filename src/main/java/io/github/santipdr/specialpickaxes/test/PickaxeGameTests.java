@@ -2039,6 +2039,25 @@ public final class PickaxeGameTests {
                 "the root ring uses opposing points instead of piling vines on one side");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_99") public static void mobAuraAudienceIsLocalCappedAndBudgetable(GameTestHelper h){
+        var level=h.getLevel();var mob=EntityType.ZOMBIE.create(level);var anchor=h.absolutePos(new BlockPos(5,2,6));
+        mob.setPos(anchor.getX()+.5D,anchor.getY(),anchor.getZ()+.5D);level.addFreshEntity(mob);
+        var eligible=new ArrayList<ServerPlayer>();
+        for(int i=0;i<9;i++){
+            var viewer=player(h,ArtifactKind.PALIMPSEST,"AuraViewer"+i);viewer.setPos(mob.getX()+1+i,mob.getY(),mob.getZ());
+            level.addFreshEntity(viewer);eligible.add(viewer);
+        }
+        var spectator=player(h,ArtifactKind.PALIMPSEST,"AuraSpectator");spectator.setPos(mob.getX()+.5D,mob.getY(),mob.getZ());
+        spectator.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);level.addFreshEntity(spectator);
+        var distant=player(h,ArtifactKind.PALIMPSEST,"AuraDistant");distant.setPos(mob.getX()+26D,mob.getY(),mob.getZ());level.addFreshEntity(distant);
+        var audience=ArtifactFeedback.entityAuraAudience(level,mob);
+        h.assertTrue(audience.size()==8,"one mob aura is delivered to at most eight nearby players");
+        h.assertTrue(!audience.contains(spectator)&&!audience.contains(distant),"spectators and players beyond 24 blocks do not receive cosmetic pulses");
+        for(int i=1;i<audience.size();i++)h.assertTrue(audience.get(i-1).distanceToSqr(mob.position())<=audience.get(i).distanceToSqr(mob.position()),
+                "the capped aura audience chooses nearest viewers first");
+        h.assertTrue(eligible.containsAll(audience),"only eligible nearby players appear in the mob aura audience");
+        for(var viewer:eligible)viewer.discard();spectator.discard();distant.discard();mob.discard();h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_79") public static void heldAuraKeepsAValidOrbitWhenLookingVertically(GameTestHelper h){
         var upward=CurioAuraGeometry.handSide(new Vec3(0D,1D,0D));
         var downward=CurioAuraGeometry.handSide(new Vec3(0D,-1D,0D));
