@@ -241,6 +241,30 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_91") public static void eventideSharesGraviticBalanceWithThreeNearbyTeammates(GameTestHelper h){
+        var owner=player(h,ArtifactKind.EVENTIDE,"EventideShareOwner");var level=h.getLevel();var center=owner.position();
+        var allies=List.of(player(h,ArtifactKind.CHOIR,"GravityOne"),player(h,ArtifactKind.ICARUS,"GravityTwo"),
+                player(h,ArtifactKind.WORLDLOOM,"GravityThree"),player(h,ArtifactKind.PALIMPSEST,"GravityFour"));
+        var distant=player(h,ArtifactKind.AXIOM,"GravityDistant");var enemy=player(h,ArtifactKind.SEAM_RIPPER,"GravityEnemy");
+        var scoreboard=level.getScoreboard();var team=scoreboard.addPlayerTeam("eventide_"+owner.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("gravfoes_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(owner.getScoreboardName(),team);
+        for(var ally:allies)scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(distant.getScoreboardName(),team);scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        for(int i=0;i<allies.size();i++)allies.get(i).setPos(center.x+i+1D,center.y,center.z);
+        distant.setPos(center.x+7D,center.y,center.z);enemy.setPos(center.x+1D,center.y,center.z);
+        var participants=new ArrayList<ServerPlayer>();participants.add(owner);participants.addAll(allies);participants.add(distant);participants.add(enemy);
+        for(var participant:participants)level.addFreshEntity(participant);
+        ArtifactPassives.tick(owner,ArtifactKind.EVENTIDE);var balance=SpecialPickaxes.GRAVITIC_BALANCE.get();
+        h.assertTrue(owner.hasEffect(balance),"Eventide keeps its own Gravitic Balance");
+        for(int i=0;i<3;i++)h.assertTrue(allies.get(i).hasEffect(balance),"one of the three nearest teammates receives controlled descent");
+        h.assertTrue(!allies.get(3).hasEffect(balance)&&!distant.hasEffect(balance)&&!enemy.hasEffect(balance),
+                "the shared gravity ward excludes the fourth teammate, distant players and enemies");
+        allies.get(0).setDeltaMovement(0,-1D,0);balance.applyEffectTick(allies.get(0),0);
+        h.assertTrue(Math.abs(allies.get(0).getDeltaMovement().y+.24D)<.001D,"a shared bearer receives the controlled-descent effect");
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(allies.get(0),12F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.25F)<.001F,"a shared bearer takes 75 percent less fall damage");finish(h,owner);
+    }
     @GameTest(template="empty",batch="rework_each_26") public static void eventideBoundaryFlowShowsSelectedGravityPolarity(GameTestHelper h){
         for(int axis=0;axis<6;axis++){
             var inward=ArtifactFeedback.eventideFlowDirection(0,axis);var outward=ArtifactFeedback.eventideFlowDirection(1,axis);

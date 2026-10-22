@@ -184,7 +184,10 @@ public final class ArtifactPassives {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
                 shareChoirMiningFocus(player);
             }
-            case EVENTIDE -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(), 0, PASSIVE_LEASE_TICKS);
+            case EVENTIDE -> {
+                grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(),0,PASSIVE_LEASE_TICKS);
+                shareGraviticBalance(player);
+            }
             // Keep the thermal ward leased before contact so its attack hook can cancel the first lava/fire tick.
             case CRUCIBLE -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(),0,PASSIVE_LEASE_TICKS);
@@ -387,6 +390,17 @@ public final class ArtifactPassives {
             grant(ally,ward,0,PASSIVE_LEASE_TICKS);
             if(newlyAnchored)ArtifactFeedback.stasisWardLink(owner,ally);
         }
+    }
+
+    /** Eventide lends its controlled descent and reduced fall damage to nearby teammates. */
+    private static void shareGraviticBalance(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.EVENTIDE,"eventideBalanceAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var balance=io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get();
+        for(var ally:allies)grant(ally,balance,0,PASSIVE_LEASE_TICKS);
     }
 
     /** Worldloom lends its slow custom healing pulses to a small, nearby allied group. */
