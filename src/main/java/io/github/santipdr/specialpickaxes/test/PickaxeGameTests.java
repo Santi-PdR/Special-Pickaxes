@@ -78,14 +78,19 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick-1,1024,4),"the shared aura allowance refreshes next tick");
         h.succeed();
     }
-    @GameTest(template="empty",batch="rework_each_86") public static void compactManualGridMapsScrolledPixelsToTheVisiblePick(GameTestHelper h){
-        h.assertTrue(ManualChoiceGrid.indexAt(1,0,36,3,40,21)==3,
-                "a 36-pixel scroll starts on the partially visible second row, not row 37");
-        h.assertTrue(ManualChoiceGrid.indexAt(81,6,36,3,40,21)==8,
-                "the clicked column and next row resolve to the matching pick");
-        h.assertTrue(ManualChoiceGrid.indexAt(120,0,0,3,40,21)==-1
-                        &&ManualChoiceGrid.indexAt(-1,0,0,3,40,21)==-1,
-                "coordinates outside the visible grid cannot select a pick");
+    @GameTest(template="empty",batch="rework_each_96") public static void manualLayoutKeepsPanelsAndScrollRegionsDisjoint(GameTestHelper h){
+        for(int width:new int[]{0,320,640,1920})for(int height:new int[]{0,100,200,540,1080}){
+            for(boolean pickerEnabled:new boolean[]{false,true}){
+                var layout=ManualScreenLayout.calculate(width,height,pickerEnabled);
+                var panel=layout.panel();var content=layout.content();var picker=layout.picker();
+                h.assertTrue(content.width()>=0&&content.height()>=0,"manual content has nonnegative dimensions");
+                h.assertTrue(content.x()>=panel.x()&&content.right()<=panel.right()&&content.y()>=panel.y()&&content.bottom()<=panel.bottom(),"manual content stays inside its panel");
+                h.assertTrue(layout.footerY()>=panel.y()&&layout.footerY()<=panel.bottom(),"manual footer stays inside its panel");
+                if(layout.pickerVisible())h.assertTrue(picker.width()>0&&picker.height()>0&&picker.bottom()<=content.y()&&picker.right()<=panel.right(),"copy picker stays above, and separate from, scroll content");
+            }
+        }
+        h.assertTrue(ManualScreenLayout.choiceIndexAt(1,0,24,13)==0&&ManualScreenLayout.choiceIndexAt(1,48,24,13)==2,"horizontal wheel scrolling maps visible pick icons to their source entries");
+        h.assertTrue(ManualScreenLayout.choiceIndexAt(23,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(-1,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(1,0,24,2)==0,"cell gaps and out-of-range clicks cannot select a pick");
         h.succeed();
     }
 

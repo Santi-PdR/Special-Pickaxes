@@ -416,6 +416,7 @@
   "curios.identifier.pickaxe": "Pico reliquia",
   "screen.specialpickaxes.manual": "Manual de reliquias",
   "screen.specialpickaxes.manual_hint": "GUÍA DE PICOS",
+  "screen.specialpickaxes.resize": "Aumenta la ventana para ver la guía",
   "screen.specialpickaxes.copy_help": "Elige un pico; el Rompemundos usa sus habilidades R y X.",
   "screen.specialpickaxes.selected": "Seleccionado: %s",
   "screen.specialpickaxes.passive": "PASIVA",
