@@ -1091,6 +1091,12 @@ public final class PickaxeGameTests {
         for(int tick=0;tick<40;tick++)
             h.assertTrue(StarfallWardEffect.shouldPredictiveScan(tick,1)!=StarfallWardEffect.shouldPredictiveScan(tick,2),
                     "adjacent entity IDs scan on opposite ticks instead of spiking the same server tick");
+        for(int tick=0;tick<40;tick++)
+            h.assertTrue(!StarfallWardEffect.shouldPredictiveScan(tick,1,100,101),
+                    "a recharging ward skips projectile broadphase entirely");
+        int rechargedScans=0;
+        for(int tick=0;tick<40;tick++)if(StarfallWardEffect.shouldPredictiveScan(tick,1,100,100))rechargedScans++;
+        h.assertTrue(rechargedScans==20,"predictive scans resume on the existing staggered cadence as soon as the ward is ready");
         h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_43") public static void exodiumCuriosStarfallWardSoftensProjectileDamage(GameTestHelper h){
