@@ -416,8 +416,10 @@ public final class ArtifactPassives {
                 center,4,128);
         var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
         for(var ally:allies){
+            boolean newlyRenewed=!ally.hasEffect(renewal);
             grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
             sustain(ally);
+            if(newlyRenewed)ArtifactFeedback.heartwoodRenewalLink(owner,ally);
         }
     }
 

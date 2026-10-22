@@ -6,6 +6,19 @@ import net.minecraft.world.phys.Vec3;
 public final class CurioAuraGeometry {
     private CurioAuraGeometry() {}
 
+    /** Five bounded samples bow a one-time passive link above the straight path between allies. */
+    public static Vec3 sharedAllyLinkPoint(Vec3 start,Vec3 end,int sample,double lift){
+        int bounded=Math.max(1,Math.min(5,sample));
+        double t=bounded/6D;
+        Vec3 delta=end.subtract(start);
+        double horizontalLength=Math.sqrt(delta.x*delta.x+delta.z*delta.z);
+        double sideX=horizontalLength<1.0E-6D?0D:-delta.z/horizontalLength;
+        double sideZ=horizontalLength<1.0E-6D?0D:delta.x/horizontalLength;
+        double arch=Math.sin(Math.PI*t);
+        double curl=Math.sin(Math.PI*2D*t)*.12D;
+        return start.lerp(end,t).add(sideX*curl,.12D+Math.max(0D,Math.min(.5D,lift))*arch,sideZ*curl);
+    }
+
     /** Stable horizontal hand-orbit axis, including when the wearer aims straight up or down. */
     public static Vec3 handSide(Vec3 look){
         double horizontalSqr=look.x*look.x+look.z*look.z;

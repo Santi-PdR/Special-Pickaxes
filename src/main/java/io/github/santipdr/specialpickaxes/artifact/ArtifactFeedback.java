@@ -83,9 +83,22 @@ public final class ArtifactFeedback {
         Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=5;i++){
-            Vec3 point=GraviticBalanceLinkGeometry.point(start,end,i);
+            Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.34D);
             level.sendParticles(wearer,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
             level.sendParticles(ally,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
+    /** A small vine-and-gleam arc shows Worldloom's renewal reaching a newly supported teammate. */
+    public static void heartwoodRenewalLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
+        for(int i=1;i<=5;i++){
+            Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.22D);
+            var particle=(i&1)==0?WORLDLOOM_GLEAM:WORLDLOOM_ROOT;
+            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */
