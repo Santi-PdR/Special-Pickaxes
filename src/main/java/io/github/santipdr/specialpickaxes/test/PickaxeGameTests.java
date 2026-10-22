@@ -93,6 +93,18 @@ public final class PickaxeGameTests {
         h.assertTrue(ManualScreenLayout.choiceIndexAt(23,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(-1,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(1,0,24,2)==0,"cell gaps and out-of-range clicks cannot select a pick");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_97") public static void magmaBrandStopsWhenItsOwnerLosesPermission(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC,"MagmaBrandOwner");h.getLevel().addFreshEntity(owner);
+        var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();float health=target.getHealth();
+        h.assertTrue(MagmaBrandEffect.applyFrom(owner,target,80,0),"a permitted Hellspec owner applies the attributed brand");
+        brand.applyEffectTick(target,0);
+        h.assertTrue(target.getHealth()<health,"the first permitted Magma Brand pulse deals its custom damage");
+        float protectedHealth=target.getHealth();owner.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);
+        brand.applyEffectTick(target,0);
+        h.assertTrue(target.getHealth()==protectedHealth&&!target.hasEffect(brand),"the brand dissipates without damage when its owner loses build/PvP permission");
+        h.succeed();
+    }
 
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
@@ -744,7 +756,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaEruptionOnlyBrandsNearbyHostilesAndLeavesBlocksUntouched(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");var center=target(h);
+        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");h.getLevel().addFreshEntity(wearer);var center=target(h);
         var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(center.getX()+1.5D,center.getY()+1,center.getZ()+.5D);h.getLevel().addFreshEntity(enemy);
         var farEnemy=EntityType.ZOMBIE.create(h.getLevel());farEnemy.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+7.5D);h.getLevel().addFreshEntity(farEnemy);
         var ally=player(h,ArtifactKind.CHOIR,"MagmaAlly");ally.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+2.5D);

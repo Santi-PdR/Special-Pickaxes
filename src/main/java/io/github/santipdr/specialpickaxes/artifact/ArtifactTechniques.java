@@ -320,8 +320,7 @@ public final class ArtifactTechniques {
             target.setDeltaMovement(target.getDeltaMovement().scale(.2D).add(horizontal.scale(.38D)).add(0,.95D,0));
             target.hasImpulse=true;target.setSecondsOnFire(3);
             target.hurt(level.damageSources().playerAttack(player),5F);
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),80,0,true,false,true));
+            MagmaBrandEffect.applyFrom(player,target,80,0);
         }
         ArtifactFeedback.message(player,"magma_eruption",targets.size());
         return true;

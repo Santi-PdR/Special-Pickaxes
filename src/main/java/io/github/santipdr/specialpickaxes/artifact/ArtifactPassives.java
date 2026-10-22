@@ -163,7 +163,7 @@ public final class ArtifactPassives {
                 event.setAmount(event.getAmount()*.8F);
                 if(retaliationAllowed){
                     attacker.setSecondsOnFire(3);
-                    grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),0,40);
+                    MagmaBrandEffect.applyFrom(player,attacker,40,0);
                     ArtifactFeedback.burst(player,kind,attacker.blockPosition(),8);
                 }
             }
@@ -306,18 +306,22 @@ public final class ArtifactPassives {
     }
 
     /** Combat passives never replace an effect supplied by a server, potion or another relic. */
-    public static void grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
+    public static boolean grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
         var current=target.getEffect(effect);var data=target.getPersistentData();String key=combatLeaseKey(effect);
         boolean owned=data.getBoolean(key)||data.getBoolean(passiveLeaseKey(effect));
         if(effect==MobEffects.ABSORPTION&&data.getBoolean(ABSORPTION_LEASE)&&current!=null&&isAbsorptionLease(current))owned=true;
         if(owned&&(current==null||!isPassiveLease(current))){data.remove(key);owned=false;}
         if(current==null){
-            target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+            boolean added=target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+            if(!added)return false;
             data.putBoolean(key,true);
+            return true;
         }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
             target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
             data.putBoolean(key,true);
+            return true;
         }
+        return owned&&current!=null&&isPassiveLease(current);
     }
 
     /** Clears only a combat/passive lease owned by this mod, preserving potion and server effects. */
