@@ -13,8 +13,8 @@ public final class OreDropHighlight {
     private static final String OWNER="specialpickaxesIridiumOwner";
     private static final String NEXT_LODE_SENSE="specialpickaxesLodeSenseNextAt";
     private static final int MAX_SPARK_BURSTS_PER_TICK=32;
-    private static final int PASSIVE_PULL_RADIUS=6;
-    private static final int PASSIVE_PULL_TARGETS=12;
+    private static final int PASSIVE_PULL_RADIUS=8;
+    private static final int PASSIVE_PULL_TARGETS=16;
     private static final int PASSIVE_PULL_INTERVAL=10;
     private static final int MAX_PULL_TRAILS=4;
     private static final DustParticleOptions SPARK=new DustParticleOptions(new Vector3f(.32F,.95F,.82F),.72F);

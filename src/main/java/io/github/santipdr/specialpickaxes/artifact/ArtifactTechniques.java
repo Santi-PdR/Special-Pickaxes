@@ -23,6 +23,7 @@ import java.util.Set;
 
 /** Bounded held-tool alternate actions. Curios equipment grants passives only. */
 public final class ArtifactTechniques {
+    public static final int IRIDIUM_RECALL_RADIUS=48;
     private ArtifactTechniques() {}
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
@@ -226,25 +227,30 @@ public final class ArtifactTechniques {
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
-        int[] recalled = {0}, inspected = {0}, visualized = {0};
+        int[] inspected = {0};var targets=new ArrayList<ItemEntity>(Math.min(cap,96));
         // Stop without materializing the full ItemEntity list around a dense farm.
         player.serverLevel().getEntities().get(net.minecraft.world.level.entity.EntityTypeTest.forClass(ItemEntity.class),
                 player.getBoundingBox().inflate(radius), item -> {
             if(++inspected[0]>4096)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
-            if(!isIridiumRecallTarget(player,item,center,radius))
-                return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
-            Vec3 delta = center.subtract(item.position());
-            item.setGlowingTag(true);
-            if(delta.lengthSqr()<.25)return net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
-            item.setDeltaMovement(item.getDeltaMovement().scale(.2).add(delta.normalize().scale(.85)));
-            item.hasImpulse=true;
-            if(visualized[0]<24){ArtifactFeedback.burst(player,ArtifactKind.IRIDIUM,item.blockPosition(),4);visualized[0]++;}
-            if(++recalled[0]>=cap)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
+            if(isIridiumRecallTarget(player,item,center,radius))targets.add(item);
             return inspected[0]>=4096?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
                     :net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });
-        if(recalled[0]>0)ArtifactFeedback.message(player,"ore_drops_recalled",recalled[0]);
-        return recalled[0]>0;
+        targets.sort(Comparator.comparingDouble(item->item.position().distanceToSqr(center)));
+        int recalled=0,visualized=0;
+        for(var item:targets){
+            if(recalled>=cap)break;
+            Vec3 delta = center.subtract(item.position());
+            item.setGlowingTag(true);
+            if(delta.lengthSqr()>=.25){
+                item.setDeltaMovement(item.getDeltaMovement().scale(.2).add(delta.normalize().scale(.85)));
+                item.hasImpulse=true;
+            }
+            if(visualized<24){ArtifactFeedback.burst(player,ArtifactKind.IRIDIUM,item.blockPosition(),4);visualized++;}
+            recalled++;
+        }
+        if(recalled>0)ArtifactFeedback.message(player,"ore_drops_recalled",recalled);
+        return recalled>0;
     }
 
     /** Shared eligibility rule for the spatial query and its radius/ownership regression tests. */
@@ -340,7 +346,7 @@ public final class ArtifactTechniques {
             case AXIOM -> nullWard(player,8,24);
             case WORLDBREAKER -> echo(player, tool, 2);
             case EXODIUM -> starfallSink(player,tool);
-            case IRIDIUM -> recallIridiumDrops(player, 32, 96);
+            case IRIDIUM -> recallIridiumDrops(player, IRIDIUM_RECALL_RADIUS, 96);
             case HELLSPEC -> magmaEruption(player);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
