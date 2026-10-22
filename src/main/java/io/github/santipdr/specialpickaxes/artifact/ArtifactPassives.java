@@ -102,6 +102,31 @@ public final class ArtifactPassives {
         return true;
     }
 
+    /** Shared Null Veil gives each nearby bearer its own restrained first-hit counter. */
+    public static boolean onSharedNullVeilGuard(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event){
+        var veil=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get();
+        if(event.getAmount()<=0||!player.hasEffect(veil)
+                ||!player.getPersistentData().getBoolean(passiveLeaseKey(veil)))return false;
+        var equipped=CuriosCompat.find(player);
+        if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind==ArtifactKind.AXIOM)return false;
+        if(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.AXIOM)return false;
+        var source=event.getSource();LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
+        if(attacker==null){
+            Entity direct=source.getDirectEntity();if(!JegProjectileCompat.isProjectile(direct))return false;
+            Entity owner=JegProjectileCompat.owner(direct);if(owner instanceof LivingEntity living)attacker=living;
+        }
+        if(attacker==null||attacker==player||attacker.isAlliedTo(player))return false;
+        if(attacker instanceof Player other&&!player.canHarmPlayer(other))return false;
+        if(!WorldSafety.allowed(player,ArtifactKind.AXIOM,attacker.blockPosition()))return false;
+        var state=ArtifactState.of(player,ArtifactKind.AXIOM);long now=ArtifactState.now(player);
+        if(state.getLong("sharedNullVeilReady")>now)return false;
+        state.putLong("sharedNullVeilReady",now+160);
+        event.setAmount(event.getAmount()*.85F);
+        grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),0,60);
+        ArtifactFeedback.burst(player,ArtifactKind.AXIOM,player.blockPosition(),4);
+        return true;
+    }
+
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind,boolean sharedGuardApplied) {
         if(event.getAmount()<=0)return;
         // Interregnum's independent Stasis Ward handler also protects its Curios allies.

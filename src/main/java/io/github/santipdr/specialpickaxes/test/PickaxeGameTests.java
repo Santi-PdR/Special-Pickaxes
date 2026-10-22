@@ -1241,6 +1241,14 @@ public final class PickaxeGameTests {
         ArtifactPassives.tick(wearer,ArtifactKind.AXIOM);
         h.assertTrue(wearer.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom grants its custom passive veil while carried in Curios");
         h.assertTrue(ally.hasEffect(SpecialPickaxes.NULL_VEIL.get())&&!enemy.hasEffect(SpecialPickaxes.NULL_VEIL.get()),"Axiom shares the passive cleanse only with nearby teammates");
+        var sharedAttacker=EntityType.ZOMBIE.create(h.getLevel());sharedAttacker.setPos(ally.getX()+2,ally.getY(),ally.getZ());h.getLevel().addFreshEntity(sharedAttacker);
+        var sharedHit=new net.minecraftforge.event.entity.living.LivingHurtEvent(ally,h.getLevel().damageSources().mobAttack(sharedAttacker),10F);
+        h.assertTrue(ArtifactPassives.onSharedNullVeilGuard(ally,sharedHit)&&Math.abs(sharedHit.getAmount()-8.5F)<.001F
+                        &&sharedAttacker.hasEffect(SpecialPickaxes.NULL_MARK.get()),
+                "each ally wearing the shared Null Veil gets an independent first-hostile-hit reduction and Null Mark counter");
+        var sharedRapid=new net.minecraftforge.event.entity.living.LivingHurtEvent(ally,h.getLevel().damageSources().mobAttack(sharedAttacker),10F);
+        h.assertTrue(!ArtifactPassives.onSharedNullVeilGuard(ally,sharedRapid)&&Math.abs(sharedRapid.getAmount()-10F)<.001F,
+                "a shared Null Veil bearer's counter respects its own eight-second cooldown");
         NullVeilEffect.pulse(ally);
         h.assertTrue(!ally.hasEffect(MobEffects.WITHER),"a nearby ally receives Axiom's custom visible cleanse pulse");
         NullVeilEffect.pulse(wearer);

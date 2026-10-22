@@ -216,6 +216,7 @@ public final class SpecialPickaxes {
             StasisWardEffect.answerHostileHit(p,e);
             boolean sharedStarfallGuard=ArtifactPassives.onSharedStarfallGuard(p,e);
             ArtifactPassives.onSharedHeartwoodGuard(p,e);
+            ArtifactPassives.onSharedNullVeilGuard(p,e);
             var equipped=CuriosCompat.find(p);
             if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind!=ArtifactKind.INTERREGNUM)
                 ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
