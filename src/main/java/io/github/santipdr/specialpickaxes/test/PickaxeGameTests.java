@@ -2024,6 +2024,21 @@ public final class PickaxeGameTests {
         h.assertTrue(highest-lowest>.45D&&highest-lowest<.9D,"the passive reads as a rising spiral rather than a flat orbit");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_98") public static void heartwoodGraspRootsStayAtTheTargetsFeet(GameTestHelper h){
+        var feet=new Vec3(2D,5D,-3D);
+        for(int i=0;i<4;i++){
+            var point=HeartwoodGraspEffect.rootFootPoint(feet,1.1D,i);
+            double height=point.y-feet.y,radius=Math.hypot(point.x-feet.x,point.z-feet.z);
+            h.assertTrue(height>=.03D&&height<=.08D,"root particles remain grounded around the target's feet");
+            h.assertTrue(radius>=.25D&&radius<=.33D,"the four roots make a close ring around the trapped target");
+        }
+        var first=HeartwoodGraspEffect.rootFootPoint(feet,1.1D,0);
+        var opposite=HeartwoodGraspEffect.rootFootPoint(feet,1.1D,2);
+        h.assertTrue(Math.abs((first.x+opposite.x)*.5D-feet.x)<.001D
+                        &&Math.abs((first.z+opposite.z)*.5D-feet.z)<.001D,
+                "the root ring uses opposing points instead of piling vines on one side");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_79") public static void heldAuraKeepsAValidOrbitWhenLookingVertically(GameTestHelper h){
         var upward=CurioAuraGeometry.handSide(new Vec3(0D,1D,0D));
         var downward=CurioAuraGeometry.handSide(new Vec3(0D,-1D,0D));

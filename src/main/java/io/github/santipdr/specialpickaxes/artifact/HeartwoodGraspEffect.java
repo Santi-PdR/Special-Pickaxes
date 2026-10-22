@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /** Worldloom's Curios counter catches one hostile attacker in a brief, visible root drag. */
@@ -32,19 +33,23 @@ public final class HeartwoodGraspEffect extends MobEffect {
         entity.setDeltaMovement(motion.x*drag,motion.y,motion.z*drag);
         entity.hasImpulse=true;
         if(entity.tickCount%10==0&&entity.level() instanceof ServerLevel level){
-            double phase=entity.tickCount*.16D;
-            double radius=Math.max(.24D,entity.getBbWidth()*.48D);
+            double phase=level.getGameTime()*.16D;
+            Vec3 feet=new Vec3(entity.getX(),entity.getY(),entity.getZ());
+            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(6);
             for(int i=0;i<4;i++){
-                double angle=phase+i*Math.PI*.5D;
-                double x=entity.getX()+Math.cos(angle)*radius;
-                double z=entity.getZ()+Math.sin(angle)*radius;
-                // Each mote climbs to the next band, making the four-pulse wrap legible as roots.
-                double rise=((entity.tickCount/10L+i)%4L)*.16D;
-                double y=entity.getY()+.1D+rise;
-                level.sendParticles(ROOTS,x,y,z,1,.015D,.025D,.015D,.003D);
-                if((i&1)==0)level.sendParticles(HEARTWOOD,x,y+.08D,z,1,0,.02D,0,0);
+                Vec3 point=rootFootPoint(feet,phase,i);
+                particles.add(new ArtifactFeedback.AuraParticle(ROOTS,point,1,.015D,.025D,.015D,.003D));
+                if((i&1)==0)particles.add(new ArtifactFeedback.AuraParticle(HEARTWOOD,point.add(0,.08D,0),1,0,.02D,0,0));
             }
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
+    }
+
+    /** Compact animated ring at the target's feet makes the root snare read as ground restraint. */
+    public static Vec3 rootFootPoint(Vec3 feet,double phase,int root){
+        double angle=phase+Math.floorMod(root,4)*Math.PI*.5D;
+        double radius=.29D+.035D*Math.sin(phase+root*.4D);
+        return feet.add(Math.cos(angle)*radius,.055D+.018D*Math.sin(phase*2D+root),Math.sin(angle)*radius);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%4==0;}
