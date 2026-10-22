@@ -141,13 +141,16 @@ public final class ArtifactManualScreen extends Screen {
     private void drawCards(GuiGraphics g,List<Card> cards,int x,int y,int cardWidth,int viewportTop,int viewportBottom){
         int cursor=y;
         for(Card card:cards){
+            if(cursor>=viewportBottom)break;
             int cardBottom=cursor+card.height;
-            if(cardBottom>viewportTop&&cursor<viewportBottom){
+            if(cardBottom>viewportTop){
                 g.fill(x,cursor,x+cardWidth,cardBottom,0xff111a23);
                 g.fill(x+1,cursor+1,x+cardWidth-1,cardBottom-1,0xff1b2733);
+                g.fill(x,cursor,x+cardWidth,cursor+1,0xff435667);
+                g.fill(x,cardBottom-1,x+cardWidth,cardBottom,0xff0b1118);
                 g.fill(x,cursor,x+3,cardBottom,card.section.color);
                 g.fill(x+3,cursor+1,x+cardWidth-1,cursor+18,0xff243443);
-                g.fill(x+3,cursor+1,x+cardWidth-1,cursor+2,0xff425565);
+                g.fill(x+3,cursor+17,x+cardWidth-1,cursor+18,0xff314555);
                 g.drawString(font,card.section.heading,x+10,cursor+5,card.section.color,false);
                 int lineY=cursor+21;
                 for(var line:card.lines){g.drawString(font,line,x+10,lineY,0xffd2dce5,false);lineY+=LINE_HEIGHT;}

@@ -1478,10 +1478,18 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",3);p.setOnGround(false);
         var origin=p.blockPosition().below();h.getLevel().setBlockAndUpdate(origin,Blocks.BEDROCK.defaultBlockState());
         h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,new DirectionalProgram(origin,Direction.DOWN,DirectionalProgram.Shape.CORE_DRILL)),"Core Drill job starts");
-        h.assertTrue(WorkQueue.protectsFall(p),"Core Drill immediately protects its descent");drain(p);
+        var activeFall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,24F,1F);MinecraftForge.EVENT_BUS.post(activeFall);
+        h.assertTrue(WorkQueue.protectsFall(p)&&activeFall.isCanceled(),"Core Drill immediately cancels fall damage during descent");
+        h.assertTrue(WorkQueue.togglePause(p),"Core Drill can pause without losing its safety guard");WorkQueue.tick();
+        var pausedFall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,24F,1F);MinecraftForge.EVENT_BUS.post(pausedFall);
+        h.assertTrue(pausedFall.isCanceled()&&p.hasEffect(MobEffects.SLOW_FALLING),"fall safety remains active while the drill is paused");
+        h.assertTrue(WorkQueue.togglePause(p),"Core Drill resumes with the same guard");drain(p);
         h.assertTrue(!WorkQueue.busy(p)&&WorkQueue.protectsFall(p),"protection remains after mining ends while the player is airborne");
-        h.assertTrue(p.hasEffect(MobEffects.SLOW_FALLING),"Slow Falling remains refreshed for the descent");
-        p.setOnGround(true);WorkQueue.tick();h.assertTrue(!WorkQueue.protectsFall(p),"landing releases the temporary fall guard");finish(h,p);
+        var afterDrillFall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,24F,1F);MinecraftForge.EVENT_BUS.post(afterDrillFall);
+        h.assertTrue(afterDrillFall.isCanceled()&&p.hasEffect(MobEffects.SLOW_FALLING),"fall safety continues after the drill finishes until the player lands");
+        p.setOnGround(true);WorkQueue.tick();h.assertTrue(!WorkQueue.protectsFall(p),"landing releases the temporary fall guard");
+        var landedFall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,24F,1F);MinecraftForge.EVENT_BUS.post(landedFall);
+        h.assertTrue(!landedFall.isCanceled(),"the temporary guard cannot cancel later falls after landing");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_12") public static void icarianLiftStopsAtProtectedBarrier(GameTestHelper h) {
         var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();

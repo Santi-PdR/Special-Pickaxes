@@ -2,6 +2,7 @@ package io.github.santipdr.specialpickaxes.client;
 
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.ArtifactItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
@@ -13,6 +14,10 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ArtifactHud {
     private ArtifactHud() {}
+    /** A full-screen guide owns the view; inventory/JEI tooltips behind it must not cover its cards. */
+    @SubscribeEvent public static void manualTooltip(net.minecraftforge.client.event.RenderTooltipEvent.Pre e){
+        if(Minecraft.getInstance().screen instanceof ArtifactManualScreen)e.setCanceled(true);
+    }
     @SubscribeEvent public static void tooltip(net.minecraftforge.client.event.RenderTooltipEvent.GatherComponents e){if(e.getItemStack().getItem() instanceof ArtifactItem)e.setMaxWidth(320);}
     @SubscribeEvent public static void levels(net.minecraftforge.event.entity.player.ItemTooltipEvent e){
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
