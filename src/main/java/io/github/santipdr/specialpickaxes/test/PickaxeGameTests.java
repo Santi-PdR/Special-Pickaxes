@@ -49,7 +49,7 @@ public final class PickaxeGameTests {
         h.assertTrue(Arrays.stream(buckets).allMatch(count->count==100),"Curios scans distribute evenly across all ten ticks");
         h.succeed();
     }
-    @GameTest(template="empty",batch="rework_each_75") public static void cosmeticCuriosAuraScanUsesEightTickCadence(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_75") public static void cosmeticCuriosAuraRespectsParticleQualityCadence(GameTestHelper h){
         h.assertTrue(CurioAuraSchedule.due(40,Integer.MIN_VALUE),"the first nearby aura scan starts immediately");
         h.assertTrue(!CurioAuraSchedule.due(47,40)&&CurioAuraSchedule.due(48,40),"the visual scan refreshes every eight ticks");
         h.assertTrue(CurioAuraSchedule.due(1,200),"a fresh client level or wrapped tick counter refreshes immediately");
@@ -57,6 +57,10 @@ public final class PickaxeGameTests {
                         &&CurioAuraSchedule.particleDue(40)&&!CurioAuraSchedule.particleDue(44)
                         &&CurioAuraSchedule.particleDue(45),
                 "passive signatures emit smoothly at four updates per second");
+        h.assertTrue(CurioAuraSchedule.particleDue(40,5)&&!CurioAuraSchedule.particleDue(45,10)
+                        &&CurioAuraSchedule.particleDue(50,10)&&!CurioAuraSchedule.particleDue(65,20)
+                        &&CurioAuraSchedule.particleDue(80,20),
+                "the reduced and minimal particle settings use progressively slower aura cadences");
         h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_85") public static void relicEffectsShareOneWholeBurstBudgetPerServerTick(GameTestHelper h){

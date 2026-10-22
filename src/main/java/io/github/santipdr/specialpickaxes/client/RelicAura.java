@@ -3,6 +3,7 @@ package io.github.santipdr.specialpickaxes.client;
 import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import io.github.santipdr.specialpickaxes.artifact.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.particles.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.ItemStack;
@@ -34,38 +35,43 @@ public final class RelicAura {
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null){heldKind=null;clearNearbyCache();return;}
         if(scanOwner!=mc.player||scanLevel!=mc.level){clearNearbyCache();scanOwner=mc.player;scanLevel=mc.level;}
-        if(mc.isPaused()||mc.options.hideGui||!CurioAuraSchedule.particleDue(mc.player.tickCount))return;
+        if(mc.isPaused()||mc.options.hideGui)return;
+        ParticleStatus quality=mc.options.particles().get();
+        int particleInterval=switch(quality){case ALL->CurioAuraSchedule.PARTICLE_INTERVAL_TICKS;case DECREASED->10;case MINIMAL->20;};
+        if(!CurioAuraSchedule.particleDue(mc.player.tickCount,particleInterval))return;
         ArtifactItem held=mc.player.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
         if(held!=null){
             if(heldKind!=held.kind){heldKind=held.kind;
                 var action=RelicControl.Action.ACTIVATE;
                 mc.player.displayClientMessage(mc.player.getMainHandItem().getHoverName().copy().append(" · ").append(RelicKeys.name(action)).append(" → ").append(net.minecraft.network.chat.Component.translatable("key.specialpickaxes."+action.name().toLowerCase(java.util.Locale.ROOT))),true);
             }
-            emitHeld(mc,mc.player,held,mc.player.getMainHandItem());
+            emitHeld(mc,mc.player,held,mc.player.getMainHandItem(),quality);
         } else heldKind=null;
         var curio=CuriosCompat.find(mc.player);
         if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
-                &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item);
+                &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item,quality);
 
-        // Aura animation updates four times per second with at most four nearby signatures;
-        // costly nearby-player and Curios inventory lookups refresh every eight ticks.
-        if(CurioAuraSchedule.due(mc.player.tickCount,lastNearbyScanTick))
+        // Reduced client settings lower visual work, while Minimal skips discovery of other wearers entirely.
+        int nearbyLimit=switch(quality){case ALL->MAX_VISIBLE_NEARBY_AURAS;case DECREASED->2;case MINIMAL->0;};
+        if(nearbyLimit>0&&CurioAuraSchedule.due(mc.player.tickCount,lastNearbyScanTick))
             refreshNearbyWearers(mc);
         int visibleAuras=0;
+        if(nearbyLimit>0){
         for(var viewer:nearbyCandidates){
             if(!visibleToLocal(mc,viewer))continue;
             ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
-            if(heldRelic!=null&&visibleAuras<MAX_VISIBLE_NEARBY_AURAS){
-                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleAuras++;
+            if(heldRelic!=null&&visibleAuras<nearbyLimit){
+                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem(),quality);visibleAuras++;
             }
         }
         for(var entry:nearbyCurios){
             if(!visibleToLocal(mc,entry.player()))continue;
             ArtifactItem heldRelic=entry.player().getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
             if(heldRelic!=null&&heldRelic.kind==entry.relic().kind)continue;
-            if(visibleAuras>=MAX_VISIBLE_NEARBY_AURAS)break;
-            emitCurios(mc,entry.player(),entry.relic());
+            if(visibleAuras>=nearbyLimit)break;
+            emitCurios(mc,entry.player(),entry.relic(),quality);
             visibleAuras++;
+        }
         }
     }
     private static void refreshNearbyWearers(Minecraft mc){
@@ -101,21 +107,22 @@ public final class RelicAura {
         scanOwner=null;scanLevel=null;lastNearbyScanTick=Integer.MIN_VALUE;
         nearbyCandidates=java.util.List.of();nearbyCurios=java.util.List.of();
     }
-    private static void emitHeld(Minecraft mc,Player player,ArtifactItem item,ItemStack tool){
+    private static void emitHeld(Minecraft mc,Player player,ArtifactItem item,ItemStack tool,ParticleStatus quality){
         var look=player.getLookAngle();var side=CurioAuraGeometry.handSide(look);
         var hand=player.getEyePosition().add(look.scale(0.65)).add(side.scale(0.3)).add(0,-0.3,0);
         double angle=player.tickCount*0.12+item.kind.ordinal()+ArtifactTooltips.mode(tool)*0.22;
         var dust=HELD_DUST.get(item.kind);
         ParticleOptions accent=accent(item.kind,dust);
-        for(int i=0;i<3;i++){
+        int points=quality==ParticleStatus.ALL?3:quality==ParticleStatus.DECREASED?2:1;
+        for(int i=0;i<points;i++){
             double orbit=angle+i*Math.PI*2/3,radius=0.055+i*0.022;
             var at=hand.add(side.scale(Math.cos(orbit)*radius)).add(0,Math.sin(orbit)*0.075,0).add(look.scale(Math.sin(orbit)*radius));
             mc.level.addParticle(dust,at.x,at.y,at.z,0,0.008,0);
-            if(i==0)mc.level.addParticle(accent,at.x,at.y,at.z,0,0.006,0);
+            if(i==0&&quality==ParticleStatus.ALL)mc.level.addParticle(accent,at.x,at.y,at.z,0,0.006,0);
         }
     }
     /** A restrained rotating belt halo makes the Curios passive visible without suggesting an active skill. */
-    private static void emitCurios(Minecraft mc,Player player,ArtifactItem item){
+    private static void emitCurios(Minecraft mc,Player player,ArtifactItem item,ParticleStatus quality){
         double phase=player.tickCount*0.075D+item.kind.ordinal()*0.61D;
         var dust=CURIOS_DUST.get(item.kind);
         int lodeCharges=0;
@@ -128,7 +135,8 @@ public final class RelicAura {
         double yaw=Math.toRadians(player.getYRot());
         boolean soaring=item.kind==ArtifactKind.ICARUS&&player.isSprinting()&&!player.isFallFlying()
                 &&player.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get());
-        int auraPoints=item.kind==ArtifactKind.ICARUS?8:4;
+        int basePoints=quality==ParticleStatus.ALL?4:quality==ParticleStatus.DECREASED?2:1;
+        int auraPoints=item.kind==ArtifactKind.ICARUS?basePoints*2:basePoints;
         for(int i=0;i<auraPoints;i++){
             double angle=phase+i*Math.PI/2D,radius=.42D+Math.sin(phase+i*.7D)*.035D;
             double x=player.getX()+Math.cos(angle)*radius,z=player.getZ()+Math.sin(angle)*radius;
