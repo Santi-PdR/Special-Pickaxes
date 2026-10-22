@@ -59,6 +59,13 @@ public final class PickaxeGameTests {
                 "passive signatures emit smoothly at four updates per second");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_85") public static void relicEffectsShareOneWholeBurstBudgetPerServerTick(GameTestHelper h){
+        var budget=new RelicParticleBudget(256);
+        h.assertTrue(budget.tryReserve(40,24)&&budget.tryReserve(40,232),"the global allowance accepts exact whole bursts up to its cap");
+        h.assertTrue(!budget.tryReserve(40,16),"an exhausted tick never leaks extra particle packets");
+        h.assertTrue(budget.tryReserve(41,24),"the particle allowance refreshes on the next server tick");
+        h.succeed();
+    }
 
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");

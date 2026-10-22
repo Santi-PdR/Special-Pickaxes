@@ -415,6 +415,7 @@
   "message.specialpickaxes.curio_cooldown": "That Curios skill is still recharging.",
   "curios.identifier.pickaxe": "Relic Pickaxe",
   "screen.specialpickaxes.manual": "Relic Manual",
+  "screen.specialpickaxes.manual_hint": "PICKAXE FIELD GUIDE",
   "screen.specialpickaxes.copy_help": "Choose a pickaxe; Worldbreaker uses its R and X skills.",
   "screen.specialpickaxes.selected": "Selected: %s",
   "screen.specialpickaxes.passive": "PASSIVE",

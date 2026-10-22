@@ -415,6 +415,7 @@
   "message.specialpickaxes.curio_cooldown": "Esa habilidad Curios todavía se está recargando.",
   "curios.identifier.pickaxe": "Pico reliquia",
   "screen.specialpickaxes.manual": "Manual de reliquias",
+  "screen.specialpickaxes.manual_hint": "GUÍA DE PICOS",
   "screen.specialpickaxes.copy_help": "Elige un pico; el Rompemundos usa sus habilidades R y X.",
   "screen.specialpickaxes.selected": "Seleccionado: %s",
   "screen.specialpickaxes.passive": "PASIVA",

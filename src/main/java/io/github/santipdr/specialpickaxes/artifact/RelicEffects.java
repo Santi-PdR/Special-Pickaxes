@@ -7,11 +7,11 @@ import org.joml.Vector3f;
 
 /** Short spatial signatures. A shared global packet budget is independent of gameplay throughput. */
 public final class RelicEffects {
-    private static long tick=Long.MIN_VALUE;private static int remaining;
+    private static final RelicParticleBudget PARTICLE_BUDGET=new RelicParticleBudget(256);
     private RelicEffects(){}
     public static void emit(ServerPlayer p,ArtifactKind k,String phase,Vec3 center){
-        long now=ArtifactState.now(p);if(tick!=now){tick=now;remaining=256;}
-        int count=k==ArtifactKind.WORLDBREAKER?24:16;if(remaining<count)return;remaining-=count;
+        int count=k==ArtifactKind.WORLDBREAKER?24:16;
+        if(!PARTICLE_BUDGET.tryReserve(p.serverLevel().getServer().getTickCount(),count))return;
         if(k==ArtifactKind.ICARUS){emitIcarianWings(p,phase,center,count);return;}
         ParticleOptions particle=switch(k){
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
