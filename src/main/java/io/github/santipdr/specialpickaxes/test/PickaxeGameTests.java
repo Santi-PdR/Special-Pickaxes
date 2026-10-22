@@ -53,6 +53,10 @@ public final class PickaxeGameTests {
         h.assertTrue(CurioAuraSchedule.due(40,Integer.MIN_VALUE),"the first nearby aura scan starts immediately");
         h.assertTrue(!CurioAuraSchedule.due(47,40)&&CurioAuraSchedule.due(48,40),"the visual scan refreshes every eight ticks");
         h.assertTrue(CurioAuraSchedule.due(1,200),"a fresh client level or wrapped tick counter refreshes immediately");
+        h.assertTrue(CurioAuraSchedule.PARTICLE_INTERVAL_TICKS==5
+                        &&CurioAuraSchedule.particleDue(40)&&!CurioAuraSchedule.particleDue(44)
+                        &&CurioAuraSchedule.particleDue(45),
+                "passive signatures emit smoothly at four updates per second");
         h.succeed();
     }
 

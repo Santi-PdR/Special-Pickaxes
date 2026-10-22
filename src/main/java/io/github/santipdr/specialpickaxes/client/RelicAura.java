@@ -17,7 +17,7 @@ import org.joml.Vector3f;
 /** Cosmetic-only hand and Curios signatures. Never sends gameplay packets. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class RelicAura {
-    private static final int MAX_VISIBLE_CURIO_AURAS=6;
+    private static final int MAX_VISIBLE_NEARBY_AURAS=4;
     private static final int MAX_CURIO_CANDIDATES=12;
     private static final int MAX_INSPECTED_NEARBY_PLAYERS=128;
     private static final double VISIBLE_CURIO_RADIUS_SQR=24D*24D;
@@ -34,7 +34,7 @@ public final class RelicAura {
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null){heldKind=null;clearNearbyCache();return;}
         if(scanOwner!=mc.player||scanLevel!=mc.level){clearNearbyCache();scanOwner=mc.player;scanLevel=mc.level;}
-        if(mc.isPaused()||mc.options.hideGui||mc.player.tickCount%4!=0)return;
+        if(mc.isPaused()||mc.options.hideGui||!CurioAuraSchedule.particleDue(mc.player.tickCount))return;
         ArtifactItem held=mc.player.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
         if(held!=null){
             if(heldKind!=held.kind){heldKind=held.kind;
@@ -47,25 +47,25 @@ public final class RelicAura {
         if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
                 &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item);
 
-        // Aura animation still updates every four ticks; costly nearby-player and Curios
-        // inventory lookups refresh every eight ticks and remain strictly client-side.
+        // Aura animation updates four times per second with at most four nearby signatures;
+        // costly nearby-player and Curios inventory lookups refresh every eight ticks.
         if(CurioAuraSchedule.due(mc.player.tickCount,lastNearbyScanTick))
             refreshNearbyWearers(mc);
-        int visibleHeld=0;
+        int visibleAuras=0;
         for(var viewer:nearbyCandidates){
             if(!visibleToLocal(mc,viewer))continue;
             ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
-            if(heldRelic!=null&&visibleHeld<MAX_VISIBLE_CURIO_AURAS){
-                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleHeld++;
+            if(heldRelic!=null&&visibleAuras<MAX_VISIBLE_NEARBY_AURAS){
+                emitHeld(mc,viewer,heldRelic,viewer.getMainHandItem());visibleAuras++;
             }
         }
-        int visibleCurios=0;
         for(var entry:nearbyCurios){
             if(!visibleToLocal(mc,entry.player()))continue;
             ArtifactItem heldRelic=entry.player().getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
             if(heldRelic!=null&&heldRelic.kind==entry.relic().kind)continue;
+            if(visibleAuras>=MAX_VISIBLE_NEARBY_AURAS)break;
             emitCurios(mc,entry.player(),entry.relic());
-            if(++visibleCurios>=MAX_VISIBLE_CURIO_AURAS)break;
+            visibleAuras++;
         }
     }
     private static void refreshNearbyWearers(Minecraft mc){
