@@ -643,6 +643,19 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.getHealth()==11F,"repeated effect refreshes cannot accelerate healing after an entity tick reset");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_63") public static void sharedWorldloomRenewalCountersOneNearbyHostileHit(GameTestHelper h){
+        var ally=player(h,ArtifactKind.ICARUS,"HeartwoodAlly");var attacker=EntityType.ZOMBIE.create(h.getLevel());
+        attacker.setPos(ally.getX()+2,ally.getY(),ally.getZ());h.getLevel().addFreshEntity(attacker);
+        ally.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.HEARTWOOD_RENEWAL.get(),100,0));
+        var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(ally,h.getLevel().damageSources().mobAttack(attacker),10F);
+        h.assertTrue(ArtifactPassives.onSharedHeartwoodGuard(ally,first),"a shared renewal grants its ally a defensive counter");
+        h.assertTrue(Math.abs(first.getAmount()-9F)<.001F&&attacker.hasEffect(SpecialPickaxes.HEARTWOOD_GRASP.get()),
+                "the ally softens one hostile hit and visibly roots its attacker");
+        var rapid=new net.minecraftforge.event.entity.living.LivingHurtEvent(ally,h.getLevel().damageSources().mobAttack(attacker),10F);
+        h.assertTrue(!ArtifactPassives.onSharedHeartwoodGuard(ally,rapid)&&Math.abs(rapid.getAmount()-10F)<.001F,
+                "the ally cannot retrigger the counter during its eight-second cooldown");
+        finish(h,ally);
+    }
     @GameTest(template="empty",batch="rework_each_46") public static void worldloomCuriosRenewalEndsOnUnequipButPersistsWhenHeld(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS);wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();

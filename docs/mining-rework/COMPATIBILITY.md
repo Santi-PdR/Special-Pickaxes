@@ -1,4 +1,6 @@
-# Compatibilidad del catálogo 5.10.340
+# Compatibilidad del catálogo 5.10.341
+
+La defensa compartida de Worldloom se activa solo para jugadores que tienen Heartwood Renewal, el estado otorgado a los aliados cercanos. Cada beneficiario tiene su propio cooldown de 160 ticks. La represalia requiere un atacante válido, respeta daño entre jugadores y consulta de zona protegida antes de aplicar Heartwood Grasp. Si el portador ya lleva Worldloom en Curios, usa su contraataque habitual sin duplicarlo.
 
 La referencia local es `/home/Santipdr/.sklauncher/instances/ghouls/mods/`, no
 una integración certificada. Hay Forge 1.20.1, Terramity 0.9.8, Create, Relics,

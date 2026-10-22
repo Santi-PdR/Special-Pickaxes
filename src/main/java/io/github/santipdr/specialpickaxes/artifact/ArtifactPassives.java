@@ -77,6 +77,31 @@ public final class ArtifactPassives {
         return true;
     }
 
+    /** Shared Heartwood renewal turns one nearby ally hit into a brief, visible root counter. */
+    public static boolean onSharedHeartwoodGuard(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event){
+        var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        if(event.getAmount()<=0||!player.hasEffect(renewal))return false;
+        var equipped=CuriosCompat.find(player);
+        if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind==ArtifactKind.WORLDLOOM)return false;
+        var source=event.getSource();LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
+        if(attacker==null){
+            Entity direct=source.getDirectEntity();if(!JegProjectileCompat.isProjectile(direct))return false;
+            Entity owner=JegProjectileCompat.owner(direct);if(owner instanceof LivingEntity living)attacker=living;
+        }
+        if(attacker==null||attacker==player||attacker.isAlliedTo(player))return false;
+        if(attacker instanceof Player other&&!player.canHarmPlayer(other))return false;
+        var state=ArtifactState.of(player,ArtifactKind.WORLDLOOM);long now=ArtifactState.now(player);
+        if(state.getLong("sharedHeartwoodReady")>now)return false;
+        state.putLong("sharedHeartwoodReady",now+160);
+        event.setAmount(event.getAmount()*.9F);
+        grantCombatEffect(player,renewal,0,60);
+        if(WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,attacker.blockPosition())){
+            grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_GRASP.get(),0,60);
+            ArtifactFeedback.burst(player,ArtifactKind.WORLDLOOM,attacker.blockPosition(),5);
+        }
+        return true;
+    }
+
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind,boolean sharedGuardApplied) {
         if(event.getAmount()<=0)return;
         // Interregnum's independent Stasis Ward handler also protects its Curios allies.
