@@ -27,7 +27,7 @@ public final class ConnectedVeinProgram implements WorkProgram {
     }
 
     private boolean sameOreFamily(BlockState state){
-        if(state.getBlock()==ore||!families.isEmpty()&&state.getTags().anyMatch(families::contains))return true;
+        if(state.getBlock()==ore||ArtifactOres.sharesVeinFamily(families,state))return true;
         return registryFamily!=null&&registryFamily.equals(ArtifactOres.registryOreFamily(state.getBlock()));
     }
 

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public final class ArtifactOres {
     private static final ConcurrentMap<Block,Boolean> ORE_CLASSIFICATION = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Block,String> ORE_FAMILIES = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Block,Set<TagKey<Block>>> VEIN_FAMILIES = new ConcurrentHashMap<>();
     private static final String NO_ORE_FAMILY="";
     private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
     private static final Set<String> WORLDGEN_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant","undead_revamp2:bostrokestone","undead_revamp2:bostroxore");
@@ -63,7 +64,7 @@ public final class ArtifactOres {
     }
 
     /** Datapack reloads can change tag membership, so discard cached classifications then. */
-    public static void clearCache(){ ORE_CLASSIFICATION.clear(); }
+    public static void clearCache(){ ORE_CLASSIFICATION.clear();VEIN_FAMILIES.clear(); }
 
     private static String canonicalPrefixedOre(String material){
         String canonical=stripHost(material);
@@ -95,8 +96,15 @@ public final class ArtifactOres {
 
     /** Specific family tags bridge natural/deepslate and modded variants without joining every ore via forge:ores. */
     public static Set<TagKey<Block>> veinFamilies(BlockState state){
-        return state.getTags().filter(tag->isVeinFamilyTag(tag.location().getPath()))
-            .collect(Collectors.toUnmodifiableSet());
+        return VEIN_FAMILIES.computeIfAbsent(state.getBlock(),block->block.defaultBlockState().getTags()
+                .filter(tag->isVeinFamilyTag(tag.location().getPath())).collect(Collectors.toUnmodifiableSet()));
+    }
+
+    /** Compare cached block-family sets without re-streaming tags for every neighbor in a vein scan. */
+    public static boolean sharesVeinFamily(Set<TagKey<Block>> families,BlockState state){
+        if(families.isEmpty())return false;
+        for(var family:veinFamilies(state))if(families.contains(family))return true;
+        return false;
     }
 
     private static boolean isVeinFamilyTag(String path) {
