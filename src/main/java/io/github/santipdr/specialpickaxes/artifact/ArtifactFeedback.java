@@ -52,7 +52,7 @@ public final class ArtifactFeedback {
                 center,3,128);
         for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
     }
-    /** Choir's Curios mining share is shown as a quiet, wearer-and-ally-only thread once per aura scan. */
+    /** Choir's Curios mining share is shown as a quiet, wearer-and-ally-only thread when the ally gains it. */
     public static void choirMiningLink(ServerPlayer wearer,ServerPlayer ally){
         if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
         var level=wearer.serverLevel();

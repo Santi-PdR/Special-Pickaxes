@@ -466,8 +466,9 @@ public final class ArtifactPassives {
                 center,3,128);
         var focus=io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get();
         for(var ally:allies){
+            boolean newlyFocused=!ally.hasEffect(focus);
             grant(ally,focus,0,PASSIVE_LEASE_TICKS);
-            ArtifactFeedback.choirMiningLink(owner,ally);
+            if(newlyFocused)ArtifactFeedback.choirMiningLink(owner,ally);
         }
     }
 
