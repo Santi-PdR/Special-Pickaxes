@@ -43,9 +43,16 @@ public final class WorldloomSnare {
                 ||!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition()))return false;
         if(target instanceof Player other&&!owner.canHarmPlayer(other))return false;
         UUID id=target.getUUID();
+        var level=owner.serverLevel();long now=level.getGameTime();
+        Binding existing=BINDINGS.get(id);
+        if(existing!=null){
+            boolean active=existing.level==level&&existing.target.isAlive()&&!existing.target.isRemoved()
+                    &&existing.owner.isAlive()&&!existing.owner.isRemoved()&&existing.owner.serverLevel()==level
+                    &&existing.target.level()==level&&(existing.expires==0||now<existing.expires);
+            if(active)return false;
+            BINDINGS.remove(id);
+        }
         if(!BINDINGS.containsKey(id)&&BINDINGS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
-        var level=owner.serverLevel();
-        long now=level.getGameTime();
         BINDINGS.put(id,new Binding(target,owner,level,now));
         return true;
     }
