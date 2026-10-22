@@ -24,6 +24,7 @@ import java.util.Set;
 /** Bounded held-tool alternate actions. Curios equipment grants passives only. */
 public final class ArtifactTechniques {
     public static final int IRIDIUM_RECALL_RADIUS=48;
+    private static final int IRIDIUM_RECALL_INSPECTION_LIMIT=4096;
     private ArtifactTechniques() {}
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
@@ -227,16 +228,11 @@ public final class ArtifactTechniques {
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
-        int[] inspected = {0};var targets=new ArrayList<ItemEntity>(Math.min(cap,96));
-        // Stop without materializing the full ItemEntity list around a dense farm.
-        player.serverLevel().getEntities().get(net.minecraft.world.level.entity.EntityTypeTest.forClass(ItemEntity.class),
-                player.getBoundingBox().inflate(radius), item -> {
-            if(++inspected[0]>4096)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
-            if(isIridiumRecallTarget(player,item,center,radius))targets.add(item);
-            return inspected[0]>=4096?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
-                    :net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
-        });
-        targets.sort(Comparator.comparingDouble(item->item.position().distanceToSqr(center)));
+        // Keep only the nearest capped drops while inspecting a bounded number of entities.
+        // This avoids allocating and sorting thousands of candidates in dense farms.
+        var targets=EntitySelection.nearest(player.serverLevel(),ItemEntity.class,
+                player.getBoundingBox().inflate(radius),
+                item->isIridiumRecallTarget(player,item,center,radius),center,cap,IRIDIUM_RECALL_INSPECTION_LIMIT);
         int recalled=0,visualized=0;
         for(var item:targets){
             if(recalled>=cap)break;
