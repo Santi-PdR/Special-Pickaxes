@@ -70,6 +70,16 @@ public final class PickaxeGameTests {
         h.assertTrue(budget.tryReserve(41,24),"the particle allowance refreshes on the next server tick");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_86") public static void compactManualGridMapsScrolledPixelsToTheVisiblePick(GameTestHelper h){
+        h.assertTrue(ManualChoiceGrid.indexAt(1,0,36,3,40,21)==3,
+                "a 36-pixel scroll starts on the partially visible second row, not row 37");
+        h.assertTrue(ManualChoiceGrid.indexAt(81,6,36,3,40,21)==8,
+                "the clicked column and next row resolve to the matching pick");
+        h.assertTrue(ManualChoiceGrid.indexAt(120,0,0,3,40,21)==-1
+                        &&ManualChoiceGrid.indexAt(-1,0,0,3,40,21)==-1,
+                "coordinates outside the visible grid cannot select a pick");
+        h.succeed();
+    }
 
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");

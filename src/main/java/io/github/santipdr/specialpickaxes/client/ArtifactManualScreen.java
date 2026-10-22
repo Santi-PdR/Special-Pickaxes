@@ -261,7 +261,7 @@ public final class ArtifactManualScreen extends Screen {
                 x=left()+PAD;y=top()+56;columns=tinyCopy()?7:3;cellWidth=Math.max(1,(panelWidth()-2*PAD)/columns);
                 int bottom=contentTop()-4;
                 if(mouseX>=x&&mouseX<x+panelWidth()-2*PAD&&mouseY>=y&&mouseY<bottom){
-                    int row=choiceScroll+(int)(mouseY-y)/21,col=(int)(mouseX-x)/cellWidth,index=row*columns+col;
+                    int index=ManualChoiceGrid.indexAt((int)(mouseX-x),(int)(mouseY-y),choiceScroll,columns,cellWidth,21);
                     if(index>=0&&index<choices.size()&&((int)(mouseY-y)%21)<19){RelicKeys.chooseCopy(choices.get(index));return true;}
                 }
             }else{
