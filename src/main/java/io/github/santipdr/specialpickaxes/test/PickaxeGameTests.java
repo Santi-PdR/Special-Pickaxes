@@ -1215,7 +1215,11 @@ public final class PickaxeGameTests {
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.AXIOM);
         var mark=SpecialPickaxes.NULL_MARK.get();
-        h.assertTrue(attacker.hasEffect(mark)&&attacker.getEffect(mark).getDuration()==60,"Axiom's Curios counter applies a three-second null mark");
+        h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F&&attacker.hasEffect(mark)&&attacker.getEffect(mark).getDuration()==60,
+                "Axiom's Curios counter reduces its first hostile hit by 15 percent and applies a three-second null mark");
+        var rapid=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
+        ArtifactPassives.onCuriosDamage(wearer,rapid,ArtifactKind.AXIOM);
+        h.assertTrue(Math.abs(rapid.getAmount()-10F)<.001F,"Axiom's defensive counter respects its eight-second cooldown");
         h.assertTrue(MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(attacker,4F)),"marked attacker cannot heal during the counter");
         h.assertTrue(!MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.living.LivingHealEvent(wearer,1F)),"the wearer and unmarked allies remain healable");
         finish(h,wearer);

@@ -179,7 +179,10 @@ public final class ArtifactPassives {
                 attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.8).add(0,.25,0)));
                 attacker.hasImpulse=true;
             }
-            case AXIOM -> grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),0,60);
+            case AXIOM -> {
+                event.setAmount(event.getAmount()*.85F);
+                grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),0,60);
+            }
             case WORLDBREAKER -> {event.setAmount(event.getAmount()*.8F);grantCombatEffect(player,MobEffects.ABSORPTION,1,60);}
             case EXODIUM -> {
                 Vec3 away=attacker.position().subtract(player.position());
