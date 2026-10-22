@@ -1963,6 +1963,14 @@ public final class PickaxeGameTests {
             h.assertTrue(pulsesByTick[tick]==4,"40 simultaneous roots spread into four visual pulses per tick; tick "+tick);
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_94") public static void worldloomRootVisualBurstsRespectTheServerTickBudget(GameTestHelper h){
+        long tick=Long.MAX_VALUE;
+        h.assertTrue(WorldloomSnare.reserveVisualParticles(tick,8)&&WorldloomSnare.reserveVisualParticles(tick,248),
+                "complete root signatures fit exactly within the 256-particle tick allowance");
+        h.assertTrue(!WorldloomSnare.reserveVisualParticles(tick,1),"over-budget root visuals are skipped as whole bursts");
+        h.assertTrue(WorldloomSnare.reserveVisualParticles(tick-1,24),"the visual allowance refreshes on the following tick");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_57") public static void worldloomCatchVinesFormFourColumnsAroundTheTarget(GameTestHelper h){
         var anchor=new net.minecraft.world.phys.Vec3(4.25D,12D,-3.5D);
         for(int i=0;i<4;i++){

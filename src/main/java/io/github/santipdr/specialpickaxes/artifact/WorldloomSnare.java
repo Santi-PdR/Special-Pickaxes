@@ -19,6 +19,7 @@ public final class WorldloomSnare {
     private static final int ROOT_DURATION_TICKS=80;
     private static final int ROOT_PULSE_TICKS=10;
     private static final int ROOT_PARTICLES=4;
+    private static final RelicParticleBudget VISUAL_BUDGET=new RelicParticleBudget(256);
     private static final net.minecraft.world.level.block.state.BlockState VINE_STATE=
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
     private static final net.minecraft.core.particles.BlockParticleOption VINE_PARTICLE=
@@ -101,6 +102,7 @@ public final class WorldloomSnare {
     /** The ankle ring tightens over four seconds, giving targets a readable escape window. */
     private static void emitWindup(Binding binding,long age){
         double progress=Math.min(1D,Math.max(0D,age/(double)WINDUP_TICKS));
+        if(!reserveVisualParticles(binding.level.getServer().getTickCount(),progress>.55D?10:8))return;
         double radius=.22D+.48D*progress,angle=age*.16D;
         double x=binding.target.getX(),y=binding.target.getY()+.08D,z=binding.target.getZ();
         // Four moving anchors make the closing circle readable from every side while
@@ -116,6 +118,7 @@ public final class WorldloomSnare {
     }
 
     private static void emitCatch(Binding binding){
+        if(!reserveVisualParticles(binding.level.getServer().getTickCount(),24))return;
         double x=binding.anchor.x,y=binding.anchor.y+.12D,z=binding.anchor.z;
         for(int i=0;i<8;i++){
             double angle=i*Math.PI/4D;
@@ -136,8 +139,14 @@ public final class WorldloomSnare {
     }
 
     private static void emitCaughtPulse(Binding binding,long age){
+        if(!reserveVisualParticles(binding.level.getServer().getTickCount(),ROOT_PARTICLES))return;
         double angle=age*.22D,x=binding.anchor.x,y=binding.anchor.y+.08D,z=binding.anchor.z;
         emit(binding,x+Math.cos(angle)*.12D,y,z+Math.sin(angle)*.12D,ROOT_PARTICLES,.18D,.035D,.18D,.006D);
+    }
+
+    /** Whole root signatures share a strict per-server-tick cosmetic budget; gameplay never depends on particles. */
+    public static boolean reserveVisualParticles(long serverTick,int count){
+        return VISUAL_BUDGET.tryReserve(serverTick,count);
     }
 
     private static void emit(Binding binding,double x,double y,double z,int count,double dx,double dy,double dz,double speed){
