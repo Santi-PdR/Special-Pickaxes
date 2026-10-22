@@ -33,20 +33,24 @@ public final class ArtifactManualScreen extends Screen {
         int x=panel.x(),y=panel.y(),w=panel.width(),h=panel.height();
         if(w<=0||h<=0){super.render(g,mouseX,mouseY,partial);return;}
         if(w<180||h<112){g.drawCenteredString(font,Component.translatable("screen.specialpickaxes.resize"),width/2,height/2,0xffd2dce5);super.render(g,mouseX,mouseY,partial);return;}
+        ItemStack active=displayStack();
+        ArtifactKind abilityKind=copiedKind(active);
         g.fill(x-1,y-1,x+w+1,y+h+1,0xff090e15);
         g.fill(x,y,x+w,y+h,0xf2111925);
         g.fill(x,y,x+w,y+40,0xff223648);
         g.fill(x,y+39,x+w,y+41,0xffd4aa5d);
         g.drawCenteredString(font,title,width/2,y+4,0xffffd477);
 
-        g.renderItem(headerIcon,x+PAD,y+18);
-        g.drawString(font,headerIcon.getHoverName(),x+PAD+24,y+22,0xfff1e5c9,false);
-        Component headerHint=Component.translatable(selectingCopy()?"screen.specialpickaxes.copy_help":"screen.specialpickaxes.manual_hint");
-        if(w>=600&&font.width(headerIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w)
+        ItemStack shownIcon=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
+                ?new ItemStack(SpecialPickaxes.PICKS.get(abilityKind).get()):headerIcon;
+        g.renderItem(shownIcon,x+PAD,y+18);
+        g.drawString(font,shownIcon.getHoverName(),x+PAD+24,y+22,0xfff1e5c9,false);
+        Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
+                ?Component.translatable("screen.specialpickaxes.copy_mode_header",shownIcon.getHoverName())
+                :Component.translatable(selectingCopy()?"screen.specialpickaxes.copy_help":"screen.specialpickaxes.manual_hint");
+        if(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w)
             g.drawString(font,headerHint,x+w-PAD-font.width(headerHint),y+22,0xffc0ccd8,false);
 
-        ItemStack active=displayStack();
-        ArtifactKind abilityKind=copiedKind(active);
         int mode=abilityKind==kind?ArtifactTooltips.mode(active):active.hasTag()?active.getTag().getInt("copiedMode"):0;
         String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
         var content=layout.content();int contentX=content.x(),contentTop=content.y(),contentBottom=content.bottom(),contentWidth=content.width();
@@ -171,7 +175,7 @@ public final class ArtifactManualScreen extends Screen {
         if(picker.width()>0&&picker.height()>0){
             g.enableScissor(x,y,right,bottom);
             String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
-            List<Component> tooltip=null;
+            ArtifactKind hoveredChoice=null;
             for(int i=0;i<choices.size();i++){
                 int px=x+i*CHOICE_CELL-choiceScroll;
                 if(px+CHOICE_CELL<=x||px>=right)continue;
@@ -180,10 +184,21 @@ public final class ArtifactManualScreen extends Screen {
                 g.fill(px+1,y+1,px+CHOICE_CELL-2,bottom-1,selected?0xff806b3a:hover?0xff455d70:0xff202e3b);
                 ItemStack icon=choiceIcons.computeIfAbsent(source,k->new ItemStack(SpecialPickaxes.PICKS.get(k).get()));
                 g.renderItem(icon,px+(CHOICE_CELL-16)/2,y+2);
-                if(hover)tooltip=choiceTooltip(source,icon,source==ArtifactKind.WORLDBREAKER?Component.translatable("screen.specialpickaxes.copy_native"):icon.getHoverName());
+                if(hover)hoveredChoice=source;
             }
             g.disableScissor();
-            if(tooltip!=null)g.renderTooltip(font,tooltip,Optional.empty(),mouseX,mouseY);
+            if(choiceScroll==0){
+                int labelX=x+choices.size()*CHOICE_CELL+8;
+                int labelWidth=right-labelX;
+                if(labelWidth>=48){
+                    ArtifactKind labelKind=hoveredChoice!=null?hoveredChoice:copyChoice(copied);
+                    ItemStack labelIcon=choiceIcons.computeIfAbsent(labelKind,k->new ItemStack(SpecialPickaxes.PICKS.get(k).get()));
+                    Component label=labelKind==ArtifactKind.WORLDBREAKER
+                            ?Component.translatable("screen.specialpickaxes.copy_native"):labelIcon.getHoverName();
+                    g.drawString(font,font.plainSubstrByWidth(label.getString(),labelWidth),labelX,y+6,
+                            hoveredChoice!=null?0xffd9e5ef:0xffbac7d1,false);
+                }
+            }
         }
     }
 
@@ -196,6 +211,10 @@ public final class ArtifactManualScreen extends Screen {
         if(kind!=ArtifactKind.WORLDBREAKER||!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return kind;
         try{return ArtifactKind.byId(stack.getTag().getString("copiedSkill"));}catch(IllegalArgumentException invalid){return kind;}
     }
+    private static ArtifactKind copyChoice(String copied){
+        if(copied==null||copied.isBlank())return ArtifactKind.WORLDBREAKER;
+        try{return ArtifactKind.byId(copied);}catch(IllegalArgumentException invalid){return ArtifactKind.WORLDBREAKER;}
+    }
     private static Section section(String heading,Component body,int color){return new Section(heading,Component.translatable(heading),List.of(body),color);}
     private ItemStack displayStack(){
         var player=Minecraft.getInstance().player;if(player==null)return ItemStack.EMPTY;
@@ -203,15 +222,6 @@ public final class ArtifactManualScreen extends Screen {
         var equipped=CuriosCompat.find(player);return equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item&&item.kind==kind?equipped.stack():ItemStack.EMPTY;
     }
     private boolean canChooseCopy(){var player=Minecraft.getInstance().player;return player!=null&&player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER;}
-
-    private List<Component> choiceTooltip(ArtifactKind source,ItemStack stack,Component label){
-        var details=new ArrayList<Component>();details.add(label);
-        if(source==ArtifactKind.WORLDBREAKER){details.add(Component.translatable("screen.specialpickaxes.copy_native_help"));return details;}
-        String mode=ArtifactInteraction.modeKey(source,0);
-        details.add(Component.translatable("screen.specialpickaxes.main").append(": ").append(Component.translatable("mining.identity."+source.id+"."+mode)));
-        details.add(Component.translatable("screen.specialpickaxes.alternate").append(": ").append(Component.translatable("alternate.detail.specialpickaxes."+source.id)));
-        return details;
-    }
 
     @Override public boolean mouseScrolled(double mouseX,double mouseY,double delta){
         var layout=layout();var picker=layout.picker();

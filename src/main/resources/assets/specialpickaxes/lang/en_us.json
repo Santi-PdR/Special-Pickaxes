@@ -418,6 +418,7 @@
   "screen.specialpickaxes.manual_hint": "PICKAXE FIELD GUIDE",
   "screen.specialpickaxes.resize": "Enlarge the window to view the guide",
   "screen.specialpickaxes.copy_help": "Choose a pickaxe; Worldbreaker uses its R and X skills.",
+  "screen.specialpickaxes.copy_mode_header": "Worldbreaker copy mode · using %s",
   "screen.specialpickaxes.selected": "Selected: %s",
   "screen.specialpickaxes.passive": "PASSIVE",
   "screen.specialpickaxes.main": "PRIMARY SKILL",
