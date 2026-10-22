@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,12 +37,15 @@ public final class SearingShellEffect extends MobEffect {
         BlockPos origin=player.blockPosition();boolean hot=false;
         scan: for(BlockPos pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2))){
             var state=level.getBlockState(pos);
-            if(state.is(Blocks.FIRE)||state.is(Blocks.SOUL_FIRE)||state.is(Blocks.MAGMA_BLOCK)
-                    ||state.is(Blocks.CAMPFIRE)||state.is(Blocks.SOUL_CAMPFIRE)||state.is(Blocks.LAVA_CAULDRON)
-                    ||state.getFluidState().is(FluidTags.LAVA)) {hot=true;break scan;}
+            if(isThermalSource(state)){hot=true;break scan;}
         }
         data.putLong(THERMAL_SCAN_TICK,now);data.putBoolean(THERMAL_SCAN_RESULT,hot);
         return hot;
+    }
+
+    /** Vanilla sources are supplied by the tag; modded packs can add their own thermal blocks. */
+    public static boolean isThermalSource(net.minecraft.world.level.block.state.BlockState state){
+        return state.is(ArtifactTags.Blocks.THERMAL_SOURCES)||state.getFluidState().is(FluidTags.LAVA);
     }
 
     public static double thermalMiningMultiplier(){return THERMAL_MINING_MULTIPLIER;}

@@ -2058,6 +2058,13 @@ public final class PickaxeGameTests {
         h.assertTrue(eligible.containsAll(audience),"only eligible nearby players appear in the mob aura audience");
         for(var viewer:eligible)viewer.discard();spectator.discard();distant.discard();mob.discard();h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_100") public static void hellspecThermalSourcesAreDatapackExtensible(GameTestHelper h){
+        for(var block:List.of(Blocks.FIRE,Blocks.SOUL_FIRE,Blocks.MAGMA_BLOCK,Blocks.CAMPFIRE,Blocks.SOUL_CAMPFIRE,Blocks.LAVA_CAULDRON))
+            h.assertTrue(SearingShellEffect.isThermalSource(block.defaultBlockState()),"default heat source stays tagged: "+block);
+        h.assertTrue(SearingShellEffect.isThermalSource(Blocks.LAVA.defaultBlockState()),"lava fluids remain a thermal source independently of block tags");
+        h.assertTrue(!SearingShellEffect.isThermalSource(Blocks.STONE.defaultBlockState()),"ordinary geology does not trigger the Hellspec thermal mining bonus");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_79") public static void heldAuraKeepsAValidOrbitWhenLookingVertically(GameTestHelper h){
         var upward=CurioAuraGeometry.handSide(new Vec3(0D,1D,0D));
         var downward=CurioAuraGeometry.handSide(new Vec3(0D,-1D,0D));
