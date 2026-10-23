@@ -18,6 +18,15 @@ class Resources(unittest.TestCase):
             for path in ROOT.rglob(pattern):
                 json.loads(path.read_text())
 
+    def test_iridium_lode_shard_particle_atlas(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/iridium_lode_shard.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:iridium_lode_shard"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/iridium_lode_shard.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], list(range(8)))
+        self.assertEqual(animation["frametime"], 2)
+        header = (ROOT / "assets/specialpickaxes/textures/particle/iridium_lode_shard.png").read_bytes()[:24]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (32, 256), "Blockbench atlas must be eight vertically stacked 32x32 frames")
+
     def test_reference_models(self):
         hashes = set()
         for artifact in IDS:

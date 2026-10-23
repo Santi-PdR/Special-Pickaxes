@@ -14,5 +14,6 @@ public final class SpecialParticleRenderers {
     @SubscribeEvent public static void register(RegisterParticleProvidersEvent event){
         event.registerSpriteSet(SpecialPickaxes.STASIS_SHARD.get(),StasisShardParticle.Provider::new);
         event.registerSpriteSet(SpecialPickaxes.ICARIAN_FEATHER.get(),IcarianFeatherParticle.Provider::new);
+        event.registerSpriteSet(SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),IridiumLodeShardParticle.Provider::new);
     }
 }

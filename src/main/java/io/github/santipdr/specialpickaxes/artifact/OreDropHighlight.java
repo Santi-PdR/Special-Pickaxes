@@ -1,25 +1,22 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
-/** Marks only drops produced by Iridium's ore break and adds one small local sparkle burst. */
+/** Marks Iridium ore drops and emits a bounded, owner-only animated crystal cue. */
 public final class OreDropHighlight {
     private static final String ORE_DROP="specialpickaxesIridiumOreDrop";
     private static final String OWNER="specialpickaxesIridiumOwner";
     private static final String NEXT_LODE_SENSE="specialpickaxesLodeSenseNextAt";
-    private static final int MAX_SPARK_BURSTS_PER_TICK=32;
+    private static final int MAX_SHARD_EMISSIONS_PER_TICK=32;
     private static final int PASSIVE_PULL_RADIUS=8;
     private static final int PASSIVE_PULL_TARGETS=16;
     private static final int PASSIVE_PULL_INTERVAL=10;
     private static final int MAX_PULL_TRAILS=4;
-    private static final DustParticleOptions SPARK=new DustParticleOptions(new Vector3f(.32F,.95F,.82F),.72F);
-    private static long sparkBudgetTick=Long.MIN_VALUE;
-    private static int sparkBurstsThisTick;
+    private static long shardBudgetTick=Long.MIN_VALUE;
+    private static int shardEmissionsThisTick;
 
     private OreDropHighlight(){}
 
@@ -33,11 +30,12 @@ public final class OreDropHighlight {
         data.putUUID(OWNER,owner.getUUID());
         if(fresh){
             long now=level.getGameTime();
-            if(now!=sparkBudgetTick){sparkBudgetTick=now;sparkBurstsThisTick=0;}
-            if(sparkBurstsThisTick<MAX_SPARK_BURSTS_PER_TICK){
-                sparkBurstsThisTick++;
-                // Sparkles are Curios feedback for the wearer; the entity glow itself remains visible to everyone.
-                level.sendParticles(owner,SPARK,false,drop.getX(),drop.getY()+drop.getBbHeight()*.5D,drop.getZ(),5,.12D,.12D,.12D,.015D);
+            if(now!=shardBudgetTick){shardBudgetTick=now;shardEmissionsThisTick=0;}
+            if(shardEmissionsThisTick<MAX_SHARD_EMISSIONS_PER_TICK){
+                shardEmissionsThisTick++;
+                // The shard is private Curios feedback; only the item entity's glow is shared with nearby players.
+                level.sendParticles(owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
+                        false,drop.getX(),drop.getY()+drop.getBbHeight()*.5D,drop.getZ(),1,0,.012D,0,0);
             }
         }
         return fresh;
@@ -65,10 +63,10 @@ public final class OreDropHighlight {
         return moved;
     }
 
-    /** A faint, wearer-only stitch makes Lode Sense legible without broadcasting trails to the area. */
+    /** A wearer-only shard marks the start of a passive Lode Sense pull without broadcasting trails. */
     private static void emitLodeSenseTrail(ServerPlayer owner,Vec3 drop,Vec3 wearer){
-        var level=owner.serverLevel();Vec3 stitch=drop.lerp(wearer,.42D);
-        level.sendParticles(owner,SPARK,false,drop.x,drop.y+.12D,drop.z,2,.035D,.035D,.035D,.006D);
-        level.sendParticles(owner,SPARK,false,stitch.x,stitch.y,stitch.z,1,0,0,0,0);
+        var level=owner.serverLevel();Vec3 point=drop.lerp(wearer,.42D);
+        level.sendParticles(owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
+                false,point.x,point.y,point.z,1,0,0,0,0);
     }
 }

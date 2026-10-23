@@ -1808,7 +1808,7 @@ public final class PickaxeGameTests {
                 "Curios shares the active ore rhythm with nearby teammates, never hostiles");
         h.assertTrue(drop.isCurrentlyGlowing()&&drop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop"),"new ore loot gets Iridium's glow tag");
         h.assertTrue(drop.getPersistentData().hasUUID("specialpickaxesIridiumOwner")&&drop.getPersistentData().getUUID("specialpickaxesIridiumOwner").equals(p.getUUID()),"only the wearer owns the recalled drop");
-        h.assertTrue(!OreDropHighlight.mark(drop,p),"a repeated observation does not replay the sparkle burst");
+        h.assertTrue(!OreDropHighlight.mark(drop,p),"a repeated observation does not replay the animated Iridium shard");
         h.assertTrue(!unrelated.isCurrentlyGlowing()&&!unrelated.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"a nearby pre-existing item is not marked");
         var moddedPos=pos.east(3);var moddedOre=TestOres.TAGGED_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(moddedPos,moddedOre);
         h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,moddedPos,moddedOre),"Iridium observes a foreign ore identified only by its modded ore-family tag");
