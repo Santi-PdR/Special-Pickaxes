@@ -28,16 +28,20 @@ public final class PhaseShearEffect extends MobEffect {
         if(!(entity.level() instanceof ServerLevel level))return;
         double facing=Math.toRadians(entity.getYRot()),radius=Math.max(.27D,entity.getBbWidth()*.58D);
         double centerY=entity.getY()+entity.getBbHeight()*.62D;
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(8);
         for(int cut=0;cut<2;cut++){
             double angle=facing+cut*Math.PI*.5D;
             for(int shard=0;shard<3;shard++){
                 double offset=(shard-1D)*.14D;
                 double x=entity.getX()+Math.cos(angle)*radius-Math.sin(angle)*offset;
                 double z=entity.getZ()+Math.sin(angle)*radius+Math.cos(angle)*offset;
-                level.sendParticles(cut==0?EMBER:RIFT,x,centerY+offset*.8D,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(cut==0?EMBER:RIFT,
+                        new net.minecraft.world.phys.Vec3(x,centerY+offset*.8D,z),1,0,0,0,0));
             }
         }
-        level.sendParticles(ParticleTypes.CRIT,entity.getX(),centerY,entity.getZ(),2,.12D,.16D,.12D,.008D);
+        particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.CRIT,
+                new net.minecraft.world.phys.Vec3(entity.getX(),centerY,entity.getZ()),2,.12D,.16D,.12D,.008D));
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
@@ -45,13 +49,16 @@ public final class PhaseShearEffect extends MobEffect {
         double phase=entity.tickCount*.22D;
         double centerY=entity.getY()+entity.getBbHeight()*.68D;
         double radius=Math.max(.26D,entity.getBbWidth()*.55D);
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(2);
         for(int i=0;i<2;i++){
             double angle=phase+i*Math.PI;
             double x=entity.getX()+Math.cos(angle)*radius;
             double z=entity.getZ()+Math.sin(angle)*radius;
             double y=centerY+Math.sin(phase+i*Math.PI)*.1D;
-            level.sendParticles(i==0?EMBER:RIFT,x,y,z,1,0,0,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(i==0?EMBER:RIFT,
+                    new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
         }
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

@@ -2,7 +2,6 @@ package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,13 +20,14 @@ public final class CrucibleMantleEffect extends MobEffect {
         if(!inHeat||!(entity.level() instanceof ServerLevel level))return;
         double phase=entity.tickCount*.12D,radius=.42D;
         double y=entity.getY()+entity.getBbHeight()*.58D;
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(4);
         for(int i=0;i<4;i++){
             double angle=phase+i*Math.PI*.5D;
             double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
-            if(entity instanceof ServerPlayer wearer)
-                level.sendParticles(wearer,EMBER_DUST,false,x,y+Math.sin(angle*2D)*.06D,z,1,0,0,0,0);
-            else level.sendParticles(EMBER_DUST,x,y+Math.sin(angle*2D)*.06D,z,1,0,0,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(EMBER_DUST,
+                    new net.minecraft.world.phys.Vec3(x,y+Math.sin(angle*2D)*.06D,z),1,0,0,0,0));
         }
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

@@ -14,8 +14,12 @@ public final class NullMarkEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity,int amplifier) {
-        if(!entity.level().isClientSide&&entity.level() instanceof ServerLevel level)
-            level.sendParticles(ParticleTypes.SCULK_SOUL,entity.getX(),entity.getY()+entity.getBbHeight()*.55D,entity.getZ(),2,.12D,.18D,.12D,.005D);
+        if(!entity.level().isClientSide&&entity.level() instanceof ServerLevel level){
+            var particle=new ArtifactFeedback.AuraParticle(ParticleTypes.SCULK_SOUL,
+                    new net.minecraft.world.phys.Vec3(entity.getX(),entity.getY()+entity.getBbHeight()*.55D,entity.getZ()),
+                    2,.12D,.18D,.12D,.005D);
+            ArtifactFeedback.entityAuraPulse(level,entity,java.util.List.of(particle));
+        }
     }
 
     @Override

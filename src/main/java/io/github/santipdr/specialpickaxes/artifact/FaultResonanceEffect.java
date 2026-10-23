@@ -34,16 +34,20 @@ public final class FaultResonanceEffect extends MobEffect {
             double phase=entity.tickCount*.17D;
             double centerY=entity.getY()+entity.getBbHeight()*.52D;
             double radius=Math.max(.28D,entity.getBbWidth()*.62D);
+            var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(4);
             for(int i=0;i<3;i++){
                 double angle=phase+i*Math.PI*2D/3D;
                 double x=entity.getX()+Math.cos(angle)*radius;
                 double z=entity.getZ()+Math.sin(angle)*radius;
                 double y=centerY+Math.sin(angle*2D)*.08D;
-                level.sendParticles(RESONANCE,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(RESONANCE,
+                        new Vec3(x,y,z),1,0,0,0,0));
             }
             double sparkX=entity.getX()+Math.cos(phase)*radius;
             double sparkZ=entity.getZ()+Math.sin(phase)*radius;
-            level.sendParticles(ParticleTypes.ELECTRIC_SPARK,sparkX,centerY+.1D,sparkZ,1,0,0,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.ELECTRIC_SPARK,
+                    new Vec3(sparkX,centerY+.1D,sparkZ),1,0,0,0,0));
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 

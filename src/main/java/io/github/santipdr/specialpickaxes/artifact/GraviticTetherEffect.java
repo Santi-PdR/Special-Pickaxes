@@ -29,13 +29,16 @@ public final class GraviticTetherEffect extends MobEffect {
             double phase=entity.tickCount*.19D;
             double centerY=entity.getY()+entity.getBbHeight()*.52D;
             double radius=Math.max(.26D,entity.getBbWidth()*.56D);
+            var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(2);
             for(int i=0;i<2;i++){
                 double angle=phase+i*Math.PI;
                 double x=entity.getX()+Math.cos(angle)*radius;
                 double z=entity.getZ()+Math.sin(angle)*radius;
                 double y=centerY+Math.sin(phase+i*Math.PI)*.18D;
-                level.sendParticles(TETHER_DUST,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(TETHER_DUST,
+                        new Vec3(x,y,z),1,0,0,0,0));
             }
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 

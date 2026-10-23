@@ -34,12 +34,16 @@ public final class StasisCrushEffect extends MobEffect {
             double phase=entity.tickCount*.13D;
             double y=entity.getY()+entity.getBbHeight()*.42D;
             double radius=Math.max(.25D,entity.getBbWidth()*.55D);
+            var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(4);
             for(int i=0;i<3;i++){
                 double angle=phase+i*Math.PI*2D/3D;
                 double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
-                level.sendParticles(i==0?VIOLET:STASIS,x,y+Math.sin(angle*2D)*.07D,z,1,0,.015D,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(i==0?VIOLET:STASIS,
+                        new Vec3(x,y+Math.sin(angle*2D)*.07D,z),1,0,.015D,0,0));
             }
-            if(entity.tickCount%24==0)level.sendParticles(ParticleTypes.REVERSE_PORTAL,entity.getX(),y,entity.getZ(),2,.08D,.12D,.08D,.004D);
+            if(entity.tickCount%24==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.REVERSE_PORTAL,
+                    new Vec3(entity.getX(),y,entity.getZ()),2,.08D,.12D,.08D,.004D));
+            ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }
 
