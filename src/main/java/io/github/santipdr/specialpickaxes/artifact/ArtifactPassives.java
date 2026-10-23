@@ -215,7 +215,11 @@ public final class ArtifactPassives {
                 attacker.setDeltaMovement(attacker.getDeltaMovement().add(away.normalize().scale(.45).add(0,.65,0)));
                 attacker.hasImpulse=true;
             }
-            case IRIDIUM -> {event.setAmount(event.getAmount()*.85F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),0,80);}
+            case IRIDIUM -> {
+                event.setAmount(event.getAmount()*.85F);
+                grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get(),0,80);
+                shareLodeguard(player);
+            }
             case SEAM_RIPPER -> {
                 event.setAmount(event.getAmount()*.85F);
                 if(retaliationAllowed){
@@ -576,6 +580,20 @@ public final class ArtifactPassives {
             boolean newlyGuarded=!ally.hasEffect(guard);
             grant(ally,guard,0,PASSIVE_LEASE_TICKS);
             if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.starfallGuardLink(owner,ally);
+        }
+    }
+
+    /** Iridium's Curios counter lends its four-second crystal armor ward to up to three nearby allies. */
+    private static void shareLodeguard(ServerPlayer owner){
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
+                center,3,128);
+        var guard=io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get();
+        for(var ally:allies){
+            boolean newlyGuarded=!ally.hasEffect(guard);
+            grantCombatEffect(ally,guard,0,80);
+            if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.lodeguardLink(owner,ally);
         }
     }
 

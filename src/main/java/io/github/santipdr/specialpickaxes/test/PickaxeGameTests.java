@@ -1668,7 +1668,20 @@ public final class PickaxeGameTests {
         h.assertTrue(diamonds>=1 && diamonds<=4,"Fortune loot within vanilla range");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_33") public static void iridiumCuriosLodeguardHardensAfterFirstHostileHit(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.IRIDIUM);
+        var wearer=player(h,ArtifactKind.IRIDIUM,"LodeguardBearer");
+        var allies=List.of(player(h,ArtifactKind.CHOIR,"LodeguardOne"),player(h,ArtifactKind.CHOIR,"LodeguardTwo"),
+                player(h,ArtifactKind.CHOIR,"LodeguardThree"),player(h,ArtifactKind.CHOIR,"LodeguardFour"));
+        var distant=player(h,ArtifactKind.CHOIR,"LodeguardDistant");var teammateEnemy=player(h,ArtifactKind.CHOIR,"LodeguardEnemy");
+        var scoreboard=h.getLevel().getScoreboard();
+        var team=scoreboard.addPlayerTeam("lg_"+wearer.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("lge_"+teammateEnemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);
+        for(var ally:allies)scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(distant.getScoreboardName(),team);scoreboard.addPlayerToTeam(teammateEnemy.getScoreboardName(),foes);
+        for(int i=0;i<allies.size();i++)allies.get(i).setPos(wearer.getX()+i+1D,wearer.getY(),wearer.getZ());
+        distant.setPos(wearer.getX()+7D,wearer.getY(),wearer.getZ());teammateEnemy.setPos(wearer.getX()+1D,wearer.getY(),wearer.getZ());
+        var participants=new ArrayList<ServerPlayer>();participants.add(wearer);participants.addAll(allies);
+        participants.add(distant);participants.add(teammateEnemy);for(var participant:participants)h.getLevel().addFreshEntity(participant);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.IRIDIUM);
@@ -1676,11 +1689,14 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Lodeguard trims the first hit by 15 percent");
         h.assertTrue(effect!=null&&effect.getDuration()==80,"the custom crystal ward lasts four seconds");
         h.assertTrue(Math.abs(wearer.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4D)<.01D,"the ward adds four armor points");
+        for(int i=0;i<3;i++)h.assertTrue(allies.get(i).hasEffect(guard),"Lodeguard shares the crystal ward with one of three nearest teammates");
+        h.assertTrue(!allies.get(3).hasEffect(guard)&&!distant.hasEffect(guard)&&!teammateEnemy.hasEffect(guard),
+                "the shared counter excludes the fourth teammate, distant players and enemies");
         var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,repeat,ArtifactKind.IRIDIUM);
         h.assertTrue(repeat.getAmount()==10F&&wearer.getEffect(guard).getDuration()==80,"the eight-second cooldown prevents repeated triggers and refresh spam");
         h.assertTrue(guard.isDurationEffectTick(80,0)&&!guard.isDurationEffectTick(79,0),"the ward's crystal effect pulses every ten ticks");
-        finish(h,wearer);
+        for(var participant:participants)finish(h,participant);
     }
     @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumSharesLodeSurgeAndHighlightsOnlyOreDrops(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR,"LodeBearer");var ally=player(h,ArtifactKind.CHOIR,"LodeAlly");
