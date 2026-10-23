@@ -321,6 +321,29 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_26") public static void eventideHardLandingSnaresThreeHostilesWithoutHarmingAllies(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE,"EventideImpactOwner");var ally=player(h,ArtifactKind.PALIMPSEST,"EventideImpactAlly");
+        var level=h.getLevel();level.addFreshEntity(wearer);var scoreboard=level.getScoreboard();
+        var team=scoreboard.addPlayerTeam("eventideimpact_"+wearer.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(wearer.getX()+1D,wearer.getY(),wearer.getZ());level.addFreshEntity(ally);
+        ArtifactPassives.tick(wearer,ArtifactKind.EVENTIDE);
+        var enemies=List.of(player(h,ArtifactKind.CHOIR,"EventideImpactOne"),player(h,ArtifactKind.ICARUS,"EventideImpactTwo"),
+                player(h,ArtifactKind.WORLDLOOM,"EventideImpactThree"),player(h,ArtifactKind.SEAM_RIPPER,"EventideImpactFour"));
+        double[] offsets={1.5D,2.5D,3.5D,4D};
+        for(int i=0;i<enemies.size();i++){var enemy=enemies.get(i);enemy.setPos(wearer.getX()+offsets[i],wearer.getY(),wearer.getZ());level.addFreshEntity(enemy);}
+        var far=player(h,ArtifactKind.AXIOM,"EventideImpactFar");far.setPos(wearer.getX()+5D,wearer.getY(),wearer.getZ());level.addFreshEntity(far);
+        h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,6.99F)==0,"a short fall cannot trigger the landing counter");
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,7F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.25F)<.001F,"Eventide keeps its fall-damage protection on a hard landing");
+        var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
+        for(int i=0;i<3;i++)h.assertTrue(enemies.get(i).hasEffect(tether)&&enemies.get(i).getEffect(tether).getDuration()==60,
+                "each caught opponent receives the three-second custom gravity snare");
+        h.assertTrue(!enemies.get(3).hasEffect(tether)&&!far.hasEffect(tether),"the target cap and four-and-a-half-block radius hold");
+        h.assertTrue(!ally.hasEffect(tether)&&ally.getHealth()==ally.getMaxHealth(),"teammates are excluded and take no landing damage");
+        h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,12F)==0,"the ten-second cooldown prevents repeat landings from refreshing the snare");
+        finish(h,wearer);finish(h,ally);for(var enemy:enemies)finish(h,enemy);finish(h,far);
+    }
     @GameTest(template="empty",batch="rework_each_91") public static void eventideSharesGraviticBalanceWithThreeNearbyTeammates(GameTestHelper h){
         var owner=player(h,ArtifactKind.EVENTIDE,"EventideShareOwner");var level=h.getLevel();var center=owner.position();
         var allies=List.of(player(h,ArtifactKind.CHOIR,"GravityOne"),player(h,ArtifactKind.ICARUS,"GravityTwo"),

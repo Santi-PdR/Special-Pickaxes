@@ -235,7 +235,10 @@ public final class SpecialPickaxes {
         if(WorkQueue.protectsFall(p)){e.setCanceled(true);return;}
         if(p.hasEffect(GRAVITIC_BALANCE.get())){
             e.setDamageMultiplier(e.getDamageMultiplier()*.25F);
-            if(e.getDistance()>=4F)GraviticBalanceEffect.landingPulse(p,e.getDistance());
+            if(e.getDistance()>=4F){
+                GraviticBalanceEffect.landingPulse(p,e.getDistance());
+                GraviticBalanceEffect.landingSnare(p,e.getDistance());
+            }
             else ArtifactFeedback.burst(p,ArtifactKind.EVENTIDE,p.blockPosition(),4);
         }
         if(p.hasEffect(ICARIAN_MOMENTUM.get())){

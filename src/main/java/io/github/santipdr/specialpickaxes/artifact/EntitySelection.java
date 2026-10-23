@@ -1,6 +1,11 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
@@ -16,6 +21,18 @@ final class EntitySelection {
     static final int DEFAULT_INSPECTION_LIMIT = 1024;
 
     private EntitySelection() {}
+
+    /** Hostiles include custom mobs that have selected the wearer or an ally as their live target. */
+    static boolean isHostileCandidate(LivingEntity entity,ServerPlayer wearer){
+        if(entity instanceof Player)return entity!=wearer;
+        if(entity instanceof Enemy)return true;
+        if(entity instanceof Mob mob){
+            LivingEntity target=mob.getTarget();
+            return target!=null&&target.isAlive()&&target.level()==wearer.level()
+                    &&(target==wearer||target.isAlliedTo(wearer));
+        }
+        return false;
+    }
 
     static <T extends Entity> List<T> nearest(ServerLevel level, Class<T> type, AABB bounds,
                                                Predicate<T> eligible, Vec3 center, int limit) {
