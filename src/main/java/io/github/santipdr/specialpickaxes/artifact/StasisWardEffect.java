@@ -8,6 +8,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import io.github.santipdr.specialpickaxes.SpecialPickaxes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -60,6 +61,11 @@ public final class StasisWardEffect extends MobEffect {
             double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
             double y=centerY+Math.sin(phase*1.6D+i*Math.PI*2D/3D)*.12D;
             particles.add(new ArtifactFeedback.AuraParticle((i&1)==0?STASIS_CORE:STASIS_DUST,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
+        }
+        if(entity.tickCount%20==0){
+            var shard=new net.minecraft.world.phys.Vec3(entity.getX()+Math.cos(phase)*.29D,centerY+.16D,
+                    entity.getZ()+Math.sin(phase)*.29D);
+            particles.add(new ArtifactFeedback.AuraParticle(SpecialPickaxes.STASIS_SHARD.get(),shard,1,0,0,0,0));
         }
         if(entity.tickCount%30==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.REVERSE_PORTAL,
                 new net.minecraft.world.phys.Vec3(entity.getX(),centerY,entity.getZ()),1,.08D,.08D,.08D,.003D));

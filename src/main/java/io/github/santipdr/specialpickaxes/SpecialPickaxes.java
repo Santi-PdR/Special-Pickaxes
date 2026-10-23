@@ -39,6 +39,8 @@ public final class SpecialPickaxes {
     public static final DeferredRegister<Item> ITEMS=DeferredRegister.create(ForgeRegistries.ITEMS,ID);
     public static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,ID);
     public static final DeferredRegister<MobEffect> EFFECTS=DeferredRegister.create(ForgeRegistries.MOB_EFFECTS,ID);
+    public static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES=DeferredRegister.create(Registries.PARTICLE_TYPE,ID);
+    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> STASIS_SHARD=PARTICLES.register("stasis_shard",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
@@ -85,7 +87,7 @@ public final class SpecialPickaxes {
     public SpecialPickaxes() {
         OrefallProgram.warmup();
         io.github.santipdr.specialpickaxes.network.RelicNetwork.register();
-        var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);
+        var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);PARTICLES.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
         var forge=MinecraftForge.EVENT_BUS;
         forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,this::protectPhysicalLimit);forge.addListener(this::tick);forge.addListener(this::logout);forge.addListener(this::clonePlayer);
