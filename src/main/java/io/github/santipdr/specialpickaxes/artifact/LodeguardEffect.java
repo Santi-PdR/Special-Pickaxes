@@ -23,8 +23,7 @@ public final class LodeguardEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(!entity.level().isClientSide&&entity.level() instanceof ServerLevel level){
-            // Keep the same three-particle budget, but arrange it as a turning
-            // crystal guard so the passive reads as a deliberate ward, not a puff.
+            // The three-mote orbit stays light; one Blockbench crystal punctuates each second.
             double phase=entity.tickCount*.038D;
             double radius=.38D;
             double centerY=entity.getY()+entity.getBbHeight()*.56D;
@@ -36,7 +35,8 @@ public final class LodeguardEffect extends MobEffect {
                 double y=centerY+Math.sin(angle*2D)*.09D;
                 particles.add(new ArtifactFeedback.AuraParticle(CRYSTAL_DUST,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
             }
-            if(entity.tickCount%20==0)particles.add(new ArtifactFeedback.AuraParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,
+            if(entity.tickCount%20==0)particles.add(new ArtifactFeedback.AuraParticle(
+                    io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
                     new net.minecraft.world.phys.Vec3(entity.getX(),centerY+.18D,entity.getZ()),1,0,0,0,0));
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }

@@ -1780,6 +1780,7 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosDamage(wearer,repeat,ArtifactKind.IRIDIUM);
         h.assertTrue(repeat.getAmount()==10F&&wearer.getEffect(guard).getDuration()==80,"the eight-second cooldown prevents repeated triggers and refresh spam");
         h.assertTrue(guard.isDurationEffectTick(80,0)&&!guard.isDurationEffectTick(79,0),"the ward's crystal effect pulses every ten ticks");
+        h.assertTrue(SpecialPickaxes.IRIDIUM_LODE_SHARD.get()!=null,"the Curios crystal ward uses the registered animated Lode Shard particle");
         for(var participant:participants)finish(h,participant);
     }
     @GameTest(template="empty",batch="legacy_each_19") public static void curiosIridiumSharesLodeSurgeAndHighlightsOnlyOreDrops(GameTestHelper h) {
