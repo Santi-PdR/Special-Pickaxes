@@ -19,6 +19,7 @@ public final class LodeguardEffect extends MobEffect {
     public LodeguardEffect(){
         super(MobEffectCategory.BENEFICIAL,0x55d7c8);
         addAttributeModifier(Attributes.ARMOR,UUID.fromString("4a8b1439-e768-4fe6-a5de-6577137933b8").toString(),4D,AttributeModifier.Operation.ADDITION);
+        addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,UUID.fromString("f0fb48f2-efc5-48d4-8354-e4c2fd4d2f9a").toString(),.2D,AttributeModifier.Operation.ADDITION);
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
@@ -35,9 +36,17 @@ public final class LodeguardEffect extends MobEffect {
                 double y=centerY+Math.sin(angle*2D)*.09D;
                 particles.add(new ArtifactFeedback.AuraParticle(CRYSTAL_DUST,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
             }
-            if(entity.tickCount%20==0)particles.add(new ArtifactFeedback.AuraParticle(
-                    io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
-                    new net.minecraft.world.phys.Vec3(entity.getX(),centerY+.18D,entity.getZ()),1,0,0,0,0));
+            if(entity.tickCount%20==0){
+                particles.add(new ArtifactFeedback.AuraParticle(
+                        io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
+                        new net.minecraft.world.phys.Vec3(entity.getX(),centerY+.18D,entity.getZ()),1,0,0,0,0));
+                // Twin foot-level marks make the new anti-knockback anchor readable
+                // without turning a four-second ward into a continuous particle cloud.
+                particles.add(new ArtifactFeedback.AuraParticle(CRYSTAL_DUST,
+                        new net.minecraft.world.phys.Vec3(entity.getX()-.22D,entity.getY()+.08D,entity.getZ()),1,0,0,0,0));
+                particles.add(new ArtifactFeedback.AuraParticle(CRYSTAL_DUST,
+                        new net.minecraft.world.phys.Vec3(entity.getX()+.22D,entity.getY()+.08D,entity.getZ()),1,0,0,0,0));
+            }
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }

@@ -1774,7 +1774,11 @@ public final class PickaxeGameTests {
         h.assertTrue(Math.abs(hit.getAmount()-8.5F)<.001F,"Lodeguard trims the first hit by 15 percent");
         h.assertTrue(effect!=null&&effect.getDuration()==80,"the custom crystal ward lasts four seconds");
         h.assertTrue(Math.abs(wearer.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4D)<.01D,"the ward adds four armor points");
+        h.assertTrue(Math.abs(wearer.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.2D)<.001D,
+                "Lodeguard anchors its bearer against knockback for the ward duration");
         for(int i=0;i<3;i++)h.assertTrue(allies.get(i).hasEffect(guard),"Lodeguard shares the crystal ward with one of three nearest teammates");
+        for(int i=0;i<3;i++)h.assertTrue(Math.abs(allies.get(i).getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.2D)<.001D,
+                "each guarded ally receives the same anti-knockback anchor");
         h.assertTrue(!allies.get(3).hasEffect(guard)&&!distant.hasEffect(guard)&&!teammateEnemy.hasEffect(guard),
                 "the shared counter excludes the fourth teammate, distant players and enemies");
         var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
