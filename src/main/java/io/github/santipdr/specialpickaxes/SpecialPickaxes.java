@@ -43,6 +43,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> STASIS_SHARD=PARTICLES.register("stasis_shard",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> ICARIAN_FEATHER=PARTICLES.register("icarian_feather",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> IRIDIUM_LODE_SHARD=PARTICLES.register("iridium_lode_shard",()->new net.minecraft.core.particles.SimpleParticleType(false));
+    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> HELLSPEC_BRAND_FLARE=PARTICLES.register("hellspec_brand_flare",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);

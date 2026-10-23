@@ -863,6 +863,7 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(center)==floor,"the effect does not alter the aimed block");
         float beforePulse=enemy.getHealth();brand.applyEffectTick(enemy,0);
         h.assertTrue(enemy.getHealth()<beforePulse,"Magma Brand deals its custom pulse separately from ordinary fire ticks");
+        h.assertTrue(MagmaBrandEffect.brandParticles(enemy,0).stream().anyMatch(sample->sample.particle()==SpecialPickaxes.HELLSPEC_BRAND_FLARE.get()),"Magma Brand uses its registered animated Blockbench flare");
         h.assertTrue(brand.isDurationEffectTick(80,0)&&!brand.isDurationEffectTick(79,0),"Magma Brand uses a one-second effect cadence");
         finish(h,wearer);
     }

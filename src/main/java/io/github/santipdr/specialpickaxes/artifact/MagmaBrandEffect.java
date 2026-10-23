@@ -55,7 +55,7 @@ public final class MagmaBrandEffect extends MobEffect {
         ArtifactFeedback.entityAuraPulse(level,entity,brandParticles(entity,level.getGameTime()));
     }
 
-    /** Three ember motes orbit the brand while a compact flame/smoke pair marks its center. */
+    /** Three ember motes orbit a compact Blockbench flare while smoke marks the burn. */
     public static List<ArtifactFeedback.AuraParticle> brandParticles(LivingEntity entity,long worldTime){
         double phase=worldTime*.16D,radius=Math.max(.28D,entity.getBbWidth()*.5D);
         double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.44D,z=entity.getZ();
@@ -65,7 +65,7 @@ public final class MagmaBrandEffect extends MobEffect {
             particles.add(new ArtifactFeedback.AuraParticle(BRAND_EMBER,
                     new Vec3(x+Math.cos(angle)*radius,y+Math.sin(angle*2D)*.07D,z+Math.sin(angle)*radius),1,0,0,0,0));
         }
-        particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.FLAME,new Vec3(x,y-.12D,z),2,.08D,.15D,.08D,.012D));
+        particles.add(new ArtifactFeedback.AuraParticle(io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),new Vec3(x,y-.12D,z),1,0,0,0,0));
         particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.SMOKE,new Vec3(x,y+entity.getBbHeight()*.24D,z),1,.025D,.035D,.025D,.002D));
         if(Math.floorMod(worldTime,40L)==0L)
             particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.LAVA,new Vec3(x,y-.2D,z),1,.06D,.04D,.06D,.003D));

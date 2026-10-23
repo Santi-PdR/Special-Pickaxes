@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.393** sustituye el fuego genérico del pulso de Marca de Magma por una llamarada de cuatro pétalos diseñada y animada en Blockbench; sigue siendo un único destello por pulso, enviado solo a jugadores cercanos.
+
 La **5.10.392** reutiliza el fragmento de veta animado también como destello central de la Guardia de Veta cuando Iridium protege al portador o a un aliado; aparece una vez por segundo dentro del presupuesto de aura y mantiene el mismo radio de audiencia local.
 
 La **5.10.391** convierte el cristal animado de Blockbench en el destello de la pasiva Curios de Iridium: cada drop de mena se marca con un fragmento pixel-art de ocho cuadros, enviado solo al portador y limitado al presupuesto existente de 32 destellos por tick. La hoja de juego se genera directamente en Blockbench y el aura reemplaza cinco chispas genéricas por una partícula animada.
