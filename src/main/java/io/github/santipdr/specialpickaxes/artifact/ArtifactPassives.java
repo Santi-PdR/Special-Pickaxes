@@ -527,7 +527,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var mantle=io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get();
-        for(var ally:allies)grant(ally,mantle,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyShielded=!ally.hasEffect(mantle);
+            grant(ally,mantle,0,PASSIVE_LEASE_TICKS);
+            if(newlyShielded&&ally.hasEffect(mantle))ArtifactFeedback.crucibleMantleLink(owner,ally);
+        }
     }
 
     /** Hellspec lends its fireproof shell and heat-fed mining tempo to a small allied group. */
