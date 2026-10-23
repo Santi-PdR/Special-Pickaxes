@@ -191,15 +191,12 @@ public final class ArtifactManualScreen extends Screen {
     }
 
     private int scrollThumbHeight(int trackHeight){
-        return Math.min(trackHeight,Math.max(10,trackHeight*trackHeight/Math.max(trackHeight,contentHeight)));
+        return ManualScrollModel.thumbHeight(trackHeight,contentHeight);
     }
 
     private void setScrollFromThumb(int mouseY,int grabOffset){
         var content=layout().content();int trackHeight=content.height();
-        int maxScroll=Math.max(0,contentHeight-trackHeight),thumb=scrollThumbHeight(trackHeight),travel=trackHeight-thumb;
-        if(maxScroll<=0||travel<=0)return;
-        int thumbY=Math.max(content.y(),Math.min(content.bottom()-thumb,mouseY-grabOffset));
-        scroll=clamp((thumbY-content.y())*maxScroll/travel,maxScroll);
+        scroll=ManualScrollModel.scrollFromThumb(trackHeight,contentHeight,mouseY-content.y(),grabOffset);
     }
 
     private void drawCopyChoices(GuiGraphics g,ItemStack active,ManualScreenLayout.Box picker,int mouseX,int mouseY){
@@ -273,11 +270,11 @@ public final class ArtifactManualScreen extends Screen {
 
     @Override public boolean mouseClicked(double mouseX,double mouseY,int button){
         var layout=layout();var picker=layout.picker();
-        var content=layout.content();int maxScroll=Math.max(0,contentHeight-content.height());
+        var content=layout.content();int maxScroll=ManualScrollModel.maxScroll(contentHeight,content.height());
         int barX=content.right()+2;
         if(button==0&&maxScroll>0&&mouseX>=barX-2&&mouseX<barX+4&&mouseY>=content.y()&&mouseY<content.bottom()){
             int thumb=scrollThumbHeight(content.height());int travel=content.height()-thumb;
-            int thumbY=content.y()+(travel==0?0:travel*scroll/maxScroll);
+            int thumbY=content.y()+ManualScrollModel.thumbOffset(content.height(),contentHeight,scroll);
             if(mouseY>=thumbY&&mouseY<thumbY+thumb)scrollbarGrabOffset=(int)mouseY-thumbY;
             else {scrollbarGrabOffset=thumb/2;setScrollFromThumb((int)mouseY,scrollbarGrabOffset);}
             draggingScrollbar=true;return true;

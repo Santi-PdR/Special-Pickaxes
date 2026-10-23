@@ -98,6 +98,25 @@ public final class PickaxeGameTests {
         h.assertTrue(ManualScreenLayout.choiceIndexAt(23,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(-1,0,24,13)==-1&&ManualScreenLayout.choiceIndexAt(1,0,24,2)==0,"cell gaps and out-of-range clicks cannot select a pick");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_96") public static void manualScrollbarDragMapsBothEndsAndKeepsThumbReachable(GameTestHelper h){
+        h.assertTrue(ManualScrollModel.maxScroll(0,80)==0&&ManualScrollModel.thumbHeight(0,100)==0,
+                "empty tracks and short content have no scroll range");
+        for(int track:new int[]{1,8,24,80,300})for(int content:new int[]{track,track+1,track*2,track*20}){
+            int max=ManualScrollModel.maxScroll(content,track),thumb=ManualScrollModel.thumbHeight(track,content);
+            h.assertTrue(thumb>=1&&thumb<=track,"the scrollbar thumb always fits its viewport");
+            h.assertTrue(ManualScrollModel.thumbOffset(track,content,0)==0,"the thumb starts at the top");
+            h.assertTrue(ManualScrollModel.thumbOffset(track,content,max)==track-thumb,"the thumb reaches the bottom at maximum scroll");
+            if(track>thumb)h.assertTrue(ManualScrollModel.scrollFromThumb(track,content,0,thumb/2)==0
+                    &&ManualScrollModel.scrollFromThumb(track,content,track-thumb+thumb/2,thumb/2)==max,
+                    "dragging the thumb to either edge maps exactly to the content limits");
+            else h.assertTrue(ManualScrollModel.scrollFromThumb(track,content,0,thumb/2)==0,
+                    "a thumb filling a tiny viewport stays at a valid scroll origin");
+            int middle=ManualScrollModel.thumbOffset(track,content,max/2);
+            int restored=ManualScrollModel.scrollFromThumb(track,content,middle,0);
+            h.assertTrue(restored>=0&&restored<=max,"drag-derived scroll remains inside the valid content range");
+        }
+        h.succeed();
+    }
     @GameTest(template="empty",batch="rework_each_97") public static void magmaBrandStopsWhenItsOwnerLosesPermission(GameTestHelper h){
         var owner=player(h,ArtifactKind.HELLSPEC,"MagmaBrandOwner");h.getLevel().addFreshEntity(owner);
         var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);
@@ -1010,6 +1029,8 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_70") public static void curiosStrataTempoRequiresASuccessfulBreak(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);var pos=target(h);
+        // GameTest reuses structure coordinates; clear stale provenance from an earlier fixture.
+        PlayerPlacedBlocks.get(wearer.serverLevel()).unmark(pos);
         var stasis=SpecialPickaxes.STASIS_RESONANCE.get();wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(stasis,40,0,true,false,true));
         h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"an uncanceled Strata mining attempt is observed");
         h.assertTrue(StrataFocusEffect.flushObservedBreaks()==0
