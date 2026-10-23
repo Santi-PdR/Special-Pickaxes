@@ -16,7 +16,8 @@ public final class ArtifactManualScreen extends Screen {
     private final ItemStack headerIcon;
     private final List<ArtifactKind> choices=Arrays.stream(ArtifactKind.playableValues()).toList();
     private final Map<ArtifactKind,ItemStack> choiceIcons=new EnumMap<>(ArtifactKind.class);
-    private int scroll,choiceScroll,contentHeight,layoutWidth=-1;
+    private int scroll,choiceScroll,contentHeight,layoutWidth=-1,scrollbarGrabOffset;
+    private boolean draggingScrollbar;
     private String layoutFingerprint="";
     private List<Card> leftCards=List.of(),rightCards=List.of();
     private record Section(String key,Component heading,List<Component> body,int color) {}
@@ -182,10 +183,23 @@ public final class ArtifactManualScreen extends Screen {
         int height=bottom-top;
         if(height<=0||maxScroll<=0)return;
         g.fill(x,top,x+2,bottom,0xff344555);
-        int thumb=Math.max(1,Math.min(height,height*height/Math.max(height,contentHeight)));
+        int thumb=scrollThumbHeight(height);
         int travel=height-thumb;
         int thumbY=top+(maxScroll==0?0:travel*scroll/maxScroll);
-        g.fill(x-1,thumbY,x+3,thumbY+thumb,0xffd4aa5d);
+        g.fill(x-2,thumbY,x+4,thumbY+thumb,0xffd4aa5d);
+        g.fill(x-1,thumbY+1,x+3,thumbY+thumb-1,0xffffdfa0);
+    }
+
+    private int scrollThumbHeight(int trackHeight){
+        return Math.min(trackHeight,Math.max(10,trackHeight*trackHeight/Math.max(trackHeight,contentHeight)));
+    }
+
+    private void setScrollFromThumb(int mouseY,int grabOffset){
+        var content=layout().content();int trackHeight=content.height();
+        int maxScroll=Math.max(0,contentHeight-trackHeight),thumb=scrollThumbHeight(trackHeight),travel=trackHeight-thumb;
+        if(maxScroll<=0||travel<=0)return;
+        int thumbY=Math.max(content.y(),Math.min(content.bottom()-thumb,mouseY-grabOffset));
+        scroll=clamp((thumbY-content.y())*maxScroll/travel,maxScroll);
     }
 
     private void drawCopyChoices(GuiGraphics g,ItemStack active,ManualScreenLayout.Box picker,int mouseX,int mouseY){
@@ -259,6 +273,15 @@ public final class ArtifactManualScreen extends Screen {
 
     @Override public boolean mouseClicked(double mouseX,double mouseY,int button){
         var layout=layout();var picker=layout.picker();
+        var content=layout.content();int maxScroll=Math.max(0,contentHeight-content.height());
+        int barX=content.right()+2;
+        if(button==0&&maxScroll>0&&mouseX>=barX-2&&mouseX<barX+4&&mouseY>=content.y()&&mouseY<content.bottom()){
+            int thumb=scrollThumbHeight(content.height());int travel=content.height()-thumb;
+            int thumbY=content.y()+(travel==0?0:travel*scroll/maxScroll);
+            if(mouseY>=thumbY&&mouseY<thumbY+thumb)scrollbarGrabOffset=(int)mouseY-thumbY;
+            else {scrollbarGrabOffset=thumb/2;setScrollFromThumb((int)mouseY,scrollbarGrabOffset);}
+            draggingScrollbar=true;return true;
+        }
         if(button==0&&kind==ArtifactKind.WORLDBREAKER&&canChooseCopy()&&layout.pickerVisible()
                 &&mouseX>=picker.x()&&mouseX<picker.right()&&mouseY>=picker.y()&&mouseY<picker.bottom()){
             int slot=ManualScreenLayout.choiceIndexAt((int)(mouseX-picker.x()),choiceScroll,CHOICE_CELL,choices.size());
@@ -266,8 +289,16 @@ public final class ArtifactManualScreen extends Screen {
         }
         return super.mouseClicked(mouseX,mouseY,button);
     }
+    @Override public boolean mouseDragged(double mouseX,double mouseY,int button,double dragX,double dragY){
+        if(draggingScrollbar&&button==0){setScrollFromThumb((int)mouseY,scrollbarGrabOffset);return true;}
+        return super.mouseDragged(mouseX,mouseY,button,dragX,dragY);
+    }
+    @Override public boolean mouseReleased(double mouseX,double mouseY,int button){
+        if(button==0&&draggingScrollbar){draggingScrollbar=false;return true;}
+        return super.mouseReleased(mouseX,mouseY,button);
+    }
     @Override public void removed(){
-        super.removed();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutFingerprint="";layoutWidth=-1;
+        super.removed();draggingScrollbar=false;leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutFingerprint="";layoutWidth=-1;
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
 }
