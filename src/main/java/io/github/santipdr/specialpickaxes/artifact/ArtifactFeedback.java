@@ -653,7 +653,7 @@ public final class ArtifactFeedback {
             double height=.08D+risingPoint*.12D;
             level.sendParticles(p,ICARIAN_ASCENT_SKY,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
         }
-        level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
+        level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHER.get(),false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
     }
     public static void nullWard(ServerPlayer p,int radius){
         var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);

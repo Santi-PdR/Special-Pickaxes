@@ -1,0 +1,478 @@
+{
+  "frames": {
+    "IcarianFlutter_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_1": {
+      "frame": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_2": {
+      "frame": {
+        "x": 0,
+        "y": 32,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_3": {
+      "frame": {
+        "x": 0,
+        "y": 48,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_4": {
+      "frame": {
+        "x": 0,
+        "y": 64,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_5": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_6": {
+      "frame": {
+        "x": 0,
+        "y": 96,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    },
+    "IcarianFlutter_0_7": {
+      "frame": {
+        "x": 0,
+        "y": 112,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "duration": 100
+    }
+  },
+  "meta": {
+    "app": "https://github.com/BlockBenchMCP",
+    "version": "1.9.0.1",
+    "image": "icarian_feather.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 16,
+      "h": 128
+    },
+    "scale": "1",
+    "frameTags": [
+      {
+        "name": "IcarianFlutter",
+        "from": 0,
+        "to": 7,
+        "direction": "forward"
+      }
+    ],
+    "layers": [
+      {
+        "name": "sprite",
+        "opacity": 255,
+        "blendMode": "normal"
+      }
+    ],
+    "slices": [
+      {
+        "name": "pivot",
+        "color": "#0000ffff",
+        "keys": [
+          {
+            "frame": 0,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 1,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 2,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 3,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 4,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 5,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 6,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          },
+          {
+            "frame": 7,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 16,
+              "h": 16
+            },
+            "pivot": {
+              "x": 8,
+              "y": 15
+            }
+          }
+        ]
+      }
+    ],
+    "pixelart": {
+      "pixels_per_unit": 1,
+      "frame_size": {
+        "w": 16,
+        "h": 16
+      },
+      "columns": 1,
+      "rows": 8,
+      "view": {
+        "yaw": 0,
+        "pitch": 0,
+        "name": "front"
+      },
+      "directions": [
+        {
+          "index": 0,
+          "name": "down",
+          "compass": "S",
+          "yaw": 0
+        }
+      ],
+      "animations": [
+        {
+          "name": "IcarianFlutter",
+          "fps": 10,
+          "loop": "loop",
+          "length": 0.8,
+          "frames": 8
+        }
+      ],
+      "style": {
+        "shading": "blockbench",
+        "outline": "none",
+        "inner_lines": "none",
+        "palette": "source",
+        "cleanup": "none",
+        "pixel_perfect": true
+      },
+      "frames": [
+        {
+          "key": "IcarianFlutter_0",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_1",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.1,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_2",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.2,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_3",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.3,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_4",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.4,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_5",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.5,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_6",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.6,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        },
+        {
+          "key": "IcarianFlutter_0_7",
+          "tag": "IcarianFlutter",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.7,
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.9375
+          }
+        }
+      ],
+      "fps": 10,
+      "anchor": "origin",
+      "texel_density": 1,
+      "pivot": {
+        "x": 8,
+        "y": 15
+      }
+    }
+  }
+}

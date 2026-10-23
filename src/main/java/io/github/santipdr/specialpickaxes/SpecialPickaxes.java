@@ -41,6 +41,7 @@ public final class SpecialPickaxes {
     public static final DeferredRegister<MobEffect> EFFECTS=DeferredRegister.create(ForgeRegistries.MOB_EFFECTS,ID);
     public static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES=DeferredRegister.create(Registries.PARTICLE_TYPE,ID);
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> STASIS_SHARD=PARTICLES.register("stasis_shard",()->new net.minecraft.core.particles.SimpleParticleType(false));
+    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> ICARIAN_FEATHER=PARTICLES.register("icarian_feather",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
