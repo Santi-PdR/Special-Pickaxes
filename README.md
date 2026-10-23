@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.397** amplía Eco de Falla y Raíces de Cantera a mobs sin `Enemy` que ya estén atacando al portador o a un aliado; no cambia su alcance ni hace barridos extra.
+
 La **5.10.396** hace que Eco de Falla y Raíces de Cantera también reconozcan enemigos de otros mods que implementan `Enemy` sin heredar de `Monster`; se conservan los filtros de equipos, PvP y zonas protegidas.
 
 La **5.10.395** refuerza la Guardia de veta: el golpe protegido ahora ancla al portador y a sus aliados contra empujones durante cuatro segundos; dos marcas de cristal a los pies señalan el efecto sin mantener una nube de partículas.

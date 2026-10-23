@@ -650,8 +650,11 @@ public final class PickaxeGameTests {
         var nearby=EntityType.SLIME.create(h.getLevel());nearby.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());nearby.setOnGround(true);h.getLevel().addFreshEntity(nearby);
         h.assertTrue(nearby instanceof net.minecraft.world.entity.monster.Enemy,
                 "the fixture covers a hostile mob implementing Enemy through a non-Monster class");
+        var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setTarget(wearer);
+        angryWolf.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());angryWolf.setOnGround(true);h.getLevel().addFreshEntity(angryWolf);
         h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR),"Choir's held alternate remains usable");
         h.assertTrue(nearby.hasEffect(resonance)&&nearby.getEffect(resonance).getAmplifier()==1,"the active Fault Echo applies the stronger resonance pulse");
+        h.assertTrue(angryWolf.hasEffect(resonance),"Fault Echo also checks a non-Enemy mob actively attacking its wearer");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosSharesMiningFocusOnlyWithNearbyTeammates(GameTestHelper h){
@@ -2169,8 +2172,11 @@ public final class PickaxeGameTests {
         var owner=player(h,ArtifactKind.WORLDLOOM);
         var rival=player(h,ArtifactKind.WORLDLOOM,"SecondWorldloom");
         var mob=EntityType.SLIME.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
+        var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setTarget(owner);
+        angryWolf.setPos(owner.getX()+3,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(angryWolf);
         var anchor=mob.position();
         h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
+        h.assertTrue(!WorldloomSnare.bind(owner,angryWolf),"Root Snare also captured an attacking non-Enemy mob in its bounded area scan");
         h.assertTrue(!WorldloomSnare.bind(rival,mob),"a second Worldloom cannot reset the first owner's four-second root windup");
         mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
         h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"roots mark the target without immediately freezing it");

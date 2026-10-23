@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -193,7 +194,7 @@ public final class ArtifactTechniques {
     private static boolean faultEcho(ServerPlayer player,int radius,int cap){
         var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
         var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
-            if(!entity.isAlive()||entity==player||!(entity instanceof Enemy||entity instanceof Player)
+            if(!entity.isAlive()||entity==player||!isHostileCandidate(entity,player)
                     ||!entity.onGround()||entity.isAlliedTo(player)
                     ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
@@ -216,7 +217,7 @@ public final class ArtifactTechniques {
     private static boolean rootSnare(ServerPlayer player,double range) {
         Vec3 center=player.position();double rangeSqr=range*range;
         var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(range),entity->{
-            if(!entity.isAlive()||entity==player||!(entity instanceof Enemy||entity instanceof Player)
+            if(!entity.isAlive()||entity==player||!isHostileCandidate(entity,player)
                     ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
                     ||!WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
@@ -224,6 +225,16 @@ public final class ArtifactTechniques {
         int bound=0;for(var target:targets)if(WorldloomSnare.bind(player,target))bound++;
         if(bound>0)ArtifactFeedback.message(player,"root_snared",bound);
         return bound>0;
+    }
+
+    /** Include custom mobs that actively target this player or a teammate even if they omit Enemy. */
+    private static boolean isHostileCandidate(LivingEntity entity,ServerPlayer player){
+        if(entity instanceof Enemy||entity instanceof Player)return true;
+        if(entity instanceof Mob mob){
+            LivingEntity target=mob.getTarget();
+            return target!=null&&(target==player||target.isAlliedTo(player));
+        }
+        return false;
     }
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
