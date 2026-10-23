@@ -512,7 +512,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var veil=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get();
-        for(var ally:allies)grant(ally,veil,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyVeiled=!ally.hasEffect(veil);
+            grant(ally,veil,0,PASSIVE_LEASE_TICKS);
+            if(newlyVeiled&&ally.hasEffect(veil))ArtifactFeedback.nullVeilLink(owner,ally);
+        }
     }
 
     /** Crucible lends its predictive fire-and-lava ward to a bounded nearby allied group. */
@@ -545,7 +549,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var aegis=io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get();
-        for(var ally:allies)grant(ally,aegis,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyAnchored=!ally.hasEffect(aegis);
+            grant(ally,aegis,0,PASSIVE_LEASE_TICKS);
+            if(newlyAnchored&&ally.hasEffect(aegis))ArtifactFeedback.worldbreakerAegisLink(owner,ally);
+        }
     }
 
     /** Exodium lends a lighter projectile ward to at most three nearby teammates. */

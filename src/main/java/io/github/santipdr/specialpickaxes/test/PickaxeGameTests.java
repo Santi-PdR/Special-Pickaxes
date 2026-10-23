@@ -332,7 +332,13 @@ public final class PickaxeGameTests {
             if(sample==3)h.assertTrue(point.y>linear.y+.25D,"the middle of the ally link rises visibly above its straight path");
         }
         var worldloom=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.22D);
+        var aegis=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.14D);
+        var nullVeil=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.29D);
         var gravity=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.34D);
+        h.assertTrue(aegis.y>start.lerp(end,.5D).y&&aegis.y<worldloom.y,
+                "Worldbreaker's brief formation link stays lower than the natural-healing arc");
+        h.assertTrue(nullVeil.y>worldloom.y&&nullVeil.y<gravity.y,
+                "Axiom's null stitch has a distinct arc between vine renewal and gravity links");
         h.assertTrue(worldloom.y>start.lerp(end,.5D).y&&worldloom.y<gravity.y,
                 "Worldloom's lower vine arc remains distinct from Eventide's higher gravity arc");
         var low=CurioAuraGeometry.sharedAllyLinkPoint(start,end,1,.34D);var clampedLow=CurioAuraGeometry.sharedAllyLinkPoint(start,end,0,.34D);

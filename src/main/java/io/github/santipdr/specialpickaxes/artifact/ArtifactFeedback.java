@@ -38,6 +38,7 @@ public final class ArtifactFeedback {
     private static final DustParticleOptions CHOIR_LINK=new DustParticleOptions(new Vector3f(.28F,.91F,.86F),.68F);
     private static final DustParticleOptions STASIS_LINK=new DustParticleOptions(new Vector3f(.67F,.82F,1F),.72F);
     private static final DustParticleOptions GRAVITY_LINK=new DustParticleOptions(new Vector3f(.72F,.55F,1F),.76F);
+    private static final DustParticleOptions NULL_VEIL_LINK=new DustParticleOptions(new Vector3f(.63F,.55F,1F),.74F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
@@ -103,6 +104,34 @@ public final class ArtifactFeedback {
             level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
             level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
+    }
+    /** A short violet splice marks Axiom's shared Null Veil only for its bearer and the new ally. */
+    public static void nullVeilLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
+        for(int i=1;i<=4;i++){
+            Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.29D);
+            var particle=(i&1)==0?ParticleTypes.SCULK_SOUL:NULL_VEIL_LINK;
+            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
+    /** Three slate motes identify which teammate just entered Worldbreaker's Aegis formation. */
+    public static void worldbreakerAegisLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
+        for(int i=1;i<=3;i++){
+            Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.14D);
+            level.sendParticles(wearer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
+            level.sendParticles(ally,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+        Vec3 midpoint=CurioAuraGeometry.sharedAllyLinkPoint(start,end,2,.14D);
+        level.sendParticles(wearer,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
+        level.sendParticles(ally,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */
     public static void stasisReflexImpact(ServerPlayer protectedPlayer){
