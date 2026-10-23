@@ -147,6 +147,8 @@ public final class RelicAura {
         ParticleOptions accent=accent(item.kind,dust);
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
         double yaw=Math.toRadians(player.getYRot());
+        boolean braking=item.kind==ArtifactKind.ICARUS&&player.isShiftKeyDown()&&!player.isFallFlying()
+                &&player.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get());
         boolean soaring=item.kind==ArtifactKind.ICARUS&&player.isSprinting()&&!player.isShiftKeyDown()&&!player.isFallFlying()
                 &&player.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get());
         int basePoints=quality==ParticleStatus.ALL?4:quality==ParticleStatus.DECREASED?2:1;
@@ -191,7 +193,7 @@ public final class RelicAura {
                     particle=i==Math.floorMod(player.tickCount/8,4)?ParticleTypes.CHERRY_LEAVES:dust;
                 }
                 case ICARUS -> {
-                    var point=CurioAuraGeometry.icarusFeatherPoint(new Vec3(player.getX(),y,player.getZ()),yaw,phase,sample,soaring);
+                    var point=CurioAuraGeometry.icarusFeatherPoint(new Vec3(player.getX(),y,player.getZ()),yaw,phase,sample,soaring,braking);
                     x=point.x;particleY=point.y;z=point.z;
                     int feather=sample%4;
                     particle=soaring&&feather==3?ParticleTypes.CLOUD:feather==3?ParticleTypes.END_ROD:feather==0?ParticleTypes.ENCHANT:dust;
@@ -237,12 +239,13 @@ public final class RelicAura {
         double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
         double phase=player.tickCount*.075D+ArtifactKind.ICARUS.ordinal()*.61D;
         double yaw=Math.toRadians(player.getYRot());
+        boolean braking=player.isShiftKeyDown()&&!player.isFallFlying();
         boolean soaring=player.isSprinting()&&!player.isShiftKeyDown()&&!player.isFallFlying();
         var dust=CURIOS_DUST.get(ArtifactKind.ICARUS);
         var origin=new Vec3(player.getX(),y,player.getZ());
         for(int i=0;i<points;i++){
             int sample=CurioAuraGeometry.icarusFeatherSample(i,points);
-            var point=CurioAuraGeometry.icarusFeatherPoint(origin,yaw,phase,sample,soaring);
+            var point=CurioAuraGeometry.icarusFeatherPoint(origin,yaw,phase,sample,soaring,braking);
             int feather=sample%4;
             ParticleOptions particle=soaring&&feather==3?ParticleTypes.CLOUD
                     :feather==3?ParticleTypes.END_ROD:feather==0?ParticleTypes.ENCHANT:dust;

@@ -2241,6 +2241,9 @@ public final class PickaxeGameTests {
         var spread=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,3,true);
         h.assertTrue(Math.abs(folded.x-origin.x)<Math.abs(spread.x-origin.x),
                 "Icarus' wings stay folded at rest and spread when soaring");
+        var braking=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,3,false,true);
+        h.assertTrue(Math.abs(braking.x-origin.x)<Math.abs(folded.x-origin.x)&&braking.y<origin.y,
+                "Icarus tucks its wings close and down while braking for a landing");
         var foldedFlap=CurioAuraGeometry.icarusFeatherPoint(origin,0D,Math.PI/2D,2,false);
         var soaringFlap=CurioAuraGeometry.icarusFeatherPoint(origin,0D,Math.PI/2D,2,true);
         h.assertTrue(Math.abs(soaringFlap.y-CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,2,true).y)>

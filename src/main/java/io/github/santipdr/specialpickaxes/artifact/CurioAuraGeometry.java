@@ -52,7 +52,21 @@ public final class CurioAuraGeometry {
 
     /** The wings fold at rest and spread into a stronger wind-catching flap while soaring. */
     public static Vec3 icarusFeatherPoint(Vec3 origin,double yawRadians,double phase,int sample,boolean soaring){
+        return icarusFeatherPoint(origin,yawRadians,phase,sample,soaring,false);
+    }
+
+    /** Braking tucks the wings close and below the shoulders, like a controlled landing flare. */
+    public static Vec3 icarusFeatherPoint(Vec3 origin,double yawRadians,double phase,int sample,boolean soaring,boolean braking){
         int index=Math.floorMod(sample,8),feather=index%4,wing=index<4?-1:1;
+        if(braking){
+            double span=.12D+feather*.07D;
+            double trail=.08D+feather*.055D;
+            double flare=Math.sin(phase+feather*.42D)*(.012D+feather*.004D);
+            Vec3 back=new Vec3(Math.sin(yawRadians),0,-Math.cos(yawRadians));
+            Vec3 side=new Vec3(Math.cos(yawRadians),0,Math.sin(yawRadians));
+            return origin.add(back.scale(trail)).add(side.scale(wing*span))
+                    .add(0,-.05D-feather*.022D+flare,0);
+        }
         double spread=soaring?1.45D:.72D;
         double span=(.2D+feather*.15D)*spread;
         double trail=.12D+feather*.07D+(soaring?feather*.035D:0D);
