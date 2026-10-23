@@ -50,6 +50,8 @@ public final class RelicAura {
         var curio=CuriosCompat.find(mc.player);
         if(curio!=null&&curio.stack().getItem() instanceof ArtifactItem item
                 &&(held==null||held.kind!=item.kind))emitCurios(mc,mc.player,item,quality);
+        if(mc.player.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get())&&!hasIcarus(held,curio))
+            emitIcarianGift(mc,mc.player,quality);
 
         // Reduced client settings lower visual work, while Minimal skips discovery of other wearers entirely.
         int nearbyLimit=switch(quality){case ALL->MAX_VISIBLE_NEARBY_AURAS;case DECREASED->2;case MINIMAL->0;};
@@ -71,6 +73,14 @@ public final class RelicAura {
             if(visibleAuras>=nearbyLimit)break;
             emitCurios(mc,entry.player(),entry.relic(),quality);
             visibleAuras++;
+        }
+        for(var viewer:nearbyCandidates){
+            if(visibleAuras>=nearbyLimit)break;
+            if(!visibleToLocal(mc,viewer)||!viewer.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get()))continue;
+            ArtifactItem heldRelic=viewer.getMainHandItem().getItem() instanceof ArtifactItem item?item:null;
+            var equipped=CuriosCompat.find(viewer);
+            if(hasIcarus(heldRelic,equipped))continue;
+            emitIcarianGift(mc,viewer,quality);visibleAuras++;
         }
         }
     }
@@ -102,6 +112,10 @@ public final class RelicAura {
     private static boolean visibleToLocal(Minecraft mc,Player viewer){
         return !viewer.isRemoved()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(mc.player)
                 &&viewer.distanceToSqr(mc.player)<=VISIBLE_CURIO_RADIUS_SQR;
+    }
+    private static boolean hasIcarus(ArtifactItem held,CuriosCompat.Equipped equipped){
+        return (held!=null&&held.kind==ArtifactKind.ICARUS)
+                ||(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.ICARUS);
     }
     private static void clearNearbyCache(){
         scanOwner=null;scanLevel=null;lastNearbyScanTick=Integer.MIN_VALUE;
@@ -138,6 +152,7 @@ public final class RelicAura {
         int basePoints=quality==ParticleStatus.ALL?4:quality==ParticleStatus.DECREASED?2:1;
         int auraPoints=item.kind==ArtifactKind.ICARUS?basePoints*2:basePoints;
         for(int i=0;i<auraPoints;i++){
+            int sample=item.kind==ArtifactKind.ICARUS?CurioAuraGeometry.icarusFeatherSample(i,auraPoints):i;
             double angle=phase+i*Math.PI/2D,radius=.42D+Math.sin(phase+i*.7D)*.035D;
             double x=player.getX()+Math.cos(angle)*radius,z=player.getZ()+Math.sin(angle)*radius;
             double particleY=y+Math.sin(angle*2D)*.06D;
@@ -176,9 +191,9 @@ public final class RelicAura {
                     particle=i==Math.floorMod(player.tickCount/8,4)?ParticleTypes.CHERRY_LEAVES:dust;
                 }
                 case ICARUS -> {
-                    var point=CurioAuraGeometry.icarusFeatherPoint(new Vec3(player.getX(),y,player.getZ()),yaw,phase,i,soaring);
+                    var point=CurioAuraGeometry.icarusFeatherPoint(new Vec3(player.getX(),y,player.getZ()),yaw,phase,sample,soaring);
                     x=point.x;particleY=point.y;z=point.z;
-                    int feather=i%4;
+                    int feather=sample%4;
                     particle=soaring&&feather==3?ParticleTypes.CLOUD:feather==3?ParticleTypes.END_ROD:feather==0?ParticleTypes.ENCHANT:dust;
                 }
                 case AXIOM -> {
@@ -214,6 +229,24 @@ public final class RelicAura {
                 default -> { }
             }
             mc.level.addParticle(particle,x,particleY,z,0,.004D,0);
+        }
+    }
+    /** Teammates protected by Curios Icarus receive the same restrained wing animation. */
+    private static void emitIcarianGift(Minecraft mc,Player player,ParticleStatus quality){
+        int points=switch(quality){case ALL->8;case DECREASED->4;case MINIMAL->2;};
+        double y=player.getY()+Math.min(player.getBbHeight()*.58D,1.05D);
+        double phase=player.tickCount*.075D+ArtifactKind.ICARUS.ordinal()*.61D;
+        double yaw=Math.toRadians(player.getYRot());
+        boolean soaring=player.isSprinting()&&!player.isFallFlying();
+        var dust=CURIOS_DUST.get(ArtifactKind.ICARUS);
+        var origin=new Vec3(player.getX(),y,player.getZ());
+        for(int i=0;i<points;i++){
+            int sample=CurioAuraGeometry.icarusFeatherSample(i,points);
+            var point=CurioAuraGeometry.icarusFeatherPoint(origin,yaw,phase,sample,soaring);
+            int feather=sample%4;
+            ParticleOptions particle=soaring&&feather==3?ParticleTypes.CLOUD
+                    :feather==3?ParticleTypes.END_ROD:feather==0?ParticleTypes.ENCHANT:dust;
+            mc.level.addParticle(particle,point.x,point.y,point.z,0,.004D,0);
         }
     }
     private static java.util.Map<ArtifactKind,DustParticleOptions> dustPalette(float size,float icarusSize){

@@ -2219,6 +2219,13 @@ public final class PickaxeGameTests {
                 "the Icarus wing points change height through the flap cycle");
         h.assertTrue(CurioAuraGeometry.icarusFeatherPoint(origin,Math.PI/2D,0D,0).x>origin.x,
                 "the wings rotate with the wearer's facing direction");
+        for(int count:List.of(2,4,8)){
+            var samples=new java.util.HashSet<Integer>();
+            for(int i=0;i<count;i++)samples.add(CurioAuraGeometry.icarusFeatherSample(i,count));
+            h.assertTrue(samples.size()==count&&samples.stream().anyMatch(sample->sample<4)
+                            &&samples.stream().anyMatch(sample->sample>=4),
+                    "Icarus keeps both wings visible at every particle quality");
+        }
         var folded=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,3,false);
         var spread=CurioAuraGeometry.icarusFeatherPoint(origin,0D,0D,3,true);
         h.assertTrue(Math.abs(folded.x-origin.x)<Math.abs(spread.x-origin.x),

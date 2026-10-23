@@ -37,6 +37,14 @@ public final class CurioAuraGeometry {
         return origin.add(Math.cos(angle)*radius,rise,Math.sin(angle)*radius);
     }
 
+    /** Selects symmetric feather samples when reduced particle settings draw fewer wings. */
+    public static int icarusFeatherSample(int point,int pointCount){
+        int count=Math.max(1,Math.min(8,pointCount));int index=Math.floorMod(point,count);
+        if(count==2)return index==0?1:5;
+        if(count==4)return index*2;
+        return index;
+    }
+
     /** Eight mirrored feather points define Icarus' compact wing silhouette. */
     public static Vec3 icarusFeatherPoint(Vec3 origin,double yawRadians,double phase,int sample){
         return icarusFeatherPoint(origin,yawRadians,phase,sample,true);
