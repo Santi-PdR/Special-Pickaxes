@@ -44,6 +44,7 @@ public final class ArtifactFeedback {
     private static final DustParticleOptions SEARING_LINK=new DustParticleOptions(new Vector3f(1F,.24F,.08F),.76F);
     private static final DustParticleOptions LODEGUARD_LINK=new DustParticleOptions(new Vector3f(.34F,.92F,.8F),.74F);
     private static final DustParticleOptions ICARIAN_LINK=new DustParticleOptions(new Vector3f(1F,.83F,.48F),.72F);
+    private static final DustParticleOptions ICARIAN_ASCENT_SKY=new DustParticleOptions(new Vector3f(.58F,.84F,1F),1.05F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
@@ -646,12 +647,11 @@ public final class ArtifactFeedback {
     /** Personal ascent helix: six rising cyan points that never broadcast to distant players. */
     public static void icarianAscent(ServerPlayer p){
         var level=p.serverLevel();double phase=p.tickCount*.22D,x=p.getX(),y=p.getY()+.15D,z=p.getZ();
-        var sky=new DustParticleOptions(new Vector3f(.58F,.84F,1F),1.05F);
         for(int i=0;i<6;i++){
             double angle=phase+i*Math.PI/3D;
             int risingPoint=(i+(p.tickCount/2))%6;
             double height=.08D+risingPoint*.12D;
-            level.sendParticles(p,sky,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
+            level.sendParticles(p,ICARIAN_ASCENT_SKY,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
         }
         level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
     }
