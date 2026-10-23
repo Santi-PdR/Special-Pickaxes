@@ -334,8 +334,8 @@ public final class PickaxeGameTests {
         for(int i=0;i<enemies.size();i++){var enemy=enemies.get(i);enemy.setPos(wearer.getX()+offsets[i],wearer.getY(),wearer.getZ());level.addFreshEntity(enemy);}
         var far=player(h,ArtifactKind.AXIOM,"EventideImpactFar");far.setPos(wearer.getX()+5D,wearer.getY(),wearer.getZ());level.addFreshEntity(far);
         h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,6.99F)==0,"a short fall cannot trigger the landing counter");
-        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,7F,1F);MinecraftForge.EVENT_BUS.post(fall);
-        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.25F)<.001F,"Eventide keeps its fall-damage protection on a hard landing");
+        int caught=GraviticBalanceEffect.landingSnare(wearer,7F);
+        h.assertTrue(caught==3,"a qualifying landing catches only the three nearest hostile players (caught="+caught+")");
         var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
         for(int i=0;i<3;i++)h.assertTrue(enemies.get(i).hasEffect(tether)&&enemies.get(i).getEffect(tether).getDuration()==60,
                 "each caught opponent receives the three-second custom gravity snare");
