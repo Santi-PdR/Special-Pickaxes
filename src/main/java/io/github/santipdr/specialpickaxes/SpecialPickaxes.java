@@ -117,7 +117,7 @@ public final class SpecialPickaxes {
     private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();MiningDesigns.clearCache();}
     private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
-        StrataFocusEffect.observeBreak(p,e.getPos());
+        StrataFocusEffect.observeBreak(p,e.getPos(),e.getState());
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.find(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());

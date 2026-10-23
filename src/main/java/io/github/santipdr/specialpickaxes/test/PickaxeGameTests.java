@@ -1008,11 +1008,21 @@ public final class PickaxeGameTests {
                 &&!wearer.getPersistentData().contains("specialpickaxesStasisResonancePulseAtWorldTime"),
                 "an unbroken or subsequently canceled block grants neither tempo nor a Stasis mining pulse");
         h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
-        h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos),"a real break is queued for end-of-tick confirmation");
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos,Blocks.STONE.defaultBlockState()),"a real break is queued with the state Forge reported before removal");
         h.assertTrue(StrataFocusEffect.flushObservedBreaks()==1
                 &&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.08D)<.001D
                 &&wearer.getPersistentData().contains("specialpickaxesStasisResonancePulseAtWorldTime"),
                 "a confirmed break grants the first Strata charge and its Stasis pulse");
+        var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,pos,ore),"natural ores also contribute to Curios mining tempo");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        h.assertTrue(StrataFocusEffect.flushObservedBreaks()==1&&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.16D)<.001D,
+                "confirmed ore mining builds on the first Strata tempo charge");
+        var machine=Blocks.CHEST.defaultBlockState();
+        h.assertTrue(!StrataFocusEffect.observeBreak(wearer,pos,machine),"block entities cannot feed the geology tempo");
+        h.assertTrue(!StrataFocusEffect.observeBreak(wearer,pos,Blocks.WATER.defaultBlockState()),"fluids cannot feed the geology tempo");
+        var placed=target(h);PlayerPlacedBlocks.get(wearer.serverLevel()).mark(placed);
+        h.assertTrue(!StrataFocusEffect.observeBreak(wearer,placed),"player-placed geology stays outside the Curios mining streak");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_40") public static void palimpsestCuriosDawnMendingPulsesAndClears(GameTestHelper h){

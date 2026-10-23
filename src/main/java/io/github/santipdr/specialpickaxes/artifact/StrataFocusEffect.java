@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayDeque;
@@ -18,17 +19,25 @@ public final class StrataFocusEffect extends MobEffect {
     private static final String MINING_STREAK="specialpickaxesStrataMiningStreak";
     private static final int STREAK_WINDOW_TICKS=80;
     private static final int MAX_PENDING_BREAKS=1024;
-    private record PendingBreak(ServerPlayer player,BlockPos pos,ResourceKey<Level> dimension,long time) {}
+    private record PendingBreak(ServerPlayer player,BlockPos pos,BlockState expected,
+                                ResourceKey<Level> dimension,long time) {}
     private static final ArrayDeque<PendingBreak> PENDING_BREAKS=new ArrayDeque<>();
 
     public StrataFocusEffect(){super(MobEffectCategory.BENEFICIAL,0x52bdd8);}
 
     /** Defer Curios mining feedback until Forge and other mods have finished this block break. */
     public static boolean observeBreak(ServerPlayer player,BlockPos pos){
+        if(!player.serverLevel().hasChunkAt(pos))return false;
+        return observeBreak(player,pos,player.serverLevel().getBlockState(pos));
+    }
+
+    /** Only natural mineable geology, including ores, contributes to the Curios mining rhythm. */
+    public static boolean observeBreak(ServerPlayer player,BlockPos pos,BlockState expected){
         if((!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get())
                 &&!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get()))
-                ||PENDING_BREAKS.size()>=MAX_PENDING_BREAKS)return false;
-        PENDING_BREAKS.addLast(new PendingBreak(player,pos.immutable(),player.level().dimension(),ArtifactState.now(player)));
+                ||PENDING_BREAKS.size()>=MAX_PENDING_BREAKS||!mineableGeology(expected)
+                ||PlayerPlacedBlocks.get(player.serverLevel()).contains(pos))return false;
+        PENDING_BREAKS.addLast(new PendingBreak(player,pos.immutable(),expected,player.level().dimension(),ArtifactState.now(player)));
         return true;
     }
 
@@ -40,7 +49,9 @@ public final class StrataFocusEffect extends MobEffect {
             long now=ArtifactState.now(player);
             if(!player.isAlive()||player.isRemoved()||!player.level().dimension().equals(pending.dimension())
                     ||now<pending.time()||now-pending.time()>2L||!player.serverLevel().hasChunkAt(pending.pos()))continue;
-            if(player.serverLevel().getBlockState(pending.pos()).isAir()){
+            if(mineableGeology(pending.expected())
+                    &&!PlayerPlacedBlocks.get(player.serverLevel()).contains(pending.pos())
+                    &&player.serverLevel().getBlockState(pending.pos()).isAir()){
                 miningPulse(player,pending.pos());
                 StasisResonanceEffect.miningPulse(player,pending.pos());
                 processed++;
@@ -78,5 +89,10 @@ public final class StrataFocusEffect extends MobEffect {
         int streak=data.getInt(MINING_STREAK);
         if(now<last||now-last>STREAK_WINDOW_TICKS||streak<=0)return 1D;
         return 1D+.08D*Math.min(3,streak);
+    }
+
+    private static boolean mineableGeology(BlockState state){
+        return !state.hasBlockEntity()&&state.getFluidState().isEmpty()
+                &&(MiningDesigns.matrix(state)||ArtifactOres.isOre(state));
     }
 }
