@@ -355,6 +355,8 @@ public final class PickaxeGameTests {
         var crucible=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.25D);
         var nullVeil=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.29D);
         var gravity=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.34D);
+        var starfall=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.31D);
+        var searing=CurioAuraGeometry.sharedAllyLinkPoint(start,end,3,.38D);
         h.assertTrue(aegis.y>start.lerp(end,.5D).y&&aegis.y<worldloom.y,
                 "Worldbreaker's brief formation link stays lower than the natural-healing arc");
         h.assertTrue(nullVeil.y>worldloom.y&&nullVeil.y<gravity.y,
@@ -363,6 +365,8 @@ public final class PickaxeGameTests {
                 "Crucible's ember current has its own bounded arc between vine and null links");
         h.assertTrue(worldloom.y>start.lerp(end,.5D).y&&worldloom.y<gravity.y,
                 "Worldloom's lower vine arc remains distinct from Eventide's higher gravity arc");
+        h.assertTrue(starfall.y>nullVeil.y&&starfall.y<gravity.y&&searing.y>gravity.y,
+                "Exodium's star stitch and Hellspec's ember arc have distinct Curios link silhouettes");
         var low=CurioAuraGeometry.sharedAllyLinkPoint(start,end,1,.34D);var clampedLow=CurioAuraGeometry.sharedAllyLinkPoint(start,end,0,.34D);
         var high=CurioAuraGeometry.sharedAllyLinkPoint(start,end,5,.34D);var clampedHigh=CurioAuraGeometry.sharedAllyLinkPoint(start,end,99,.34D);
         h.assertTrue(low.equals(clampedLow)&&high.equals(clampedHigh),"invalid particle sample indices clamp to the five bounded interior points");h.succeed();

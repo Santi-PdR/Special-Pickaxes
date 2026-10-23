@@ -542,7 +542,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var shell=io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get();
-        for(var ally:allies)grant(ally,shell,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyShielded=!ally.hasEffect(shell);
+            grant(ally,shell,0,PASSIVE_LEASE_TICKS);
+            if(newlyShielded&&ally.hasEffect(shell))ArtifactFeedback.searingShellLink(owner,ally);
+        }
     }
 
     /** Worldbreaker lends its armor-and-anchor ward to a bounded three-player allied formation. */
@@ -568,7 +572,11 @@ public final class ArtifactPassives {
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var guard=io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get();
-        for(var ally:allies)grant(ally,guard,0,PASSIVE_LEASE_TICKS);
+        for(var ally:allies){
+            boolean newlyGuarded=!ally.hasEffect(guard);
+            grant(ally,guard,0,PASSIVE_LEASE_TICKS);
+            if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.starfallGuardLink(owner,ally);
+        }
     }
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
