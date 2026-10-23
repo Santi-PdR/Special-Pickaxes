@@ -401,10 +401,21 @@ public final class PickaxeGameTests {
         h.assertTrue(lifted.y>falling.y&&lifted.x==falling.x&&lifted.z==falling.z,"looking up while sprinting converts the glide into a controlled ascent");
         h.assertTrue(IcarianMomentumEffect.guidedLift(new Vec3(0,.18D,0),new Vec3(0,1D,0),true,false).y==.22D,
                 "the updraft caps upward velocity instead of allowing unlimited flight speed");
+        var incoming=new Vec3(.6D,-.8D,.3D);var braked=IcarianMomentumEffect.airBrake(incoming,true,false);
+        h.assertTrue(Math.abs(braked.x-.408D)<1.0E-6D&&Math.abs(braked.z-.204D)<1.0E-6D&&braked.y==-.12D,
+                "Sneak cuts horizontal drift and caps a fast fall for precise landing");
+        h.assertTrue(IcarianMomentumEffect.airBrake(incoming,false,false).equals(incoming)
+                        &&IcarianMomentumEffect.airBrake(incoming,true,true).equals(incoming),
+                "the air brake only changes normal airborne movement");
         wearer.setXRot(-45F);wearer.setDeltaMovement(0,-.2,0);glide.applyEffectTick(wearer,0);var boosted=wearer.getDeltaMovement();
         h.assertTrue(boosted.horizontalDistanceSqr()>.0025&&boosted.y>-.2,"sprint-gliding gains forward momentum and updraft when the wearer looks up");
         wearer.setSprinting(false);wearer.setDeltaMovement(.1,-.2,0);glide.applyEffectTick(wearer,0);
         h.assertTrue(Math.abs(wearer.getDeltaMovement().x-.1)<.001&&Math.abs(wearer.getDeltaMovement().z)<.001,"the glide stops accelerating when sprint is released");
+        wearer.setSprinting(true);wearer.setShiftKeyDown(true);wearer.setDeltaMovement(.6,-.8,.3);glide.applyEffectTick(wearer,0);
+        var braking=wearer.getDeltaMovement();
+        h.assertTrue(Math.abs(braking.x-.408)<.001D&&Math.abs(braking.z-.204)<.001D&&Math.abs(braking.y+.12)<.001D,
+                "holding Sneak brakes horizontal momentum and slows a steep fall");
+        wearer.setShiftKeyDown(false);wearer.setSprinting(false);
         wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);
         h.assertTrue(Math.abs(wearer.getDeltaMovement().y+.36)<.001,"Icarian Momentum caps a fast descent at a controlled speed");
         wearer.startFallFlying();wearer.setDeltaMovement(0,-1.2,0);glide.applyEffectTick(wearer,0);

@@ -61,11 +61,22 @@ public final class IcarianMomentumEffect extends MobEffect {
         return new Vec3(motion.x,Math.min(.22D,motion.y+lift),motion.z);
     }
 
+    /** Sneak trims horizontal momentum and caps descent for deliberate midair positioning. */
+    public static Vec3 airBrake(Vec3 motion,boolean sneaking,boolean fallFlying){
+        if(!sneaking||fallFlying)return motion;
+        double vertical=motion.y<0D?Math.max(-.12D,motion.y):motion.y*.6D;
+        return new Vec3(motion.x*.68D,vertical,motion.z*.68D);
+    }
+
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||entity.onGround())return;
         Vec3 motion=entity.getDeltaMovement();
-        if(!entity.isFallFlying()&&motion.y<-.36D){entity.setDeltaMovement(motion.x,-.36D,motion.z);entity.hasImpulse=true;}
-        if(entity instanceof Player player&&player.isSprinting()){
+        boolean braking=entity instanceof Player player&&player.isShiftKeyDown()&&!entity.isFallFlying();
+        if(braking){
+            Vec3 slowed=airBrake(motion,true,false);
+            if(!slowed.equals(motion)){entity.setDeltaMovement(slowed);entity.hasImpulse=true;motion=slowed;}
+        }else if(!entity.isFallFlying()&&motion.y<-.36D){entity.setDeltaMovement(motion.x,-.36D,motion.z);entity.hasImpulse=true;}
+        if(entity instanceof Player player&&player.isSprinting()&&!player.isShiftKeyDown()){
             Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
             if(forward.lengthSqr()>.001D){
                 motion=player.getDeltaMovement();Vec3 horizontal=new Vec3(motion.x,0,motion.z).add(forward.normalize().scale(.06D));
@@ -74,10 +85,11 @@ public final class IcarianMomentumEffect extends MobEffect {
             }
         }
         if(entity instanceof Player player){
-            Vec3 before=player.getDeltaMovement();Vec3 lifted=guidedLift(before,player.getLookAngle(),player.isSprinting(),player.isFallFlying());
+            Vec3 before=player.getDeltaMovement();Vec3 lifted=guidedLift(before,player.getLookAngle(),player.isSprinting()&&!player.isShiftKeyDown(),player.isFallFlying());
             if(lifted.y!=before.y){player.setDeltaMovement(lifted);player.hasImpulse=true;}
         }
-        if(entity instanceof Player player&&player.isSprinting()&&entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
+        if(entity instanceof Player player&&player.isSprinting()&&!player.isShiftKeyDown()
+                &&entity.tickCount%12==0&&entity.level() instanceof ServerLevel level){
             Vec3 forward=glideTrailForward(player.getDeltaMovement(),player.getLookAngle());
             Vec3 right=new Vec3(-forward.z,0,forward.x);
             double speed=Math.min(.8D,player.getDeltaMovement().horizontalDistance());
