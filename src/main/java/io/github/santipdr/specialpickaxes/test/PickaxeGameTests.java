@@ -421,6 +421,30 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING),"unequipping Icarus preserves Slow Falling supplied by another source");
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_101") public static void icarusCuriosSharesControlledGlideWithTwoAirborneTeammates(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS,"IcarianWindbearer");wearer.setPos(wearer.getX(),wearer.getY()+6D,wearer.getZ());wearer.setOnGround(false);
+        var allies=List.of(player(h,ArtifactKind.CHOIR,"IcarianOne"),player(h,ArtifactKind.CHOIR,"IcarianTwo"),
+                player(h,ArtifactKind.CHOIR,"IcarianThree"));
+        var grounded=player(h,ArtifactKind.CHOIR,"IcarianGrounded");var enemy=player(h,ArtifactKind.CHOIR,"IcarianEnemy");
+        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("iw_"+wearer.getUUID().toString().substring(0,6));
+        var foes=scoreboard.addPlayerTeam("iwe_"+enemy.getUUID().toString().substring(0,6));
+        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);
+        for(var ally:allies)scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);
+        scoreboard.addPlayerToTeam(grounded.getScoreboardName(),team);scoreboard.addPlayerToTeam(enemy.getScoreboardName(),foes);
+        for(int i=0;i<allies.size();i++){allies.get(i).setPos(wearer.getX()+i+1D,wearer.getY(),wearer.getZ());allies.get(i).setOnGround(false);}
+        grounded.setPos(wearer.getX()+1D,wearer.getY()-6D,wearer.getZ());grounded.setOnGround(true);
+        enemy.setPos(wearer.getX()+1D,wearer.getY(),wearer.getZ());enemy.setOnGround(false);
+        var participants=new ArrayList<ServerPlayer>();participants.add(wearer);participants.addAll(allies);participants.add(grounded);participants.add(enemy);
+        for(var participant:participants){h.getLevel().addFreshEntity(participant);if(participant!=grounded)participant.setOnGround(false);}
+        ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);var glide=SpecialPickaxes.ICARIAN_MOMENTUM.get();
+        h.assertTrue(wearer.hasEffect(glide),"Icarus keeps its own airborne Curios glide");
+        h.assertTrue(allies.get(0).hasEffect(glide)&&allies.get(1).hasEffect(glide),"Icarus lends controlled glide to its two nearest airborne allies");
+        h.assertTrue(!allies.get(2).hasEffect(glide)&&!grounded.hasEffect(glide)&&!enemy.hasEffect(glide),
+                "the wind excludes the third ally, grounded players and enemies");
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(allies.get(0),12F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.5F)<.001F,"the shared wind halves an ally's fall damage");
+        for(var participant:participants)finish(h,participant);
+    }
     @GameTest(template="empty",batch="rework_each_67") public static void icarusProtectedLandingConvertsIntoCooledWingRebound(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS,"IcarusLanding");wearer.setYRot(0);wearer.setDeltaMovement(0,0,0);
         wearer.getPersistentData().putLong("specialpickaxesIcarianLandingReady",Long.MAX_VALUE);
@@ -1772,7 +1796,7 @@ public final class PickaxeGameTests {
         level.addFreshEntity(farOwned);
         var nearerDrops=new java.util.ArrayList<ItemEntity>();
         for(int i=0;i<95;i++){
-            var item=new ItemEntity(level,origin.x+12D,origin.y+.5D,origin.z+i*.01D,new ItemStack(Items.DIAMOND));
+            var item=new ItemEntity(level,origin.x+12D+(i%10)*.5D,origin.y+.5D,origin.z+(i/10)*2.5D,new ItemStack(Items.DIAMOND));
             item.getItem().getOrCreateTag().putInt("testDropIndex",i);
             item.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);item.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
             level.addFreshEntity(item);nearerDrops.add(item);

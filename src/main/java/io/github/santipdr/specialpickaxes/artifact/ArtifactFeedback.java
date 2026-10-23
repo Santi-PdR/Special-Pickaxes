@@ -43,6 +43,7 @@ public final class ArtifactFeedback {
     private static final DustParticleOptions STARFALL_LINK=new DustParticleOptions(new Vector3f(.58F,.78F,1F),.72F);
     private static final DustParticleOptions SEARING_LINK=new DustParticleOptions(new Vector3f(1F,.24F,.08F),.76F);
     private static final DustParticleOptions LODEGUARD_LINK=new DustParticleOptions(new Vector3f(.34F,.92F,.8F),.74F);
+    private static final DustParticleOptions ICARIAN_LINK=new DustParticleOptions(new Vector3f(1F,.83F,.48F),.72F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
     private ArtifactFeedback() {}
@@ -190,6 +191,20 @@ public final class ArtifactFeedback {
             var particle=(i&1)==0?ParticleTypes.END_ROD:LODEGUARD_LINK;
             level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
             level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+        }
+    }
+    /** A short golden feather current shows Icarus sharing controlled glide with a falling ally. */
+    public static void icarianWindLink(ServerPlayer wearer,ServerPlayer ally){
+        if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
+        var level=wearer.serverLevel();
+        if(!reserveAuraParticles(level.getGameTime(),5,2))return;
+        Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
+        Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
+        for(int i=1;i<=5;i++){
+            Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.27D);
+            var particle=(i==3||i==4)?ParticleTypes.END_ROD:ICARIAN_LINK;
+            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
+            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
         }
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */

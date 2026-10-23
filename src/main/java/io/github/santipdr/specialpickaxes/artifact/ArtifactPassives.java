@@ -261,7 +261,10 @@ public final class ArtifactPassives {
                 shareHeartwood(player);
             }
             case ICARUS -> {
-                if(!player.onGround())grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
+                if(!player.onGround()){
+                    grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
+                    shareIcarianMomentum(player);
+                }
                 else removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
             }
             case AXIOM -> {
@@ -594,6 +597,22 @@ public final class ArtifactPassives {
             boolean newlyGuarded=!ally.hasEffect(guard);
             grantCombatEffect(ally,guard,0,80);
             if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.lodeguardLink(owner,ally);
+        }
+    }
+
+    /** An airborne Icarus wearer lends a brief controlled glide to two nearest airborne teammates. */
+    private static void shareIcarianMomentum(ServerPlayer owner){
+        if(!allyAuraScanDue(owner,ArtifactKind.ICARUS,"icarianWindAuraScanAt"))return;
+        var center=owner.position();double rangeSqr=36D;
+        var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
+                ally!=owner&&ally.isAlive()&&!ally.onGround()&&ally.isAlliedTo(owner)
+                        &&ally.distanceToSqr(center)<=rangeSqr,
+                center,2,128);
+        var glide=io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get();
+        for(var ally:allies){
+            boolean newlyLifted=!ally.hasEffect(glide);
+            grantCombatEffect(ally,glide,0,PASSIVE_LEASE_TICKS);
+            if(newlyLifted&&ally.hasEffect(glide))ArtifactFeedback.icarianWindLink(owner,ally);
         }
     }
 
