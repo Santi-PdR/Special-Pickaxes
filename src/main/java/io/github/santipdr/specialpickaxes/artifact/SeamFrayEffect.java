@@ -27,6 +27,7 @@ public final class SeamFrayEffect extends MobEffect {
         if(!(entity.level() instanceof ServerLevel level))return;
         double phase=entity.tickCount*.13D,cx=entity.getX(),cz=entity.getZ(),centerY=entity.getY()+entity.getBbHeight()*.56D;
         double radius=Math.max(.28D,entity.getBbWidth()*.62D);
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(16);
         for(int cut=0;cut<3;cut++){
             double angle=phase+cut*Math.PI*2D/3D;
             for(int shard=0;shard<4;shard++){
@@ -34,10 +35,13 @@ public final class SeamFrayEffect extends MobEffect {
                 double x=cx+Math.cos(angle)*radius+Math.sin(angle)*offset;
                 double z=cz+Math.sin(angle)*radius-Math.cos(angle)*offset;
                 double y=centerY+offset*.7D;
-                level.sendParticles(shard==1||shard==2?SCAR_CORE:SCAR_DUST,x,y,z,1,0,0,0,0);
+                particles.add(new ArtifactFeedback.AuraParticle(shard==1||shard==2?SCAR_CORE:SCAR_DUST,
+                        new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
             }
         }
-        level.sendParticles(ParticleTypes.CRIT,cx,centerY,cz,4,.18D,.22D,.18D,.015D);
+        particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.CRIT,
+                new net.minecraft.world.phys.Vec3(cx,centerY,cz),4,.18D,.22D,.18D,.015D));
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
@@ -45,12 +49,15 @@ public final class SeamFrayEffect extends MobEffect {
         double phase=entity.tickCount*.17D;
         double radius=Math.max(.24D,entity.getBbWidth()*.52D);
         double centerY=entity.getY()+entity.getBbHeight()*.55D;
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(3);
         for(int shard=0;shard<3;shard++){
             double angle=phase+shard*Math.PI*2D/3D;
             double x=entity.getX()+Math.cos(angle)*radius,z=entity.getZ()+Math.sin(angle)*radius;
             double y=centerY+Math.sin(angle*2D)*.11D;
-            level.sendParticles(SCAR_DUST,x,y,z,1,0,0,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(SCAR_DUST,
+                    new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0));
         }
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){
