@@ -1407,6 +1407,19 @@ public final class PickaxeGameTests {
         PlayerPlacedBlocks.get(level).unmark(placed);
         finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_102") public static void crucibleRecognizesAndRephasesThirdPartyGeology(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var level=h.getLevel();
+        var gabbro=TestOres.GABBRO_ROCK.defaultBlockState();var mudstone=TestOres.MUDSTONE_ROCK.defaultBlockState();
+        h.assertTrue(MiningDesigns.matrix(gabbro)&&MiningDesigns.crucibleGeology(gabbro)
+                        &&MiningDesigns.matrix(mudstone)&&MiningDesigns.crucibleGeology(mudstone),
+                "common modded igneous and sedimentary rock names count as geology");
+        level.setBlockAndUpdate(pos,gabbro);PlayerPlacedBlocks.get(level).unmark(pos);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible can target third-party rock");drain(p);
+        h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"third-party rock rephases without drops into the selected output");
+        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"modded geology rephase creates no drops");
+        finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

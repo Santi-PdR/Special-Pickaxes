@@ -9,7 +9,8 @@ import java.util.*;
 public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
     private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar","undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
-    private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay");
+    private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay",
+            "gabbro","gneiss","quartzite","schist","phyllite","argillite","hornfels","siltstone","mudstone","claystone","conglomerate","breccia","pumice","rhyolite","dacite","travertine","dolomite","chalk","soapstone","gypsum","mud","soil");
     private static final Set<net.minecraft.world.level.block.Block> VANILLA_GEOLOGY=Set.of(
             Blocks.STONE,Blocks.COBBLESTONE,Blocks.MOSSY_COBBLESTONE,Blocks.STONE_BRICKS,Blocks.MOSSY_STONE_BRICKS,Blocks.CRACKED_STONE_BRICKS,Blocks.CHISELED_STONE_BRICKS,
             Blocks.GRANITE,Blocks.POLISHED_GRANITE,Blocks.DIORITE,Blocks.POLISHED_DIORITE,Blocks.ANDESITE,Blocks.POLISHED_ANDESITE,
