@@ -294,6 +294,12 @@ public final class ArtifactPassives {
         }
     }
 
+    /** Keep the shared Night Vision passive while a playable pick is held or equipped in Curios. */
+    public static void syncNightVisionSource(ServerPlayer player,boolean hasArtifactSource){
+        if(hasArtifactSource)grantNightVision(player);
+        else clearNightVisionLease(player);
+    }
+
     /** Successive Iridium ore breaks build up to three short mining-speed charges. */
     public static int lodeSurge(ServerPlayer player,BlockPos pos){
         return lodeSurge(player,pos,false);

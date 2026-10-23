@@ -794,6 +794,18 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(renewal),"held Worldloom keeps the matching healing passive");
         h.assertTrue(wearer.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"another pick source preserves night vision");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_97") public static void heldPickMaintainsItsNightVisionPassiveAndReleasesIt(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var nightVision=net.minecraft.world.effect.MobEffects.NIGHT_VISION;
+        ArtifactPassives.syncNightVisionSource(wearer,true);
+        h.assertTrue(wearer.hasEffect(nightVision)&&wearer.getEffect(nightVision).getDuration()==40,
+                "holding a pick renews the advertised short Night Vision passive");
+        ArtifactPassives.syncNightVisionSource(wearer,false);
+        h.assertTrue(!wearer.hasEffect(nightVision),"putting away the last pick removes only its own Night Vision lease");
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(nightVision,6000,0,false,true,true));
+        ArtifactPassives.syncNightVisionSource(wearer,true);ArtifactPassives.syncNightVisionSource(wearer,false);
+        h.assertTrue(wearer.hasEffect(nightVision)&&wearer.getEffect(nightVision).getDuration()==6000,
+                "a server-owned Night Vision effect survives held-pick changes");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_56",timeoutTicks=140) public static void worldloomCuriosFoodPulseIsSpacedFiveSeconds(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.getFoodData().setFoodLevel(10);
         ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
@@ -1854,7 +1866,13 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM),"Iridium recall activates without requiring a target block");
         h.assertTrue(near.getDeltaMovement().x<-.5D,"an owned ore drop in the active test zone accelerates to the wearer");
         h.assertTrue(!farOwned.isCurrentlyGlowing(),"the 96-item cap leaves the farthest eligible drop untouched");
-        h.assertTrue(nearerDrops.stream().allMatch(ItemEntity::isCurrentlyGlowing),"the 96-item cap selects all closer owned drops first");
+        long recalledNearer=nearerDrops.stream().filter(ItemEntity::isCurrentlyGlowing).count();
+        String unrecalled=nearerDrops.stream().filter(item->!item.isCurrentlyGlowing()).limit(3)
+                .map(item->"alive="+item.isAlive()+", owner="+item.getPersistentData().getUUID("specialpickaxesIridiumOwner")
+                        +", distance="+item.position().distanceToSqr(center)+", tag="+item.getItem().getTag())
+                .collect(java.util.stream.Collectors.joining("; "));
+        h.assertTrue(recalledNearer==nearerDrops.size(),"the 96-item cap selects all closer owned drops first (glowing="
+                +recalledNearer+"/"+nearerDrops.size()+", missing="+unrecalled+")");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,wearer.getEyePosition(),48D),"the 48-block exclusion remains in force after recalling nearby loot");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,wearer.getEyePosition(),48D),"a nearby drop owned by someone else remains excluded after recall");finish(h,wearer);
     }

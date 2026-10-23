@@ -144,6 +144,8 @@ public final class SpecialPickaxes {
                 if(player.isRemoved()){due.remove();curiosPassives.remove(entry.getKey());continue;}
                 var equipped=CuriosCompat.find(player);
                 ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
+                boolean heldArtifact=player.getMainHandItem().getItem() instanceof ArtifactItem;
+                ArtifactPassives.syncNightVisionSource(player,heldArtifact||current!=null);
                 ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
                 if(previous!=current){
                     if(previous!=null)ArtifactPassives.onCuriosUnequip(player,previous);
