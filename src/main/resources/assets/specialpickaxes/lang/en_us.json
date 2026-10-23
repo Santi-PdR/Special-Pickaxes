@@ -426,7 +426,7 @@
   "screen.specialpickaxes.curios": "CURIOS PASSIVES",
   "passive.specialpickaxes.palimpsest": "Night Vision · Strata Focus II · Dawn Mending (1 hp/2 s) · mining streak: +8–24% / 4 s",
   "passive.specialpickaxes.fault_choir": "Night Vision · Strata Focus I · shares the mining rhythm with up to 3 teammates within 6 blocks",
-  "passive.specialpickaxes.eventide": "Night Vision · Gravitic Balance shares controlled descent and 75% less fall damage with 3 nearby teammates",
+  "passive.specialpickaxes.eventide": "Night Vision · controlled descent / 75% less fall damage; hard landings snare 3 nearby hostiles",
   "passive.specialpickaxes.paradox_crucible": "Night Vision · Crucible Mantle shares fire/lava immunity with 3 allies; embers orbit in heat",
   "passive.specialpickaxes.interregnum": "Night Vision · Absorption I · Stasis Ward shared within 6 blocks",
   "passive.specialpickaxes.worldloom": "Night Vision · Heartwood Renewal · +2 food/5 s · Curios: shared root guard",
