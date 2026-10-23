@@ -16,7 +16,8 @@ public final class ArtifactOres {
     private static final ConcurrentMap<Block,Set<TagKey<Block>>> VEIN_FAMILIES = new ConcurrentHashMap<>();
     private static final String NO_ORE_FAMILY="";
     private static final String[] HOST_PREFIXES={"deepslate_","netherrack_","blackstone_","stone_","granite_","diorite_","andesite_","basalt_","end_stone_"};
-    private static final Set<String> WORLDGEN_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant","undead_revamp2:bostrokestone","undead_revamp2:bostroxore");
+    private static final Set<String> UNCONVENTIONAL_MODDED_ORES=Set.of("terramity:brimslag","terramity:stellar_remnant",
+            "terramity:prismatic_crystal_cluster","undead_revamp2:bostrokestone","undead_revamp2:bostroxore");
     // Some modpacks broaden common ore tags to include host geology. Never treat
     // vanilla stone/soil as an ore just because it inherits one of those tags.
     private static final Set<String> VANILLA_GEOLOGY=Set.of("stone","granite","diorite","andesite","deepslate","cobblestone","cobbled_deepslate",
@@ -56,11 +57,16 @@ public final class ArtifactOres {
         return ORE_FAMILIES.get(block);
     }
 
-    /** Some worldgen ore features use mineral names without an ore suffix or ore tag. */
+    /** Ghouls-pack ore deposits that lack both ore tags and a conventional *_ore name. */
     private static boolean isOreBlock(net.minecraft.resources.ResourceLocation key){
         if(key==null)return false;
         if(isOreTagPath(key.getPath()))return true;
-        return WORLDGEN_ORES.contains(key.toString());
+        return isUnconventionalOre(key);
+    }
+
+    /** Explicit fallback for actual resource deposits whose mod registry ids omit the ore convention. */
+    public static boolean isUnconventionalOre(net.minecraft.resources.ResourceLocation key){
+        return key!=null&&UNCONVENTIONAL_MODDED_ORES.contains(key.toString());
     }
 
     /** Datapack reloads can change tag membership, so discard cached classifications then. */

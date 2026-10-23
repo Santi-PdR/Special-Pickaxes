@@ -1,0 +1,494 @@
+{
+  "frames": [
+    {
+      "filename": "Lode resonance_0",
+      "frame": {
+        "x": 1,
+        "y": 1,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_1",
+      "frame": {
+        "x": 37,
+        "y": 1,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_2",
+      "frame": {
+        "x": 73,
+        "y": 1,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_3",
+      "frame": {
+        "x": 109,
+        "y": 1,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_4",
+      "frame": {
+        "x": 1,
+        "y": 37,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_5",
+      "frame": {
+        "x": 37,
+        "y": 37,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_6",
+      "frame": {
+        "x": 73,
+        "y": 37,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    },
+    {
+      "filename": "Lode resonance_0_7",
+      "frame": {
+        "x": 109,
+        "y": 37,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 100
+    }
+  ],
+  "meta": {
+    "app": "https://github.com/BlockBenchMCP",
+    "version": "1.9.0.1",
+    "image": "iridium_lode_shard.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 142,
+      "h": 70
+    },
+    "scale": "1",
+    "frameTags": [
+      {
+        "name": "Lode resonance",
+        "from": 0,
+        "to": 7,
+        "direction": "forward"
+      }
+    ],
+    "layers": [
+      {
+        "name": "sprite",
+        "opacity": 255,
+        "blendMode": "normal"
+      }
+    ],
+    "slices": [
+      {
+        "name": "pivot",
+        "color": "#0000ffff",
+        "keys": [
+          {
+            "frame": 0,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 1,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 2,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 3,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 4,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 5,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 6,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          },
+          {
+            "frame": 7,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 33
+            }
+          }
+        ]
+      }
+    ],
+    "pixelart": {
+      "pixels_per_unit": 1,
+      "frame_size": {
+        "w": 32,
+        "h": 32
+      },
+      "columns": 4,
+      "rows": 2,
+      "view": {
+        "yaw": 0,
+        "pitch": 30,
+        "name": "three_quarter"
+      },
+      "directions": [
+        {
+          "index": 0,
+          "name": "down",
+          "compass": "S",
+          "yaw": 0
+        }
+      ],
+      "animations": [
+        {
+          "name": "Lode resonance",
+          "fps": 10,
+          "loop": "loop",
+          "length": 0.8,
+          "frames": 8
+        }
+      ],
+      "style": {
+        "shading": "toon",
+        "shade_levels": 3,
+        "light": [
+          -0.35,
+          0.75,
+          0.45
+        ],
+        "outline": "outer",
+        "outline_color": "#132329",
+        "inner_lines": "depth",
+        "line_depth_threshold": 2.5,
+        "palette": "source",
+        "cleanup": "specks",
+        "pixel_perfect": true
+      },
+      "frames": [
+        {
+          "key": "Lode resonance_0",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_1",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.1,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_2",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.2,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_3",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.3,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_4",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.4,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_5",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.5,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_6",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.6,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        },
+        {
+          "key": "Lode resonance_0_7",
+          "tag": "Lode resonance",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.7,
+          "pivot": {
+            "x": 16,
+            "y": 33
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 1.03125
+          }
+        }
+      ],
+      "fps": 10,
+      "anchor": "origin",
+      "texel_density": 1,
+      "pivot": {
+        "x": 16,
+        "y": 33
+      }
+    }
+  }
+}

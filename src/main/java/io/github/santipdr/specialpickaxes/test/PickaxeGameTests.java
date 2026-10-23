@@ -297,6 +297,10 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_48") public static void iridiumRecognizesForeignOresButNotBroadlyTaggedHostRock(GameTestHelper h){
         h.assertTrue(ArtifactOres.isOre(TestOres.NAMED_ORE.defaultBlockState()),"foreign conventional *_ore registry names qualify as ore");
         h.assertTrue(ArtifactOres.isOre(TestOres.TAGGED_ORE.defaultBlockState()),"foreign ore-family tags classify ores without ore in their registry name");
+        var prismaticCluster=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("terramity","prismatic_crystal_cluster");
+        var prismaticStorage=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("terramity","prismatic_crystal_block");
+        h.assertTrue(ArtifactOres.isUnconventionalOre(prismaticCluster),"Terramity's loot-bearing Prismatic Crystal Cluster is protected as an ore despite its nonstandard registry name");
+        h.assertTrue(!ArtifactOres.isUnconventionalOre(prismaticStorage),"crafted Prismatic Crystal storage blocks are not misclassified as ore deposits");
         var host=TestOres.HOST_ROCK.defaultBlockState();
         var aggregate=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("pickaxe_compat_test","ores/broad_aggregate"));
         var hostRockTag=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("pickaxe_compat_test","ore_bearing_ground/stone_hosts"));
