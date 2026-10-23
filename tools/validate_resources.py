@@ -163,6 +163,26 @@ class Resources(unittest.TestCase):
             self.assertFalse(tag["replace"])
             self.assertEqual(set(tag["values"]), {"specialpickaxes:" + artifact for artifact in IDS})
 
+    def test_curios_pickaxe_slot_registration(self):
+        slot = json.loads((ROOT / "data/specialpickaxes/curios/slots/pickaxe.json").read_text())
+        self.assertEqual(slot["size"], 1)
+        self.assertEqual(slot["icon"], "specialpickaxes:slot/empty_pickaxe_slot")
+        self.assertEqual(slot["validators"], ["curios:tag"])
+        self.assertFalse(slot["add_cosmetic"])
+
+        entities = json.loads((ROOT / "data/specialpickaxes/curios/entities/entities.json").read_text())
+        self.assertEqual(entities["entities"], ["minecraft:player"])
+        self.assertIn("pickaxe", entities["slots"])
+
+        tag = json.loads((ROOT / "data/curios/tags/items/pickaxe.json").read_text())
+        self.assertFalse(tag["replace"])
+        self.assertEqual(set(tag["values"]), {"specialpickaxes:" + artifact for artifact in IDS})
+
+        dependency = re.search(r'\[\[dependencies\.specialpickaxes\]\]\s*modId="curios"\s*mandatory=(true|false)',
+                               pathlib.Path("src/main/resources/META-INF/mods.toml").read_text())
+        self.assertIsNotNone(dependency, "Curios must remain optional")
+        self.assertEqual(dependency.group(1), "false")
+
 
 if __name__ == "__main__":
     unittest.main()

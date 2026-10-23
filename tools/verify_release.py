@@ -27,6 +27,17 @@ with zipfile.ZipFile(jar) as z:
   assert image[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',image[16:24])==(16,16),f'Invalid mob effect HUD icon: {icon}'
  assert 'io/github/santipdr/specialpickaxes/artifact/ArtifactActions.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/WorkQueue.class' in z.namelist()
+ assert 'io/github/santipdr/specialpickaxes/artifact/CuriosCompat.class' in z.namelist()
+ curios_slot='data/specialpickaxes/curios/slots/pickaxe.json'
+ curios_entities='data/specialpickaxes/curios/entities/entities.json'
+ curios_tag='data/curios/tags/items/pickaxe.json'
+ assert all(path in z.namelist() for path in [curios_slot,curios_entities,curios_tag])
+ slot=json.loads(z.read(curios_slot))
+ assert slot['size']==1 and slot['icon']=='specialpickaxes:slot/empty_pickaxe_slot'
+ slot_icon='assets/specialpickaxes/textures/slot/empty_pickaxe_slot.png'
+ assert slot_icon in z.namelist() and z.read(slot_icon)[:8]==b'\x89PNG\r\n\x1a\n'
+ assert 'pickaxe' in json.loads(z.read(curios_entities))['slots']
+ assert set(json.loads(z.read(curios_tag))['values'])=={'specialpickaxes:'+item for item in ids}
 digest=hashlib.sha256(jar.read_bytes()).hexdigest()
 info={'file':jar.name,'bytes':jar.stat().st_size,'sha256':digest,'commit':sha,'run_id':os.environ.get('GITHUB_RUN_ID'),'artifacts':ids}
 (root/'build/RELEASE.json').write_text(json.dumps(info,indent=2)+'\n')
