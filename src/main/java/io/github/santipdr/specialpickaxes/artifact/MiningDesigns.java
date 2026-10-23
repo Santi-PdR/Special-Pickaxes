@@ -8,7 +8,17 @@ import java.util.*;
 /** Mining-specific plans. Resource detection never sends ore positions or outlines to the client. */
 public final class MiningDesigns {
     private static final java.util.concurrent.ConcurrentMap<net.minecraft.world.level.block.Block,Boolean> MODDED_GEOLOGY=new java.util.concurrent.ConcurrentHashMap<>();
-    private static final Set<String> WORLDGEN_GEOLOGY=Set.of("terramity:igneostone","undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar","undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
+    private static final Set<String> EXPLICIT_MODDED_GEOLOGY=Set.of(
+            "terramity:fairystone","terramity:moonstone","terramity:moonstone_slab","terramity:moonstone_stairs",
+            "terramity:polished_moonstone","terramity:polished_moonstone_slab","terramity:polished_moonstone_stairs",
+            "terramity:moonstone_bricks","terramity:moonstone_brick_slab","terramity:moonstone_brick_stairs","terramity:moonstone_brick_wall",
+            "terramity:moonstone_tiles","terramity:moonstone_tile_slab","terramity:moonstone_tile_stairs","terramity:moonstone_pillar",
+            "terramity:igneostone","terramity:chiseled_igneostone","terramity:polished_igneostone",
+            "terramity:polished_igneostone_slab","terramity:polished_igneostone_stairs","terramity:polished_igneostone_wall",
+            "terramity:igneostone_bricks","terramity:igneostone_brick_slab","terramity:igneostone_brick_stairs","terramity:igneostone_brick_wall",
+            "terramity:igneostone_tiles","terramity:igneostone_tile_slab","terramity:igneostone_tile_stairs",
+            "undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar",
+            "undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
     private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay",
             "gabbro","gneiss","quartzite","schist","phyllite","argillite","hornfels","siltstone","mudstone","claystone","conglomerate","breccia","pumice","rhyolite","dacite","travertine","dolomite","chalk","soapstone","gypsum","mud","soil");
     private static final Set<net.minecraft.world.level.block.Block> VANILLA_GEOLOGY=Set.of(
@@ -59,7 +69,7 @@ public final class MiningDesigns {
         return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{
             var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
             if(key==null)return false;
-            if(WORLDGEN_GEOLOGY.contains(key.toString()))return true;
+            if(EXPLICIT_MODDED_GEOLOGY.contains(key.toString()))return true;
             if(key.getNamespace().equals("minecraft"))return false;
             var defaultState=block.defaultBlockState();
             if(defaultState.hasBlockEntity()||!defaultState.getFluidState().isEmpty()||ArtifactOres.isOre(defaultState))return false;

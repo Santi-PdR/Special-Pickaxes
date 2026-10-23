@@ -1420,6 +1420,26 @@ public final class PickaxeGameTests {
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"modded geology rephase creates no drops");
         finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_103") public static void crucibleRecognizesPackStonesAndRejectsTerramityMachines(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var level=h.getLevel();
+        var moonstone=TestOres.TERRAMITY_MOONSTONE.defaultBlockState();
+        var fairystone=TestOres.TERRAMITY_FAIRYSTONE.defaultBlockState();
+        var polishedIgneostone=TestOres.TERRAMITY_POLISHED_IGNEOSTONE.defaultBlockState();
+        h.assertTrue(MiningDesigns.matrix(moonstone)&&MiningDesigns.crucibleGeology(moonstone)
+                        &&MiningDesigns.matrix(fairystone)&&MiningDesigns.crucibleGeology(fairystone)
+                        &&MiningDesigns.matrix(polishedIgneostone)&&MiningDesigns.crucibleGeology(polishedIgneostone),
+                "Terramity moonstone, fairystone and polished igneostone count as geology");
+        var lamp=TestOres.TERRAMITY_MOONSTONE_LAMP.defaultBlockState();
+        var dispenser=TestOres.TERRAMITY_MOONSTONE_DISPENSER.defaultBlockState();
+        h.assertTrue(!MiningDesigns.crucibleGeology(lamp)&&!MiningDesigns.crucibleGeology(dispenser),
+                "functional Terramity lamp and poker-chip dispenser are not geology");
+        level.setBlockAndUpdate(pos,moonstone);PlayerPlacedBlocks.get(level).unmark(pos);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible can target Terramity moonstone");drain(p);
+        h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"Terramity moonstone rephases to the selected material");
+        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"Terramity geology rephase creates no drops");
+        finish(h,p);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);
