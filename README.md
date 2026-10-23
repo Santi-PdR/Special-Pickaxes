@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.396** hace que Eco de Falla y Raíces de Cantera también reconozcan enemigos de otros mods que implementan `Enemy` sin heredar de `Monster`; se conservan los filtros de equipos, PvP y zonas protegidas.
+
 La **5.10.395** refuerza la Guardia de veta: el golpe protegido ahora ancla al portador y a sus aliados contra empujones durante cuatro segundos; dos marcas de cristal a los pies señalan el efecto sin mantener una nube de partículas.
 
 La **5.10.394** lleva el flare animado de Blockbench a los cinco respiraderos de Erupción Magmática; reduce las llamas vanilla por respiradero para mantener el mismo coste de partículas.

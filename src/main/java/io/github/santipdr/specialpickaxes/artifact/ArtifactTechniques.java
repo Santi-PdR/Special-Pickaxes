@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -193,7 +193,7 @@ public final class ArtifactTechniques {
     private static boolean faultEcho(ServerPlayer player,int radius,int cap){
         var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
         var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
-            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
+            if(!entity.isAlive()||entity==player||!(entity instanceof Enemy||entity instanceof Player)
                     ||!entity.onGround()||entity.isAlliedTo(player)
                     ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
@@ -216,7 +216,7 @@ public final class ArtifactTechniques {
     private static boolean rootSnare(ServerPlayer player,double range) {
         Vec3 center=player.position();double rangeSqr=range*range;
         var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(range),entity->{
-            if(!entity.isAlive()||entity==player||!(entity instanceof Monster||entity instanceof Player)
+            if(!entity.isAlive()||entity==player||!(entity instanceof Enemy||entity instanceof Player)
                     ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
                     ||!WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,entity.blockPosition()))return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);

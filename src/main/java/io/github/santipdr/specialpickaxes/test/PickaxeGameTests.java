@@ -647,7 +647,9 @@ public final class PickaxeGameTests {
         var damped=attacker.getDeltaMovement();
         h.assertTrue(Math.abs(damped.x-.62)<.001&&Math.abs(damped.z-.31)<.001&&Math.abs(damped.y-.4)<.001,"Fault Resonance damps horizontal momentum while preserving vertical movement");
         h.assertTrue(resonance.isDurationEffectTick(60,0)&&!resonance.isDurationEffectTick(59,0),"resonance pulses every four ticks");
-        var nearby=EntityType.ZOMBIE.create(h.getLevel());nearby.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());nearby.setOnGround(true);h.getLevel().addFreshEntity(nearby);
+        var nearby=EntityType.SLIME.create(h.getLevel());nearby.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());nearby.setOnGround(true);h.getLevel().addFreshEntity(nearby);
+        h.assertTrue(nearby instanceof net.minecraft.world.entity.monster.Enemy,
+                "the fixture covers a hostile mob implementing Enemy through a non-Monster class");
         h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR),"Choir's held alternate remains usable");
         h.assertTrue(nearby.hasEffect(resonance)&&nearby.getEffect(resonance).getAmplifier()==1,"the active Fault Echo applies the stronger resonance pulse");
         finish(h,wearer);
@@ -2166,7 +2168,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_35",timeoutTicks=120) public static void worldloomRootsHoldHostilesThenReleaseCleanly(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);
         var rival=player(h,ArtifactKind.WORLDLOOM,"SecondWorldloom");
-        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
+        var mob=EntityType.SLIME.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
         var anchor=mob.position();
         h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
         h.assertTrue(!WorldloomSnare.bind(rival,mob),"a second Worldloom cannot reset the first owner's four-second root windup");
