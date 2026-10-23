@@ -1855,14 +1855,17 @@ public final class PickaxeGameTests {
         unrelated.getPersistentData().putUUID("specialpickaxesIridiumOwner",UUID.randomUUID());
         var farOwned=new ItemEntity(level,origin.x+47D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
         farOwned.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);farOwned.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+        level.getChunkAt(farOwned.blockPosition());
         level.addFreshEntity(farOwned);
         var nearerDrops=new java.util.ArrayList<ItemEntity>();
         for(int i=0;i<95;i++){
             var item=new ItemEntity(level,origin.x+12D+(i%10)*.5D,origin.y+.5D,origin.z+(i/10)*2.5D,new ItemStack(Items.DIAMOND));
             item.getItem().getOrCreateTag().putInt("testDropIndex",i);
             item.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);item.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+            level.getChunkAt(item.blockPosition());
             level.addFreshEntity(item);nearerDrops.add(item);
         }
+        level.getChunkAt(near.blockPosition());level.getChunkAt(unrelated.blockPosition());
         level.addFreshEntity(near);level.addFreshEntity(unrelated);
         var center=wearer.getEyePosition();
         h.assertTrue(ArtifactTechniques.IRIDIUM_RECALL_RADIUS==48&&ArtifactTechniques.isIridiumRecallTarget(wearer,near,center,48D),"the active Lode recall reaches owned drops from 48 blocks");

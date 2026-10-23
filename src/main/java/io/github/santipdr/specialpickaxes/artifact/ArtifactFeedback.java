@@ -697,7 +697,8 @@ public final class ArtifactFeedback {
             double angle=i*Math.PI*2D/5D,x=cx+Math.cos(angle)*1.75D,z=cz+Math.sin(angle)*1.75D;
             if(!level.hasChunkAt(BlockPos.containing(x,cy,z)))continue;
             level.sendParticles(core,x,cy+.2D,z,2,.08D,.08D,.08D,.004D);
-            level.sendParticles(ParticleTypes.FLAME,x,cy+.65D,z,5,.12D,.72D,.12D,.018D);
+            level.sendParticles(io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),x,cy+.42D,z,1,0,0,0,0);
+            level.sendParticles(ParticleTypes.FLAME,x,cy+.65D,z,3,.12D,.72D,.12D,.018D);
             level.sendParticles(ParticleTypes.LAVA,x,cy+.85D,z,2,.08D,.5D,.08D,.006D);
         }
         for(var target:targets){

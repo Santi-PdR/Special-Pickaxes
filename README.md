@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.394** lleva el flare animado de Blockbench a los cinco respiraderos de Erupción Magmática; reduce las llamas vanilla por respiradero para mantener el mismo coste de partículas.
+
 La **5.10.393** sustituye el fuego genérico del pulso de Marca de Magma por una llamarada de cuatro pétalos diseñada y animada en Blockbench; sigue siendo un único destello por pulso, enviado solo a jugadores cercanos.
 
 La **5.10.392** reutiliza el fragmento de veta animado también como destello central de la Guardia de Veta cuando Iridium protege al portador o a un aliado; aparece una vez por segundo dentro del presupuesto de aura y mantiene el mismo radio de audiencia local.
