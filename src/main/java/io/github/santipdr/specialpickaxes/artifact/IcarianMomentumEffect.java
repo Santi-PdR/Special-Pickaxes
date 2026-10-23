@@ -33,17 +33,19 @@ public final class IcarianMomentumEffect extends MobEffect {
 
     /** A compact pair of feather arcs makes the landing rebound visible without a large particle burst. */
     public static void landingPulse(ServerPlayer player){
-        if(!(player.level() instanceof ServerLevel level))return;
+        if(!(player.level() instanceof ServerLevel))return;
         Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
         if(forward.lengthSqr()<.001D)forward=new Vec3(0,0,1);else forward=forward.normalize();
         Vec3 right=new Vec3(-forward.z,0,forward.x);double y=player.getY()+.18D;
+        var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(8);
         for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
             double span=.22D+feather*.18D,trail=.08D+feather*.12D;
             double x=player.getX()+right.x*side*span-forward.x*trail;
             double z=player.getZ()+right.z*side*span-forward.z*trail;
-            level.sendParticles(WING_GLEAM,x,y+feather*.025D,z,1,0,.015D,0,0);
-            if(feather==2)level.sendParticles(ParticleTypes.END_ROD,x,y+.04D,z,1,0,.02D,0,0);
+            particles.add(new ArtifactFeedback.AuraParticle(WING_GLEAM,new Vec3(x,y+feather*.025D,z),1,0,.015D,0,0));
+            if(feather==2)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.END_ROD,new Vec3(x,y+.04D,z),1,0,.02D,0,0));
         }
+        ArtifactFeedback.nearbyWardPulse(player,particles);
     }
 
     /** Keeps the feather wake aligned with actual travel, even when the wearer looks aside mid-glide. */
