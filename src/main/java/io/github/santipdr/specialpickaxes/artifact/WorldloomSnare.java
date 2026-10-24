@@ -18,7 +18,7 @@ public final class WorldloomSnare {
     private static final int WINDUP_TICKS=80;
     private static final int ROOT_DURATION_TICKS=80;
     private static final int ROOT_PULSE_TICKS=10;
-    private static final int ROOT_PARTICLES=4;
+    private static final int ROOT_PARTICLES=1;
     private static final RelicParticleBudget VISUAL_BUDGET=new RelicParticleBudget(256);
     private static final net.minecraft.world.level.block.state.BlockState VINE_STATE=
             net.minecraft.world.level.block.Blocks.VINE.defaultBlockState();
@@ -141,7 +141,8 @@ public final class WorldloomSnare {
     private static void emitCaughtPulse(Binding binding,long age){
         if(!reserveVisualParticles(binding.level.getServer().getTickCount(),ROOT_PARTICLES))return;
         double angle=age*.22D,x=binding.anchor.x,y=binding.anchor.y+.08D,z=binding.anchor.z;
-        emit(binding,x+Math.cos(angle)*.12D,y,z+Math.sin(angle)*.12D,ROOT_PARTICLES,.18D,.035D,.18D,.006D);
+        binding.level.sendParticles(io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDLOOM_ROOT_CLAMP.get(),
+                x+Math.cos(angle)*.12D,y,z+Math.sin(angle)*.12D,ROOT_PARTICLES,0,0,0,0);
     }
 
     /** Whole root signatures share a strict per-server-tick cosmetic budget; gameplay never depends on particles. */

@@ -69,7 +69,10 @@ class Resources(unittest.TestCase):
         self.assertTrue(header[25] in (4, 6) or b"tRNS" in chunks, "the root sigil keeps its transparent interior and background")
         effect = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/HeartwoodGraspEffect.java").read_text()
         renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        snare = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/WorldloomSnare.java").read_text()
         self.assertIn("WORLDLOOM_ROOT_CLAMP.get()", effect, "the Curios root snare must show its custom sigil")
+        self.assertIn("WORLDLOOM_ROOT_CLAMP.get()", snare, "the active Worldloom root snare must reuse its custom sigil")
+        self.assertIn("private static final int ROOT_PARTICLES=1", snare, "the captured pulse must cost one animated sprite")
         self.assertIn("WORLDLOOM_ROOT_CLAMP.get(),WorldloomRootClampParticle.Provider::new", renderer, "the root sigil sprite must be registered on the client")
 
     def test_crucible_manual_matches_mode_controls(self):
