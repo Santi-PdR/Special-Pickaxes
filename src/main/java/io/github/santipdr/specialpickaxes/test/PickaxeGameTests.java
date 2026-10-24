@@ -643,18 +643,24 @@ public final class PickaxeGameTests {
         h.assertTrue(level.getBlockState(placed).is(Blocks.STONE),"player-placed geology is preserved");
         PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_24") public static void seamRipperAlternateMinesTheVisibleFiveByFiveFace(GameTestHelper h) {
+    @GameTest(template="empty",batch="rework_each_24") public static void seamRipperAlternateMinesTheVisibleSevenBySevenFace(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var center=target(h);var level=h.getLevel();
-        var east=center.east();var above=center.above();var ore=center.west();var placed=center.below();var outside=center.south();
-        for(var pos:List.of(center,east,above,ore,placed,outside))PlayerPlacedBlocks.get(level).unmark(pos);
+        var east=center.east();var above=center.above();var ore=center.west();var placed=center.below();
+        var outer=center.above(3);var beyond=center.above(4);var outside=center.south();
+        for(var pos:List.of(center,east,above,ore,placed,outer,beyond,outside))PlayerPlacedBlocks.get(level).unmark(pos);
         level.setBlockAndUpdate(east,Blocks.TUFF.defaultBlockState());level.setBlockAndUpdate(above,Blocks.DIORITE.defaultBlockState());
         level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());
-        level.setBlockAndUpdate(outside,Blocks.ANDESITE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
+        level.setBlockAndUpdate(outer,Blocks.GRANITE.defaultBlockState());
+        level.setBlockAndUpdate(beyond,Blocks.ANDESITE.defaultBlockState());level.setBlockAndUpdate(outside,Blocks.ANDESITE.defaultBlockState());
+        PlayerPlacedBlocks.get(level).mark(placed);
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));
         h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER),"X mines a visible geology face without offhand materials");
         for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(level.getBlockState(center).isAir()&&level.getBlockState(east).isAir()&&level.getBlockState(above).isAir(),"natural geology on the 5x5 target face is mined");
-        h.assertTrue(level.getBlockState(ore).is(Blocks.DIAMOND_ORE)&&level.getBlockState(placed).is(Blocks.STONE)&&level.getBlockState(outside).is(Blocks.ANDESITE),"ores, placed blocks and blocks beyond the face are preserved");
+        h.assertTrue(level.getBlockState(center).isAir()&&level.getBlockState(east).isAir()&&level.getBlockState(above).isAir()
+                        &&level.getBlockState(outer).isAir(),"natural geology through the outer ring of the 7x7 target face is mined");
+        h.assertTrue(level.getBlockState(ore).is(Blocks.DIAMOND_ORE)&&level.getBlockState(placed).is(Blocks.STONE)
+                        &&level.getBlockState(beyond).is(Blocks.ANDESITE)&&level.getBlockState(outside).is(Blocks.ANDESITE),
+                "ores, placed blocks, cells beyond the 7x7 boundary and blocks behind the face are preserved");
         PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosCounterAppliesCustomFaultResonance(GameTestHelper h){

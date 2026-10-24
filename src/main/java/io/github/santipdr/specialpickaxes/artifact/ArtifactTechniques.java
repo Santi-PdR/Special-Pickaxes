@@ -24,6 +24,8 @@ import java.util.Set;
 public final class ArtifactTechniques {
     public static final int IRIDIUM_RECALL_RADIUS=48;
     private static final int IRIDIUM_RECALL_INSPECTION_LIMIT=4096;
+    private static final int SEAM_FACE_RADIUS=3;
+    private static final int SEAM_FACE_CELLS=(SEAM_FACE_RADIUS*2+1)*(SEAM_FACE_RADIUS*2+1);
     private ArtifactTechniques() {}
 
     private static boolean echo(ServerPlayer player, ItemStack tool, int skill) {
@@ -278,8 +280,8 @@ public final class ArtifactTechniques {
         Direction face=hit.getDirection();
         Direction u=face.getAxis()==Direction.Axis.Y?Direction.EAST:Direction.UP;
         Direction v=face.getAxis()==Direction.Axis.Y?Direction.SOUTH:face.getAxis()==Direction.Axis.X?Direction.SOUTH:Direction.EAST;
-        var steps=new ArrayList<WorkStep>(25);
-        for(int a=-2;a<=2;a++)for(int b=-2;b<=2;b++){
+        var steps=new ArrayList<WorkStep>(SEAM_FACE_CELLS);
+        for(int a=-SEAM_FACE_RADIUS;a<=SEAM_FACE_RADIUS;a++)for(int b=-SEAM_FACE_RADIUS;b<=SEAM_FACE_RADIUS;b++){
             var pos=origin.relative(u,a).relative(v,b);if(!level.hasChunkAt(pos))continue;
             var block=level.getBlockState(pos);
             if(MiningDesigns.seamGeology(block)&&!PlayerPlacedBlocks.get(level).contains(pos))steps.add(new WorkStep.Mine(pos,block));
