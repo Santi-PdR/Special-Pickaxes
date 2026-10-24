@@ -37,6 +37,17 @@ class Resources(unittest.TestCase):
         self.assertEqual(struct.unpack(">II", header[16:24]), (16, 64), "Stasis must use four vertically stacked 16x16 frames")
         self.assertEqual(header[25], 6, "Stasis frames need an RGBA channel for transparent pixels")
 
+    def test_crucible_manual_matches_mode_controls(self):
+        expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]
+        for language in ["en_us", "es_es"]:
+            data = json.loads((ROOT / f"assets/specialpickaxes/lang/{language}.json").read_text())
+            for section in ["regional", "proximity"]:
+                how = data[f"mining.how.paradox_crucible.{section}"].casefold()
+                self.assertIn(" c ", how, f"{language}/{section}: instructions must use the C mode key")
+                self.assertNotIn("offhand", how, f"{language}/{section}: stale offhand instructions")
+                self.assertNotIn("mano secundaria", how, f"{language}/{section}: stale offhand instructions")
+            self.assertTrue(all(data.get(f"mode.specialpickaxes.{mode}") for mode in expected_outputs), language)
+
     def test_reference_models(self):
         hashes = set()
         for artifact in IDS:

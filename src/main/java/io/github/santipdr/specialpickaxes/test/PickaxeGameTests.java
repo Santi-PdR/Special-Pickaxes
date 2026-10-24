@@ -321,7 +321,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!wearer.hasEffect(balance),"the custom Curios passive clears when Eventide is unequipped");
         finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_26") public static void eventideHardLandingSnaresThreeHostilesWithoutHarmingAllies(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_105") public static void eventideHardLandingSnaresThreeHostilesWithoutHarmingAllies(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE,"EventideImpactOwner");var ally=player(h,ArtifactKind.PALIMPSEST,"EventideImpactAlly");
         var level=h.getLevel();level.addFreshEntity(wearer);var scoreboard=level.getScoreboard();
         var team=scoreboard.addPlayerTeam("eventideimpact_"+wearer.getUUID().toString().substring(0,6));
@@ -338,7 +338,8 @@ public final class PickaxeGameTests {
         h.assertTrue(caught==3,"a qualifying landing catches only the three nearest hostile players (caught="+caught+")");
         var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
         for(int i=0;i<3;i++)h.assertTrue(enemies.get(i).hasEffect(tether)&&enemies.get(i).getEffect(tether).getDuration()==60,
-                "each caught opponent receives the three-second custom gravity snare");
+                "each caught opponent receives the three-second custom gravity snare (index="+i+", caught="+caught
+                        +", effect="+enemies.get(i).getEffect(tether)+")");
         h.assertTrue(!enemies.get(3).hasEffect(tether)&&!far.hasEffect(tether),"the target cap and four-and-a-half-block radius hold");
         h.assertTrue(!ally.hasEffect(tether)&&ally.getHealth()==ally.getMaxHealth(),"teammates are excluded and take no landing damage");
         h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,12F)==0,"the ten-second cooldown prevents repeat landings from refreshing the snare");
@@ -1452,6 +1453,16 @@ public final class PickaxeGameTests {
         PlayerPlacedBlocks.get(level).unmark(placed);
         finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_104") public static void crucibleAcceptsCalciteAsNaturalInput(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var level=h.getLevel();
+        level.setBlockAndUpdate(pos,Blocks.CALCITE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(pos);
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
+        h.assertTrue(MiningDesigns.crucibleGeology(level.getBlockState(pos)),"calcite is an eligible natural geology source");
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible starts over calcite");drain(p);
+        h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"calcite rephases to the selected obsidian output");
+        h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"calcite rephase creates no drops");
+        finish(h,p);
+    }
     @GameTest(template="empty",batch="rework_each_102") public static void crucibleRecognizesAndRephasesThirdPartyGeology(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var level=h.getLevel();
         var gabbro=TestOres.GABBRO_ROCK.defaultBlockState();var mudstone=TestOres.MUDSTONE_ROCK.defaultBlockState();
@@ -1904,6 +1915,8 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactTechniques.isIridiumRecallTarget(wearer,farOwned,center,48D),"the last eligible drop is inside the active radius before the target cap is applied");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,center,48D),"an owned ore drop outside the extended range is excluded");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,center,48D),"another player's ore drop is excluded");
+        long visibleOwned=level.getEntitiesOfClass(ItemEntity.class,wearer.getBoundingBox().inflate(48D),
+                item->ArtifactTechniques.isIridiumRecallTarget(wearer,item,center,48D)).size();
         h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM),"Iridium recall activates without requiring a target block");
         h.assertTrue(near.getDeltaMovement().x<-.5D,"an owned ore drop in the active test zone accelerates to the wearer");
         h.assertTrue(!farOwned.isCurrentlyGlowing(),"the 96-item cap leaves the farthest eligible drop untouched");
@@ -1913,7 +1926,7 @@ public final class PickaxeGameTests {
                         +", distance="+item.position().distanceToSqr(center)+", tag="+item.getItem().getTag())
                 .collect(java.util.stream.Collectors.joining("; "));
         h.assertTrue(recalledNearer==nearerDrops.size(),"the 96-item cap selects all closer owned drops first (glowing="
-                +recalledNearer+"/"+nearerDrops.size()+", missing="+unrecalled+")");
+                +recalledNearer+"/"+nearerDrops.size()+", visible="+visibleOwned+", missing="+unrecalled+")");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,beyond,wearer.getEyePosition(),48D),"the 48-block exclusion remains in force after recalling nearby loot");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,wearer.getEyePosition(),48D),"a nearby drop owned by someone else remains excluded after recall");finish(h,wearer);
     }

@@ -299,10 +299,10 @@
   "mining.how.eventide.gravity_out": "Aim at a block and press R to anchor a spherical field with an 8-block radius. Hostile mobs and projectiles are pushed away from its center while you mine faster inside. Every 24 blocks mined, it pulls up to 64 safe drops to you. C switches to inward gravity.",
   "mode.specialpickaxes.gravity_out": "GRAVITY OUT",
   "mining.identity.paradox_crucible.regional": "Change existing geology in a selected region.",
-  "mining.how.paradox_crucible.regional": "Choose material before the second corner. Arm selection, left-click two different corners, wait for analysis, then confirm. Offhand stone, deepslate, basalt or obsidian chooses the result; empty hand means stone.",
+  "mining.how.paradox_crucible.regional": "Press C to choose the output: Stone, Deepslate, Granite, Diorite, Andesite, Dirt, Basalt, Obsidian, Calcite, Tuff, Dripstone or Gravel. Press R to arm selection, click two different corners, wait for analysis, then press R to confirm. Ores, player-placed blocks, containers, fluids and reinforced blocks stay safe.",
   "mode.specialpickaxes.regional": "REGIONAL",
   "mining.identity.paradox_crucible.proximity": "Change nearby geology in a sphere, without corners.",
-  "mining.how.paradox_crucible.proximity": "Activate once to transform nearby natural matrix. Offhand stone, deepslate, basalt or obsidian chooses the result. No ore, loot or experience is created.",
+  "mining.how.paradox_crucible.proximity": "Press C to choose the output, then activate once while facing a point in range. It transforms eligible natural geology without corner selection. Ores, player-placed blocks, containers, fluids and reinforced blocks stay safe; no loot or experience is created.",
   "mode.specialpickaxes.proximity": "PROXIMITY",
   "mining.identity.interregnum.stasis": "Mine at extreme speed inside local stasis.",
   "mining.how.interregnum.stasis": "Aim at your worksite and activate. Mine inside the field to sustain it; nearby interruptions are slowed. Allied miners inside receive custom Stasis Resonance (1.6× mining speed), Regeneration II, Stasis Ward (+15% knockback resistance), Night Vision and food pulses. Cancel releases the field.",
@@ -596,6 +596,6 @@
   "mode.specialpickaxes.connected": "CONNECTED",
   "message.specialpickaxes.nullward": "Null Ward absorbed %s hostile shots.",
   "message.specialpickaxes.magma_eruption": "Magma Eruption launched %s nearby enemies.",
-  "message.specialpickaxes.crucible_no_change": "No safe natural geology was found; aim at stone, dirt or gravel and choose a different output.",
+  "message.specialpickaxes.crucible_no_change": "No eligible geology changed. Choose another output or aim at natural stone, deepslate, calcite, obsidian, dirt, gravel or compatible modded rock; ores, placed blocks, containers and fluids are skipped.",
   "mode.specialpickaxes.hollow_pulse": "HOLLOW PULSE"
 }
