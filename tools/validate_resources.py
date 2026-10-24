@@ -27,6 +27,16 @@ class Resources(unittest.TestCase):
         header = (ROOT / "assets/specialpickaxes/textures/particle/iridium_lode_shard.png").read_bytes()[:24]
         self.assertEqual(struct.unpack(">II", header[16:24]), (32, 256), "Blockbench atlas must be eight vertically stacked 32x32 frames")
 
+    def test_stasis_shard_particle_atlas(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/stasis_shard.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:stasis_shard"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/stasis_shard.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], list(range(4)))
+        self.assertEqual(animation["frametime"], 5)
+        header = (ROOT / "assets/specialpickaxes/textures/particle/stasis_shard.png").read_bytes()[:26]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (16, 64), "Stasis must use four vertically stacked 16x16 frames")
+        self.assertEqual(header[25], 6, "Stasis frames need an RGBA channel for transparent pixels")
+
     def test_reference_models(self):
         hashes = set()
         for artifact in IDS:
