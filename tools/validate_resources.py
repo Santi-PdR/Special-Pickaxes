@@ -37,6 +37,16 @@ class Resources(unittest.TestCase):
         self.assertEqual(struct.unpack(">II", header[16:24]), (16, 64), "Stasis must use four vertically stacked 16x16 frames")
         self.assertEqual(header[25], 6, "Stasis frames need an RGBA channel for transparent pixels")
 
+    def test_icarian_feather_atlas_matches_particle_lifetime(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/icarian_feather.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:icarian_feather"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/icarian_feather.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], [0, 1, 2, 3])
+        self.assertEqual(animation["frametime"], 4)
+        self.assertEqual(animation["frametime"] * len(animation["frames"]), 16, "the animated feather spans its 16-tick particle lifetime")
+        header = (ROOT / "assets/specialpickaxes/textures/particle/icarian_feather.png").read_bytes()[:24]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (32, 128), "Icarian must use four vertically stacked 32x32 Blockbench frames")
+
     def test_crucible_manual_matches_mode_controls(self):
         expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]
         for language in ["en_us", "es_es"]:
