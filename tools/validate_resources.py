@@ -51,6 +51,27 @@ class Resources(unittest.TestCase):
         self.assertIn("SpecialPickaxes.ICARIAN_FEATHER.get()", passive, "Curios glide must use its animated feather particle")
         self.assertIn("ICARIAN_FEATHER.get(),IcarianFeatherParticle.Provider::new", renderer, "the animated feather must be registered on the client")
 
+    def test_worldloom_root_clamp_is_blockbench_animated_and_registered(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/worldloom_root_clamp.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:worldloom_root_clamp"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/worldloom_root_clamp.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], list(range(6)))
+        self.assertEqual(animation["frametime"] * len(animation["frames"]), 18, "the six Blockbench frames span the 18-tick root-clamp particle")
+        header = (ROOT / "assets/specialpickaxes/textures/particle/worldloom_root_clamp.png").read_bytes()[:26]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (32, 192), "Worldloom roots must use six vertically stacked 32x32 Blockbench frames")
+        png = (ROOT / "assets/specialpickaxes/textures/particle/worldloom_root_clamp.png").read_bytes()
+        chunks = set()
+        offset = 8
+        while offset < len(png):
+            chunk_size = struct.unpack(">I", png[offset:offset + 4])[0]
+            chunks.add(png[offset + 4:offset + 8])
+            offset += chunk_size + 12
+        self.assertTrue(header[25] in (4, 6) or b"tRNS" in chunks, "the root sigil keeps its transparent interior and background")
+        effect = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/HeartwoodGraspEffect.java").read_text()
+        renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        self.assertIn("WORLDLOOM_ROOT_CLAMP.get()", effect, "the Curios root snare must show its custom sigil")
+        self.assertIn("WORLDLOOM_ROOT_CLAMP.get(),WorldloomRootClampParticle.Provider::new", renderer, "the root sigil sprite must be registered on the client")
+
     def test_crucible_manual_matches_mode_controls(self):
         expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]
         for language in ["en_us", "es_es"]:
