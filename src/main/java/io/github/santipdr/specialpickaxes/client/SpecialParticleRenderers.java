@@ -17,5 +17,6 @@ public final class SpecialParticleRenderers {
         event.registerSpriteSet(SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),IridiumLodeShardParticle.Provider::new);
         event.registerSpriteSet(SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),HellspecBrandFlareParticle.Provider::new);
         event.registerSpriteSet(SpecialPickaxes.WORLDLOOM_ROOT_CLAMP.get(),WorldloomRootClampParticle.Provider::new);
+        event.registerSpriteSet(SpecialPickaxes.EXODIUM_STARFALL.get(),ExodiumStarfallParticle.Provider::new);
     }
 }

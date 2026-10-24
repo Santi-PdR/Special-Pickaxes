@@ -1,0 +1,294 @@
+{
+  "frames": [
+    {
+      "filename": "starfall_pulse_0",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 125
+    },
+    {
+      "filename": "starfall_pulse_0_125",
+      "frame": {
+        "x": 0,
+        "y": 32,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 125
+    },
+    {
+      "filename": "starfall_pulse_0_25",
+      "frame": {
+        "x": 0,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 125
+    },
+    {
+      "filename": "starfall_pulse_0_375",
+      "frame": {
+        "x": 0,
+        "y": 96,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "duration": 125
+    }
+  ],
+  "meta": {
+    "app": "https://github.com/BlockBenchMCP",
+    "version": "1.9.0.1",
+    "image": "exodium_starfall.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 32,
+      "h": 128
+    },
+    "scale": "1",
+    "frameTags": [
+      {
+        "name": "starfall_pulse",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      }
+    ],
+    "layers": [
+      {
+        "name": "sprite",
+        "opacity": 255,
+        "blendMode": "normal"
+      }
+    ],
+    "slices": [
+      {
+        "name": "pivot",
+        "color": "#0000ffff",
+        "keys": [
+          {
+            "frame": 0,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 17
+            }
+          },
+          {
+            "frame": 1,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 17
+            }
+          },
+          {
+            "frame": 2,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 17
+            }
+          },
+          {
+            "frame": 3,
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "w": 32,
+              "h": 32
+            },
+            "pivot": {
+              "x": 16,
+              "y": 17
+            }
+          }
+        ]
+      }
+    ],
+    "pixelart": {
+      "pixels_per_unit": 1.75,
+      "frame_size": {
+        "w": 32,
+        "h": 32
+      },
+      "columns": 1,
+      "rows": 4,
+      "view": {
+        "yaw": 0,
+        "pitch": 0,
+        "name": "front"
+      },
+      "directions": [
+        {
+          "index": 0,
+          "name": "down",
+          "compass": "S",
+          "yaw": 0
+        }
+      ],
+      "animations": [
+        {
+          "name": "starfall_pulse",
+          "fps": 8,
+          "loop": "loop",
+          "length": 0.5,
+          "frames": 4
+        }
+      ],
+      "style": {
+        "shading": "toon",
+        "shade_levels": 3,
+        "light": [
+          -0.35,
+          0.75,
+          0.45
+        ],
+        "outline": "outer",
+        "outline_color": "#341348",
+        "inner_lines": "depth+parts",
+        "line_depth_threshold": 1.5,
+        "palette": "source",
+        "cleanup": "none",
+        "pixel_perfect": true
+      },
+      "frames": [
+        {
+          "key": "starfall_pulse_0",
+          "tag": "starfall_pulse",
+          "direction": "down",
+          "compass": "S",
+          "time": 0,
+          "pivot": {
+            "x": 16,
+            "y": 17
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.53125
+          }
+        },
+        {
+          "key": "starfall_pulse_0_125",
+          "tag": "starfall_pulse",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.125,
+          "pivot": {
+            "x": 16,
+            "y": 17
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.53125
+          }
+        },
+        {
+          "key": "starfall_pulse_0_25",
+          "tag": "starfall_pulse",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.25,
+          "pivot": {
+            "x": 16,
+            "y": 17
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.53125
+          }
+        },
+        {
+          "key": "starfall_pulse_0_375",
+          "tag": "starfall_pulse",
+          "direction": "down",
+          "compass": "S",
+          "time": 0.375,
+          "pivot": {
+            "x": 16,
+            "y": 17
+          },
+          "pivot_normalized": {
+            "x": 0.5,
+            "y": 0.53125
+          }
+        }
+      ],
+      "fps": 8,
+      "anchor": "origin",
+      "texel_density": 4,
+      "pivot": {
+        "x": 16,
+        "y": 17
+      }
+    }
+  }
+}

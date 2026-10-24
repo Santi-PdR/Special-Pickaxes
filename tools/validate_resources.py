@@ -75,6 +75,22 @@ class Resources(unittest.TestCase):
         self.assertIn("private static final int ROOT_PARTICLES=1", snare, "the captured pulse must cost one animated sprite")
         self.assertIn("WORLDLOOM_ROOT_CLAMP.get(),WorldloomRootClampParticle.Provider::new", renderer, "the root sigil sprite must be registered on the client")
 
+    def test_exodium_starfall_impact_is_blockbench_animated_and_registered(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/exodium_starfall.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:exodium_starfall"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/exodium_starfall.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], [0, 1, 2, 3])
+        self.assertEqual(animation["frametime"], 2)
+        header = (ROOT / "assets/specialpickaxes/textures/particle/exodium_starfall.png").read_bytes()[:26]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (32, 128), "Exodium uses four vertically stacked 32x32 Blockbench frames")
+        self.assertEqual(header[25], 6, "the starfall impact keeps its transparent background")
+        model = pathlib.Path("artwork/blockbench/exodium_starfall_mote.bbmodel").read_text()
+        self.assertIn("starfall_pulse", model, "the Blockbench source preserves the authored pulse animation")
+        technique = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactFeedback.java").read_text()
+        renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        self.assertIn("EXODIUM_STARFALL.get()", technique, "Starfall mining impacts must use the animated custom particle")
+        self.assertIn("EXODIUM_STARFALL.get(),ExodiumStarfallParticle.Provider::new", renderer, "the Starfall sprite must have a client renderer")
+
     def test_crucible_manual_matches_mode_controls(self):
         expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]
         for language in ["en_us", "es_es"]:

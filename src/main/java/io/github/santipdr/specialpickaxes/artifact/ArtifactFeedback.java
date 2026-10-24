@@ -629,9 +629,8 @@ public final class ArtifactFeedback {
     /** A short falling-star pulse marks each live Exodium excavation step without broadcasting to distant players. */
     public static void starfallWork(ServerPlayer p,BlockPos at){
         var level=p.serverLevel();double x=at.getX()+.5,y=at.getY()+.65,z=at.getZ()+.5;
-        var trail=new DustParticleOptions(new Vector3f(1F,.4F,.78F),1.05F);
-        level.sendParticles(p,ParticleTypes.END_ROD,false,x,y,z,1,0,.18,0,.005);
-        level.sendParticles(p,trail,false,x,y-.28,z,1,0,0,0,0);
+        level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.EXODIUM_STARFALL.get(),
+                false,x,y,z,1,.015D,.025D,.015D,.004D);
     }
     /** Compact landing burst confirms that Icarian Lift actually reached open sky. */
     public static void icarianSurface(ServerPlayer p){
