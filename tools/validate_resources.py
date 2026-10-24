@@ -46,6 +46,10 @@ class Resources(unittest.TestCase):
         self.assertEqual(animation["frametime"] * len(animation["frames"]), 16, "the animated feather spans its 16-tick particle lifetime")
         header = (ROOT / "assets/specialpickaxes/textures/particle/icarian_feather.png").read_bytes()[:24]
         self.assertEqual(struct.unpack(">II", header[16:24]), (32, 128), "Icarian must use four vertically stacked 32x32 Blockbench frames")
+        passive = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/IcarianMomentumEffect.java").read_text()
+        renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        self.assertIn("SpecialPickaxes.ICARIAN_FEATHER.get()", passive, "Curios glide must use its animated feather particle")
+        self.assertIn("ICARIAN_FEATHER.get(),IcarianFeatherParticle.Provider::new", renderer, "the animated feather must be registered on the client")
 
     def test_crucible_manual_matches_mode_controls(self):
         expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]

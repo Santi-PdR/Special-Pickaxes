@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -9,11 +8,9 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 /** Icarus' Curios passive turns a sprint-jump into a controlled, visible aerial glide. */
 public final class IcarianMomentumEffect extends MobEffect {
-    private static final DustParticleOptions WING_GLEAM=new DustParticleOptions(new Vector3f(.98F,.82F,.48F),.72F);
     private static final String LANDING_READY="specialpickaxesIcarianLandingReadyAtWorldTime";
     public IcarianMomentumEffect(){super(MobEffectCategory.BENEFICIAL,0xffc057);}
 
@@ -38,11 +35,12 @@ public final class IcarianMomentumEffect extends MobEffect {
         if(forward.lengthSqr()<.001D)forward=new Vec3(0,0,1);else forward=forward.normalize();
         Vec3 right=new Vec3(-forward.z,0,forward.x);double y=player.getY()+.18D;
         var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(8);
+        var featherSprite=io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHER.get();
         for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
             double span=.22D+feather*.18D,trail=.08D+feather*.12D;
             double x=player.getX()+right.x*side*span-forward.x*trail;
             double z=player.getZ()+right.z*side*span-forward.z*trail;
-            particles.add(new ArtifactFeedback.AuraParticle(WING_GLEAM,new Vec3(x,y+feather*.025D,z),1,0,.015D,0,0));
+            particles.add(new ArtifactFeedback.AuraParticle(featherSprite,new Vec3(x,y+feather*.025D,z),1,0,.015D,0,0));
             if(feather==2)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.END_ROD,new Vec3(x,y+.04D,z),1,0,.02D,0,0));
         }
         ArtifactFeedback.nearbyWardPulse(player,particles);
@@ -97,12 +95,13 @@ public final class IcarianMomentumEffect extends MobEffect {
             double speed=Math.min(.8D,player.getDeltaMovement().horizontalDistance());
             double shoulderY=entity.getY()+entity.getBbHeight()*.56D;
             var particles=new java.util.ArrayList<ArtifactFeedback.AuraParticle>(8);
+            var featherSprite=io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHER.get();
             for(int side=-1;side<=1;side+=2)for(int feather=0;feather<3;feather++){
                 double span=(.24D+feather*.19D)*(1D+speed*.22D),trail=.08D+feather*.13D+speed*.12D;
                 double x=entity.getX()+right.x*side*span-forward.x*trail;
                 double z=entity.getZ()+right.z*side*span-forward.z*trail;
                 double y=shoulderY+(2-feather)*.035D;
-                particles.add(new ArtifactFeedback.AuraParticle(WING_GLEAM,new Vec3(x,y,z),1,0,0,0,0));
+                particles.add(new ArtifactFeedback.AuraParticle(featherSprite,new Vec3(x,y,z),1,0,0,0,0));
                 if(feather==2)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.END_ROD,new Vec3(x,y,z),1,0,0,0,0));
             }
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
