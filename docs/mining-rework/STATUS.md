@@ -1,4 +1,15 @@
-# Rework minero — 5.0.0 validado y publicado
+# Historial de la versión 5.0.0 (publicación anterior)
+
+> Este archivo conserva la evidencia histórica de 5.0.0. El estado actual del mod es 5.10.163; no uses la identidad, los conteos ni los hashes de la sección histórica para instalar el candidato actual.
+
+## Estado vigente — 5.10.163 (2026-10-25)
+
+- Fuente actual: `93adc47b1c74cf37f2db4b4c6fee92d64c05843b`; validación completa en [GitHub Actions 40214619594](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40214619594).
+- El build pasó compilación, tests, GameTest y runtime. El cliente validó 32 escenas y 64 tooltips normales/SHIFT, además de activación/cancelación y la geometría y las barreras de Worldbreaker.
+- Candidato: `special-pickaxes-1.20.1-5.10.163.jar`. La verificación exige 13 modelos y 13 texturas, clase Java 17, manifiesto vinculado al commit, cero recetas/worldgen y ausencia de clases de fixture en el JAR.
+- `VISUAL-REVIEW.json` sigue registrando una aprobación para otro commit y otro JAR. El workflow actual rechazó esa evidencia para este source y omitió staging/publicación; no hay binario 5.10.163 publicado por esa corrida.
+- El árbol actual del repositorio no contiene JARs de Special Pickaxes anteriores; solo incluye el wrapper de Gradle y JARs de mods de referencia. No se inspeccionó ni modificó la carpeta local `ghouls/mods`.
+
 
 Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente, revisión visual y reproducción binaria están aprobadas. El JAR final está publicado.
 Los resultados de un commit anterior no certifican sus correcciones posteriores.
