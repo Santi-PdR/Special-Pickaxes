@@ -54,7 +54,6 @@ public final class RelicAura {
             double angle=phase+i*Math.PI/2D,radius=.42D+Math.sin(phase+i*.7D)*.035D;
             double x=player.getX()+Math.cos(angle)*radius,z=player.getZ()+Math.sin(angle)*radius;
             double particleY=y+Math.sin(angle*2D)*.06D;
-            ParticleOptions 
             switch(item.kind){
                 case PALIMPSEST -> {
                     angle=phase*.72D+i*Math.PI/2D;radius=.25D+i*.035D;
