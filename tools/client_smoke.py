@@ -88,6 +88,10 @@ try:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
    ux.add(id);i=scenes.index(id)
+   if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
+    # Change the artifact mode without producing an image already covered by
+    # the next scene's normal and Shift captures.
+    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press','mode'],env=env,check=True,timeout=20)
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
