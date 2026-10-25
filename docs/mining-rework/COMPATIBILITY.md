@@ -1,29 +1,26 @@
-# Compatibilidad del catálogo 5.9.0
+# Compatibilidad con la instancia ghouls
 
-La referencia local es `/home/Santipdr/.sklauncher/instances/ghouls/mods/`, no
-una integración certificada. Hay Forge 1.20.1, Terramity 0.9.8, Create, Relics,
-ToolLeveling, SecurityCraft, JourneyMap, Jade, Advanced XRay, Sophisticated
-Backpacks, Better Combat y otros mods del pack.
+## Base observada
 
-| Sistema | Comportamiento deliberado | Límite de esta revisión |
+Inventario revisado por nombres de archivo en `D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\ghouls\mods` el 2026-10-25. No se inspeccionaron ni modificaron los JAR del pack. El mod apunta a Forge 1.20.1; `build.gradle` fija Forge 47.4.10 para compilar. La lista de mods no confirma por sí sola la versión de Forge instalada en la instancia.
+
+El inventario muestra, entre otros, Terramity 0.9.8, Undead Revamped 2.1h, Tool Leveling 2.0.0, Create 6.0.8, SecurityCraft 1.9.12, Curios 5.14.1, Relics 0.8.0.9, Just Enough Guns 0.13.1, Sophisticated Backpacks, Embeddium y Photon.
+
+## Compatibilidad implementada
+
+| Mod o sistema | Comportamiento del mod | Estado de validación |
 |---|---|---|
-| Terramity | Tier IV; las herramientas tienen velocidad base 64 o superior, 32.768 de durabilidad y encantabilidad 50. Las menas y geología Forge se consideran picables aunque un mod no declare nivel de herramienta. | Confirmado comparando con el Exodium Pickaxe del JAR local: tier IV, velocidad 20, 8.124 de durabilidad, encantabilidad 50. No se ejecutó el pack completo. |
-| Advanced XRay / JourneyMap / Jade | No hay habilidades de detección de menas. Iridium sí extrae menas existentes por tandas y resalta sus drops; el mod no bloquea XRay. | No se comprobó convivencia visual en juego con shaders, LOD o configuración de servidor real. |
-| Create / máquinas / cofres | Las habilidades de área excluyen block entities y fluidos; el Crucible solo cambia estados geológicos predeterminados y seguros. | No se probó automatización móvil o máquinas de terceros. |
-| SecurityCraft / claims | Las operaciones consultan `mayInteract`, `mayBuild` y eventos Forge de habilidad/rotura. Una denegación detiene el paso y no salta la barrera. | Un mod que no participe de los hooks Forge puede aplicar reglas propias no observables. |
-| ToolLeveling / encantamientos | Se conserva el nivel de Efficiency, Fortune, Silk Touch, Unbreaking y Mending en el NBT; el cálculo de trabajo y la cola siguen acotados. | No se probó el progreso/XP de ToolLeveling dentro del pack completo. |
-| Distant Horizons / Photon / shaders | Las habilidades usan partículas Forge/vanilla limitadas y no dependen del renderer del mundo. | No hay medición de TPS ni revisión visual con el perfil completo. |
-| Mochilas / recolección | Drops nativos; no añade almacenamiento, duplicación ni imán global. La cola pausa si los drops cercanos alcanzan el umbral de congestión. | La capacidad real de una mochila no se integra con el limitador. |
-| Modo multijugador | Los cambios se ejecutan en servidor, ligados al propietario, herramienta, dimensión y permiso; el sonido se limita a jugadores cercanos. | No se considera certificación para TPS, claims o configuraciones específicas del servidor. |
-| Curios | Registra un slot `pickaxe`; los picos equipados mantienen sus pasivas. No agrega teclas ni habilidades activas al slot. | El slot y su GUI requieren Curios en cliente/servidor. Relics requiere Curios y OctoLib; los JAR de `ghouls` se usan como referencia para la instancia de prueba. |
+| Herramientas y drops | Los trece picos están en la etiqueta vanilla `minecraft:pickaxes`, usan el tier IV del mod y no tienen recetas en `data/`. Sus filtros de bloques añaden tags Forge y familias de menas/geología para bloques de otros mods. | Revisado en fuente y recursos del repositorio; no se ejecutó el pack completo. |
+| Terramity 0.9.8 | Los picos superan el Exodium Pickaxe tier IV en velocidad. Se reconocen `brimslag`, `stellar_remnant` y la geología indicada en el README. Exodium, Iridium y Hellspec reutilizan texturas con permiso documentado. | IDs y referencias documentados; pendiente prueba dentro de la instancia. |
+| Undead Revamped 2.1h | Se reconocen `bostrokestone`, `bostroxore`, `igneostone` y variantes naturales de dripstone para minería/transmutación. | Compatibilidad basada en IDs explícitos; pendiente prueba en la instancia. |
+| Tool Leveling 2.0.0 | El mod conserva encantamientos guardados en el objeto y aplica escalado seguro de Efficiency/Fortune. No añade una integración directa con la progresión o XP de Tool Leveling. | No se validó cómo interactúan sus niveles, XP y restricciones con estos picos. |
+| Create 6.0.8 y SecurityCraft 1.9.12 | Las operaciones masivas omiten block entities y comprueban permisos Forge del jugador antes de afectar bloques o entidades. | No se probó el pack ni los casos de máquinas móviles, claims o configuraciones particulares. |
+| Just Enough Guns 0.13.1 | Las defensas de Eventide, Crucible y pasivas relacionadas reconocen proyectiles JEG mediante su compatibilidad específica. | Integración en fuente; falta prueba en juego. |
+| Curios 5.14.1 / Relics 0.8.0.9 | Curios es opcional; los picos equipados en el slot conservan sus pasivas, sin activar técnicas desde el slot. Relics aparece en el pack, pero no requiere un adaptador propio. | Compatibilidad con Curios documentada; GUI y combinación con Relics pendientes de probar. |
+| Embeddium / Photon / AmbientSounds | El mod usa efectos Forge/vanilla y no depende de estos renderizadores para la lógica de minería. | No se revisaron capturas con el perfil visual completo. |
 
-Los picos de Terramity Exodium, Nyxium y Reverium usan el tier IV más alto de
-Terramity. La herramienta Special Pickaxes es tier IV, con velocidad muy superior,
-y permite cosechar los bloques del mod etiquetados como picables. Exodium, Iridium
-y Hellspec usan las texturas de Terramity 0.9.8 bajo el permiso del propietario;
-las procedencias y hashes están en `ASSET-PROVENANCE.json`.
+El inventario también incluye `Item-Obliterator-NeoForge-MC1.20.1-2.3.1`. El nombre del JAR indica una distribución NeoForge en un pack objetivo Forge; hace falta revisar el metadata interno del JAR y el loader de la instancia para confirmar que puede cargarse. No se considera una compatibilidad certificada de Special Pickaxes.
 
-Las transformaciones protegen geología marcada al colocarla desde esta versión.
-Vanilla no conserva el historial de colocación para bloques preexistentes; por
-eso no se afirma que pueda distinguir cada bloque natural de cada bloque antiguo
-colocado por jugador.
+## Límites
+
+Esta tabla describe inspección estática del código y de nombres de JAR. No representa una ejecución de la instancia, ni certifica estabilidad de TPS, claims de terceros, shaders, servidores o todos los mods del inventario. Las habilidades de minería se ejecutan en servidor, reparten el trabajo por ticks, vuelven a comprobar permisos y no cargan chunks descargados. No existen recetas, minerales propios, worldgen ni energía obligatorios.
