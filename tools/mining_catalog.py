@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-IDS=['palimpsest', 'fault_choir', 'eventide', 'paradox_crucible', 'interregnum', 'worldloom', 'icarus', 'hollow_axiom', 'worldbreaker', 'exodium', 'iridium', 'hellspec', 'seam_ripper']
+IDS=['palimpsest', 'fault_choir', 'eventide', 'paradox_crucible', 'interregnum', 'worldloom', 'icarus', 'hollow_axiom', 'exodium', 'iridium', 'hellspec', 'worldbreaker', 'seam_ripper']
 MODES={'palimpsest': {'vein': ('VEIN ECHO: harvest the connected ore vein.',
                          'ECO DE VETA: extrae la veta conectada.',
                          'Aim at an exposed ore and activate. It searches a 12-block radius and mines up to '
