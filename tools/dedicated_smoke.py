@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Boot the reobfuscated release JAR in a clean Forge dedicated server, then stop cleanly."""
-import pathlib, subprocess, shutil, time, threading, queue, urllib.request, sys, json, re
+import pathlib, subprocess, shutil, time, threading, queue, urllib.request, sys, json
 root=pathlib.Path.cwd(); server=root/'build/packaged-smoke'; server.mkdir(parents=True,exist_ok=True)
 build_config=(root/'build.gradle').read_text()
-match=re.search(r"""minecraft\\s+['"]net\\.minecraftforge:forge:([^'"]+)['"]""",build_config)
-if not match:sys.exit('Could not resolve the Forge version from build.gradle')
-forge_version=match.group(1)
+dependency_prefix="minecraft 'net.minecraftforge:forge:"
+dependency=next((line.strip() for line in build_config.splitlines() if line.strip().startswith(dependency_prefix)),None)
+if not dependency:sys.exit('Could not resolve the Forge version from build.gradle')
+forge_version=dependency.partition(dependency_prefix)[2].partition("'")[0]
+if not forge_version:sys.exit('Forge dependency in build.gradle has no version')
 installer=server/'forge-installer.jar'
 if not installer.exists():
  url=f'https://maven.minecraftforge.net/net/minecraftforge/forge/{forge_version}/forge-{forge_version}-installer.jar'
