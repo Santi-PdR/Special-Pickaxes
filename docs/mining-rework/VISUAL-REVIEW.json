@@ -1,8 +1,8 @@
 {
-  "source_commit": "7de02e2768ad31c393e6636de262aac3f3913408",
-  "run_id": 40231953747,
-  "jar_sha256": "5e48fd56347c4912281424dabbfb92c6a5af368ee9d0f02912404248b6e92d19",
-  "jar_bytes": 363535,
+  "source_commit": "8ad7d5bccab8e89a396061d3eb8814a67e62e1ed",
+  "run_id": 40236809580,
+  "jar_sha256": "e83ce8af69de680d3d700b4fac92f2ded7f53a3b46c890e250861aca4375a8f3",
+  "jar_bytes": 363538,
   "approved": true,
   "reviewer": "Codex visual review",
   "reviewed_images": [
@@ -86,468 +86,468 @@
   "review_copies": [
     {
       "original": "ux-palimpsest-vein.png",
-      "sha256": "487fe76ccf2cbddfaf98abd070ba29a8bcd79509c76be929389e7e46a199333a",
+      "sha256": "c4385ea5939fe20cb2ecfa80589f6e3d44f7e12e947d1d40c3478784829ba4e6",
       "review_copy": "ux-palimpsest-vein.jpg",
-      "review_sha256": "b3b4bf5c70b48ff771a590c6b8b0addfa562ce5484a24e16a87ef4dba378b73c"
+      "review_sha256": "4543f74638750e053f2d310fd5cc100cfb7c0a28386e75882919529f151156bc"
     },
     {
       "original": "supreme-camera-first.png",
-      "sha256": "198404bf18f5723f2868f27f19c57203714aac3b994b2670fb66824269232f0a",
+      "sha256": "682e4174a30aa597cccdff83cd55e62078389fb89c32476a217ad06c6ec445df",
       "review_copy": "supreme-camera-first.jpg",
-      "review_sha256": "3da8a02128109f0be7f34fb087adf0bc72b889928754ecd174cfec4dc7021d47"
+      "review_sha256": "f2f2bab7b4f0ca062f7d49269b4337e881dbb5ba3b27e2cfdc2db554be125f26"
     },
     {
       "original": "ux-paradox_crucible-basalt.png",
-      "sha256": "c9a8d5be485d78a9b7378e3696c1d09741820f7ed2d81dbfdf137e87b3ac23c4",
+      "sha256": "b9420c46bdfd76b233665302db78b3c694f7142b668383368f5e1520da581fbe",
       "review_copy": "ux-paradox_crucible-basalt.jpg",
-      "review_sha256": "92c6e2dc9b9c524ba6453d7eaacc33c4484a93c4fbecb12e5592dff88cd92678"
+      "review_sha256": "69335eb6725c1d2ce7a09566a5731d67b9e5f66cc55a03ab0b721dd06fcd1fd2"
     },
     {
       "original": "ux-shift-paradox_crucible-diorite.png",
-      "sha256": "3c06c9a2cef600418f78744f7117645af8d5fa62cb53446f3eb4daa9a8405adf",
+      "sha256": "5fd9cbaa10031831600cc9a498c9fa40fb2cd68fdfc96c4feecfa17db7d60870",
       "review_copy": "ux-shift-paradox_crucible-diorite.jpg",
-      "review_sha256": "7bf081a51c3bdee484da145ec5631b58259d206aa7ad296bf534c32e74c008ca"
+      "review_sha256": "fa16c9926e963cf420021280d751240d0120790693ba0b8345c4f16bb14bbd75"
     },
     {
       "original": "gallery.png",
-      "sha256": "215108d8c17a33cdc7e901f4876b7ceebb6c4173686be48275fd94a9c5ade603",
+      "sha256": "dadbdeba2c1a975439ab20b8962696cccabecb29c22ab1ec1cc37e8cdaec4b1f",
       "review_copy": "gallery.jpg",
-      "review_sha256": "4ed180cb28821806006b8e3addc8fdb4bbee37c8cae26c118c59d5dea402707e"
+      "review_sha256": "a1d13b14d8887777567d61aaa1e84ed0a7d4cb0fd6df47a1e76a0bc1cf483649"
     },
     {
       "original": "ux-shift-hellspec-hellforge.png",
-      "sha256": "b2450c30f227c0617200872da6237ca86ceac1f04e5c2421508f4ff755f1aa13",
+      "sha256": "c709b185c69d92b9feb9cc22bb3c10334eee3d5507788b7d1432819257db15b5",
       "review_copy": "ux-shift-hellspec-hellforge.jpg",
-      "review_sha256": "56b24d173cec85b36f5fa8cef31ff506f3286061dbc53d0cadcecc3d68157596"
+      "review_sha256": "7e75e993388c1f69125facb4e8fe6609a01d7f747721120ca7c7c6c241690c5b"
     },
     {
       "original": "ux-shift-worldbreaker-fracture.png",
-      "sha256": "604d8e4690938637dcbdf514242415a06b9bcf5888b8cae39bf94d57c55a9a4d",
+      "sha256": "b12dbe2817197094f9565bc61f9ecf28086e56f3acc84a5674e29d6d68f35517",
       "review_copy": "ux-shift-worldbreaker-fracture.jpg",
-      "review_sha256": "60176e03a2b8089a222df2d1f5f3609c6e7156facdc07c5a5a4da3b06fd96a56"
+      "review_sha256": "de658a550b9e35d4408eed39b9b81cb244d7f65f54abd2631a4656b8b5ecc115"
     },
     {
       "original": "ux-iridium-orefall.png",
-      "sha256": "5f7001538255e3b86eb9548a934f7c5c76471a8c48286d2d2552c51fec7bc2e0",
+      "sha256": "ffc6a4a3d78ea9b24d29d5cf5ea07e8cd294e1492292adc5e6cbbaed9e5ad655",
       "review_copy": "ux-iridium-orefall.jpg",
-      "review_sha256": "ffb9a3af0fd2a05e06918a63fc9484a9f36b605b878484e61e3aaa79d9f21172"
+      "review_sha256": "418a30d770971dad7f7bd87dbe4bf60212281f79c89386fdf46a8529a32188d2"
     },
     {
       "original": "ux-shift-worldbreaker-world_shatter.png",
-      "sha256": "adba543a86c5f7eb2e7917aae353ee1a2a1535602fbe8cb9278ee12a8b1210ee",
+      "sha256": "a6a258bcd41b908a6d8696ef577734c09d76953bb904e191ea680a18c8a8d181",
       "review_copy": "ux-shift-worldbreaker-world_shatter.jpg",
-      "review_sha256": "c22ac55ce1a80fa17d9a4dac744cc07927781c6095a3f55690f9c4caf856b903"
+      "review_sha256": "0a796c561e625309c605e2851a97f3eff0232375f76f587ee1aeea0f68215f30"
     },
     {
       "original": "ux-worldbreaker-cleave.png",
-      "sha256": "d6be49bc44ac0cca5a2303a63d74789688e149aea7b71132ac20def54d7d38f5",
+      "sha256": "05bd15f1d36cb291b94b9fa51af7edaa6bb19f71508c730585778026aab70333",
       "review_copy": "ux-worldbreaker-cleave.jpg",
-      "review_sha256": "ba50fe2358a7ed7dd3e864012e81af3e950088b59d251f64ee76a75485fde51e"
+      "review_sha256": "4f72f1422561597413173f5b561de3fbd9170a49d9cd422549f98d28d94dd043"
     },
     {
       "original": "ux-icarus-wide.png",
-      "sha256": "917ae2c8b2ee31f2fe7caf07f4bfaea0a1df1c2b68928da84af007d88a3fbc8f",
+      "sha256": "963cf51fac3643d570c1c8bc97b9d5976d88fe17e09356910813c39e33d964e1",
       "review_copy": "ux-icarus-wide.jpg",
-      "review_sha256": "691a66c814ca9beca09ee0fe580cd1cce0fe29984e46c5bc3e07d7ab45d38f12"
+      "review_sha256": "661ee7f00633849d0c06c5ca1410624a086a898e0d29c22170bb62b2436f2023"
     },
     {
       "original": "third-person.png",
-      "sha256": "37f7bd0ce7f1380f46689ddc525942e8bb974b7549049a3233e9a3f73f0076f4",
+      "sha256": "a517367beddaa511cff5e10d67728a44caaa40e99eaa8637bf74a574aa9f6dd4",
       "review_copy": "third-person.jpg",
-      "review_sha256": "c14a5c555d0e998bf850f0da78a82840dc3ad3323074cc7aaf27cbd67d7d42be"
+      "review_sha256": "43afa90644efd39251288c489e812205379888ecc8632e047885c46820545982"
     },
     {
       "original": "ux-shift-paradox_crucible-granite.png",
-      "sha256": "169fa09e60f83fb6baa45eab5674c369f43d296368e162acad494b5e9ff06ceb",
+      "sha256": "15dead076232b56fba58f20835e21f5fab7ccf372d95a3a2305e6b873060bd73",
       "review_copy": "ux-shift-paradox_crucible-granite.jpg",
-      "review_sha256": "594baee79d32de9c1efbd6d2a5db6b76745f86cdf54589b683e2542b3ddbcb67"
+      "review_sha256": "8897019055480679f63d571f6508ea7d2dc5e006950f6f71eb218e310389f86b"
     },
     {
       "original": "ux-paradox_crucible-diorite.png",
-      "sha256": "5022c89e53ac56e2666b2e25872e659c2846d2f3ba8a780767a8b517258f6e4d",
+      "sha256": "50eefbe0b9ede8423a72c1e11c30ad960f0405a739b19e4ef2348d46e1e490b5",
       "review_copy": "ux-paradox_crucible-diorite.jpg",
-      "review_sha256": "71a77da5301fa881798ad8cccfa568a905cfd50c37cec1d8938facbb31b63779"
+      "review_sha256": "3779475672dfe03292cb3be18ecd2f8b43996dcd94db5ba7f3bac13694c40f54"
     },
     {
       "original": "ux-shift-hollow_axiom-hollow_pulse.png",
-      "sha256": "7925b74cf7ee5eaeb507f9fa5534f699debea1f5e9034ded628d86873b82df38",
+      "sha256": "e66a826b52b292bcf2cf544548e57ac8318897b43140e0c5cbc6615b484970fb",
       "review_copy": "ux-shift-hollow_axiom-hollow_pulse.jpg",
-      "review_sha256": "28d4babf0a53c32fd70511b7f2deb9d0e6ee744013d9021d6e8779c0dd62c041"
+      "review_sha256": "3fe8677c370c63e465d024875ccba9e206b2de98055c8b1d44eac6542179b725"
     },
     {
       "original": "gallery-clean.png",
-      "sha256": "5d0ca0303c116d2b2dacf0d5f844cfdba225dcc5ec50886828d49a121026bba7",
+      "sha256": "94098b45ec155745827466b845f7b1d8f2d7e5c009591e35d52493f87edde26b",
       "review_copy": "gallery-clean.jpg",
-      "review_sha256": "970d161196dc94e7177986e88b773213da4157ef7ab909c8807a9c0fecddeca7"
+      "review_sha256": "30c0a178f42e1e441fb92d7207b7182e29000f1ef7b2c73ac7c58c1c05782eeb"
     },
     {
       "original": "ux-hellspec-hellforge.png",
-      "sha256": "51c11f12be6a3da22e7ab3eb90ba717967ce4e9845db27da74e08e8a61f909fc",
+      "sha256": "6febd546b764fd6b2aaa7d5e55eedd6b0af46d667791e121424d2153a0870f24",
       "review_copy": "ux-hellspec-hellforge.jpg",
-      "review_sha256": "bd4526488305bb8b2cfc8a288281b82fb5d96df8672b6e921b8ffdf7e334c9f1"
+      "review_sha256": "d26f9b36d45012b8877b069752b0e50091528e8213f58cf9fb988b2a2eb8a0e9"
     },
     {
       "original": "ux-eventide-gravity_in.png",
-      "sha256": "c55ca3fc1898b7eb522cad3c349a2a63a765c1df650fff0133eb7db78b3c7249",
+      "sha256": "324f15947cec65d38909f4b09cbce829619ab8c0410bbca778e93e772e534b9b",
       "review_copy": "ux-eventide-gravity_in.jpg",
-      "review_sha256": "49ec89c7c1bd3e1abfd2ceab7e5207075ac0adba3a5d9c79c7d3a341275f8cfe"
+      "review_sha256": "201c39c65284c5ebb3efe248ff0e9687a0d16e0f395086db2d544f29ce67483e"
     },
     {
       "original": "ux-shift-iridium-orefall.png",
-      "sha256": "9e5d0491b4fda619353cf3b139dd65341a3ba5ff14a9eebcd73fc39805d36e05",
+      "sha256": "cb3f892b40826d98cf7f5813d505b4dfcfbe074acb5af8ed2c62918b26e8be5e",
       "review_copy": "ux-shift-iridium-orefall.jpg",
-      "review_sha256": "09c1872ddeede98623bd4fa5c8b16fe7efd35354eeed0db111f16c5836bc51e3"
+      "review_sha256": "e51ca0dce05447061dc624d27b8a0e4fc7b6f2163e1870af151f3138e4adc93a"
     },
     {
       "original": "ux-worldbreaker-core_drill.png",
-      "sha256": "c2e3efeae269d4552b3b04907e123856848727916a44ce9a3786dc3ea5c7feb8",
+      "sha256": "e72956f876caec3d38a1d51c51c1eeb30cf080a09388f64980d225183b1eb3b5",
       "review_copy": "ux-worldbreaker-core_drill.jpg",
-      "review_sha256": "08ba98e9bf8f7ad592185d87da0a5fdfb371b22e0900d1f1e37f471dd3f48795"
+      "review_sha256": "4fb5396aa717adf1be558ab4b682017e4faf2a30d4dd2787cefc798d95e41c79"
     },
     {
       "original": "supreme-complete.png",
-      "sha256": "2945c17a2f390d1e6209d0ff7ac099a7cf306c7eeb375dac07300872a0d18cc9",
+      "sha256": "465c9caf53ceac860a88eff5c061c70aa840520c32f620c1e3b03c39733c9dc9",
       "review_copy": "supreme-complete.jpg",
-      "review_sha256": "4dc7524c3b27984180543488513fff4f72a68809470b168f43f2813c26c89762"
+      "review_sha256": "ea70e38193933635f8faec1dad8e67d2cde74a459236747913de1177e63f5a06"
     },
     {
       "original": "ux-shift-worldloom-quarry.png",
-      "sha256": "ccc512ec6a8a1aa70a7eb569d64e9fb47e8663cdf59c204f12d61c23fdfe5f33",
+      "sha256": "0b6735efa21a587738de13b86305ac5203a3e8d304229b36804379da8f123171",
       "review_copy": "ux-shift-worldloom-quarry.jpg",
-      "review_sha256": "57aaa82f29510c1c591e41cbcd924e0d5061eec39a30eb5c2ba6a43c4e31cc11"
+      "review_sha256": "2ee4c907208ee7f51fd3299f11fadf17cf18ebcad5ea19d5c1bc881843cbb2c3"
     },
     {
       "original": "ux-shift-paradox_crucible-stone.png",
-      "sha256": "bbc822e9c84542d6b12c71ae48680fdce525204de586ec1c872a967492e45066",
+      "sha256": "1aaacbaf95ce11000ff45c37ee886addc1651c0ff0ad7441cb9a9b483b45805d",
       "review_copy": "ux-shift-paradox_crucible-stone.jpg",
-      "review_sha256": "8d3341cce301c90aa9c96ce58c8973e2054afdcee833ddda25e521dacef19f9d"
+      "review_sha256": "91c2841583b89e9d81902637a68e81ef40b1ea204e1f513d1a46485a1a772bd9"
     },
     {
       "original": "ux-shift-eventide-gravity_in.png",
-      "sha256": "3f90dc85d4d6164c8ec04b0c411c24fa08f3cf89c2f391c2963adc81ddeeb5c6",
+      "sha256": "ac2bba0c21c97fd950466b37a3c948c98b46ee632f18d7e20138152598cc3620",
       "review_copy": "ux-shift-eventide-gravity_in.jpg",
-      "review_sha256": "699ee2ad286f49e075f2d70d5a89179ae006efa7a2071c75f5d163cbfc62c9aa"
+      "review_sha256": "4d56a29e30798c3b8622b312f7f8d33b4cf6dc12fb57afe925e2eaeb804ee499"
     },
     {
       "original": "ux-paradox_crucible-granite.png",
-      "sha256": "ac9168510751d756df67f50d9169da3971ea3bf7263e2541b344f139aa6b6b7b",
+      "sha256": "90fc1ce2878943b1125365ad2aa741a59183c0071efee990778817fb67a51e1c",
       "review_copy": "ux-paradox_crucible-granite.jpg",
-      "review_sha256": "34ec02c95f01f153fc621c0f098819df2aac599c201f4cedabc01cf1be4b5540"
+      "review_sha256": "7a62a9c70a9b331138aaf85f4d69bcafe2cce9fe9430a9e1942055417867cd3e"
     },
     {
       "original": "supreme-executing.png",
-      "sha256": "2e2f997150f54b2503c71331a3c69173392d8eb5b85ae5f27c7597d1c81737b4",
+      "sha256": "91b2e07faafec94cffb82d5bfb6630857f6cc27500663f7487446c2bceb317db",
       "review_copy": "supreme-executing.jpg",
-      "review_sha256": "5b77a35f862566cfe4df5ece6cf750867918d3c6735b8b98331c15ddcb932d17"
+      "review_sha256": "617b96655bef6adfe1bf08d799987e7e8fcd7438084df30e83f6848fada39915"
     },
     {
       "original": "gallery-hud.png",
-      "sha256": "b3b64c858c6bc89841e05c3abf74e1f7db371e47735c3821ec62705b74c42196",
+      "sha256": "48023abea1ba01194f34f39f64280a1575b431814e70e5c65481ac576f45f38a",
       "review_copy": "gallery-hud.jpg",
-      "review_sha256": "b3e97a0cc79dd1c4d953e30696a76ee9c9c62bf5beadde5b69e5bd29e00153f4"
+      "review_sha256": "7c762c02343be7a02ce1fdea76bbbf9db230ab71e657ce1a63a38ec1145cbb37"
     },
     {
       "original": "ux-eventide-gravity_out.png",
-      "sha256": "7e169d46fa7d098e66cdaa05fb473f229eb960490f1d5ac0139a5269c833153c",
+      "sha256": "78df0a49175659b684a59a12562cd30c4c25b659a1b6ca84566ada375eb597f7",
       "review_copy": "ux-eventide-gravity_out.jpg",
-      "review_sha256": "3c65873189b9245419f74b059daa5e0055684c0d22a57b550f7bb5b6d79c281d"
+      "review_sha256": "36cf2d1415e26423f199a8668076b90a074256f99324130ac04685c60b0cca6c"
     },
     {
       "original": "ux-shift-worldbreaker-carve.png",
-      "sha256": "9789e65517591abb37b918f44f974709d9e510082534869cca477af048ed28a0",
+      "sha256": "17a9dde3d091443ad218dc6fca73d61960055e8b4605578c2fb04aeb1cb09a66",
       "review_copy": "ux-shift-worldbreaker-carve.jpg",
-      "review_sha256": "d3c0d4523af80a22cc6106ddf7ff5684b680a519348073a0b1c4f54c0275b3e6"
+      "review_sha256": "8649de5b9d2d3c4f19c05953eced5ed1dc51695f60797953b159765666d36fae"
     },
     {
       "original": "ux-shift-palimpsest-vein.png",
-      "sha256": "93b6c0a276388fa54e344e3810588b4324c955bfe310b3631933d005e592ef53",
+      "sha256": "3d7f4ec5f1067f34806c0da07662bba578d1fb07cca3f5ec434c73b1debe2391",
       "review_copy": "ux-shift-palimpsest-vein.jpg",
-      "review_sha256": "a467591c22daeae1550771a148821896903829f6ffff175f5262d915d738d1f9"
+      "review_sha256": "08295571eb959c7c7ab366087ed59440c78e0e7e52da0afdadefcfd67a9bacfd"
     },
     {
       "original": "ux-shift-paradox_crucible-tuff.png",
-      "sha256": "50082bb13cdb3692d8ff0d26837b0f4d7b62f39dc617a2ab17eaf00eccdf1f9f",
+      "sha256": "e2faebdd61ed2fbadf221235a2ce7c565993e3b2846d3e774d00c9e185a8fe67",
       "review_copy": "ux-shift-paradox_crucible-tuff.jpg",
-      "review_sha256": "7052e1514c9258dddedf95df0415cef52db8ca7a9dad0076ddc70472f6d77c99"
+      "review_sha256": "6c319720cb03d11694ed94f284ebcebfc55eb4598f1bbe3ebea59349a58d86d3"
     },
     {
       "original": "ux-worldbreaker-region_break.png",
-      "sha256": "5a8631df64c5096cca3007c1aeb9cae98e4d3b52e0c4e2fa6fdc77d4ac2589f0",
+      "sha256": "9f6f034fc9e8ada184b3978f83a26ea6596d2c754708e1f210b82a0c1f0a1cf1",
       "review_copy": "ux-worldbreaker-region_break.jpg",
-      "review_sha256": "46d99f1c57108729e12b398d60bc4df30cbeb7d67fd1795e8eda79331cc33180"
+      "review_sha256": "a881a52c3178279bb643e867d4d5ea2424737110c90b0f8238f86d4f7a73a832"
     },
     {
       "original": "ux-shift-seam_ripper-connected.png",
-      "sha256": "2dc658a0eeeabaca35bf67e8d9000760b4da6bfb3e9aedfaee5db0a7a062ebed",
+      "sha256": "927e0cef24c12074b030b7f809bd7b1d1cfdda4339bd5a1cc35dc63ca26c0961",
       "review_copy": "ux-shift-seam_ripper-connected.jpg",
-      "review_sha256": "32cb6d9982a70d05d9bf61d2324c0e344ea6d2833d09ee32179fa6121df89563"
+      "review_sha256": "4ca37e1a8780246668d9a4a8061281987dbda3cd2fb5044ec4be5755da27f59f"
     },
     {
       "original": "ux-shift-interregnum-aura.png",
-      "sha256": "aa4dd1490467192647b9597912b9e32bc162294240164851d379e171ca026c09",
+      "sha256": "0037dad395c9bda5652ac0334b1a80e8c4efda7ab76b491fc5638b6e6f5da913",
       "review_copy": "ux-shift-interregnum-aura.jpg",
-      "review_sha256": "65ed9ca6b77abc382aee40c154db3afcad896a41e13c6cbe10d0aa58e457ea74"
+      "review_sha256": "ae28b051d024edd1ee49c2a643d517364e9bea846edd58de6af681b5d0767d04"
     },
     {
       "original": "inventory-closed.png",
-      "sha256": "b9cdbef17ebce5c80e002205efd75c33cbad29428af80dfe0b039160120940a6",
+      "sha256": "21c4aa99eb4c4e4a0103d7c13bbfda80f6ac1c3da8332a829e57c2c7af7b6a72",
       "review_copy": "inventory-closed.jpg",
-      "review_sha256": "4111b16ac643715993c94e76376952f1f619fcf4eb167b8034e72c97b4cd41fe"
+      "review_sha256": "f3c0a02b697a80908559a807849414d2c8ea24c2bdd1fdc87a8e0aea438f8c97"
     },
     {
       "original": "ux-hollow_axiom-hollow_pulse.png",
-      "sha256": "01c26bf08e23403aba649207bd30ba7136217618a8f64da40d3d000983652c12",
+      "sha256": "29fdd641802d5219b6a1f76271548c1809d3b87381f860be690b7691f5a82a75",
       "review_copy": "ux-hollow_axiom-hollow_pulse.jpg",
-      "review_sha256": "e96e4228ff7c65e6df53c3fe1341f708dca6bb0934fa098ed552adf82c4085c3"
+      "review_sha256": "b34f8165dd181e751ded9c789ad8629589d3f9711bb7131c78cb9ff68daaade8"
     },
     {
       "original": "ux-worldbreaker-fracture.png",
-      "sha256": "a0163ff99c7209d3f78fa7959192bbaf564a5fd78b4a7d93e236186d31ff4347",
+      "sha256": "3f8aa3580ba8af6bb3aee4e5ff88b58edd7fec208aefe0eae96495d52ec4676c",
       "review_copy": "ux-worldbreaker-fracture.jpg",
-      "review_sha256": "fd30b26a3854fca8853b81e3355dd46b8bc5bef209586f23f56c01c6d2a49cbd"
+      "review_sha256": "cfe3c6965c37c33107c1e311bc065b9d337b74a97343324cf1530f63a5b60f23"
     },
     {
       "original": "ux-shift-eventide-gravity_out.png",
-      "sha256": "e05f7016623eaff717576612c448cf733af33f8bed480ef0b9dd7a24eb5f5f41",
+      "sha256": "107bbc028c3987bc7a1c370ffd366208b26f07831504cb72d0a7c74fe3d16ce9",
       "review_copy": "ux-shift-eventide-gravity_out.jpg",
-      "review_sha256": "f17d2e37e0759353bc5d722dbe9ae06463e952e4f5473b66db8f6330bade7929"
+      "review_sha256": "68ac68987d93a7d5c461f5bc7012b37ee4be7664e2691928ce8cfa00914e0124"
     },
     {
       "original": "ux-shift-paradox_crucible-gravel.png",
-      "sha256": "b57c0eb650ccad5d534852c1c809ed485386303a6e22e2565e8e45a7a7cdc136",
+      "sha256": "3f083b09325c262f26139e9fd1650128fb9174c58aed1ca739d42b364f7d4081",
       "review_copy": "ux-shift-paradox_crucible-gravel.jpg",
-      "review_sha256": "e01321dbee580e68f6b5c5016aa2fb69dc811dd0353e43684c5cba30f16e1cd7"
+      "review_sha256": "cf7dcf8831039637e36dce1a294fea0df87d83ee52b3b0484923e0c500a1324f"
     },
     {
       "original": "ux-shift-worldbreaker-region_break.png",
-      "sha256": "cbd699ddccdd4ca6dfa6e2e97fef3ee0c74b473b1e589a4f7acfde1728e45561",
+      "sha256": "472043e407be799a7c40961f0fb00878538b3e6c84191f8b4f06c784ca54fc66",
       "review_copy": "ux-shift-worldbreaker-region_break.jpg",
-      "review_sha256": "66c1a94814ee18a2b3dd79b9ad88f042d56c699e52d6f33140d8bdb2dd10654b"
+      "review_sha256": "1db3d2497b4cabc13740dfdcfeb489791491d22963c651ff79ef94ed62058634"
     },
     {
       "original": "inventory.png",
-      "sha256": "d0df8604c64ac738b6f5c1a556ad170b2ce576d81f0c3edddbb89347af3a0a2a",
+      "sha256": "a78c25b9a8cd618714a8fd7f15582bfd1bede41b181adaa4288dbd14da5c430b",
       "review_copy": "inventory.jpg",
-      "review_sha256": "1007134995bf0433567adac3afbf744ed0f2ca58441d3165182169810ce4052f"
+      "review_sha256": "ef30ababacf32921d586f5b3af37b0685cdd44a08527e09438f309f3cb224355"
     },
     {
       "original": "supreme-camera-front.png",
-      "sha256": "089c8db043e49e5885310a45f2816eedfb7f3f6c065ba72059539051e5431c6e",
+      "sha256": "52f38dacba11a3c33f5d342da9508072e7e4b49c0c56082942f740d6068e3cbe",
       "review_copy": "supreme-camera-front.jpg",
-      "review_sha256": "f9b543fc6a1ccf03ea6da8d639ffd92892fa602aeaf2e9418c22e6c48ca6449b"
+      "review_sha256": "29410a3b1becd84ac3886ed136d070791fb4f095b6c6f2d5177805bd14e5018b"
     },
     {
       "original": "ux-shift-paradox_crucible-dirt.png",
-      "sha256": "dd9a305e09ab74e08fd4497b2440a6b2474129a55f9ef3b534962ae31159099c",
+      "sha256": "eeb3b8f61839a0273a3c8e99703cfb6366d8b711bde222df13911c6e83308cfd",
       "review_copy": "ux-shift-paradox_crucible-dirt.jpg",
-      "review_sha256": "a2aae06a6ac95303ad2a8505ed0a1c68cb3dc431341111029872b23497516a5b"
+      "review_sha256": "57bd74c5da09fd0f4876896fd5d5c72c33908067bc32b8bf120dc3ff8fce64af"
     },
     {
       "original": "ux-shift-icarus-forward.png",
-      "sha256": "37ca937e3c911f4dd224f8b28dda672ff33022325cc4d3a95087e40c03a3a480",
+      "sha256": "664fd7dedc712cdf7c6b9335926355fd4a9300b40d7b302875b4cfac96709da1",
       "review_copy": "ux-shift-icarus-forward.jpg",
-      "review_sha256": "ced7ea221f497004f7b44457252fb138f544c787c62532e225fe52dfb285b982"
+      "review_sha256": "ffac72b3cc8f56584811c1241a23c23a461acc3340844af11ac77882fbcdbd23"
     },
     {
       "original": "ux-shift-paradox_crucible-obsidian.png",
-      "sha256": "34b99bc856e0f4c1d8d949018a87936ec8e50f961fddbbb1c958bdc89ccca95c",
+      "sha256": "565c7d4548b53a47974b065857dd657171aeeda22c48a7ade36bbdeb8c585fb0",
       "review_copy": "ux-shift-paradox_crucible-obsidian.jpg",
-      "review_sha256": "35b894c25a9d892e77c6bee48dd8b0c2014953e4f14d3f010bfff93fefdd6ea3"
+      "review_sha256": "6f8a2efbfd0d2019366f17ed8f8e5e7071e09f85cfd1efeca385daf88628d9f3"
     },
     {
       "original": "ux-paradox_crucible-andesite.png",
-      "sha256": "1505efb0513bad6c0a1d76cb5571c5164cb725bfeeccd6ede6e3548d3a701d1a",
+      "sha256": "c2270e770a9e80add5f29aa72b91c18c80893143b7e0406c3746d34117806b60",
       "review_copy": "ux-paradox_crucible-andesite.jpg",
-      "review_sha256": "6917770638b1075adf52962d58a6798ac89a7026c269c617bc94a021399f6730"
+      "review_sha256": "f0e35763098c48f95ca1b65bb73b9eb4b25274e617d3abead6bc68e18700c45e"
     },
     {
       "original": "ux-shift-worldbreaker-cleave.png",
-      "sha256": "d38564e301b960debe35c3541507a40b9b0e607b9bc0d82e7e1a6a311566a7ff",
+      "sha256": "8167adc4562ab028a87ba7d2b4d8a2310e2f501c7f4412151baadc9430b9e581",
       "review_copy": "ux-shift-worldbreaker-cleave.jpg",
-      "review_sha256": "d6cfe9ec2894473d77101d42ac6afa4e95e2566e477f55f161e1387ef967a566"
+      "review_sha256": "b1018772e0262123c06f7cf899a3f76870ced23f57485c62880b894b9fbd99bd"
     },
     {
       "original": "ux-interregnum-aura.png",
-      "sha256": "2e168e04cb6a8ec79081bead6b6c385f3dfa04d2155b4109849f78f2e2f7a924",
+      "sha256": "9fab28d4c76282458138999b9d2a9c371a8863a9cc60f85654813be4ab9fe595",
       "review_copy": "ux-interregnum-aura.jpg",
-      "review_sha256": "ff6ec4c2c9f4a5d16888963a07c5e8aa4b0da0188565641f642de060fbf7cfe8"
+      "review_sha256": "486e0f58a6cf30159b208e25e284122fdfeb40c160a8e42ca834ecd4f36aa2b1"
     },
     {
       "original": "ux-paradox_crucible-stone.png",
-      "sha256": "ecc68ded680367bf86496505aa9b5ad6cc7018649cc2d49b1a68c416bb9090d5",
+      "sha256": "6edc9b95a951a23e5773a8d6952a1734427e7cf39cc227be5b06fcae44dd8d5f",
       "review_copy": "ux-paradox_crucible-stone.jpg",
-      "review_sha256": "a92d225b55ad967e6550c5d2917017c34e530588008a1ee283822e5a52f65b31"
+      "review_sha256": "409ff8e10f8b7424c08cb042811252b294d63cb58e5b8db10744087f59b8b7ef"
     },
     {
       "original": "ux-worldbreaker-carve.png",
-      "sha256": "019a0be1c8aa4e4af295df7140cf3560aa5b6360ab9b0916236a768a8a9850df",
+      "sha256": "8d2822671400dc64d9e814f7f8097b66394810c4a8afb5c45ff13539c5bd2e9f",
       "review_copy": "ux-worldbreaker-carve.jpg",
-      "review_sha256": "99d58737f097c12031c929532fbf5a1e96557498b17243293f07a38b13def5f3"
+      "review_sha256": "8fff7ba599c3e7b00638614fea57f8580af12a54ee8e9e24243b89fdab635d28"
     },
     {
       "original": "ux-paradox_crucible-dirt.png",
-      "sha256": "f84752e446c55c613807e7debacda28b81b5311bbc99785d0a4e2a6182336ae4",
+      "sha256": "d09824470c621b8e1835ebd32b8b717a62f2454746520f74e84b503297feb282",
       "review_copy": "ux-paradox_crucible-dirt.jpg",
-      "review_sha256": "9f545c1cdc2334c43cd97002ddf8c217a45abd47c288950699a8f0028bb49ba1"
+      "review_sha256": "7505b20cb42d4a0153c97396f2ba6ed78ddd67257dd37bae2db12ac6c79ec432"
     },
     {
       "original": "ux-shift-paradox_crucible-andesite.png",
-      "sha256": "d625586e88feb330f79fd1eb3ef3ba648659b41bb78e42628eea8fe7b1daa57a",
+      "sha256": "1b5a0daadf71e497cafeb13358591affbe8c560b48d86e9aac82586e4ca3bab5",
       "review_copy": "ux-shift-paradox_crucible-andesite.jpg",
-      "review_sha256": "3b62c4965bce6756886abeb4f0f33ff25347306912d468ba1d095bd8f13eb6e0"
+      "review_sha256": "2f10ee3e06a154a395d0e3c3c1dabe6884327d66986844ab1d73ec0eb22a1221"
     },
     {
       "original": "ux-worldloom-quarry.png",
-      "sha256": "f5e5489fc12c0847056d0f380258816e699e0a6abe0693dc8a2daaee6cee49b2",
+      "sha256": "6f0c1024222d22f449196f72af25b000434dd59dbd592d837e53a35fe290509a",
       "review_copy": "ux-worldloom-quarry.jpg",
-      "review_sha256": "cfcfca52ae65dedbce7b16746206bda38ecdc48d8383ac2d6849d471007f1e75"
+      "review_sha256": "8b77b18d70085bb3020aed9abd4d5fc3e5cb2db0e05cb63e8d775b0aa3d8d186"
     },
     {
       "original": "ux-paradox_crucible-calcite.png",
-      "sha256": "42f1a8b402dd371ff4ef5b2cf9e058217e84dff6e3c90a3d405594eacd120952",
+      "sha256": "a38648f28f5f04ed3b150f58a2e77bc209e27b8916b640d91f713609021e8ee5",
       "review_copy": "ux-paradox_crucible-calcite.jpg",
-      "review_sha256": "b86c692ee29aed6f373a0f5999ec974588011cbda50456485dfa2d418ae2a0ce"
+      "review_sha256": "dcdf187d546c8fdbce2c82bc385824ff0d94f868b319393ad3319ccb226bec7d"
     },
     {
       "original": "ux-shift-fault_choir-forward.png",
-      "sha256": "f5833738d2961165fbc843a1473a6ef6c3a47b2a81673459399e6639a535459b",
+      "sha256": "d084949d24f7b61317e4e52e7ee510a9884949323e4aa113e2a753d4c20aad3d",
       "review_copy": "ux-shift-fault_choir-forward.jpg",
-      "review_sha256": "ec669ead959b21de0f69cf29ba3937490ef09ace7cdd150dd2c14a9af3435fb8"
+      "review_sha256": "b62dddb0b150ef99a13192031d5b2e5fb1aafe2ccba2a7113816fb70f3d99018"
     },
     {
       "original": "ux-shift-paradox_crucible-dripstone.png",
-      "sha256": "f35d1dc285a49dbaadfe1172e7197e5ac1dd369ff1b6ab708f172b21b79ba0f7",
+      "sha256": "a369965f69b8b8889549a2ac6f67fdac0a61068a82bc09178c27b33b656d8f55",
       "review_copy": "ux-shift-paradox_crucible-dripstone.jpg",
-      "review_sha256": "580dca259ba79f63e06afdecefe9937343fe71086bf263003648254802e71014"
+      "review_sha256": "3e8ef446d6421c13d501d8c48e763da5422df2e3d064bd6295f98d38792eb842"
     },
     {
       "original": "control-cancel.png",
-      "sha256": "496fe7c2d9e5d3438a521b2c6b59f8ddd97df9a7eddeba3afe46716d550c6050",
+      "sha256": "03bfb35c9a474da6a21dbce657c6a5bcb58fb37a346b9dd8d7ca648f9590dbe7",
       "review_copy": "control-cancel.jpg",
-      "review_sha256": "8026fe4805784f3c14f2421c376fefc94e689fae32e8676b5c96457335047283"
+      "review_sha256": "4063d64c33e2bc89fd843b788567832b2309996bee0484692c02de489a294039"
     },
     {
       "original": "ux-fault_choir-forward.png",
-      "sha256": "61644c96bf843801104ac82f7a846293af44f52a7d4bc6a6d9523e3371fbd2f6",
+      "sha256": "643abf9edea2ef88790205667bb2b4fffb0b49da9fd55bef576e8ec71443f974",
       "review_copy": "ux-fault_choir-forward.jpg",
-      "review_sha256": "1381d3c92a6c184e2b9dceeb79b466eb39f6f9fb50e7e4beab8fc262b8f58c6e"
+      "review_sha256": "97c3e81a430284dfee050ce323bff825ce4f93159f3f250f474fa43f615b3408"
     },
     {
       "original": "ux-shift-interregnum-domain.png",
-      "sha256": "5d4f1ba1286c4b75191252aca84975835eea1b959e73d220587d8a716f9c1244",
+      "sha256": "da7191534a6f4bd3a88ce9db31eecd22e2dfb6f7833d036824daf12355ac65c4",
       "review_copy": "ux-shift-interregnum-domain.jpg",
-      "review_sha256": "042530948c46a72fcd8b1715bbb30391c2063aa1258cd46bd2a1cdf05fa7914d"
+      "review_sha256": "c6a4d196cfe7ab0f84d4eb61547a801ca5f4e1a67de32338149882de43816c58"
     },
     {
       "original": "ux-icarus-forward.png",
-      "sha256": "bdcebf9abd8721cf3af8924164ab977027fed7b79f97b1c1fe9fddb8f12b0508",
+      "sha256": "c4594e73f6763be3f09090d0762534dd9df28d6c93ac954b21258e663fafd80f",
       "review_copy": "ux-icarus-forward.jpg",
-      "review_sha256": "8b988ee31f51a724253742734386dec570eef8ac30fd4b724e3fdf8b8b6425c1"
+      "review_sha256": "3f15f108cead274e2c6bc870bd69f90565f24335ac4a4028d7047a8247b5de5a"
     },
     {
       "original": "ux-shift-paradox_crucible-calcite.png",
-      "sha256": "25b67e22e14390c7ba4c59f75c257e7239170809a3da27651fd4c5603fc87c02",
+      "sha256": "7bea623d0f63756de523da26bc66a911df64ea144f8f7ebef8eb4f1fad80b004",
       "review_copy": "ux-shift-paradox_crucible-calcite.jpg",
-      "review_sha256": "e671edde341714446c0689e333eae2c8b0564f143d0d886113d279eaf36576dd"
+      "review_sha256": "6aa77bf8a6e35ddcd61c51d63ffeacc6537012271c774d6eda2f23a7a5e541c5"
     },
     {
       "original": "ux-exodium-starfall.png",
-      "sha256": "a56caedbfdbf06294dd6fae9b193454aad64115a237114594a3a5eee2d46c298",
+      "sha256": "6abceb70f199a7a4e29c6690f47e2adb45552b430b792f317d22bd7803782e5f",
       "review_copy": "ux-exodium-starfall.jpg",
-      "review_sha256": "7b95b76cfc4b0b44351571bdcd3c978b13f722a2de07a06b507cd84537ce3af4"
+      "review_sha256": "0da03bd690d1d1b0495e4914b81948caf90cc4cd0adcf2b2b1dd9d1da802792d"
     },
     {
       "original": "ux-shift-icarus-wide.png",
-      "sha256": "b24c1b86f18bd8484bd9f94b53e98ce156c74f26250b71acb6814954b46a9dd9",
+      "sha256": "c45169e757b67165a56bee5674e8f5716a1bb47d9cfe33a5b0c2ea35a29d9abf",
       "review_copy": "ux-shift-icarus-wide.jpg",
-      "review_sha256": "f1eadd39f735e87c502857be6c12c6830e527659670fefc477a7bf08e196f65e"
+      "review_sha256": "51ef8f6fff77b5d1cf4fbb591399df037857cf7e62650cdbd848f803805ced67"
     },
     {
       "original": "ux-worldbreaker-world_shatter.png",
-      "sha256": "112e78b05a6756d4cea0aa73e061eb07991d0df26418656735bbc1b9194783f2",
+      "sha256": "e08712cf0c5ffb6b577aca1998517ba7e358c68f76469fe86a3f8eea614889f7",
       "review_copy": "ux-worldbreaker-world_shatter.jpg",
-      "review_sha256": "a8d6abf9b72ee3e5c6654a3d588883d442cd4f5ad0565abc2340241c2cdd8946"
+      "review_sha256": "13ae8812b3b691bf264233c42ce101d0316a027415d2b0737d0a8cb911060c97"
     },
     {
       "original": "control-activate.png",
-      "sha256": "73a1e88150c786a60d2cc26684b955eb2685b7a63bb1d92a89f786f2ec8a56a6",
+      "sha256": "1e51034b5478c39caca10ec606c0d38fcd59b678035c6628843d8d04c86bebb2",
       "review_copy": "control-activate.jpg",
-      "review_sha256": "2c372f397bc320f90f506a3d260479ce321d53fd0eba4a2098c9478d41e0eeb2"
+      "review_sha256": "b68891123763d7fbf7e065f2ee49e2242047a0f79a698dd9d206ebed0f425790"
     },
     {
       "original": "ux-interregnum-domain.png",
-      "sha256": "575ef1dcfec96ffd4cfd854f04a9f3995e85cadb56c408556e357d99a57fa7ed",
+      "sha256": "aeb86a4e2cc7e94c70b7f4e13c1f16bb96905ea4f85e79b8248c2190f1bfdcab",
       "review_copy": "ux-interregnum-domain.jpg",
-      "review_sha256": "2ee6d80dd22733704cd1c403cb36b3584e5394ba030448c8969366adfbfb97c9"
+      "review_sha256": "60509ef098b4ef75041c36023703fa95cfbd57975a9ec12418a951c7a1425a0d"
     },
     {
       "original": "ux-paradox_crucible-gravel.png",
-      "sha256": "23c18e894eb8bf9d88f00e8eee2922ef4022515de7a8094a17e4d4c3e30ab5b2",
+      "sha256": "c40438b68e1fe6eb3736bdc83f91fe4dafc4fd2e2f7a5b9ca8b62df39eb2bf07",
       "review_copy": "ux-paradox_crucible-gravel.jpg",
-      "review_sha256": "42322509e95eab0b01641c3532f8352002e6df260c054c93815ee046182f668c"
+      "review_sha256": "4f8a3e6659eb1a532b53dd23f8ecb1421a88a9ca94c18c8e592d12d8f875c4e6"
     },
     {
       "original": "ux-shift-paradox_crucible-deepslate.png",
-      "sha256": "47567fe3ba0558082c3ac85d2922dceee1916acbca368b016827bf4f6b65c30f",
+      "sha256": "776617886c025072ab7557241132a0290e43352455ca3ad7cea2cc10ddde8c23",
       "review_copy": "ux-shift-paradox_crucible-deepslate.jpg",
-      "review_sha256": "97a4c1b7589e02f2f8ceee0706b6810599fe942cbd1d8248faf5f09310afccee"
+      "review_sha256": "f689022a3e83095013a8d822f32fea7a52e4907075f3125d32dbe478764cadcc"
     },
     {
       "original": "ux-paradox_crucible-dripstone.png",
-      "sha256": "d0236e327681a99c960ff3d6ec59fd7f30140da6df079e060a7e91a301691772",
+      "sha256": "6cf417cd19b8d5f19368500c871210c5345021887f07d3020be000cc7cf65986",
       "review_copy": "ux-paradox_crucible-dripstone.jpg",
-      "review_sha256": "e283f42c1b88a2ca0a3b81a5067e3848fbe1efb6d6992b2bcf7cff7820987d45"
+      "review_sha256": "25e683da387c7c852a2df0d35590c78dd144895414be030b01c1042ba4c074b0"
     },
     {
       "original": "ux-paradox_crucible-tuff.png",
-      "sha256": "8a69703da9dc4df1b400e6a663b34113aeceb62edd9d7b1bc905eb9e6ff35fe8",
+      "sha256": "5e7273c9cad0c40774251cf32e99d99f2e83e8f1555fbe10db42c13fddbcd9f8",
       "review_copy": "ux-paradox_crucible-tuff.jpg",
-      "review_sha256": "c610024e9689e190ee2acb48796df17096a7e6e5c426582e33b3cc19886159cc"
+      "review_sha256": "d1d78d215004fb8d4e2dae4be2a14bdad3e72bd4279b0cdbc268bceffd9d537c"
     },
     {
       "original": "ux-seam_ripper-connected.png",
-      "sha256": "d24ceab8c86f6a2613fae3c7cee732ae1196287a7cf624535f33dc0d70e56187",
+      "sha256": "c8d16aa4d53cb3d61f322e29848b8924c233de225f14f253d53d2f4c807c7600",
       "review_copy": "ux-seam_ripper-connected.jpg",
-      "review_sha256": "aebbf20235cb476a14a1399e192be26752c30de42184e6cea82d65dca93e58b5"
+      "review_sha256": "ff4bc553d503e907f445416884aee66735795d640116f5a777598f695d1fdb05"
     },
     {
       "original": "ux-shift-exodium-starfall.png",
-      "sha256": "8aa2b629fe42311d5c7a638919a6962f5fdd8f5fbb19495e676302b6433dc230",
+      "sha256": "c1711525e646494baa1a41be908cc137d49a2764f74611c234dc8bc24d45698c",
       "review_copy": "ux-shift-exodium-starfall.jpg",
-      "review_sha256": "c0dbddd788e93c735c04b4934af79442f10ab5842c177450d3f58f32cae26f5d"
+      "review_sha256": "b5007caa950c2563d895eb6115751d8089bfac1c3796b26d683534b56986595b"
     },
     {
       "original": "ux-paradox_crucible-deepslate.png",
-      "sha256": "98c09662e5c65ec4cedf17e4b39d0dcd319a20b8f70b288385de65710b26e482",
+      "sha256": "cd21fa57e7c93e5250f6070a37a8078cacc10079547a94e4575c4cbd5df9267e",
       "review_copy": "ux-paradox_crucible-deepslate.jpg",
-      "review_sha256": "fc9df819f883a1f609dae84c9f4dfc860fa2c137ec52b009e5ed0760baf0bc47"
+      "review_sha256": "32b0579532f3bc5a0c282aa42d753903f98e9e553abccf06e0e900110440ac48"
     },
     {
       "original": "ux-paradox_crucible-obsidian.png",
-      "sha256": "25292dd6b21e11909b7904da9c48c979be6d42b6ee104bafc966b4febfe8ccaf",
+      "sha256": "a3a8ff1f02c894f2597dea8a903f2e9380310e9f98da174b59005d3bcb881d59",
       "review_copy": "ux-paradox_crucible-obsidian.jpg",
-      "review_sha256": "6664e9bddfbcb6dec6fbbe53c53d372dce2b9b0bd5c381be4015eb0acd5a1d45"
+      "review_sha256": "65809cc6a67e46e1a44bdd019ad88e9d3bfb8467f780c1a808f0b40f0f3533ab"
     },
     {
       "original": "ux-shift-worldbreaker-core_drill.png",
-      "sha256": "4c57a3f7951ba1444c25693ba5150482e7a8db7ced85c38e39d04db3d0a8a78a",
+      "sha256": "c2795686b8cdcc86d0ee2ef72d59a858361416621bf596b74d86d550dc10d939",
       "review_copy": "ux-shift-worldbreaker-core_drill.jpg",
-      "review_sha256": "6b156c0720551cab1b1259e2007cc77887a8f068fef267041abd98228d020d0b"
+      "review_sha256": "46924ee5506cf8186ca806c7d8a1371dfd507d42f58d5ca6f0e6d32885484c1b"
     },
     {
       "original": "ux-shift-paradox_crucible-basalt.png",
-      "sha256": "c4a9e37790006b50d9d14b9e13366eed3aaeb380ccade6e88e80fea7423953e7",
+      "sha256": "03c9687710493eeb7dc2d79b1a34861241b78e1ce4580d84d061d706c3d83f4b",
       "review_copy": "ux-shift-paradox_crucible-basalt.jpg",
-      "review_sha256": "d0f0899e1d8bf566a6f190f75724278c95f394e590c046812ff8cb51c4ec734e"
+      "review_sha256": "1993e154d07bf01f5e600281226cce4ac6b3076a71f066eb1408343ee6da5fb5"
     }
   ],
-  "image_manifest_sha256": "3be9cba01d9900e09343c3f86a5b478ccecec51e360bd5095130bfe9f316f52c",
-  "review_method": "Manual visual inspection of all 76 client-smoke JPEG review copies from successful GitHub Actions run #514; verified the evidence ZIP SHA-256 and every image-manifest row.",
+  "image_manifest_sha256": "46ac601ad2dfaf376c0c7ef5b1551a1edf1e7cf6a97dd42cc72d89dadca854fd",
+  "review_method": "Manual visual inspection of all 76 client-smoke JPEG review copies from successful GitHub Actions run #523; verified the evidence ZIP SHA-256 and every image-manifest row.",
   "observations": [
     "Reviewed all 76 captures: 32 per-pickaxe UX scenes, 32 SHIFT tooltips, and 12 gallery, inventory, control, supreme, and camera scenes.",
-    "The gallery shows all 13 pickaxes with distinct pixel-art silhouettes and coordinated palettes; the inventory presentation and Spanish ability labels are clear.",
-    "Aura and Curios trails use compact tinted dust motes. Ability feedback remains localized and readable; Worldbreaker execution has visible restrained accents.",
-    "The review-copy filenames and SHA-256 values match the CI image manifest; the source screenshots are PNG and the inspected review copies are JPEG."
+    "All 13 pickaxes have distinct silhouettes and coordinated palettes; ability names, Spanish instructions, costs, mode selectors, safety limits, and control hints are legible.",
+    "Particles and ability accents remain localized; Worldbreaker modes and execution controls are visually identifiable.",
+    "The review-copy filenames and SHA-256 values match the CI image manifest; source screenshots are PNG and inspected review copies are JPEG."
   ],
   "limitations": [
     "The screenshots come from the CI client harness. The ghouls instance, its full mod set, shaders, and performance were not tested.",
