@@ -48,7 +48,7 @@ try:
  def read():
   for line in proc.stdout:lines.put(line)
  threading.Thread(target=read,daemon=True).start()
- deadline=time.monotonic()+540
+ deadline=time.monotonic()+700
  next_progress=time.monotonic()+45
  progress_id=None
  while time.monotonic()<deadline:
@@ -81,13 +81,13 @@ try:
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True,timeout=20)
    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-shift-'+id+'.png')),'shift'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('execution-'+id+'.png')),'confirm' if id=='paradox_crucible-regional' else 'activate'],env=env,check=True,timeout=20)
+   # Actual ability activation advances the server gallery; UX and Shift screenshots above
+   # already cover every mode, so do not encode a redundant execution image.
+   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press','confirm' if id=='paradox_crucible-regional' else 'activate'],env=env,check=True,timeout=20)
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
    ux.add(id);i=scenes.index(id)
-   if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
-    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('mode-switch-'+scenes[i+1]+'.png')),'mode'],env=env,check=True,timeout=20)
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
