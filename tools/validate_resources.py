@@ -80,6 +80,25 @@ class Resources(unittest.TestCase):
                 self.assertNotIn("sneak", data[key].lower())
                 self.assertNotIn("usar", data[key].lower().replace("pausar", ""))
 
+    def test_curios_pickaxe_slot(self):
+        slot = json.loads((ROOT / "data/specialpickaxes/curios/slots/pickaxe.json").read_text())
+        self.assertEqual(slot.get("size"), 1)
+        self.assertEqual(slot.get("icon"), "specialpickaxes:slot/empty_pickaxe_slot")
+        self.assertFalse(slot.get("add_cosmetic"))
+        self.assertIn("curios:tag", slot.get("validators", []))
+        self.assertTrue((ROOT / "assets/specialpickaxes/textures/slot/empty_pickaxe_slot.png").is_file())
+
+        entities = json.loads((ROOT / "data/specialpickaxes/curios/entities/entities.json").read_text())
+        self.assertIn("minecraft:player", entities.get("entities", []))
+        self.assertIn("pickaxe", entities.get("slots", []))
+
+        tag = json.loads((ROOT / "data/curios/tags/items/pickaxe.json").read_text())
+        self.assertFalse(tag.get("replace"))
+        self.assertEqual(set(tag.get("values", [])), {"specialpickaxes:" + artifact for artifact in IDS})
+        for lang in ["en_us", "es_es"]:
+            data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
+            self.assertIn("curios.identifier.pickaxe", data)
+
     def test_no_energy_and_manual_keys(self):
         kind_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactKind.java").read_text()
         kind_ids = dict(re.findall(r'^\s*([A-Z_]+)\("([^"]+)"', kind_source, re.M))
