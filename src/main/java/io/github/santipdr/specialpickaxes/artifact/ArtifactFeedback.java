@@ -58,7 +58,7 @@ public final class ArtifactFeedback {
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
         int rgb=kind.color;
-        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.3F);
+        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.75F);
         net.minecraft.core.particles.ParticleOptions accent=switch(kind){
             case PALIMPSEST,CHRONICLE->net.minecraft.core.particles.ParticleTypes.ENCHANT;
             case CHOIR,MERIDIAN->net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK;
@@ -95,10 +95,10 @@ public final class ArtifactFeedback {
     /** Compact 3D boundary preview for bounded radial mining; only the activating player receives it. */
     public static void sphere(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int innerRadius,int points) {
         int rgb=kind.color;
-        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.25F);
+        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.75F);
         boolean hollow=kind==ArtifactKind.AXIOM;
-        var outer=hollow?new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.3F):dust;
-        var core=hollow?new DustParticleOptions(new Vector3f(.72F,.42F,1F),1.45F):dust;
+        var outer=hollow?new DustParticleOptions(new Vector3f(.24F,.88F,1F),0.75F):dust;
+        var core=hollow?new DustParticleOptions(new Vector3f(.72F,.42F,1F),0.8F):dust;
         int count=Math.max(12,Math.min(hollow?128:64,points));
         for(int shell=0;shell<(innerRadius>0?2:1);shell++){
             double r=shell==0?radius:innerRadius;
@@ -112,7 +112,7 @@ public final class ArtifactFeedback {
         }
     }
     public static void worldloomBore(ServerPlayer p,BlockPos origin,net.minecraft.core.Direction direction){
-        var level=p.serverLevel();var green=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),1.25F);
+        var level=p.serverLevel();var green=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),0.75F);
         for(int depth:new int[]{0,8,15})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++)if(Math.abs(u)==2||Math.abs(v)==2){
             BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
                 case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};
@@ -122,7 +122,7 @@ public final class ArtifactFeedback {
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
     public static void gravityCollapse(ServerPlayer p,BlockPos center,int drops){
         var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;
-        var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.6F);
+        var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.9F);
         level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,24,1.4,.9,1.4,.12);
         level.sendParticles(p,core,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,14,.9,.65,.9,.015);
         var eye=p.getEyePosition();
@@ -133,8 +133,8 @@ public final class ArtifactFeedback {
     /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
     public static void starfallSink(ServerPlayer p,BlockPos origin){
         var level=p.serverLevel();
-        var rim=new DustParticleOptions(new Vector3f(1F,.34F,.72F),1.35F);
-        var core=new DustParticleOptions(new Vector3f(.96F,.83F,1F),1.15F);
+        var rim=new DustParticleOptions(new Vector3f(1F,.34F,.72F),0.75F);
+        var core=new DustParticleOptions(new Vector3f(.96F,.83F,1F),0.7F);
         for(int depth:new int[]{0,8,16,24,31})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++){
             if(Math.abs(u)==2&&Math.abs(v)==2)continue;
             if(Math.abs(u)!=2&&Math.abs(v)!=2)continue;
@@ -149,14 +149,14 @@ public final class ArtifactFeedback {
     /** A short falling-star pulse marks each live Exodium excavation step without broadcasting to distant players. */
     public static void starfallWork(ServerPlayer p,BlockPos at){
         var level=p.serverLevel();double x=at.getX()+.5,y=at.getY()+.65,z=at.getZ()+.5;
-        var trail=new DustParticleOptions(new Vector3f(1F,.4F,.78F),1.05F);
+        var trail=new DustParticleOptions(new Vector3f(1F,.4F,.78F),0.65F);
         level.sendParticles(p,ParticleTypes.END_ROD,false,x,y,z,1,0,.18,0,.005);
         level.sendParticles(p,trail,false,x,y-.28,z,1,0,0,0,0);
     }
     /** Compact landing burst confirms that Icarian Lift actually reached open sky. */
     public static void icarianSurface(ServerPlayer p){
         var level=p.serverLevel();double x=p.getX(),y=p.getY()+.15D,z=p.getZ();
-        var sky=new DustParticleOptions(new Vector3f(.72F,.9F,1F),1.35F);
+        var sky=new DustParticleOptions(new Vector3f(.72F,.9F,1F),0.75F);
         for(int i=0;i<12;i++){
             double angle=i*Math.PI/6;
             level.sendParticles(p,sky,false,x+Math.cos(angle)*.85D,y,z+Math.sin(angle)*.85D,1,0,.35D,0,.005D);
@@ -167,7 +167,7 @@ public final class ArtifactFeedback {
     /** Personal ascent halo: a small rotating cyan ring that never broadcasts to distant players. */
     public static void icarianAscent(ServerPlayer p){
         var level=p.serverLevel();double phase=p.tickCount*.22D,x=p.getX(),y=p.getY()+.15D,z=p.getZ();
-        var sky=new DustParticleOptions(new Vector3f(.58F,.84F,1F),1.05F);
+        var sky=new DustParticleOptions(new Vector3f(.58F,.84F,1F),0.65F);
         for(int i=0;i<6;i++){
             double angle=phase+i*Math.PI/3D;
             level.sendParticles(p,sky,false,x+Math.cos(angle)*.48D,y+(i%3)*.27D,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
@@ -176,7 +176,7 @@ public final class ArtifactFeedback {
     }
     public static void nullWard(ServerPlayer p,int radius){
         var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);
-        var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.35F);
+        var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),0.75F);
         for(int i=0;i<16;i++){
             double angle=i*Math.PI/8;
             p.serverLevel().sendParticles(p,soul,false,p.getX()+Math.cos(angle)*radius,p.getY()+.8,p.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
@@ -184,8 +184,8 @@ public final class ArtifactFeedback {
     }
     /** Bounded ember outlines make Hellspec's core-and-petal quarry legible before it starts. */
     public static void hellBloom(ServerPlayer p,BlockPos center) {
-        var ember=new DustParticleOptions(new Vector3f(1F,.24F,.035F),1.35F);
-        var heart=new DustParticleOptions(new Vector3f(1F,.72F,.12F),1.5F);
+        var ember=new DustParticleOptions(new Vector3f(1F,.24F,.035F),0.75F);
+        var heart=new DustParticleOptions(new Vector3f(1F,.72F,.12F),0.85F);
         var level=p.serverLevel();var outline=HellspecBloomShape.boundary();
         int stride=Math.max(1,(outline.size()+191)/192);
         for(int i=0;i<outline.size();i+=stride){
@@ -203,8 +203,8 @@ public final class ArtifactFeedback {
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {
         boolean stasis=kind==ArtifactKind.INTERREGNUM;
-        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),stasis?1.25F:0.82F);
-        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),stasis?1.05F:0.7F);
+        int color=kind.color;var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),stasis?0.75F:0.82F);
+        var crown=new DustParticleOptions(new Vector3f(0.95F,0.78F,0.42F),stasis?0.65F:0.7F);
         double minX=center.getX()-radius+0.5,maxX=center.getX()+radius+0.5,minZ=center.getZ()-radius+0.5,maxZ=center.getZ()+radius+0.5,y=center.getY()+0.08;
         double topY=center.getY()+halfHeight+0.08;
         // A capped wireframe remains legible while bounding particle packets per field update.
@@ -261,7 +261,7 @@ public final class ArtifactFeedback {
         for(int i=0;i<=16;i++) {
             var point=start.lerp(end,i/16.0);if(!p.serverLevel().hasChunkAt(BlockPos.containing(point))) continue;
             int color=i%2==0?kind.color:0xffd783;
-            var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),1.3F);
+            var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),0.75F);
             p.serverLevel().sendParticles(p,dust,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
