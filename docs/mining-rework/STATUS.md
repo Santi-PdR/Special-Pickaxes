@@ -12,7 +12,7 @@
 
 ## Evidencia del candidato vigente — 5.10.163
 
-- Rama del PR: `codex/pack-compat-version-sync`. La versión de runtime revisada procede de `ea741fff436b4eedd2a4b04e2c5ca8a8526c822c`; el commit `73ec707177bc2745e8bc23cbc41eb67dcdde254f` solo actualizó el manifiesto visual, y el head `24f065e40e925fc4260dac34125793d30bef48ed` solo actualiza este estado.
+- Rama del PR: `codex/pack-compat-version-sync`. La versión de runtime revisada procede de `ea741fff436b4eedd2a4b04e2c5ca8a8526c822c`; los commits posteriores de esta rama actualizan únicamente el manifiesto visual y el registro documental, sin cambios de runtime ni recursos.
 - Verificación: [run 40241320136](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40241320136), exitoso sobre el código de runtime indicado; compiló, superó GameTests, servidor empaquetado y smoke de cliente. El artefacto de publicación se generó con aprobación visual válida.
 - Artefacto: [special-pickaxes-verified-527](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40241320136/artifacts/12616244274). Contiene un solo JAR, `RELEASE.json` y `SHA256SUMS`.
 - JAR: `special-pickaxes-1.20.1-5.10.163.jar`, 363539 bytes; SHA-256 `15fcf25ce3efbaa556220fe959301e3009840730b9848f0afd1a1731fe0c934e`. El manifiesto y `SHA256SUMS` concuerdan.
