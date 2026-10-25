@@ -41,7 +41,7 @@ public final class RelicAura {
             double orbit=angle+i*Math.PI*2/3,radius=0.055+i*0.022;
             var at=hand.add(side.scale(Math.cos(orbit)*radius)).add(0,Math.sin(orbit)*0.075,0).add(look.scale(Math.sin(orbit)*radius));
             mc.level.addParticle(dust,at.x,at.y,at.z,0,0.008,0);
-            if(i==0)mc.level.addParticle(accent,at.x,at.y,at.z,0,0.006,0);
+            if(i==0&&mc.player.tickCount%16==0)mc.level.addParticle(accent,at.x,at.y,at.z,0,0.006,0);
         }
     }
     /** A restrained rotating belt halo makes the Curios passive visible without suggesting an active skill. */
@@ -130,6 +130,7 @@ public final class RelicAura {
                 }
                 default -> { }
             }
+            if(player.tickCount%16!=0&&particle!=dust)particle=dust;
             mc.level.addParticle(particle,x,particleY,z,0,.004D,0);
         }
     }
