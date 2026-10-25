@@ -17,7 +17,17 @@ with zipfile.ZipFile(jar) as z:
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
  assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==len(ids)
- assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==len(ids)
+ models=[n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')]
+ assert len(models)==len(ids)
+ texture_paths=set()
+ for id in ids:
+  model=json.loads(z.read(f'assets/specialpickaxes/models/item/{id}.json').decode())
+  texture=model.get('textures',{}).get('layer0','')
+  assert texture.startswith('specialpickaxes:item/'),f'Invalid item texture model: {id} -> {texture}'
+  texture_path='assets/specialpickaxes/textures/'+texture.split(':',1)[1]+'.png'
+  assert texture_path in z.namelist(),f'Missing item texture for {id}: {texture_path}'
+  texture_paths.add(texture_path)
+ assert len(texture_paths)==len(ids), 'Each pickaxe must have a unique runtime item texture'
  effect_ids=re.findall(r'EFFECTS\.register\("([^"]+)"',(root/'src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java').read_text())
  assert effect_ids,'No registered mob effects found'
  for effect_id in effect_ids:
