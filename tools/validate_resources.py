@@ -102,8 +102,8 @@ class Resources(unittest.TestCase):
                     self.assertIn(key + artifact, data)
 
     def test_no_recipes_ores_worldgen(self):
-        self.assertFalse(list((ROOT / "data/specialpickaxes/recipes").glob("*.json")))
-        self.assertFalse(list((ROOT / "data/specialpickaxes/advancements/recipes").glob("*.json")))
+        recipe_json = [path for path in (ROOT / "data").rglob("*.json") if "recipes" in path.parts]
+        self.assertFalse(recipe_json, f"Pickaxes must remain command-only; found recipe files: {recipe_json}")
         self.assertFalse(list(ROOT.glob("data/*/worldgen/**/*.json")))
         self.assertFalse(list(ROOT.glob("assets/specialpickaxes/blockstates/*.json")))
 
