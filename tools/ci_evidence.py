@@ -8,7 +8,12 @@ for pattern in ['build/client-smoke/*.jpg','build/client-smoke/image-manifest.js
  files.extend(root.glob(pattern))
 if os.environ.get('PUBLISH_BINARY')=='true':files.extend(root.glob('build/libs/*.jar'))
 files=sorted(set(p for p in files if p.is_file()))
-subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True)
+try:
+ subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True,capture_output=True,text=True)
+except subprocess.CalledProcessError as error:
+ detail=(error.stderr or error.stdout or 'Checks API request failed').strip()
+ print('WARNING: Could not publish the diagnostic check; full logs remain in the Actions artifact. '+detail[-1200:])
+ raise SystemExit(0)
 # Full-resolution captures remain in the Actions artifact. Checks exports favor a
 # bounded, verifiable review subset and must never hide diagnostic text on overflow.
 while True:
@@ -32,5 +37,10 @@ for i,chunk in enumerate(chunks):
    'summary':f'Run {os.environ["GITHUB_RUN_ID"]}. ZIP base64 chunk {i+1}/{len(chunks)}. SHA256(zip): {hashlib.sha256(b.getvalue()).hexdigest()}',
    'text':'```base64\n'+chunk+'\n```'}}
  result=subprocess.run(['gh','api',f'repos/{os.environ["GITHUB_REPOSITORY"]}/check-runs','--input','-'],
-     input=json.dumps(payload),text=True,capture_output=True,check=True)
- print(json.loads(result.stdout)['html_url'])
+     input=json.dumps(payload),text=True,capture_output=True)
+ if result.returncode:
+  detail=(result.stderr or result.stdout or 'Checks API request failed').strip()
+  print(f'WARNING: Checks API rejected evidence chunk {i+1}/{len(chunks)}; full files remain in the Actions artifact. '+detail[-1200:])
+  break
+ try:print(json.loads(result.stdout)['html_url'])
+ except (json.JSONDecodeError,KeyError):print(f'Published evidence chunk {i+1}/{len(chunks)}')
