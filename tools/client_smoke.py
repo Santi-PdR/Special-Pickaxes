@@ -40,11 +40,11 @@ env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
 proc=None;capture_process=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
 def capture_screen(path,action=None):
- capture_process.stdin.write('capture\\t'+str(path)+'\\t'+(action or '')+'\\n');capture_process.stdin.flush()
+ capture_process.stdin.write('capture\t'+str(path)+'\t'+(action or '')+'\n');capture_process.stdin.flush()
  response=capture_process.stdout.readline().strip()
  if response!='OK':raise RuntimeError('Persistent screenshot helper failed: '+response)
 def press_screen(action):
- capture_process.stdin.write('press\\t'+action+'\\n');capture_process.stdin.flush()
+ capture_process.stdin.write('press\t'+action+'\n');capture_process.stdin.flush()
  response=capture_process.stdout.readline().strip()
  if response!='OK':raise RuntimeError('Persistent keyboard helper failed: '+response)
 try:
@@ -124,7 +124,7 @@ finally:
  # Stop the persistent screen helper before closing Xvfb.
  if capture_process and capture_process.poll() is None:
   try:
-   capture_process.stdin.write('exit\\n');capture_process.stdin.flush();capture_process.wait(timeout=10)
+   capture_process.stdin.write('exit\n');capture_process.stdin.flush();capture_process.wait(timeout=10)
   except (BrokenPipeError,subprocess.TimeoutExpired):
    capture_process.terminate();capture_process.wait(timeout=5)
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
