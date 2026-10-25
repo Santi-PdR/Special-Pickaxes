@@ -40,9 +40,11 @@ public final class ArtifactItem extends PickaxeItem {
             default->64F;
         };
     }
-    // The artifact tier is IV and intentionally outclasses Terramity's Exodium tier IV.
-    // Keep harvesting enabled for modded pickaxe blocks even when their mod omits tier tags.
-    @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state); }
+    // Preserve modded multi-tool materials while enforcing Forge's ordered tier requirements.
+    @Override public boolean isCorrectToolForDrops(BlockState state) {
+        return ArtifactTools.effective(state)
+            && net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(getTier(),state);
+    }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
         boolean damaged=super.hurtEnemy(stack,target,attacker);
