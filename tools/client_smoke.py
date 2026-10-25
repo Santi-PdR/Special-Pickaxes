@@ -121,7 +121,6 @@ finally:
   signals=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
   chat=[s.strip() for s in captured if '[CHAT]' in s][-12:]
   markers=(signals+chat)[-20:]
-  payload={'status':'completed','conclusion':'neutral','output':{'title':'Disposable client 
   payload={'status':'completed','conclusion':'neutral','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; result={'passed' if success else 'failed'}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'No client gallery markers'}}
   subprocess.run(['gh','api','--method','PATCH',f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs/{progress_id}",'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
