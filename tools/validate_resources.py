@@ -22,8 +22,11 @@ class Resources(unittest.TestCase):
         hashes = set()
         for artifact in IDS:
             model = json.loads((ROOT / f"assets/specialpickaxes/models/item/{artifact}.json").read_text())
-            self.assertEqual(model["textures"]["layer0"], "specialpickaxes:item/" + artifact)
-            hashes.add(hashlib.sha256((ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()).hexdigest())
+            self.assertEqual(model["textures"]["layer0"].startswith("specialpickaxes:item/"), True)
+            texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
+            texture_path = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
+            self.assertTrue(texture_path.is_file(), f"{artifact}: missing model texture {texture_path}")
+            hashes.add(hashlib.sha256(texture_path.read_bytes()).hexdigest())
         self.assertEqual(len(hashes), len(IDS))
 
     def test_reference_sprite_provenance(self):
@@ -50,9 +53,24 @@ class Resources(unittest.TestCase):
             reference_hash = hashlib.sha256(reference_png).hexdigest()
             self.assertEqual(reference_hash, expected_hash, f"{artifact}: reference archive hash changed")
 
-            runtime_png = (ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()
+            runtime_texture = record.get("runtime_texture", f"{artifact}.png")
+            runtime_expected = record.get("runtime_sha256", expected_hash)
+            self.assertRegex(runtime_expected, re.compile(r"^[0-9a-f]{64}$"), artifact)
+            runtime_png = (ROOT / f"assets/specialpickaxes/textures/item/{runtime_texture}").read_bytes()
             runtime_hash = hashlib.sha256(runtime_png).hexdigest()
-            self.assertEqual(runtime_hash, expected_hash, f"{artifact}: runtime texture differs from its reference")
+            self.assertEqual(runtime_hash, runtime_expected, f"{artifact}: runtime texture hash differs from provenance")
+
+    def test_item_texture_dimensions(self):
+        models = ROOT / "assets/specialpickaxes/models/item"
+        for path in models.glob("*.json"):
+            model = json.loads(path.read_text())
+            texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
+            png = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
+            data = png.read_bytes()
+            self.assertTrue(data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"), path.stem)
+            width, height = struct.unpack(">II", data[16:24])
+            self.assertEqual(width, height, f"{path.stem}: texture must be square")
+            self.assertIn((width, height), {(16, 16), (32, 32)}, f"{path.stem}: unsupported icon size")
 
     def test_mining_modes_and_removed_models(self):
         self.assertEqual({path.stem for path in (ROOT / "assets/specialpickaxes/models/item").glob("*.json")}, set(IDS))

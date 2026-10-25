@@ -60,7 +60,9 @@
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
     "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Authorized source sprite remains unchanged in the repository. The runtime uses a hand-pixelled 32×32 redraw, refined from a generated concept and the existing sprite silhouette; this replacement does not copy an external texture.",
+    "runtime_texture": "worldbreaker_v2.png",
+    "runtime_sha256": "a76e31fb8f13072c3986c03aa360bc0ea54538b4e241727c399ba876bf6cd6da"
   },
   {
     "artifact": "exodium",
