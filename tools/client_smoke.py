@@ -38,12 +38,21 @@ fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
-proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
+proc=None;capture_process=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
+def capture_screen(path,action=None):
+ capture_process.stdin.write('capture\\t'+str(path)+'\\t'+(action or '')+'\\n');capture_process.stdin.flush()
+ response=capture_process.stdout.readline().strip()
+ if response!='OK':raise RuntimeError('Persistent screenshot helper failed: '+response)
+def press_screen(action):
+ capture_process.stdin.write('press\\t'+action+'\\n');capture_process.stdin.flush()
+ response=capture_process.stdout.readline().strip()
+ if response!='OK':raise RuntimeError('Persistent keyboard helper failed: '+response)
 try:
  for _ in range(100):
   if pathlib.Path('/tmp/.X11-unix/X99').exists():break
   if xvfb.poll() is not None:raise RuntimeError('Xvfb failed to start')
   time.sleep(0.1)
+ capture_process=subprocess.Popen(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--server'],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=open(out/'capture-helper.log','w'),text=True,bufsize=1)
  proc=subprocess.Popen(['./gradlew','runClient','-PclientSmoke','--stacktrace'],env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,bufsize=1,start_new_session=True)
  def read():
   for line in proc.stdout:lines.put(line)
@@ -69,21 +78,21 @@ try:
    captured.append(line);print(line,end='')
    if '[CHAT]' in line and 'ARTIFACT_CLIENT_SMOKE_READY' in line:ready=time.monotonic()
   if ready and not gallery_done and time.monotonic()-ready>8:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery.png')],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True,timeout=20)
+   capture_screen(out/'gallery.png')
+   capture_screen(out/'gallery-clean.png', 'clean')
    # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory.png'),'inventory'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory-closed.png'),'inventory'],env=env,check=True,timeout=20)
+   capture_screen(out/'gallery-hud.png', 'clean')
+   capture_screen(out/'inventory.png', 'inventory')
+   capture_screen(out/'inventory-closed.png', 'inventory')
    gallery_done=True;gallery_flag.write_text("ready")
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-shift-'+id+'.png')),'shift'],env=env,check=True,timeout=20)
+   capture_screen(out/('ux-'+id+'.png'))
+   capture_screen(out/('ux-shift-'+id+'.png'), 'shift')
    # Actual ability activation advances the server gallery; UX and Shift screenshots above
    # already cover every mode, so do not encode a redundant execution image.
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press','confirm' if id=='paradox_crucible-regional' else 'activate'],env=env,check=True,timeout=20)
+   press_screen('confirm' if id=='paradox_crucible-regional' else 'activate')
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
@@ -91,27 +100,33 @@ try:
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
     # Change the artifact mode without producing an image already covered by
     # the next scene's normal and Shift captures.
-    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press','mode'],env=env,check=True,timeout=20)
+    press_screen('mode')
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-activate.png'),'activate'],env=env,check=True,timeout=20)
+   capture_screen(out/'third-person.png', 'third')
+   capture_screen(out/'control-activate.png', 'activate')
   if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-cancel.png'),'cancel'],env=env,check=True,timeout=20)
+   capture_screen(out/'control-cancel.png', 'cancel')
   if '[CHAT]' in line and 'SUPREME_READY' in line:
    # Return from the control-test third-person view to first person for an unobscured cut.
    for view in ['front','first']:
-    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('supreme-camera-'+view+'.png')),'third'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-executing.png'),'activate'],env=env,check=True,timeout=20)
+    capture_screen(out/('supreme-camera-'+view+'.png'), 'third')
+   capture_screen(out/'supreme-executing.png', 'activate')
   if '[CHAT]' in line and 'SUPREME_COMPLETE' in line:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-complete.png')],env=env,check=True,timeout=20)
+   capture_screen(out/'supreme-complete.png')
    success=True;break
 finally:
  # PNG originals and JPEG review copies are encoded from the exact same Robot capture.
  import hashlib
  manifest=[{'original':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'review_copy':p.with_suffix('.jpg').name,'review_sha256':hashlib.sha256(p.with_suffix('.jpg').read_bytes()).hexdigest()} for p in out.glob('*.png') if p.with_suffix('.jpg').exists()]
  (out/'image-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+ # Stop the persistent screen helper before closing Xvfb.
+ if capture_process and capture_process.poll() is None:
+  try:
+   capture_process.stdin.write('exit\\n');capture_process.stdin.flush();capture_process.wait(timeout=10)
+  except (BrokenPipeError,subprocess.TimeoutExpired):
+   capture_process.terminate();capture_process.wait(timeout=5)
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
  latest=root/'run/logs/latest.log'
  if latest.exists():shutil.copy2(latest,out/'client.log')
