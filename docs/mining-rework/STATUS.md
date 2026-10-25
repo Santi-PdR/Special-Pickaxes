@@ -1,17 +1,18 @@
 # Estado del mod y registro de versiones
 
-## Estado vigente — 5.10.163 (2026-10-25)
+## Estado vigente — 5.10.163
 
-- PR de trabajo: [#1](https://github.com/Santi-PdR/Special-Pickaxes/pull/1), abierto como borrador; no está integrado en `main`.
-- La validación visual aprobada quedó registrada en `docs/mining-rework/VISUAL-REVIEW.json`; se revisaron las 76 capturas del run #514. El run #515 volvió a ejecutar la validación completa con el commit de aprobación actual y terminó correctamente: [GitHub Actions 40233210363](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40233210363).
-- El workflow pasó compilación, tests, GameTest, cliente de prueba, servidor empaquetado, runtime y escaneo de seguridad. La evidencia de tier/drop incluye los 13 picos en tier IV, 32 768 usos, velocidad 64 y ataque 12, además de obsidiana, mena de diamante, escombros ancestrales y el control negativo del pico de hierro.
-- JAR verificado: `special-pickaxes-1.20.1-5.10.163.jar`, 363 536 bytes; SHA-256 `a7d8877b393389ca431b97af9d7d7c93b6f97b92660c28bce96b25f18b014afe`. El run construyó el candidato con el merge commit `1578c05a5c8927fd9f6b130c70b19b00c0cc6d1d`.
-- [Artefacto verificado del run #515](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40233210363/artifacts/12614561223). El ZIP contiene el JAR vigente junto con `RELEASE.json` y `SHA256SUMS`; la etapa de staging elimina JARs previos y exige que quede exactamente un JAR de Special Pickaxes.
-- El mod está diseñado para Forge 1.20.1 / Java 17, los picos no tienen recetas y la validación fue estática respecto al modpack ghouls. No se instaló nada en `ghouls/mods` ni se controló la instancia local.
+- El trabajo está en [PR #1](https://github.com/Santi-PdR/Special-Pickaxes/pull/1), abierto como borrador y aún sin integrar en `main`.
+- La [última ejecución de Forge verification](https://github.com/Santi-PdR/Special-Pickaxes/actions/workflows/verify.yml) es la autoridad para el JAR vigente. Usa solo el artefacto `special-pickaxes-verified-<run>` del último run completado con éxito; su `RELEASE.json` y `SHA256SUMS` indican el nombre y SHA-256 de ese build exacto.
+- El workflow comprueba el hash contra el JAR de release, borra JAR previos del staging temporal y falla si no queda exactamente uno. El artefacto verificado incluye ese JAR y sus dos manifiestos; no se instala automáticamente en el modpack.
+- La aprobación visual se guarda en `docs/mining-rework/VISUAL-REVIEW.json` con identidad de fuente y hashes. El workflow la compara con la build antes de publicar.
+- Los trece picos usan tier IV de Forge, con velocidad 64 o superior, durabilidad 32 768 y ataque 12. Las pruebas cubren drops de obsidiana, mena de diamante y escombros ancestrales, y que una herramienta de tier inferior no obtenga drops de obsidiana.
+- El proyecto compila para Forge 1.20.1 y Java 17. No contiene recetas para los picos.
+- La matriz del modpack ghouls describe inspección estática del código y los nombres de archivos observados. No equivale a ejecutar la instancia; esta tarea no modificó `ghouls/mods` ni controló el PC.
 
 ## Historial de la versión 5.0.0 (publicación anterior)
 
-> Las notas y hashes de la sección histórica describen exclusivamente 5.0.0; no los uses para instalar el candidato 5.10.163.
+> Las notas y hashes de la sección histórica describen exclusivamente 5.0.0; no los uses para instalar 5.10.163.
 
 ## Correcciones verificables
 
@@ -84,4 +85,5 @@ modificaciones arbitrarias del mundo por cualquier otro mod.
 - Copia local: `artifacts/5.0.0/special-pickaxes-1.20.1-5.0.0.jar`.
 - Galería autocontenida: `artifacts/5.0.0/GALERIA.html` (95 capturas y hashes).
 - Los commits posteriores de documentación no cambian la identidad de la fuente compilada.
+
 
