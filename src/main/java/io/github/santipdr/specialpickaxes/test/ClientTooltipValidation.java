@@ -21,8 +21,13 @@ public final class ClientTooltipValidation {
         if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item){
             if(!bindingsChecked&&!net.minecraft.client.gui.screens.Screen.hasShiftDown()){
                 var keys=io.github.santipdr.specialpickaxes.client.RelicKeys.KEYS;
-                if(!java.util.Arrays.asList(mc.options.keyMappings).containsAll(java.util.Arrays.asList(keys)))throw new IllegalStateException("Missing registered bindings");
-                var bind=keys[0];var old=bind.getKey();
+                var registered=java.util.List.of(
+                    keys[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ACTIVATE.ordinal()],
+                    keys[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.MODE.ordinal()],
+                    keys[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ALT_SKILL.ordinal()],
+                    io.github.santipdr.specialpickaxes.client.RelicKeys.MANUAL);
+                if(!java.util.Arrays.asList(mc.options.keyMappings).containsAll(registered))throw new IllegalStateException("Missing registered bindings");
+                var bind=keys[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ACTIVATE.ordinal()];var old=bind.getKey();
                 try{
                     bind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_O));
                     var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
