@@ -1,19 +1,17 @@
-# Historial de la versión 5.0.0 (publicación anterior)
-
-> Este archivo conserva la evidencia histórica de 5.0.0. El estado actual del mod es 5.10.163; no uses la identidad, los conteos ni los hashes de la sección histórica para instalar el candidato actual.
+# Estado del mod y registro de versiones
 
 ## Estado vigente — 5.10.163 (2026-10-25)
 
-- Fuente actual: `2af9a308e1facbeda08e9e0adc58406694770da5`; validación completa en [GitHub Actions 40216446187](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40216446187).
-- Build, tests, GameTest, servidor empaquetado, runtime y escaneo de seguridad pasaron. El cliente validó 32 escenas y 64 tooltips normales/SHIFT, además de activación/cancelación y la geometría y las barreras de Worldbreaker.
-- Los 13 picos cumplen tier IV, 32 768 usos, velocidad 64 y ataque 12. GameTest confirma drops de obsidiana, mena de diamante y escombros ancestrales; el pico de hierro no puede obtener drops de obsidiana. La comprobación combina la elegibilidad multi-herramienta con el orden de tiers de Forge.
-- Candidato: `special-pickaxes-1.20.1-5.10.163.jar`. La verificación exige 13 modelos y 13 texturas, clase Java 17, manifiesto vinculado al commit, cero recetas/worldgen y ausencia de clases de fixture en el JAR.
-- `VISUAL-REVIEW.json` sigue registrando una aprobación para otro commit y otro JAR. El workflow actual rechazó esa evidencia para este source y omitió staging/publicación; no hay binario 5.10.163 publicado por esa corrida.
-- El árbol actual del repositorio no contiene JARs de Special Pickaxes anteriores; solo incluye el wrapper de Gradle y JARs de mods de referencia. No se inspeccionó ni modificó la carpeta local `ghouls/mods`.
+- PR de trabajo: [#1](https://github.com/Santi-PdR/Special-Pickaxes/pull/1), abierto como borrador; no está integrado en `main`.
+- La validación visual aprobada quedó registrada en `docs/mining-rework/VISUAL-REVIEW.json`; se revisaron las 76 capturas del run #514. El run #515 volvió a ejecutar la validación completa con el commit de aprobación actual y terminó correctamente: [GitHub Actions 40233210363](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40233210363).
+- El workflow pasó compilación, tests, GameTest, cliente de prueba, servidor empaquetado, runtime y escaneo de seguridad. La evidencia de tier/drop incluye los 13 picos en tier IV, 32 768 usos, velocidad 64 y ataque 12, además de obsidiana, mena de diamante, escombros ancestrales y el control negativo del pico de hierro.
+- JAR verificado: `special-pickaxes-1.20.1-5.10.163.jar`, 363 536 bytes; SHA-256 `a7d8877b393389ca431b97af9d7d7c93b6f97b92660c28bce96b25f18b014afe`. El run construyó el candidato con el merge commit `1578c05a5c8927fd9f6b130c70b19b00c0cc6d1d`.
+- [Artefacto verificado del run #515](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40233210363/artifacts/12614561223). El ZIP contiene el JAR vigente junto con `RELEASE.json` y `SHA256SUMS`; la etapa de staging elimina JARs previos y exige que quede exactamente un JAR de Special Pickaxes.
+- El mod está diseñado para Forge 1.20.1 / Java 17, los picos no tienen recetas y la validación fue estática respecto al modpack ghouls. No se instaló nada en `ghouls/mods` ni se controló la instancia local.
 
+## Historial de la versión 5.0.0 (publicación anterior)
 
-Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente, revisión visual y reproducción binaria están aprobadas. El JAR final está publicado.
-Los resultados de un commit anterior no certifican sus correcciones posteriores.
+> Las notas y hashes de la sección histórica describen exclusivamente 5.0.0; no los uses para instalar el candidato 5.10.163.
 
 ## Correcciones verificables
 
@@ -86,3 +84,4 @@ modificaciones arbitrarias del mundo por cualquier otro mod.
 - Copia local: `artifacts/5.0.0/special-pickaxes-1.20.1-5.0.0.jar`.
 - Galería autocontenida: `artifacts/5.0.0/GALERIA.html` (95 capturas y hashes).
 - Los commits posteriores de documentación no cambian la identidad de la fuente compilada.
+
