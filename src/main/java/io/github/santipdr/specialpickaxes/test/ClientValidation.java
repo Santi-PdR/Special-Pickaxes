@@ -81,7 +81,7 @@ public final class ClientValidation {
                 p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.fallDistance=0;
                 for(int x=-6;x<=6;x++)for(int y=65;y<=72;y++)for(int z=4;z<=12;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
                 for(int x=-5;x<=-3;x++)for(int y=65;y<=67;y++)for(int z=6;z<=8;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                var rock=new BlockPos(0,67,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                var rock=new BlockPos(0,66,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 p.serverLevel().setBlockAndUpdate(rock.above(),net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState());
                 p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(k==ArtifactKind.CRUCIBLE?net.minecraft.world.item.Items.BASALT:net.minecraft.world.item.Items.STONE,64));
                 if(k==ArtifactKind.PALIMPSEST||k==ArtifactKind.CHOIR){
