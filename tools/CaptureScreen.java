@@ -14,7 +14,7 @@ class CaptureScreen {
             case "mode" -> java.awt.event.KeyEvent.VK_C;
             case "inventory" -> java.awt.event.KeyEvent.VK_E;
             case "activate" -> java.awt.event.KeyEvent.VK_R;
-            case "cancel" -> java.awt.event.KeyEvent.VK_V;
+            case "cancel" -> java.awt.event.KeyEvent.VK_X;
             case "shift" -> java.awt.event.KeyEvent.VK_SHIFT;
             case "third" -> java.awt.event.KeyEvent.VK_F5;
             case "clean" -> java.awt.event.KeyEvent.VK_F1;
