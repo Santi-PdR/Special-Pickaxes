@@ -22,7 +22,7 @@ class Resources(unittest.TestCase):
         hashes = set()
         for artifact in IDS:
             model = json.loads((ROOT / f"assets/specialpickaxes/models/item/{artifact}.json").read_text())
-            self.assertEqual(model["textures"]["layer0"].startswith("specialpickaxes:item/"), True)
+            self.assertTrue(model["textures"]["layer0"].startswith("specialpickaxes:item/"))
             texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
             texture_path = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
             self.assertTrue(texture_path.is_file(), f"{artifact}: missing model texture {texture_path}")
