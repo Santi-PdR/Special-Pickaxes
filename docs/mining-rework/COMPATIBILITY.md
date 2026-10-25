@@ -19,7 +19,7 @@ El inventario muestra, entre otros, Terramity 0.9.8, Undead Revamped 2.1h, Tool 
 | Curios 5.14.1 / Relics 0.8.0.9 | Curios es opcional; los picos equipados en el slot conservan sus pasivas, sin activar técnicas desde el slot. Relics aparece en el pack, pero no requiere un adaptador propio. | Compatibilidad con Curios documentada; GUI y combinación con Relics pendientes de probar. |
 | Embeddium / Photon / AmbientSounds | El mod usa efectos Forge/vanilla y no depende de estos renderizadores para la lógica de minería. | No se revisaron capturas con el perfil visual completo. |
 
-El inventario también incluye `Item-Obliterator-NeoForge-MC1.20.1-2.3.1`. El nombre del JAR indica una distribución NeoForge en un pack objetivo Forge; hace falta revisar el metadata interno del JAR y el loader de la instancia para confirmar que puede cargarse. No se considera una compatibilidad certificada de Special Pickaxes.
+El inventario también incluye `Item-Obliterator-NeoForge-MC1.20.1-2.3.1`. Aunque el nombre del archivo dice NeoForge, la ficha oficial de [CurseForge](https://www.curseforge.com/minecraft/mc-mods/item-obliterator/files/5479898) marca ese mismo archivo 2.3.1 para Forge y NeoForge en Minecraft 1.20.1. La compatibilidad de Item Obliterator no implica una integración específica con Special Pickaxes; el comportamiento conjunto aún requiere prueba en la instancia.
 
 ## Límites
 
