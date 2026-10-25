@@ -31,7 +31,7 @@ public final class ClientTooltipValidation {
                 try{
                     bind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_O));
                     var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
-                    if(!io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.regional(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))&&!lines.get(lines.size()-1).getString().startsWith(bind.getTranslatedKeyMessage().getString()))throw new IllegalStateException("Tooltip ignored rebound key");
+                    if(!io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.regional(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))&&lines.stream().noneMatch(line->line.getString().startsWith(bind.getTranslatedKeyMessage().getString())))throw new IllegalStateException("Tooltip ignored rebound key");
                 }finally{bind.setKey(old);net.minecraft.client.KeyMapping.resetMapping();}
                 bindingsChecked=true;com.mojang.logging.LogUtils.getLogger().info("KEY_BINDINGS_REGISTERED_AND_REBOUND_OK");
             }

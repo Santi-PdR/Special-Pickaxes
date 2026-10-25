@@ -18,6 +18,10 @@ public final class ArtifactHud {
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
         var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(item.kind==io.github.santipdr.specialpickaxes.artifact.ArtifactKind.WORLDBREAKER?name.copy().withStyle(net.minecraft.ChatFormatting.GOLD):name);
         io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
+        var activate=RelicKeys.KEYS[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ACTIVATE.ordinal()].getTranslatedKeyMessage();
+        var alternate=RelicKeys.KEYS[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ALT_SKILL.ordinal()].getTranslatedKeyMessage();
+        lines.set(1,Component.translatable("tooltip.specialpickaxes.r",activate,Component.translatable("mining.short.specialpickaxes."+item.kind.id)).withStyle(net.minecraft.ChatFormatting.GRAY));
+        lines.set(2,Component.translatable("tooltip.specialpickaxes.x",alternate,Component.translatable("alternate.specialpickaxes."+item.kind.id)).withStyle(net.minecraft.ChatFormatting.AQUA));
         if(net.minecraft.client.gui.screens.Screen.hasShiftDown())
             io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.expanded(e.getItemStack(),item.kind,lines);
     }
