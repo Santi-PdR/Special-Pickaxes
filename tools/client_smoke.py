@@ -54,7 +54,7 @@ try:
  while time.monotonic()<deadline:
   if os.environ.get('GH_TOKEN') and time.monotonic()>=next_progress:
    markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
-   payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'completed','conclusion':'neutral','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
+   payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'in_progress','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
    endpoint=f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs"+(f'/{progress_id}' if progress_id else '')
    report=subprocess.run(['gh','api','--method','PATCH' if progress_id else 'POST',endpoint,'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
    if report.returncode==0:progress_id=json.loads(report.stdout)['id']
@@ -115,6 +115,10 @@ finally:
   try:proc.wait(timeout=20)
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
+ if os.environ.get('GH_TOKEN') and progress_id:
+  markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
+  payload={'status':'completed','conclusion':'neutral','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; result={'passed' if success else 'failed'}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'No client gallery markers'}}
+  subprocess.run(['gh','api','--method','PATCH',f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs/{progress_id}",'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
 subprocess.run(['python3','tools/validate_runtime_logs.py',str(out/'client.log')],check=True)
 text=(out/'client.log').read_text().lower()
