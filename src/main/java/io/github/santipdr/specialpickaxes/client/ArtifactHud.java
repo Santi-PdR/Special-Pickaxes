@@ -18,5 +18,7 @@ public final class ArtifactHud {
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
         var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(item.kind==io.github.santipdr.specialpickaxes.artifact.ArtifactKind.WORLDBREAKER?name.copy().withStyle(net.minecraft.ChatFormatting.GOLD):name);
         io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
+        if(net.minecraft.client.gui.screens.Screen.hasShiftDown())
+            io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.expanded(e.getItemStack(),item.kind,lines);
     }
 }
