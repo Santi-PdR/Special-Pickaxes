@@ -51,6 +51,9 @@ public final class PickaxeGameTests {
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
         for(var kind:ArtifactKind.playableValues()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");
+            var tier=((ArtifactItem)item).getTier();
+            h.assertTrue(tier.getLevel()==4,"OP pickaxe harvest tier IV: "+kind);
+            h.assertTrue(tier.getUses()==32768&&tier.getSpeed()>=64F&&tier.getAttackDamageBonus()>=12F,"OP tier durability, speed and attack: "+kind);
             var tool=new ItemStack(item);h.assertTrue(tool.is(net.minecraft.tags.ItemTags.PICKAXES),"recognized as a pickaxe: "+kind);
             h.assertTrue(tool.is(net.minecraft.tags.ItemTags.AXES)&&tool.is(net.minecraft.tags.ItemTags.SHOVELS),"multi-tool tags stay complete: "+kind);
             h.assertTrue(h.getLevel().getRecipeManager().getRecipes().stream().noneMatch(r -> r.getResultItem(h.getLevel().registryAccess()).is(item)),"no recipe outputs artifact");
