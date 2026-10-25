@@ -67,7 +67,7 @@ class Resources(unittest.TestCase):
             texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
             png = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
             data = png.read_bytes()
-            self.assertTrue(data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"), path.stem)
+            self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"), path.stem)
             width, height = struct.unpack(">II", data[16:24])
             self.assertEqual(width, height, f"{path.stem}: texture must be square")
             self.assertIn((width, height), {(16, 16), (32, 32)}, f"{path.stem}: unsupported icon size")
