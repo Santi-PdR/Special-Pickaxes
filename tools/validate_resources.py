@@ -23,7 +23,7 @@ class Resources(unittest.TestCase):
         for artifact in IDS:
             model = json.loads((ROOT / f"assets/specialpickaxes/models/item/{artifact}.json").read_text())
             self.assertTrue(model["textures"]["layer0"].startswith("specialpickaxes:item/"))
-            texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
+            texture_name = model["textures"]["layer0"].split(":", 1)[1]
             texture_path = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
             self.assertTrue(texture_path.is_file(), f"{artifact}: missing model texture {texture_path}")
             hashes.add(hashlib.sha256(texture_path.read_bytes()).hexdigest())
@@ -64,7 +64,7 @@ class Resources(unittest.TestCase):
         models = ROOT / "assets/specialpickaxes/models/item"
         for path in models.glob("*.json"):
             model = json.loads(path.read_text())
-            texture_name = model["textures"]["layer0"].split(":", 1)[1].split("/", 1)[1]
+            texture_name = model["textures"]["layer0"].split(":", 1)[1]
             png = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
             data = png.read_bytes()
             self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"), path.stem)
