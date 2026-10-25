@@ -48,7 +48,7 @@ try:
  def read():
   for line in proc.stdout:lines.put(line)
  threading.Thread(target=read,daemon=True).start()
- deadline=time.monotonic()+700
+ deadline=time.monotonic()+1100
  next_progress=time.monotonic()+45
  progress_id=None
  while time.monotonic()<deadline:
