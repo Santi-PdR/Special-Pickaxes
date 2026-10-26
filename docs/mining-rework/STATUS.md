@@ -12,11 +12,12 @@
 
 ## Evidencia del candidato vigente — 5.10.163
 
-- Rama del PR: `codex/pack-compat-version-sync`. La versión de runtime revisada procede de `ea741fff436b4eedd2a4b04e2c5ca8a8526c822c`; los commits posteriores de esta rama actualizan únicamente el manifiesto visual y el registro documental, sin cambios de runtime ni recursos.
-- Verificación: [run 40241320136](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40241320136), exitoso sobre el código de runtime indicado; compiló, superó GameTests, servidor empaquetado y smoke de cliente. El artefacto de publicación se generó con aprobación visual válida.
-- Artefacto: [special-pickaxes-verified-527](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40241320136/artifacts/12616244274). Contiene un solo JAR, `RELEASE.json` y `SHA256SUMS`.
-- JAR: `special-pickaxes-1.20.1-5.10.163.jar`, 363539 bytes; SHA-256 `15fcf25ce3efbaa556220fe959301e3009840730b9848f0afd1a1731fe0c934e`. El manifiesto y `SHA256SUMS` concuerdan.
-- La revisión visual completa cubrió las 76 capturas JPG del run 40239736437 sobre el código de runtime `ea741fff436b4eedd2a4b04e2c5ca8a8526c822c`. Desde entonces solo cambiaron manifiestos/documentación; no cambió el código ni los recursos incluidos en el juego.
+- Rama del PR: `codex/pack-compat-version-sync`. El runtime y los recursos vigentes se verificaron desde `7158a0e49d62e502e11d04d33103b0197de0c294`; los commits posteriores solo actualizan el manifiesto de aprobación y este registro.
+- Verificación de runtime: [run 40246183037 (#540)](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40246183037), exitoso. Compiló, superó GameTests, servidor empaquetado y smoke de cliente; generó la galería de la que se revisó la diferencia visual de Worldbreaker.
+- Revisión visual: inventario del cliente y las 12 capturas de los modos normal/SHIFT de Worldbreaker del run #540. La textura nueva se ve en el catálogo; la forma del pico y la galería renderizan correctamente. Las otras habilidades no cambiaron respecto a la revisión completa previa.
+- Verificación publicable: [run 40253072773 (#541)](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40253072773), exitoso con aprobación visual vinculada al mismo runtime. Superó build, JUnit/GameTests, recursos, servidor empaquetado, smoke de cliente y galería.
+- Artefacto: [special-pickaxes-verified-541](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40253072773/artifacts/12621218969). Contiene un solo JAR, `RELEASE.json` y `SHA256SUMS`; el ZIP tiene SHA-256 `1d8c52d497a99ed9ac205c8b0a29900538e92b8cb6aa13e84a074ce50cd0d120`.
+- JAR: `special-pickaxes-1.20.1-5.10.163.jar`, 364273 bytes; SHA-256 `bd5da1caedac1fcbe9baa4afff43b2f1421c627676265f56cef33290c4c3d6d7`. El manifiesto de release coincide.
 - La tabla de compatibilidad sigue siendo una revisión estática del inventario observado; no se ejecutó la instancia ghouls ni se modificó su carpeta `mods`.
 
 ## Historial de la versión 5.0.0 (publicación anterior)
