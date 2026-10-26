@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.407** cambia los iconos de Exodium, Iridium, Hellspec y Worldbreaker por sprites pixel-art 32×32 dibujados para este mod; conserva las referencias y su procedencia.
+
 La **5.10.406** amplía Barrido de Falla de Sutura de los Estratos a una cara 7×7 (hasta 49 bloques naturales); mantiene los filtros de seguridad y comprueba en GameTest los bloques del borde y los exteriores.
 
 La **5.10.405** añade a Starfall de Exodium un núcleo estelar animado de Blockbench en los impactos de minería; cada avance de la técnica envía una sola partícula propia en vez del par genérico anterior.
