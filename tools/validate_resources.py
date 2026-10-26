@@ -173,11 +173,12 @@ class Resources(unittest.TestCase):
     def test_current_controls(self):
         source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/RelicKeyRegistration.java").read_text()
         actions_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/RelicControl.java").read_text()
-        actions = set(re.search(r"enum Action \\{([^}]+)\\}", actions_source).group(1).replace(" ", "").split(","))
-        self.assertRegex(source, r"@Mod\\.EventBusSubscriber\\([^)]*bus=Mod\\.EventBusSubscriber\\.Bus\\.MOD")
-        excluded = set(re.findall(r"action\\s*!=\\s*RelicControl\\.Action\\.(\\w+)", source))
-        self.assertIn("event.register(RelicKeys.KEYS[action.ordinal()])", source)
-        self.assertIn("event.register(RelicKeys.MANUAL)", source)
+        actions_text = actions_source.split("enum Action {", 1)[1].split("}", 1)[0]
+        actions = set(actions_text.replace(" ", "").split(","))
+        self.assertIn("bus=Mod.EventBusSubscriber.Bus.MOD", source)
+        excluded = {action for action in actions if f"action != RelicControl.Action.{action}" in source}
+        self.assertIn("event.register(RelicKeys.KEYS[action.ordinal()]);", source)
+        self.assertIn("event.register(RelicKeys.MANUAL);", source)
         registered = {"key.specialpickaxes." + action.lower() for action in actions - excluded}
         registered.add("key.specialpickaxes.manual")
         self.assertEqual(registered, {"key.specialpickaxes.activate", "key.specialpickaxes.mode", "key.specialpickaxes.alt_skill", "key.specialpickaxes.manual"})
