@@ -45,7 +45,10 @@ jobs:
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
-          cp run/logs/latest.log run/logs/gametest.log
+          mkdir -p run/logs
+          gametest_log=$(find build -path 'build/gametest-*/logs/latest.log' -type f -print -quit)
+          test -n "$gametest_log"
+          cp "$gametest_log" run/logs/gametest.log
           python3 tools/validate_runtime_logs.py run/logs/gametest.log
           python3 tools/verify_gametests.py run/logs/gametest.log
       - run: |
