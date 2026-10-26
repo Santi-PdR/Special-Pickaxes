@@ -10,15 +10,14 @@
 - El proyecto compila para Forge 1.20.1 y Java 17. No contiene recetas para los picos.
 - La matriz del modpack ghouls describe inspección estática del código y los nombres de archivos observados. No equivale a ejecutar la instancia; esta tarea no modificó `ghouls/mods` ni controló el PC.
 
-## Evidencia del candidato vigente — 5.10.163
+## Evidencia visual del candidato — 5.10.163
 
-- Rama del PR: `codex/pack-compat-version-sync`. El runtime y los recursos vigentes se verificaron desde `7158a0e49d62e502e11d04d33103b0197de0c294`; los commits posteriores solo actualizan el manifiesto de aprobación y este registro.
-- Verificación de runtime: [run 40246183037 (#540)](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40246183037), exitoso. Compiló, superó GameTests, servidor empaquetado y smoke de cliente; generó la galería de la que se revisó la diferencia visual de Worldbreaker.
-- Revisión visual: inventario del cliente y las 12 capturas de los modos normal/SHIFT de Worldbreaker del run #540. La textura nueva se ve en el catálogo; la forma del pico y la galería renderizan correctamente. Las otras habilidades no cambiaron respecto a la revisión completa previa.
-- Verificación publicable: [run 40253072773 (#541)](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40253072773), exitoso con aprobación visual vinculada al mismo runtime. Superó build, JUnit/GameTests, recursos, servidor empaquetado, smoke de cliente y galería.
-- Artefacto: [special-pickaxes-verified-541](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40253072773/artifacts/12621218969). Contiene un solo JAR, `RELEASE.json` y `SHA256SUMS`; el ZIP tiene SHA-256 `1d8c52d497a99ed9ac205c8b0a29900538e92b8cb6aa13e84a074ce50cd0d120`.
-- JAR: `special-pickaxes-1.20.1-5.10.163.jar`, 364273 bytes; SHA-256 `bd5da1caedac1fcbe9baa4afff43b2f1421c627676265f56cef33290c4c3d6d7`. El manifiesto de release coincide.
-- La tabla de compatibilidad sigue siendo una revisión estática del inventario observado; no se ejecutó la instancia ghouls ni se modificó su carpeta `mods`.
+- Rama del PR: `codex/pack-compat-version-sync`. La fuente runtime y los recursos visuales nuevos están en `db30b43f3b6735a7980edf62b9463523c8a2a51a`.
+- Validación y capturas: [run #544](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40255897174), exitoso. Pasó build, JUnit/GameTests, validación de recursos, servidor empaquetado, smoke de cliente, galería normal/SHIFT y evidencia. La publicación binaria se omitió porque la aprobación visual aún apuntaba al runtime anterior.
+- Revisión de las texturas nuevas: inventario actual y las seis capturas normales/SHIFT de Exodium Starfall, Iridium Lodebreaker y Hellspec Infernal Bloom del run #544. Los tres iconos originales 32×32 cargan y se distinguen en el modelo en mano. Las otras habilidades no cambiaron desde la revisión completa de 76 capturas del run #526.
+- JAR de diagnóstico de #544, aún sin publicar como artefacto verificado: `special-pickaxes-1.20.1-5.10.163.jar`, 365910 bytes, SHA-256 `eb6f7768ff411f9b5d4d86018f88dbd90b40a62ff8c5cc011ec8f4bb3d8ff570`.
+- El artefacto `forge-validation` de #544 contiene capturas y logs; su ZIP tiene SHA-256 `d69bf23a07fe62446bce219b7f1bb9c6cc45d99d8335b08e92d4dd6525955883`. El siguiente run comprobará la nueva aprobación contra esta fuente antes de publicar.
+- La tabla de compatibilidad sigue siendo una revisión estática; no se ejecutó la instancia ghouls ni se modificó su carpeta `mods`.
 
 ## Historial de la versión 5.0.0 (publicación anterior)
 
