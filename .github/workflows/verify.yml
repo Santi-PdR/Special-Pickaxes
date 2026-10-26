@@ -54,7 +54,7 @@ jobs:
       - run: |
           set -o pipefail
           python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log
-      - run: python3 tools/validate_runtime_logs.py run/logs/latest.log build/packaged-smoke/console.log
+      - run: python3 tools/validate_runtime_logs.py run/logs/gametest.log build/packaged-smoke/console.log
       - name: Client runtime dependencies
         timeout-minutes: 14
         run: |
