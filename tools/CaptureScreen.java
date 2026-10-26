@@ -30,7 +30,7 @@ class CaptureScreen {
             Thread.sleep(120);
             if (!action.equals("shift")) robot.keyRelease(key);
             if (operation.equals("press")) {
-                Thread.sleep(180);
+                Thread.sleep(1000);
                 return;
             }
             Thread.sleep(500);
