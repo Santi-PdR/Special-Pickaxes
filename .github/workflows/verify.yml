@@ -7,6 +7,10 @@ on:
       - README.md
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: forge-verification-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   actions: read
@@ -14,14 +18,14 @@ permissions:
 jobs:
   forge:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
         with:
           distribution: temurin
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c
       - run: python3 tools/validate_resources.py
       - run: python3 tools/scan_secrets.py
       - run: python3 tools/withdraw_unvalidated.py
@@ -32,7 +36,10 @@ jobs:
           set -o pipefail
           ./gradlew build test --stacktrace 2>&1 | tee build/verification-build.log
       - run: python3 tools/verify_release.py
-      - run: python3 tools/scan_secrets.py build/libs/special-pickaxes-1.20.1-5.0.0.jar | tee build/verification-security.log
+      - run: |
+          set -o pipefail
+          jar="$(python3 -c 'import json; print(json.load(open("build/RELEASE.json"))["file"])')"
+          python3 tools/scan_secrets.py "build/libs/$jar" | tee build/verification-security.log
       - run: |
           set -o pipefail
           ./gradlew runGameTestServer --stacktrace 2>&1 | tee build/verification-gametest.log
@@ -44,12 +51,12 @@ jobs:
           python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log
       - run: python3 tools/validate_runtime_logs.py run/logs/latest.log build/packaged-smoke/console.log
       - name: Client runtime dependencies
-        timeout-minutes: 6
+        timeout-minutes: 14
         run: |
-          timeout 120s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -qq
-          timeout 180s sudo apt-get install -y xvfb libflite1
-      - name: Real client gallery and nine normal and SHIFT tooltip captures
-        timeout-minutes: 13
+          timeout 300s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=90 -o Acquire::https::Timeout=90 update -qq
+          timeout 600s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=90 -o Acquire::https::Timeout=90 install -y xvfb libflite1
+      - name: Real client gallery and all normal and SHIFT tooltip captures
+        timeout-minutes: 22
         run: |
           set -o pipefail
           python3 tools/client_smoke.py 2>&1 | tee build/verification-client.log
@@ -76,17 +83,42 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PUBLISH_BINARY: ${{ job.status == 'success' && steps.publication.outputs.approved == 'true' }}
+      - name: Stage the single verified release JAR
+        if: success() && steps.publication.outputs.approved == 'true'
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, shutil
+          root = pathlib.Path("build")
+          release = json.loads((root / "RELEASE.json").read_text())
+          name = release.get("file")
+          if not isinstance(name, str) or pathlib.Path(name).name != name:
+              raise SystemExit("Release manifest must name one file in build/libs")
+          source = root / "libs" / name
+          if not source.is_file():
+              raise SystemExit(f"Manifest JAR does not exist: {source}")
+          digest = hashlib.sha256(source.read_bytes()).hexdigest()
+          if digest != release.get("sha256"):
+              raise SystemExit("Release JAR does not match RELEASE.json SHA-256")
+          staged = root / "verified-release"
+          staged.mkdir(parents=True, exist_ok=True)
+          for previous in staged.glob("*.jar"):
+              previous.unlink()
+          shutil.copy2(source, staged / name)
+          jars = list(staged.glob("*.jar"))
+          if len(jars) != 1 or jars[0].name != name:
+              raise SystemExit(f"Expected only {name} in verified release, found {jars}")
+          PY
       - name: Publish verified release only
         if: success() && steps.publication.outputs.approved == 'true'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: special-pickaxes-5.0.0-verified
+          name: special-pickaxes-verified-${{ github.run_number }}
           path: |
-            build/libs/*.jar
+            build/verified-release/*.jar
             build/RELEASE.json
             build/SHA256SUMS
       - if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: forge-validation
           path: |

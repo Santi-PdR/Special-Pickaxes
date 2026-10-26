@@ -10,7 +10,7 @@ public final class RelicEffects {
     private RelicEffects(){}
     public static void emit(ServerPlayer p,ArtifactKind k,String phase,Vec3 center){
         long now=ArtifactState.now(p);if(tick!=now){tick=now;remaining=256;}
-        int count=k==ArtifactKind.WORLDBREAKER?24:16;if(remaining<count)return;remaining-=count;
+        int count=16;if(remaining<count)return;remaining-=count;
         ParticleOptions particle=switch(k){
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
             case EVENTIDE->ParticleTypes.REVERSE_PORTAL;case MERIDIAN->ParticleTypes.PORTAL;
@@ -23,6 +23,7 @@ public final class RelicEffects {
             case AEGIS->ParticleTypes.ELECTRIC_SPARK;case LODESTAR->ParticleTypes.NAUTILUS;
             case SEAM_RIPPER->ParticleTypes.ASH;case CAUSEWAY->ParticleTypes.CLOUD;
             case COUNTERSEAL->ParticleTypes.SOUL;case COVENANT->ParticleTypes.DRIPPING_OBSIDIAN_TEAR;};
+        int rgb=k.color;ParticleOptions trail=new DustParticleOptions(new org.joml.Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),.7F);
         double scale=phase.equals("error")||phase.equals("cancel")?.35:phase.equals("complete")?1.5:phase.equals("alternate")?1.25:1;
         double mode=ArtifactState.mode(p,k)*Math.PI/6+(phase.equals("alternate")?Math.PI/8:0);
         for(int i=0;i<count;i++){
@@ -39,8 +40,8 @@ public final class RelicEffects {
                 case WORLDBREAKER->{x=Math.cos(a)*(1+t);y=Math.sin(a*3)*.4;z=Math.sin(a)*(1+t);}
                 default->{x=Math.cos(a);y=t*.6;z=Math.sin(a);}
             }
-            if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
-            else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
+            if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,i%8==0?particle:trail,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
+            else p.serverLevel().sendParticles(p,i%8==0?particle:trail,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }
     }
 }

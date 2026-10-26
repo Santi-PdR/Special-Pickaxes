@@ -51,8 +51,13 @@ public final class PickaxeGameTests {
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
         for(var kind:ArtifactKind.playableValues()) {
             var item=SpecialPickaxes.PICKS.get(kind).get();h.assertTrue(item instanceof ArtifactItem,"artifact item class");
+            var tier=((ArtifactItem)item).getTier();
+            h.assertTrue(tier.getLevel()==4,"OP pickaxe harvest tier IV: "+kind);
+            h.assertTrue(tier.getUses()==32768&&tier.getSpeed()>=64F&&tier.getAttackDamageBonus()>=12F,"OP tier durability, speed and attack: "+kind);
             var tool=new ItemStack(item);h.assertTrue(tool.is(net.minecraft.tags.ItemTags.PICKAXES),"recognized as a pickaxe: "+kind);
             h.assertTrue(tool.is(net.minecraft.tags.ItemTags.AXES)&&tool.is(net.minecraft.tags.ItemTags.SHOVELS),"multi-tool tags stay complete: "+kind);
+            for(var block:List.of(Blocks.OBSIDIAN,Blocks.DIAMOND_ORE,Blocks.ANCIENT_DEBRIS))
+                h.assertTrue(tool.isCorrectToolForDrops(block.defaultBlockState()),"tier IV harvest eligibility: "+kind+" "+block);
             h.assertTrue(h.getLevel().getRecipeManager().getRecipes().stream().noneMatch(r -> r.getResultItem(h.getLevel().registryAccess()).is(item)),"no recipe outputs artifact");
             int result=h.getLevel().getServer().getCommands().performPrefixedCommand(source,"specialpickaxes grant @s "+kind.id);
             h.assertTrue(result==1 && p.getInventory().countItem(item)==1,"admin command actually grants "+kind.id);
@@ -609,6 +614,7 @@ public final class PickaxeGameTests {
         var air=pos.above();h.assertTrue(!WorldSafety.placePaid(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,air,Blocks.STONE.defaultBlockState()),"no free block without payment");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_21") public static void vanillaTiersRemainValid(GameTestHelper h) {
+        h.assertTrue(!new ItemStack(Items.IRON_PICKAXE).isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState()),"iron tier must not yield obsidian drops");
         h.assertTrue(new ItemStack(Items.DIAMOND_PICKAXE).isCorrectToolForDrops(Blocks.OBSIDIAN.defaultBlockState()),"artifact tier does not revoke vanilla diamond harvesting");
         h.assertTrue(new ItemStack(Items.NETHERITE_PICKAXE).isCorrectToolForDrops(Blocks.DIAMOND_ORE.defaultBlockState()),"netherite remains valid");
         h.succeed();

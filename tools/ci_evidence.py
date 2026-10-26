@@ -2,13 +2,18 @@
 """Publish reproducible evidence through Checks API, also accessible when blob artifact CDN is blocked.
 Only explicit build products are exported. No environment, credentials or world data.
 """
-import base64,hashlib,io,json,os,pathlib,subprocess,zipfile
+import base64,hashlib,io,json,os,pathlib,subprocess,time,zipfile
 root=pathlib.Path('.'); files=[]
 for pattern in ['build/client-smoke/*.jpg','build/client-smoke/image-manifest.json','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))
 if os.environ.get('PUBLISH_BINARY')=='true':files.extend(root.glob('build/libs/*.jar'))
 files=sorted(set(p for p in files if p.is_file()))
-subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True)
+try:
+ subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True,capture_output=True,text=True)
+except subprocess.CalledProcessError as error:
+ detail=(error.stderr or error.stdout or 'Checks API request failed').strip()
+ print('WARNING: Could not publish the diagnostic check; full logs remain in the Actions artifact. '+detail[-1200:])
+ raise SystemExit(0)
 # Full-resolution captures remain in the Actions artifact. Checks exports favor a
 # bounded, verifiable review subset and must never hide diagnostic text on overflow.
 while True:
@@ -31,6 +36,18 @@ for i,chunk in enumerate(chunks):
   'status':'completed','conclusion':'neutral','output':{'title':'Downloadable build and verification evidence',
    'summary':f'Run {os.environ["GITHUB_RUN_ID"]}. ZIP base64 chunk {i+1}/{len(chunks)}. SHA256(zip): {hashlib.sha256(b.getvalue()).hexdigest()}',
    'text':'```base64\n'+chunk+'\n```'}}
- result=subprocess.run(['gh','api',f'repos/{os.environ["GITHUB_REPOSITORY"]}/check-runs','--input','-'],
-     input=json.dumps(payload),text=True,capture_output=True,check=True)
- print(json.loads(result.stdout)['html_url'])
+ for attempt in range(5):
+  result=subprocess.run(['gh','api',f'repos/{os.environ["GITHUB_REPOSITORY"]}/check-runs','--input','-'],
+      input=json.dumps(payload),text=True,capture_output=True)
+  if result.returncode==0:break
+  detail=(result.stderr or result.stdout or 'Checks API request failed').strip()
+  transient=any(token in detail.lower() for token in ('http 429','http 500','http 502','http 503','http 504','timed out','connection reset','temporary failure'))
+  if not transient or attempt==4:
+   print(f'WARNING: Checks API rejected evidence chunk {i+1}/{len(chunks)}; full files remain in the Actions artifact. '+detail[-1200:])
+   break
+  delay=2**(attempt+1)
+  print(f'Retrying evidence chunk {i+1}/{len(chunks)} after transient API error (attempt {attempt+1}/5, {delay}s).',flush=True)
+  time.sleep(delay)
+ if result.returncode:break
+ try:print(json.loads(result.stdout)['html_url'])
+ except (json.JSONDecodeError,KeyError):print(f'Published evidence chunk {i+1}/{len(chunks)}')

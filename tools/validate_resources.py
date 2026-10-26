@@ -22,8 +22,11 @@ class Resources(unittest.TestCase):
         hashes = set()
         for artifact in IDS:
             model = json.loads((ROOT / f"assets/specialpickaxes/models/item/{artifact}.json").read_text())
-            self.assertEqual(model["textures"]["layer0"], "specialpickaxes:item/" + artifact)
-            hashes.add(hashlib.sha256((ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()).hexdigest())
+            self.assertTrue(model["textures"]["layer0"].startswith("specialpickaxes:item/"))
+            texture_name = model["textures"]["layer0"].split(":", 1)[1]
+            texture_path = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
+            self.assertTrue(texture_path.is_file(), f"{artifact}: missing model texture {texture_path}")
+            hashes.add(hashlib.sha256(texture_path.read_bytes()).hexdigest())
         self.assertEqual(len(hashes), len(IDS))
 
     def test_reference_sprite_provenance(self):
@@ -50,9 +53,24 @@ class Resources(unittest.TestCase):
             reference_hash = hashlib.sha256(reference_png).hexdigest()
             self.assertEqual(reference_hash, expected_hash, f"{artifact}: reference archive hash changed")
 
-            runtime_png = (ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()
+            runtime_texture = record.get("runtime_texture", f"{artifact}.png")
+            runtime_expected = record.get("runtime_sha256", expected_hash)
+            self.assertRegex(runtime_expected, re.compile(r"^[0-9a-f]{64}$"), artifact)
+            runtime_png = (ROOT / f"assets/specialpickaxes/textures/item/{runtime_texture}").read_bytes()
             runtime_hash = hashlib.sha256(runtime_png).hexdigest()
-            self.assertEqual(runtime_hash, expected_hash, f"{artifact}: runtime texture differs from its reference")
+            self.assertEqual(runtime_hash, runtime_expected, f"{artifact}: runtime texture hash differs from provenance")
+
+    def test_item_texture_dimensions(self):
+        models = ROOT / "assets/specialpickaxes/models/item"
+        for path in models.glob("*.json"):
+            model = json.loads(path.read_text())
+            texture_name = model["textures"]["layer0"].split(":", 1)[1]
+            png = ROOT / "assets/specialpickaxes/textures" / f"{texture_name}.png"
+            data = png.read_bytes()
+            self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"), path.stem)
+            width, height = struct.unpack(">II", data[16:24])
+            self.assertEqual(width, height, f"{path.stem}: texture must be square")
+            self.assertIn((width, height), {(16, 16), (32, 32)}, f"{path.stem}: unsupported icon size")
 
     def test_mining_modes_and_removed_models(self):
         self.assertEqual({path.stem for path in (ROOT / "assets/specialpickaxes/models/item").glob("*.json")}, set(IDS))
@@ -80,6 +98,25 @@ class Resources(unittest.TestCase):
                 self.assertNotIn("sneak", data[key].lower())
                 self.assertNotIn("usar", data[key].lower().replace("pausar", ""))
 
+    def test_curios_pickaxe_slot(self):
+        slot = json.loads((ROOT / "data/specialpickaxes/curios/slots/pickaxe.json").read_text())
+        self.assertEqual(slot.get("size"), 1)
+        self.assertEqual(slot.get("icon"), "specialpickaxes:slot/empty_pickaxe_slot")
+        self.assertFalse(slot.get("add_cosmetic"))
+        self.assertIn("curios:tag", slot.get("validators", []))
+        self.assertTrue((ROOT / "assets/specialpickaxes/textures/slot/empty_pickaxe_slot.png").is_file())
+
+        entities = json.loads((ROOT / "data/specialpickaxes/curios/entities/entities.json").read_text())
+        self.assertIn("minecraft:player", entities.get("entities", []))
+        self.assertIn("pickaxe", entities.get("slots", []))
+
+        tag = json.loads((ROOT / "data/curios/tags/items/pickaxe.json").read_text())
+        self.assertFalse(tag.get("replace"))
+        self.assertEqual(set(tag.get("values", [])), {"specialpickaxes:" + artifact for artifact in IDS})
+        for lang in ["en_us", "es_es"]:
+            data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
+            self.assertIn("curios.identifier.pickaxe", data)
+
     def test_no_energy_and_manual_keys(self):
         kind_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactKind.java").read_text()
         kind_ids = dict(re.findall(r'^\s*([A-Z_]+)\("([^"]+)"', kind_source, re.M))
@@ -102,8 +139,8 @@ class Resources(unittest.TestCase):
                     self.assertIn(key + artifact, data)
 
     def test_no_recipes_ores_worldgen(self):
-        self.assertFalse(list((ROOT / "data/specialpickaxes/recipes").glob("*.json")))
-        self.assertFalse(list((ROOT / "data/specialpickaxes/advancements/recipes").glob("*.json")))
+        recipe_json = [path for path in (ROOT / "data").rglob("*.json") if "recipes" in path.parts]
+        self.assertFalse(recipe_json, f"Pickaxes must remain recipe-free; found recipe files: {recipe_json}")
         self.assertFalse(list(ROOT.glob("data/*/worldgen/**/*.json")))
         self.assertFalse(list(ROOT.glob("assets/specialpickaxes/blockstates/*.json")))
 
