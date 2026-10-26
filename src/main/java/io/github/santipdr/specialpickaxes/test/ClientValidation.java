@@ -70,7 +70,7 @@ public final class ClientValidation {
             if(phase==0){
                 ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);
                 if(scene.mode()==0){
-                    var stack=new ItemStack(SpecialPickaxes.PICKS.get(k).get());
+                    var stack=new ItemStack(SpecialPickaxes.PICKS.get(k).get());stack.getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());
                     var list=new net.minecraft.nbt.ListTag();var ench=new net.minecraft.nbt.CompoundTag();ench.putString("id","minecraft:efficiency");ench.putInt("lvl",1000);list.add(ench);stack.getOrCreateTag().put("Enchantments",list);
                     p.setItemInHand(InteractionHand.MAIN_HAND,stack);ArtifactState.of(p,k).putInt("mode",0);
                 } else if(ArtifactState.mode(p,k)!=scene.mode())throw new IllegalStateException("Real C key did not change mode: "+k+" expected "+scene.mode());
