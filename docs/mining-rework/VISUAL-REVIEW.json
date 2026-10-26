@@ -1,8 +1,8 @@
 {
-  "source_commit": "ea741fff436b4eedd2a4b04e2c5ca8a8526c822c",
-  "run_id": 40239736437,
-  "jar_sha256": "967b7e7d344c2f03c0bb0ae58b1d5f65d9e1ed3afdd793a868cdbb804c3728a1",
-  "jar_bytes": 363538,
+  "source_commit": "7158a0e49d62e502e11d04d33103b0197de0c294",
+  "run_id": 40246183037,
+  "jar_sha256": "3eb7824b031bd00c5e644e7c0ffc6ea4ab112ff1642872b1e67b53dbe2fe2d69",
+  "jar_bytes": 364273,
   "approved": true,
   "reviewer": "Codex visual review",
   "reviewed_images": [
@@ -400,5 +400,6 @@
   "limitations": [
     "The screenshots come from the CI client harness. The ghouls instance, its full mod set, shaders, and performance were not tested.",
     "This approval covers rendered visual evidence, not multiplayer balance or every third-party block interaction."
-  ]
+  ],
+  "review_notes": "For run #540, reviewed the current inventory crop and a contact sheet of all 12 Worldbreaker normal/SHIFT runtime captures after replacing its icon with the 32x32 redraw. The new icon renders cleanly with the handheld item model; other visuals are unchanged from the previously reviewed run."
 }
