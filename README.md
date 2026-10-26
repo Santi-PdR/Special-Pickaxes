@@ -50,8 +50,9 @@ La instancia `ghouls` trae Terramity 0.9.8. Su Exodium Pickaxe es tier IV, veloc
 velocidad base 64 o mayor, durabilidad 32.768 y encantabilidad 50; la habilidad de
 herramienta permite extraer bloques picables y menas con tags de Forge.
 
-Exodium, Iridium y Hellspec usan los sprites de Terramity con permiso del
-propietario. La procedencia y SHA-256 están en
+Los sprites de referencia de Exodium, Iridium y Hellspec proceden de
+Terramity y se conservaron con permiso; los iconos usados en juego son
+redibujos propios de 32×32 píxeles. La procedencia y SHA-256 están en
 [TEXTURE_CREDITS.md](src/main/resources/assets/specialpickaxes/TEXTURE_CREDITS.md)
 y [ASSET-PROVENANCE.json](docs/mining-rework/ASSET-PROVENANCE.json).
 
