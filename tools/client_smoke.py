@@ -38,7 +38,7 @@ fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
-proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
+proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set();activation_pending=None
 def capture_screen(path,action=None):
  args=['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(path)]
  if action:args.append(action)
@@ -59,7 +59,7 @@ try:
  progress_id=None
  while time.monotonic()<deadline:
   if os.environ.get('GH_TOKEN') and time.monotonic()>=next_progress:
-   markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
+   markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_','CLIENT_INPUT_','KEY_BINDINGS_REGISTERED'])][-8:]
    payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'in_progress','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
    endpoint=f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs"+(f'/{progress_id}' if progress_id else '')
    report=subprocess.run(['gh','api','--method','PATCH' if progress_id else 'POST',endpoint,'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
@@ -86,9 +86,11 @@ try:
    capture_screen(str(out/('ux-'+id+'.png')))
    capture_screen(str(out/('ux-shift-'+id+'.png')), 'shift')
    press_screen('confirm' if id=='paradox_crucible-regional' else 'activate')
+   activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
+   activation_pending=None
    ux.add(id);i=scenes.index(id)
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
     press_screen('mode')
@@ -107,6 +109,8 @@ try:
   if '[CHAT]' in line and 'SUPREME_COMPLETE' in line:
    capture_screen(str(out/'supreme-complete.png'))
    success=True;break
+  if activation_pending and time.monotonic()-activation_pending>45:
+   raise RuntimeError('Client input did not activate scene '+id+' within 45 seconds')
 finally:
  # PNG originals and JPEG review copies are encoded from the exact same Robot capture.
  import hashlib

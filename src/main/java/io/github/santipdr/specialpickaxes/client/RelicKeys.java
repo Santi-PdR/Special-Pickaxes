@@ -32,8 +32,13 @@ public final class RelicKeys {
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(!edge||mc.screen!=null||mc.player==null)continue;
-            if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable()&&mc.player.getMainHandItem().hasTag()&&mc.player.getMainHandItem().getTag().hasUUID("controlIdentity"))
-                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,mc.player.getMainHandItem().getTag().getUUID("controlIdentity")));
+            var hand=mc.player.getMainHandItem();
+            boolean validTool=hand.getItem() instanceof ArtifactItem item&&item.kind.playable();
+            boolean identity=hand.hasTag()&&hand.getTag().hasUUID("controlIdentity");
+            if(Boolean.getBoolean("specialpickaxes.clientSmoke"))
+                com.mojang.logging.LogUtils.getLogger().info("CLIENT_INPUT_EDGE_{} validTool={} identity={}",a.name(),validTool,identity);
+            if(validTool&&identity&&hand.getItem() instanceof ArtifactItem item)
+                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,hand.getTag().getUUID("controlIdentity")));
         }
     }
     public static void chooseCopy(ArtifactKind source){
