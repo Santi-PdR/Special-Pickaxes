@@ -118,7 +118,7 @@ public final class ArtifactItem extends PickaxeItem {
         ArtifactTooltips.compact(stack,kind,lines);
         // Append the full guide from the item tooltip builder so Minecraft and integrations
         // receive the same Shift content even when a tooltip is queried before rendering.
-        if(level!=null&&level.isClientSide&&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown())
+        if(net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT&&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown())
             ArtifactTooltips.expanded(stack,kind,lines);
     }
 }
