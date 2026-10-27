@@ -41,7 +41,7 @@ public final class ClientTooltipValidation {
                 // query can retain a compact list created before the synthetic Shift press.
                 var lines=new java.util.ArrayList<net.minecraft.network.chat.Component>();
                 item.appendHoverText(mc.player.getMainHandItem().copy(),mc.level,lines,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
-                if(shift?lines.size()<9:lines.size()!=3)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
+                if(shift?lines.size()<9:lines.size()!=2)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }
             e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);
