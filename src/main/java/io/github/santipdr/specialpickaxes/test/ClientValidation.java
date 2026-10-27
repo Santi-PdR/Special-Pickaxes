@@ -35,6 +35,7 @@ public final class ClientValidation {
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
             }
+            if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");}
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
