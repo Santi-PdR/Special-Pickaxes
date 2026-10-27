@@ -35,7 +35,6 @@ public final class ClientValidation {
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
             }
-            if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");setupSupreme(p);}
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
@@ -45,10 +44,13 @@ public final class ClientValidation {
                 if(data.getBoolean("controlActive")&&!WorkQueue.busy(p)&&!data.getBoolean("controlCancelled")){data.putBoolean("controlCancelled",true);p.sendSystemMessage(Component.literal("CONTROL_CANCELLED"));}
                 if(data.getBoolean("controlCancelled")&&!data.getBoolean("supremeSetup")){
                     data.putBoolean("supremeSetup",true);
-                    setupSupreme(p);
+                    beginSupremeSetup(p);
+                }
+                if(data.getBoolean("supremeSetup")&&!data.getBoolean("supremeSetupComplete")&&advanceSupremeSetup(p)){
+                    data.putBoolean("supremeSetupComplete",true);
                     p.sendSystemMessage(Component.literal("SUPREME_READY"));
                 }
-                if(data.getBoolean("supremeSetup")&&WorkQueue.busy(p)&&!data.getBoolean("supremeRunning")){
+                if(data.getBoolean("supremeSetupComplete")&&WorkQueue.busy(p)&&!data.getBoolean("supremeRunning")){
                     data.putBoolean("supremeRunning",true);data.putLong("supremeCenter",ArtifactActions.target(p).orElse(p.blockPosition()).asLong());
                     p.sendSystemMessage(Component.literal("SUPREME_EXECUTING"));
                 }
@@ -103,21 +105,34 @@ public final class ClientValidation {
             }
         }
     }
-    private static void setupSupreme(net.minecraft.server.level.ServerPlayer p){
+        private static void beginSupremeSetup(net.minecraft.server.level.ServerPlayer p){
         ArtifactConfig.PER_PLAYER.set(16);ArtifactConfig.GLOBAL.set(256);
         p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,12000,0,false,false,false));
-        // Clear the approach as well as the workpiece: the disposable server world has
-        // natural terrain, which must not put the actor inside a tree or mountain.
+        // Keep each server tick bounded: synchronous chunk-spanning fixture fills can stall
+        // the integrated server long enough to starve the client gallery and its acknowledgements.
         for(int x=97;x<=103;x++)for(int z=90;z<=99;z++)for(int y=78;y<=84;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
-                    for(int x=92;x<=108;x++)for(int z=100;z<=149;z++)for(int y=76;y<=88;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                    p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
-                    for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                    p.connection.teleport(100.5,81,96.5,0,0);
-                    p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
-                    p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
-                    ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",4);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");
+        for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+        p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
+        p.connection.teleport(100.5,81,96.5,0,0);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
+        p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
+        ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",4);
+        ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");
         p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.fallDistance=0;
         p.getMainHandItem().getOrCreateTag().putInt("artifactMode",4);
+        p.getPersistentData().putInt("supremeFillCursor",0);
     }
-
+    private static boolean advanceSupremeSetup(net.minecraft.server.level.ServerPlayer p){
+        final int zSize=50,ySize=13,total=17*zSize*ySize;
+        int cursor=p.getPersistentData().getInt("supremeFillCursor");
+        int end=Math.min(total,cursor+512);
+        for(int i=cursor;i<end;i++){
+            int x=92+i/(zSize*ySize);
+            int z=100+(i/ySize)%zSize;
+            int y=76+i%ySize;
+            p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+        }
+        p.getPersistentData().putInt("supremeFillCursor",end);
+        return end==total;
+    }
 }
