@@ -37,10 +37,10 @@ public final class ClientTooltipValidation {
             }
             boolean shift=net.minecraft.client.gui.screens.Screen.hasShiftDown();String key=item.kind.id+"-"+io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.modeKey(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))+(shift?"-shift":"-normal");
             if(CHECKED.add(key)){
-                // Query a fresh copy so the validation does not reuse a compact tooltip
-                // that may already have been requested before the synthetic Shift press.
-                var tooltipStack=mc.player.getMainHandItem().copy();
-                var lines=tooltipStack.getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+                // Exercise the item's tooltip builder directly: Minecraft's stack-level tooltip
+                // query can retain a compact list created before the synthetic Shift press.
+                var lines=new java.util.ArrayList<net.minecraft.network.chat.Component>();
+                item.appendHoverText(mc.player.getMainHandItem().copy(),mc.level,lines,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
                 if(shift?lines.size()<9:lines.size()!=3)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }
