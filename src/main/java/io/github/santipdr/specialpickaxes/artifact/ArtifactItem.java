@@ -116,5 +116,9 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public boolean isFoil(ItemStack stack) { return kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.ATLAS; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         ArtifactTooltips.compact(stack,kind,lines);
+        // Append the full guide from the item tooltip builder so Minecraft and integrations
+        // receive the same Shift content even when a tooltip is queried before rendering.
+        if(level!=null&&level.isClientSide&&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown())
+            ArtifactTooltips.expanded(stack,kind,lines);
     }
 }
