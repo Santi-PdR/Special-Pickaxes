@@ -10,9 +10,9 @@ public final class ArtifactTooltips {
     private ArtifactTooltips(){}
     public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):0;}
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
-        lines.add(Component.translatable("tooltip.specialpickaxes.r",
+        lines.add(Component.translatable("tooltip.specialpickaxes.r", Component.keybind("key.specialpickaxes.activate"),
                 Component.translatable("mining.short.specialpickaxes."+k.id)).withStyle(ChatFormatting.GRAY));
-        lines.add(Component.translatable("tooltip.specialpickaxes.x",
+        lines.add(Component.translatable("tooltip.specialpickaxes.x", Component.keybind("key.specialpickaxes.alt_skill"),
                 Component.translatable("alternate.specialpickaxes."+k.id)).withStyle(ChatFormatting.AQUA));
         if(k==ArtifactKind.WORLDBREAKER&&stack.hasTag()&&stack.getTag().contains("copiedSkill")){
             String source=stack.getTag().getString("copiedSkill");
