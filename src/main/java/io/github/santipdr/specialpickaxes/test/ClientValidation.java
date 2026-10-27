@@ -53,7 +53,7 @@ public final class ClientValidation {
                     p.sendSystemMessage(Component.literal("SUPREME_EXECUTING"));
                 }
                 if(data.getBoolean("supremeRunning")&&!WorkQueue.busy(p)&&!data.getBoolean("supremeDone")){
-                    data.putBoolean("supremeDone",true);ArtifactConfig.PER_PLAYER.set(24);
+                    data.putBoolean("supremeDone",true);// Higher CI throughput is configured before the long World Shatter work queue starts.
                     if(!p.serverLevel().getBlockState(new BlockPos(100,82,100)).isAir()
                         ||!p.serverLevel().getBlockState(new BlockPos(112,82,140)).isAir()
                         ||!p.serverLevel().getBlockState(new BlockPos(112,82,100)).is(net.minecraft.world.level.block.Blocks.STONE)
@@ -104,11 +104,12 @@ public final class ClientValidation {
         }
     }
     private static void setupSupreme(net.minecraft.server.level.ServerPlayer p){
+        ArtifactConfig.PER_PLAYER.set(16);ArtifactConfig.GLOBAL.set(256);
         p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,12000,0,false,false,false));
         // Clear the approach as well as the workpiece: the disposable server world has
         // natural terrain, which must not put the actor inside a tree or mountain.
-        for(int x=76;x<=124;x++)for(int z=90;z<=99;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
-                    for(int x=76;x<=124;x++)for(int z=100;z<=151;z++)for(int y=75;y<=95;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+        for(int x=97;x<=103;x++)for(int z=90;z<=99;z++)for(int y=78;y<=84;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                    for(int x=92;x<=108;x++)for(int z=100;z<=149;z++)for(int y=76;y<=88;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
                     p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
                     for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
                     p.connection.teleport(100.5,81,96.5,0,0);
