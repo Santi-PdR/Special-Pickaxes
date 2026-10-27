@@ -1,12 +1,10 @@
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 
-/** CI-only screen helper. Never packaged in the mod. */
+/** CI-only screenshot helper. Never packaged in the mod. */
 class CaptureScreen {
     private static int key(String action) {
         return switch (action) {
@@ -44,36 +42,14 @@ class CaptureScreen {
     public static void main(String[] args) throws Exception {
         var bounds = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         var robot = new Robot();
-        if (args.length > 0 && args[0].equals("--server")) {
-            try (var input = new BufferedReader(new InputStreamReader(System.in))) {
-                String line;
-                while ((line = input.readLine()) != null) {
-                    if (line.equals("exit")) return;
-                    String[] parts = line.split("\\t", -1);
-                    try {
-                        if (parts[0].equals("press") && parts.length == 2) {
-                            run(robot, bounds, "press", null, parts[1]);
-                        } else if (parts[0].equals("capture") && parts.length == 3 && !parts[1].isEmpty()) {
-                            run(robot, bounds, "capture", parts[1], parts[2]);
-                        } else {
-                            throw new IllegalArgumentException("Malformed screen-helper command");
-                        }
-                        System.out.println("OK");
-                    } catch (Throwable error) {
-                        System.err.println("Screen helper command failed: " + error);
-                        System.out.println("ERROR");
-                    }
-                    System.out.flush();
-                }
-            }
-            return;
-        }
         String action = args.length > 1 ? args[1] : null;
         String path = args.length > 0 ? args[0] : null;
         if ("--press".equals(path)) {
             run(robot, bounds, "press", null, action);
+            System.exit(0);
         } else if (path != null) {
             run(robot, bounds, "capture", path, action);
+            System.exit(0);
         }
     }
 }

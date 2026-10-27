@@ -38,26 +38,23 @@ fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
-proc=None;capture_process=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
+proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
 def capture_screen(path,action=None):
- capture_process.stdin.write('capture\t'+str(path)+'\t'+(action or '')+'\n');capture_process.stdin.flush()
- response=capture_process.stdout.readline().strip()
- if response!='OK':raise RuntimeError('Persistent screenshot helper failed: '+response)
+ args=['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(path)]
+ if action:args.append(action)
+ subprocess.run(args,env=env,check=True,timeout=20)
 def press_screen(action):
- capture_process.stdin.write('press\t'+action+'\n');capture_process.stdin.flush()
- response=capture_process.stdout.readline().strip()
- if response!='OK':raise RuntimeError('Persistent keyboard helper failed: '+response)
+ subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press',action],env=env,check=True,timeout=20)
 try:
  for _ in range(100):
   if pathlib.Path('/tmp/.X11-unix/X99').exists():break
   if xvfb.poll() is not None:raise RuntimeError('Xvfb failed to start')
   time.sleep(0.1)
- capture_process=subprocess.Popen(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--server'],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=open(out/'capture-helper.log','w'),text=True,bufsize=1)
  proc=subprocess.Popen(['./gradlew','runClient','-PclientSmoke','--stacktrace'],env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,bufsize=1,start_new_session=True)
  def read():
   for line in proc.stdout:lines.put(line)
  threading.Thread(target=read,daemon=True).start()
- deadline=time.monotonic()+540
+ deadline=time.monotonic()+1100
  next_progress=time.monotonic()+45
  progress_id=None
  while time.monotonic()<deadline:
@@ -115,12 +112,6 @@ finally:
  import hashlib
  manifest=[{'original':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'review_copy':p.with_suffix('.jpg').name,'review_sha256':hashlib.sha256(p.with_suffix('.jpg').read_bytes()).hexdigest()} for p in out.glob('*.png') if p.with_suffix('.jpg').exists()]
  (out/'image-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
- # Stop the persistent screen helper before closing Xvfb.
- if capture_process and capture_process.poll() is None:
-  try:
-   capture_process.stdin.write('exit\n');capture_process.stdin.flush();capture_process.wait(timeout=10)
-  except (BrokenPipeError,subprocess.TimeoutExpired):
-   capture_process.terminate();capture_process.wait(timeout=5)
  # Save the runtime log BEFORE the intentional termination of the disposable graphical client.
  latest=root/'run/logs/latest.log'
  if latest.exists():shutil.copy2(latest,out/'client.log')
