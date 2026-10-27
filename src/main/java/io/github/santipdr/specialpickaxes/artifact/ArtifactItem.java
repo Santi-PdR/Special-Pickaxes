@@ -15,6 +15,7 @@ import java.util.List;
 
 public final class ArtifactItem extends PickaxeItem {
     public final ArtifactKind kind;
+    private static final java.util.Set<String> TOOLTIP_PROBES=new java.util.HashSet<>();
     public ArtifactItem(ArtifactKind kind) {
         super(SpecialPickaxes.TIER,12,-2.4F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.IRIDIUM||kind==ArtifactKind.HELLSPEC?Rarity.EPIC:Rarity.RARE));this.kind=kind;
     }
@@ -116,9 +117,12 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public boolean isFoil(ItemStack stack) { return kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.ATLAS; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         ArtifactTooltips.compact(stack,kind,lines);
-        // Append the full guide from the item tooltip builder so Minecraft and integrations
-        // receive the same Shift content even when a tooltip is queried before rendering.
-        if(net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT&&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown())
-            ArtifactTooltips.expanded(stack,kind,lines);
+        boolean client=net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT;
+        boolean shift=client&&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown();
+        if(Boolean.getBoolean("specialpickaxes.clientSmoke")){
+            String probe=kind.id+":"+client+":"+shift+":"+(level==null);
+            if(TOOLTIP_PROBES.add(probe))com.mojang.logging.LogUtils.getLogger().info("ARTIFACT_TOOLTIP_PROBE {}",probe);
+        }
+        if(shift)ArtifactTooltips.expanded(stack,kind,lines);
     }
 }
