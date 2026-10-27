@@ -16,6 +16,7 @@ import java.util.List;
 public final class ArtifactItem extends PickaxeItem {
     public final ArtifactKind kind;
     private static final java.util.Set<String> TOOLTIP_PROBES=new java.util.HashSet<>();
+    private static final java.util.Set<String> TOOLTIP_EXPANSIONS=new java.util.HashSet<>();
     public ArtifactItem(ArtifactKind kind) {
         super(SpecialPickaxes.TIER,12,-2.4F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.IRIDIUM||kind==ArtifactKind.HELLSPEC?Rarity.EPIC:Rarity.RARE));this.kind=kind;
     }
@@ -123,6 +124,13 @@ public final class ArtifactItem extends PickaxeItem {
             String probe=kind.id+":"+client+":"+shift+":"+(level==null);
             if(TOOLTIP_PROBES.add(probe))com.mojang.logging.LogUtils.getLogger().info("ARTIFACT_TOOLTIP_PROBE {}",probe);
         }
-        if(shift)ArtifactTooltips.expanded(stack,kind,lines);
+        if(shift){
+            int before=lines.size();
+            ArtifactTooltips.expanded(stack,kind,lines);
+            if(Boolean.getBoolean("specialpickaxes.clientSmoke")){
+                String probe=kind.id+":"+before+"->"+lines.size();
+                if(TOOLTIP_EXPANSIONS.add(probe))com.mojang.logging.LogUtils.getLogger().info("ARTIFACT_TOOLTIP_EXPANDED {}",probe);
+            }
+        }
     }
 }
