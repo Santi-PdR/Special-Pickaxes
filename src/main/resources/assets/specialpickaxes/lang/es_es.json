@@ -1,7 +1,7 @@
 {
   "itemGroup.specialpickaxes": "Special Pickaxes — Artefactos",
   "effect.specialpickaxes.dominion": "Stasis",
-  "tooltip.specialpickaxes.controls": "R: usar / analizar / confirmar / pausar / reanudar / cancelar dominio · X: técnica / cancelar selección o excavación · C: modo · I: manual",
+  "tooltip.specialpickaxes.controls": "%s: usar / analizar / confirmar / pausar / reanudar / cancelar dominio · %s: técnica / cancelar selección o excavación · %s: modo · %s: manual",
   "message.specialpickaxes.cancelled": "Operación cancelada.",
   "message.specialpickaxes.mode": "Estado secundario %s.",
   "message.specialpickaxes.no_target": "Sin operación válida: revisa objetivo, memoria, anclas o material.",
