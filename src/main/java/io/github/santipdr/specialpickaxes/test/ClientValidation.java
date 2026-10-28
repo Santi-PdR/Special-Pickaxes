@@ -131,6 +131,7 @@ public final class ClientValidation {
         for(int x=97;x<=103;x++)for(int z=90;z<=99;z++)for(int y=78;y<=84;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
         for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
         p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
+        p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,151),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
         p.connection.teleport(100.5,81,96.5,0,0);
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
         p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
