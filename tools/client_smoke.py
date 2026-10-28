@@ -18,7 +18,11 @@ execute as @a[scores={artifactAge=1}] run tp @s 0 65 14 180 -14
 execute as @a[tag=!artifact_gallery,scores={artifactAge=60..}] run function artifact_gallery:setup
 ''')
 from mining_catalog import IDS as ids, MODES
-scenes=[id+'-'+mode for id in ids for mode in MODES[id]]
+# Keep the display gallery order from the asset catalog, but drive captures in
+# ArtifactKind enum order so the server and client agree on every acknowledgement index.
+scene_ids=['palimpsest','fault_choir','eventide','paradox_crucible','interregnum','worldloom','icarus','hollow_axiom','exodium','iridium','hellspec','worldbreaker','seam_ripper']
+if set(scene_ids)!=set(ids):raise SystemExit('Client scene order no longer covers the full playable pickaxe catalog')
+scenes=[id+'-'+mode for id in scene_ids for mode in MODES[id]]
 commands=['tag @s add artifact_gallery','fill -9 65 0 9 74 16 minecraft:air','fill -9 64 -1 9 64 17 minecraft:polished_andesite','fill -9 65 0 9 74 0 minecraft:black_concrete','fill -9 74 0 9 74 16 minecraft:sea_lantern','time set noon','weather clear','gamerule doDaylightCycle false','gamerule doMobSpawning false','tp @s 0 65 14 180 -14','clear @s']
 for i,id in enumerate(ids):
  x=-6+(i%5)*3;y=72.5-(i//5)*2.1
