@@ -17,7 +17,14 @@ with zipfile.ZipFile(jar) as z:
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
  assert len([n for n in z.namelist() if '/models/item/' in n and n.endswith('.json')])==len(ids)
- assert len([n for n in z.namelist() if '/textures/item/' in n and n.endswith('.png')])==len(ids)
+ runtime_textures=set()
+ for id in ids:
+  model=json.loads(z.read(f'assets/specialpickaxes/models/item/{id}.json'))
+  namespace,resource=model['textures']['layer0'].split(':',1)
+  assert namespace=='specialpickaxes'
+  runtime_textures.add(f'assets/{namespace}/textures/{resource}.png')
+ assert len(runtime_textures)==len(ids)
+ assert runtime_textures<=set(z.namelist()),f'Missing runtime item textures: {runtime_textures-set(z.namelist())}'
  effect_ids=re.findall(r'EFFECTS\.register\("([^"]+)"',(root/'src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java').read_text())
  assert effect_ids,'No registered mob effects found'
  for effect_id in effect_ids:

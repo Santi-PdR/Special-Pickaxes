@@ -18,7 +18,11 @@ execute as @a[scores={artifactAge=1}] run tp @s 0 65 14 180 -14
 execute as @a[tag=!artifact_gallery,scores={artifactAge=60..}] run function artifact_gallery:setup
 ''')
 from mining_catalog import IDS as ids, MODES
-scenes=[id+'-'+mode for id in ids for mode in MODES[id]]
+# Keep the display gallery order from the asset catalog, but drive captures in
+# ArtifactKind enum order so the server and client agree on every acknowledgement index.
+scene_ids=['palimpsest','fault_choir','eventide','paradox_crucible','interregnum','worldloom','icarus','hollow_axiom','exodium','iridium','hellspec','worldbreaker','seam_ripper']
+if set(scene_ids)!=set(ids):raise SystemExit('Client scene order no longer covers the full playable pickaxe catalog')
+scenes=[id+'-'+mode for id in scene_ids for mode in MODES[id]]
 commands=['tag @s add artifact_gallery','fill -9 65 0 9 74 16 minecraft:air','fill -9 64 -1 9 64 17 minecraft:polished_andesite','fill -9 65 0 9 74 0 minecraft:black_concrete','fill -9 74 0 9 74 16 minecraft:sea_lantern','time set noon','weather clear','gamerule doDaylightCycle false','gamerule doMobSpawning false','tp @s 0 65 14 180 -14','clear @s']
 for i,id in enumerate(ids):
  x=-6+(i%5)*3;y=72.5-(i//5)*2.1
@@ -38,7 +42,13 @@ fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
-proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set()
+proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set();activation_pending=None
+def capture_screen(path,action=None):
+ args=['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(path)]
+ if action:args.append(action)
+ subprocess.run(args,env=env,check=True,timeout=20)
+def press_screen(action):
+ subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press',action],env=env,check=True,timeout=20)
 try:
  for _ in range(100):
   if pathlib.Path('/tmp/.X11-unix/X99').exists():break
@@ -48,13 +58,13 @@ try:
  def read():
   for line in proc.stdout:lines.put(line)
  threading.Thread(target=read,daemon=True).start()
- deadline=time.monotonic()+540
+ deadline=time.monotonic()+1100
  next_progress=time.monotonic()+45
  progress_id=None
  while time.monotonic()<deadline:
   if os.environ.get('GH_TOKEN') and time.monotonic()>=next_progress:
-   markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_'])][-8:]
-   payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'completed','conclusion':'neutral','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
+   markers=[s.strip() for s in captured if any(m in s for m in ['ARTIFACT_UX_READY_','SCENE_ACTIVATED_','SUPREME_','CONTROL_','CLIENT_INPUT_','KEY_BINDINGS_REGISTERED'])][-8:]
+   payload={'name':'Live client diagnostics','head_sha':os.environ['GITHUB_SHA'],'status':'in_progress','output':{'title':'Disposable client progress (not release approval)','summary':f"Run {os.environ['GITHUB_RUN_ID']}; captures={len(list(out.glob('*.png')))}; activated scenes={len(ux)}",'text':'\n'.join(markers) or 'Waiting for client gallery'}}
    endpoint=f"repos/{os.environ['GITHUB_REPOSITORY']}/check-runs"+(f'/{progress_id}' if progress_id else '')
    report=subprocess.run(['gh','api','--method','PATCH' if progress_id else 'POST',endpoint,'--input','-'],input=json.dumps(payload),text=True,capture_output=True,timeout=20)
    if report.returncode==0:progress_id=json.loads(report.stdout)['id']
@@ -67,40 +77,44 @@ try:
    captured.append(line);print(line,end='')
    if '[CHAT]' in line and 'ARTIFACT_CLIENT_SMOKE_READY' in line:ready=time.monotonic()
   if ready and not gallery_done and time.monotonic()-ready>8:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery.png')],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-clean.png'),'clean'],env=env,check=True,timeout=20)
+   capture_screen(str(out/'gallery.png'))
+   capture_screen(str(out/'gallery-clean.png'), 'clean')
    # F1 is toggled back so subsequent screenshots include real tooltips and HUD.
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'gallery-hud.png'),'clean'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory.png'),'inventory'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'inventory-closed.png'),'inventory'],env=env,check=True,timeout=20)
+   capture_screen(str(out/'gallery-hud.png'), 'clean')
+   capture_screen(str(out/'inventory.png'), 'inventory')
+   capture_screen(str(out/'inventory-closed.png'), 'inventory')
    gallery_done=True;gallery_flag.write_text("ready")
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-'+id+'.png'))],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('ux-shift-'+id+'.png')),'shift'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('execution-'+id+'.png')),'confirm' if id=='paradox_crucible-regional' else 'activate'],env=env,check=True,timeout=20)
+   capture_screen(str(out/('ux-'+id+'.png')))
+   capture_screen(str(out/('ux-shift-'+id+'.png')), 'shift')
+   press_screen('confirm' if id=='paradox_crucible-regional' else 'activate')
+   activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
+   activation_pending=None
    ux.add(id);i=scenes.index(id)
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
-    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('mode-switch-'+scenes[i+1]+'.png')),'mode'],env=env,check=True,timeout=20)
+    press_screen('mode')
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'third-person.png'),'third'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-activate.png'),'activate'],env=env,check=True,timeout=20)
+   capture_screen(str(out/'third-person.png'), 'third')
+   capture_screen(str(out/'control-activate.png'), 'activate')
   if '[CHAT]' in line and 'CONTROL_ACTIVE' in line:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'control-cancel.png'),'cancel'],env=env,check=True,timeout=20)
+   capture_screen(str(out/'control-cancel.png'), 'cancel')
   if '[CHAT]' in line and 'SUPREME_READY' in line:
    # Return from the control-test third-person view to first person for an unobscured cut.
    for view in ['front','first']:
-    subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/('supreme-camera-'+view+'.png')),'third'],env=env,check=True,timeout=20)
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-executing.png'),'activate'],env=env,check=True,timeout=20)
+    capture_screen(str(out/('supreme-camera-'+view+'.png')), 'third')
+   capture_screen(str(out/'supreme-executing.png'), 'activate')
   if '[CHAT]' in line and 'SUPREME_COMPLETE' in line:
-   subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(out/'supreme-complete.png')],env=env,check=True,timeout=20)
+   capture_screen(str(out/'supreme-complete.png'))
    success=True;break
+  if activation_pending and time.monotonic()-activation_pending>45:
+   raise RuntimeError('Client input did not activate scene '+id+' within 45 seconds')
 finally:
  # PNG originals and JPEG review copies are encoded from the exact same Robot capture.
  import hashlib

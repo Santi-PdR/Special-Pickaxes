@@ -15,10 +15,21 @@ public final class RelicNetwork {
     public record CopyChoice(ArtifactKind source,long sequence,java.util.UUID toolIdentity){}
     private static final java.util.Map<java.util.UUID,Long> SEEN=new java.util.HashMap<>();
     public static boolean accept(net.minecraft.server.level.ServerPlayer p,Intent intent){
-        if(intent.sequence()<=0||intent.sequence()<=SEEN.getOrDefault(p.getUUID(),0L))return false;
+        boolean smoke=Boolean.getBoolean("specialpickaxes.clientSmoke");
+        if(intent.sequence()<=0||intent.sequence()<=SEEN.getOrDefault(p.getUUID(),0L)){
+            if(smoke)com.mojang.logging.LogUtils.getLogger().info("CLIENT_INPUT_SERVER_REJECT_SEQUENCE_{} seq={}",intent.action(),intent.sequence());
+            return false;
+        }
         SEEN.put(p.getUUID(),intent.sequence());
-        var tool=p.getMainHandItem();if(!tool.hasTag()||!tool.getTag().hasUUID("controlIdentity")||!tool.getTag().getUUID("controlIdentity").equals(intent.toolIdentity()))return false;
-        return RelicControl.execute(p,intent.kind(),intent.action());
+        var tool=p.getMainHandItem();
+        boolean identity=tool.hasTag()&&tool.getTag().hasUUID("controlIdentity")&&tool.getTag().getUUID("controlIdentity").equals(intent.toolIdentity());
+        if(!identity){
+            if(smoke)com.mojang.logging.LogUtils.getLogger().info("CLIENT_INPUT_SERVER_REJECT_IDENTITY_{} item={}",intent.action(),tool.getItem());
+            return false;
+        }
+        boolean accepted=RelicControl.execute(p,intent.kind(),intent.action());
+        if(smoke)com.mojang.logging.LogUtils.getLogger().info("CLIENT_INPUT_SERVER_RESULT_{} accepted={}",intent.action(),accepted);
+        return accepted;
     }
     public static boolean acceptCopy(net.minecraft.server.level.ServerPlayer p,CopyChoice choice){
         if(choice.sequence()<=0||choice.sequence()<=SEEN.getOrDefault(p.getUUID(),0L))return false;

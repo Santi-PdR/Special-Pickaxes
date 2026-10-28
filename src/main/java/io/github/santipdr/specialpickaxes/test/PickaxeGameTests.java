@@ -1895,20 +1895,20 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_60") public static void iridiumRecallUsesExtendedRangeAndOnlyPullsOwnedOreDrops(GameTestHelper h){
         var wearer=player(h,ArtifactKind.IRIDIUM,"IridiumRecall");var level=h.getLevel();var origin=wearer.position();
-        var near=new ItemEntity(level,origin.x+10D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
+        var near=new ItemEntity(level,origin.x+1D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
         near.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);near.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
         var beyond=new ItemEntity(level,origin.x+50D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
         beyond.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);beyond.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
         var unrelated=new ItemEntity(level,origin.x+8D,origin.y+.5D,origin.z,new ItemStack(Items.ROTTEN_FLESH));
         unrelated.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);
         unrelated.getPersistentData().putUUID("specialpickaxesIridiumOwner",UUID.randomUUID());
-        var farOwned=new ItemEntity(level,origin.x+47D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
+        var farOwned=new ItemEntity(level,origin.x+8.5D,origin.y+.5D,origin.z,new ItemStack(Items.DIAMOND));
         farOwned.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);farOwned.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
         level.getChunkAt(farOwned.blockPosition());
         level.addFreshEntity(farOwned);
         var nearerDrops=new java.util.ArrayList<ItemEntity>();
         for(int i=0;i<95;i++){
-            var item=new ItemEntity(level,origin.x+12D+(i%10)*.5D,origin.y+.5D,origin.z+(i/10)*2.5D,new ItemStack(Items.DIAMOND));
+            var item=new ItemEntity(level,origin.x+2D+(i%10)*.5D,origin.y+.5D,origin.z+(i/10)*.5D,new ItemStack(Items.DIAMOND));
             item.getItem().getOrCreateTag().putInt("testDropIndex",i);
             item.getPersistentData().putBoolean("specialpickaxesIridiumOreDrop",true);item.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
             level.getChunkAt(item.blockPosition());
@@ -1923,6 +1923,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(wearer,unrelated,center,48D),"another player's ore drop is excluded");
         long visibleOwned=level.getEntitiesOfClass(ItemEntity.class,wearer.getBoundingBox().inflate(48D),
                 item->ArtifactTechniques.isIridiumRecallTarget(wearer,item,center,48D)).size();
+        h.assertTrue(visibleOwned==97,"the recall fixture exposes all 97 owned drops before applying its 96-item cap (visible="+visibleOwned+")");
         h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM),"Iridium recall activates without requiring a target block");
         h.assertTrue(near.getDeltaMovement().x<-.5D,"an owned ore drop in the active test zone accelerates to the wearer");
         h.assertTrue(!farOwned.isCurrentlyGlowing(),"the 96-item cap leaves the farthest eligible drop untouched");
