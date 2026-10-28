@@ -134,13 +134,13 @@ public final class ClientValidation {
         p.getPersistentData().putInt("supremeFillCursor",0);
     }
     private static boolean advanceSupremeSetup(net.minecraft.server.level.ServerPlayer p){
-        final int zSize=50,ySize=13,total=17*zSize*ySize;
+        final int xSize=49,zSize=50,ySize=21,total=xSize*zSize*ySize;
         int cursor=p.getPersistentData().getInt("supremeFillCursor");
         int end=Math.min(total,cursor+512);
         for(int i=cursor;i<end;i++){
-            int x=92+i/(zSize*ySize);
+            int x=76+i/(zSize*ySize);
             int z=100+(i/ySize)%zSize;
-            int y=76+i%ySize;
+            int y=75+i%ySize;
             p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
         }
         p.getPersistentData().putInt("supremeFillCursor",end);
