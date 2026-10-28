@@ -28,7 +28,6 @@ public final class RelicKeys {
             else {var equipped=CuriosCompat.find(mc.player);if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)mc.setScreen(new ArtifactManualScreen(item.kind));}
         }
         for(var a:RelicControl.Action.values()){
-            if(a==RelicControl.Action.CONFIRM||a==RelicControl.Action.PAUSE||a==RelicControl.Action.SELECT||a==RelicControl.Action.CANCEL)continue;
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(!edge||mc.screen!=null||mc.player==null)continue;

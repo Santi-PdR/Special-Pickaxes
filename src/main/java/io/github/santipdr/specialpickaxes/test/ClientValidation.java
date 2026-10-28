@@ -39,8 +39,18 @@ public final class ClientValidation {
             ticks++;if(ticks<240)continue;
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
-                if(index==SCENES.size()&&phase==0)p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));
                 var data=p.getPersistentData();
+                if(!data.getBoolean("controlFixtureReady")){
+                    if(!data.getBoolean("controlFixtureStarted")){
+                        data.putBoolean("controlFixtureStarted",true);
+                        beginSupremeSetup(p);
+                    }
+                    if(advanceSupremeSetup(p)){
+                        data.putBoolean("controlFixtureReady",true);
+                        p.sendSystemMessage(Component.literal("ARTIFACT_UX_COMPLETE"));
+                    }
+                    return;
+                }
                 if(WorkQueue.busy(p)&&!data.getBoolean("controlActive")){data.putBoolean("controlActive",true);WorkQueue.togglePause(p);p.sendSystemMessage(Component.literal("CONTROL_ACTIVE"));}
                 if(data.getBoolean("controlActive")&&!WorkQueue.busy(p)&&!data.getBoolean("controlCancelled")){data.putBoolean("controlCancelled",true);p.sendSystemMessage(Component.literal("CONTROL_CANCELLED"));}
                 if(data.getBoolean("controlCancelled")&&!data.getBoolean("supremeSetup")){
