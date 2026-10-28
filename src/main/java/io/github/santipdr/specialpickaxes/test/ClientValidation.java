@@ -67,11 +67,18 @@ public final class ClientValidation {
                 }
                 if(data.getBoolean("supremeRunning")&&!WorkQueue.busy(p)&&!data.getBoolean("supremeDone")){
                     data.putBoolean("supremeDone",true);// Higher CI throughput is configured before the long World Shatter work queue starts.
-                    if(!p.serverLevel().getBlockState(new BlockPos(100,82,100)).isAir()
-                        ||!p.serverLevel().getBlockState(new BlockPos(112,82,140)).isAir()
-                        ||!p.serverLevel().getBlockState(new BlockPos(112,82,100)).is(net.minecraft.world.level.block.Blocks.STONE)
-                        ||!p.serverLevel().getBlockState(new BlockPos(100,82,150)).is(net.minecraft.world.level.block.Blocks.BEDROCK)
-                        ||!p.serverLevel().getBlockState(new BlockPos(100,82,151)).is(net.minecraft.world.level.block.Blocks.STONE))throw new IllegalStateException("Supreme wedge geometry or barrier failed");
+                    var center=BlockPos.of(data.getLong("supremeCenter"));
+                    var centerState=p.serverLevel().getBlockState(new BlockPos(100,82,100));
+                    var wedgeState=p.serverLevel().getBlockState(new BlockPos(112,82,140));
+                    var outsideState=p.serverLevel().getBlockState(new BlockPos(112,82,100));
+                    var bedrockState=p.serverLevel().getBlockState(new BlockPos(100,82,150));
+                    var barrierState=p.serverLevel().getBlockState(new BlockPos(100,82,151));
+                    String geometry="center="+center+" states="+centerState+","+wedgeState+","+outsideState+","+bedrockState+","+barrierState;
+                    if(!centerState.isAir()||!wedgeState.isAir()||!outsideState.is(net.minecraft.world.level.block.Blocks.STONE)
+                        ||!bedrockState.is(net.minecraft.world.level.block.Blocks.BEDROCK)||!barrierState.is(net.minecraft.world.level.block.Blocks.STONE)){
+                        p.sendSystemMessage(Component.literal("SUPREME_GEOMETRY_FAILED "+geometry));
+                        throw new IllegalStateException("Supreme wedge geometry or barrier failed: "+geometry);
+                    }
                     int removed=0;for(int x=76;x<=124;x++)for(int z=100;z<150;z++)for(int y=75;y<=95;y++)if(p.serverLevel().getBlockState(new BlockPos(x,y,z)).isAir())removed++;
                     if(removed<=4096)throw new IllegalStateException("Supreme excavation truncated: "+removed);
                     p.sendSystemMessage(Component.literal("SUPREME_REMOVED_BLOCKS_"+removed));
