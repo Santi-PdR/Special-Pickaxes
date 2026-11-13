@@ -187,3 +187,8 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Manifiesto de esa fuente: `special-pickaxes-1.20.1-5.10.414.jar`, 525972 bytes, SHA256 `690976b34add7ec8775ffb18565822219370928f40fe0ff1062d2155f09ef8a1`. Es metadato comprobado del bundle, no descarga local/instalación del JAR ni autorización para publicación.
 - Inspeccionadas únicamente tres capturas: `ux-shift-interregnum-domain.jpg`, `ux-shift-iridium-orefall.jpg`, `supreme-complete.jpg`. Tool HUD/iconos visibles; en el resultado supremo aparece un mensaje de acción «Operación cancelada», aunque el harness informa 9341 bloques y finalización. No se atribuye causa ni se aprueba visualmente la galería completa. Algunas partículas de primer plano ocupan bastante pantalla; requiere evaluación visual más amplia antes de ajustar tamaños.
 - 5.10.416 sigue pendiente de su propio CI `43450387194`, fuente `3e4eecb7609fe6d352e69908cfb3291b92931fdc`. Monitor `ci-de-special-pickaxes-5-10-416-d1dbf4dc`.
+
+### Avance confirmado posterior
+
+- 5.10.415 `43449061170` completed/success según API. No se inspeccionó su galería ni se instaló su binario.
+- 5.10.416 fuente `3e4eecb`, run `43450387194`: pasos 10–17 success (build/JUnit, verificación JAR, seguridad JAR, 202 GameTests completos, servidor empaquetado, scanner de logs y dependencias cliente). Cliente real aún in_progress; sin resultado global conocido. Estas pruebas sí corresponden al cambio de Estasis, no se heredan de 414.

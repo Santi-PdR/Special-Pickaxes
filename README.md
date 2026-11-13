@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.416 — Estasis revalida cada fijación; pendiente de CI.** Tanto el dominio
+**5.10.416 — Estasis revalida cada fijación; build/JUnit, 202 GameTests, servidor y logs correctos en CI; cliente pendiente.** Tanto el dominio
 como el pulso comprueban objetivo, alianzas, dimensión, herramienta y claims antes
 de volver a fijar una entidad, incluido el permiso del punto de retorno. La
 liberación restaura velocidad acotada sin teletransportar, y no escribe movimiento
