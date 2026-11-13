@@ -316,28 +316,35 @@ public final class ArtifactTechniques {
         if(!level.hasChunkAt(center)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,center))return false;
         Vec3 origin=new Vec3(center.getX()+.5D,center.getY()+.65D,center.getZ()+.5D);
         double radius=5D;
+        var tool=player.getMainHandItem();
         var targets=EntitySelection.nearest(level,LivingEntity.class,
-                new net.minecraft.world.phys.AABB(center).inflate(radius,4D,radius),entity->{
-            if(!entity.isAlive()||entity==player||entity.isAlliedTo(player)
-                    ||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,entity.blockPosition())
-                    ||entity instanceof Player other&&!player.canHarmPlayer(other)
-                    ||!player.hasLineOfSight(entity))return false;
-            Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5D,0).subtract(origin);
-            return delta.x*delta.x+delta.z*delta.z<=radius*radius&&Math.abs(delta.y)<=4D;
-        },origin,8,512);
-        if(targets.isEmpty())return false;
-        ArtifactFeedback.magmaEruption(player,center,targets);
+                new net.minecraft.world.phys.AABB(center).inflate(radius,4D,radius),
+                entity->eruptionTarget(player,entity,origin,radius),origin,8,512);
+        var affected=new ArrayList<LivingEntity>();
         for(var target:targets){
+            var at=target.blockPosition();
+            if(!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,at)
+                    ||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty()
+                    ||!target.blockPosition().equals(at)||!eruptionTarget(player,target,origin,radius))continue;
             Vec3 away=target.position().subtract(origin);Vec3 horizontal=new Vec3(away.x,0,away.z);
             if(horizontal.lengthSqr()<1.0E-4D)horizontal=new Vec3(0,0,1);
             else horizontal=horizontal.normalize();
             target.setDeltaMovement(target.getDeltaMovement().scale(.2D).add(horizontal.scale(.38D)).add(0,.95D,0));
             target.hasImpulse=true;target.setSecondsOnFire(3);
             target.hurt(level.damageSources().playerAttack(player),5F);
-            MagmaBrandEffect.applyFrom(player,target,80,0);
+            MagmaBrandEffect.applyFrom(player,target,80,0);affected.add(target);
         }
-        ArtifactFeedback.message(player,"magma_eruption",targets.size());
+        if(affected.isEmpty())return false;
+        ArtifactFeedback.magmaEruption(player,center,affected);
+        ArtifactFeedback.message(player,"magma_eruption",affected.size());
         return true;
+    }
+    private static boolean eruptionTarget(ServerPlayer player,LivingEntity entity,Vec3 origin,double radius){
+        if(!player.isAlive()||!entity.isAlive()||entity.isRemoved()||entity.level()!=player.level()
+                ||entity==player||entity.isAlliedTo(player)||entity instanceof Player other&&!player.canHarmPlayer(other)
+                ||!player.hasLineOfSight(entity))return false;
+        Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5D,0).subtract(origin);
+        return delta.x*delta.x+delta.z*delta.z<=radius*radius&&Math.abs(delta.y)<=4D;
     }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {

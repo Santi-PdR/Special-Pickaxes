@@ -201,3 +201,12 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Cinco GameTests añadidos (135–139), pendientes de CI: cancelación en rotura nativa, sustitución sin borrado/ejecución vieja, clear+tick recursivo, pausa durante apply y reentrada desde loaded de programa regional. Total 207 en fuente.
 - Validación local ejecutada: 22 recursos + 28 Python correctos, parser 124 Java sin errores, diff-check y scan de secretos correctos. No compilación/pruebas Java locales ni instalación Windows. No cambio de tier, fuerza, presupuestos ni recetas.
 - Run 5.10.416 `43450387194` aún en capturas reales de cliente al consultar; build/JUnit, 202 GameTests, servidor/logs ya confirmados, resultado global pendiente.
+
+## Hellspec — 5.10.418
+
+- Se detectó que Magma Brand conservaba su UUID caster cuando un efecto externo sustituía la instancia; el pulso podía dañarla como propia o borrarla por completo al perder permisos el caster. Ahora exige el fingerprint combat lease antes y después del callback de permiso, limpia solo atribución obsoleta y usa cleanup conservador sin `removeEffect` incondicional.
+- Otro portador no puede reatribuir/mejorar una marca activa de otro caster. La comprobación de daño revalida estado vivo, dimensión, PvP/alianza y posición tras el permiso.
+- Erupción: selección geométrica sin eventos en el predicado; cada objetivo pasa permiso y revalidación completa justo antes de daño/ignición/lanzamiento. Si todos dejan de ser válidos devuelve false; partículas y mensaje usan únicamente la lista afectada. Preserva daño 5, radio 5, cap 8, velocidad/ignición y marca de 80 ticks.
+- Cuatro GameTests añadidos (140–143), pendientes de CI: preservar reemplazo externo sin daño, propiedad del caster original, reemplazo durante callback, objetivo movido durante permiso sin efectos residuales. Total de fuente 211 GameTests.
+- Validación local ejecutada: 22 recursos + 28 Python, parser 124 Java, diff-check y secret scan (252 entradas) correctos; sin build/pruebas Java locales. Sin cambios de recetas, potencia ni tier, sin acceso/instalación Windows.
+- Última consulta: 5.10.417 `43452383160` en build; 5.10.416 `43450387194` en exportación de evidencia tras pasar cliente. No resultado global confirmado aún para esas fuentes.

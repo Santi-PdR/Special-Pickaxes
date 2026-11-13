@@ -379,6 +379,11 @@ public final class ArtifactPassives {
         return owned;
     }
 
+    /** Validates the recorded combat fingerprint without claiming a replacement effect. */
+    public static boolean ownsCombatEffect(LivingEntity target,MobEffect effect){
+        return ownsLease(target.getPersistentData(),combatLeaseKey(effect),target.getEffect(effect));
+    }
+
     /** Clears only a matching lease, preserving replacement effects even when their visual flags match. */
     public static void clearCombatEffectLease(LivingEntity target,MobEffect effect){
         var data=target.getPersistentData();String key=combatLeaseKey(effect);

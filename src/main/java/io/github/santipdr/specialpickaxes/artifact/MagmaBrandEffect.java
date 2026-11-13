@@ -23,31 +23,41 @@ public final class MagmaBrandEffect extends MobEffect {
     /** Keeps the owner so each later damage pulse can recheck PvP, teams, range and protected regions. */
     public static boolean applyFrom(ServerPlayer caster,LivingEntity target,int duration,int amplifier){
         if(!canDamage(caster,target))return false;
+        var data=target.getPersistentData();
+        if(target.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get())
+                &&data.hasUUID(CASTER)&&!data.getUUID(CASTER).equals(caster.getUUID()))return false;
         if(!ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.MAGMA_BRAND.get(),amplifier,duration))return false;
         target.getPersistentData().putUUID(CASTER,caster.getUUID());
         return true;
     }
 
     private static boolean canDamage(ServerPlayer caster,LivingEntity target){
-        if(caster==null||target==null||!caster.isAlive()||caster.isRemoved()||target==caster||!target.isAlive()
-                ||caster.serverLevel()!=target.level()||caster.isAlliedTo(target))return false;
-        if(target instanceof Player other&&!caster.canHarmPlayer(other))return false;
-        return WorldSafety.allowed(caster,ArtifactKind.HELLSPEC,target.blockPosition());
+        if(!eligible(caster,target))return false;
+        var at=target.blockPosition();
+        return WorldSafety.allowed(caster,ArtifactKind.HELLSPEC,at)
+                &&eligible(caster,target)&&target.blockPosition().equals(at);
+    }
+    private static boolean eligible(ServerPlayer caster,LivingEntity target){
+        return caster!=null&&target!=null&&caster.isAlive()&&!caster.isRemoved()&&target!=caster&&target.isAlive()
+                &&!target.isRemoved()&&caster.serverLevel()==target.level()&&!caster.isAlliedTo(target)
+                &&(!(target instanceof Player other)||caster.canHarmPlayer(other));
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity.level() instanceof ServerLevel level))return;
         var data=entity.getPersistentData();
         if(!data.hasUUID(CASTER))return; // An effect supplied outside the relic system never becomes owned damage.
+        if(!ArtifactPassives.ownsCombatEffect(entity,this)){data.remove(CASTER);return;}
         var id=data.getUUID(CASTER);
         net.minecraft.world.entity.Entity owner=level.getEntity(id);
         ServerPlayer caster=owner instanceof ServerPlayer player?player:level.getServer().getPlayerList().getPlayer(id);
         if(!canDamage(caster,entity)){
-            entity.removeEffect(this);
             ArtifactPassives.clearCombatEffectLease(entity,this);
             data.remove(CASTER);
             return;
         }
+        // A permission callback may replace the effect itself after the first ownership check.
+        if(!ArtifactPassives.ownsCombatEffect(entity,this)){data.remove(CASTER);return;}
         // Keep the custom pulse distinct from vanilla fire ticks so already-burning targets still feel the mark.
         int previousInvulnerability=entity.invulnerableTime;
         entity.invulnerableTime=0;

@@ -1,5 +1,12 @@
 # Special Pickaxes — mining rework
 
+**5.10.418 — atribución de Magma Brand y erupción; pendiente de CI.** Una marca
+reemplazada externamente no se convierte en daño propio ni se elimina al perder
+permisos el antiguo caster. Otro portador no puede robar una marca viva. El pulso
+revalida ownership después de callbacks; la erupción comprueba cada objetivo
+antes y después del permiso, y solo informa/visualiza objetivos afectados. Cuatro
+regresiones adicionales; 211 GameTests en fuente. Daño, radio y límites intactos.
+
 **5.10.417 — cola de trabajo resistente a cancelaciones; pendiente de CI.** Los
 callbacks pueden cancelar, sustituir o pausar un trabajo sin que la cola continúe
 sus pasos viejos, borre el sustituto o lo vuelva a encolar. Una guarda separada

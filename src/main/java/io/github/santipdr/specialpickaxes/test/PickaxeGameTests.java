@@ -154,6 +154,61 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_140") public static void magmaBrandNeverDamagesOrRemovesAnExternalReplacement(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC);h.getLevel().addFreshEntity(owner);
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();
+        h.assertTrue(MagmaBrandEffect.applyFrom(owner,mob,80,0),"owned brand starts");
+        mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(brand,600,1,true,false,true));
+        float before=mob.getHealth();owner.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);
+        brand.applyEffectTick(mob,1);
+        h.assertTrue(mob.getHealth()==before&&mob.hasEffect(brand)&&mob.getEffect(brand).getDuration()==600,
+                "an external longer/stronger brand survives stale caster cleanup without becoming relic-owned damage");
+        h.assertTrue(!mob.getPersistentData().hasUUID("specialpickaxesMagmaBrandCaster"),"stale attribution is removed");finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_141") public static void magmaBrandCannotBeStolenByAnotherCaster(GameTestHelper h){
+        var first=player(h,ArtifactKind.HELLSPEC,"FirstBrandCaster");var second=player(h,ArtifactKind.HELLSPEC,"SecondBrandCaster");
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(first.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
+        h.assertTrue(MagmaBrandEffect.applyFrom(first,mob,80,0),"first caster applies the brand");
+        h.assertTrue(!MagmaBrandEffect.applyFrom(second,mob,120,1)
+                        &&mob.getPersistentData().getUUID("specialpickaxesMagmaBrandCaster").equals(first.getUUID())
+                        &&mob.getEffect(SpecialPickaxes.MAGMA_BRAND.get()).getDuration()==80,
+                "a second caster cannot reattribute or upgrade somebody else's live brand");finish(h,first);
+    }
+    @GameTest(template="empty",batch="rework_each_142") public static void magmaBrandRechecksEffectOwnershipAfterPermissionCallbacks(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC);h.getLevel().addFreshEntity(owner);
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();h.assertTrue(MagmaBrandEffect.applyFrom(owner,mob,80,0),"brand starts");
+        float before=mob.getHealth();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> replace=event->{
+            if(event.player==owner)mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(brand,600,1,true,false,true));
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,replace);
+        try{
+            brand.applyEffectTick(mob,0);
+            h.assertTrue(mob.getHealth()==before&&mob.getEffect(brand).getDuration()==600,
+                    "replacing the brand during permission dispatch prevents an attributed damage pulse");
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);}
+        finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_143") public static void magmaEruptionDoesNotHitTargetsMovedByPermissionCallbacks(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC);var at=target(h);var level=h.getLevel();
+        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(at.getX()+1.5,at.getY()+1,at.getZ()+.5);level.addFreshEntity(mob);
+        var original=mob.blockPosition();float before=mob.getHealth();mob.setDeltaMovement(Vec3.ZERO);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
+            if(event.player==owner&&event.target.equals(original))mob.setPos(mob.position().add(12,0,0));
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{
+            h.assertTrue(!ArtifactTechniques.magmaEruptionAt(owner,at),"an eruption with no remaining valid target does not report success");
+            h.assertTrue(mob.getHealth()==before&&!mob.isOnFire()&&mob.getDeltaMovement().equals(Vec3.ZERO)
+                            &&!mob.hasEffect(SpecialPickaxes.MAGMA_BRAND.get()),
+                    "a moved target receives no direct damage, ignition, lift or brand after the callback");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);}
+        finish(h,owner);
+    }
     @GameTest(template="empty",batch="rework_each_97") public static void magmaBrandStopsWhenItsOwnerLosesPermission(GameTestHelper h){
         var owner=player(h,ArtifactKind.HELLSPEC,"MagmaBrandOwner");h.getLevel().addFreshEntity(owner);
         var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);
