@@ -117,6 +117,43 @@ public final class PickaxeGameTests {
         }
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_120") public static void ambientServerReplacementsSurvivePassiveUnequip(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM,"AmbientReplacement");
+        var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
+        var nightVision=net.minecraft.world.effect.MobEffects.NIGHT_VISION;
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(renewal,600,0,true,false,true));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(nightVision,600,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.WORLDLOOM);
+        ArtifactPassives.syncNightVisionSource(wearer,false);
+        h.assertTrue(wearer.hasEffect(renewal)&&wearer.getEffect(renewal).getDuration()==600,
+                "ambient hidden server renewal is not mistaken for the expired short lease");
+        h.assertTrue(wearer.hasEffect(nightVision)&&wearer.getEffect(nightVision).getDuration()==600,
+                "ambient hidden server night vision survives source removal");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_121") public static void ambientAbsorptionReplacementSurvivesStasisUnequip(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM,"AbsorptionReplacement");
+        var absorption=net.minecraft.world.effect.MobEffects.ABSORPTION;
+        ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(absorption,600,0,true,false,true));
+        ArtifactPassives.tick(wearer,ArtifactKind.INTERREGNUM);
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.INTERREGNUM);
+        h.assertTrue(wearer.hasEffect(absorption)&&wearer.getEffect(absorption).getDuration()==600,
+                "Stasis cannot remove a longer ambient absorption replacement");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_122") public static void combatLeaseDoesNotClearStrongerAmbientReplacement(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.AXIOM,"CombatReplacement");
+        var effect=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get();
+        h.assertTrue(ArtifactPassives.grantCombatEffect(wearer,effect,0,60),"initial combat lease is granted");
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(effect,60,1,true,false,true));
+        h.assertTrue(!ArtifactPassives.grantCombatEffect(wearer,effect,0,60),"stronger external effect is not claimed as owned");
+        ArtifactPassives.clearCombatEffectLease(wearer,effect);
+        h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
+                "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_97") public static void magmaBrandStopsWhenItsOwnerLosesPermission(GameTestHelper h){
         var owner=player(h,ArtifactKind.HELLSPEC,"MagmaBrandOwner");h.getLevel().addFreshEntity(owner);
         var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);

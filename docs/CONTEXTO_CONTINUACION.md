@@ -141,3 +141,11 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Logs: scanner importable, detecta nombres completos de excepciones y errores Java (antes `Exception` aislado no cubría `NullPointerException`). Seis pruebas Python. No hay allowlist de autenticación: el gate sigue siendo estricto.
 - Evidencia: validación de ZIP y manifiesto antes de escribir archivos, tamaños totales, hashes, rutas, duplicados y symlinks. Ocho pruebas Python. El exportador Checks conserva todo el texto, reduce solo imágenes, escribe `evidence-export.json` con omisiones y mantiene las capturas completas en Actions. ZIP reproducible; techo comprimido 2 MB (máximo 56 chunks), pausas entre publicaciones y reintentos acotados. Cinco pruebas Python adicionales. Sobre evidencia real de 5.10.410 produce 1.994.828 bytes sin truncar logs.
 - No se compila localmente ni se controla la PC; se mantiene la rama de sesión y cero recetas/tier OP.
+
+## Continuación de auditoría — 5.10.413
+
+- Se detectó que las marcas booleanas de ownership y flags ambient/visible/icon no bastaban para preservar reemplazos externos más largos o de distinta potencia con los mismos flags. Ahora cada concesión exitosa registra también amplificador y duración máxima; ownership se invalida si cambian. Marcas antiguas sin fingerprint se abandonan de forma conservadora sin borrar efectos.
+- Un veto de `addEffect` ya no crea ownership de una pasiva que nunca se concedió; una mejora de combate vetada no devuelve éxito salvo que el efecto actual ya satisfaga lo pedido.
+- Tres GameTests añadidos (120–122), pendientes de ejecución: reemplazos ambient largos de renovación/visión nocturna, absorción de Estasis y reemplazo de combate de mayor potencia. Esta protección no distingue un reemplazo externo exactamente idéntico al efecto propio.
+- Validación local: 22 pruebas de recursos, 28 unittest de herramientas, parser de 123 archivos Java y diff-check correctos. No compilación ni ejecución Java local.
+- El CI 5.10.412 seguía en curso al comenzar estos cambios; no se hereda su resultado para 5.10.413.

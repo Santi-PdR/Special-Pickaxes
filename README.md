@@ -1,5 +1,13 @@
 # Special Pickaxes — mining rework
 
+**5.10.413 — protección adicional de efectos; pendiente de CI.** Las pasivas
+registran la potencia y duración concedidas, además de su marca de propiedad.
+Un reemplazo externo más largo o de distinta potencia, incluso con las mismas
+opciones visuales, no se renueva ni se elimina al quitar el pico. Los efectos
+vetados al concederse no crean una marca de propiedad. Tres GameTests nuevos
+cubren renovación, visión nocturna, absorción y efectos de combate. Un reemplazo
+exactamente idéntico no puede distinguirse solo por estos datos.
+
 **5.10.412 — auditoría en desarrollo; pendiente de su propio CI.** Iridium respeta
 propiedad vanilla y marcas previas de otros jugadores, consulta claims tanto en
 atracción pasiva como activa y revalida el drop después de callbacks. Sus
@@ -11,7 +19,7 @@ remate; Estasis reduce el brillo móvil según la calidad elegida sin ocultar su
 contorno. Se refuerzan el escaneo de excepciones Java y la exportación/extracción
 de evidencia de CI, conservando diagnósticos y declarando imágenes omitidas.
 
-**5.10.411 — build/JUnit, GameTests y servidor empaquetado comprobados en CI; cliente y aprobación visual pendientes.** La selección de entidades
+**5.10.411 — build/JUnit, GameTests, servidor y cliente comprobados en CI; ejecución global fallida al exportar evidencia, sin aprobación visual.** La selección de entidades
 usa un colector top-k acotado, sin duplicados, siempre ordenado y con desempate
 por ID; las listas pequeñas ya no saltan la ordenación. Los dominios no vuelven
 a consultar JEG si su tipo ya es un proyectil vanilla y respetan el presupuesto

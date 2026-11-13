@@ -334,44 +334,56 @@ public final class ArtifactPassives {
         return switch(kind){case PALIMPSEST,CHOIR,AXIOM,EXODIUM,IRIDIUM,SEAM_RIPPER->true;default->false;};
     }
 
+    private static void rememberLease(net.minecraft.nbt.CompoundTag data,String key,int amplifier,int duration){
+        data.putBoolean(key,true);data.putInt(key+":amplifier",amplifier);data.putInt(key+":duration",duration);
+    }
+    private static void forgetLease(net.minecraft.nbt.CompoundTag data,String key){
+        data.remove(key);data.remove(key+":amplifier");data.remove(key+":duration");
+    }
+    /** Flags alone cannot distinguish a server replacement with identical ambient/icon settings. */
+    private static boolean ownsLease(net.minecraft.nbt.CompoundTag data,String key,MobEffectInstance current){
+        if(!data.getBoolean(key))return false;
+        boolean owned=current!=null&&isPassiveLease(current)
+                &&data.contains(key+":amplifier",net.minecraft.nbt.Tag.TAG_INT)
+                &&data.contains(key+":duration",net.minecraft.nbt.Tag.TAG_INT)
+                &&current.getAmplifier()==data.getInt(key+":amplifier")
+                &&current.getDuration()>=0&&current.getDuration()<=data.getInt(key+":duration");
+        if(!owned)forgetLease(data,key);
+        return owned;
+    }
     private static void grant(ServerPlayer player, MobEffect effect, int amplifier, int duration) {
         var current=player.getEffect(effect);var data=player.getPersistentData();String key=passiveLeaseKey(effect);
-        boolean owned=data.getBoolean(key);
-        if(owned&&(current==null||!isPassiveLease(current))){data.remove(key);owned=false;}
-        if(current==null){
-            player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
-            data.putBoolean(key,true);
-        }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
-            player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
+        boolean owned=ownsLease(data,key,current);
+        if(current==null||owned&&(current.getAmplifier()<amplifier
+                ||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
+            if(player.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true)))
+                rememberLease(data,key,amplifier,duration);
         }
     }
 
     /** Combat passives never replace an effect supplied by a server, potion or another relic. */
     public static boolean grantCombatEffect(LivingEntity target,MobEffect effect,int amplifier,int duration){
         var current=target.getEffect(effect);var data=target.getPersistentData();String key=combatLeaseKey(effect);
-        boolean owned=data.getBoolean(key)||data.getBoolean(passiveLeaseKey(effect));
-        if(effect==MobEffects.ABSORPTION&&data.getBoolean(ABSORPTION_LEASE)&&current!=null&&isAbsorptionLease(current))owned=true;
-        if(owned&&(current==null||!isPassiveLease(current))){data.remove(key);owned=false;}
-        if(current==null){
-            boolean added=target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
-            if(!added)return false;
-            data.putBoolean(key,true);
-            return true;
-        }else if(owned&&(current.getAmplifier()<amplifier||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
-            target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true));
-            data.putBoolean(key,true);
-            return true;
+        boolean combatOwned=ownsLease(data,key,current);
+        boolean passiveOwned=ownsLease(data,passiveLeaseKey(effect),current);
+        boolean absorptionOwned=effect==MobEffects.ABSORPTION&&ownsLease(data,ABSORPTION_LEASE,current);
+        boolean owned=combatOwned||passiveOwned||absorptionOwned;
+        if(current==null||owned&&(current.getAmplifier()<amplifier
+                ||current.getAmplifier()==amplifier&&current.getDuration()<=duration)){
+            if(target.addEffect(new MobEffectInstance(effect,duration,amplifier,true,false,true))){
+                rememberLease(data,key,amplifier,duration);return true;
+            }
+            // An event vetoing an upgrade must not report that the stronger effect was granted.
+            return owned&&current!=null&&current.getAmplifier()>=amplifier&&current.getDuration()>=duration;
         }
-        return owned&&current!=null&&isPassiveLease(current);
+        return owned;
     }
 
-    /** Clears only a combat/passive lease owned by this mod, preserving potion and server effects. */
+    /** Clears only a matching lease, preserving replacement effects even when their visual flags match. */
     public static void clearCombatEffectLease(LivingEntity target,MobEffect effect){
         var data=target.getPersistentData();String key=combatLeaseKey(effect);
-        if(!data.getBoolean(key))return;
-        var current=target.getEffect(effect);
-        if(current!=null&&isPassiveLease(current))target.removeEffect(effect);
-        data.remove(key);
+        if(ownsLease(data,key,target.getEffect(effect)))target.removeEffect(effect);
+        forgetLease(data,key);
     }
 
     private static String combatLeaseKey(MobEffect effect){
@@ -384,61 +396,36 @@ public final class ArtifactPassives {
 
     private static void removeLease(ServerPlayer player,MobEffect effect){
         var data=player.getPersistentData();String key=passiveLeaseKey(effect);
-        if(!data.getBoolean(key))return;
-        var current=player.getEffect(effect);
-        if(current!=null&&isPassiveLease(current))player.removeEffect(effect);
-        data.remove(key);
+        if(ownsLease(data,key,player.getEffect(effect)))player.removeEffect(effect);
+        forgetLease(data,key);
     }
 
-    /** Keeps Curios absorption from replacing a potion supplied by the server or another mod. */
+    /** Absorption and Night Vision follow the same ownership fingerprint as custom effects. */
     private static void grantAbsorption(ServerPlayer player,int duration){
         var current=player.getEffect(MobEffects.ABSORPTION);var data=player.getPersistentData();
-        boolean owned=data.getBoolean(ABSORPTION_LEASE);
-        if(owned&&(current==null||!isAbsorptionLease(current))){data.remove(ABSORPTION_LEASE);owned=false;}
-        if(current==null){
-            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,duration,0,true,false,true));
-            data.putBoolean(ABSORPTION_LEASE,true);
-        }else if(owned&&current.getAmplifier()==0&&current.getDuration()<=duration){
-            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,duration,0,true,false,true));
+        boolean owned=ownsLease(data,ABSORPTION_LEASE,current);
+        if(current==null||owned&&current.getAmplifier()==0&&current.getDuration()<=duration){
+            if(player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,duration,0,true,false,true)))
+                rememberLease(data,ABSORPTION_LEASE,0,duration);
         }
     }
-
-    private static boolean isAbsorptionLease(MobEffectInstance effect){
-        return effect.getAmplifier()==0&&isPassiveLease(effect);
-    }
-
-    /** Remove only the Absorption instance granted by the Curios passive, preserving any server replacement. */
     private static void clearAbsorptionLease(ServerPlayer player){
-        var data=player.getPersistentData();if(!data.getBoolean(ABSORPTION_LEASE))return;
-        var current=player.getEffect(MobEffects.ABSORPTION);
-        if(current!=null&&isAbsorptionLease(current))player.removeEffect(MobEffects.ABSORPTION);
-        data.remove(ABSORPTION_LEASE);
+        var data=player.getPersistentData();
+        if(ownsLease(data,ABSORPTION_LEASE,player.getEffect(MobEffects.ABSORPTION)))player.removeEffect(MobEffects.ABSORPTION);
+        forgetLease(data,ABSORPTION_LEASE);
     }
-
-    /** Keeps the shared passive from replacing or removing a server/mod-owned Night Vision effect. */
     private static void grantNightVision(ServerPlayer player){
         var current=player.getEffect(MobEffects.NIGHT_VISION);var data=player.getPersistentData();
-        boolean owned=data.getBoolean(NIGHT_VISION_LEASE);
-        if(owned&&(current==null||current.getDuration()>PASSIVE_LEASE_TICKS||!isNightVisionLease(current))){
-            data.remove(NIGHT_VISION_LEASE);owned=false;
-        }
-        if(current==null){
-            player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,PASSIVE_LEASE_TICKS,0,true,false,true));
-            data.putBoolean(NIGHT_VISION_LEASE,true);
-        }else if(owned&&current.getDuration()<=PASSIVE_LEASE_TICKS){
-            player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,PASSIVE_LEASE_TICKS,0,true,false,true));
+        boolean owned=ownsLease(data,NIGHT_VISION_LEASE,current);
+        if(current==null||owned&&current.getDuration()<=PASSIVE_LEASE_TICKS){
+            if(player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,PASSIVE_LEASE_TICKS,0,true,false,true)))
+                rememberLease(data,NIGHT_VISION_LEASE,0,PASSIVE_LEASE_TICKS);
         }
     }
-
     private static void clearNightVisionLease(ServerPlayer player){
-        var data=player.getPersistentData();var current=player.getEffect(MobEffects.NIGHT_VISION);
-        if(data.getBoolean(NIGHT_VISION_LEASE)&&current!=null&&current.getDuration()<=PASSIVE_LEASE_TICKS&&isNightVisionLease(current))
-            player.removeEffect(MobEffects.NIGHT_VISION);
-        data.remove(NIGHT_VISION_LEASE);
-    }
-
-    private static boolean isNightVisionLease(MobEffectInstance effect){
-        return effect.getAmplifier()==0&&isPassiveLease(effect);
+        var data=player.getPersistentData();
+        if(ownsLease(data,NIGHT_VISION_LEASE,player.getEffect(MobEffects.NIGHT_VISION)))player.removeEffect(MobEffects.NIGHT_VISION);
+        forgetLease(data,NIGHT_VISION_LEASE);
     }
 
     private static boolean isPassiveLease(MobEffectInstance effect){
