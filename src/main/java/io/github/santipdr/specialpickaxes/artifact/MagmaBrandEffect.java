@@ -49,8 +49,14 @@ public final class MagmaBrandEffect extends MobEffect {
             return;
         }
         // Keep the custom pulse distinct from vanilla fire ticks so already-burning targets still feel the mark.
+        int previousInvulnerability=entity.invulnerableTime;
         entity.invulnerableTime=0;
-        if(!entity.hurt(level.damageSources().magic(),1.5F+.5F*Math.max(0,amplifier)))return;
+        if(!entity.hurt(level.damageSources().magic(),1.5F+.5F*Math.max(0,amplifier))){
+            // A protection mod vetoing the pulse must not lose the target's existing damage grace.
+            // Preserve a different value installed by an external damage listener.
+            if(entity.invulnerableTime==0)entity.invulnerableTime=previousInvulnerability;
+            return;
+        }
         entity.setSecondsOnFire(2);
         ArtifactFeedback.entityAuraPulse(level,entity,brandParticles(entity,level.getGameTime()));
     }

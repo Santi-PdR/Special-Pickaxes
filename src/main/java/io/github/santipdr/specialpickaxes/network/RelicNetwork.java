@@ -32,6 +32,7 @@ public final class RelicNetwork {
         return accepted;
     }
     public static boolean acceptCopy(net.minecraft.server.level.ServerPlayer p,CopyChoice choice){
+        if(p.isRemoved()||!p.isAlive()||p.isSpectator())return false;
         if(choice.sequence()<=0||choice.sequence()<=SEEN.getOrDefault(p.getUUID(),0L))return false;
         SEEN.put(p.getUUID(),choice.sequence());var tool=p.getMainHandItem();
         if(!(tool.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER)return false;

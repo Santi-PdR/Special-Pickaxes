@@ -100,3 +100,13 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Se descubren **176 GameTests** entre todas las clases `*GameTests.java`; es un recuento de fuente, no un resultado de ejecución.
 - `git diff --check` limpio; los scripts de release y GameTests pasan `py_compile`.
 - Consulta de run #622 sigue fallando con EOF de red; estado final desconocido. Compilación, GameTests, verificación del JAR generado y validación visual de 5.10.409 permanecen pendientes de CI.
+
+## Tanda 5.10.410 — 2026-11-13
+
+- Partículas de aliados: las cuatro reservas que usaban `level.getGameTime()` usan ahora `level.getServer().getTickCount()`, igual que las auras. Evita reinicios del presupuesto por alternar relojes de mundo y servidor. Una comprobación de recursos impide reintroducir ese patrón en `ArtifactFeedback`.
+- `RelicParticleBudget` inicializa explícitamente su primer tick; acepta también `Long.MIN_VALUE` como primer valor en lugar de confundirlo con un sentinel no inicializado. Cuatro pruebas JUnit nuevas cubren reserva atómica, rechazo sin consumir remanente, wrap/reinicio, capacidad cero y argumentos inválidos. No se ejecutaron aquí.
+- Reserva del Alba: un sol propio + tres motas (4 en vez de 9 partículas). Conserva restauración de un punto de comida por segundo y omite pulsos al estar lleno. GameTest nuevo (batch 109).
+- Copia de Worldbreaker: `acceptCopy` rechaza removidos, muertos y espectadores antes de consumir secuencia o modificar NBT. GameTest nuevo (batch 110): rechazo en espectador, retorno a supervivencia, repetición y jugador muerto.
+- Magma Brand: un daño cancelado no elimina los fotogramas de invulnerabilidad que tenía el blanco; si un listener establece otro valor, se respeta. GameTest nuevo (batch 111) usa un listener de `LivingAttackEvent` que veta el pulso y comprueba salud, fuego y ambas variantes de invulnerabilidad. Daño y cadencia de pulsos permitidos sin cambios.
+- Validación ejecutada: 22 tests de recursos OK; 9 tests Python OK; parser Java sobre 114 archivos sin errores de sintaxis; `git diff --check` limpio. Compilación/JUnit/GameTests y visuales siguen sin ejecutar, pendientes de CI. No hubo build local.
+- Nuevo intento de push volvió a fallar por TLS. Se mantiene la rama `arena/cec54523-special-pickaxes`; no se ha actualizado el PR #2 ni se ha instalado ningún JAR.

@@ -1566,6 +1566,70 @@ public final class PickaxeGameTests {
         h.assertTrue(!ArtifactOres.isOre(rateOnly)&&ArtifactOres.isOre(named),"classifications stay correct after cache invalidation");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_109") public static void dawnReserveKeepsFoodCadenceWithFourAuthoredParticles(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);
+        var effect=SpecialPickaxes.DAWN_RESERVE.get();
+        var particles=DawnReserveEffect.reserveParticles(wearer);
+        h.assertTrue(particles.size()==2&&particles.stream().mapToInt(ArtifactFeedback.AuraParticle::count).sum()==4,
+                "reserve uses one sun and three dust motes rather than nine generic particles");
+        h.assertTrue(particles.get(0).particle()==SpecialPickaxes.DAWN_MENDING_BLOOM.get(),"reserve shares the dawn sun signature");
+        wearer.getFoodData().setFoodLevel(19);
+        effect.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==20,"reserve still restores one food point");
+        float saturation=wearer.getFoodData().getSaturationLevel();
+        effect.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getFoodData().getSaturationLevel()==saturation,"full food never produces an idle reserve pulse");
+        h.assertTrue(effect.isDurationEffectTick(40,0)&&!effect.isDurationEffectTick(39,0),"one-second cadence unchanged");
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_110") public static void copyChoiceRejectsSpectatorsReplaysAndDeadPlayers(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDBREAKER);
+        var networkIdentity=UUID.randomUUID();
+        var tool=wearer.getMainHandItem();tool.getOrCreateTag().putUUID("controlIdentity",networkIdentity);
+        var choice=new io.github.santipdr.specialpickaxes.network.RelicNetwork.CopyChoice(ArtifactKind.PALIMPSEST,1L,networkIdentity);
+        try{
+            wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);
+            h.assertTrue(!io.github.santipdr.specialpickaxes.network.RelicNetwork.acceptCopy(wearer,choice)
+                    &&!tool.getTag().contains("copiedSkill"),"spectators cannot change the copied skill");
+            wearer.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
+            h.assertTrue(io.github.santipdr.specialpickaxes.network.RelicNetwork.acceptCopy(wearer,choice),
+                    "a rejected spectator packet does not consume the live player's sequence");
+            h.assertTrue(!io.github.santipdr.specialpickaxes.network.RelicNetwork.acceptCopy(wearer,choice),"duplicate copy choices are rejected");
+            wearer.setHealth(0F);
+            var deadChoice=new io.github.santipdr.specialpickaxes.network.RelicNetwork.CopyChoice(ArtifactKind.IRIDIUM,2L,networkIdentity);
+            h.assertTrue(!io.github.santipdr.specialpickaxes.network.RelicNetwork.acceptCopy(wearer,deadChoice)
+                    &&tool.getTag().getString("copiedSkill").equals(ArtifactKind.PALIMPSEST.id),
+                    "a dead player cannot overwrite the live choice");
+        }finally{io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(wearer);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_111") public static void canceledMagmaPulsePreservesDamageGraceAndListenerChanges(GameTestHelper h){
+        var owner=player(h,ArtifactKind.HELLSPEC,"VetoedMagmaOwner");h.getLevel().addFreshEntity(owner);
+        var target=EntityType.ZOMBIE.create(h.getLevel());
+        target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);
+        var brand=SpecialPickaxes.MAGMA_BRAND.get();
+        h.assertTrue(MagmaBrandEffect.applyFrom(owner,target,80,0),"a permitted owner applies the brand before damage is vetoed");
+        int[] externalGrace={0};
+        Consumer<net.minecraftforge.event.entity.living.LivingAttackEvent> deny=event->{
+            if(event.getEntity()==target){
+                if(externalGrace[0]>0)target.invulnerableTime=externalGrace[0];
+                event.setCanceled(true);
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                net.minecraftforge.event.entity.living.LivingAttackEvent.class,deny);
+        try{
+            float health=target.getHealth();target.invulnerableTime=17;target.clearFire();
+            brand.applyEffectTick(target,0);
+            h.assertTrue(target.getHealth()==health&&target.invulnerableTime==17&&!target.isOnFire(),
+                    "a vetoed pulse preserves health, damage grace and fire state");
+            externalGrace[0]=9;
+            brand.applyEffectTick(target,0);
+            h.assertTrue(target.getHealth()==health&&target.invulnerableTime==9,
+                    "a grace period explicitly installed by a protection listener is not overwritten");
+        }finally{MinecraftForge.EVENT_BUS.unregister(deny);target.removeEffect(brand);}
+        finish(h,owner);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

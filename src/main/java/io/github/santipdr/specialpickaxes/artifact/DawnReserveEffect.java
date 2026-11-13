@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -19,12 +18,18 @@ public final class DawnReserveEffect extends MobEffect {
         if(entity.level().isClientSide||!(entity instanceof Player player)||!player.getFoodData().needsFood())return;
         player.getFoodData().eat(1,.35F);
         if(entity.level() instanceof ServerLevel level){
-            double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.62D,z=entity.getZ();
-            var particles=java.util.List.of(
-                    new ArtifactFeedback.AuraParticle(ParticleTypes.WAX_ON,new net.minecraft.world.phys.Vec3(x,y,z),6,.26D,.2D,.26D,.025D),
-                    new ArtifactFeedback.AuraParticle(DAWN,new net.minecraft.world.phys.Vec3(x,y+.16D,z),3,.2D,.18D,.2D,0));
+            var particles=reserveParticles(entity);
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
+    }
+
+    /** One authored sun replaces six generic sparks; three dust motes keep the warm outward cue. */
+    public static java.util.List<ArtifactFeedback.AuraParticle> reserveParticles(LivingEntity entity){
+        double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.62D,z=entity.getZ();
+        return java.util.List.of(
+                new ArtifactFeedback.AuraParticle(io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING_BLOOM.get(),
+                        new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,0),
+                new ArtifactFeedback.AuraParticle(DAWN,new net.minecraft.world.phys.Vec3(x,y+.16D,z),3,.2D,.18D,.2D,0));
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%20==0;}

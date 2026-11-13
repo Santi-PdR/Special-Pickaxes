@@ -60,6 +60,14 @@ class Resources(unittest.TestCase):
                     for frame in animation["frames"]:
                         self.assertIn(frame, range(height // width))
 
+    def test_aura_budget_uses_only_the_server_tick_clock(self):
+        feedback = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactFeedback.java").read_text()
+        self.assertNotRegex(feedback, r"reserveAuraParticles\(level\.getGameTime\(")
+        reservations = re.findall(r"reserveAuraParticles\((level\.[^,]+),", feedback)
+        self.assertGreaterEqual(len(reservations), 6)
+        self.assertTrue(all(clock == "level.getServer().getTickCount()" for clock in reservations),
+                        "dimension/world clocks cannot reset the shared server allowance")
+
     def test_json(self):
         for pattern in ["*.json", "*.mcmeta"]:
             for path in ROOT.rglob(pattern):

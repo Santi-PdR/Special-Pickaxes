@@ -156,7 +156,7 @@ public final class ArtifactFeedback {
     public static void starfallGuardLink(ServerPlayer wearer,ServerPlayer ally){
         if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
         var level=wearer.serverLevel();
-        if(!reserveAuraParticles(level.getGameTime(),5,2))return;
+        if(!reserveAuraParticles(level.getServer().getTickCount(),5,2))return;
         Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=5;i++){
@@ -170,7 +170,7 @@ public final class ArtifactFeedback {
     public static void searingShellLink(ServerPlayer wearer,ServerPlayer ally){
         if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
         var level=wearer.serverLevel();
-        if(!reserveAuraParticles(level.getGameTime(),4,2))return;
+        if(!reserveAuraParticles(level.getServer().getTickCount(),4,2))return;
         Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=4;i++){
@@ -184,7 +184,7 @@ public final class ArtifactFeedback {
     public static void lodeguardLink(ServerPlayer wearer,ServerPlayer ally){
         if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
         var level=wearer.serverLevel();
-        if(!reserveAuraParticles(level.getGameTime(),4,2))return;
+        if(!reserveAuraParticles(level.getServer().getTickCount(),4,2))return;
         Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=4;i++){
@@ -198,7 +198,7 @@ public final class ArtifactFeedback {
     public static void icarianWindLink(ServerPlayer wearer,ServerPlayer ally){
         if(!wearer.isAlive()||!ally.isAlive()||wearer.serverLevel()!=ally.serverLevel())return;
         var level=wearer.serverLevel();
-        if(!reserveAuraParticles(level.getGameTime(),5,2))return;
+        if(!reserveAuraParticles(level.getServer().getTickCount(),5,2))return;
         Vec3 start=wearer.position().add(0,wearer.getBbHeight()*.62D,0);
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=5;i++){

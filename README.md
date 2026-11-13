@@ -1,5 +1,14 @@
 # Special Pickaxes — mining rework
 
+**5.10.410 — en desarrollo, pendiente de CI y revisión en cliente.** Unifica el
+presupuesto de partículas de vínculos aliados con el tick del servidor, incluso
+si difiere de la hora de una dimensión. Reserva del Alba usa un sol propio y
+tres motas (4 partículas en vez de 9), sin cambiar comida ni cadencia. La copia
+de Worldbreaker rechaza jugadores muertos, eliminados o espectadores. Un pulso
+de Magma Brand cancelado por otro mod conserva la invulnerabilidad previa sin
+pisar un valor distinto establecido por su listener. Nuevas pruebas cubren
+presupuesto, copia, reserva y veto Forge del daño.
+
 **5.10.409 — en desarrollo, pendiente de CI y revisión en cliente.** Corrige la
 clasificación de tags `ore_rates/*` para que no inventen menas ni unan vetas;
 limpia también el caché de familias al recargar tags. La respuesta de Estasis
