@@ -1519,6 +1519,22 @@ public final class PickaxeGameTests {
         h.assertTrue(!MiningDesigns.matrix(Blocks.AMETHYST_BLOCK.defaultBlockState()),"unrelated blocks are not geology by default");
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_106") public static void geologyDatapackTagCannotOverrideSafetyFilters(GameTestHelper h){
+        var terrain=TestOres.DATAPACK_TERRAIN.defaultBlockState();
+        h.assertTrue(!GeologyNames.geologyPart("ashen_stratum"),"fixture cannot pass by name inference");
+        h.assertTrue(terrain.is(ArtifactTags.Blocks.GEOLOGY),"datapack geology fixture loaded");
+        h.assertTrue(MiningDesigns.matrix(terrain)&&MiningDesigns.crucibleGeology(terrain)
+                        &&WorldSafety.inert(terrain)&&ArtifactTools.effective(terrain),
+                "tagged terrain supports mining, transmutation, restoration and tool effectiveness");
+        for(var block:List.of(Blocks.CHEST,Blocks.BEDROCK,Blocks.WATER,Blocks.LAVA,Blocks.DIAMOND_ORE,
+                Blocks.STONE_SLAB,TestOres.STRUCTURAL_STONE,TestOres.NAMED_ORE,TestOres.TAGGED_ORE)){
+            var state=block.defaultBlockState();
+            h.assertTrue(state.is(ArtifactTags.Blocks.GEOLOGY),"unsafe fixture must really be tagged: "+block);
+            h.assertTrue(!MiningDesigns.matrix(state)&&!MiningDesigns.crucibleGeology(state)&&!WorldSafety.inert(state),
+                    "tag cannot override safety protections: "+block);
+        }
+        h.succeed();
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

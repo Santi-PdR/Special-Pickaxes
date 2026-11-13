@@ -13,6 +13,18 @@ from mining_catalog import IDS, MODES
 
 
 class Resources(unittest.TestCase):
+    def test_geology_fixture_is_optional_and_never_packaged(self):
+        geology = json.loads((ROOT / "data/specialpickaxes/tags/blocks/geology.json").read_text())
+        fixture = "data/pickaxe_compat_test/tags/blocks/geology_fixture.json"
+        self.assertIn({"id": "#pickaxe_compat_test:geology_fixture", "required": False}, geology["values"])
+        entries = json.loads((ROOT / fixture).read_text())["values"]
+        self.assertTrue(all(isinstance(entry, dict) and entry.get("required") is False for entry in entries))
+        ids = {entry["id"] for entry in entries}
+        self.assertTrue({"pickaxe_compat_test:ashen_stratum", "minecraft:chest", "minecraft:bedrock",
+                         "minecraft:water", "minecraft:lava", "minecraft:diamond_ore"} <= ids)
+        self.assertIn("exclude '" + fixture + "'", pathlib.Path("build.gradle").read_text())
+        self.assertIn(repr(fixture) + " not in z.namelist()", pathlib.Path("tools/verify_release.py").read_text())
+
     def test_json(self):
         for pattern in ["*.json", "*.mcmeta"]:
             for path in ROOT.rglob(pattern):

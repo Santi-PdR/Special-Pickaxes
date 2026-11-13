@@ -13,6 +13,7 @@ with zipfile.ZipFile(jar) as z:
  assert 'Build-Commit: '+sha in manifest,manifest
  assert not any('/recipes/' in n or '/worldgen/' in n for n in z.namelist())
  assert not any('/test/' in n for n in z.namelist())
+ assert 'data/pickaxe_compat_test/tags/blocks/geology_fixture.json' not in z.namelist(), 'Unsafe geology fixture must never ship'
  assert all(struct.unpack('>H',z.read(n)[6:8])[0]==61 for n in z.namelist() if n.endswith('.class'))
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()

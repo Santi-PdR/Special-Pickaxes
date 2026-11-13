@@ -1,12 +1,37 @@
 {
   "replace": false,
   "values": [
-    {"id": "terramity:fairystone", "required": false},
-    {"id": "terramity:moonstone", "required": false},
-    {"id": "terramity:igneostone", "required": false},
-    {"id": "undead_revamp2:chiseleddripstoneblock", "required": false},
-    {"id": "undead_revamp2:chiseled_dripstonepillar", "required": false},
-    {"id": "undead_revamp2:chiseleddripstonepillarbottom", "required": false},
-    {"id": "undead_revamp2:chiseleddripstonepillartop", "required": false}
+    {
+      "id": "terramity:fairystone",
+      "required": false
+    },
+    {
+      "id": "terramity:moonstone",
+      "required": false
+    },
+    {
+      "id": "terramity:igneostone",
+      "required": false
+    },
+    {
+      "id": "undead_revamp2:chiseleddripstoneblock",
+      "required": false
+    },
+    {
+      "id": "undead_revamp2:chiseled_dripstonepillar",
+      "required": false
+    },
+    {
+      "id": "undead_revamp2:chiseleddripstonepillarbottom",
+      "required": false
+    },
+    {
+      "id": "undead_revamp2:chiseleddripstonepillartop",
+      "required": false
+    },
+    {
+      "id": "#pickaxe_compat_test:geology_fixture",
+      "required": false
+    }
   ]
 }
