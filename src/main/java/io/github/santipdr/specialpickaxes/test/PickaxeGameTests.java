@@ -1535,6 +1535,37 @@ public final class PickaxeGameTests {
         }
         h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_107") public static void stasisReflexUsesNineCompactBudgetedSamples(GameTestHelper h){
+        var origin=new Vec3(-2D,30D,7D);
+        for(long time:new long[]{0L,20L,12345L}){
+            var particles=ArtifactFeedback.stasisReflexParticles(origin,time);
+            h.assertTrue(particles.size()==9,"reflex uses nine samples rather than ten generic particles");
+            for(var sample:particles){
+                var delta=sample.position().subtract(origin);
+                h.assertTrue(sample.count()==1&&delta.horizontalDistanceSqr()<=.303D
+                                &&delta.y>=.71D&&delta.y<=.89D,"reflex stays tight around the protected player");
+            }
+            h.assertTrue(particles.get(8).particle()==SpecialPickaxes.STASIS_SHARD.get(),"the central response is the authored crystal");
+        }
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_108") public static void oreDropRateTagsNeverInventDepositsOrJoinVeins(GameTestHelper h){
+        var rateOnly=TestOres.RATE_ONLY_BLOCK.defaultBlockState();
+        var named=TestOres.NAMED_ORE.defaultBlockState();
+        var tagged=TestOres.TAGGED_ORE.defaultBlockState();
+        var rateTag=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,
+                new net.minecraft.resources.ResourceLocation("pickaxe_compat_test","ore_rates/dense"));
+        h.assertTrue(rateOnly.is(rateTag)&&named.is(rateTag)&&tagged.is(rateTag),"shared drop-rate fixture loaded");
+        h.assertTrue(!ArtifactOres.isOre(rateOnly),"rate metadata cannot create a mineral deposit");
+        h.assertTrue(!ArtifactTools.effective(rateOnly)&&ArtifactTools.effective(named)&&ArtifactTools.effective(tagged),
+                "rate metadata does not grant tool effectiveness while real ores remain harvestable");
+        h.assertTrue(ArtifactOres.isOre(named)&&ArtifactOres.isOre(tagged),"real ores still classify by name and family tags");
+        h.assertTrue(!ArtifactOres.sharesVeinFamily(ArtifactOres.veinFamilies(named),tagged),
+                "matching drop rates never connect different minerals");
+        ArtifactOres.clearCache();
+        h.assertTrue(!ArtifactOres.isOre(rateOnly)&&ArtifactOres.isOre(named),"classifications stay correct after cache invalidation");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

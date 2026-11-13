@@ -70,7 +70,7 @@ public final class ArtifactOres {
     }
 
     /** Datapack reloads can change tag membership, so discard cached classifications then. */
-    public static void clearCache(){ ORE_CLASSIFICATION.clear();VEIN_FAMILIES.clear(); }
+    public static void clearCache(){ ORE_CLASSIFICATION.clear();ORE_FAMILIES.clear();VEIN_FAMILIES.clear(); }
 
     private static String canonicalPrefixedOre(String material){
         String canonical=stripHost(material);
@@ -85,6 +85,7 @@ public final class ArtifactOres {
 
     static boolean isOreTagPath(String path) {
         if(path==null)return false;
+        if(path.equals("ore_rates")||path.startsWith("ore_rates/")||path.startsWith("ore_rates_"))return false;
         // Forge's ores_in_ground tags describe ore generation hosts, not mineral families.
         if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
         if(isOreHostTagPath(path))return false;
@@ -113,13 +114,14 @@ public final class ArtifactOres {
         return false;
     }
 
-    private static boolean isVeinFamilyTag(String path) {
+    static boolean isVeinFamilyTag(String path) {
+        if(!isOreTagPath(path))return false;
         // Forge's ores_in_ground tags describe ore generation hosts, not mineral families.
         if(path.equals("ores_in_ground")||path.startsWith("ores_in_ground/")||path.startsWith("ores_in_ground_"))return false;
         // Forge's ore_rates tags classify drop/XP rates and are shared by every
         // mineral. They must never connect otherwise separate veins.
         if(path.startsWith("ore_rates"))return false;
-        return path.startsWith("ores/")&&path.length()>6||path.startsWith("ore/")&&path.length()>4
+        return path.startsWith("ores/")&&path.length()>5||path.startsWith("ore/")&&path.length()>4
             ||path.startsWith("ores_")&&path.length()>5||path.startsWith("ore_")&&path.length()>4
             ||path.endsWith("_ores")&&path.length()>5||path.endsWith("_ore")&&path.length()>4;
     }

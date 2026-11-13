@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '5.10.408'
+version = '5.10.409'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -72,7 +72,7 @@ jar {
     manifest { attributes('Implementation-Version': project.version, 'Build-Commit': providers.exec { commandLine 'git', 'rev-parse', 'HEAD' }.standardOutput.asText.get().trim()) }
     exclude 'io/github/santipdr/specialpickaxes/test/**'
     exclude 'data/specialpickaxes/structures/empty.nbt'
-    exclude 'data/pickaxe_compat_test/tags/blocks/geology_fixture.json'
+    exclude 'data/pickaxe_compat_test/**'
     preserveFileTimestamps = false
     reproducibleFileOrder = true
     finalizedBy 'reobfJar'

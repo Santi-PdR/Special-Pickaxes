@@ -78,3 +78,25 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Añadido GameTest `geologyDatapackTagCannotOverrideSafetyFilters` (batch 106): usa un terreno de prueba sin nombre geológico y comprueba clasificación, efectividad de herramienta y elegibilidad para restauración. Comprueba también el rechazo de cofres, bedrock, agua, lava, menas y losas incluso cuando pertenecen al tag.
 - La fixture `pickaxe_compat_test:geology_fixture` se referencia opcionalmente; sus entradas son opcionales y el archivo se excluye explícitamente del JAR. `verify_release.py` rechaza una entrega que incluya esa fixture. No se modifica el tier ni se añaden recetas.
 - Validación de recursos: 20 tests OK. El GameTest se añadió pero no se ejecutó: requiere CI. No se afirma compatibilidad certificada con el pack completo ni revisión visual nueva.
+
+## Tanda amplia 5.10.409 — 2026-11-13
+
+- Rama de sesión vigente: `arena/cec54523-special-pickaxes`. No se creó ni se cambió de rama; no se actualizó el head del PR #2. No se ejecutó checkout ni build local ni se accedió a la PC del usuario.
+- Menas: `ore_rates`, `ore_rates/*` y `ore_rates_*` se excluyen de clasificación; las familias de veta deben pasar también los filtros de tags de menas (evita familias de almacenamiento). Se admite `ores/x`, y el caché de familias de registro se limpia junto con los demás.
+- Nuevos casos JUnit en `ArtifactOresTest` y GameTest `oreDropRateTagsNeverInventDepositsOrJoinVeins` (batch 108). Estasis tiene un GameTest geométrico de sus nueve muestras (batch 107). Se añadieron pero no se ejecutaron aquí.
+- Estasis: su respuesta usa `nearbyWardPulse`, por lo que reserva el coste de toda la audiencia antes de emitir. Ocho motas más un cristal sustituyen las diez partículas anteriores.
+- Hellspec: el aviso Infernal Bloom usa un flare en lugar de dos llamas por núcleo; las partículas de blancos de la erupción reutilizan `MagmaBrandEffect.brandParticles` con `entityAuraPulse` (audiencia local limitada y presupuesto compartido). No se cambian los filtros de blancos ni el combate.
+- Empaquetado: se excluye todo `data/pickaxe_compat_test/**`; `verify_release.py` exige su ausencia y verifica definición/atlas PNG de cada partícula registrada. La referencia opcional a la fixture geológica puede quedar sin resolver en producción sin ser obligatoria.
+- Recursos: comprobación general de registros, renderers, atlas, índices de fotogramas y transparencia (RGBA o paleta PNG transparente). El atlas de Worldloom usa paleta con tRNS, que es válido: no se convirtió ni se alteró.
+- CI: `verify_gametests.py` ahora es importable y rechaza cero tests, resúmenes parciales o inconsistentes y fallos required. Se añadieron siete pruebas unitarias del verificador y dos de regeneración/estructura del sprite del Alba. El workflow ejecuta estas pruebas Python antes del build.
+- Guía nueva `docs/mining-rework/DATAPACK-INTEGRATION.md`: ejemplo 1.20.1, contrato del tag y límites de seguridad, diferenciando terreno y rotura manual.
+- GitHub: nuevo intento de push falló por TLS (`gnutls_handshake`). La publicación, el estado final del run #622 y la instalación siguen sin confirmar. No se reutiliza aprobación visual antigua para esta versión.
+
+### Comprobaciones al cerrar la tanda
+
+- `python3 tools/validate_resources.py`: **21 tests OK**.
+- `python3 -m unittest discover -s tools -p 'test_*.py'`: **9 tests OK**, incluidos regeneración byte a byte del atlas del Alba y casos negativos del verificador de GameTests.
+- Parser Java: **113 archivos, 0 errores de sintaxis**. Esto no sustituye compilación ni resolución de APIs de Forge.
+- Se descubren **176 GameTests** entre todas las clases `*GameTests.java`; es un recuento de fuente, no un resultado de ejecución.
+- `git diff --check` limpio; los scripts de release y GameTests pasan `py_compile`.
+- Consulta de run #622 sigue fallando con EOF de red; estado final desconocido. Compilación, GameTests, verificación del JAR generado y validación visual de 5.10.409 permanecen pendientes de CI.

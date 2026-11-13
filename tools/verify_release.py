@@ -13,7 +13,7 @@ with zipfile.ZipFile(jar) as z:
  assert 'Build-Commit: '+sha in manifest,manifest
  assert not any('/recipes/' in n or '/worldgen/' in n for n in z.namelist())
  assert not any('/test/' in n for n in z.namelist())
- assert 'data/pickaxe_compat_test/tags/blocks/geology_fixture.json' not in z.namelist(), 'Unsafe geology fixture must never ship'
+ assert not any(n.startswith('data/pickaxe_compat_test/') for n in z.namelist()), 'Compatibility fixtures must never ship'
  assert all(struct.unpack('>H',z.read(n)[6:8])[0]==61 for n in z.namelist() if n.endswith('.class'))
  for id in ids:
   for n in [f'assets/specialpickaxes/models/item/{id}.json']:assert n in z.namelist()
@@ -33,6 +33,16 @@ with zipfile.ZipFile(jar) as z:
   assert icon in z.namelist(),f'Missing mob effect HUD icon: {icon}'
   image=z.read(icon)
   assert image[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',image[16:24])==(16,16),f'Invalid mob effect HUD icon: {icon}'
+ particle_ids=re.findall(r'PARTICLES\.register\("([^"]+)"',(root/'src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java').read_text())
+ assert particle_ids, 'No registered particles found'
+ for particle_id in particle_ids:
+  definition=f'assets/specialpickaxes/particles/{particle_id}.json'
+  assert definition in z.namelist(), f'Missing particle definition: {definition}'
+  for texture in json.loads(z.read(definition))['textures']:
+   namespace,resource=texture.split(':',1)
+   atlas=f'assets/{namespace}/textures/particle/{resource}.png'
+   assert atlas in z.namelist(), f'Missing particle atlas: {atlas}'
+   assert z.read(atlas)[:8]==b'\x89PNG\r\n\x1a\n', f'Invalid particle PNG: {atlas}'
  assert 'io/github/santipdr/specialpickaxes/artifact/ArtifactActions.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/WorkQueue.class' in z.namelist()
  assert 'io/github/santipdr/specialpickaxes/artifact/CuriosCompat.class' in z.namelist()

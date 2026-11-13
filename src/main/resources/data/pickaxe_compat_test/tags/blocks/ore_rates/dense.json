@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "pickaxe_compat_test:neutral_cluster",
+      "required": false
+    },
+    {
+      "id": "pickaxe_compat_test:cobalt_ore",
+      "required": false
+    },
+    {
+      "id": "pickaxe_compat_test:raw_gem",
+      "required": false
+    }
+  ]
+}

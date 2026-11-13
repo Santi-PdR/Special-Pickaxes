@@ -98,6 +98,7 @@ def main():
     write_png(ROOT / "textures/particle/dawn_mending_bloom.png", rows, FRAME, FRAME * FRAMES)
     (ROOT / "textures/particle/dawn_mending_bloom.png.mcmeta").write_text(
         json.dumps({"animation": {"frametime": 3, "frames": list(range(FRAMES))}}, indent=2) + "\n")
+    (ROOT / "particles").mkdir(parents=True, exist_ok=True)
     (ROOT / "particles/dawn_mending_bloom.json").write_text(
         json.dumps({"textures": ["specialpickaxes:dawn_mending_bloom"]}, indent=2) + "\n")
     print("dawn_mending_bloom: %dx%d, %d frames" % (FRAME, FRAME * FRAMES, FRAMES))

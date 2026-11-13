@@ -210,15 +210,20 @@ public final class ArtifactFeedback {
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */
     public static void stasisReflexImpact(ServerPlayer protectedPlayer){
-        var level=protectedPlayer.serverLevel();var audience=nearbyWardAudience(protectedPlayer);
-        double phase=level.getGameTime()*.13D,x=protectedPlayer.getX(),y=protectedPlayer.getY()+.72D,z=protectedPlayer.getZ();
+        nearbyWardPulse(protectedPlayer,stasisReflexParticles(protectedPlayer.position(),protectedPlayer.serverLevel().getGameTime()));
+    }
+    /** Eight compact ring motes plus one authored crystal; all nine share the aura budget. */
+    public static List<AuraParticle> stasisReflexParticles(Vec3 origin,long worldTime){
+        double phase=worldTime*.13D;
+        var particles=new java.util.ArrayList<AuraParticle>(9);
         for(int i=0;i<8;i++){
             double angle=phase+i*Math.PI/4D,radius=.42D+(i%2)*.13D;
-            double px=x+Math.cos(angle)*radius,pz=z+Math.sin(angle)*radius;
-            for(var viewer:audience)level.sendParticles(viewer,(i&1)==0?STASIS_LINK:ParticleTypes.REVERSE_PORTAL,
-                    false,px,y+(i%3)*.08D,pz,1,0,0,0,0);
+            Vec3 at=origin.add(Math.cos(angle)*radius,.72D+(i%3)*.08D,Math.sin(angle)*radius);
+            particles.add(new AuraParticle((i&1)==0?STASIS_LINK:ParticleTypes.REVERSE_PORTAL,at,1,0,0,0,0));
         }
-        for(var viewer:audience)level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y+.16D,z,2,.05D,.1D,.05D,.003D);
+        particles.add(new AuraParticle(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_SHARD.get(),
+                origin.add(0,.88D,0),1,0,0,0,0));
+        return List.copyOf(particles);
     }
     /** Persistent Curios auras are sent only to the bearer and three visible players within twelve blocks. */
     public static void nearbyWardPulse(ServerPlayer wearer,List<AuraParticle> particles){
@@ -677,7 +682,7 @@ public final class ArtifactFeedback {
             var at=center.offset(offset[0],0,offset[1]);
             if(level.hasChunkAt(at)){
                 level.sendParticles(p,heart,false,at.getX()+.5,at.getY()+.4,at.getZ()+.5,2,.08,.1,.08,0);
-                level.sendParticles(p,ParticleTypes.FLAME,false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,2,.15,.12,.15,.015);
+                level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,1,0,0,0,0);
             }
         }
     }
@@ -701,9 +706,8 @@ public final class ArtifactFeedback {
             level.sendParticles(ParticleTypes.LAVA,x,cy+.85D,z,2,.08D,.5D,.08D,.006D);
         }
         for(var target:targets){
-            double x=target.getX(),y=target.getY()+target.getBbHeight()*.35D,z=target.getZ();
-            level.sendParticles(ParticleTypes.FLAME,x,y,z,6,.16D,.3D,.16D,.018D);
-            level.sendParticles(ParticleTypes.LAVA,x,y-.18D,z,2,.1D,.18D,.1D,.006D);
+            // Reuse the brand's authored flare and bounded local audience instead of eight broadcast sparks.
+            entityAuraPulse(level,target,MagmaBrandEffect.brandParticles(target,level.getGameTime()));
         }
     }
     public static void domain(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int halfHeight) {

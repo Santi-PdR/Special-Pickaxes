@@ -22,8 +22,43 @@ class Resources(unittest.TestCase):
         ids = {entry["id"] for entry in entries}
         self.assertTrue({"pickaxe_compat_test:ashen_stratum", "minecraft:chest", "minecraft:bedrock",
                          "minecraft:water", "minecraft:lava", "minecraft:diamond_ore"} <= ids)
-        self.assertIn("exclude '" + fixture + "'", pathlib.Path("build.gradle").read_text())
-        self.assertIn(repr(fixture) + " not in z.namelist()", pathlib.Path("tools/verify_release.py").read_text())
+        self.assertIn("exclude 'data/pickaxe_compat_test/**'", pathlib.Path("build.gradle").read_text())
+        self.assertIn("n.startswith('data/pickaxe_compat_test/')", pathlib.Path("tools/verify_release.py").read_text())
+
+    def test_all_registered_particles_have_atlases_and_renderers(self):
+        source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java").read_text()
+        renderers = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        registrations = re.findall(r'(\w+)=PARTICLES\.register\("([^"]+)"', source)
+        self.assertTrue(registrations)
+        for constant, particle_id in registrations:
+            with self.subTest(particle=particle_id):
+                self.assertIn("SpecialPickaxes." + constant + ".get()", renderers)
+                definition = json.loads((ROOT / f"assets/specialpickaxes/particles/{particle_id}.json").read_text())
+                self.assertTrue(definition["textures"])
+                for texture in definition["textures"]:
+                    namespace, resource = texture.split(":", 1)
+                    atlas = ROOT / f"assets/{namespace}/textures/particle/{resource}.png"
+                    image = atlas.read_bytes()
+                    header = image[:26]
+                    self.assertEqual(header[:8], b"\x89PNG\r\n\x1a\n")
+                    width, height = struct.unpack(">II", header[16:24])
+                    self.assertGreater(width, 0)
+                    self.assertEqual(height % width, 0)
+                    # Blockbench may export indexed PNGs; their alpha lives in tRNS rather than RGBA.
+                    transparent_palette = False
+                    offset = 8
+                    while offset + 12 <= len(image):
+                        size = struct.unpack(">I", image[offset:offset + 4])[0]
+                        kind = image[offset + 4:offset + 8]
+                        if kind == b"tRNS":
+                            transparent_palette = any(alpha < 255 for alpha in image[offset + 8:offset + 8 + size])
+                        offset += size + 12
+                    self.assertTrue(header[25] in (4, 6) or header[25] == 3 and transparent_palette,
+                                    "particle atlases need an alpha channel or transparent palette")
+                    animation = json.loads(pathlib.Path(str(atlas) + ".mcmeta").read_text())["animation"]
+                    self.assertGreater(animation["frametime"], 0)
+                    for frame in animation["frames"]:
+                        self.assertIn(frame, range(height // width))
 
     def test_json(self):
         for pattern in ["*.json", "*.mcmeta"]:

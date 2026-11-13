@@ -1,5 +1,18 @@
 # Special Pickaxes — mining rework
 
+**5.10.409 — en desarrollo, pendiente de CI y revisión en cliente.** Corrige la
+clasificación de tags `ore_rates/*` para que no inventen menas ni unan vetas;
+limpia también el caché de familias al recargar tags. La respuesta de Estasis
+usa un cristal animado y nueve partículas bajo el presupuesto compartido.
+Hellspec sustituye chispas genéricas por sus flares propios en el aviso de
+Infernal Bloom y reutiliza el pulso de marca con audiencia local en los blancos
+de la erupción, sin cambiar daño, alcance o recarga. Todos los recursos de
+compatibilidad de prueba quedan excluidos del JAR. El CI añade pruebas del
+verificador de GameTests y de reproducción del sprite del Alba, y se verifican
+los recursos de todas las partículas registradas.
+
+Guía de extensión del terreno: [integración por datapacks](docs/mining-rework/DATAPACK-INTEGRATION.md).
+
 La **5.10.408** añade un sol animado de cuatro fotogramas al pulso de Remiendo del Alba de Palimpsest (una sola partícula propia por curación real, con generador determinista en `tools/dawn_bloom_asset.py`) y un tag de bloques `specialpickaxes:geology` para que los packs declaren terreno seguro sin actualizar el mod; las piezas fabricadas (losas, escaleras, muros, puertas, lámparas) ya no cuentan como geología aunque su nombre contenga roca. La inferencia por nombre de otros mods ahora exige segmentos completos (`lodestone` o `milestone` no coinciden) y sigue excluyendo menas, máquinas y fluidos antes de cualquier regla de nombre.
 
 La **5.10.407** cambia los iconos de Exodium, Iridium, Hellspec y Worldbreaker por sprites pixel-art 32×32 dibujados para este mod; conserva las referencias y su procedencia.
