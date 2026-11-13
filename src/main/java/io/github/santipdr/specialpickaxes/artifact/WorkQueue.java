@@ -15,6 +15,7 @@ public final class WorkQueue {
     private static final Map<UUID,FallGuard> CORE_DRILL_GUARDS=new HashMap<>();
     private static final ArrayDeque<UUID> ORDER=new ArrayDeque<>();
     private static boolean running;
+    private static boolean ticking;
     private static int lastAttempts;
     private static final long CORE_DRILL_LANDING_GRACE=600;
     private static final class FallGuard {
@@ -85,9 +86,13 @@ public final class WorkQueue {
         job.steps.add(step);job.accepted++;return true;
     }
     public static void cancel(ServerPlayer p) { JOBS.remove(p.getUUID());ORDER.remove(p.getUUID()); }
-    public static void clear() { JOBS.clear();CORE_DRILL_GUARDS.clear();ORDER.clear();running=false;lastAttempts=0; }
+    public static void clear() { JOBS.clear();CORE_DRILL_GUARDS.clear();ORDER.clear();lastAttempts=0; }
     public static void tick() {
-        if(running)return; // Forge callbacks cannot recursively consume this or another job.
+        if(ticking)return;
+        ticking=true;
+        try{tickJobs();}finally{ticking=false;}
+    }
+    private static void tickJobs(){
         int budget=ArtifactConfig.GLOBAL.get();lastAttempts=0;int turns=ORDER.size(),initial=turns,visited=0;
         while(turns-->0 && budget>0 && !ORDER.isEmpty()) {
             visited++;UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;
@@ -96,17 +101,25 @@ public final class WorkQueue {
                     || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
             // Keep aerial mining safe even while the same active job is paused for confirmation, chunks, or drops.
             if(protectsFall(p))p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
+            if(JOBS.get(id)!=job)continue;
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
-            if(job.region!=null&&!job.region.loaded(p)){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);continue;}
+            if(job.region!=null&&!job.region.loaded(p)){
+                if(JOBS.get(id)==job){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);}
+                continue;
+            }
+            if(JOBS.get(id)!=job)continue;
             int playerBudget=job.region==null?EnchantmentScaling.budget(job.tool):job.region.attemptsPerTick(job.tool);
             int turn=Math.min(budget,playerBudget);BlockPos feedback=null;net.minecraft.world.level.block.state.BlockState feedbackMaterial=null;
-            while(turn-->0 && (job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
+            while(turn-->0 && JOBS.get(id)==job&&!job.paused&&(job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
                 if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
                 if(dropBackpressured(job,p)){
                     job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
                 }
+                if(JOBS.get(id)!=job||job.paused)break;
                 budget--;lastAttempts++;
-                WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);job.completed++;
+                WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);
+                if(JOBS.get(id)!=job)break;
+                job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);
                     if(ok) {
@@ -119,8 +132,13 @@ public final class WorkQueue {
                 } catch(RuntimeException error) {
                     LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
                 } finally { running=false; }
-                if(job.tool.isEmpty() || p.getMainHandItem()!=job.tool) { job.steps.clear();job.paused=true;break; }
+                if(JOBS.get(id)!=job||job.paused)break;
+                if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=job.dimension
+                        ||job.tool.isEmpty()||p.getMainHandItem()!=job.tool){job.steps.clear();job.aborted=true;break;}
             }
+            // A native break/claim callback may cancel or replace this exact job.
+            // Never requeue it, emit stale completion, or remove the replacement.
+            if(JOBS.get(id)!=job)continue;
             if(feedback!=null&&p.tickCount%10==0)RelicEffects.emit(p,job.kind,"work",net.minecraft.world.phys.Vec3.atCenterOf(feedback));
             if(feedback!=null && p.tickCount%4==0){
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
@@ -134,12 +152,13 @@ public final class WorkQueue {
                 }
             }
             if(job.region!=null)job.region.reportProgress(p);
+            if(JOBS.get(id)!=job)continue;
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
                 else if(job.region instanceof IcarianLiftProgram lift){
                     String result=lift.surfaced()?"icarian_lift_surface":lift.fluidBlocked()?"icarian_lift_fluid":lift.blocked()?"icarian_lift_barrier":"icarian_lift_limit";
                     ArtifactFeedback.message(p,result);if(lift.surfaced())ArtifactFeedback.icarianSurface(p);ArtifactFeedback.cue(p,"complete");
-                }else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id);
+                }else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id,job);
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
@@ -147,14 +166,14 @@ public final class WorkQueue {
     }
 
     private static void tickCoreDrillGuards(){
-        var iterator=CORE_DRILL_GUARDS.entrySet().iterator();
-        while(iterator.hasNext()){
-            var entry=iterator.next();var guard=entry.getValue();var p=guard.player;
-            if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=guard.dimension||ArtifactState.now(p)>guard.expires||p.onGround()) {iterator.remove();continue;}
+        for(var entry:new ArrayList<>(CORE_DRILL_GUARDS.entrySet())){
+            var guard=entry.getValue();var p=guard.player;
+            if(CORE_DRILL_GUARDS.get(entry.getKey())!=guard)continue;
+            if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=guard.dimension||ArtifactState.now(p)>guard.expires||p.onGround()) {CORE_DRILL_GUARDS.remove(entry.getKey(),guard);continue;}
             var job=JOBS.get(entry.getKey());
             if(job!=null&&job.kind==ArtifactKind.WORLDBREAKER&&job.region instanceof DirectionalProgram directional&&directional.isCoreDrill())guard.expires=ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE;
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
-            if(job==null&&p.tickCount%10==0)RelicEffects.emit(p,ArtifactKind.WORLDBREAKER,"fall_guard",p.position());
+            if(CORE_DRILL_GUARDS.get(entry.getKey())==guard&&job==null&&p.tickCount%10==0)RelicEffects.emit(p,ArtifactKind.WORLDBREAKER,"fall_guard",p.position());
         }
     }
 

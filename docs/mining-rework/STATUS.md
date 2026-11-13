@@ -1,4 +1,4 @@
-# Estado actual — 5.10.416 pendiente de CI
+# Estado actual — 5.10.417 pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -12,7 +12,10 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.413 | `460a5af` / [43447481028](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43447481028) | Build y 60 JUnit OK; 190 GameTests, mismo único fallo. Bundle recuperado y verificado. Cliente omitido. |
 | 5.10.414 | `1bbd645` / [43448248860](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43448248860) | CI global success: build/JUnit, 197 GameTests, servidor, logs, cliente y exportación de evidencia. 32 escenas/64 tooltips, 9341 bloques. Publicación binaria omitida; sin revisión visual completa. |
 | 5.10.415 | `74c4481` / [43449061170](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43449061170) | CI global success confirmado. Sin inferir aprobación visual ni instalación. |
-| 5.10.416 | Fuente actual | Build/JUnit, JAR, 202 GameTests, servidor empaquetado y logs success para `3e4eecb`; cliente en curso. |
+| 5.10.416 | `3e4eecb` / [43450387194](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43450387194) | Build/JUnit, JAR, 202 GameTests, servidor empaquetado y logs success para `3e4eecb`; cliente en curso. |
+
+5.10.417 añade cinco regresiones de cancelación/sustitución/pausa y reentrada del
+scheduler; 207 GameTests pendientes de CI para la nueva fuente.
 
 5.10.414 corrige la confusión entre lanzador de `ItemEntity` y reserva vanilla de
 recogida, refuerza permisos tras callbacks y tolera cancelación reentrante de

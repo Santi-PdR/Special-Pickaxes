@@ -192,3 +192,12 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 
 - 5.10.415 `43449061170` completed/success según API. No se inspeccionó su galería ni se instaló su binario.
 - 5.10.416 fuente `3e4eecb`, run `43450387194`: pasos 10–17 success (build/JUnit, verificación JAR, seguridad JAR, 202 GameTests completos, servidor empaquetado, scanner de logs y dependencias cliente). Cliente real aún in_progress; sin resultado global conocido. Estas pruebas sí corresponden al cambio de Estasis, no se heredan de 414.
+
+## Cola de excavación — 5.10.417
+
+- Auditoría detectó que cancelar o sustituir un job durante `WorkStep.apply` no impedía ejecutar los siguientes pasos del job antiguo en ese turno. La finalización antigua también podía borrar el sustituto indexado por el mismo UUID. Se comprueba identidad antes/después de callbacks y antes de feedback/finalización/reencolado; pausa desde callback detiene el turno.
+- Guarda `ticking` separada de `running`: impide reentrada durante preparación, consultas y progreso, no solo durante apply. `clear()` no desactiva prematuramente el marcador de mutación nativa; el finally del apply lo restaura.
+- Cambio de dimensión, retirada, muerte o cambio de herramienta después de un paso aborta el trabajo antiguo antes de otra operación. La protección de caída Core Drill itera snapshot y verifica identidad para tolerar callbacks de efectos que la eliminan.
+- Cinco GameTests añadidos (135–139), pendientes de CI: cancelación en rotura nativa, sustitución sin borrado/ejecución vieja, clear+tick recursivo, pausa durante apply y reentrada desde loaded de programa regional. Total 207 en fuente.
+- Validación local ejecutada: 22 recursos + 28 Python correctos, parser 124 Java sin errores, diff-check y scan de secretos correctos. No compilación/pruebas Java locales ni instalación Windows. No cambio de tier, fuerza, presupuestos ni recetas.
+- Run 5.10.416 `43450387194` aún en capturas reales de cliente al consultar; build/JUnit, 202 GameTests, servidor/logs ya confirmados, resultado global pendiente.

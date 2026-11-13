@@ -1,5 +1,12 @@
 # Special Pickaxes — mining rework
 
+**5.10.417 — cola de trabajo resistente a cancelaciones; pendiente de CI.** Los
+callbacks pueden cancelar, sustituir o pausar un trabajo sin que la cola continúe
+sus pasos viejos, borre el sustituto o lo vuelva a encolar. Una guarda separada
+impide ticks recursivos durante preparación y mutación, incluso tras limpiar la
+cola. Cambios de dimensión/vida/herramienta detienen el turno. Cinco regresiones
+nuevas; 207 GameTests en fuente. Presupuestos y potencia no cambian.
+
 **5.10.416 — Estasis revalida cada fijación; build/JUnit, 202 GameTests, servidor y logs correctos en CI; cliente pendiente.** Tanto el dominio
 como el pulso comprueban objetivo, alianzas, dimensión, herramienta y claims antes
 de volver a fijar una entidad, incluido el permiso del punto de retorno. La

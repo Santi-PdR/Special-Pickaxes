@@ -1968,6 +1968,99 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(change);}
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_139") public static void regionalPreparationCannotRecursivelyRunTheScheduler(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);int[] loaded={0},applied={0};boolean[] done={false};
+        WorkProgram program=new WorkProgram(){
+            public int remaining(){return done[0]?0:1;}
+            public boolean awaiting(){return false;}
+            public boolean executing(){return true;}
+            public boolean done(){return done[0];}
+            public void confirm(){}
+            public boolean loaded(ServerPlayer p){if(++loaded[0]==1)WorkQueue.tick();return true;}
+            public WorkStep next(ServerPlayer p){
+                done[0]=true;
+                return new WorkStep(){
+                    public BlockPos pos(){return at;}
+                    public boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind kind){applied[0]++;return true;}
+                };
+            }
+        };
+        h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,program),"streaming program starts");
+        WorkQueue.tick();
+        h.assertTrue(loaded[0]==2&&applied[0]==1&&!WorkQueue.busy(wearer),
+                "loaded callback cannot recursively enter the scheduler before a native mutation begins");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_135") public static void cancelledQueueStopsAfterTheCurrentNativeBreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);var second=at.east();var level=h.getLevel();
+        level.setBlockAndUpdate(second,Blocks.STONE.defaultBlockState());
+        Consumer<BlockEvent.BreakEvent> cancel=event->{if(event.getPlayer()==wearer&&event.getPos().equals(at))WorkQueue.cancel(wearer);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,cancel);
+        try{
+            h.assertTrue(WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(
+                    new WorkStep.Mine(at,Blocks.STONE.defaultBlockState()),new WorkStep.Mine(second,Blocks.STONE.defaultBlockState()))),"two-step job starts");
+            WorkQueue.tick();
+            h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(second).is(Blocks.STONE),
+                    "cancelling inside the first native break prevents the second step without undoing the atomic first break");
+            h.assertTrue(!WorkQueue.busy(wearer),"cancelled work is not requeued");
+        }finally{MinecraftForge.EVENT_BUS.unregister(cancel);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_136") public static void queueReplacementSurvivesCompletionOfTheOldCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);var stale=at.east();var replacement=at.east(2);var level=h.getLevel();
+        level.setBlockAndUpdate(stale,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(replacement,Blocks.STONE.defaultBlockState());
+        Consumer<BlockEvent.BreakEvent> replace=event->{
+            if(event.getPlayer()==wearer&&event.getPos().equals(at)){
+                WorkQueue.cancel(wearer);
+                h.assertTrue(WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,
+                        List.of(new WorkStep.Mine(replacement,Blocks.STONE.defaultBlockState()))),"callback replacement starts");
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,replace);
+        try{
+            WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(
+                    new WorkStep.Mine(at,Blocks.STONE.defaultBlockState()),new WorkStep.Mine(stale,Blocks.STONE.defaultBlockState())));
+            WorkQueue.tick();
+            h.assertTrue(WorkQueue.busy(wearer)&&WorkQueue.completed(wearer)==0&&level.getBlockState(stale).is(Blocks.STONE),
+                    "old completion cannot delete, execute or overwrite the replacement job");
+            WorkQueue.tick();
+            h.assertTrue(level.getBlockState(replacement).isAir()&&!WorkQueue.busy(wearer),"replacement executes once on its own turn");
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_137") public static void queueClearInsideCallbackCannotBypassTheTickGuard(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);int[] applied={0};
+        WorkStep replacement=new WorkStep(){
+            public BlockPos pos(){return at;}
+            public boolean apply(ServerPlayer p,ItemStack tool,ArtifactKind kind){applied[0]++;return true;}
+        };
+        WorkStep clear=new WorkStep(){
+            public BlockPos pos(){return at;}
+            public boolean apply(ServerPlayer p,ItemStack tool,ArtifactKind kind){
+                WorkQueue.clear();
+                h.assertTrue(WorkQueue.running(),"clear must not drop the native-mutation marker inside an active step");
+                h.assertTrue(WorkQueue.start(p,tool,kind,List.of(replacement)),"replacement starts after clear");
+                WorkQueue.tick();return true;
+            }
+        };
+        WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(clear));WorkQueue.tick();
+        h.assertTrue(applied[0]==0&&WorkQueue.busy(wearer)&&!WorkQueue.running(),"recursive tick is suppressed even after clear, and the marker resets on return");
+        WorkQueue.tick();h.assertTrue(applied[0]==1&&!WorkQueue.busy(wearer),"replacement is neither lost nor duplicated");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_138") public static void pausingInsideAQueueCallbackStopsTheCurrentTurn(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);int[] applied={0};
+        WorkStep pause=new WorkStep(){
+            public BlockPos pos(){return at;}
+            public boolean apply(ServerPlayer p,ItemStack tool,ArtifactKind kind){applied[0]++;WorkQueue.togglePause(p);return true;}
+        };
+        WorkStep next=new WorkStep(){
+            public BlockPos pos(){return at;}
+            public boolean apply(ServerPlayer p,ItemStack tool,ArtifactKind kind){applied[0]++;return true;}
+        };
+        WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(pause,next));WorkQueue.tick();
+        h.assertTrue(applied[0]==1&&WorkQueue.status(wearer).equals("paused"),"callback pause stops before the next step of the same turn");
+        h.assertTrue(WorkQueue.togglePause(wearer),"paused work resumes");WorkQueue.tick();
+        h.assertTrue(applied[0]==2&&!WorkQueue.busy(wearer),"resumption executes the remaining step exactly once");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_131") public static void stasisFieldRechecksClaimsOnOddTicksBeforePinning(GameTestHelper h){
         var owner=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var level=h.getLevel();
         var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setNoGravity(true);
