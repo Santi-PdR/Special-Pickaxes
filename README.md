@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.411 — auditoría en desarrollo, pendiente de CI.** La selección de entidades
+**5.10.411 — build/JUnit, GameTests y servidor empaquetado comprobados en CI; cliente y aprobación visual pendientes.** La selección de entidades
 usa un colector top-k acotado, sin duplicados, siempre ordenado y con desempate
 por ID; las listas pequeñas ya no saltan la ordenación. Los dominios no vuelven
 a consultar JEG si su tipo ya es un proyectil vanilla y respetan el presupuesto

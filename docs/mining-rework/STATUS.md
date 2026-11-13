@@ -1,3 +1,38 @@
+# Estado actual — 5.10.411 en verificación de cliente
+
+## Evidencia verificada el 2026-11-13
+
+Fuente: `e2c3699c1ad01ede19f27e22bf19b3b6d3a0ac55`, rama
+`arena/cec54523-special-pickaxes`.
+Run: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43443796300
+
+Pasos confirmados **success** mediante la API de Actions:
+
+- Recursos (22 pruebas), pruebas Python del tooling (9) y escaneo de secretos.
+- Build y pruebas JUnit (`./gradlew build test`), ejecutados solo en CI.
+- `verify_release.py`: estructura del JAR, exclusión de fixtures y recursos de partículas.
+- Fase de GameTests, incluido el gate que exige el resumen completo de los **182** tests de fuente y ausencia de fallos required.
+- Arranque del servidor con el JAR empaquetado y escaneo de logs de GameTests/servidor.
+
+Al consultar, el job estaba en `Client runtime dependencies`. **No se confirma
+éxito del cliente, revisión visual, publicación aprobada ni instalación.** Una
+validación parcial no autoriza reutilizar la aprobación visual de 5.10.407.
+La carpeta Windows de mods del usuario sigue sin acceso desde el sandbox.
+
+La tanda 5.10.411 cubre selección top-k ordenada y sin duplicados, presupuesto
+exacto de consultas de proyectiles, reparación de tipos NBT, caducidad de anclas
+tras retroceder el reloj, protección aritmética y pulsación física del manual,
+y revalidación de herramienta/barreras antes de escrituras. Incluye 17 nuevos
+casos JUnit y tres GameTests de regresión. No modifica tier, potencia ni recetas.
+
+Los commits pendientes hasta 5.10.410 también se subieron a la misma rama. Su run
+`43443258552` había pasado build/JUnit, GameTests y servidor empaquetado y estaba
+en capturas de cliente. El antiguo run #622 (`43437302899`) terminó en failure
+en `Real client gallery and normal and SHIFT tooltip captures`; no se atribuye
+una causa concreta sin sus logs.
+
+## Registro histórico: 5.0.0
+
 # Rework minero — 5.0.0 validado y publicado
 
 Se mantiene el diseño de nueve artefactos de 5.0.0. La fuente, revisión visual y reproducción binaria están aprobadas. El JAR final está publicado.
