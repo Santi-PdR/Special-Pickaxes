@@ -179,3 +179,11 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - No cambios de potencia, radio, duración, tier ni recetas. Sin build local ni instalación Windows. Validación local final se registra tras ejecutarse, no confundir parser con compilación.
 - Última consulta: 5.10.414 y 5.10.415 seguían en capturas reales de cliente, sin fallo registrado hasta ese paso; esto no confirma éxito del cliente ni revisión visual/global.
 - Validación local ejecutada para 5.10.416: 22 pruebas de recursos, 28 unittest Python, parser 124 archivos Java, escaneo de secretos (252 entradas) y diff-check correctos. No pruebas Java locales.
+
+### Resultado recuperado de 5.10.414
+
+- `43448248860` completed/success. Confirmados servidor empaquetado, escaneo de logs, cliente real, exportador Checks y upload de Actions. `Publish verified release only` skipped: no aprobación visual aplicable. No confundir gate no bloqueante de aprobación con aprobación real.
+- Evidencia recuperada/verificada en `/tmp/sp-ci414`; incluye `GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS=32; NORMAL_AND_SHIFT=64`, controles teclado-servidor y `SUPREME_REMOVED_BLOCKS_9341` / `SUPREME_COMPLETE`.
+- Manifiesto de esa fuente: `special-pickaxes-1.20.1-5.10.414.jar`, 525972 bytes, SHA256 `690976b34add7ec8775ffb18565822219370928f40fe0ff1062d2155f09ef8a1`. Es metadato comprobado del bundle, no descarga local/instalación del JAR ni autorización para publicación.
+- Inspeccionadas únicamente tres capturas: `ux-shift-interregnum-domain.jpg`, `ux-shift-iridium-orefall.jpg`, `supreme-complete.jpg`. Tool HUD/iconos visibles; en el resultado supremo aparece un mensaje de acción «Operación cancelada», aunque el harness informa 9341 bloques y finalización. No se atribuye causa ni se aprueba visualmente la galería completa. Algunas partículas de primer plano ocupan bastante pantalla; requiere evaluación visual más amplia antes de ajustar tamaños.
+- 5.10.416 sigue pendiente de su propio CI `43450387194`, fuente `3e4eecb7609fe6d352e69908cfb3291b92931fdc`. Monitor `ci-de-special-pickaxes-5-10-416-d1dbf4dc`.

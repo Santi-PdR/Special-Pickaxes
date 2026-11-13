@@ -13,9 +13,10 @@ claims por drop, revalida posición/dimensión/mano/propiedad tras callbacks y n
 gasta cooldown si todos los objetivos están protegidos. Mantiene fuerza, radio y
 límite de objetivos. Una regresión adicional eleva la fuente a 198 GameTests.
 
-**5.10.414:** build/JUnit, verificación de JAR y fase de los 197 GameTests
-confirmados en CI; servidor empaquetado en curso en la última consulta. Cliente,
-logs finales, revisión visual y aprobación global todavía pendientes.
+**5.10.414:** CI global exitoso: build/JUnit, 197 GameTests, servidor empaquetado,
+logs y cliente real (32 escenas/64 tooltips; 9341 bloques retirados). Evidencia
+Checks recuperada y verificada. Solo tres capturas revisadas aquí; publicación
+binaria omitida por falta de aprobación visual de esa fuente. No valida cambios posteriores.
 
 **5.10.414 — propiedad real de drops y callbacks; pendiente de CI.** Corrige la
 confusión entre `ItemEntity.getOwner()` (lanzador) y el UUID vanilla `Owner`
