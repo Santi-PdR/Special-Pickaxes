@@ -1,5 +1,16 @@
 # Special Pickaxes — mining rework
 
+**5.10.412 — auditoría en desarrollo; pendiente de su propio CI.** Iridium respeta
+propiedad vanilla y marcas previas de otros jugadores, consulta claims tanto en
+atracción pasiva como activa y revalida el drop después de callbacks. Sus
+esquirlas y estelas comparten un límite de 32 por tick del servidor y el
+presupuesto global de auras. Las observaciones mineras usan una ventana de dos
+ticks del servidor. Worldloom comprueba permisos antes de cada captura o pin y
+rechaza objetivos de otras dimensiones. Ícaro contabiliza sus dos partículas de
+remate; Estasis reduce el brillo móvil según la calidad elegida sin ocultar su
+contorno. Se refuerzan el escaneo de excepciones Java y la exportación/extracción
+de evidencia de CI, conservando diagnósticos y declarando imágenes omitidas.
+
 **5.10.411 — build/JUnit, GameTests y servidor empaquetado comprobados en CI; cliente y aprobación visual pendientes.** La selección de entidades
 usa un colector top-k acotado, sin duplicados, siempre ordenado y con desempate
 por ID; las listas pequeñas ya no saltan la ordenación. Los dominios no vuelven

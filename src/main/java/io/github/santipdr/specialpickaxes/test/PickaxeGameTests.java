@@ -1682,6 +1682,96 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(swap);MinecraftForge.EVENT_BUS.unregister(observe);}
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_115") public static void iridiumMarkCannotStealAnotherWearersDrops(GameTestHelper h){
+        var first=player(h,ArtifactKind.IRIDIUM,"FirstLodeOwner");var second=player(h,ArtifactKind.IRIDIUM,"SecondLodeOwner");
+        var drop=new ItemEntity(h.getLevel(),first.getX()+2,first.getY(),first.getZ(),new ItemStack(Items.DIAMOND));
+        h.assertTrue(OreDropHighlight.mark(drop,first),"the first wearer marks the new ore drop");
+        h.assertTrue(!OreDropHighlight.mark(drop,second)
+                        &&drop.getPersistentData().getUUID("specialpickaxesIridiumOwner").equals(first.getUUID()),
+                "another player's observation cannot reassign the drop");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(second,drop,second.position(),8D),"the second player cannot recall it");
+        var saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Owner",second.getUUID());drop.load(saved);
+        h.assertTrue(second.getUUID().equals(drop.getOwner()),"vanilla ownership fixture loaded");
+        h.assertTrue(!OreDropHighlight.mark(drop,first)&&!ArtifactTechniques.isIridiumRecallTarget(first,drop,first.position(),8D),
+                "vanilla pickup ownership overrides a stale relic marker");
+        h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(first,drop,first.position(),Double.POSITIVE_INFINITY),"unbounded recall radii are rejected");
+        finish(h,first);
+    }
+    @GameTest(template="empty",batch="rework_each_116") public static void iridiumActiveAndPassivePullRespectClaimVetoes(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var level=h.getLevel();
+        var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.3D,wearer.getZ(),new ItemStack(Items.DIAMOND));
+        drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);
+        int[] denied={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
+            if(event.player==wearer&&event.target.equals(drop.blockPosition())){event.setCanceled(true);denied[0]++;}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+        try{
+            h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&drop.getDeltaMovement().equals(Vec3.ZERO),
+                    "passive Lode Sense cannot move a claim-protected drop");
+            h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM)
+                            &&drop.getDeltaMovement().equals(Vec3.ZERO)&&denied[0]>=2,
+                    "active recall rechecks permission at the drop rather than only at the caster");
+        }finally{MinecraftForge.EVENT_BUS.unregister(deny);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_117") public static void effectBudgetsIncludeIcarianCompletionAccents(GameTestHelper h){
+        h.assertTrue(RelicEffects.particleCost(ArtifactKind.ICARUS,"complete")==18,
+                "Icarus reserves sixteen wing motes and two completion accents");
+        h.assertTrue(RelicEffects.particleCost(ArtifactKind.ICARUS,"alternate")==16
+                        &&RelicEffects.particleCost(ArtifactKind.WORLDBREAKER,"complete")==24,
+                "other phase budgets keep their established counts");
+        var budget=new RelicParticleBudget(17);
+        h.assertTrue(!budget.tryReserve(10,RelicEffects.particleCost(ArtifactKind.ICARUS,"complete")),
+                "an eighteen-particle completion cannot leak through a seventeen-particle allowance");
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_118",timeoutTicks=120) public static void rootedTargetsAreReleasedImmediatelyWhenClaimPermissionChanges(GameTestHelper h){
+        var owner=player(h,ArtifactKind.WORLDLOOM);var level=h.getLevel();
+        var target=EntityType.SLIME.create(level);target.setNoAi(true);target.setNoGravity(true);
+        target.setPos(owner.getX()+2,owner.getY(),owner.getZ());level.addFreshEntity(target);
+        h.assertTrue(WorldloomSnare.bind(owner,target),"root windup starts for the permitted target");
+        h.runAfterDelay(81,()->{
+            Runnable probe=()->{
+                WorldloomSnare.tick();var displaced=target.position().add(1,0,0);
+                target.setPos(displaced);var motion=new Vec3(.4D,.1D,.2D);target.setDeltaMovement(motion);
+                Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
+                    if(event.player==owner&&event.ability.equals(ArtifactKind.WORLDLOOM.id))event.setCanceled(true);
+                };
+                MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                        io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+                try{
+                    WorldloomSnare.tick();
+                    h.assertTrue(target.position().distanceToSqr(displaced)<1.0E-6D&&target.getDeltaMovement().equals(motion),
+                            "a newly protected target is not teleported or motion-locked between the old five-tick checks");
+                }finally{MinecraftForge.EVENT_BUS.unregister(deny);WorldloomSnare.forget(owner);}
+                finish(h,owner);
+            };
+            if(level.getGameTime()%5==0)h.runAfterDelay(1,probe);else probe.run();
+        });
+    }
+    @GameTest(template="empty",batch="rework_each_119") public static void iridiumRechecksOwnershipAfterPermissionCallbacks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var level=h.getLevel();
+        var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.3D,wearer.getZ(),new ItemStack(Items.DIAMOND));
+        drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);
+        UUID changedOwner=UUID.randomUUID();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=event->{
+            if(event.player==wearer&&event.target.equals(drop.blockPosition()))
+                drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",changedOwner);
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        try{
+            h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&drop.getDeltaMovement().equals(Vec3.ZERO),
+                    "a passive permission callback changing ownership prevents the pull");
+            drop.getPersistentData().putUUID("specialpickaxesIridiumOwner",wearer.getUUID());
+            h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM)
+                            &&drop.getDeltaMovement().equals(Vec3.ZERO),
+                    "active recall also revalidates ownership after the callback");
+        }finally{MinecraftForge.EVENT_BUS.unregister(change);}
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

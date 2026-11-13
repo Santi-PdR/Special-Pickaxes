@@ -40,7 +40,8 @@ public final class WorldloomSnare {
     private WorldloomSnare() {}
 
     public static boolean bind(ServerPlayer owner,LivingEntity target){
-        if(!target.isAlive()||target==owner||target.isAlliedTo(owner)||DomainFields.frozen(target)
+        if(!target.isAlive()||target.isRemoved()||target.level()!=owner.level()
+                ||target==owner||target.isAlliedTo(owner)||DomainFields.frozen(target)
                 ||!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition()))return false;
         if(target instanceof Player other&&!owner.canHarmPlayer(other))return false;
         UUID id=target.getUUID();
@@ -66,9 +67,11 @@ public final class WorldloomSnare {
             long now=level.getGameTime();
             if(!target.isAlive()||target.isRemoved()||owner.isRemoved()||!owner.isAlive()||owner.serverLevel()!=level||target.level()!=level
                     ||target.isAlliedTo(owner)||target instanceof Player other&&!owner.canHarmPlayer(other)
-                    ||binding.expires>0&&now>=binding.expires){iterator.remove();continue;}
-            if(now%5==0&&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
+                    ||now<binding.started||binding.expires>0&&now>=binding.expires){iterator.remove();continue;}
             long age=now-binding.started;
+            // Revalidate every actual capture/pin, not merely one out of five ticks.
+            if((binding.anchor!=null||age>=WINDUP_TICKS||now%5==0)
+                    &&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
             if(binding.anchor==null){
                 // Roots cast together would send every telegraph in the same server tick.
                 // Spread each target's pulse across the interval without reducing its cadence.

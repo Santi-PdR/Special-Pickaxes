@@ -11,7 +11,8 @@ public final class RelicEffects {
     private RelicEffects(){}
     public static void emit(ServerPlayer p,ArtifactKind k,String phase,Vec3 center){
         int count=k==ArtifactKind.WORLDBREAKER?24:16;
-        if(!PARTICLE_BUDGET.tryReserve(p.serverLevel().getServer().getTickCount(),count))return;
+        int total=particleCost(k,phase);
+        if(!PARTICLE_BUDGET.tryReserve(p.serverLevel().getServer().getTickCount(),total))return;
         if(k==ArtifactKind.ICARUS){emitIcarianWings(p,phase,center,count);return;}
         ParticleOptions particle=switch(k){
             case PALIMPSEST->ParticleTypes.WAX_OFF;case CHOIR->ParticleTypes.SCULK_CHARGE_POP;
@@ -50,6 +51,11 @@ public final class RelicEffects {
             if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
             else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }
+    }
+
+    /** Includes secondary accents, so reserving a full burst never undercounts Icarus completion. */
+    public static int particleCost(ArtifactKind kind,String phase){
+        return (kind==ArtifactKind.WORLDBREAKER?24:16)+(kind==ArtifactKind.ICARUS&&"complete".equals(phase)?2:0);
     }
 
     /** Paired feather trails give Icarus a wing silhouette while keeping its old 16-particle budget. */

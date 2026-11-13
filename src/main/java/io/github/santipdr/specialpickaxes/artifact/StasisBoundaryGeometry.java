@@ -7,6 +7,15 @@ import net.minecraft.world.phys.Vec3;
 public final class StasisBoundaryGeometry {
     private StasisBoundaryGeometry() {}
 
+    /** Particle quality affects only the traveling spark, never the gameplay-volume outline. */
+    public static int particleInterval(int quality){
+        return switch(Math.max(0,Math.min(2,quality))){case 0->4;case 1->8;default->16;};
+    }
+    public static boolean particleDue(long tick,int quality){
+        return Math.floorMod(tick,particleInterval(quality))==0;
+    }
+
+
     /** A moving marker follows the square perimeter at the domain's actual upper plane. */
     public static Vec3 upperPerimeterPoint(BlockPos center,int radius,int halfHeight,double distance){
         return perimeterPoint(center,radius,distance,center.getY()+halfHeight+1D);

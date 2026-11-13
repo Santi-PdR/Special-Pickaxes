@@ -14,7 +14,7 @@ import java.util.*;
 public final class MiningObservations {
     private static final int DROP_QUERY_LIMIT=256;
     private record Observation(ServerPlayer player,ItemStack tool,ArtifactKind kind,BlockPos pos,
-                               BlockState state,ResourceKey<Level> dimension,long time,Map<UUID,ItemStack> dropsBefore,
+                               BlockState state,ResourceKey<Level> dimension,int time,Map<UUID,ItemStack> dropsBefore,
                                boolean dropsBeforeComplete,boolean applyHeldMiningEffects,boolean shareCuriosPassive) {}
     private record DropSnapshot(Map<UUID,ItemStack> stacks,boolean complete) {}
     private static final ArrayDeque<Observation> PENDING=new ArrayDeque<>();
@@ -33,7 +33,7 @@ public final class MiningObservations {
         if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return false;
         boolean tagDropsAtSpawn=trackOreDrops&&WorldSafety.capturesIridiumDrops();
         DropSnapshot snapshot=trackOreDrops&&!tagDropsAtSpawn?dropSnapshot(p,pos):new DropSnapshot(Map.of(),!tagDropsAtSpawn);
-        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),ArtifactState.now(p),snapshot.stacks(),snapshot.complete(),
+        PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),p.server.getTickCount(),snapshot.stacks(),snapshot.complete(),
                 applyHeldMiningEffects&&!queuedIridiumOre,shareCuriosPassive));
         return true;
     }
@@ -50,7 +50,7 @@ public final class MiningObservations {
             var o=PENDING.removeFirst();var p=o.player;
             if(!p.isAlive() || p.isRemoved() || p.level().dimension()!=o.dimension
                     || (o.applyHeldMiningEffects&&(p.getMainHandItem()!=o.tool||o.tool.isEmpty()))
-                    || ArtifactState.now(p)-o.time>2 || !p.serverLevel().hasChunkAt(o.pos)) continue;
+                    || !ObservationWindow.fresh(p.server.getTickCount(),o.time) || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)){
                     ArtifactPassives.lodeSurge(p,o.pos,o.shareCuriosPassive);

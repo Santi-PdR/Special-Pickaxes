@@ -45,7 +45,8 @@ public final class StasisBoundaryClient {
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null){BOUNDARIES.clear();return;}
         BOUNDARIES.entrySet().removeIf(entry->clientTicks-entry.getValue().lastSeen()>45);
-        if(mc.isPaused()||clientTicks%4!=0)return;
+        int quality=mc.options.particles().get().ordinal();
+        if(mc.isPaused()||!StasisBoundaryGeometry.particleDue(clientTicks,quality))return;
         for(var boundary:BOUNDARIES.values()){
             if(!boundary.dimension().equals(mc.level.dimension().location()))continue;
             var center=boundary.center();int radius=boundary.radius(),height=boundary.halfHeight();
@@ -54,7 +55,7 @@ public final class StasisBoundaryClient {
             var head=StasisBoundaryGeometry.upperPerimeterPoint(center,radius,height,phase);
             double bob=Math.sin(phase*.7D)*.045D;
             mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD,head.x,head.y+bob,head.z,0,.008D,0);
-            mc.level.addParticle(BOUNDARY_GLOW,head.x,head.y-.08D+bob,head.z,0,.003D,0);
+            if(quality<2)mc.level.addParticle(BOUNDARY_GLOW,head.x,head.y-.08D+bob,head.z,0,.003D,0);
         }
     }
 

@@ -237,6 +237,8 @@ public final class ArtifactTechniques {
         int recalled=0,visualized=0;
         for(var item:targets){
             if(recalled>=cap)break;
+            if(!WorldSafety.allowed(player,ArtifactKind.IRIDIUM,item.blockPosition())
+                    ||!isIridiumRecallTarget(player,item,center,radius))continue;
             Vec3 delta = center.subtract(item.position());
             item.setGlowingTag(true);
             if(delta.lengthSqr()>=.25){
@@ -253,7 +255,10 @@ public final class ArtifactTechniques {
     /** Shared eligibility rule for the spatial query and its radius/ownership regression tests. */
     public static boolean isIridiumRecallTarget(ServerPlayer player,ItemEntity item,Vec3 center,double radius){
         var data=item.getPersistentData();
-        return item.isAlive()&&data.getBoolean("specialpickaxesIridiumOreDrop")
+        return player.isAlive()&&item.isAlive()&&item.level()==player.level()
+                &&Double.isFinite(radius)&&radius>=0D
+                &&(item.getOwner()==null||item.getOwner().equals(player.getUUID()))
+                &&data.getBoolean("specialpickaxesIridiumOreDrop")
                 &&data.hasUUID("specialpickaxesIridiumOwner")
                 &&player.getUUID().equals(data.getUUID("specialpickaxesIridiumOwner"))
                 &&item.position().distanceToSqr(center)<=radius*radius;
