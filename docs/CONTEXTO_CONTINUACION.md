@@ -210,3 +210,10 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Cuatro GameTests añadidos (140–143), pendientes de CI: preservar reemplazo externo sin daño, propiedad del caster original, reemplazo durante callback, objetivo movido durante permiso sin efectos residuales. Total de fuente 211 GameTests.
 - Validación local ejecutada: 22 recursos + 28 Python, parser 124 Java, diff-check y secret scan (252 entradas) correctos; sin build/pruebas Java locales. Sin cambios de recetas, potencia ni tier, sin acceso/instalación Windows.
 - Última consulta: 5.10.417 `43452383160` en build; 5.10.416 `43450387194` en exportación de evidencia tras pasar cliente. No resultado global confirmado aún para esas fuentes.
+
+### Resultados CI confirmados al cerrar la tanda
+
+- 5.10.416 `43450387194` completed/success. Bundle Checks recuperado/verificado en `/tmp/sp-ci416`; cliente confirma 32 escenas, 64 tooltips, controles teclado-servidor y World Shatter con 9341 bloques. Sin revisión visual completa ni instalación. Manifiesto: JAR `special-pickaxes-1.20.1-5.10.416.jar`, 526753 bytes, SHA256 `af48c5cfe3921a8e1983195c96031b32c6658cc2fb7bde1703fbc40a8d65bd77`, fuente `3e4eecb7609fe6d352e69908cfb3291b92931fdc`.
+- 5.10.417 `43452383160`, fuente `5ec728889e25f843285f5caad9198da60ec553e2`: build/JUnit, JAR, 207 GameTests, servidor empaquetado y logs success; cliente real aún en curso. Monitor `ci-de-special-pickaxes-5-10-417-6fe5c741`.
+- 5.10.418 `43452644898`, fuente `cb2c5bec55b43b66ce69903cacf132dc02acba54`: build/JUnit, JAR, 211 GameTests, servidor empaquetado y logs success; cliente real aún en curso. Monitor `ci-de-special-pickaxes-5-10-418-58a8f494`.
+- El siguiente commit solo sincroniza estos resultados documentales y usa `[skip ci]` para no duplicar todos los runs por un cambio de texto. No omite ninguna validación de código fuente nueva.

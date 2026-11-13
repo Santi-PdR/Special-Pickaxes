@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.418 — atribución de Magma Brand y erupción; pendiente de CI.** Una marca
+**5.10.418 — atribución de Magma Brand y erupción; build/JUnit, 211 GameTests, servidor y logs correctos en CI; cliente pendiente.** Una marca
 reemplazada externamente no se convierte en daño propio ni se elimina al perder
 permisos el antiguo caster. Otro portador no puede robar una marca viva. El pulso
 revalida ownership después de callbacks; la erupción comprueba cada objetivo
@@ -14,7 +14,7 @@ impide ticks recursivos durante preparación y mutación, incluso tras limpiar l
 cola. Cambios de dimensión/vida/herramienta detienen el turno. Cinco regresiones
 nuevas; 207 GameTests en fuente. Presupuestos y potencia no cambian.
 
-**5.10.416 — Estasis revalida cada fijación; build/JUnit, 202 GameTests, servidor y logs correctos en CI; cliente pendiente.** Tanto el dominio
+**5.10.416 — Estasis revalida cada fijación; CI global exitoso, sin aprobación visual completa ni instalación.** Tanto el dominio
 como el pulso comprueban objetivo, alianzas, dimensión, herramienta y claims antes
 de volver a fijar una entidad, incluido el permiso del punto de retorno. La
 liberación restaura velocidad acotada sin teletransportar, y no escribe movimiento
