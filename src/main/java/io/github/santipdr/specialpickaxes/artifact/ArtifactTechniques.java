@@ -43,13 +43,19 @@ public final class ArtifactTechniques {
         return ArtifactActions.target(player).orElseGet(() -> player.blockPosition().relative(player.getDirection(), 6)).immutable();
     }
 
-    private static boolean magnetDrops(ServerPlayer player, int radius, int cap) {
+    private static boolean magnetDrops(ServerPlayer player,ItemStack tool,int radius,int cap) {
         Vec3 center = player.getEyePosition();
         int moved = 0,visualized=0;
-        var drops=EntitySelection.nearest(player.serverLevel(),ItemEntity.class,player.getBoundingBox().inflate(radius),
-                e->e.isAlive()&&(e.getOwner()==null||player.getUUID().equals(e.getOwner()))
+        var level=player.serverLevel();
+        var drops=EntitySelection.nearest(level,ItemEntity.class,player.getBoundingBox().inflate(radius),
+                e->e.isAlive()&&DropOwnership.allows(player,e)
                         &&e.position().distanceToSqr(center)<=(double)radius*radius,center,cap);
         for (var drop : drops) {
+            var checkedPosition=drop.blockPosition();
+            if(!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,checkedPosition)
+                    ||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty()
+                    ||!drop.isAlive()||drop.level()!=level||!drop.blockPosition().equals(checkedPosition)
+                    ||!DropOwnership.allows(player,drop)||drop.position().distanceToSqr(center)>(double)radius*radius)continue;
             Vec3 delta = center.subtract(drop.position());
             if (delta.lengthSqr() < .25) continue;
             if(visualized<12){ArtifactFeedback.gravityTether(player,drop.position(),center);visualized++;}
@@ -338,7 +344,7 @@ public final class ArtifactTechniques {
         return switch (kind) {
             case PALIMPSEST -> knockbackPulse(player, kind, 6, 1.0, 24);
             case CHOIR -> faultEcho(player, 6, 4);
-            case EVENTIDE -> magnetDrops(player, 16, 64);
+            case EVENTIDE -> magnetDrops(player,tool,16,64);
             case CRUCIBLE -> crucibleWard(player,tool);
             case INTERREGNUM -> ArtifactState.mode(player,kind)==1
                     ? arrestMotion(player,kind,player.blockPosition(),8,24)

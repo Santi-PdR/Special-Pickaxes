@@ -1,5 +1,15 @@
 # Special Pickaxes — mining rework
 
+**5.10.415 — cierre de la auditoría de atracción de drops; pendiente de CI.**
+El alternativo de Eventide también respeta la reserva vanilla de recogida y los
+claims por drop, revalida posición/dimensión/mano/propiedad tras callbacks y no
+gasta cooldown si todos los objetivos están protegidos. Mantiene fuerza, radio y
+límite de objetivos. Una regresión adicional eleva la fuente a 198 GameTests.
+
+**5.10.414:** build/JUnit, verificación de JAR y fase de los 197 GameTests
+confirmados en CI; servidor empaquetado en curso en la última consulta. Cliente,
+logs finales, revisión visual y aprobación global todavía pendientes.
+
 **5.10.414 — propiedad real de drops y callbacks; pendiente de CI.** Corrige la
 confusión entre `ItemEntity.getOwner()` (lanzador) y el UUID vanilla `Owner`
 (reserva de recogida). Iridium y el colapso de Eventide respetan la reserva real;

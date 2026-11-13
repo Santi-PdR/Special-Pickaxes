@@ -1,35 +1,23 @@
-# Estado actual — 5.10.411 en verificación de cliente
+# Estado actual — 5.10.415 pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
-Fuente: `e2c3699c1ad01ede19f27e22bf19b3b6d3a0ac55`, rama
-`arena/cec54523-special-pickaxes`.
-Run: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43443796300
+Rama de sesión: `arena/cec54523-special-pickaxes`. No instalación Windows ni
+control de la PC. Las validaciones de una fuente no certifican cambios posteriores.
 
-Pasos confirmados **success** mediante la API de Actions:
+| Versión | Fuente / run | Resultado comprobado |
+|---|---|---|
+| 5.10.411 | `e2c3699` / [43443796300](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43443796300) | Build/JUnit, 182 GameTests, servidor y cliente completos. Falló después al exportar evidencia. Sin aprobación visual/global. |
+| 5.10.412 | `3cd8c71` / [43447050583](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43447050583) | Build y 60 JUnit OK; 187 GameTests, uno fallido en fixture de propiedad Iridium. Bundle Checks recuperado y verificado. Cliente omitido. |
+| 5.10.413 | `460a5af` / [43447481028](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43447481028) | Build y 60 JUnit OK; 190 GameTests, mismo único fallo. Bundle recuperado y verificado. Cliente omitido. |
+| 5.10.414 | `1bbd645` / [43448248860](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43448248860) | Build/JUnit, verificación del JAR y fase completa de 197 GameTests success. Servidor empaquetado en curso en la última consulta; cliente y gate global pendientes. |
+| 5.10.415 | Fuente actual | 198 GameTests en fuente, incluido un caso nuevo para el alternativo Eventide. Aún no ejecutados para esta fuente. |
 
-- Recursos (22 pruebas), pruebas Python del tooling (9) y escaneo de secretos.
-- Build y pruebas JUnit (`./gradlew build test`), ejecutados solo en CI.
-- `verify_release.py`: estructura del JAR, exclusión de fixtures y recursos de partículas.
-- Fase de GameTests, incluido el gate que exige el resumen completo de los **182** tests de fuente y ausencia de fallos required.
-- Arranque del servidor con el JAR empaquetado y escaneo de logs de GameTests/servidor.
-
-Al consultar, el job estaba en `Client runtime dependencies`. **No se confirma
-éxito del cliente, revisión visual, publicación aprobada ni instalación.** Una
-validación parcial no autoriza reutilizar la aprobación visual de 5.10.407.
-La carpeta Windows de mods del usuario sigue sin acceso desde el sandbox.
-
-La tanda 5.10.411 cubre selección top-k ordenada y sin duplicados, presupuesto
-exacto de consultas de proyectiles, reparación de tipos NBT, caducidad de anclas
-tras retroceder el reloj, protección aritmética y pulsación física del manual,
-y revalidación de herramienta/barreras antes de escrituras. Incluye 17 nuevos
-casos JUnit y tres GameTests de regresión. No modifica tier, potencia ni recetas.
-
-Los commits pendientes hasta 5.10.410 también se subieron a la misma rama. Su run
-`43443258552` había pasado build/JUnit, GameTests y servidor empaquetado y estaba
-en capturas de cliente. El antiguo run #622 (`43437302899`) terminó en failure
-en `Real client gallery and normal and SHIFT tooltip captures`; no se atribuye
-una causa concreta sin sus logs.
+5.10.414 corrige la confusión entre lanzador de `ItemEntity` y reserva vanilla de
+recogida, refuerza permisos tras callbacks y tolera cancelación reentrante de
+raíces/campos/selecciones. 5.10.415 extiende la corrección al alternativo Eventide.
+Tier OP, herramienta correcta al minar y cero recetas conservados. Validación
+local: 22 pruebas de recursos, 28 Python y parser de 124 archivos Java; no build local.
 
 ## Registro histórico: 5.0.0
 

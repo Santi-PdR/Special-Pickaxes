@@ -1788,6 +1788,34 @@ public final class PickaxeGameTests {
             if(level.getGameTime()%5==0)h.runAfterDelay(1,probe);else probe.run();
         });
     }
+    @GameTest(template="empty",batch="rework_each_130") public static void eventideAlternateCannotBypassClaimsOrPickupOwnership(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var level=h.getLevel();
+        var reserved=new ItemEntity(level,wearer.getX()+3,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
+        var protectedDrop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
+        var changed=new ItemEntity(level,wearer.getX()+5,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
+        var saved=new net.minecraft.nbt.CompoundTag();reserved.saveWithoutId(saved);saved.putUUID("Owner",UUID.randomUUID());reserved.load(saved);
+        for(var drop:List.of(reserved,protectedDrop,changed)){drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);}
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> protect=event->{
+            if(event.player!=wearer)return;
+            if(event.target.equals(protectedDrop.blockPosition()))event.setCanceled(true);
+            if(event.target.equals(changed.blockPosition())){
+                var tag=new net.minecraft.nbt.CompoundTag();changed.saveWithoutId(tag);tag.putUUID("Owner",UUID.randomUUID());changed.load(tag);
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,protect);
+        try{
+            h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE),
+                    "an alternate with only protected drops reports no target");
+            for(var drop:List.of(reserved,protectedDrop,changed))h.assertTrue(drop.getDeltaMovement().equals(Vec3.ZERO),
+                    "the alternate respects claims, vanilla pickup reservations and callback ownership changes");
+            h.assertTrue(!ArtifactState.of(wearer,ArtifactKind.EVENTIDE).contains("alternateReady"),
+                    "no-target protection does not spend the alternate cooldown");
+        }finally{MinecraftForge.EVENT_BUS.unregister(protect);}
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE)
+                        &&protectedDrop.getDeltaMovement().x<-.5D,
+                "the now-permitted unreserved drop keeps the original strong pull");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_129") public static void domainCallbacksCanStopAFieldWithoutInvalidatingOtherFields(GameTestHelper h){
         var first=player(h,ArtifactKind.EVENTIDE,"FirstCallbackField");var second=player(h,ArtifactKind.EVENTIDE,"SecondCallbackField");
         var at=target(h);

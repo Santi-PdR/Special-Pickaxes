@@ -160,3 +160,11 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Campos: iteración snapshot y comprobación de identidad tras callbacks; las operaciones no deben continuar en un campo ya cancelado o sustituido. Se revalidan proyectiles/objetivos antes de modificar movimiento.
 - Siete GameTests añadidos (123–129), pendientes de CI: teleport/revocación de permisos sin cancelación, cancelación del selector, movimiento del objetivo al bind, cancelación reentrante de varias raíces, distinción Thrower/Owner, colapso con claims/propiedad y cancelación reentrante de campos.
 - Validación local: 22 pruebas recursos + 28 Python, parser 124 Java, diff-check y scan de secretos correctos. No build ni ejecución Java local, no checkout ni instalación Windows. Run 5.10.413 `43447481028` seguía en curso en la última consulta.
+
+## Cierre de atracción de drops — 5.10.415
+
+- Auditoría de todos los `getOwner()` comparados con UUID encontró el mismo error en el alternativo de Eventide (`magnetDrops`). Sustituido por `DropOwnership`, con permiso por drop y revalidación de propiedad/posición/dimensión/herramienta después del callback. Se conserva la fuerza .65, radio 16 y cap 64.
+- Un GameTest añadido (130), pendiente de ejecución: reserva vanilla ajena, claim vetado, ownership cambiado durante callback; no gastar cooldown cuando no se mueve nada y permitir de nuevo el tirón fuerte cuando se levanta el claim. Fuente total: 198 GameTests.
+- CI de 5.10.413 `43447481028`: failure, bundle recuperado/verificado en `/tmp/sp-ci413`. 60 JUnit sin errores; 190 GameTests completos, único fallo en el mismo fixture `vanilla ownership fixture loaded`. Esto confirma que no hubo otros GameTests fallidos en esa ejecución, no una aprobación global.
+- CI de 5.10.414 `43448248860` (fuente `1bbd645`): build/JUnit, estructura/hash JAR, escaneo JAR y paso completo de 197 GameTests success según API. El paso de servidor empaquetado estaba in_progress. No aprobación del cliente/global ni instalación. Monitor de proceso `ci-de-special-pickaxes-5-10-414-2267620e`.
+- Validación local tras el último cambio: 22 recursos y 28 Python OK, parser 124 fuentes Java sin errores, diff-check limpio. Java solo se compila/prueba en Actions.
