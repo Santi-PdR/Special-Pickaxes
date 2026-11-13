@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,12 +40,12 @@ public final class WorldloomSnare {
     private WorldloomSnare() {}
 
     public static boolean bind(ServerPlayer owner,LivingEntity target){
-        if(!target.isAlive()||target.isRemoved()||target.level()!=owner.level()
-                ||target==owner||target.isAlliedTo(owner)||DomainFields.frozen(target)
-                ||!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition()))return false;
-        if(target instanceof Player other&&!owner.canHarmPlayer(other))return false;
+        var origin=target.blockPosition();var level=owner.serverLevel();
+        if(!validTarget(owner,target,level)||DomainFields.frozen(target)
+                ||!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,origin)
+                ||!validTarget(owner,target,level)||!target.blockPosition().equals(origin))return false;
         UUID id=target.getUUID();
-        var level=owner.serverLevel();long now=level.getGameTime();
+        long now=level.getGameTime();
         Binding existing=BINDINGS.get(id);
         if(existing!=null){
             boolean active=existing.level==level&&existing.target.isAlive()&&!existing.target.isRemoved()
@@ -61,17 +61,24 @@ public final class WorldloomSnare {
 
     public static void tick(){
         if(BINDINGS.isEmpty())return;
-        var iterator=BINDINGS.entrySet().iterator();
-        while(iterator.hasNext()){
-            var binding=iterator.next().getValue();var target=binding.target;var owner=binding.owner;var level=binding.level;
+        // Permission callbacks may clear/replace bindings; iterate a bounded snapshot, not a live iterator.
+        for(var binding:new ArrayList<>(BINDINGS.values())){
+            var target=binding.target;var owner=binding.owner;var level=binding.level;
+            if(BINDINGS.get(target.getUUID())!=binding)continue;
             long now=level.getGameTime();
-            if(!target.isAlive()||target.isRemoved()||owner.isRemoved()||!owner.isAlive()||owner.serverLevel()!=level||target.level()!=level
-                    ||target.isAlliedTo(owner)||target instanceof Player other&&!owner.canHarmPlayer(other)
-                    ||now<binding.started||binding.expires>0&&now>=binding.expires){iterator.remove();continue;}
+            if(!validTarget(owner,target,level)||now<binding.started||binding.expires>0&&now>=binding.expires){
+                BINDINGS.remove(target.getUUID(),binding);continue;
+            }
             long age=now-binding.started;
-            // Revalidate every actual capture/pin, not merely one out of five ticks.
-            if((binding.anchor!=null||age>=WINDUP_TICKS||now%5==0)
-                    &&!WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,target.blockPosition())){iterator.remove();continue;}
+            var checkedPosition=target.blockPosition();
+            // Revalidate every actual capture/pin, including state changed inside a permission callback.
+            if(binding.anchor!=null||age>=WINDUP_TICKS||now%5==0){
+                boolean allowed=WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,checkedPosition);
+                if(BINDINGS.get(target.getUUID())!=binding)continue;
+                if(!allowed||!validTarget(owner,target,level)||!target.blockPosition().equals(checkedPosition)){
+                    BINDINGS.remove(target.getUUID(),binding);continue;
+                }
+            }
             if(binding.anchor==null){
                 // Roots cast together would send every telegraph in the same server tick.
                 // Spread each target's pulse across the interval without reducing its cadence.
@@ -91,6 +98,12 @@ public final class WorldloomSnare {
             target.setDeltaMovement(Vec3.ZERO);target.hasImpulse=true;
             if(pulseDue(binding,now))emitCaughtPulse(binding,age);
         }
+    }
+
+    private static boolean validTarget(ServerPlayer owner,LivingEntity target,ServerLevel level){
+        return owner.isAlive()&&!owner.isRemoved()&&owner.serverLevel()==level
+                &&target.isAlive()&&!target.isRemoved()&&target.level()==level&&target!=owner
+                &&!target.isAlliedTo(owner)&&(!(target instanceof Player other)||owner.canHarmPlayer(other));
     }
 
     private static boolean pulseDue(Binding binding,long now){

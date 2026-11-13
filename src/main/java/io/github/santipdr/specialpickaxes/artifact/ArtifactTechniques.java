@@ -257,7 +257,7 @@ public final class ArtifactTechniques {
         var data=item.getPersistentData();
         return player.isAlive()&&item.isAlive()&&item.level()==player.level()
                 &&Double.isFinite(radius)&&radius>=0D
-                &&(item.getOwner()==null||item.getOwner().equals(player.getUUID()))
+                &&DropOwnership.allows(player,item)
                 &&data.getBoolean("specialpickaxesIridiumOreDrop")
                 &&data.hasUUID("specialpickaxesIridiumOwner")
                 &&player.getUUID().equals(data.getUUID("specialpickaxesIridiumOwner"))

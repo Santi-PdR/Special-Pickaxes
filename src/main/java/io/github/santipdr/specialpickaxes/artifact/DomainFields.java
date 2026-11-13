@@ -162,29 +162,38 @@ public final class DomainFields {
         var player=field.owner;var level=player.serverLevel();var center=Vec3.atCenterOf(field.center);var pullTo=player.getEyePosition();
         var drops=EntitySelection.nearest(level,net.minecraft.world.entity.item.ItemEntity.class,
                 new AABB(field.center).inflate(EVENTIDE_COLLAPSE_RADIUS),item->item.isAlive()
-                        &&(item.getOwner()==null||player.getUUID().equals(item.getOwner()))
+                        &&DropOwnership.allows(player,item)
                         &&item.position().distanceToSqr(center)<=(double)EVENTIDE_COLLAPSE_RADIUS*EVENTIDE_COLLAPSE_RADIUS,
                 center,EVENTIDE_COLLAPSE_DROP_CAP);
+        int moved=0;
         for(var item:drops){
+            var checkedPosition=item.blockPosition();
+            if(!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,checkedPosition)
+                    ||FIELDS.get(player.getUUID())!=field||player.getMainHandItem()!=field.tool||field.tool.isEmpty()
+                    ||!item.isAlive()||item.level()!=level||player.serverLevel()!=level
+                    ||!item.blockPosition().equals(checkedPosition)||!DropOwnership.allows(player,item)
+                    ||item.position().distanceToSqr(center)>(double)EVENTIDE_COLLAPSE_RADIUS*EVENTIDE_COLLAPSE_RADIUS)continue;
             var delta=pullTo.subtract(item.position());
             if(delta.lengthSqr()<.04D)continue;
             item.setDeltaMovement(item.getDeltaMovement().scale(.2D).add(delta.normalize().scale(.72D)));
-            item.hasImpulse=true;
+            item.hasImpulse=true;moved++;
         }
-        return drops.size();
+        return moved;
     }
     public static void tick() {
         tickPulses();
-        var iterator=FIELDS.values().iterator();
-        while(iterator.hasNext()) {
-            var f=iterator.next();var p=f.owner;var level=p.serverLevel();
+        for(var f:new ArrayList<>(FIELDS.values())) {
+            var p=f.owner;var level=p.serverLevel();
+            if(FIELDS.get(p.getUUID())!=f)continue;
             if(f.kind==ArtifactKind.CRUCIBLE)f.center=p.blockPosition();
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=f.tool || f.tool.isEmpty()
                     || p.level().dimension()!=f.dimension || ArtifactState.now(p)>f.expires || !WorldSafety.allowed(p,f.kind,f.center)) {
                 if(p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==f.tool&&p.level().dimension()==f.dimension&&ArtifactState.now(p)>f.expires){ArtifactFeedback.message(p,"released");ArtifactFeedback.cue(p,"complete");}
                 if(f.kind==ArtifactKind.INTERREGNUM)io.github.santipdr.specialpickaxes.network.RelicNetwork.clearStasisBoundary(p,f.center,f.radius,Math.max(2,f.radius/2),f.dimension);
-                release(f);iterator.remove();continue;
+                if(FIELDS.remove(p.getUUID(),f))release(f);
+                continue;
             }
+            if(FIELDS.get(p.getUUID())!=f||p.getMainHandItem()!=f.tool||f.tool.isEmpty()||p.level().dimension()!=f.dimension)continue;
             if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition())) {
                 ArtifactPassives.grantCombatEffect(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,12);
                 ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,40);
@@ -215,6 +224,9 @@ public final class DomainFields {
                         &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
                         &&WorldSafety.allowed(p,f.kind,e.blockPosition()),CRUCIBLE_PROJECTILE_INSPECTION_BUDGET);
                 for(var projectile:projectiles){
+                    if(FIELDS.get(p.getUUID())!=f||p.serverLevel()!=level||p.getMainHandItem()!=f.tool)break;
+                    if(!projectile.isAlive()||projectile.level()!=level||!hostileProjectile(projectile,p,false)
+                            ||!withinProjectilePath(projectile,center,rangeSqr))continue;
                     Vec3 away=projectile.position().subtract(p.position()).normalize();
                     if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
                     double speed=Math.min(4.0,Math.max(1.5,projectile.getDeltaMovement().length()));
@@ -231,6 +243,7 @@ public final class DomainFields {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
                 if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
+                if(FIELDS.get(p.getUUID())!=f)continue;
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
             }
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0){f.center=p.blockPosition().immutable();ArtifactFeedback.domain(p,f.kind,f.center,2,2);}continue;}
@@ -254,7 +267,10 @@ public final class DomainFields {
             var current=f.observed;current.clear();int processed=0;
             for(var entity:entities) {
                 if(processed>=targetLimit) break;
-                if(!WorldSafety.allowed(p,f.kind,entity.blockPosition())) continue;
+                var checkedPosition=entity.blockPosition();
+                if(!WorldSafety.allowed(p,f.kind,checkedPosition))continue;
+                if(FIELDS.get(p.getUUID())!=f||p.serverLevel()!=level||p.getMainHandItem()!=f.tool)break;
+                if(!entity.isAlive()||entity.level()!=level||!entity.blockPosition().equals(checkedPosition)||!eligible.test(entity))continue;
                 processed++;current.add(entity.getUUID());
                 if(f.kind==ArtifactKind.AEGIS){
                     var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001 || entity instanceof net.minecraft.world.entity.projectile.AbstractArrow && !level.noCollision(entity,entity.getBoundingBox()))continue;

@@ -1728,7 +1728,7 @@ public final class PickaxeGameTests {
                 "another player's observation cannot reassign the drop");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(second,drop,second.position(),8D),"the second player cannot recall it");
         var saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Owner",second.getUUID());drop.load(saved);
-        h.assertTrue(second.getUUID().equals(drop.getOwner()),"vanilla ownership fixture loaded");
+        h.assertTrue(DropOwnership.allows(second,drop)&&!DropOwnership.allows(first,drop),"vanilla pickup ownership fixture loaded");
         h.assertTrue(!OreDropHighlight.mark(drop,first)&&!ArtifactTechniques.isIridiumRecallTarget(first,drop,first.position(),8D),
                 "vanilla pickup ownership overrides a stale relic marker");
         h.assertTrue(!ArtifactTechniques.isIridiumRecallTarget(first,drop,first.position(),Double.POSITIVE_INFINITY),"unbounded recall radii are rejected");
@@ -1786,6 +1786,137 @@ public final class PickaxeGameTests {
                 finish(h,owner);
             };
             if(level.getGameTime()%5==0)h.runAfterDelay(1,probe);else probe.run();
+        });
+    }
+    @GameTest(template="empty",batch="rework_each_129") public static void domainCallbacksCanStopAFieldWithoutInvalidatingOtherFields(GameTestHelper h){
+        var first=player(h,ArtifactKind.EVENTIDE,"FirstCallbackField");var second=player(h,ArtifactKind.EVENTIDE,"SecondCallbackField");
+        var at=target(h);
+        h.assertTrue(DomainFields.start(first,first.getMainHandItem(),ArtifactKind.EVENTIDE,at,8)
+                        &&DomainFields.start(second,second.getMainHandItem(),ArtifactKind.EVENTIDE,at,8),"both fields start");
+        int[] stopped={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> stop=event->{
+            if(event.player==first){stopped[0]++;DomainFields.stop(first);}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,stop);
+        try{
+            DomainFields.tick();
+            h.assertTrue(stopped[0]==1&&!DomainFields.active(first)&&DomainFields.active(second),
+                    "callback cancellation neither resurrects the first field nor breaks iteration over another field");
+        }finally{MinecraftForge.EVENT_BUS.unregister(stop);DomainFields.stop(second);}
+        finish(h,first);
+    }
+    @GameTest(template="empty",batch="rework_each_127") public static void pickupOwnershipIsIndependentFromThrowerIdentity(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var other=UUID.randomUUID();
+        var drop=new ItemEntity(h.getLevel(),wearer.getX()+2,wearer.getY(),wearer.getZ(),new ItemStack(Items.DIAMOND));
+        var saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Thrower",other);drop.load(saved);
+        h.assertTrue(DropOwnership.allows(wearer,drop),"a thrower UUID alone does not reserve vanilla pickup ownership");
+        h.assertTrue(OreDropHighlight.mark(drop,wearer),"unreserved drops remain markable regardless of thrower");
+        saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Owner",wearer.getUUID());drop.load(saved);
+        h.assertTrue(DropOwnership.allows(wearer,drop)&&ArtifactTechniques.isIridiumRecallTarget(wearer,drop,wearer.position(),8),
+                "the pickup owner can recall its own drop even with a different thrower");
+        saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Owner",other);drop.load(saved);
+        h.assertTrue(!DropOwnership.allows(wearer,drop)&&!ArtifactTechniques.isIridiumRecallTarget(wearer,drop,wearer.position(),8),
+                "another player's pickup reservation overrides the Iridium mark");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_128") public static void eventideCollapseRespectsClaimsAndPickupReservations(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var center=target(h);var level=h.getLevel();
+        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field starts");
+        var open=new ItemEntity(level,center.getX()+.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
+        var reserved=new ItemEntity(level,center.getX()+1.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
+        var denied=new ItemEntity(level,center.getX()+2.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
+        var changed=new ItemEntity(level,center.getX()+3.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
+        var saved=new net.minecraft.nbt.CompoundTag();reserved.saveWithoutId(saved);saved.putUUID("Owner",UUID.randomUUID());reserved.load(saved);
+        for(var drop:List.of(open,reserved,denied,changed)){drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);}
+        int[] vetoes={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> protect=event->{
+            if(event.player!=wearer)return;
+            if(event.target.equals(denied.blockPosition())){event.setCanceled(true);vetoes[0]++;}
+            if(event.target.equals(changed.blockPosition())){
+                var tag=new net.minecraft.nbt.CompoundTag();changed.saveWithoutId(tag);tag.putUUID("Owner",UUID.randomUUID());changed.load(tag);
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,protect);
+        try{
+            for(int n=0;n<24;n++)DomainFields.feed(wearer,wearer.getMainHandItem(),center,Blocks.STONE.defaultBlockState());
+            h.assertTrue(open.getDeltaMovement().lengthSqr()>.1D,"collapse still strongly pulls an unreserved permitted drop");
+            h.assertTrue(reserved.getDeltaMovement().equals(Vec3.ZERO),"collapse never pulls another player's reserved drop");
+            h.assertTrue(denied.getDeltaMovement().equals(Vec3.ZERO)&&vetoes[0]>0,"claim-protected drops remain untouched");
+            h.assertTrue(changed.getDeltaMovement().equals(Vec3.ZERO),"pickup ownership is rechecked after a permission callback");
+        }finally{MinecraftForge.EVENT_BUS.unregister(protect);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_123") public static void abilityPermissionRechecksPlayerAfterCallbacks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);var initial=wearer.position();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
+            if(event.player==wearer){calls[0]++;wearer.setPos(initial.add(2048,0,0));}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{
+            h.assertTrue(!WorldSafety.allowed(wearer,ArtifactKind.PALIMPSEST,at),
+                    "a non-cancelling listener moving the caster out of range invalidates permission");
+            h.assertTrue(calls[0]==1,"post-event validation must not post the permission event twice");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);wearer.setPos(initial);}
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> revoke=event->{
+            if(event.player==wearer)wearer.getAbilities().mayBuild=false;
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,revoke);
+        try{
+            h.assertTrue(!WorldSafety.allowed(wearer,ArtifactKind.PALIMPSEST,at),
+                    "revoking build rights without cancelling still prevents the action");
+        }finally{MinecraftForge.EVENT_BUS.unregister(revoke);wearer.getAbilities().mayBuild=true;}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_124") public static void selectionCallbacksCannotAppendToACancelledSelection(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
+        h.assertTrue(ArtifactInteraction.use(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"selection arms");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> cancel=event->{
+            if(event.player==wearer)ArtifactInteraction.clear(wearer);
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,cancel);
+        try{
+            h.assertTrue(ArtifactInteraction.left(wearer,at,false),"the corner click remains consumed after cancellation");
+            h.assertTrue(!ArtifactInteraction.selecting(wearer)&&ArtifactInteraction.cornerCount(wearer)==0,
+                    "a callback-cleared selection is not resurrected or appended to");
+        }finally{MinecraftForge.EVENT_BUS.unregister(cancel);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_125") public static void worldloomCannotBindATargetMovedByPermissionCallbacks(GameTestHelper h){
+        var owner=player(h,ArtifactKind.WORLDLOOM);var target=EntityType.SLIME.create(h.getLevel());
+        target.setNoAi(true);target.setNoGravity(true);target.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(target);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
+            if(event.player==owner)target.setPos(target.position().add(4,0,0));
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!WorldloomSnare.bind(owner,target),"claim approval at the old position cannot bind a moved target");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);WorldloomSnare.forget(owner);}
+        finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_126") public static void worldloomPermissionCallbacksCanClearBindingsSafely(GameTestHelper h){
+        var owner=player(h,ArtifactKind.WORLDLOOM);var target=EntityType.SLIME.create(h.getLevel());
+        target.setNoAi(true);target.setNoGravity(true);target.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(target);
+        h.assertTrue(WorldloomSnare.bind(owner,target),"first target binds");
+        var second=EntityType.SLIME.create(h.getLevel());second.setNoAi(true);second.setNoGravity(true);
+        second.setPos(owner.position().add(3,0,0));h.getLevel().addFreshEntity(second);
+        h.assertTrue(WorldloomSnare.bind(owner,second),"second target binds");
+        h.runAfterDelay(5-Math.floorMod(h.getLevel().getGameTime(),5),()->{
+            int[] calls={0};
+            Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> cancel=event->{
+                if(event.player==owner){calls[0]++;WorldloomSnare.forget(owner);}
+            };
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                    io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,cancel);
+            try{
+                WorldloomSnare.tick();
+                h.assertTrue(calls[0]==1,"callback removal skips the remaining stale bindings without concurrent modification");
+                h.assertTrue(WorldloomSnare.bind(owner,target),"cancelled target can be bound again");
+            }finally{MinecraftForge.EVENT_BUS.unregister(cancel);WorldloomSnare.forget(owner);}
+            finish(h,owner);
         });
     }
     @GameTest(template="empty",batch="rework_each_119") public static void iridiumRechecksOwnershipAfterPermissionCallbacks(GameTestHelper h){

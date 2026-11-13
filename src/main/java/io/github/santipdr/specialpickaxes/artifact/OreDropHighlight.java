@@ -22,7 +22,7 @@ public final class OreDropHighlight {
     /** @return true only when this drop receives its first highlight for this wearer. */
     public static boolean mark(ItemEntity drop,ServerPlayer owner){
         if(!drop.isAlive()||!owner.isAlive()||drop.level()!=owner.level()||!(drop.level() instanceof ServerLevel level)
-                ||drop.getOwner()!=null&&!drop.getOwner().equals(owner.getUUID()))return false;
+                ||!DropOwnership.allows(owner,drop))return false;
         var data=drop.getPersistentData();
         if(data.getBoolean(ORE_DROP)&&data.hasUUID(OWNER)&&!data.getUUID(OWNER).equals(owner.getUUID()))return false;
         boolean fresh=!data.getBoolean(ORE_DROP)||!data.hasUUID(OWNER)||!data.getUUID(OWNER).equals(owner.getUUID());

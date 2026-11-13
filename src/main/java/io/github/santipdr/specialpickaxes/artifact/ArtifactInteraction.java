@@ -8,9 +8,9 @@ import java.util.*;
 /** Region selections are owned by one exact stack and mode. */
 public final class ArtifactInteraction {
     private static final class Selection {
-        final ItemStack tool;final ArtifactKind kind;final String dimension;final int mode;final long expires;
+        final ItemStack tool;final ArtifactKind kind;final String dimension;final int mode;final long started;final long expires;
         final List<BlockPos> points=new ArrayList<>(2);boolean submitted;
-        Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;mode=ArtifactState.mode(p,k);dimension=ArtifactState.dimension(p);expires=ArtifactState.now(p)+12000;}
+        Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;mode=ArtifactState.mode(p,k);dimension=ArtifactState.dimension(p);started=ArtifactState.now(p);expires=started+12000;}
     }
     private static final Map<UUID,Selection> SELECTED=new HashMap<>();
     private ArtifactInteraction(){}
@@ -30,7 +30,7 @@ public final class ArtifactInteraction {
     private static void resetDisplay(Selection selection){if(selection!=null&&!selection.tool.isEmpty())selection.tool.getOrCreateTag().putString("artifactStatus","idle");}
     public static void clear(ServerPlayer p){resetDisplay(SELECTED.remove(p.getUUID()));}
     public static void clear(){SELECTED.values().forEach(ArtifactInteraction::resetDisplay);SELECTED.clear();}
-    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.mode(p,s.kind)==s.mode&&ArtifactState.dimension(p).equals(s.dimension)&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
+    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.mode(p,s.kind)==s.mode&&ArtifactState.dimension(p).equals(s.dimension)&&ArtifactState.now(p)>=s.started&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
     private static Selection selection(ServerPlayer p){var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);return null;}return s;}
     public static boolean selecting(ServerPlayer p){return selection(p)!=null;}
     public static int cornerCount(ServerPlayer p){var s=selection(p);return s==null?0:s.points.size();}
@@ -39,7 +39,7 @@ public final class ArtifactInteraction {
         // Consume even invalid/duplicate clicks: never fall through to normal mining while selecting.
         if(s.submitted||s.points.size()==2)return true;
         if(s.points.contains(pos)){ArtifactFeedback.message(p,"duplicate_corner");return true;}
-        if(!WorldSafety.allowed(p,s.kind,pos)||p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos))>32*32){ArtifactFeedback.message(p,"selection_invalid");return true;}
+        if(!WorldSafety.allowed(p,s.kind,pos)||selection(p)!=s||p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos))>32*32){ArtifactFeedback.message(p,"selection_invalid");return true;}
         s.points.add(pos.immutable());ArtifactFeedback.cue(p,"select");ArtifactFeedback.message(p,"corner",s.points.size());display(p,s.tool,s.kind);return true;
     }
     public static void analyzeComplete(ServerPlayer p){
@@ -54,7 +54,8 @@ public final class ArtifactInteraction {
         }catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"selection_invalid");}
     }
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
-        if(!kind.playable()||!WorldSafety.allowed(p,kind,p.blockPosition()))return false;
+        if(!kind.playable()||p.getMainHandItem()!=tool||tool.isEmpty()
+                ||!WorldSafety.allowed(p,kind,p.blockPosition())||p.getMainHandItem()!=tool||tool.isEmpty())return false;
         if(secondary){WorkQueue.cancel(p);DomainFields.stop(p);clear(p);return true;}
         if(!regional(kind,ArtifactState.mode(p,kind)))return ArtifactActions.use(p,tool,kind,false);
         if(WorkQueue.busy(p))return false;

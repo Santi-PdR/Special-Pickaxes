@@ -1,5 +1,17 @@
 # Special Pickaxes — mining rework
 
+**5.10.414 — propiedad real de drops y callbacks; pendiente de CI.** Corrige la
+confusión entre `ItemEntity.getOwner()` (lanzador) y el UUID vanilla `Owner`
+(reserva de recogida). Iridium y el colapso de Eventide respetan la reserva real;
+Eventide comprueba claims por drop y revalida después del evento. Los permisos
+recomprueban estado/dimensión/distancia del jugador después de callbacks sin
+emitir un segundo evento. Selecciones, raíces y campos toleran cancelación
+reentrante. Siete GameTests nuevos, todavía no ejecutados.
+
+**Resultado de 5.10.412:** build y 60 JUnit correctos; GameTests fallaron en el
+fixture de propiedad de Iridium, revelando la confusión anterior. No pasó el gate
+global ni llegó a validar cliente. Evidencia Checks recuperada y verificada.
+
 **5.10.413 — protección adicional de efectos; pendiente de CI.** Las pasivas
 registran la potencia y duración concedidas, además de su marca de propiedad.
 Un reemplazo externo más largo o de distinta potencia, incluso con las mismas

@@ -46,12 +46,16 @@ public final class WorldSafety {
         && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();
+        return allowedWithoutEvent(p,level,pos)
+                &&!MinecraftForge.EVENT_BUS.post(new AbilityUseEvent(p,kind.id,pos))
+                // A claim listener can teleport, kill or revoke build permission without cancelling.
+                &&p.serverLevel()==level&&allowedWithoutEvent(p,level,pos);
+    }
+    private static boolean allowedWithoutEvent(ServerPlayer p,net.minecraft.server.level.ServerLevel level,BlockPos pos){
         double range=ArtifactConfig.RANGE.get();
-        double maxDistanceSqr=range*range;
-        return p.isAlive() && !p.isSpectator() && p.mayBuild() && !level.isOutsideBuildHeight(pos)
-            && p.distanceToSqr(pos.getX()+0.5D,pos.getY()+0.5D,pos.getZ()+0.5D)<=maxDistanceSqr
-            && level.hasChunkAt(pos) && level.getWorldBorder().isWithinBounds(pos) && level.mayInteract(p,pos)
-            && !MinecraftForge.EVENT_BUS.post(new AbilityUseEvent(p,kind.id,pos));
+        return p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&p.mayBuild()&&!level.isOutsideBuildHeight(pos)
+                &&p.distanceToSqr(pos.getX()+.5D,pos.getY()+.5D,pos.getZ()+.5D)<=range*range
+                &&level.hasChunkAt(pos)&&level.getWorldBorder().isWithinBounds(pos)&&level.mayInteract(p,pos);
     }
     /** Physical barriers: query the level Fluid API as well as the block state. */
     public static boolean barrier(ServerPlayer p,BlockPos pos){
