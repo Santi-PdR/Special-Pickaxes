@@ -60,28 +60,36 @@
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
     "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Authorized source sprite remains unchanged in the repository. The runtime uses a hand-pixelled 32×32 redraw, refined from a generated concept and the existing sprite silhouette; this replacement does not copy an external texture.",
+    "runtime_texture": "worldbreaker_v2.png",
+    "runtime_sha256": "a76e31fb8f13072c3986c03aa360bc0ea54538b4e241727c399ba876bf6cd6da"
   },
   {
     "artifact": "exodium",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/exodium_pickaxe.png",
     "sha256": "3908b3d7b6e101a6517c3c29aac6da167f85c8460444e61f4b7c7816bc0acb1e",
-    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
+    "runtime_texture": "exodium_v2.png",
+    "runtime_sha256": "7ca3a6710f7008ce046c80c81bbd243f5a8bebdb60512524be8387f60f913c3a"
   },
   {
     "artifact": "iridium",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/iridium_pickaxe.png",
     "sha256": "bf7a1762354030256ebc3cc099617d760530c990bb5e9f497b3fab2465e67ee5",
-    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
+    "runtime_texture": "iridium_v2.png",
+    "runtime_sha256": "859947db9b23195d66e03dea0448bf864c8faae4eae5bf58d027ece5fda31f91"
   },
   {
     "artifact": "hellspec",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/hellspec_pickaxe.png",
     "sha256": "1bad527651745b25844edd661acee8e8c0974ab9eed904166481e90b19584e80",
-    "adaptation": "Reference sprite reused unchanged with permission. Independent stats, model and mining ability."
+    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
+    "runtime_texture": "hellspec_v2.png",
+    "runtime_sha256": "d209556a0be1647fe95d74aba628a1591bf9ca6fc413927e53e1facf5a0316d0"
   },
   {
     "artifact": "seam_ripper",

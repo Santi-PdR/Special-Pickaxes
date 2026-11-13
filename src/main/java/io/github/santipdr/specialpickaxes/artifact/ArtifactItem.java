@@ -116,5 +116,8 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public boolean isFoil(ItemStack stack) { return kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.ATLAS; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         ArtifactTooltips.compact(stack,kind,lines);
+        if(net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT
+                &&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown())
+            ArtifactTooltips.expanded(stack,kind,lines);
     }
 }

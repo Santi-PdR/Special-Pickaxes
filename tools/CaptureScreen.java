@@ -6,19 +6,50 @@ import javax.imageio.ImageIO;
 
 /** CI-only screenshot helper. Never packaged in the mod. */
 class CaptureScreen {
+    private static int key(String action) {
+        return switch (action) {
+            case "confirm" -> java.awt.event.KeyEvent.VK_ENTER;
+            case "mode" -> java.awt.event.KeyEvent.VK_C;
+            case "inventory" -> java.awt.event.KeyEvent.VK_E;
+            case "activate" -> java.awt.event.KeyEvent.VK_R;
+            case "cancel" -> java.awt.event.KeyEvent.VK_X;
+            case "shift" -> java.awt.event.KeyEvent.VK_SHIFT;
+            case "third" -> java.awt.event.KeyEvent.VK_F5;
+            case "clean" -> java.awt.event.KeyEvent.VK_F1;
+            default -> java.awt.event.KeyEvent.VK_F1;
+        };
+    }
+
+    private static void run(Robot robot, Rectangle bounds, String operation,
+            String path, String action) throws Exception {
+        if (action != null && !action.isEmpty()) {
+            int key = key(action);
+            robot.keyPress(key);
+            Thread.sleep(120);
+            if (!action.equals("shift")) robot.keyRelease(key);
+            if (operation.equals("press")) {
+                Thread.sleep(1000);
+                return;
+            }
+            Thread.sleep(500);
+        }
+        var image = robot.createScreenCapture(bounds);
+        ImageIO.write(image, "png", new File(path));
+        ImageIO.write(image, "jpg", new File(path.substring(0, path.length() - 4) + ".jpg"));
+        if ("shift".equals(action)) robot.keyRelease(java.awt.event.KeyEvent.VK_SHIFT);
+    }
+
     public static void main(String[] args) throws Exception {
         var bounds = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         var robot = new Robot();
-        if (args.length > 1) {
-            int key=args[1].equals("confirm")?java.awt.event.KeyEvent.VK_ENTER:args[1].equals("mode")?java.awt.event.KeyEvent.VK_C:args[1].equals("inventory")?java.awt.event.KeyEvent.VK_E:args[1].equals("activate")?java.awt.event.KeyEvent.VK_R:args[1].equals("cancel")?java.awt.event.KeyEvent.VK_V:args[1].equals("shift")?java.awt.event.KeyEvent.VK_SHIFT:args[1].equals("third")?java.awt.event.KeyEvent.VK_F5:java.awt.event.KeyEvent.VK_F1;
-            robot.keyPress(key);Thread.sleep(120);
-            if(!args[1].equals("shift"))robot.keyRelease(key);
-            Thread.sleep(1000);
+        String action = args.length > 1 ? args[1] : null;
+        String path = args.length > 0 ? args[0] : null;
+        if ("--press".equals(path)) {
+            run(robot, bounds, "press", null, action);
+            System.exit(0);
+        } else if (path != null) {
+            run(robot, bounds, "capture", path, action);
+            System.exit(0);
         }
-        var image=robot.createScreenCapture(bounds);
-        ImageIO.write(image, "png", new File(args[0]));
-        ImageIO.write(image, "jpg", new File(args[0].substring(0,args[0].length()-4)+".jpg"));
-        if(args.length>1&&args[1].equals("shift"))robot.keyRelease(java.awt.event.KeyEvent.VK_SHIFT);
-        System.exit(0); // AWT/X11 event threads must not keep this one-shot helper alive.
     }
 }

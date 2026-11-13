@@ -103,11 +103,18 @@ class Resources(unittest.TestCase):
             self.assertTrue(all(data.get(f"mode.specialpickaxes.{mode}") for mode in expected_outputs), language)
 
     def test_reference_models(self):
+        records = {record["artifact"]: record for record in json.loads(MANIFEST.read_text())}
         hashes = set()
         for artifact in IDS:
+            record = records[artifact]
+            runtime_texture = record.get("runtime_texture", artifact + ".png")
+            runtime_stem = pathlib.Path(runtime_texture).stem
             model = json.loads((ROOT / f"assets/specialpickaxes/models/item/{artifact}.json").read_text())
-            self.assertEqual(model["textures"]["layer0"], "specialpickaxes:item/" + artifact)
-            hashes.add(hashlib.sha256((ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()).hexdigest())
+            self.assertEqual(model["textures"]["layer0"], "specialpickaxes:item/" + runtime_stem)
+            runtime_png = (ROOT / "assets/specialpickaxes/textures/item" / runtime_texture).read_bytes()
+            if record.get("runtime_texture"):
+                self.assertEqual(struct.unpack(">II", runtime_png[16:24]), (32, 32), artifact + " runtime icon must be 32x32")
+            hashes.add(hashlib.sha256(runtime_png).hexdigest())
         self.assertEqual(len(hashes), len(IDS))
 
     def test_reference_sprite_provenance(self):
@@ -134,9 +141,10 @@ class Resources(unittest.TestCase):
             reference_hash = hashlib.sha256(reference_png).hexdigest()
             self.assertEqual(reference_hash, expected_hash, f"{artifact}: reference archive hash changed")
 
-            runtime_png = (ROOT / f"assets/specialpickaxes/textures/item/{artifact}.png").read_bytes()
+            runtime_texture = record.get("runtime_texture", artifact + ".png")
+            runtime_png = (ROOT / "assets/specialpickaxes/textures/item" / runtime_texture).read_bytes()
             runtime_hash = hashlib.sha256(runtime_png).hexdigest()
-            self.assertEqual(runtime_hash, expected_hash, f"{artifact}: runtime texture differs from its reference")
+            self.assertEqual(runtime_hash, record.get("runtime_sha256", expected_hash), f"{artifact}: runtime texture hash changed")
 
     def test_mining_modes_and_removed_models(self):
         self.assertEqual({path.stem for path in (ROOT / "assets/specialpickaxes/models/item").glob("*.json")}, set(IDS))
@@ -163,11 +171,14 @@ class Resources(unittest.TestCase):
                                  for key in data))
 
     def test_current_controls(self):
-        source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/RelicKeys.java").read_text()
+        source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/RelicKeyRegistration.java").read_text()
         actions_source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/RelicControl.java").read_text()
-        actions = set(re.search(r"enum Action \{([^}]+)\}", actions_source).group(1).replace(" ", "").split(","))
-        register_body = re.search(r"void register\([^)]*\)\s*\{([^}]+)\}", source).group(1)
-        excluded = set(re.findall(r"action!=RelicControl\.Action\.(\w+)", register_body))
+        actions_text = actions_source.split("enum Action {", 1)[1].split("}", 1)[0]
+        actions = set(actions_text.replace(" ", "").split(","))
+        self.assertIn("bus=Mod.EventBusSubscriber.Bus.MOD", source)
+        excluded = {action for action in actions if f"action != RelicControl.Action.{action}" in source}
+        self.assertIn("event.register(RelicKeys.KEYS[action.ordinal()]);", source)
+        self.assertIn("event.register(RelicKeys.MANUAL);", source)
         registered = {"key.specialpickaxes." + action.lower() for action in actions - excluded}
         registered.add("key.specialpickaxes.manual")
         self.assertEqual(registered, {"key.specialpickaxes.activate", "key.specialpickaxes.mode", "key.specialpickaxes.alt_skill", "key.specialpickaxes.manual"})

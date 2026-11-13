@@ -1,4 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
-  "textures": {"layer0": "specialpickaxes:item/exodium"}
+  "textures": {
+    "layer0": "specialpickaxes:item/exodium_v2"
+  }
 }

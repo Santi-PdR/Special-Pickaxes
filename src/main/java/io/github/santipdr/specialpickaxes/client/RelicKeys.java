@@ -5,7 +5,6 @@ import io.github.santipdr.specialpickaxes.network.RelicNetwork;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,10 +18,6 @@ public final class RelicKeys {
     private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
-    @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT,bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static final class Registration {
-        @SubscribeEvent public static void register(RegisterKeyMappingsEvent e){for(var action:RelicControl.Action.values())if(action!=RelicControl.Action.CONFIRM&&action!=RelicControl.Action.PAUSE&&action!=RelicControl.Action.SELECT&&action!=RelicControl.Action.CANCEL)e.register(KEYS[action.ordinal()]);e.register(MANUAL);}
-    }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(connection!=mc.getConnection()){
@@ -33,12 +28,16 @@ public final class RelicKeys {
             else {var equipped=CuriosCompat.find(mc.player);if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)mc.setScreen(new ArtifactManualScreen(item.kind));}
         }
         for(var a:RelicControl.Action.values()){
-            if(a==RelicControl.Action.CONFIRM||a==RelicControl.Action.PAUSE||a==RelicControl.Action.SELECT||a==RelicControl.Action.CANCEL)continue;
             var key=KEYS[a.ordinal()];for(int n=0;n<8&&key.consumeClick();n++){}
             boolean edge=DOWN[a.ordinal()].update(key.isDown());
             if(!edge||mc.screen!=null||mc.player==null)continue;
-            if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind.playable()&&mc.player.getMainHandItem().hasTag()&&mc.player.getMainHandItem().getTag().hasUUID("controlIdentity"))
-                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,mc.player.getMainHandItem().getTag().getUUID("controlIdentity")));
+            var hand=mc.player.getMainHandItem();
+            boolean validTool=hand.getItem() instanceof ArtifactItem item&&item.kind.playable();
+            boolean identity=hand.hasTag()&&hand.getTag().hasUUID("controlIdentity");
+            if(Boolean.getBoolean("specialpickaxes.clientSmoke"))
+                com.mojang.logging.LogUtils.getLogger().info("CLIENT_INPUT_EDGE_{} validTool={} identity={}",a.name(),validTool,identity);
+            if(validTool&&identity&&hand.getItem() instanceof ArtifactItem item)
+                RelicNetwork.CHANNEL.sendToServer(new RelicNetwork.Intent(item.kind,a,++sequence,hand.getTag().getUUID("controlIdentity")));
         }
     }
     public static void chooseCopy(ArtifactKind source){
