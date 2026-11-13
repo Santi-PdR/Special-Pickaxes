@@ -1502,15 +1502,20 @@ public final class PickaxeGameTests {
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"Terramity geology rephase creates no drops");
         finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_105") public static void geologyTagAllowsDatapackAddedTerrainAndStructuralPiecesStayOut(GameTestHelper h){
-        var level=h.getLevel();
+    @GameTest(template="empty",batch="rework_each_105") public static void geologyRejectsStructuralPiecesAndUnsafeTerrain(GameTestHelper h){
         var slab=TestOres.STRUCTURAL_STONE.defaultBlockState();
         h.assertTrue(GeologyNames.decoration("basalt_slab")&&GeologyNames.decoration("igneostone_brick_wall")
                         &&!GeologyNames.decoration("basalt")&&!GeologyNames.decoration("slate_layer"),
                 "shaped pieces are rejected while plain rock ids remain geology");
         h.assertTrue(!MiningDesigns.crucibleGeology(slab)&&!MiningDesigns.matrix(slab),
                 "a slab-shaped mod block never becomes transmutation or quarry input");
-        // Datapack extension point: a pack can declare its own safe terrain without a mod update.
+        for(var block:List.of(Blocks.BEDROCK,Blocks.CHEST,Blocks.WATER,Blocks.LAVA,Blocks.DIAMOND_ORE,
+                Blocks.STONE_SLAB,Blocks.STONE_STAIRS,Blocks.COBBLESTONE_WALL)){
+            var state=block.defaultBlockState();
+            h.assertTrue(!MiningDesigns.matrix(state)&&!MiningDesigns.crucibleGeology(state),
+                    "shared terrain filters reject protected blocks: "+block);
+        }
+
         h.assertTrue(!MiningDesigns.matrix(Blocks.AMETHYST_BLOCK.defaultBlockState()),"unrelated blocks are not geology by default");
         h.succeed();
     }

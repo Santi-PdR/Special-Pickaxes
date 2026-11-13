@@ -103,6 +103,7 @@ class Resources(unittest.TestCase):
         effect = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/DawnMendingEffect.java").read_text()
         renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
         self.assertIn("DAWN_MENDING_BLOOM.get()", effect, "a successful Dawn Mending pulse must show its authored sun")
+        self.assertNotIn("ParticleTypes.WAX_ON", effect, "the authored bloom replaces the four generic healing sparks")
         self.assertIn("DAWN_MENDING_BLOOM.get(),DawnBloomParticle.Provider::new", renderer, "the dawn sun needs its client renderer")
         generator = pathlib.Path("tools/dawn_bloom_asset.py")
         self.assertTrue(generator.is_file(), "the dawn sprite stays reproducible from its generator")

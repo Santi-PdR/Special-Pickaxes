@@ -64,3 +64,11 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
   - Tag de bloques `specialpickaxes:geology` (datapack allowlist) + `GeologyNames` (reglas sin registries, con unit test `GeologyNamesTest`): inferencia por segmentos completos, exclusión de piezas fabricadas en `crucibleGeology`, `WorldSafety.inert` incluye el tag. GameTest nuevo `geologyTagAllowsDatapackAddedTerrainAndStructuralPiecesStayOut` (batch `rework_each_105`, 151 GameTests en total).
   - Sintaxis Java verificada con `java-parser` (113 archivos, 0 errores); sin JDK/Gradle en el sandbox, la compilación y los GameTests quedan para CI.
 - Pendiente tras el reset de la API: confirmar run #622, hacer push de 5.10.408 y vigilar el workflow Forge verification.
+
+### Refuerzo posterior de 5.10.408
+
+- `matrix` y `crucibleGeology` comparten ahora filtros de menas, bedrock, bloques con entidad, fluidos y formas decorativas antes de consultar tags. La nueva rama de `WorldSafety.inert` exige también esos filtros para bloques del tag `geology`.
+- El GameTest de terreno se renombró a `geologyRejectsStructuralPiecesAndUnsafeTerrain`: comprueba además cofres, agua, lava, menas y formas vanilla. No afirma probar una recarga de datapack.
+- Remiendo del Alba sustituye cuatro chispas WAX_ON por un sol propio: ocho partículas de polvo + un sol por curación efectiva (9 en vez de las 12 originales).
+- Validación local: 19 pruebas de recursos OK, `git diff --check` limpio. Compilación, GameTests y revisión visual siguen pendientes de CI; no se ejecutó build local. El último intento de push falló por TLS; no se confirmó publicación ni actualización del PR #2.
+- Precisión de evidencia: el hash del JAR citado arriba se leyó de los manifiestos recuperados del run **40756578748**; los manifiestos del artefacto **12849296809** no pudieron descargarse desde el sandbox. No se ha verificado el hash del binario contenido en ese ZIP específico.

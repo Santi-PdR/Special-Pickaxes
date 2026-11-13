@@ -1,7 +1,6 @@
 package io.github.santipdr.specialpickaxes.artifact;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -32,13 +31,11 @@ public final class DawnMendingEffect extends MobEffect {
         data.putLong(NEXT_PULSE,now+40L);
         if(entity.level() instanceof ServerLevel level){
             double x=entity.getX(),y=entity.getY()+entity.getBbHeight()*.48D,z=entity.getZ();
-            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(12);
+            var particles=new ArrayList<ArtifactFeedback.AuraParticle>(9);
             for(int i=0;i<8;i++){
                 double angle=Math.PI*2D*i/8D;
                 particles.add(new ArtifactFeedback.AuraParticle(DAWN_DUST,
                         new net.minecraft.world.phys.Vec3(x+Math.cos(angle)*.42D,y+(i%2)*.12D,z+Math.sin(angle)*.42D),1,.025D,.04D,.025D,0));
-                if((i&1)==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.WAX_ON,
-                        new net.minecraft.world.phys.Vec3(x+Math.cos(angle)*.32D,y+.25D,z+Math.sin(angle)*.32D),1,.02D,.035D,.02D,.004D));
             }
             // One authored sun sprite marks the pulse; the dust ring stays as the outward cue.
             particles.add(new ArtifactFeedback.AuraParticle(

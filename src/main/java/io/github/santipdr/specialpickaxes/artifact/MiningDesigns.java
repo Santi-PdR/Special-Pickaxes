@@ -56,16 +56,16 @@ public final class MiningDesigns {
         for(int i=0;i<candidates.size()&&i<128;i++)steps.add(new WorkStep.Mine(candidates.get(i),level.getBlockState(candidates.get(i))));
         return WorkQueue.start(p,tool,ArtifactKind.IRIDIUM,steps);
     }
-    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);}
-    public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
-    public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
-        if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
-        // Structural pieces players and villages place are terrain, not transmutation stock.
+    /** Shared terrain gate: datapack tags cannot bypass ore, machine, fluid or shape protections. */
+    public static boolean matrix(net.minecraft.world.level.block.state.BlockState s){
+        if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s)||s.is(Blocks.BEDROCK))return false;
         var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(s.getBlock());
         if(key!=null&&GeologyNames.decoration(key.getPath()))return false;
-        if(s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL))return true;
-        return VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);
+        return s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)
+                ||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL)||VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);
     }
+    public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
+    public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s);}
     /**
      * Modded geology, in order of authority: the pack's datapack tag, the explicit
      * Ghouls list, then a conservative registry-name inference. Ores, fluids and block
