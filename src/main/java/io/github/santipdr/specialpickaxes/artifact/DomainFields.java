@@ -77,35 +77,48 @@ public final class DomainFields {
         return true;
     }
     private static void release(Field f) {
-        f.frozen.forEach((id,v) -> {
-            if(v.entity.isAlive()) v.entity.setDeltaMovement(clamp(v.velocity));
-            removeFrozenMembership(id);
-        });
-        f.frozen.clear();ArtifactPassives.clearCombatEffectLease(f.owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
+        releaseFrozen(f.frozen,f.dimension);
+        ArtifactPassives.clearCombatEffectLease(f.owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get());
     }
     private static void removeFrozenMembership(UUID id) {
         FROZEN_ENTITIES.computeIfPresent(id,(ignored,count)->count<=1?null:count-1);
     }
     private static Vec3 clamp(Vec3 v) { return v.lengthSqr()>9?v.normalize().scale(3):v; }
+    private static void restoreMomentum(Frozen frozen,net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension){
+        // Release restores momentum only in the capture dimension; it must never teleport a
+        // newly protected target or overwrite movement after another mod changes its dimension.
+        if(frozen.entity.isAlive()&&frozen.entity.level().dimension()==dimension){
+            frozen.entity.setDeltaMovement(clamp(frozen.velocity));frozen.entity.hasImpulse=true;
+        }
+    }
     private static void releaseFrozen(Map<UUID,Frozen> frozen,net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension){
-        frozen.forEach((id,value)->{
-            if(value.entity.isAlive()){
-                if(value.entity.level().dimension()==dimension){
-                    var box=value.entity.getBoundingBox().move(value.position.subtract(value.entity.position()));
-                    if(value.entity.level().noCollision(value.entity,box))value.entity.setPos(value.position);
-                }
-                value.entity.setDeltaMovement(clamp(value.velocity));
-            }
-            removeFrozenMembership(id);
-        });
+        frozen.forEach((id,value)->{restoreMomentum(value,dimension);removeFrozenMembership(id);});
         frozen.clear();
+    }
+    /** Permission belongs to the actual current target position, not its position before a callback. */
+    private static boolean pinAllowed(ServerPlayer owner,ItemStack tool,Frozen frozen,
+                                      net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension){
+        var entity=frozen.entity;var at=entity.blockPosition();
+        if(!pinEligible(owner,tool,entity,dimension))return false;
+        var anchor=BlockPos.containing(frozen.position);
+        return WorldSafety.allowed(owner,ArtifactKind.INTERREGNUM,at)
+                &&pinEligible(owner,tool,entity,dimension)&&entity.blockPosition().equals(at)
+                &&(anchor.equals(at)||WorldSafety.allowed(owner,ArtifactKind.INTERREGNUM,anchor))
+                &&pinEligible(owner,tool,entity,dimension)&&entity.blockPosition().equals(at);
+    }
+    private static boolean pinEligible(ServerPlayer owner,ItemStack tool,Entity entity,
+                                      net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension){
+        return owner.isAlive()&&!owner.isRemoved()&&owner.getMainHandItem()==tool&&!tool.isEmpty()
+                &&owner.level().dimension()==dimension&&entity.isAlive()&&!entity.isRemoved()
+                &&entity.level()==owner.level()&&!entity.isAlliedTo(owner)&&hostileProjectile(entity,owner,false);
     }
     private static void releasePulse(StasisPulse pulse){releaseFrozen(pulse.frozen,pulse.dimension);}
     /** Holds a capped set of valid threats in place briefly and restores their captured momentum afterwards. */
     public static int stasisPulse(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius,int cap,int duration){
         if(kind!=ArtifactKind.INTERREGNUM||p.isRemoved()||!p.isAlive()||p.isSpectator()
                 ||!(p.getMainHandItem().getItem() instanceof ArtifactItem pick)||pick.kind!=kind)return 0;
-        var level=p.serverLevel();var bounds=new AABB(center).inflate(radius);var fieldCenter=Vec3.atCenterOf(center);
+        var tool=p.getMainHandItem();var level=p.serverLevel();
+        var bounds=new AABB(center).inflate(radius);var fieldCenter=Vec3.atCenterOf(center);
         var targets=EntitySelection.nearest(level,Entity.class,bounds,e->e.isAlive()&&(projectileEntity(e)||e instanceof Monster)
                 &&!e.isAlliedTo(p)&&!FROZEN_ENTITIES.containsKey(e.getUUID())
                 &&hostileProjectile(e,p,false)
@@ -113,8 +126,11 @@ public final class DomainFields {
         var frozen=new HashMap<UUID,Frozen>();int processed=0;
         for(var entity:targets){
             if(processed>=cap)break;
-            if(!WorldSafety.allowed(p,kind,entity.blockPosition()))continue;
-            frozen.put(entity.getUUID(),new Frozen(entity,entity.position(),entity.getDeltaMovement()));
+            var capture=new Frozen(entity,entity.position(),entity.getDeltaMovement());
+            if(!pinAllowed(p,tool,capture,level.dimension())
+                    ||entity.position().distanceToSqr(fieldCenter)>(double)radius*radius
+                    ||FROZEN_ENTITIES.containsKey(entity.getUUID()))continue;
+            frozen.put(entity.getUUID(),capture);
             FROZEN_ENTITIES.merge(entity.getUUID(),1,Integer::sum);
             entity.setDeltaMovement(Vec3.ZERO);entity.hasImpulse=true;processed++;
         }
@@ -124,7 +140,15 @@ public final class DomainFields {
         return processed;
     }
     private static void holdFrozen(net.minecraft.server.level.ServerLevel level,Field field) {
-        for(var frozen:field.frozen.values())if(frozen.entity.isAlive()){
+        for(var frozen:new ArrayList<>(field.frozen.values())){
+            boolean allowed=pinAllowed(field.owner,field.tool,frozen,field.dimension);
+            if(FIELDS.get(field.owner.getUUID())!=field)break;
+            if(!allowed){
+                if(field.frozen.remove(frozen.entity.getUUID(),frozen)){
+                    restoreMomentum(frozen,field.dimension);removeFrozenMembership(frozen.entity.getUUID());
+                }
+                continue;
+            }
             var box=frozen.entity.getBoundingBox().move(frozen.position.subtract(frozen.entity.position()));
             if(level.noCollision(frozen.entity,box))frozen.entity.setPos(frozen.position);
             frozen.entity.setDeltaMovement(Vec3.ZERO);frozen.entity.hasImpulse=true;
@@ -271,7 +295,7 @@ public final class DomainFields {
                 if(!WorldSafety.allowed(p,f.kind,checkedPosition))continue;
                 if(FIELDS.get(p.getUUID())!=f||p.serverLevel()!=level||p.getMainHandItem()!=f.tool)break;
                 if(!entity.isAlive()||entity.level()!=level||!entity.blockPosition().equals(checkedPosition)||!eligible.test(entity))continue;
-                processed++;current.add(entity.getUUID());
+                processed++;
                 if(f.kind==ArtifactKind.AEGIS){
                     var velocity=entity.getDeltaMovement();if(velocity.lengthSqr()<0.00001 || entity instanceof net.minecraft.world.entity.projectile.AbstractArrow && !level.noCollision(entity,entity.getBoundingBox()))continue;
                     var away=entity.position().subtract(centerPosition).normalize();
@@ -279,6 +303,11 @@ public final class DomainFields {
                     entity.setDeltaMovement(away.scale(Math.min(3,Math.max(0.25,velocity.length()))));
                 } else if(f.kind==ArtifactKind.INTERREGNUM) {
                     var original=f.frozen.get(entity.getUUID());
+                    if(original!=null){
+                        boolean allowed=pinAllowed(p,f.tool,original,f.dimension);
+                        if(FIELDS.get(p.getUUID())!=f)break;
+                        if(!allowed)continue;
+                    }
                     if(original==null) {
                         original=new Frozen(entity,entity.position(),entity.getDeltaMovement());
                         f.frozen.put(entity.getUUID(),original);
@@ -291,11 +320,11 @@ public final class DomainFields {
                     double sign=ArtifactState.mode(p,f.kind)%2==0?1:-1;
                     entity.setDeltaMovement(clamp(entity.getDeltaMovement().scale(0.6).add(delta.scale(sign*ArtifactConfig.FIELD_FORCE.get()))));
                 }
-                entity.hasImpulse=true;
+                current.add(entity.getUUID());entity.hasImpulse=true;
             }
             f.frozen.entrySet().removeIf(entry -> {
                 if(current.contains(entry.getKey())) return false;
-                if(entry.getValue().entity.isAlive()) entry.getValue().entity.setDeltaMovement(clamp(entry.getValue().velocity));
+                restoreMomentum(entry.getValue(),f.dimension);
                 removeFrozenMembership(entry.getKey());
                 return true;
             });
@@ -308,18 +337,28 @@ public final class DomainFields {
         return start.add(segment.scale(t)).distanceToSqr(center)<=radiusSqr;
     }
     private static void tickPulses(){
-        var iterator=PULSES.values().iterator();
-        while(iterator.hasNext()){
-            var pulse=iterator.next();var p=pulse.owner;
+        for(var pulse:new ArrayList<>(PULSES.values())){
+            var p=pulse.owner;
+            if(PULSES.get(p.getUUID())!=pulse)continue;
             if(!p.isAlive()||p.isRemoved()||p.getMainHandItem()!=pulse.tool||pulse.tool.isEmpty()
                     ||p.level().dimension()!=pulse.dimension||ArtifactState.now(p)>=pulse.expires){
-                releasePulse(pulse);iterator.remove();continue;
+                if(PULSES.remove(p.getUUID(),pulse))releasePulse(pulse);
+                continue;
             }
-            for(var value:pulse.frozen.values())if(value.entity.isAlive()&&value.entity.level().dimension()==pulse.dimension){
+            for(var value:new ArrayList<>(pulse.frozen.values())){
+                boolean allowed=pinAllowed(p,pulse.tool,value,pulse.dimension);
+                if(PULSES.get(p.getUUID())!=pulse)break;
+                if(!allowed){
+                    if(pulse.frozen.remove(value.entity.getUUID(),value)){
+                        restoreMomentum(value,pulse.dimension);removeFrozenMembership(value.entity.getUUID());
+                    }
+                    continue;
+                }
                 var box=value.entity.getBoundingBox().move(value.position.subtract(value.entity.position()));
                 if(value.entity.level().noCollision(value.entity,box))value.entity.setPos(value.position);
                 value.entity.setDeltaMovement(Vec3.ZERO);value.entity.hasImpulse=true;
             }
+            if(pulse.frozen.isEmpty())PULSES.remove(p.getUUID(),pulse);
         }
     }
 }

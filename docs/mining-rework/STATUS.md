@@ -1,4 +1,4 @@
-# Estado actual — 5.10.415 pendiente de CI
+# Estado actual — 5.10.416 pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -11,7 +11,8 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.412 | `3cd8c71` / [43447050583](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43447050583) | Build y 60 JUnit OK; 187 GameTests, uno fallido en fixture de propiedad Iridium. Bundle Checks recuperado y verificado. Cliente omitido. |
 | 5.10.413 | `460a5af` / [43447481028](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43447481028) | Build y 60 JUnit OK; 190 GameTests, mismo único fallo. Bundle recuperado y verificado. Cliente omitido. |
 | 5.10.414 | `1bbd645` / [43448248860](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43448248860) | Build/JUnit, verificación del JAR y fase completa de 197 GameTests success. Servidor empaquetado en curso en la última consulta; cliente y gate global pendientes. |
-| 5.10.415 | Fuente actual | 198 GameTests en fuente, incluido un caso nuevo para el alternativo Eventide. Aún no ejecutados para esta fuente. |
+| 5.10.415 | `74c4481` / [43449061170](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43449061170) | Build/JUnit, 198 GameTests, servidor empaquetado y escaneo de logs success. Capturas de cliente en curso. |
+| 5.10.416 | Fuente actual | Cuatro regresiones de Estasis añadidas; 202 GameTests pendientes de CI para esta fuente. |
 
 5.10.414 corrige la confusión entre lanzador de `ItemEntity` y reserva vanilla de
 recogida, refuerza permisos tras callbacks y tolera cancelación reentrante de

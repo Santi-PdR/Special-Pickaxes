@@ -1,5 +1,12 @@
 # Special Pickaxes — mining rework
 
+**5.10.416 — Estasis revalida cada fijación; pendiente de CI.** Tanto el dominio
+como el pulso comprueban objetivo, alianzas, dimensión, herramienta y claims antes
+de volver a fijar una entidad, incluido el permiso del punto de retorno. La
+liberación restaura velocidad acotada sin teletransportar, y no escribe movimiento
+en otra dimensión. Cancelar el pulso desde un callback no reanuda su efecto ni
+invalida la iteración. Cuatro regresiones nuevas; 202 GameTests en fuente.
+
 **5.10.415 — cierre de la auditoría de atracción de drops; pendiente de CI.**
 El alternativo de Eventide también respeta la reserva vanilla de recogida y los
 claims por drop, revalida posición/dimensión/mano/propiedad tras callbacks y no

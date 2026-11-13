@@ -168,3 +168,14 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - CI de 5.10.413 `43447481028`: failure, bundle recuperado/verificado en `/tmp/sp-ci413`. 60 JUnit sin errores; 190 GameTests completos, único fallo en el mismo fixture `vanilla ownership fixture loaded`. Esto confirma que no hubo otros GameTests fallidos en esa ejecución, no una aprobación global.
 - CI de 5.10.414 `43448248860` (fuente `1bbd645`): build/JUnit, estructura/hash JAR, escaneo JAR y paso completo de 197 GameTests success según API. El paso de servidor empaquetado estaba in_progress. No aprobación del cliente/global ni instalación. Monitor de proceso `ci-de-special-pickaxes-5-10-414-2267620e`.
 - Validación local tras el último cambio: 22 recursos y 28 Python OK, parser 124 fuentes Java sin errores, diff-check limpio. Java solo se compila/prueba en Actions.
+
+## Estasis y liberación — 5.10.416
+
+- La auditoría encontró que el mantenimiento de entidades ya congeladas (`holdFrozen`, ticks sin escaneo y `tickPulses`) no revalidaba claims. Ahora cada pin comprueba estado vivo/no retirado, alianza, hostilidad del proyectil, dimensión, misma herramienta y permiso en posición actual y destino capturado; revalida tras callbacks. El camino de escaneo también comprueba el destino de entidades ya capturadas.
+- Los pulsos se iteran mediante snapshots acotados de sus objetivos; se verifica la identidad del pulso después de callbacks. Cancelarlo desde el evento no causa ConcurrentModificationException ni vuelve a fijar entidades liberadas.
+- Liberación común: restaura la velocidad original acotada únicamente si la entidad sigue en la dimensión capturada; marca impulso. Ya no teletransporta al liberar. Esto evita devolver a un objetivo a un ancla ahora protegida y evita modificar movimiento después de una transferencia de dimensión.
+- La captura inicial del pulso revalida herramienta/objetivo/posición/dimensión tras el permiso y no roba membership de otra congelación creada durante el callback.
+- Cuatro GameTests nuevos (131–134), pendientes de CI: veto de claim en mantenimiento de tick impar; veto en el punto de retorno del pulso; cancelación reentrante con dos objetivos; cambio de herramienta durante captura. Total en fuente 202.
+- No cambios de potencia, radio, duración, tier ni recetas. Sin build local ni instalación Windows. Validación local final se registra tras ejecutarse, no confundir parser con compilación.
+- Última consulta: 5.10.414 y 5.10.415 seguían en capturas reales de cliente, sin fallo registrado hasta ese paso; esto no confirma éxito del cliente ni revisión visual/global.
+- Validación local ejecutada para 5.10.416: 22 pruebas de recursos, 28 unittest Python, parser 124 archivos Java, escaneo de secretos (252 entradas) y diff-check correctos. No pruebas Java locales.

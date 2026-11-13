@@ -1968,6 +1968,81 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(change);}
         finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_131") public static void stasisFieldRechecksClaimsOnOddTicksBeforePinning(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var level=h.getLevel();
+        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setNoGravity(true);
+        mob.setPos(at.getX()+1.5,at.getY(),at.getZ()+.5);level.addFreshEntity(mob);
+        var velocity=new Vec3(.15,0,.05);mob.setDeltaMovement(velocity);owner.tickCount=0;
+        h.assertTrue(ArtifactActions.use(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"field starts");DomainFields.tick();
+        h.assertTrue(DomainFields.frozen(mob),"target initially frozen");
+        var displaced=mob.position().add(.3,0,0);mob.setPos(displaced);owner.tickCount=1;
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
+            if(event.player==owner&&event.target.equals(mob.blockPosition()))event.setCanceled(true);
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+        try{
+            DomainFields.tick();
+            h.assertTrue(!DomainFields.frozen(mob)&&mob.position().distanceToSqr(displaced)<1.0E-8,
+                    "claim revocation prevents the odd-tick hold from teleporting a protected target");
+            h.assertTrue(mob.getDeltaMovement().distanceToSqr(velocity)<1.0E-8,"release restores captured momentum without amplifying it");
+        }finally{MinecraftForge.EVENT_BUS.unregister(deny);}
+        finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_132") public static void stasisPulseRechecksDestinationClaimsWithoutReleaseTeleport(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var level=h.getLevel();
+        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setNoGravity(true);
+        mob.setPos(at.getX()+1.5,at.getY(),at.getZ()+.5);level.addFreshEntity(mob);mob.setDeltaMovement(.2,0,0);
+        h.assertTrue(DomainFields.stasisPulse(owner,ArtifactKind.INTERREGNUM,at,8,24,40)==1,"pulse captures one hostile");
+        var captured=mob.blockPosition();var displaced=mob.position().add(2,0,0);mob.setPos(displaced);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
+            if(event.player==owner&&event.target.equals(captured))event.setCanceled(true);
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+        try{
+            DomainFields.tick();
+            h.assertTrue(!DomainFields.frozen(mob)&&mob.position().distanceToSqr(displaced)<1.0E-8,
+                    "a pulse checks its return destination and releases without teleport when that anchor becomes protected");
+        }finally{MinecraftForge.EVENT_BUS.unregister(deny);}
+        finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_133") public static void stasisPulseCallbacksCanCancelWithoutRepinningTargets(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var level=h.getLevel();
+        var first=EntityType.ZOMBIE.create(level);var second=EntityType.ZOMBIE.create(level);
+        first.setNoAi(true);second.setNoAi(true);first.setPos(at.getX()+1.5,at.getY(),at.getZ()+.5);
+        second.setPos(at.getX()+2.5,at.getY(),at.getZ()+.5);level.addFreshEntity(first);level.addFreshEntity(second);
+        first.setDeltaMovement(.1,0,0);second.setDeltaMovement(.2,0,0);
+        h.assertTrue(DomainFields.stasisPulse(owner,ArtifactKind.INTERREGNUM,at,8,24,40)==2,"two hostiles captured");
+        var moved=first.position().add(.3,0,0);first.setPos(moved);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> stop=event->{if(event.player==owner)DomainFields.stop(owner);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,stop);
+        try{
+            DomainFields.tick();
+            h.assertTrue(!DomainFields.frozen(first)&&!DomainFields.frozen(second),"callback cancellation removes every membership without concurrent modification");
+            h.assertTrue(first.position().distanceToSqr(moved)<1.0E-8&&first.getDeltaMovement().x==.1,
+                    "cancelled pulse never teleports or zeroes the released target again");
+        }finally{MinecraftForge.EVENT_BUS.unregister(stop);}
+        finish(h,owner);
+    }
+    @GameTest(template="empty",batch="rework_each_134") public static void stasisPulseDoesNotCaptureAfterCallbackChangesTheHeldTool(GameTestHelper h){
+        var owner=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var level=h.getLevel();
+        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(at.getX()+1.5,at.getY(),at.getZ()+.5);
+        level.addFreshEntity(mob);var velocity=new Vec3(.2,0,0);mob.setDeltaMovement(velocity);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> swap=event->{
+            if(event.player==owner)owner.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,swap);
+        try{
+            h.assertTrue(DomainFields.stasisPulse(owner,ArtifactKind.INTERREGNUM,at,8,24,40)==0,
+                    "callback tool changes reject the initial pulse capture");
+            h.assertTrue(!DomainFields.frozen(mob)&&mob.getDeltaMovement().equals(velocity),
+                    "rejected capture neither freezes membership nor changes velocity");
+        }finally{MinecraftForge.EVENT_BUS.unregister(swap);}
+        finish(h,owner);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);
