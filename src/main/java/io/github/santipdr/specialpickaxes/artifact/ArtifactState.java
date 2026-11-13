@@ -15,12 +15,12 @@ public final class ArtifactState {
     private ArtifactState() {}
     public static long now(ServerPlayer p) { return p.server.overworld().getGameTime(); }
     public static CompoundTag root(ServerPlayer p) {
-        if (!p.getPersistentData().contains(ROOT)) p.getPersistentData().put(ROOT,new CompoundTag());
+        if (!p.getPersistentData().contains(ROOT,Tag.TAG_COMPOUND)) p.getPersistentData().put(ROOT,new CompoundTag());
         return p.getPersistentData().getCompound(ROOT);
     }
     public static CompoundTag of(ServerPlayer p, ArtifactKind kind) {
         var root=root(p);
-        if (!root.contains(kind.id)) root.put(kind.id,new CompoundTag());
+        if (!root.contains(kind.id,Tag.TAG_COMPOUND)) root.put(kind.id,new CompoundTag());
         var data=root.getCompound(kind.id);
         if(data.getInt("miningSchema")<7){
             // Old TRANSPOSE/RESTORE/CONVERGENCE and material modes have different
@@ -74,7 +74,7 @@ public final class ArtifactState {
     private static boolean expired(ServerPlayer p,CompoundTag tag){return age(p,tag)>ArtifactConfig.MEMORY_TTL.get();}
     public static void anchor(ServerPlayer p,ArtifactKind kind,String key,BlockPos pos) {
         var data=of(p,kind);
-        if(!data.getString("dimension").equals(dimension(p)) || now(p)-data.getLong("anchorTime")>ArtifactConfig.MEMORY_TTL.get()) {
+        if(!validAnchorTime(p,data)||!data.getString("dimension").equals(dimension(p))) {
             data.remove("a");data.remove("b");
         }
         if(key.equals("a")) data.remove("b");
@@ -82,9 +82,13 @@ public final class ArtifactState {
     }
     public static Optional<BlockPos> anchor(ServerPlayer p,ArtifactKind kind,String key) {
         var data=of(p,kind);
-        return data.contains(key) && data.getString("dimension").equals(dimension(p))
-            && now(p)-data.getLong("anchorTime")<=ArtifactConfig.MEMORY_TTL.get()
+        return data.contains(key,Tag.TAG_LONG) && data.getString("dimension").equals(dimension(p))
+            && validAnchorTime(p,data)
             ?Optional.of(BlockPos.of(data.getLong(key))):Optional.empty();
+    }
+    private static boolean validAnchorTime(ServerPlayer p,CompoundTag data){
+        long now=now(p),then=data.getLong("anchorTime");
+        return data.contains("anchorTime",Tag.TAG_LONG)&&then<=now&&then>=now-ArtifactConfig.MEMORY_TTL.get();
     }
     public static void clearAnchors(ServerPlayer p,ArtifactKind kind) { var d=of(p,kind);d.remove("a");d.remove("b"); }
 }

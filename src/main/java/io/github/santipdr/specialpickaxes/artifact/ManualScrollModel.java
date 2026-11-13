@@ -5,7 +5,7 @@ public final class ManualScrollModel {
     private ManualScrollModel(){}
 
     public static int maxScroll(int contentHeight,int viewportHeight){
-        return Math.max(0,contentHeight-Math.max(0,viewportHeight));
+        return Math.max(0,Math.max(0,contentHeight)-Math.max(0,viewportHeight));
     }
 
     public static int thumbHeight(int trackHeight,int contentHeight){
@@ -24,7 +24,7 @@ public final class ManualScrollModel {
     public static int scrollFromThumb(int trackHeight,int contentHeight,int thumbTop,int grabOffset){
         int max=maxScroll(contentHeight,trackHeight),travel=trackHeight-thumbHeight(trackHeight,contentHeight);
         if(max<=0||travel<=0)return 0;
-        int clampedTop=Math.max(0,Math.min(travel,thumbTop-grabOffset));
+        long clampedTop=Math.max(0L,Math.min((long)travel,(long)thumbTop-grabOffset));
         return (int)((long)clampedTop*max/travel);
     }
 }

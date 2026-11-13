@@ -1630,6 +1630,58 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(deny);target.removeEffect(brand);}
         finish(h,owner);
     }
+    @GameTest(template="empty",batch="rework_each_112") public static void corruptedRelicCompoundsRecoverIntoPersistentState(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);
+        wearer.getPersistentData().putString(ArtifactState.ROOT,"invalid old root");
+        var root=ArtifactState.root(wearer);root.putInt("probe",17);
+        h.assertTrue(wearer.getPersistentData().getCompound(ArtifactState.ROOT).getInt("probe")==17,
+                "a repaired root is attached to persistent player data");
+        root.putInt(ArtifactKind.PALIMPSEST.id,99);
+        var state=ArtifactState.of(wearer,ArtifactKind.PALIMPSEST);state.putInt("probe",23);
+        h.assertTrue(ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).getInt("probe")==23,
+                "a repaired relic compound is persistent rather than a detached empty tag");
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_113") public static void futureAnchorTimesCannotResurrectASelection(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var kind=ArtifactKind.PALIMPSEST;
+        var first=h.absolutePos(new BlockPos(2,3,2));var next=first.offset(2,0,0);
+        ArtifactState.anchor(wearer,kind,"a",first);
+        var state=ArtifactState.of(wearer,kind);state.putLong("anchorTime",ArtifactState.now(wearer)+100L);
+        h.assertTrue(ArtifactState.anchor(wearer,kind,"a").isEmpty(),"clock rollback invalidates old anchors");
+        ArtifactState.anchor(wearer,kind,"b",next);
+        h.assertTrue(ArtifactState.anchor(wearer,kind,"a").isEmpty()
+                        &&ArtifactState.anchor(wearer,kind,"b").orElseThrow().equals(next),
+                "a fresh anchor clears a stale future-dated selection");
+        state.putString("b","not a block position");
+        h.assertTrue(ArtifactState.anchor(wearer,kind,"b").isEmpty(),"a malformed position never becomes the origin");
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_114") public static void toolChangesDuringPermissionChecksPreventTentativeWrites(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var level=h.getLevel();var at=target(h);var other=at.offset(2,0,0);
+        var tool=wearer.getMainHandItem();level.setBlockAndUpdate(other,Blocks.BASALT.defaultBlockState());
+        PlayerPlacedBlocks.get(level).unmark(at);PlayerPlacedBlocks.get(level).unmark(other);
+        int[] placements={0};
+        Consumer<BlockEvent.BreakEvent> swap=event->{if(event.getPlayer()==wearer)
+                wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.STICK));};
+        Consumer<BlockEvent.EntityPlaceEvent> observe=event->{if(event.getEntity()==wearer)placements[0]++;};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.BreakEvent.class,swap);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,observe);
+        try{
+            h.assertTrue(!WorldSafety.transmute(wearer,tool,ArtifactKind.CRUCIBLE,at,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState())
+                            &&level.getBlockState(at).is(Blocks.STONE)&&placements[0]==0,
+                    "permission-time hand changes cancel transmutation before tentative placement callbacks");
+            wearer.setItemInHand(InteractionHand.MAIN_HAND,tool);
+            h.assertTrue(!WorldSafety.exchange(wearer,tool,at,other,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState())
+                            &&level.getBlockState(at).is(Blocks.STONE)&&level.getBlockState(other).is(Blocks.BASALT)&&placements[0]==0,
+                    "permission-time hand changes cancel both sides of an exchange before writes");
+            wearer.setItemInHand(InteractionHand.MAIN_HAND,tool);wearer.gameMode.changeGameModeForPlayer(GameType.CREATIVE);
+            var vacant=at.above(3);level.setBlockAndUpdate(vacant,Blocks.AIR.defaultBlockState());
+            h.assertTrue(!WorldSafety.placePaid(wearer,tool.copy(),ArtifactKind.WORLDLOOM,vacant,Blocks.STONE.defaultBlockState())
+                            &&level.getBlockState(vacant).isAir()&&placements[0]==0,
+                    "a detached tool cannot start paid placement even in creative");
+        }finally{MinecraftForge.EVENT_BUS.unregister(swap);MinecraftForge.EVENT_BUS.unregister(observe);}
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

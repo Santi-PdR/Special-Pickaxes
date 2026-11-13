@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 @Mod.EventBusSubscriber(modid="specialpickaxes",value=Dist.CLIENT)
 public final class RelicKeys {
     private static final io.github.santipdr.specialpickaxes.artifact.PressLatch[] DOWN=java.util.stream.IntStream.range(0,RelicControl.Action.values().length).mapToObj(i->new io.github.santipdr.specialpickaxes.artifact.PressLatch()).toArray(io.github.santipdr.specialpickaxes.artifact.PressLatch[]::new);
+    private static final PressLatch MANUAL_DOWN=new PressLatch();
     private static Object connection;private static long sequence;
     public static final KeyMapping MANUAL=new KeyMapping("key.specialpickaxes.manual",net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_I,"key.categories.specialpickaxes");
     private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X};
@@ -21,9 +22,11 @@ public final class RelicKeys {
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
         if(e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();
         if(connection!=mc.getConnection()){
-            connection=mc.getConnection();sequence=0;for(var a:RelicControl.Action.values())DOWN[a.ordinal()].update(KEYS[a.ordinal()].isDown());return;
+            connection=mc.getConnection();sequence=0;MANUAL_DOWN.update(MANUAL.isDown());for(var a:RelicControl.Action.values())DOWN[a.ordinal()].update(KEYS[a.ordinal()].isDown());return;
         }
-        if(MANUAL.consumeClick()&&mc.screen==null&&mc.player!=null){
+        // Physical edges only: queued repeats must not reopen the manual after it closes.
+        for(int n=0;n<8&&MANUAL.consumeClick();n++){}
+        if(MANUAL_DOWN.update(MANUAL.isDown())&&mc.screen==null&&mc.player!=null){
             if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item)mc.setScreen(new ArtifactManualScreen(item.kind));
             else {var equipped=CuriosCompat.find(mc.player);if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem item)mc.setScreen(new ArtifactManualScreen(item.kind));}
         }

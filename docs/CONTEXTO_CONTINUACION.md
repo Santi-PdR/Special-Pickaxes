@@ -110,3 +110,20 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Magma Brand: un daño cancelado no elimina los fotogramas de invulnerabilidad que tenía el blanco; si un listener establece otro valor, se respeta. GameTest nuevo (batch 111) usa un listener de `LivingAttackEvent` que veta el pulso y comprueba salud, fuego y ambas variantes de invulnerabilidad. Daño y cadencia de pulsos permitidos sin cambios.
 - Validación ejecutada: 22 tests de recursos OK; 9 tests Python OK; parser Java sobre 114 archivos sin errores de sintaxis; `git diff --check` limpio. Compilación/JUnit/GameTests y visuales siguen sin ejecutar, pendientes de CI. No hubo build local.
 - Nuevo intento de push volvió a fallar por TLS. Se mantiene la rama `arena/cec54523-special-pickaxes`; no se ha actualizado el PR #2 ni se ha instalado ningún JAR.
+
+## Auditoría amplia 5.10.411 — 2026-11-13
+
+### Red y CI recuperados
+
+- El push de todos los commits anteriores hasta `a347b14` a la rama vigente `arena/cec54523-special-pickaxes` tuvo éxito. No se creó otra rama de trabajo; el remoto no tenía aún esta rama de sesión.
+- Run #622 (`43437302899`) confirmado **completed / failure**: falló el paso `Real client gallery and normal and SHIFT tooltip captures`. No se consultaron logs externos inaccesibles ni se infirió la causa exacta.
+- CI nuevo de 5.10.410: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43443258552. Se confirmó éxito de `./gradlew build test`, `verify_release.py`, validadores Python y escaneo de secretos. Al consultar seguía ejecutando la fase de GameTests. Esto valida build/JUnit de **5.10.410**, no de los cambios posteriores ni una publicación aprobada.
+
+### Cambios de 5.10.411
+
+- `NearestCandidates`: colector genérico top-k, memoria O(k), sin duplicados y snapshots inmutables. `EntitySelection` lo usa en consultas del nivel y listas combinadas; ordena también cuando hay menos candidatos que el límite, con desempate por ID de entidad. Se revisaron consumidores: no mutan la lista devuelta. Siete pruebas JUnit nuevas cubren selección aleatoria contra referencia, duplicados, límites, snapshots y desempate.
+- `DomainFields`: omite el segundo escaneo si JEG hereda de `Projectile`; combina con el colector común. `ProjectileScanBudget` reparte exactamente el total sin redondear dos consultas de un solo candidato sobre un límite de uno. Tres pruebas JUnit nuevas cubren tipos independientes, valores impares, cero y extremos. No se ejecutó el pack con JEG.
+- `ArtifactState`: valida tipos `TAG_COMPOUND` antes de acceder al root y estado de cada reliquia; evita tags vacíos desconectados cuando un mod o save antiguo guarda otro tipo. Las anclas exigen posición long y tiempo válido, rechazan tiempos futuros y se limpian al iniciar otra selección tras retroceder el reloj. Dos GameTests nuevos (batches 112/113).
+- Manual: `ManualScrollModel` no desborda con contenido negativo o coordenadas de arrastre extremas; `ManualScreenLayout` suma offsets con long y normaliza dimensiones negativas. Cinco casos JUnit nuevos. `RelicKeys` usa latch físico también para el manual y descarta clicks repetidos; dos casos JUnit adicionales de latch al sostener/reconectar.
+- `WorldSafety`: la colocación exige la misma referencia de herramienta desde el inicio. Transmutación e intercambio revalidan mano, herramienta y barreras después de callbacks de permiso, antes de escrituras tentativas. GameTest nuevo (batch 114): un listener cambia la mano; no debe haber escrituras ni eventos de colocación; incluye herramienta separada en creativo.
+- Sin cambios de potencia, tier o recetas; sin build local, checkout o control de la PC.

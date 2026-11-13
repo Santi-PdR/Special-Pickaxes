@@ -114,7 +114,7 @@ public final class WorldSafety {
         if(level.hasChunkAt(pos)&&level.getBlockState(pos)==placed&&level.getFluidState(pos).isEmpty()&&placed.getFluidState().isEmpty())snapshot.restore(true,false);
     }
     public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
-        if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty()) return false;
+        if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             for(int i=0;i<p.getInventory().getContainerSize();i++) {
@@ -151,7 +151,8 @@ public final class WorldSafety {
                 || !validTool || p.serverLevel().getBlockState(pos)!=expected
                 || barrier(p,pos) || !breakPermission(p,pos)) return false;
         var level=p.serverLevel();
-        if(level.getBlockState(pos)!=expected) return false;
+        // Break-permission listeners can change the tool or introduce a physical barrier.
+        if(level.getBlockState(pos)!=expected||p.getMainHandItem()!=tool||tool.isEmpty()||barrier(p,pos)) return false;
         var snapshot=BlockSnapshot.create(level.dimension(),level,pos);boolean accepted=false;
         try {
             if(!level.setBlock(pos,next,2)) return false;
@@ -182,7 +183,8 @@ public final class WorldSafety {
         if(!vacant(sa) && (!harvestable(p,tool,a) || !breakPermission(p,a))) return false;
         if(!vacant(sb) && (!harvestable(p,tool,b) || !breakPermission(p,b))) return false;
         if(vacant(sa) && !emptyForPlacement(p,a,sb) || vacant(sb) && !emptyForPlacement(p,b,sa)) return false;
-        if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb) return false;
+        if(level.getBlockState(a)!=sa || level.getBlockState(b)!=sb || p.getMainHandItem()!=tool
+                ||tool.isEmpty()||barrier(p,a)||barrier(p,b)) return false;
         var oldA=BlockSnapshot.create(level.dimension(),level,a);var oldB=BlockSnapshot.create(level.dimension(),level,b);
         boolean accepted=false;
         try {

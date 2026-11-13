@@ -1,5 +1,15 @@
 # Special Pickaxes — mining rework
 
+**5.10.411 — auditoría en desarrollo, pendiente de CI.** La selección de entidades
+usa un colector top-k acotado, sin duplicados, siempre ordenado y con desempate
+por ID; las listas pequeñas ya no saltan la ordenación. Los dominios no vuelven
+a consultar JEG si su tipo ya es un proyectil vanilla y respetan el presupuesto
+total incluso con límites impares. Se reparan compuestos NBT de tipos inválidos
+y se invalidan anclas fechadas en el futuro. El manual abre por pulsación física,
+no por repeticiones acumuladas; el scroll y el selector resisten desbordamientos
+numéricos. Las operaciones revalidan mano y barreras tras los callbacks Forge,
+antes de escribir bloques. Se añaden 17 casos JUnit y tres GameTests de regresión.
+
 **5.10.410 — en desarrollo, pendiente de CI y revisión en cliente.** Unifica el
 presupuesto de partículas de vínculos aliados con el tick del servidor, incluso
 si difiere de la hora de una dimensión. Reserva del Alba usa un sol propio y

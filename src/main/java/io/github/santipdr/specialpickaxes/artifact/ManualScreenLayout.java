@@ -14,11 +14,12 @@ public final class ManualScreenLayout {
     /** Maps a horizontally scrolled icon strip click to a pick, ignoring each cell's trailing gap. */
     public static int choiceIndexAt(int localX,int pixelScroll,int cellWidth,int choiceCount){
         if(localX<0||pixelScroll<0||cellWidth<=2||choiceCount<=0)return -1;
-        int offset=localX+pixelScroll,index=offset/cellWidth;
-        return index<choiceCount&&offset%cellWidth<cellWidth-2?index:-1;
+        long offset=(long)localX+pixelScroll,index=offset/cellWidth;
+        return index<choiceCount&&offset%cellWidth<cellWidth-2?(int)index:-1;
     }
 
     public static Layout calculate(int screenWidth,int screenHeight,boolean showPicker){
+        screenWidth=Math.max(0,screenWidth);screenHeight=Math.max(0,screenHeight);
         int width=Math.max(0,Math.min(MAX_WIDTH,screenWidth-16));
         int height=Math.max(0,Math.min(MAX_HEIGHT,screenHeight-16));
         int left=(screenWidth-width)/2,top=(screenHeight-height)/2;

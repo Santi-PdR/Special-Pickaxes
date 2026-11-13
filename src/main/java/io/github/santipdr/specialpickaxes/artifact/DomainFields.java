@@ -44,17 +44,18 @@ public final class DomainFields {
     }
     static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
                                                  java.util.function.Predicate<Entity> eligible){
-        int totalBudget=EntitySelection.DEFAULT_INSPECTION_LIMIT*(JegProjectileCompat.entityType()==null?1:2);
+        int totalBudget=EntitySelection.DEFAULT_INSPECTION_LIMIT*(JegProjectileCompat.needsSeparateScan()?2:1);
         return projectilesNear(level,bounds,center,cap,eligible,totalBudget);
     }
     private static List<Entity> projectilesNear(net.minecraft.server.level.ServerLevel level,AABB bounds,Vec3 center,int cap,
                                                  java.util.function.Predicate<Entity> eligible,int totalInspectionBudget){
+        if(cap<=0||totalInspectionBudget<=0)return List.of();
+        var plan=ProjectileScanBudget.split(totalInspectionBudget,JegProjectileCompat.needsSeparateScan());
         var selected=new ArrayList<Entity>();
-        var jegType=JegProjectileCompat.entityType();int perTypeBudget=jegType==null?totalInspectionBudget:Math.max(1,totalInspectionBudget/2);
-        selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,projectile->eligible.test(projectile),center,cap,perTypeBudget));
-        if(jegType!=null)selected.addAll(EntitySelection.nearest(level,jegType,bounds,eligible,center,cap,perTypeBudget));
-        selected.sort(java.util.Comparator.comparingDouble(entity->entity.distanceToSqr(center)));
-        return selected.size()>cap?new ArrayList<>(selected.subList(0,cap)):selected;
+        selected.addAll(EntitySelection.nearest(level,Projectile.class,bounds,eligible::test,center,cap,plan.vanilla()));
+        if(plan.optional()>0)
+            selected.addAll(EntitySelection.nearest(level,JegProjectileCompat.entityType(),bounds,eligible,center,cap,plan.optional()));
+        return EntitySelection.nearest(selected,center,cap);
     }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,int radius) {
         return start(p,tool,kind,pos,radius,ArtifactConfig.FIELD_TIME.get());

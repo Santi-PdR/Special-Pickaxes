@@ -30,12 +30,13 @@ final class JegProjectileCompat {
     }
     @SuppressWarnings("unchecked")
     static Class<Entity> entityType(){return TYPE==null?null:(Class<Entity>)(Class<?>)TYPE;}
+    static boolean needsSeparateScan(){return TYPE!=null&&!Projectile.class.isAssignableFrom(TYPE);}
     /** Query projectile entity types directly so fast wards do not inspect every nearby mob/item each tick. */
     static List<Entity> nearest(ServerLevel level,AABB bounds,Predicate<Entity> eligible,Vec3 center,int limit,int inspectionLimit){
         var candidates=new ArrayList<Entity>();
         candidates.addAll(EntitySelection.nearest(level,Projectile.class,bounds,shot->eligible.test(shot),center,limit,inspectionLimit));
         var jegType=entityType();
-        if(jegType!=null&&!Projectile.class.isAssignableFrom(jegType))
+        if(needsSeparateScan())
             candidates.addAll(EntitySelection.nearest(level,jegType,bounds,shot->eligible.test(shot),center,limit,inspectionLimit));
         return EntitySelection.nearest(candidates,center,limit);
     }
