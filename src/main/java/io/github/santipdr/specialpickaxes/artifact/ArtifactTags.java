@@ -14,5 +14,8 @@ public final class ArtifactTags {
         private Blocks() {}
         public static final TagKey<Block> THERMAL_SOURCES=TagKey.create(Registries.BLOCK,
                 ResourceLocation.fromNamespaceAndPath(SpecialPickaxes.ID,"thermal_sources"));
+        /** Datapack allowlist: any block here counts as safe geology for mining and transmutation. */
+        public static final TagKey<Block> GEOLOGY=TagKey.create(Registries.BLOCK,
+                ResourceLocation.fromNamespaceAndPath(SpecialPickaxes.ID,"geology"));
     }
 }

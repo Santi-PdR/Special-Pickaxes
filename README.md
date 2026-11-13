@@ -1,5 +1,7 @@
 # Special Pickaxes — mining rework
 
+La **5.10.408** añade un sol animado de cuatro fotogramas al pulso de Remiendo del Alba de Palimpsest (una sola partícula propia por curación real, con generador determinista en `tools/dawn_bloom_asset.py`) y un tag de bloques `specialpickaxes:geology` para que los packs declaren terreno seguro sin actualizar el mod; las piezas fabricadas (losas, escaleras, muros, puertas, lámparas) ya no cuentan como geología aunque su nombre contenga roca. La inferencia por nombre de otros mods ahora exige segmentos completos (`lodestone` o `milestone` no coinciden) y sigue excluyendo menas, máquinas y fluidos antes de cualquier regla de nombre.
+
 La **5.10.407** cambia los iconos de Exodium, Iridium, Hellspec y Worldbreaker por sprites pixel-art 32×32 dibujados para este mod; conserva las referencias y su procedencia.
 
 La **5.10.406** amplía Barrido de Falla de Sutura de los Estratos a una cara 7×7 (hasta 49 bloques naturales); mantiene los filtros de seguridad y comprueba en GameTest los bloques del borde y los exteriores.

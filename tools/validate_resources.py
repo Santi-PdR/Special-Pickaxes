@@ -91,6 +91,22 @@ class Resources(unittest.TestCase):
         self.assertIn("EXODIUM_STARFALL.get()", technique, "Starfall mining impacts must use the animated custom particle")
         self.assertIn("EXODIUM_STARFALL.get(),ExodiumStarfallParticle.Provider::new", renderer, "the Starfall sprite must have a client renderer")
 
+    def test_dawn_mending_bloom_atlas_matches_particle_lifetime(self):
+        particle = json.loads((ROOT / "assets/specialpickaxes/particles/dawn_mending_bloom.json").read_text())
+        self.assertEqual(particle["textures"], ["specialpickaxes:dawn_mending_bloom"])
+        animation = json.loads((ROOT / "assets/specialpickaxes/textures/particle/dawn_mending_bloom.png.mcmeta").read_text())["animation"]
+        self.assertEqual(animation["frames"], [0, 1, 2, 3])
+        self.assertEqual(animation["frametime"] * len(animation["frames"]), 12, "the four dawn frames span the 12-tick pulse particle")
+        header = (ROOT / "assets/specialpickaxes/textures/particle/dawn_mending_bloom.png").read_bytes()[:26]
+        self.assertEqual(struct.unpack(">II", header[16:24]), (32, 128), "Dawn Mending uses four vertically stacked 32x32 frames")
+        self.assertEqual(header[25], 6, "the dawn bloom keeps its transparent background")
+        effect = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/artifact/DawnMendingEffect.java").read_text()
+        renderer = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()
+        self.assertIn("DAWN_MENDING_BLOOM.get()", effect, "a successful Dawn Mending pulse must show its authored sun")
+        self.assertIn("DAWN_MENDING_BLOOM.get(),DawnBloomParticle.Provider::new", renderer, "the dawn sun needs its client renderer")
+        generator = pathlib.Path("tools/dawn_bloom_asset.py")
+        self.assertTrue(generator.is_file(), "the dawn sprite stays reproducible from its generator")
+
     def test_crucible_manual_matches_mode_controls(self):
         expected_outputs = ["stone", "deepslate", "granite", "diorite", "andesite", "dirt", "basalt", "obsidian", "calcite", "tuff", "dripstone", "gravel"]
         for language in ["en_us", "es_es"]:

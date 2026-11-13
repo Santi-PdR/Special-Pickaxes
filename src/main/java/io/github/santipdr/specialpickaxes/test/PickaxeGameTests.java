@@ -1502,6 +1502,18 @@ public final class PickaxeGameTests {
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"Terramity geology rephase creates no drops");
         finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_105") public static void geologyTagAllowsDatapackAddedTerrainAndStructuralPiecesStayOut(GameTestHelper h){
+        var level=h.getLevel();
+        var slab=TestOres.STRUCTURAL_STONE.defaultBlockState();
+        h.assertTrue(GeologyNames.decoration("basalt_slab")&&GeologyNames.decoration("igneostone_brick_wall")
+                        &&!GeologyNames.decoration("basalt")&&!GeologyNames.decoration("slate_layer"),
+                "shaped pieces are rejected while plain rock ids remain geology");
+        h.assertTrue(!MiningDesigns.crucibleGeology(slab)&&!MiningDesigns.matrix(slab),
+                "a slab-shaped mod block never becomes transmutation or quarry input");
+        // Datapack extension point: a pack can declare its own safe terrain without a mod update.
+        h.assertTrue(!MiningDesigns.matrix(Blocks.AMETHYST_BLOCK.defaultBlockState()),"unrelated blocks are not geology by default");
+        h.succeed();
+    }
     @GameTest(template="empty",batch="legacy_each_08") public static void interregnumStasisAndRelease(GameTestHelper h) {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);

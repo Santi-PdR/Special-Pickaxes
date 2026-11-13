@@ -41,7 +41,8 @@ public final class WorldSafety {
         OreDropHighlight.mark(drop,context.player());
     }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!ArtifactOres.isOre(state)
-        &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL))
+        &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL)
+            ||state.is(ArtifactTags.Blocks.GEOLOGY))
         && state==state.getBlock().defaultBlockState(); }
     public static boolean allowed(ServerPlayer p, ArtifactKind kind, BlockPos pos) {
         var level=p.serverLevel();

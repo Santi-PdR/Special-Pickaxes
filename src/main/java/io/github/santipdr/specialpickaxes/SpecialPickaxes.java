@@ -46,6 +46,7 @@ public final class SpecialPickaxes {
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> HELLSPEC_BRAND_FLARE=PARTICLES.register("hellspec_brand_flare",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> WORLDLOOM_ROOT_CLAMP=PARTICLES.register("worldloom_root_clamp",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> EXODIUM_STARFALL=PARTICLES.register("exodium_starfall",()->new net.minecraft.core.particles.SimpleParticleType(false));
+    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> DAWN_MENDING_BLOOM=PARTICLES.register("dawn_mending_bloom",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);
@@ -121,6 +122,7 @@ public final class SpecialPickaxes {
         if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
             PlayerPlacedBlocks.scheduleCleanup(level,e.getPos());
     }
+    /** Geology and ore decisions are cached per block; a datapack reload invalidates both together. */
     private void tagsUpdated(net.minecraftforge.event.TagsUpdatedEvent e){ArtifactOres.clearCache();MiningDesigns.clearCache();}
     private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;

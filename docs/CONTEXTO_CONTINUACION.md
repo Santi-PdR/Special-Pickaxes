@@ -54,3 +54,13 @@ El JAR **todavía no se ha copiado** a `test-1\mods`. Ése es el paso pendiente 
 ## Instrucciones iniciales para la siguiente IA
 
 Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja sobre `codex/test1-507-icons` y PR #2. No crees una rama nueva ni vuelvas a empezar el mod desde cero. Primero completa la instalación pendiente del JAR verificado; después sigue con mejoras concretas sin perder el requisito de compatibilidad del modpack, minería con nivel correcto, picos OP y cero recetas. No controles la PC del usuario.
+
+## Sesión 2026-11-13 (rama arena/cec54523-special-pickaxes, versión 5.10.408)
+
+- **Instalación del JAR 5.10.407: sigue pendiente y no puede ejecutarse desde el sandbox.** La carpeta `D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods` está en la PC del usuario; el sandbox no tiene acceso a ella. No se afirmó instalación. El artefacto verificado sigue siendo la entrega: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/40761842497/artifacts/12849296809 (JAR `special-pickaxes-1.20.1-5.10.407.jar`, SHA-256 `e75aaf8f0ca196a8ee613cb98f3917b077ff4fb168b98ee4e865c0245edcbd0c`, 515303 bytes, verificado contra `build/SHA256SUMS` de la evidencia de CI).
+- La API de GitHub agotó su cuota (5200 req) durante la sesión; el reset es el epoch `1794580040`. El estado final del run #622 (`43437302899`, check `Live client diagnostics`) quedó sin confirmar por ese límite; re-consultarlo tras el reset.
+- **5.10.408 (sin validar aún en CI):**
+  - Partícula propia `dawn_mending_bloom` (4 fotogramas 32×32, atlas 32×128, frametime 3, vida 12 ticks) para el pulso de Remiendo del Alba de Palimpsest; generador determinista `tools/dawn_bloom_asset.py`; validación en `tools/validate_resources.py` (19 tests OK).
+  - Tag de bloques `specialpickaxes:geology` (datapack allowlist) + `GeologyNames` (reglas sin registries, con unit test `GeologyNamesTest`): inferencia por segmentos completos, exclusión de piezas fabricadas en `crucibleGeology`, `WorldSafety.inert` incluye el tag. GameTest nuevo `geologyTagAllowsDatapackAddedTerrainAndStructuralPiecesStayOut` (batch `rework_each_105`, 151 GameTests en total).
+  - Sintaxis Java verificada con `java-parser` (113 archivos, 0 errores); sin JDK/Gradle en el sandbox, la compilación y los GameTests quedan para CI.
+- Pendiente tras el reset de la API: confirmar run #622, hacer push de 5.10.408 y vigilar el workflow Forge verification.

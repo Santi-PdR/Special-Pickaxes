@@ -40,6 +40,10 @@ public final class DawnMendingEffect extends MobEffect {
                 if((i&1)==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.WAX_ON,
                         new net.minecraft.world.phys.Vec3(x+Math.cos(angle)*.32D,y+.25D,z+Math.sin(angle)*.32D),1,.02D,.035D,.02D,.004D));
             }
+            // One authored sun sprite marks the pulse; the dust ring stays as the outward cue.
+            particles.add(new ArtifactFeedback.AuraParticle(
+                    io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING_BLOOM.get(),
+                    new net.minecraft.world.phys.Vec3(x,y+.06D,z),1,0,0,0,0));
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
     }

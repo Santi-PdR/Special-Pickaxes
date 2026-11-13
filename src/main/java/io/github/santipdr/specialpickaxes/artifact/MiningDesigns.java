@@ -19,8 +19,6 @@ public final class MiningDesigns {
             "terramity:igneostone_tiles","terramity:igneostone_tile_slab","terramity:igneostone_tile_stairs",
             "undead_revamp2:chiseleddripstoneblock","undead_revamp2:chiseled_dripstonepillar",
             "undead_revamp2:chiseleddripstonepillarbottom","undead_revamp2:chiseleddripstonepillartop");
-    private static final Set<String> GEOLOGY_PARTS=Set.of("stone","rock","rocks","basalt","granite","diorite","andesite","limestone","marble","slate","shale","tuff","calcite","dripstone","speleothem","stalactite","stalagmite","deepslate","blackstone","netherrack","endstone","obsidian","sandstone","cobble","cobblestone","gravel","dirt","clay",
-            "gabbro","gneiss","quartzite","schist","phyllite","argillite","hornfels","siltstone","mudstone","claystone","conglomerate","breccia","pumice","rhyolite","dacite","travertine","dolomite","chalk","soapstone","gypsum","mud","soil");
     private static final Set<net.minecraft.world.level.block.Block> VANILLA_GEOLOGY=Set.of(
             Blocks.STONE,Blocks.COBBLESTONE,Blocks.MOSSY_COBBLESTONE,Blocks.STONE_BRICKS,Blocks.MOSSY_STONE_BRICKS,Blocks.CRACKED_STONE_BRICKS,Blocks.CHISELED_STONE_BRICKS,
             Blocks.GRANITE,Blocks.POLISHED_GRANITE,Blocks.DIORITE,Blocks.POLISHED_DIORITE,Blocks.ANDESITE,Blocks.POLISHED_ANDESITE,
@@ -62,10 +60,20 @@ public final class MiningDesigns {
     public static boolean seamGeology(net.minecraft.world.level.block.state.BlockState s){return matrix(s)&&!ArtifactOres.isOre(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty();}
     public static boolean crucibleGeology(net.minecraft.world.level.block.state.BlockState s){
         if(s.hasBlockEntity()||!s.getFluidState().isEmpty()||ArtifactOres.isOre(s))return false;
+        // Structural pieces players and villages place are terrain, not transmutation stock.
+        var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(s.getBlock());
+        if(key!=null&&GeologyNames.decoration(key.getPath()))return false;
         if(s.is(net.minecraftforge.common.Tags.Blocks.STONE)||s.is(net.minecraft.tags.BlockTags.DIRT)||s.is(net.minecraftforge.common.Tags.Blocks.GRAVEL))return true;
         return VANILLA_GEOLOGY.contains(s.getBlock())||isModdedGeology(s);
     }
+    /**
+     * Modded geology, in order of authority: the pack's datapack tag, the explicit
+     * Ghouls list, then a conservative registry-name inference. Ores, fluids and block
+     * entities are excluded before any name rule so a machine called "stone_mill"
+     * never becomes transmutation input.
+     */
     private static boolean isModdedGeology(net.minecraft.world.level.block.state.BlockState state){
+        if(state.is(ArtifactTags.Blocks.GEOLOGY))return true;
         return MODDED_GEOLOGY.computeIfAbsent(state.getBlock(),block->{
             var key=net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
             if(key==null)return false;
@@ -73,9 +81,7 @@ public final class MiningDesigns {
             if(key.getNamespace().equals("minecraft"))return false;
             var defaultState=block.defaultBlockState();
             if(defaultState.hasBlockEntity()||!defaultState.getFluidState().isEmpty()||ArtifactOres.isOre(defaultState))return false;
-            String path=key.getPath().toLowerCase(java.util.Locale.ROOT);
-            for(String part:path.split("_"))if(GEOLOGY_PARTS.contains(part))return true;
-            return false;
+            return GeologyNames.inferred(key.getNamespace(),key.getPath(),false);
         });
     }
     /** Tag membership can change during datapack reloads, so clear geology decisions with ore caches. */

@@ -25,6 +25,15 @@ y permite cosechar los bloques del mod etiquetados como picables. Exodium, Iridi
 y Hellspec usan las texturas de Terramity 0.9.8 bajo el permiso del propietario;
 las procedencias y hashes están en `ASSET-PROVENANCE.json`.
 
+La geología de otros mods se reconoce en este orden: el tag de bloques
+`specialpickaxes:geology` (los packs pueden declarar terreno seguro con un datapack,
+sin actualizar el mod; las entradas del mod ya incluyen las piedras de Terramity y
+los pilares de dripstone de undead_revamp2 con `required: false`), la lista explícita
+de Ghouls y, por último, una inferencia conservadora por nombre que exige segmentos
+completos del id. Las piezas fabricadas (losas, escaleras, muros, puertas, lámparas,
+vallas) nunca cuentan como terreno aunque su nombre contenga roca, y las menas, los
+bloques con entidad y los fluidos se excluyen antes de cualquier regla de nombre.
+
 Las transformaciones protegen geología marcada al colocarla desde esta versión.
 Vanilla no conserva el historial de colocación para bloques preexistentes; por
 eso no se afirma que pueda distinguir cada bloque natural de cada bloque antiguo
