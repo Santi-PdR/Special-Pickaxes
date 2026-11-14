@@ -154,6 +154,57 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_144") public static void movementDoesNotOverwritePositionChangedByPermissionCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);wearer.setPos(wearer.position().add(0,4,0));
+        var origin=wearer.position();var external=origin.add(.3,0,0);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
+            if(event.player==wearer){calls[0]++;wearer.setPos(external);}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{
+            h.assertTrue(!WorldSafety.move(wearer,origin.add(1,0,0)),"movement aborts when the permission listener changes its origin");
+            h.assertTrue(calls[0]==1&&wearer.position().equals(external),"the external movement is preserved, not overwritten by the stale destination");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_145") public static void movementRechecksBodyClearanceAfterPermissionCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);wearer.setPos(wearer.position().add(0,4,0));
+        var origin=wearer.position();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> wall=event->{
+            if(event.player==wearer){calls[0]++;h.getLevel().setBlockAndUpdate(event.target,Blocks.STONE.defaultBlockState());}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,wall);
+        try{
+            h.assertTrue(!WorldSafety.move(wearer,origin.add(.1,0,0)),"a newly installed destination obstruction prevents the teleport");
+            h.assertTrue(calls[0]==1&&wearer.position().equals(origin),"the callback really ran and no movement was committed");
+        }finally{MinecraftForge.EVENT_BUS.unregister(wall);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_146") public static void movementRejectsNonFiniteCoordinatesBeforeWorldQueries(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);var origin=wearer.position();
+        for(var target:List.of(new Vec3(Double.NaN,origin.y,origin.z),new Vec3(origin.x,Double.POSITIVE_INFINITY,origin.z),
+                new Vec3(origin.x,origin.y,Double.NEGATIVE_INFINITY))){
+            h.assertTrue(!WorldSafety.freeBody(wearer,target)&&!WorldSafety.move(wearer,target),"non-finite movement/body coordinates are rejected");
+        }
+        h.assertTrue(wearer.position().equals(origin),"invalid coordinates never reach the player connection");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_147") public static void relocationCannotMoveAFieldReplacedInsidePermissionCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var replacement=at.east(12);var destination=at.west(5);
+        h.assertTrue(DomainFields.start(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,at,8),"old field starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> replace=event->{
+            if(event.player==wearer){DomainFields.stop(wearer);DomainFields.start(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,replacement,8);}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,replace);
+        try{
+            h.assertTrue(!DomainFields.relocate(wearer,destination),"relocating the stale field fails after a callback replaces it");
+            h.assertTrue(DomainFields.contains(wearer,replacement)&&!DomainFields.contains(wearer,destination),
+                    "the replacement retains its own center and boundary");
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);}
+        finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_140") public static void magmaBrandNeverDamagesOrRemovesAnExternalReplacement(GameTestHelper h){
         var owner=player(h,ArtifactKind.HELLSPEC);h.getLevel().addFreshEntity(owner);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(mob);

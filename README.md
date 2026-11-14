@@ -1,6 +1,13 @@
 # Special Pickaxes — mining rework
 
-**5.10.418 — atribución de Magma Brand y erupción; build/JUnit, 211 GameTests, servidor y logs correctos en CI; cliente pendiente.** Una marca
+**5.10.419 — desplazamientos y recolocación seguros; pendiente de CI.** La ruta
+usa un origen fijo y aborta si un callback cambia posición, dimensión, herramienta
+o estado de montura/sueño. Recomprueba colisión después del permiso y rechaza
+coordenadas no finitas antes de consultar el mundo. Un dominio cancelado o
+sustituido durante el permiso ya no puede recolocarse como si siguiera activo.
+Cuatro regresiones nuevas; 215 GameTests en fuente.
+
+**5.10.418 — atribución de Magma Brand y erupción; CI global exitoso, evidencia recuperada, sin aprobación visual completa ni instalación.** Una marca
 reemplazada externamente no se convierte en daño propio ni se elimina al perder
 permisos el antiguo caster. Otro portador no puede robar una marca viva. El pulso
 revalida ownership después de callbacks; la erupción comprueba cada objetivo

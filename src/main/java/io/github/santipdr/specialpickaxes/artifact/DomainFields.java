@@ -67,7 +67,10 @@ public final class DomainFields {
     public static boolean relocate(ServerPlayer p,BlockPos destination){
         var field=FIELDS.get(p.getUUID());
         if(field==null||field.kind!=ArtifactKind.INTERREGNUM||field.mode!=0
-                ||!WorldSafety.allowed(p,ArtifactKind.INTERREGNUM,destination))return false;
+                ||p.getMainHandItem()!=field.tool||field.tool.isEmpty()||p.level().dimension()!=field.dimension
+                ||!WorldSafety.allowed(p,ArtifactKind.INTERREGNUM,destination)
+                ||FIELDS.get(p.getUUID())!=field||p.getMainHandItem()!=field.tool||field.tool.isEmpty()
+                ||p.level().dimension()!=field.dimension)return false;
         var previous=field.center;
         io.github.santipdr.specialpickaxes.network.RelicNetwork.clearStasisBoundary(p,previous,field.radius,Math.max(2,field.radius/2),field.dimension);
         field.center=destination.immutable();

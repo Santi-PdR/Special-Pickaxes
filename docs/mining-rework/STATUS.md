@@ -1,4 +1,4 @@
-# Estado actual — 5.10.418 pendiente de CI
+# Estado actual — 5.10.419 pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -14,8 +14,11 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.415 | `74c4481` / [43449061170](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43449061170) | CI global success confirmado. Sin inferir aprobación visual ni instalación. |
 | 5.10.416 | `3e4eecb` / [43450387194](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43450387194) | CI global success; evidencia cliente recuperada/verificada (32 escenas, 64 tooltips y World Shatter). Sin aprobación visual completa ni instalación. |
 
-| 5.10.417 | `5ec7288` / [43452383160](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452383160) | Build/JUnit, 207 GameTests, servidor y logs success; cliente en curso. |
-| 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | Build/JUnit, 211 GameTests, servidor y logs success; cliente en curso. |
+| 5.10.417 | `5ec7288` / [43452383160](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452383160) | Failure cliente por autenticación devolviendo HTML; bundle recuperado. Build/JUnit, 207 GameTests, servidor y logs pasaron. |
+| 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | CI global success, evidencia cliente recuperada/verificada. Sin aprobación visual completa ni instalación. |
+
+5.10.419 añade cuatro regresiones de movimiento/recolocación; 215 GameTests
+pendientes de CI para esa nueva fuente.
 
 5.10.418 añade cuatro regresiones de Hellspec: atribución, reemplazos externos y
 objetivos movidos en callbacks; total 211 GameTests ya pasados por el CI de esa fuente.

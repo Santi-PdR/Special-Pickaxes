@@ -203,6 +203,7 @@ public final class WorldSafety {
         }
     }
     public static boolean freeBody(ServerPlayer p,Vec3 feet) {
+        if(!Double.isFinite(feet.x)||!Double.isFinite(feet.y)||!Double.isFinite(feet.z))return false;
         var level=p.serverLevel();var box=p.getBoundingBox().move(feet.subtract(p.position()));
         if(box.minY<level.getMinBuildHeight() || box.maxY>=level.getMaxBuildHeight() || !level.getWorldBorder().isWithinBounds(box)) return false;
         for(BlockPos pos:BlockPos.betweenClosed(BlockPos.containing(box.minX,box.minY,box.minZ),BlockPos.containing(box.maxX,box.maxY,box.maxZ)))
@@ -211,12 +212,17 @@ public final class WorldSafety {
     }
     public static boolean move(ServerPlayer p,Vec3 target) { return move(p,target,ArtifactKind.ICARUS); }
     public static boolean move(ServerPlayer p,Vec3 target,ArtifactKind kind) {
-        var delta=target.subtract(p.position());double distance=delta.length();
-        if(!Double.isFinite(distance) || distance>8 || p.isPassenger() || p.isSleeping()) return false;
-        int steps=Math.max(1,(int)Math.ceil(distance/0.2));
-        for(int i=1;i<=steps;i++) {
-            var point=p.position().add(delta.scale(i/(double)steps));
-            if(!freeBody(p,point) || !allowed(p,kind,BlockPos.containing(point))) return false;
+        var origin=p.position();var level=p.serverLevel();var tool=p.getMainHandItem();
+        var delta=target.subtract(origin);double distance=delta.length();
+        if(!Double.isFinite(distance)||distance>8||p.isPassenger()||p.isSleeping())return false;
+        int steps=Math.max(1,(int)Math.ceil(distance/.2D));
+        for(int i=1;i<=steps;i++){
+            var point=origin.add(delta.scale(i/(double)steps));
+            if(!freeBody(p,point)||!allowed(p,kind,BlockPos.containing(point)))return false;
+            // Permission callbacks may move the player or build an obstacle after the first body check.
+            // Never overwrite that external movement or finish a path checked in another level.
+            if(p.serverLevel()!=level||!p.position().equals(origin)||p.getMainHandItem()!=tool
+                    ||p.isPassenger()||p.isSleeping()||!freeBody(p,point))return false;
         }
         p.connection.teleport(target.x,target.y,target.z,p.getYRot(),p.getXRot());return true;
     }

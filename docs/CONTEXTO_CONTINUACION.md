@@ -217,3 +217,16 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - 5.10.417 `43452383160`, fuente `5ec728889e25f843285f5caad9198da60ec553e2`: build/JUnit, JAR, 207 GameTests, servidor empaquetado y logs success; cliente real aún en curso. Monitor `ci-de-special-pickaxes-5-10-417-6fe5c741`.
 - 5.10.418 `43452644898`, fuente `cb2c5bec55b43b66ce69903cacf132dc02acba54`: build/JUnit, JAR, 211 GameTests, servidor empaquetado y logs success; cliente real aún en curso. Monitor `ci-de-special-pickaxes-5-10-418-58a8f494`.
 - El siguiente commit solo sincroniza estos resultados documentales y usa `[skip ci]` para no duplicar todos los runs por un cambio de texto. No omite ninguna validación de código fuente nueva.
+
+## Desplazamientos — 5.10.419
+
+- `WorldSafety.move` calculaba delta una vez pero sumaba cada punto a la posición viva, que un listener podía cambiar; además comprobaba colisión antes del permiso sin recomprobar tras el callback. Ahora usa origen/nivel/herramienta capturados, aborta ante cambios de posición/dimensión/mano/montura/sueño y revalida cuerpo libre después de cada permiso. No sobrescribe la posición elegida por un mod externo. Mantiene distancia máxima 8 e inspección cada .2 bloques.
+- `freeBody` rechaza NaN e infinitos antes de formar cajas o posiciones de bloque.
+- `DomainFields.relocate` verifica identidad del campo, dimensión y herramienta antes/después del permiso; no emite una recolocación exitosa de una referencia que el listener canceló/sustituyó.
+- Cuatro GameTests añadidos (144–147), pendientes de CI: cambio de posición por callback, pared creada tras comprobación inicial de colisión, coordenadas no finitas y dominio sustituido durante recolocación. Fuente total 215 GameTests.
+- Validación local: 22 recursos + 28 Python, parser 124 Java, diff-check y secret scan correctos. Sin build/pruebas Java locales, sin instalación Windows. No cambios de potencia, tier ni recetas.
+
+### Evidencia recuperada de las tandas anteriores
+
+- 5.10.417 `43452383160` completed/failure en cliente. Bundle verificado `/tmp/sp-ci417`: `AuthenticationUnavailableException` al consultar autenticación; respuesta HTML seguida de Gson `Expected BEGIN_OBJECT but was STRING`. El scanner provoca el fallo; no se añade allowlist ni se declara verde. Sus 207 GameTests/servidor habían pasado.
+- 5.10.418 `43452644898` completed/success. Bundle verificado `/tmp/sp-ci418` confirma 32 escenas/64 tooltips, controles teclado-servidor y World Shatter real (9341 bloques). Sin inspección visual de la galería de esa fuente ni instalación. JAR manifest: `special-pickaxes-1.20.1-5.10.418.jar`, 527455 bytes, SHA256 `eb25948d104c0f8dc031080895130de61df4e59a77c1a009d281042c26eadbbc`, fuente `cb2c5bec55b43b66ce69903cacf132dc02acba54`.
