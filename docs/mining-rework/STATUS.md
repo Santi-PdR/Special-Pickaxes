@@ -1,4 +1,4 @@
-# Estado actual — 5.10.437: verificación integral en curso
+# Estado actual — 5.10.438: verificación integral en curso
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -250,3 +250,9 @@ pasaron. Ningún JAR432/433 publicado. 434/435 todavía en CI.
 chunks descargados, sin segundo clip de24bloques; conserva procedencia natural
 también tras preview y valida actor tras callbacks. Dos regresiones nuevas:
 287GameTests esperados. 49Python/22recursos/parser136Java/diffcheck locales OK.
+
+438 pendiente CI: estabiliza la regresión histórica de cancelación reentrante de
+Worldloom. En435 falló sólo ese test (284/285GameTests), no los nuevos tests de
+guía/contexto. El fixture ahora espera la cadencia real del mundo en lugar de
+suponer un offset entre GameTest y ticks; slimes suspendidos fuera de paredes.
+Sin cambiar la habilidad ni relajar sus aserciones. 287GameTests esperados.

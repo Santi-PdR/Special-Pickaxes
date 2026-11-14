@@ -2507,13 +2507,16 @@ public final class PickaxeGameTests {
         finish(h,owner);
     }
     @GameTest(template="empty",batch="rework_each_126") public static void worldloomPermissionCallbacksCanClearBindingsSafely(GameTestHelper h){
-        var owner=player(h,ArtifactKind.WORLDLOOM);var target=EntityType.SLIME.create(h.getLevel());
+        var owner=player(h,ArtifactKind.WORLDLOOM);owner.setPos(owner.position().add(0,15,0));var target=EntityType.SLIME.create(h.getLevel());
         target.setNoAi(true);target.setNoGravity(true);target.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(target);
         h.assertTrue(WorldloomSnare.bind(owner,target),"first target binds");
         var second=EntityType.SLIME.create(h.getLevel());second.setNoAi(true);second.setNoGravity(true);
         second.setPos(owner.position().add(3,0,0));h.getLevel().addFreshEntity(second);
         h.assertTrue(WorldloomSnare.bind(owner,second),"second target binds");
-        h.runAfterDelay(5-Math.floorMod(h.getLevel().getGameTime(),5),()->{
+        h.succeedWhen(()->{
+            // GameTest scheduling and the level tick do not share a fixed offset.
+            // Wait for the real permission cadence instead of guessing a delayed tick.
+            h.assertTrue(Math.floorMod(h.getLevel().getGameTime(),5)==0,"waiting for the five-tick permission cadence");
             int[] calls={0};
             Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> cancel=event->{
                 if(event.player==owner){calls[0]++;WorldloomSnare.forget(owner);}
@@ -2525,7 +2528,7 @@ public final class PickaxeGameTests {
                 h.assertTrue(calls[0]==1,"callback removal skips the remaining stale bindings without concurrent modification");
                 h.assertTrue(WorldloomSnare.bind(owner,target),"cancelled target can be bound again");
             }finally{MinecraftForge.EVENT_BUS.unregister(cancel);WorldloomSnare.forget(owner);}
-            finish(h,owner);
+            target.discard();second.discard();
         });
     }
     @GameTest(template="empty",batch="rework_each_119") public static void iridiumRechecksOwnershipAfterPermissionCallbacks(GameTestHelper h){
