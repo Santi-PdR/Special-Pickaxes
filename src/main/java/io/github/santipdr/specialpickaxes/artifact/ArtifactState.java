@@ -51,7 +51,15 @@ public final class ArtifactState {
     }
     public static boolean snapshot(ServerPlayer p,ArtifactKind kind,BlockPos pos,BlockState state){
         if(!WorldSafety.inert(state))return false;
-        var d=of(p,kind);var list=d.getList("memory",Tag.TAG_COMPOUND);if(list.size()>=ArtifactConfig.MEMORY.get())return false;
+        var d=of(p,kind);var list=d.getList("memory",Tag.TAG_COMPOUND);
+        if(list.size()>=ArtifactConfig.MEMORY.get()){
+            // Ordinary admissions stay O(1); full lists are reclaimed at most once per server tick.
+            long tick=now(p);
+            if(!d.contains("snapshotPruneTick",Tag.TAG_LONG)||d.getLong("snapshotPruneTick")!=tick){
+                prune(p,kind);d.putLong("snapshotPruneTick",tick);list=d.getList("memory",Tag.TAG_COMPOUND);
+            }
+            if(list.size()>=ArtifactConfig.MEMORY.get())return false;
+        }
         var tag=new CompoundTag();tag.putLong("pos",pos.asLong());tag.putString("dim",dimension(p));tag.putLong("time",now(p));tag.putLong("epoch",System.currentTimeMillis());
         tag.putString("block",ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString());list.add(tag);d.put("memory",list);return true;
     }
@@ -70,8 +78,16 @@ public final class ArtifactState {
         var list=of(p,kind).getList("memory",Tag.TAG_COMPOUND);for(int i=list.size()-1;i>=0;i--)if(expired(p,list.getCompound(i)))list.remove(i);
         while(list.size()>ArtifactConfig.MEMORY.get())list.remove(0);
     }
-    public static long age(ServerPlayer p,CompoundTag tag){return tag.contains("epoch")?Math.max(0,(System.currentTimeMillis()-tag.getLong("epoch"))/50):Math.max(0,now(p)-tag.getLong("time"));}
-    private static boolean expired(ServerPlayer p,CompoundTag tag){return age(p,tag)>ArtifactConfig.MEMORY_TTL.get();}
+    public static long age(ServerPlayer p,CompoundTag tag){
+        if(tag.contains("epoch"))return tag.contains("epoch",Tag.TAG_LONG)
+                ?RecordedAge.ticks(System.currentTimeMillis(),tag.getLong("epoch"),50):Long.MAX_VALUE;
+        return tag.contains("time",Tag.TAG_LONG)?RecordedAge.ticks(now(p),tag.getLong("time"),1):Long.MAX_VALUE;
+    }
+    private static boolean expired(ServerPlayer p,CompoundTag tag){
+        return !tag.contains("pos",Tag.TAG_LONG)||!tag.contains("dim",Tag.TAG_STRING)||!tag.contains("block",Tag.TAG_STRING)
+                ||ResourceLocation.tryParse(tag.getString("dim"))==null
+                ||ResourceLocation.tryParse(tag.getString("block"))==null||age(p,tag)>ArtifactConfig.MEMORY_TTL.get();
+    }
     public static void anchor(ServerPlayer p,ArtifactKind kind,String key,BlockPos pos) {
         var data=of(p,kind);
         if(!validAnchorTime(p,data)||!data.getString("dimension").equals(dimension(p))) {

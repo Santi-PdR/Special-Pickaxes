@@ -16,6 +16,7 @@ public final class IridiumLodeShardParticle extends TextureSheetParticle {
     private IridiumLodeShardParticle(ClientLevel level,double x,double y,double z,double xd,double yd,double zd,SpriteSet sprites){
         super(level,x,y,z,xd,yd,zd);
         this.sprites=sprites;
+        this.alpha=0F;
         this.lifetime=16;
         this.quadSize=.24F;
         this.gravity=0F;
@@ -33,8 +34,7 @@ public final class IridiumLodeShardParticle extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
         this.oRoll=this.roll;
         this.roll+=this.spin;
-        int remaining=this.lifetime-this.age;
-        this.alpha=this.age<2?this.age/2F:remaining<4?remaining/4F:1F;
+        this.alpha=ParticleEnvelope.alpha(this.age,this.lifetime,2,4);
     }
 
     @Override public int getLightColor(float partialTick){return 15728880;}

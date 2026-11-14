@@ -16,6 +16,7 @@ public final class WorldloomRootClampParticle extends TextureSheetParticle {
                                        double xd,double yd,double zd,SpriteSet sprites){
         super(level,x,y,z,xd,yd,zd);
         this.sprites=sprites;
+        this.alpha=0F;
         this.lifetime=18;
         this.quadSize=.48F;
         this.gravity=0F;
@@ -28,9 +29,8 @@ public final class WorldloomRootClampParticle extends TextureSheetParticle {
         super.tick();
         if(this.removed)return;
         this.setSpriteFromAge(this.sprites);
-        int remaining=this.lifetime-this.age;
         this.quadSize=.38F+Math.min(this.age,4)*.025F;
-        this.alpha=this.age<2?this.age/2F:remaining<4?remaining/4F:1F;
+        this.alpha=ParticleEnvelope.alpha(this.age,this.lifetime,2,4);
     }
 
     @Override public int getLightColor(float partialTick){return 15728880;}

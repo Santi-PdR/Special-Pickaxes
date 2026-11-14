@@ -154,6 +154,95 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_151") public static void palimpsestPulseRevalidatesTargetsMovedByClaims(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var mob=EntityType.ZOMBIE.create(h.getLevel());
+        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(mob);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer)mob.setPos(mob.position().add(12,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&mob.getDeltaMovement().equals(Vec3.ZERO),
+                "a target moved out of the pulse cannot be pushed after the claim callback");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}
+        mob.setPos(wearer.position().add(2,0,0));
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&mob.getDeltaMovement().x>.9,
+                "a failed attempt releases its guard and preserves the original strong push when retried");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_152") public static void nullWardDoesNotDiscardAProjectileMadeFriendlyByCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.AXIOM);var shooter=EntityType.SKELETON.create(h.getLevel());
+        shooter.setPos(wearer.position().add(4,0,0));h.getLevel().addFreshEntity(shooter);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);arrow.setPos(wearer.position().add(3,1,0));h.getLevel().addFreshEntity(arrow);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=event->{if(event.player==wearer)arrow.setOwner(wearer);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.AXIOM)&&arrow.isAlive(),
+                "Null Ward rechecks projectile hostility after permission callbacks");}
+        finally{MinecraftForge.EVENT_BUS.unregister(change);}
+        arrow.setOwner(shooter);
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.AXIOM)&&arrow.isRemoved(),"hostile shots are still collapsed on a permitted retry");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_153") public static void choirEchoPreservesExternallySuppliedResonance(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var mob=EntityType.ZOMBIE.create(h.getLevel());
+        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setOnGround(true);mob.setDeltaMovement(.4,0,.2);h.getLevel().addFreshEntity(mob);
+        var resonance=SpecialPickaxes.FAULT_RESONANCE.get();mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(resonance,600,1,true,false,true));
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR),"ground echo still arrests a valid hostile");
+        h.assertTrue(mob.getDeltaMovement().x==0&&mob.getDeltaMovement().z==0&&mob.getEffect(resonance).getDuration()==600,
+                "Choir preserves a longer external resonance while keeping its own motion arrest");
+        h.assertTrue(!ArtifactPassives.ownsCombatEffect(mob,resonance),"an external resonance is not silently claimed as a relic lease");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_154") public static void alternateRejectsReentrantCallsAndRecoversItsCooldown(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var mob=EntityType.ZOMBIE.create(h.getLevel());
+        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(mob);
+        ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).putLong("alternateReady",Long.MAX_VALUE);int[] callbacks={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> recurse=event->{
+            if(event.player==wearer){callbacks[0]++;h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST),"recursive alternate is rejected before its first cooldown is committed");}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,recurse);
+        try{h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&callbacks[0]==1&&mob.getDeltaMovement().x==1,
+                "one recovered activation performs exactly one pulse, not a recursive chain");}
+        finally{MinecraftForge.EVENT_BUS.unregister(recurse);}
+        h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST),"the ordinary cooldown still blocks the second activation");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_155") public static void alternateRejectsDetachedToolsAndMismatchedKinds(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var tool=wearer.getMainHandItem();
+        h.assertTrue(!ArtifactSkills.use(wearer,tool.copy(),ArtifactKind.PALIMPSEST),"a detached copy cannot activate the held skill");
+        h.assertTrue(!ArtifactSkills.use(wearer,tool,ArtifactKind.AXIOM),"the actual held pick must match the requested skill");
+        h.assertTrue(!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"invalid entry points do not spend a cooldown");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_156") public static void choirEchoRechecksGroundContactAfterPermissionCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var mob=EntityType.ZOMBIE.create(h.getLevel());
+        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setOnGround(true);var motion=new Vec3(.4,.3,.2);mob.setDeltaMovement(motion);h.getLevel().addFreshEntity(mob);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> lift=event->{if(event.player==wearer)mob.setOnGround(false);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,lift);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR)&&mob.getDeltaMovement().equals(motion)
+                        &&!mob.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"an airborne target is not arrested or branded after a callback changes ground contact");}
+        finally{MinecraftForge.EVENT_BUS.unregister(lift);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_157") public static void worldloomAlternatePostsOnlyTheActualBindPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var mob=EntityType.ZOMBIE.create(h.getLevel());
+        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> count=event->{if(event.player==wearer)calls[0]++;};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,count);
+        try{h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM)&&calls[0]==1,
+                "root selection does not dispatch duplicate permission callbacks before the actual bind");}
+        finally{MinecraftForge.EVENT_BUS.unregister(count);WorldloomSnare.forget(wearer);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_158") public static void malformedAndFutureMemoriesCannotBecomeRestorationTargets(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.record(wearer,ArtifactKind.CRUCIBLE,at,Blocks.STONE.defaultBlockState());
+        var list=ArtifactState.of(wearer,ArtifactKind.CRUCIBLE).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);var valid=list.getCompound(0);
+        var future=valid.copy();future.putLong("epoch",Long.MAX_VALUE);list.add(future);
+        var wrong=valid.copy();wrong.putString("epoch","invalid");list.add(wrong);
+        var missing=valid.copy();missing.remove("pos");list.add(missing);
+        var legacy=valid.copy();legacy.remove("epoch");legacy.putLong("time",ArtifactState.now(wearer)+10000);list.add(legacy);
+        h.assertTrue(ArtifactState.memories(wearer,ArtifactKind.CRUCIBLE).size()==1,"only the valid typed, nonfuture memory can restore a block");
+        ArtifactState.prune(wearer,ArtifactKind.CRUCIBLE);h.assertTrue(list.size()==1,"invalid memories are pruned from persistent storage");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_159") public static void expiredSnapshotCapacityIsReclaimedBeforeAdmission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.record(wearer,ArtifactKind.CRUCIBLE,at,Blocks.STONE.defaultBlockState());
+        var list=ArtifactState.of(wearer,ArtifactKind.CRUCIBLE).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);var invalid=list.getCompound(0).copy();invalid.putLong("epoch",-1);list.clear();
+        for(int i=0;i<ArtifactConfig.MEMORY.get();i++)list.add(invalid.copy());
+        h.assertTrue(ArtifactState.snapshot(wearer,ArtifactKind.CRUCIBLE,at,Blocks.BASALT.defaultBlockState()),"expired capacity is reclaimed before rejecting a new snapshot");
+        var memories=ArtifactState.memories(wearer,ArtifactKind.CRUCIBLE);h.assertTrue(memories.size()==1&&memories.get(0).state().is(Blocks.BASALT),"only the fresh snapshot remains");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_148") public static void healingPassivesRecoverStaleDeadlinesWithoutAcceleratingPulses(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setHealth(10);
         var data=wearer.getPersistentData();data.putLong("specialpickaxesDawnMendingAtWorldTime",Long.MAX_VALUE);

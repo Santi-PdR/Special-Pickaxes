@@ -15,6 +15,7 @@ public final class StasisShardParticle extends TextureSheetParticle {
     private StasisShardParticle(ClientLevel level,double x,double y,double z,double xd,double yd,double zd,SpriteSet sprites){
         super(level,x,y,z,xd,yd,zd);
         this.sprites=sprites;
+        this.alpha=0F;
         this.lifetime=20;
         this.quadSize=.16F;
         this.gravity=0F;
@@ -30,8 +31,7 @@ public final class StasisShardParticle extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
         this.oRoll=this.roll;
         this.roll+=.035F;
-        int remaining=this.lifetime-this.age;
-        this.alpha=this.age<2?this.age/2F:remaining<4?remaining/4F:1F;
+        this.alpha=ParticleEnvelope.alpha(this.age,this.lifetime,2,4);
     }
 
     @Override public int getLightColor(float partialTick){return 15728880;}

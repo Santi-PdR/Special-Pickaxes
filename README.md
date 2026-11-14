@@ -1,5 +1,16 @@
 # Special Pickaxes — mining rework
 
+**5.10.421 — tanda amplia de combate, memorias y animación; pendiente de CI.**
+Palimpsest, Choir y Null Ward revalidan cada objetivo tras callbacks; los predicados
+de selección ya no emiten eventos. Choir conserva resonancias externas y Null Ward
+comparte presupuesto de partículas sin limitar su capacidad de detener proyectiles.
+Los alternativos rechazan herramientas separadas, tipos incorrectos y activaciones
+recursivas, y recuperan cooldowns inválidos. Memorias futuras/mal tipadas no se
+restauran; los snapshots recuperan capacidad caducada sin barrer cada admisión.
+Siete partículas animadas nacen transparentes y comparten fundido suavizado, sin
+cambiar sprites, tamaño o vida. Nueve GameTests y ocho JUnit nuevos: 227 GameTests
+en fuente. Sin cambios de tier, fuerza, radios ni recetas.
+
 **5.10.420 — recuperación de cooldowns persistentes; build/JUnit, 218 GameTests, JAR, servidor y logs correctos en CI; cliente pendiente.** Dawn
 Mending, Heartwood, comida de Worldloom y Null Veil descartan plazos imposibles
 fuera de su propio intervalo. Las curaciones usan el reloj común del servidor,

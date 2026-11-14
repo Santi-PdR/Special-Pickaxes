@@ -15,6 +15,7 @@ public final class DawnBloomParticle extends TextureSheetParticle {
     private DawnBloomParticle(ClientLevel level,double x,double y,double z,double xd,double yd,double zd,SpriteSet sprites){
         super(level,x,y,z,xd,yd,zd);
         this.sprites=sprites;
+        this.alpha=0F;
         // 4 frames x 3 ticks keeps the sprite and the particle lifetime identical.
         this.lifetime=12;
         this.quadSize=.52F;
@@ -32,9 +33,8 @@ public final class DawnBloomParticle extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
         this.oRoll=this.roll;
         this.roll+=.012F;
-        int remaining=this.lifetime-this.age;
         this.quadSize=.46F+Math.min(this.age,6)*.016F;
-        this.alpha=this.age<2?this.age/2F:remaining<3?remaining/3F:1F;
+        this.alpha=ParticleEnvelope.alpha(this.age,this.lifetime,2,3);
     }
 
     @Override public int getLightColor(float partialTick){return 15728880;}

@@ -92,24 +92,28 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean knockbackPulse(ServerPlayer player, ArtifactKind kind, int radius, double strength, int cap) {
-        Vec3 center = player.position();
-        double rangeSqr=(double)radius*radius;
-        int pushed = 0;
-        for (LivingEntity target : EntitySelection.nearest(player.serverLevel(), LivingEntity.class,
-                player.getBoundingBox().inflate(radius), entity -> {
-            if (!entity.isAlive() || entity == player || entity.isAlliedTo(player)
-                    ||entity.position().distanceToSqr(center)>rangeSqr
-                    || !WorldSafety.allowed(player, kind, entity.blockPosition())) return false;
-            return !(entity instanceof Player other) || player.canHarmPlayer(other);
-        }, center, cap)) {
-            Vec3 away = target.position().subtract(center);
-            if (away.lengthSqr() < .01) continue;
-            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(strength).add(0, .25, 0)));
-            target.hasImpulse = true;
-            if (++pushed >= cap) break;
+    /** Query predicates stay side-effect free; permissions are checked immediately before each mutation. */
+    private static boolean livingTarget(ServerPlayer player,LivingEntity entity,Vec3 center,double rangeSqr){
+        return player.isAlive()&&!player.isRemoved()&&entity.isAlive()&&!entity.isRemoved()
+                &&entity.level()==player.level()&&entity!=player&&!entity.isAlliedTo(player)
+                &&entity.position().distanceToSqr(center)<=rangeSqr
+                &&(!(entity instanceof Player other)||player.canHarmPlayer(other));
+    }
+    private static boolean knockbackPulse(ServerPlayer player,ArtifactKind kind,int radius,double strength,int cap){
+        var level=player.serverLevel();var tool=player.getMainHandItem();Vec3 center=player.position();
+        double rangeSqr=(double)radius*radius;int pushed=0;
+        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),
+                entity->livingTarget(player,entity,center,rangeSqr),center,cap);
+        for(var target:targets){
+            var at=target.blockPosition();
+            if(!WorldSafety.allowed(player,kind,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
+                    ||!target.blockPosition().equals(at)||!livingTarget(player,target,center,rangeSqr))continue;
+            Vec3 away=target.position().subtract(center);
+            if(away.lengthSqr()<.01D)continue;
+            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(strength).add(0,.25D,0)));
+            target.hasImpulse=true;pushed++;
         }
-        if(pushed>0)ArtifactFeedback.message(player, "targets_pushed", pushed);
+        if(pushed>0)ArtifactFeedback.message(player,"targets_pushed",pushed);
         return pushed>0;
     }
 
@@ -177,42 +181,47 @@ public final class ArtifactTechniques {
     }
 
     /** Null Ward collapses nearby hostile shots into a player-only sculk pulse. */
-    private static boolean nullWard(ServerPlayer player,int radius,int cap) {
+    private static final RelicParticleBudget NULL_WARD_VISUALS=new RelicParticleBudget(192);
+    private static boolean nullWard(ServerPlayer player,int radius,int cap){
+        var level=player.serverLevel();var tool=player.getMainHandItem();
         Vec3 center=player.position();double rangeSqr=(double)radius*radius;int collapsed=0;
-        var shots=DomainFields.projectilesNear(player.serverLevel(),player.getBoundingBox().inflate(radius),center,cap,projectile->{
-            return projectile.isAlive()&&JegProjectileCompat.hostileTo(projectile,player,false)
-                    &&projectile.position().distanceToSqr(center)<=rangeSqr
-                    &&WorldSafety.allowed(player,ArtifactKind.AXIOM,projectile.blockPosition());
-        });
+        var shots=DomainFields.projectilesNear(level,player.getBoundingBox().inflate(radius),center,cap,
+                projectile->projectile.isAlive()&&JegProjectileCompat.hostileTo(projectile,player,false)
+                        &&projectile.position().distanceToSqr(center)<=rangeSqr);
         for(var projectile:shots){
+            var at=projectile.blockPosition();
+            if(!WorldSafety.allowed(player,ArtifactKind.AXIOM,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
+                    ||!projectile.isAlive()||projectile.level()!=level||!projectile.blockPosition().equals(at)
+                    ||!JegProjectileCompat.hostileTo(projectile,player,false)
+                    ||projectile.position().distanceToSqr(center)>rangeSqr)continue;
             var point=projectile.position();
-            player.serverLevel().sendParticles(player,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,8,.12,.12,.12,.015);
-            projectile.discard();
-            collapsed++;
+            long tick=level.getServer().getTickCount();
+            if(NULL_WARD_VISUALS.tryReserve(tick,8)&&ArtifactFeedback.reserveAuraParticles(tick,8,1))
+                level.sendParticles(player,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,8,.12,.12,.12,.015);
+            projectile.discard();collapsed++;
         }
         if(collapsed==0)return false;
-        ArtifactFeedback.nullWard(player,radius);
-        ArtifactFeedback.message(player,"nullward",collapsed);
-        return true;
+        ArtifactFeedback.nullWard(player,radius);ArtifactFeedback.message(player,"nullward",collapsed);return true;
     }
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
     private static boolean faultEcho(ServerPlayer player,int radius,int cap){
-        var level=player.serverLevel();var center=player.position();double rangeSqr=(double)radius*radius;
-        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),entity->{
-            if(!entity.isAlive()||entity==player||!EntitySelection.isHostileCandidate(entity,player)
-                    ||!entity.onGround()||entity.isAlliedTo(player)
-                    ||entity.position().distanceToSqr(center)>rangeSqr||!WorldSafety.allowed(player,ArtifactKind.CHOIR,entity.blockPosition()))return false;
-            return !(entity instanceof Player other)||player.canHarmPlayer(other);
-        },center,cap);
-        if(targets.isEmpty())return false;
+        var level=player.serverLevel();var tool=player.getMainHandItem();var center=player.position();
+        double rangeSqr=(double)radius*radius;
+        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),
+                entity->livingTarget(player,entity,center,rangeSqr)&&entity.onGround()
+                        &&EntitySelection.isHostileCandidate(entity,player),center,cap);
         int stopped=0;
         for(var target:targets){
-            if(stopped>=cap)break;
+            var at=target.blockPosition();
+            if(!WorldSafety.allowed(player,ArtifactKind.CHOIR,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
+                    ||!target.blockPosition().equals(at)||!livingTarget(player,target,center,rangeSqr)
+                    ||!target.onGround()||!EntitySelection.isHostileCandidate(target,player))continue;
             target.setDeltaMovement(0,Math.min(0,target.getDeltaMovement().y),0);target.hasImpulse=true;
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),40,1,true,false,true));
+            ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),1,40);
             ArtifactFeedback.burst(player,ArtifactKind.CHOIR,target.blockPosition(),3);stopped++;
         }
+        if(stopped==0)return false;
         for(int i=0;i<12;i++){
             double angle=i*Math.PI/6,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
             level.sendParticles(player,ParticleTypes.ELECTRIC_SPARK,false,x,player.getY()+.08,z,1,0,0,0,0);
@@ -224,11 +233,15 @@ public final class ArtifactTechniques {
         Vec3 center=player.position();double rangeSqr=range*range;
         var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(range),entity->{
             if(!entity.isAlive()||entity==player||!EntitySelection.isHostileCandidate(entity,player)
-                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr
-                    ||!WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,entity.blockPosition()))return false;
+                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr)return false;
             return !(entity instanceof Player other)||player.canHarmPlayer(other);
         },center,16);
-        int bound=0;for(var target:targets)if(WorldloomSnare.bind(player,target))bound++;
+        var level=player.serverLevel();var tool=player.getMainHandItem();int bound=0;
+        for(var target:targets){
+            if(player.serverLevel()!=level||player.getMainHandItem()!=tool)break;
+            if(livingTarget(player,target,center,rangeSqr)&&EntitySelection.isHostileCandidate(target,player)
+                    &&WorldloomSnare.bind(player,target))bound++;
+        }
         if(bound>0)ArtifactFeedback.message(player,"root_snared",bound);
         return bound>0;
     }

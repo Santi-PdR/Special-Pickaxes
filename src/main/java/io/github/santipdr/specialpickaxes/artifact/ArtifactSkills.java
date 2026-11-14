@@ -5,12 +5,20 @@ import net.minecraft.world.item.ItemStack;
 
 /** Alternate skills are utility actions; timed status effects are handled by passives. */
 public final class ArtifactSkills {
+    private static final java.util.Set<java.util.UUID> ACTIVE=new java.util.HashSet<>();
     private ArtifactSkills() {}
 
     public static boolean use(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
+        if(!kind.playable()||!player.isAlive()||player.isRemoved()||player.isSpectator()||!player.mayBuild()
+                ||tool.isEmpty()||player.getMainHandItem()!=tool
+                ||!(tool.getItem() instanceof ArtifactItem item)||item.kind!=kind||!ACTIVE.add(player.getUUID()))return false;
+        try{return perform(player,tool,kind);}finally{ACTIVE.remove(player.getUUID());}
+    }
+    private static boolean perform(ServerPlayer player,ItemStack tool,ArtifactKind kind){
         var data = ArtifactState.of(player, kind);
         long now = ArtifactState.now(player);
-        if (data.getLong("alternateReady") > now) {
+        int interval=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
+        if (PersistedCooldown.active(now,data.getLong("alternateReady"),interval)) {
             ArtifactFeedback.message(player, "cooldown");
             return false;
         }
@@ -18,7 +26,7 @@ public final class ArtifactSkills {
             ArtifactFeedback.message(player, "alternate_no_target");
             return false;
         }
-        data.putLong("alternateReady", now + Math.max(100, ArtifactConfig.COOLDOWN.get() * 5));
+        data.putLong("alternateReady", now + interval);
         ArtifactKind feedbackKind=feedbackKind(tool,kind);
         ArtifactFeedback.sound(player, feedbackKind, "alternate");
         ArtifactFeedback.burst(player, feedbackKind, player.blockPosition(), 10);
