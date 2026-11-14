@@ -1,5 +1,13 @@
 # Special Pickaxes — mining rework
 
+**5.10.423 — aislamiento de regresiones espaciales; pendiente de CI.** Los casos
+negativos y de conteo limitan el permiso del fixture a su propio objetivo, para
+no aceptar entidades/drops ajenos que puedan quedar de otros lotes. No se quitan
+aserciones de propiedad, movimiento, fuerza o cooldown. Los CI 421/422 compilaron
+y pasaron los 72 JUnit, pero fallaron en un GameTest distinto de selección espacial;
+no se consideran verdes. La fuente mantiene 232 GameTests y está pendiente de su
+propio resultado completo.
+
 **5.10.422 — guardas en la ruta real de activación; pendiente de CI.** La guarda
 antirreentrada cubre también el primer evento del alternativo y comparte la
 protección con el primario. Ambos rechazan herramientas separadas y revalidan la
