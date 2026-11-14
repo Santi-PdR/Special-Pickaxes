@@ -2507,29 +2507,28 @@ public final class PickaxeGameTests {
         finish(h,owner);
     }
     @GameTest(template="empty",batch="rework_each_126") public static void worldloomPermissionCallbacksCanClearBindingsSafely(GameTestHelper h){
-        var owner=player(h,ArtifactKind.WORLDLOOM);owner.setPos(owner.position().add(0,15,0));var target=EntityType.SLIME.create(h.getLevel());
+        var owner=player(h,ArtifactKind.WORLDLOOM);var target=EntityType.SLIME.create(h.getLevel());
         target.setNoAi(true);target.setNoGravity(true);target.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(target);
         h.assertTrue(WorldloomSnare.bind(owner,target),"first target binds");
         var second=EntityType.SLIME.create(h.getLevel());second.setNoAi(true);second.setNoGravity(true);
         second.setPos(owner.position().add(3,0,0));h.getLevel().addFreshEntity(second);
         h.assertTrue(WorldloomSnare.bind(owner,second),"second target binds");
-        h.succeedWhen(()->{
-            // GameTest scheduling and the level tick do not share a fixed offset.
-            // Wait for the real permission cadence instead of guessing a delayed tick.
-            h.assertTrue(Math.floorMod(h.getLevel().getGameTime(),5)==0,"waiting for the five-tick permission cadence");
-            int[] calls={0};
-            Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> cancel=event->{
-                if(event.player==owner){calls[0]++;WorldloomSnare.forget(owner);}
-            };
-            MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
-                    io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,cancel);
-            try{
-                WorldloomSnare.tick();
-                h.assertTrue(calls[0]==1,"callback removal skips the remaining stale bindings without concurrent modification");
-                h.assertTrue(WorldloomSnare.bind(owner,target),"cancelled target can be bound again");
-            }finally{MinecraftForge.EVENT_BUS.unregister(cancel);WorldloomSnare.forget(owner);}
-            target.discard();second.discard();
-        });
+        // Exercise reentry synchronously before entity/world ticks can invalidate this fixture.
+        // Borrow a permission-cadence instant and restore world time in the same call stack.
+        var clock=h.getLevel().getServer().getWorldData().overworldData();long originalTime=clock.getGameTime();
+        int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> cancel=event->{
+            if(event.player==owner){calls[0]++;WorldloomSnare.forget(owner);}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,cancel);
+        try{
+            clock.setGameTime(originalTime+Math.floorMod(-originalTime,5L));
+            WorldloomSnare.tick();
+            h.assertTrue(calls[0]==1,"callback removal skips remaining stale bindings; observed calls="+calls[0]);
+            h.assertTrue(WorldloomSnare.bind(owner,target),"cancelled target can be bound again");
+        }finally{clock.setGameTime(originalTime);MinecraftForge.EVENT_BUS.unregister(cancel);WorldloomSnare.forget(owner);target.discard();second.discard();}
+        finish(h,owner);
     }
     @GameTest(template="empty",batch="rework_each_119") public static void iridiumRechecksOwnershipAfterPermissionCallbacks(GameTestHelper h){
         var wearer=player(h,ArtifactKind.IRIDIUM);var level=h.getLevel();

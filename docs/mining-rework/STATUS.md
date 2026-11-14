@@ -1,4 +1,4 @@
-# Estado actual — 5.10.438: verificación integral en curso
+# Estado actual — 5.10.439: verificación integral en curso
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -256,3 +256,9 @@ Worldloom. En435 falló sólo ese test (284/285GameTests), no los nuevos tests d
 guía/contexto. El fixture ahora espera la cadencia real del mundo en lugar de
 suponer un offset entre GameTest y ticks; slimes suspendidos fuera de paredes.
 Sin cambiar la habilidad ni relajar sus aserciones. 287GameTests esperados.
+
+439 pendiente CI: la espera en438 no estabilizó el fixture histórico (286/287
+GameTests; sólo falló126). Regresión reentrante ahora síncrona: presta un instante
+del reloj alineado, ejecuta tick/restablece reloj/listener/bindings en finally.
+Evita ticks de entidades entre setup y aserción, sin cambiar la habilidad ni
+reducir las dos vinculaciones/assertcalls==1. 86JUnit observados pasados en437.
