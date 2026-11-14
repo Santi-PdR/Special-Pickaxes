@@ -1,12 +1,12 @@
 # Special Pickaxes — mining rework
 
-**5.10.424 — minería observada, calor y resonancia; pendiente de CI.** Hellspec
+**5.10.424 — minería observada, calor y resonancia; CI global correcto.** Hellspec
 liga su caché térmica al origen/dimensión/tick y omite chunks descargados. Una
 rotura observada no duplica la racha; su ventana usa ticks del servidor. Strata,
 Estasis e Iridium recuperan plazos imposibles sin acelerar sus intervalos, y los
 contadores corruptos no desbordan niveles. Las partículas de Iridium comparten
 presupuesto global, sin condicionar los bonus/comida al renderizado. Ocho
-GameTests y tres JUnit nuevos: 240 GameTests en fuente pendientes de CI propio.
+GameTests y tres JUnit nuevos. [CI 43543547256](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43543547256): 75 JUnit y 240 GameTests pasados; servidor/logs/JAR y cliente real correctos (32 escenas, 64 tooltips). Sin aprobación visual completa ni instalación Windows.
 
 **5.10.423 — CI global exitoso: 72 JUnit, 232 GameTests, servidor, logs y cliente real.** Los casos
 negativos y de conteo limitan el permiso del fixture a su propio objetivo, para

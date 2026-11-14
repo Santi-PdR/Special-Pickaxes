@@ -1,4 +1,4 @@
-# Estado actual — 5.10.424: nueva tanda pendiente de CI
+# Estado actual — 5.10.424: CI global exitoso, sin aprobación visual completa
 
 ## Evidencia verificada el 2026-11-13
 
@@ -20,7 +20,15 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 
 5.10.424 mejora caché térmica sin cargar chunks, deduplicación/clock de roturas,
 recuperación y overflow de rachas, y presupuesto cosmético de Iridium. Ocho
-GameTests y tres JUnit añadidos; 240 GameTests pendientes de esta fuente.
+GameTests y tres JUnit añadidos. Fuente `328077af660e9873578d100d5417924af0314cb8`,
+[run 43543547256](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43543547256)
+completed/success: 75 JUnit sin fallos/errores/skips y 240 GameTests pasados.
+JAR/servidor/logs y cliente 32 escenas/64 tooltips, teclado-servidor y World Shatter
+9341 correctos. Bundle de 55 fragmentos recuperado/verificado en `/tmp/sp-ci424`.
+No revisión visual completa de esta galería; publicación binaria skipped, no instalación Windows.
+Artefacto `forge-validation` 14092744566. Manifiesto: JAR 532550 bytes, SHA256
+`1c32c52fa672b9e3ef72c1d8f70669f43afefe64e7357c79ed5a22f5bcb8615c`.
+El manifiesto se verificó dentro del bundle; no se descargó/instaló el JAR aquí.
 
 **Fuente `72b7b8b432913b3d78ba906920b5c7e88edce2ae`: [run 43540141390](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43540141390) completed/success.**
 72 JUnit sin fallos/errores/skips, 232 GameTests completos, JAR/servidor/logs y

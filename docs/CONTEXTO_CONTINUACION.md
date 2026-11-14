@@ -290,3 +290,12 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Iridium: sparkle, handoff, órbita y meal pulse reservan el presupuesto global de aura. Costes exactos: ore 3/4/5/7 según carga; handoff 8 o 9 contando ambos viewers y un único acento del destinatario. Gameplay (carga/comida) se realiza independientemente de poder emitir partículas. Se acota amplifier negativo en la geometría visual.
 - Ocho GameTests nuevos (165–172): movimiento y dimensión de caché, no carga de chunks, dedup/cleanup, overflow/edad de racha, flash Estasis, carga Iridium corrupta y comida peak. Tres JUnit nuevos prueban costes visuales/extremos. Fuente total 240 GameTests, pendientes de CI propio.
 - Validación local ejecutada: 22 recursos + 28 Python, parser 131 fuentes Java, diff-check y secret scan correctos. No build/pruebas Java locales; no acceso o instalación Windows. Tier OP, radios, fuerza y cero recetas conservados.
+
+### Cierre verificado 424
+
+- Fuente `328077af660e9873578d100d5417924af0314cb8`, run `43543547256`: completed/success. El watcher terminó 0 y se confirmó por API.
+- Bundle Checks de 55 fragmentos recuperado con verificación SHA256/archivo en `/tmp/sp-ci424`. XML: 75 JUnit, 0 failures/errors/skipped. Log GameTest: All 240 required tests passed. Incluye las ocho regresiones nuevas y los tres JUnit nuevos.
+- Build/JAR, servidor empaquetado y validación de logs success. Cliente: GRAPHICAL_CLIENT_GALLERY_OK, UX_ARTIFACTS=32, NORMAL_AND_SHIFT=64, KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK y SUPREME_REMOVED_BLOCKS_9341/SUPREME_COMPLETE.
+- Publish verified release only skipped. Ninguna captura 424 revisada visualmente en esta tanda: no aprobación visual completa ni animación temporal certificada. No instalación Windows ni control de UI/PC, no build local.
+- Artifact `forge-validation` id 14092744566, 46693852 bytes, no expired. RELEASE.json verificado: special-pickaxes-1.20.1-5.10.424.jar, 532550 bytes, SHA256 `1c32c52fa672b9e3ef72c1d8f70669f43afefe64e7357c79ed5a22f5bcb8615c`. Esto verifica el manifiesto, no una instalación/descarga del JAR.
+- Próxima auditoría identificada, todavía sin modificar: fallback de aura no-jugador en SearingShell/StasisWard/WorldbreakerAegis usa envío directo en lugar de entityAuraPulse; StasisWard.answerHostileHit conserva comparación raw de su reflex deadline. GraviticTether calcula drag con amplifier negativo sin clamp. No presentar esas posibles mejoras como implementadas.
