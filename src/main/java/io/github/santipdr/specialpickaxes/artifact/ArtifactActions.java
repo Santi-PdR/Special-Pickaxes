@@ -14,12 +14,16 @@ public final class ArtifactActions {
     private ArtifactActions() {}
     private static final Set<UUID> ACTIVATING=new HashSet<>();
     public static Optional<BlockPos> target(ServerPlayer p) {
+        return targetHit(p).map(hit->hit.getBlockPos().immutable());
+    }
+    /** Share the exact loaded collider face with face-mining; never perform a second unbounded raycast. */
+    static Optional<BlockHitResult> targetHit(ServerPlayer p){
         var level=p.serverLevel();Vec3 from=p.getEyePosition(),to=from.add(p.getLookAngle().scale(32));
         var loadedEnd=loadedRayEnd(level,from,to);
         if(loadedEnd.distanceToSqr(from)<1.0E-10)return Optional.empty();
         var hit=level.clip(new net.minecraft.world.level.ClipContext(from,loadedEnd,
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
-        return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?Optional.empty():Optional.of(hit.getBlockPos().immutable());
+        return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?Optional.empty():Optional.of(hit);
     }
     /** Clip the ray at the first unloaded voxel; a nearer loaded target remains usable. */
     static Vec3 loadedRayEnd(net.minecraft.server.level.ServerLevel level,Vec3 from,Vec3 to){

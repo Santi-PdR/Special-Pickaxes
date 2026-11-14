@@ -1,4 +1,4 @@
-# Estado actual — 5.10.436: verificación integral en curso
+# Estado actual — 5.10.437: verificación integral en curso
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -245,3 +245,8 @@ JAR. Dieciséis pruebas Python nuevas (49 pasadas localmente), sin build local.
 433 completó86JUnit y276/277GameTests: sólo falló el test combinado de pasarela
 anterior a separar/despejarfixture; sus cuatro nuevas regresiones de pago/Crisol
 pasaron. Ningún JAR432/433 publicado. 434/435 todavía en CI.
+
+437 pendiente CI: Barrido de Falla reutiliza la cara del único raycast que evita
+chunks descargados, sin segundo clip de24bloques; conserva procedencia natural
+también tras preview y valida actor tras callbacks. Dos regresiones nuevas:
+287GameTests esperados. 49Python/22recursos/parser136Java/diffcheck locales OK.

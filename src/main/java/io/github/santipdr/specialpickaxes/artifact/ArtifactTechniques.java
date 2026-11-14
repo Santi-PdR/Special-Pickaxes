@@ -166,22 +166,20 @@ public final class ArtifactTechniques {
 
 
     private static boolean seamFace(ServerPlayer player,ItemStack tool) {
-        var target=ArtifactActions.target(player);if(target.isEmpty())return false;
-        var level=player.serverLevel();var origin=target.get();var state=level.getBlockState(origin);
+        var hit=ArtifactActions.targetHit(player);if(hit.isEmpty())return false;
+        var level=player.serverLevel();var actorOrigin=player.position();var origin=hit.get().getBlockPos();var state=level.getBlockState(origin);
         if(!MiningDesigns.seamGeology(state)||PlayerPlacedBlocks.get(level).contains(origin)
-                ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,origin))return false;
-        var hit=level.clip(new net.minecraft.world.level.ClipContext(player.getEyePosition(),
-                player.getEyePosition().add(player.getLookAngle().normalize().scale(24)),
-                net.minecraft.world.level.ClipContext.Block.OUTLINE,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
-        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)return false;
-        Direction face=hit.getDirection();
+                ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,origin)
+                ||player.serverLevel()!=level||!player.position().equals(actorOrigin)||player.getMainHandItem()!=tool||tool.isEmpty()
+                ||!level.hasChunkAt(origin)||level.getBlockState(origin)!=state||PlayerPlacedBlocks.get(level).contains(origin))return false;
+        Direction face=hit.get().getDirection();
         Direction u=face.getAxis()==Direction.Axis.Y?Direction.EAST:Direction.UP;
         Direction v=face.getAxis()==Direction.Axis.Y?Direction.SOUTH:face.getAxis()==Direction.Axis.X?Direction.SOUTH:Direction.EAST;
         var steps=new ArrayList<WorkStep>(SEAM_FACE_CELLS);
         for(int a=-SEAM_FACE_RADIUS;a<=SEAM_FACE_RADIUS;a++)for(int b=-SEAM_FACE_RADIUS;b<=SEAM_FACE_RADIUS;b++){
             var pos=origin.relative(u,a).relative(v,b);if(!level.hasChunkAt(pos))continue;
             var block=level.getBlockState(pos);
-            if(MiningDesigns.seamGeology(block)&&!PlayerPlacedBlocks.get(level).contains(pos))steps.add(new WorkStep.Mine(pos,block));
+            if(MiningDesigns.seamGeology(block)&&!PlayerPlacedBlocks.get(level).contains(pos))steps.add(new WorkStep.Mine(pos,block,true));
         }
         if(steps.isEmpty())return false;
         steps.sort(Comparator.comparingDouble(step->step.pos().distSqr(origin)));

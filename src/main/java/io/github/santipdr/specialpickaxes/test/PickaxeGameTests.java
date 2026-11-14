@@ -335,6 +335,19 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,pos,state)&&h.getLevel().getBlockState(pos)==state,"same-level claim movement invalidates the captured break even when the target remains in range");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_218") public static void seamFacePreservesSameStatePlacedAfterQueueing(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.SEAM_RIPPER);var pos=target(h);wearer.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(pos));
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.SEAM_RIPPER),"natural face is queued");PlayerPlacedBlocks.get(h.getLevel()).mark(pos);
+        try{drain(wearer);h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.STONE),"a placed replacement introduced after preview remains intact during face extraction");}
+        finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_219") public static void seamFaceRejectsMovedMinerDuringClaimCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.SEAM_RIPPER);var pos=target(h);wearer.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(pos));
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer&&event.target.equals(pos))wearer.setPos(wearer.position().add(.25,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.SEAM_RIPPER)&&!WorkQueue.busy(wearer)&&!ArtifactState.of(wearer,ArtifactKind.SEAM_RIPPER).contains("alternateReady"),"a moved actor does not queue a stale face or spend cooldown");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
