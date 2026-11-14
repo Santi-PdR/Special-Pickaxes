@@ -1,12 +1,12 @@
 # Special Pickaxes — mining rework
 
-**5.10.428 — aterrizajes, Starfall y Lode Sense; pendiente de CI.** Eventide
+**5.10.428 — aterrizajes, Starfall y Lode Sense; CI global correcto.** Eventide
 selecciona objetivos sin callbacks de permisos dentro del selector y revalida
 origen, protección y objetivos antes del snare; evita reentrada. Icarus rechaza
 caídas no finitas. Starfall, aterrizajes, Lode Sense y escaneos aliados recuperan
 plazos imposibles manteniendo intervalos/potencia. Starfall valida bearer/nivel y
 presupuesta flashes; Lode Sense revalida posiciones después de permisos. Once
-GameTests y tres JUnit añadidos. En 427 pasó build/JUnit y 260/261 GameTests; el fixture antiguo de recarga no equipaba su ward. Corregido en 428, pendiente de CI propio.
+GameTests y tres JUnit añadidos. En 427 pasó build/JUnit y 260/261 GameTests; el fixture antiguo de recarga no equipaba su ward. Corregido en 428: [CI 43548490641](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43548490641) global correcto, 81 JUnit y 261 GameTests pasados, JAR/servidor/logs y cliente real (32 escenas, 64 tooltips y controles). Sin aprobación visual completa ni instalación Windows.
 
 **5.10.426 — defensa de Estasis y auras de mobs; CI global correcto.** La respuesta
 compartida de Estasis evita reentrada y revalida daño, ward y atacante después de

@@ -1,14 +1,25 @@
-# Estado actual — 5.10.428: fixture Starfall corregido, pendiente de CI
+# Estado actual — 5.10.428: CI global exitoso, sin aprobación visual completa
+
+**Fuente `7904bf8a6be920e4b6227620cb3addd5a4a10e20`,
+[run 43548490641](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43548490641): completed/success.**
+81 JUnit sin fallos/errores/skips y All 261 required tests passed. JAR/servidor/logs
+correctos; cliente real 32 escenas/64 tooltips, teclado-servidor y World Shatter
+9341. Bundle Checks54 recuperado/verificado `/tmp/sp-ci428`; logs GameTest y cliente
+reescaneados localmente, limpios. Sin inspección visual de esta galería, no aprobación
+visual completa/temporal. Publicación binaria skipped; no instalación Windows.
+Artifact forge-validation 14095304337 (40237972 bytes). RELEASE.json verificado:
+JAR533981 bytes, SHA256 `32fc53ed93f7a6003554d276faa94d63bfe9c6f5cb09704d35fe49c64046de03`.
+Se verificó el manifiesto del bundle, no una descarga/instalación del JAR.
 
 427: aterrizajes Eventide protegidos frente a reentrada/cambios durante permisos;
 Icarus valida caídas finitas; Starfall/Lode Sense/escaneos aliados recuperan plazos
 imposibles. Flashes Starfall y ripple Eventide tienen presupuesto global. Once
-GameTests (261 en fuente) y tres JUnit nuevos, pendientes de ejecución CI propia.
+GameTests (261 totales) y tres JUnit nuevos, ejecutados y pasados en 428.
 
 427 `aa73158` / run43547927879 completed/failure: 81 JUnit pasados,
 260/261 GameTests. Falló únicamente exodiumStarfallCatchRechargesAfterThirtyTicks,
 que llamaba a tryCatchIncoming sin aplicar STARFALL_WARD. 428 añade la protección
-al fixture y conserva la comprobación en producción; CI propio pendiente.
+al fixture y conserva la comprobación en producción; CI propio exitoso indicado arriba.
 
 426: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
 en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras

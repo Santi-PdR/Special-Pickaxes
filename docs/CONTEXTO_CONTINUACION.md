@@ -337,3 +337,12 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 
 - Fuente `aa7315888015a7c057606787f0900a38a88c13e6`, run43547927879 completed/failure. Bundle recuperado/verificado `/tmp/sp-ci427`. Build/JAR y 81 JUnit pasados; 260/261 GameTests, las once nuevas regresiones pasaron. Único fallo: exodiumStarfallCatchRechargesAfterThirtyTicks / batch71, primer catch.
 - Ese fixture no aplicaba STARFALL_WARD. El public helper ahora requiere bearer protegido (cubierto explícitamente por la nueva regresión189). 428 prepara la ward100 en el fixture71, sin relajar validación ni retirar assertions de recarga29/30. No cambia gameplay427. Nueva versión aún pendiente de CI propio; no certificar servidor/cliente de427, omitidos.
+
+### Cierre 428 comprobado
+
+- Fuente `7904bf8a6be920e4b6227620cb3addd5a4a10e20`, run43548490641 completed/success (watcher exit0+API). Bundle54 fragmentos recuperado/verificado `/tmp/sp-ci428`.
+- XML81 JUnit, cero failures/errors/skipped. All 261 required tests passed. Incluye once GameTests/tres JUnit nuevos de esta tanda, más fixture71 completado con su ward. Historial427failure no se reescribe como verde.
+- JAR/servidor empaquetado/logs correctos. Cliente: GRAPHICAL_CLIENT_GALLERY_OK; UX_ARTIFACTS=32; NORMAL_AND_SHIFT=64; KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK; SUPREME_REMOVED_BLOCKS_9341 y SUPREME_COMPLETE. Scanner local de logs GameTest+cliente recuperados: limpio.
+- Publish verified release only skipped. Ninguna captura428 inspeccionada visualmente, no aprobación visual completa ni temporal de animaciones. Sin instalación Windows/control de PC/UI ni build local.
+- Artifact forge-validation14095304337,40237972bytes,noexpired. RELEASE.json verificado: special-pickaxes-1.20.1-5.10.428.jar,533981bytes,SHA256 `32fc53ed93f7a6003554d276faa94d63bfe9c6f5cb09704d35fe49c64046de03`. Se verificó el manifiesto, no JAR descargado/instalado.
+- Pendiente próxima auditoría: ArtifactPassives sharedHeartwood/sharedNullVeil/onCuriosDamage conservan plazos raw y callbacks que pueden cambiar actor/target/efectos. Revisar preservando semántica (Heartwood permite mitigación propia aunque claim rechace retaliación; otros necesitan permiso). No afirmar que están corregidos. Revisión visual completa sigue pendiente.
