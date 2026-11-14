@@ -184,6 +184,74 @@ public final class PickaxeGameTests {
         }
         h.assertTrue(SpecialPickaxes.TIER.getUses()==32768&&SpecialPickaxes.TIER.getSpeed()==64F&&SpecialPickaxes.TIER.getLevel()==5,"mining durability, speed and tier remain OP");h.succeed();
     }
+    private static BlockPos bridgeFixture(GameTestHelper h,ServerPlayer player){
+        player.setPos(player.position().add(0,30,0));player.setXRot(-90);
+        var first=player.blockPosition().below().relative(player.getDirection());
+        for(int n=0;n<9;n++)h.getLevel().setBlockAndUpdate(first.relative(player.getDirection(),n),Blocks.AIR.defaultBlockState());
+        return first;
+    }
+    @GameTest(template="empty",batch="rework_each_196") public static void worldloomBridgeNeedsNoAimAndOnlyConsumesOffhand(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var level=h.getLevel();
+        wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,3));var reserve=new ItemStack(Blocks.COBBLESTONE,64);wearer.getInventory().setItem(10,reserve);
+        h.assertTrue(ArtifactActions.target(wearer).isEmpty()&&ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"a ledge walkway activates while looking at empty sky");drain(wearer);
+        h.assertTrue(wearer.getOffhandItem().isEmpty()&&reserve.getCount()==64,"exactly the offhand material is paid, never a matching inventory reserve");
+        for(int n=0;n<3;n++)h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),n)).is(Blocks.COBBLESTONE),"paid floor cells are placed in order");
+        h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),3)).isAir()&&!WorkQueue.busy(wearer),"the walkway stops immediately when offhand payment runs out");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_197") public static void worldloomBridgeStopsAtDeniedCellWithoutJumpingIt(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var denied=first.relative(wearer.getDirection());wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,9));
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"bridge is scheduled");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=event->{if(event.player==wearer&&event.target.equals(denied))event.setCanceled(true);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+        try{drain(wearer);h.assertTrue(h.getLevel().getBlockState(first).is(Blocks.COBBLESTONE)&&h.getLevel().getBlockState(denied).isAir()&&h.getLevel().getBlockState(denied.relative(wearer.getDirection())).isAir()&&wearer.getOffhandItem().getCount()==8,"a denied cell stops the whole remaining path with no free blocks or later placements");}
+        finally{MinecraftForge.EVENT_BUS.unregister(veto);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_198") public static void worldloomBridgeDoesNotSkipObstaclesDuringPlanning(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var barrier=first.relative(wearer.getDirection());h.getLevel().setBlockAndUpdate(barrier,Blocks.CHEST.defaultBlockState());wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,9));
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"the one safe cell before the obstacle can be planned");drain(wearer);
+        h.assertTrue(h.getLevel().getBlockState(first).is(Blocks.COBBLESTONE)&&h.getLevel().getBlockState(barrier).is(Blocks.CHEST)&&h.getLevel().getBlockState(barrier.relative(wearer.getDirection())).isAir(),"planning never jumps a container or changes its contents");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_199") public static void worldloomBridgeRejectsNamedMaterialWithoutChargingCooldown(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);bridgeFixture(h,wearer);var material=new ItemStack(Blocks.COBBLESTONE,9);material.setHoverName(net.minecraft.network.chat.Component.literal("Keep me"));wearer.setItemInHand(InteractionHand.OFF_HAND,material);
+        h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM)&&!WorkQueue.busy(wearer)&&!ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).contains("alternateReady")&&material.getCount()==9,"named/NBT material is rejected before queueing or charging an activation");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_200") public static void naturalMiningStepRechecksPlacedProvenanceAtExecution(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var expected=h.getLevel().getBlockState(at);var step=new WorkStep.Mine(at,expected,true);PlayerPlacedBlocks.get(h.getLevel()).mark(at);
+        try{h.assertTrue(!step.apply(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM)&&h.getLevel().getBlockState(at)==expected,"a same-state replacement marked placed after planning is preserved");}
+        finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(at);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_201") public static void naturalMiningRejectsProvenanceChangedDuringClaimCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var at=target(h);var expected=h.getLevel().getBlockState(at);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> mark=event->{if(event.player==wearer&&event.target.equals(at))PlayerPlacedBlocks.get(h.getLevel()).mark(at);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,mark);
+        try{h.assertTrue(!new WorkStep.Mine(at,expected,true).apply(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR)&&h.getLevel().getBlockState(at)==expected,"non-cancelling provenance changes after permission prevent the native break");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_202") public static void naturalMiningRejectsProvenanceChangedDuringForgeBreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var at=target(h);var expected=h.getLevel().getBlockState(at);
+        Consumer<BlockEvent.BreakEvent> mark=event->{if(event.getPlayer()==wearer&&event.getPos().equals(at))PlayerPlacedBlocks.get(h.getLevel()).mark(at);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mark);
+        try{h.assertTrue(!new WorkStep.Mine(at,expected,true).apply(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC)&&h.getLevel().getBlockState(at)==expected,"the native break context also protects provenance changed inside Forge's break event");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_203") public static void surveySelectsNearestThirtyTwoNaturalOreCells(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var center=target(h).above(20);var level=h.getLevel();
+        for(var at:BlockPos.betweenClosed(center.offset(-2,-2,-2),center.offset(2,2,2))){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(at);}
+        PlayerPlacedBlocks.get(level).mark(center);var result=MiningAlternates.surveyCandidates(wearer,center);
+        h.assertTrue(result.size()==32&&!result.contains(center)&&result.stream().allMatch(at->at.distSqr(center)<=4),"survey uses a bounded nearest-first natural-ore collector rather than scan-order priority");
+        for(int n=1;n<result.size();n++)h.assertTrue(result.get(n-1).distSqr(center)<=result.get(n).distSqr(center),"survey candidates remain ordered by proximity");PlayerPlacedBlocks.get(level).unmark(center);finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_204") public static void surveyNeverLoadsDistantMissingChunks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
+        h.assertTrue(!level.hasChunkAt(remote)&&MiningAlternates.surveyCandidates(wearer,remote).isEmpty()&&!level.hasChunkAt(remote),"a bounded survey skips unloaded blocks instead of loading chunks");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_205") public static void surveyRejectsCasterTeleportDuringPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"a moved miner does not receive stale survey data or spend a cooldown");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

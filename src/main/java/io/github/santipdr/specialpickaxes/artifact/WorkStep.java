@@ -10,11 +10,18 @@ public interface WorkStep {
     BlockPos pos();
     boolean apply(ServerPlayer player,ItemStack tool,ArtifactKind kind);
     default boolean stopOnFailure() { return false; }
-    record Mine(BlockPos pos,BlockState expected) implements WorkStep {
-        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.mineQueued(p,t,k,pos,expected); }
+    record Mine(BlockPos pos,BlockState expected,boolean naturalOnly) implements WorkStep {
+        public Mine(BlockPos pos,BlockState expected){this(pos,expected,false);}
+        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) {
+            return naturalOnly?WorldSafety.mineNaturalQueued(p,t,k,pos,expected):WorldSafety.mineQueued(p,t,k,pos,expected);
+        }
     }
-    record Place(BlockPos pos,BlockState state) implements WorkStep {
-        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.placePaid(p,t,k,pos,state); }
+    record Place(BlockPos pos,BlockState state,boolean offhandOnly) implements WorkStep {
+        public Place(BlockPos pos,BlockState state){this(pos,state,false);}
+        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) {
+            return offhandOnly?WorldSafety.placePaidOffhand(p,t,k,pos,state):WorldSafety.placePaid(p,t,k,pos,state);
+        }
+        public boolean stopOnFailure(){return offhandOnly;}
     }
     record Rephase(BlockPos pos,BlockState expected,BlockState target) implements WorkStep {
         public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.transmute(p,t,k,pos,expected,target); }

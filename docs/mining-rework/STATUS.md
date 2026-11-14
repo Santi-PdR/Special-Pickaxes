@@ -1,4 +1,4 @@
-# Estado actual — 5.10.431: prerelease de prueba público y CI global exitoso
+# Estado actual — 5.10.432: primera fase de utilidad/efectos/interfaz pendiente CI
 
 429: nuevas secundarias mineras para siete familias, sin interacciones de combate
 en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base

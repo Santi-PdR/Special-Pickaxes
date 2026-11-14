@@ -24,11 +24,12 @@ public final class WorldSafety {
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK,
         Blocks.DIRT,Blocks.COARSE_DIRT,Blocks.GRASS_BLOCK,Blocks.PODZOL,Blocks.ROOTED_DIRT,Blocks.GRAVEL,Blocks.DRIPSTONE_BLOCK,Blocks.POINTED_DRIPSTONE);
     private WorldSafety() {}
-    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind){}
+    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind,boolean naturalOnly){}
     private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
     public static boolean changedDuringBreakEvent(ServerPlayer p,BlockPos pos){
         var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
-            &&(p.getMainHandItem()!=context.tool()||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos));
+            &&(p.getMainHandItem()!=context.tool()||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos)
+                    ||context.naturalOnly()&&PlayerPlacedBlocks.get(p.serverLevel()).contains(pos));
     }
     static boolean capturesIridiumDrops(){
         var context=NATIVE_BREAK.get();return context!=null&&context.kind()==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(context.expected());
@@ -80,12 +81,19 @@ public final class WorldSafety {
     static boolean mineQueued(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
         return mine(p,tool,kind,pos,expected,false);
     }
-    private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure) {
-        if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)) return false;
+    static boolean mineNaturalQueued(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
+        return mine(p,tool,kind,pos,expected,false,true);
+    }
+    private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure){
+        return mine(p,tool,kind,pos,expected,checkDropPressure,false);
+    }
+    private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure,boolean naturalOnly) {
+        if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)
+                ||naturalOnly&&PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(checkDropPressure&&dropPressure(p,pos))return false;
         // Keep the exact break context through item spawning so Iridium can tag only these drops.
-        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind));
+        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly));
         boolean mined;
         try{mined=p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
         return mined;
@@ -117,11 +125,18 @@ public final class WorldSafety {
         // another listener. Unconditional rollback would destructively overwrite it.
         if(level.hasChunkAt(pos)&&level.getBlockState(pos)==placed&&level.getFluidState(pos).isEmpty()&&placed.getFluidState().isEmpty())snapshot.restore(true,false);
     }
-    public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state) {
+    public static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state){
+        return placePaid(p,tool,kind,pos,state,false);
+    }
+    public static boolean placePaidOffhand(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state){
+        return placePaid(p,tool,kind,pos,state,true);
+    }
+    private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly) {
         if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
-            for(int i=0;i<p.getInventory().getContainerSize();i++) {
+            int first=offhandOnly?p.getInventory().getContainerSize()-1:0;
+            for(int i=first;i<p.getInventory().getContainerSize();i++) {
                 var stack=p.getInventory().getItem(i);
                 if(stack.is(state.getBlock().asItem()) && !stack.hasTag()) { paymentSlot=i;break; }
             }

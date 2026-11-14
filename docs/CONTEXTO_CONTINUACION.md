@@ -389,3 +389,17 @@ Release público creado por workflow: `test-5.10.431-43557399012`, prereleasetru
 JARrealrecuperadoChecks `/tmp/sp-ci431/build/libs/special-pickaxes-1.20.1-5.10.431.jar`: hash/bytescoincidenconGitHub; zipcontieneMETA-INF/MANIFEST.MF ymods.toml. IntentodescargacurlURLpública devolvióredirectrealalCDN release-assets.githubusercontent.com y SSL_ERROR_SYSCALL porhostnolista; no afirmardescargadirectacompletada. URLasset verificadaporAPI/GitHubdigest, descargapúblicadisponiblefueraentorno. SininstalaciónWindows. No modificarPC.
 
 Final: comandoPSuna línea, URLdirecta https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-5.10.431-43557399012/special-pickaxes-1.20.1-5.10.431.jar, tamaño536128, hasharriba. VerificardescargaANTESmover/borrarsóloSpecialPickaxesviejos, validarhashdestino, cleanupcatch SINfinally. No guardarcomandoenarchivo.
+
+## Tanda amplia solicitada con «Sigue» — 432, primera fase pendiente CI
+
+Usuario define Sigue como mejora amplia (efectos/habilidades/arte/interfaces/balance/bugs) con mínimo30min trabajo efectivo salvo interrupción/bloqueo; no contar esperas artificiales. Mantener daño4base, Xsinmobs, mineríaOP, sinrecetas/buildlocal/checkout/PCautomation. Al final comandoPSuna línea URL/tamaño/SHAreales, sinfinally/gh/token/ps1.
+
+Al retomar snapshot HEADbase28b8ebf y archivos previosdirty: fetch ramaactiva1e96419; comparación365archivos remotos dio0missing/different. Sólo se sincronizaron refCAS eíndice(update-ref/read-tree), sincheckout/reseteo/escrituraarchivos; árbollimpio anteseditar.
+
+432 fase1:
+- Worldloom no necesita target de raycast; verifica contexto actor/posición/nivel/herramienta tras permiso inicial. Offhand NBT/nombre rechazado al inicio. Plan de hasta9 se corta al primer bloque ocupado/chunkfaltante; Place.offhandOnly mantiene compatconstructor2args ystopOnFailure, sin saltar claims/celdas sinpago. WorldSafety.placePaidOffhand sólo selecciona últimoslot offhand y revalida referencia/material trasplacecallback. Place genérico conserva política inventario.
+- Mine.naturalOnly (constructor2args anterior sigue false) usado por nuevas MiningAlternates. WorldSafety.mineNaturalQueued revalida procedencia trasAbilityUseEvent; contextoNativeBreak lleva flag y protectorLOWEST también veta marca playerplaced dentroForgeBreakEvent. Backpressure ignora targets naturales ya protegidos para no pausar falsamente.
+- SurveyCandidates top32 nearest naturalore en2197celdasloaded, colecciónbounded32 orden distancia+tiebreakposition. Sin callbacks dentroselector. Sondeo valida todosclaims/actorcapturado antesemitir información; omite denegados/cambiados/playerplaced; partículas presupuestadas ychatcoordenadanearest aceptada. No prometer xray/visiónatravéspiedra.
+- MiningSignature orienta geometría con miradahorizontal, fallbackvertical/no-finito; ancla delante/abajo para reducir ocultacióncámara. Fase NaN se normaliza. Manual+SHIFT añadeperfil daño4base, tier5/speed64/uses32768 yXno combate; ES/EN corregidos.
+- Diez GameTests196–205 (total273esperado) y3JUnit (86esperado): pasarelaaire/pagos/denegación/obstáculo/NBT,3provenance natural,nearestsurvey/chunks/teleport. Recursos22/Python28/parser136/diffcheck correctos. Java noejecutadolocal, pendienteCI.
+- Se prepara segunda fase independiente de legibilidad de iconos/texturas y auditoría adicional; no afirmar aún implementada ni duración cumplida.

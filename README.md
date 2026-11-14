@@ -1,5 +1,13 @@
 # Special Pickaxes — mining rework
 
+**5.10.432 — utilidad segura, orientación visual y guía; pendiente de CI.**
+Worldloom activa sin bloque apuntado, paga sólo offhand y corta la pasarela ante
+obstáculos/denegaciones/falta de material. Palimpsest prioriza las32menas naturales
+más cercanas y comunica la coordenada de la primera. Los trabajos naturales
+revalidan procedencia player-placed incluso durante callbacks de rotura. Firmas
+alineadas con la mirada y nueva ficha de herramienta en manual/SHIFT. Diez
+GameTests y tres JUnit añadidos; aún pendientes de ejecución Java en CI.
+
 **5.10.431 — prueba descargable publicada; CI global correcto.**
 Se conserva el gameplay validado en430. Tras CI completo exitoso en la rama de
 sesión se publica un **prerelease de prueba** con JAR/RELEASE.json/SHA256SUMS.

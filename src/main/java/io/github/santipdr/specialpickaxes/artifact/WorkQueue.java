@@ -181,6 +181,7 @@ public final class WorkQueue {
         if(job.region!=null)return job.region.backpressured(player);
         var next=job.steps.peekFirst();
         return next instanceof WorkStep.Mine mine
+                &&(!mine.naturalOnly()||!PlayerPlacedBlocks.get(player.serverLevel()).contains(mine.pos()))
                 &&WorldSafety.backpressuredMine(player,job.tool,job.kind,mine.pos(),mine.expected());
     }
 }

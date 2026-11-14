@@ -489,12 +489,12 @@
   "screen.specialpickaxes.melee": "EFECTO AL GOLPEAR",
   "screen.specialpickaxes.scroll": "Rueda para leer",
   "manual4.cost_detail": "R: desgaste %s · %s s. X: desgaste %s · %s s.",
-  "alternate.detail.specialpickaxes.palimpsest": "Revela hasta 32 menas cargadas en un cubo de radio 6 alrededor del bloque apuntado. No rompe bloques ni afecta criaturas.",
+  "alternate.detail.specialpickaxes.palimpsest": "Sondea las 32 menas naturales cargadas más cercanas al bloque apuntado en un cubo de radio 6. Señala partículas e indica en el chat las coordenadas de la más cercana, incluso enterrada. No rompe bloques ni revela menas protegidas por claims.",
   "alternate.detail.specialpickaxes.fault_choir": "Excava una galería de arco, de 3 de ancho y 3 de alto, hasta 8 bloques al frente. Respeta bloques colocados, fluidos y protecciones.",
   "alternate.detail.specialpickaxes.eventide": "Pulsa X para atraer hasta 64 objetos sueltos propios o sin dueño en un radio de 16 bloques. No atrae criaturas ni proyectiles. R activa el Campo Gravitatorio.",
   "alternate.detail.specialpickaxes.paradox_crucible": "Transforma un bloque de geología natural al material del modo actual. Prueba el acabado antes de transformar una región; no crea un escudo.",
   "alternate.detail.specialpickaxes.interregnum": "Extrae únicamente el bloque de geología o mena apuntado. Sin campo, inmovilización, proyectiles ni criaturas.",
-  "alternate.detail.specialpickaxes.worldloom": "Coloca hasta 9 bloques en línea bajo tus pies hacia delante, pagando cada bloque desde la mano secundaria. Requiere material inerte y respeta protecciones.",
+  "alternate.detail.specialpickaxes.worldloom": "Sin apuntar a un bloque: coloca una pasarela recta de hasta 9 bloques bajo tus pies hacia delante, pagando sólo desde la mano secundaria. Requiere material inerte sin nombre/NBT y un borde libre; se detiene ante obstáculos, permisos denegados o falta de material.",
   "alternate.detail.specialpickaxes.icarus": "Pulsa X para abrir un túnel de un bloque de ancho y dos de alto y ascender por él. Se detiene al llegar al cielo abierto, ante una barrera o tras 384 bloques; protege los bloques colocados por jugadores.",
   "alternate.detail.specialpickaxes.hollow_axiom": "Apunta a una mena: retira la geología natural de sus seis caras sin romper el núcleo de mineral. No absorbe proyectiles.",
   "alternate.detail.specialpickaxes.worldbreaker": "Usa la habilidad X del pico copiado. El objeto y este Manual muestran qué pico está copiado.",
@@ -599,5 +599,8 @@
   "message.specialpickaxes.crucible_no_change": "No cambió geología válida. Elige otra salida o apunta a piedra natural, pizarra, calcita, obsidiana, tierra, grava o roca compatible de un mod; se omiten menas, bloques colocados, contenedores y fluidos.",
   "mode.specialpickaxes.hollow_pulse": "HOLLOW PULSE",
   "message.specialpickaxes.mining_alternate_started": "Trabajo minero iniciado: %s pasos.",
-  "message.specialpickaxes.survey_found": "Sondeo: %s menas señaladas (máximo 32)."
+  "message.specialpickaxes.survey_found": "Sondeo: %s menas señaladas (máximo 32).",
+  "manual4.tool_profile": "Perfil de herramienta",
+  "manual4.tool_profile_detail": "Daño cuerpo a cuerpo base: 4 puntos, antes de encantamientos y efectos. Minería de tier 5, velocidad base 64 y 32768 usos. X es minería, construcción o utilidad: no ataca ni controla criaturas o proyectiles.",
+  "message.specialpickaxes.survey_nearest": "Mena natural más cercana al sondeo: X %s · Y %s · Z %s."
 }

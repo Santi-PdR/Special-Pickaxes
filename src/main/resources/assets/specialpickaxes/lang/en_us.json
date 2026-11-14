@@ -489,12 +489,12 @@
   "screen.specialpickaxes.melee": "ON-HIT EFFECT",
   "screen.specialpickaxes.scroll": "Scroll to read",
   "manual4.cost_detail": "R: durability %s · %s s. X: durability %s · %s s.",
-  "alternate.detail.specialpickaxes.palimpsest": "Reveals up to 32 loaded ore cells within a six-block cube of the aimed block. No block destruction or creature effects.",
+  "alternate.detail.specialpickaxes.palimpsest": "Surveys the 32 nearest loaded natural ore cells in a six-block cube around the aimed block. Shows particles and posts the nearest coordinates in chat, even if buried. Does not break blocks or disclose claim-denied ore.",
   "alternate.detail.specialpickaxes.fault_choir": "Mines a three-wide, three-high arched gallery up to eight blocks forward. Respects placed blocks, fluids and claims.",
   "alternate.detail.specialpickaxes.eventide": "Press X to pull up to 64 loose items you own or that have no owner within 16 blocks. It does not pull creatures or projectiles. R activates the Gravity Field.",
   "alternate.detail.specialpickaxes.paradox_crucible": "Rephases one natural geology block into the selected mode material. Sample a finish before a regional job; creates no shield.",
   "alternate.detail.specialpickaxes.interregnum": "Extracts only the aimed geology or ore block. No field, immobilization, projectile or creature interactions.",
-  "alternate.detail.specialpickaxes.worldloom": "Builds up to nine floor blocks forward, paying for every block from the offhand. Requires inert material and respects claims.",
+  "alternate.detail.specialpickaxes.worldloom": "No block aim required: builds a straight walkway of up to nine floor blocks forward, paying only from the offhand. Requires plain inert material and an open ledge; stops at obstacles, denied claims or missing material.",
   "alternate.detail.specialpickaxes.icarus": "Press X to clear a one-block-wide, two-block-high shaft and rise through it. It stops at open sky, a barrier, or the 384-block safety limit; player-placed blocks are preserved.",
   "alternate.detail.specialpickaxes.hollow_axiom": "Aim at ore: clears natural geology from its six adjacent faces while preserving the ore core. Does not absorb projectiles.",
   "alternate.detail.specialpickaxes.worldbreaker": "Uses the copied pickaxe’s X skill. The selected pickaxe is shown on the item and in Copy Mode in this Manual.",
@@ -599,5 +599,8 @@
   "message.specialpickaxes.crucible_no_change": "No eligible geology changed. Choose another output or aim at natural stone, deepslate, calcite, obsidian, dirt, gravel or compatible modded rock; ores, placed blocks, containers and fluids are skipped.",
   "mode.specialpickaxes.hollow_pulse": "HOLLOW PULSE",
   "message.specialpickaxes.mining_alternate_started": "Mining job started: %s steps.",
-  "message.specialpickaxes.survey_found": "Survey: %s ore cells marked (maximum 32)."
+  "message.specialpickaxes.survey_found": "Survey: %s ore cells marked (maximum 32).",
+  "manual4.tool_profile": "Tool profile",
+  "manual4.tool_profile_detail": "Base melee damage: 4 points, before enchantments and effects. Mining tier 5, base speed 64, and 32768 uses. X is mining, construction or utility: never attacks or controls creatures or projectiles.",
+  "message.specialpickaxes.survey_nearest": "Nearest natural ore to survey: X %s · Y %s · Z %s."
 }

@@ -13,18 +13,20 @@ public final class MiningAlternates {
     private MiningAlternates(){}
 
     public static boolean use(ServerPlayer player,ItemStack tool,ArtifactKind kind){
-        var aimed=ArtifactActions.target(player);if(aimed.isEmpty())return false;
-        var origin=aimed.get();var level=player.serverLevel();
-        if(!WorldSafety.allowed(player,kind,origin)||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty())return false;
+        var level=player.serverLevel();var actorOrigin=player.position();
+        var aimed=kind==ArtifactKind.WORLDLOOM?java.util.Optional.of(player.blockPosition().below()):ArtifactActions.target(player);
+        if(aimed.isEmpty())return false;
+        var origin=aimed.get();
+        if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
         if(kind==ArtifactKind.PALIMPSEST)return survey(player,tool,origin);
         var steps=new ArrayList<WorkStep>();var forward=player.getDirection();var side=forward.getClockWise();
         if(kind==ArtifactKind.WORLDLOOM){
-            if(!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
+            if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
             var floor=player.blockPosition().below();
             for(int depth=1;depth<=9;depth++){
                 var at=floor.relative(forward,depth);
-                if(level.hasChunkAt(at)&&!level.isOutsideBuildHeight(at)&&level.getBlockState(at).isAir())
-                    steps.add(new WorkStep.Place(at,block.getBlock().defaultBlockState()));
+                if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir())break;
+                steps.add(new WorkStep.Place(at,block.getBlock().defaultBlockState(),true));
             }
         }else if(kind==ArtifactKind.AXIOM){
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;
@@ -55,21 +57,45 @@ public final class MiningAlternates {
         var level=player.serverLevel();
         if(level.isOutsideBuildHeight(at)||!level.hasChunkAt(at)||PlayerPlacedBlocks.get(level).contains(at))return;
         var state=level.getBlockState(at);
-        if(MiningDesigns.seamGeology(state)||(ores&&ArtifactOres.isOre(state)))steps.add(new WorkStep.Mine(at.immutable(),state));
+        if(MiningDesigns.seamGeology(state)||(ores&&ArtifactOres.isOre(state)))steps.add(new WorkStep.Mine(at.immutable(),state,true));
     }
 
-    /** Reveals at most 32 loaded ore cells to this miner; no drops or world mutation. */
-    private static boolean survey(ServerPlayer player,ItemStack tool,BlockPos origin){
-        var level=player.serverLevel();int found=0;
+    private static boolean context(ServerPlayer player,ItemStack tool,net.minecraft.server.level.ServerLevel level,net.minecraft.world.phys.Vec3 origin){
+        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.serverLevel()==level
+                &&player.position().equals(origin)&&player.getMainHandItem()==tool&&!tool.isEmpty();
+    }
+
+    /** Loaded, natural, nearest-first cells; no permission callbacks inside the collector. */
+    public static java.util.List<BlockPos> surveyCandidates(ServerPlayer player,BlockPos origin){
+        var level=player.serverLevel();
+        var best=new NearestCandidates<BlockPos>(32,java.util.Comparator.comparingDouble((BlockPos p)->p.distSqr(origin)).thenComparingLong(BlockPos::asLong));
         for(var cursor:BlockPos.betweenClosed(origin.offset(-6,-6,-6),origin.offset(6,6,6))){
-            if(level.isOutsideBuildHeight(cursor)||!level.hasChunkAt(cursor)||!ArtifactOres.isOre(level.getBlockState(cursor)))continue;
-            var at=cursor.immutable();
-            if(!WorldSafety.allowed(player,ArtifactKind.PALIMPSEST,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty())return false;
-            if(!ArtifactOres.isOre(level.getBlockState(at)))continue;
+            if(level.isOutsideBuildHeight(cursor)||!level.hasChunkAt(cursor)||PlayerPlacedBlocks.get(level).contains(cursor)
+                    ||!ArtifactOres.isOre(level.getBlockState(cursor)))continue;
+            best.offer(cursor.immutable());
+        }
+        return best.sorted();
+    }
+
+    /** Information is emitted only after validating all claim callbacks and the captured miner. */
+    private static boolean survey(ServerPlayer player,ItemStack tool,BlockPos origin){
+        var level=player.serverLevel();var actorOrigin=player.position();var accepted=new java.util.LinkedHashMap<BlockPos,net.minecraft.world.level.block.state.BlockState>();
+        for(var at:surveyCandidates(player,origin)){
+            var expected=level.getBlockState(at);
+            boolean allowed=WorldSafety.allowed(player,ArtifactKind.PALIMPSEST,at);
+            if(!context(player,tool,level,actorOrigin))return false;
+            if(allowed&&level.hasChunkAt(at)&&level.getBlockState(at)==expected&&!PlayerPlacedBlocks.get(level).contains(at))accepted.put(at,expected);
+        }
+        int found=0;BlockPos nearest=null;
+        for(var hit:accepted.entrySet()){
+            var at=hit.getKey();
+            if(!level.hasChunkAt(at)||level.getBlockState(at)!=hit.getValue()||PlayerPlacedBlocks.get(level).contains(at))continue;
+            if(nearest==null)nearest=at;
             if(ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),1,1))
                 level.sendParticles(player,net.minecraft.core.particles.ParticleTypes.END_ROD,true,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
-            if(++found==32)break;
+            found++;
         }
+        if(nearest!=null)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.specialpickaxes.survey_nearest",nearest.getX(),nearest.getY(),nearest.getZ()),false);
         ArtifactFeedback.message(player,"survey_found",found);return true;
     }
 }

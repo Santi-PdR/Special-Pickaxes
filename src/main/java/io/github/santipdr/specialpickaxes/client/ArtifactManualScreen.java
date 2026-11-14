@@ -108,6 +108,7 @@ public final class ArtifactManualScreen extends Screen {
         result.add(section("screen.specialpickaxes.main",Component.translatable("mining.identity."+abilityKind.id+"."+modeKey),0xffe4edf4));
         result.add(section("manual4.how",Component.translatable("mining.how."+abilityKind.id+"."+modeKey),0xffc7d4df));
         result.add(section("screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+abilityKind.id),0xffffd385));
+        result.add(section("manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"),0xffa7d9ef));
         result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));
         result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
         var curiosInfo=new ArrayList<Component>();curiosInfo.add(Component.translatable("screen.specialpickaxes.curios_passive"));

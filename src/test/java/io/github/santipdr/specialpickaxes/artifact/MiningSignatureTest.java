@@ -20,4 +20,20 @@ class MiningSignatureTest {
             for(int i=0;i<base.size();i++)assertTrue(moved.get(i).distanceTo(base.get(i).add(origin))<1e-8);
         }
     }
+    @Test void orientationPreservesScaleAndVerticalShape(){
+        var local=new Vec3(.3,.4,.6);
+        for(var look:new Vec3[]{new Vec3(1,0,0),new Vec3(0,0,-1),new Vec3(0,1,0),Vec3.ZERO}){
+            var transformed=MiningSignature.orient(local,look);
+            assertEquals(local.y,transformed.y,1e-9);assertEquals(local.lengthSqr(),transformed.lengthSqr(),1e-9);
+        }
+        assertEquals(.6,MiningSignature.orient(local,new Vec3(1,0,0)).x,1e-9);
+    }
+    @Test void malformedLookFallsBackToAFiniteHorizontalBasis(){
+        var result=MiningSignature.orient(new Vec3(.2,.3,.4),new Vec3(Double.NaN,0,Double.POSITIVE_INFINITY));
+        assertTrue(Double.isFinite(result.x)&&Double.isFinite(result.y)&&Double.isFinite(result.z));
+    }
+    @Test void malformedPhaseNeverCreatesInvalidParticles(){
+        for(int style=0;style<13;style++)for(var p:MiningSignature.points(style,Vec3.ZERO,Double.NaN))
+            assertTrue(Double.isFinite(p.x)&&Double.isFinite(p.y)&&Double.isFinite(p.z));
+    }
 }

@@ -51,6 +51,7 @@ public final class ArtifactTooltips {
         section(lines,"manual4.what",Component.translatable("mining.identity."+k.id+"."+mode));
         section(lines,"manual4.how",Component.translatable("mining.how."+k.id+"."+mode));
         section(lines,"screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+k.id));
+        section(lines,"manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"));
         section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios_passive"));

@@ -20,6 +20,7 @@ public final class MiningSignature {
     }
     /** Pure geometry does not bootstrap Forge sound/item registries in unit tests. */
     public static List<Vec3> points(int style,Vec3 origin,double phase){
+        phase=Double.isFinite(phase)?phase:0D;
         var points=new ArrayList<Vec3>();
         for(int i=0;i<16;i++){
             double t=i/15D,a=phase+t*Math.PI*2,x=0,y=0,z=0;
@@ -43,11 +44,19 @@ public final class MiningSignature {
         }
         return List.copyOf(points);
     }
+    /** Maps a local signature to the mining direction, preserving size even when looking vertically. */
+    public static Vec3 orient(Vec3 local,Vec3 look){
+        double square=look.x*look.x+look.z*look.z;
+        Vec3 forward=Double.isFinite(square)&&square>1e-8?new Vec3(look.x,0,look.z).normalize():new Vec3(0,0,1);
+        Vec3 right=new Vec3(-forward.z,0,forward.x);
+        return right.scale(local.x).add(0,local.y,0).add(forward.scale(local.z));
+    }
     public static void emit(ServerPlayer player,ArtifactKind kind){
         int rgb=kind.color;
         var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),.65F);
-        var samples=points(kind,player.position().add(0,.85,0),player.tickCount*.07).stream()
-                .map(point->new ArtifactFeedback.AuraParticle(dust,point,1,0,0,0,0)).toList();
+        var look=player.getLookAngle();var origin=player.position().add(0,.65,0).add(orient(new Vec3(0,0,.75),look));
+        var samples=points(kind,Vec3.ZERO,player.tickCount*.07).stream()
+                .map(local->new ArtifactFeedback.AuraParticle(dust,origin.add(orient(local,look)),1,0,0,0,0)).toList();
         ArtifactFeedback.nearbyWardPulse(player,samples);
     }
 }
