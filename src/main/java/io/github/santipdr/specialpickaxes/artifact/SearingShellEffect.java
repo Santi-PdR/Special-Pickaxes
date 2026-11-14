@@ -64,9 +64,7 @@ public final class SearingShellEffect extends MobEffect {
         if(entity.isOnFire())entity.clearFire();
         if(inHeat&&entity.level() instanceof ServerLevel level){
             var halo=heatHaloParticles(entity,entity.tickCount);
-            if(entity instanceof ServerPlayer wearer)ArtifactFeedback.nearbyWardPulse(wearer,halo);
-            else for(var sample:halo){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
-                    sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+            ArtifactFeedback.entityAuraPulse(level,entity,halo);
         }else if(entity instanceof ServerPlayer wearer&&entity.tickCount%20==0&&nearbyHeat(wearer)){
             ArtifactFeedback.nearbyWardPulse(wearer,thermalMiningHaloParticles(wearer,entity.tickCount));
         }

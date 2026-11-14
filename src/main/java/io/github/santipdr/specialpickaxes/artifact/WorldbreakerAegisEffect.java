@@ -37,9 +37,7 @@ public final class WorldbreakerAegisEffect extends MobEffect {
             double y=centerY+Math.sin(angle*2D)*.11D;
             particles.add(new ArtifactFeedback.AuraParticle(SLATE_SHARD,new net.minecraft.world.phys.Vec3(x,y,z),1,0,0,0,.012D));
         }
-        if(entity instanceof ServerPlayer wearer)ArtifactFeedback.nearbyWardPulse(wearer,particles);
-        else for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
-                sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

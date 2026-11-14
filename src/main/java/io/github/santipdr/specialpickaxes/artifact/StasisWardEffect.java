@@ -27,27 +27,47 @@ public final class StasisWardEffect extends MobEffect {
         addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,UUID.fromString("7ad59033-6f29-465b-a95b-8fedb5d866c4").toString(),.15D,AttributeModifier.Operation.ADDITION);
     }
 
+    private static final java.util.Set<UUID> ANSWERING=new java.util.HashSet<>();
+
     /** The shared ward protects its bearer from one hostile strike and answers with a gravity tether. */
     public static boolean answerHostileHit(ServerPlayer protectedPlayer,LivingHurtEvent event){
-        if(event.getAmount()<=0||!protectedPlayer.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get()))return false;
-        LivingEntity attacker=event.getSource().getEntity() instanceof LivingEntity living?living:null;
-        if(attacker==null){
-            var direct=event.getSource().getDirectEntity();
-            if(JegProjectileCompat.isProjectile(direct)){
-                var owner=JegProjectileCompat.owner(direct);
-                if(owner instanceof LivingEntity living)attacker=living;
+        if(!validHit(protectedPlayer,event)||!ANSWERING.add(protectedPlayer.getUUID()))return false;
+        try{
+            LivingEntity attacker=event.getSource().getEntity() instanceof LivingEntity living?living:null;
+            if(attacker==null){
+                var direct=event.getSource().getDirectEntity();
+                if(JegProjectileCompat.isProjectile(direct)){
+                    var owner=JegProjectileCompat.owner(direct);
+                    if(owner instanceof LivingEntity living)attacker=living;
+                }
             }
-        }
-        if(attacker==null||attacker==protectedPlayer||attacker.isAlliedTo(protectedPlayer))return false;
-        if(attacker instanceof Player other&&!protectedPlayer.canHarmPlayer(other))return false;
-        if(!WorldSafety.allowed(protectedPlayer,ArtifactKind.INTERREGNUM,attacker.blockPosition()))return false;
-        long now=ArtifactState.now(protectedPlayer);var data=protectedPlayer.getPersistentData();
-        if(data.getLong("specialpickaxesStasisReflexReadyAt")>now)return false;
-        data.putLong("specialpickaxesStasisReflexReadyAt",now+160L);
-        event.setAmount(event.getAmount()*.85F);
-        ArtifactPassives.grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get(),1,40);
-        ArtifactFeedback.stasisReflexImpact(protectedPlayer);
-        return true;
+            if(!hostile(protectedPlayer,attacker))return false;
+            long now=ArtifactState.now(protectedPlayer);var data=protectedPlayer.getPersistentData();
+            if(PersistedCooldown.active(now,data.getLong("specialpickaxesStasisReflexReadyAt"),160))return false;
+            var level=protectedPlayer.serverLevel();var position=attacker.position();
+            var ward=protectedPlayer.getEffect(SpecialPickaxes.STASIS_WARD.get());
+            if(!WorldSafety.allowed(protectedPlayer,ArtifactKind.INTERREGNUM,attacker.blockPosition())
+                    ||protectedPlayer.serverLevel()!=level||!validHit(protectedPlayer,event)
+                    ||protectedPlayer.getEffect(SpecialPickaxes.STASIS_WARD.get())!=ward
+                    ||!hostile(protectedPlayer,attacker)||!attacker.position().equals(position))return false;
+            now=ArtifactState.now(protectedPlayer);
+            if(PersistedCooldown.active(now,data.getLong("specialpickaxesStasisReflexReadyAt"),160))return false;
+            data.putLong("specialpickaxesStasisReflexReadyAt",now+160L);
+            event.setAmount(event.getAmount()*.85F);
+            ArtifactPassives.grantCombatEffect(attacker,SpecialPickaxes.GRAVITIC_TETHER.get(),1,40);
+            ArtifactFeedback.stasisReflexImpact(protectedPlayer);
+            return true;
+        }finally{ANSWERING.remove(protectedPlayer.getUUID());}
+    }
+
+    private static boolean validHit(ServerPlayer player,LivingHurtEvent event){
+        return event.getEntity()==player&&!event.isCanceled()&&Float.isFinite(event.getAmount())&&event.getAmount()>0
+                &&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.hasEffect(SpecialPickaxes.STASIS_WARD.get());
+    }
+    private static boolean hostile(ServerPlayer player,LivingEntity attacker){
+        return attacker!=null&&attacker!=player&&attacker.isAlive()&&!attacker.isRemoved()
+                &&attacker.level()==player.level()&&!attacker.isAlliedTo(player)&&!player.isAlliedTo(attacker)
+                &&(!(attacker instanceof Player other)||player.canHarmPlayer(other));
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
@@ -69,9 +89,7 @@ public final class StasisWardEffect extends MobEffect {
         }
         if(entity.tickCount%30==0)particles.add(new ArtifactFeedback.AuraParticle(ParticleTypes.REVERSE_PORTAL,
                 new net.minecraft.world.phys.Vec3(entity.getX(),centerY,entity.getZ()),1,.08D,.08D,.08D,.003D));
-        if(entity instanceof ServerPlayer wearer)ArtifactFeedback.nearbyWardPulse(wearer,particles);
-        else for(var sample:particles){var at=sample.position();level.sendParticles(sample.particle(),at.x,at.y,at.z,
-                sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
+        ArtifactFeedback.entityAuraPulse(level,entity,particles);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%10==0;}

@@ -20,7 +20,7 @@ public final class GraviticTetherEffect extends MobEffect {
     public void applyEffectTick(LivingEntity entity,int amplifier) {
         if(entity.level().isClientSide)return;
         Vec3 motion=entity.getDeltaMovement();
-        double drag=Math.max(.35D,.68D-amplifier*.08D);
+        double drag=horizontalDrag(amplifier);
         entity.setDeltaMovement(motion.x*drag,motion.y,motion.z*drag);
         entity.hasImpulse=true;
         // Two counter-rotating filaments read as a tether and cost fewer particles
@@ -40,6 +40,11 @@ public final class GraviticTetherEffect extends MobEffect {
             }
             ArtifactFeedback.entityAuraPulse(level,entity,particles);
         }
+    }
+
+    /** Malformed negative levels must never turn restraint into acceleration. */
+    public static double horizontalDrag(int amplifier){
+        return Math.max(.35D,.68D-Math.max(0,amplifier)*.08D);
     }
 
     @Override

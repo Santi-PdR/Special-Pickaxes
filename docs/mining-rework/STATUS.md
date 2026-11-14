@@ -1,4 +1,9 @@
-# Estado actual — 5.10.424: CI global exitoso, sin aprobación visual completa
+# Estado actual — 5.10.425: nueva tanda pendiente de CI
+
+425: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
+en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras
+beneficiosas sobre mobs ahora respetan audiencia/coste global. Diez GameTests
+(250 en fuente) y tres JUnit añadidos, pendientes de compilación/ejecución CI.
 
 ## Evidencia verificada el 2026-11-13
 

@@ -154,6 +154,96 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    private static net.minecraft.world.entity.monster.Zombie wardAttacker(GameTestHelper h,ServerPlayer wearer){
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_WARD.get(),100));
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setNoAi(true);
+        attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);return attacker;
+    }
+    private static net.minecraftforge.event.entity.living.LivingHurtEvent wardHit(ServerPlayer wearer,LivingEntity attacker,float amount){
+        return new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,wearer.damageSources().mobAttack(attacker),amount);
+    }
+    @GameTest(template="empty",batch="rework_each_181") public static void beneficialMobAurasReserveTheirViewerWeightedGlobalBudget(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setPos(wearer.position().add(0,80,0));h.getLevel().addFreshEntity(wearer);
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
+        long tick=h.getLevel().getServer().getTickCount();
+        for(var effect:List.of(SpecialPickaxes.STASIS_WARD.get(),SpecialPickaxes.WORLDBREAKER_AEGIS.get(),SpecialPickaxes.SEARING_SHELL.get())){
+            ArtifactFeedback.reserveAuraParticles(tick-1,1,1);mob.setSecondsOnFire(5);effect.applyEffectTick(mob,0);
+            h.assertTrue(!ArtifactFeedback.reserveAuraParticles(tick,4096,1),"each beneficial effect on a mob reserves its actual audience cost instead of bypassing the cap");
+        }
+        ArtifactFeedback.reserveAuraParticles(tick-1,1,1);h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,4096,1),"fixture exhausts this tick's global aura budget");
+        mob.setSecondsOnFire(5);SpecialPickaxes.SEARING_SHELL.get().applyEffectTick(mob,0);
+        h.assertTrue(!mob.isOnFire(),"exhausted cosmetic allowance never prevents Hellspec from extinguishing its bearer");
+        ArtifactFeedback.reserveAuraParticles(tick-1,1,1);mob.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_182") public static void beneficialMobAurasDoNotSpendParticlesWithoutEligibleViewers(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setPos(wearer.position().add(0,80,0));wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);h.getLevel().addFreshEntity(wearer);
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
+        long tick=h.getLevel().getServer().getTickCount();
+        h.assertTrue(ArtifactFeedback.entityAuraAudience(h.getLevel(),mob).isEmpty(),"isolated mob has only an ineligible spectator nearby");
+        for(var effect:List.of(SpecialPickaxes.STASIS_WARD.get(),SpecialPickaxes.WORLDBREAKER_AEGIS.get(),SpecialPickaxes.SEARING_SHELL.get())){
+            ArtifactFeedback.reserveAuraParticles(tick-1,1,1);mob.setSecondsOnFire(5);effect.applyEffectTick(mob,0);
+            h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,4096,1),"invisible-to-audience cosmetics spend no global capacity");
+        }ArtifactFeedback.reserveAuraParticles(tick-1,1,1);mob.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_173") public static void stasisReflexRecoversCorruptDeadlineAndPreservesNormalThrottle(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var data=wearer.getPersistentData();
+        data.putLong("specialpickaxesStasisReflexReadyAt",Long.MAX_VALUE);var hit=wardHit(wearer,attacker,10F);
+        h.assertTrue(StasisWardEffect.answerHostileHit(wearer,hit)&&Math.abs(hit.getAmount()-8.5F)<.001F,"an impossible reflex deadline recovers without losing the guard");
+        h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F)),"a real eight-second cooldown blocks a second reflex");attacker.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_174") public static void stasisReflexRejectsInvalidCancelledAndForeignHits(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);
+        for(float amount:new float[]{Float.NaN,Float.POSITIVE_INFINITY,Float.NEGATIVE_INFINITY,0F,-1F})
+            h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,amount)),"invalid damage does not spend a reflex");
+        var cancelled=wardHit(wearer,attacker,10F);cancelled.setCanceled(true);
+        h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,cancelled),"cancelled damage needs no mitigation");
+        var foreign=new net.minecraftforge.event.entity.living.LivingHurtEvent(attacker,wearer.damageSources().mobAttack(attacker),10F);
+        h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,foreign),"another victim's event cannot spend this player's ward");
+        h.assertTrue(!wearer.getPersistentData().contains("specialpickaxesStasisReflexReadyAt")&&!attacker.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"rejected input leaves cooldown and attacker unchanged");attacker.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_175") public static void stasisReflexCannotReenterThroughPermissionCallbacks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var nested=wardHit(wearer,attacker,10F);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer){calls[0]++;h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,nested),"nested reflex is denied before recursively posting permission");}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F))&&calls[0]==1&&nested.getAmount()==10F,"one outer reflex commits and nested event remains intact");}
+        finally{MinecraftForge.EVENT_BUS.unregister(listener);attacker.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_176") public static void stasisReflexRevalidatesWardRemovalAfterPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var hit=wardHit(wearer,attacker,10F);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)wearer.removeEffect(SpecialPickaxes.STASIS_WARD.get());};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,hit)&&hit.getAmount()==10F&&!wearer.getPersistentData().contains("specialpickaxesStasisReflexReadyAt")&&!attacker.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"revoking the ward cancels the stale response without spending cooldown");}
+        finally{MinecraftForge.EVENT_BUS.unregister(listener);attacker.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_177") public static void stasisReflexRevalidatesAttackerPositionAfterPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var hit=wardHit(wearer,attacker,10F);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)attacker.setPos(attacker.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,hit)&&hit.getAmount()==10F&&!attacker.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"a claim callback moving the target invalidates permission for its former position");}
+        finally{MinecraftForge.EVENT_BUS.unregister(listener);attacker.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_178") public static void stasisReflexRevalidatesEventCancellationAfterPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var hit=wardHit(wearer,attacker,10F);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)hit.setCanceled(true);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,hit)&&hit.getAmount()==10F&&!wearer.getPersistentData().contains("specialpickaxesStasisReflexReadyAt"),"cancellation during permission does not spend the reflex");}
+        finally{MinecraftForge.EVENT_BUS.unregister(listener);attacker.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_179") public static void stasisReflexReleasesGuardAfterPermissionException(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);boolean[] threw={false};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)throw new IllegalStateException("expected ward permission fixture");};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F));}catch(IllegalStateException expected){threw[0]=true;}
+        finally{MinecraftForge.EVENT_BUS.unregister(listener);}
+        h.assertTrue(threw[0]&&StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F)),"finally releases the guard and permission failure does not spend the cooldown");attacker.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_180") public static void graviticTetherMalformedAmplifierNeverAcceleratesTargets(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var attacker=wardAttacker(h,wearer);var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
+        for(int amplifier:new int[]{Integer.MIN_VALUE,-1,0,1,Integer.MAX_VALUE}){
+            attacker.setDeltaMovement(1,.37,-2);tether.applyEffectTick(attacker,amplifier);var motion=attacker.getDeltaMovement();
+            h.assertTrue(motion.x>=.35D&&motion.x<=.68D&&Math.abs(motion.z+2*motion.x)<.001D&&Math.abs(motion.y-.37D)<.001D,"tether remains bounded horizontal restraint and preserves vertical movement for every level");
+        }attacker.discard();finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_165") public static void thermalScanFollowsMovementWithinTheSameServerTick(GameTestHelper h){
         var wearer=player(h,ArtifactKind.HELLSPEC);wearer.setPos(wearer.position().add(0,20,0));var level=h.getLevel();
         var hot=wearer.blockPosition();var cold=hot.east(10);
