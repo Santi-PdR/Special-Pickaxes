@@ -377,3 +377,15 @@ El usuario pide efectos/habilidades más únicos, secundarias SIN atacar/control
 Usuario pegó dos instaladores que abortaban: primero requería gh no instalado; segundo apuntaba /releases/latest cuando no existían releases. No repetir comandos que dependen de un binario inexistente. Pide PowerShell pegado en shell, sin guardar.ps1 y sin finally, no requieregh/token por repo público. Mantener backup/rollback y SHA256 y sólo reemplazar SpecialPickaxes.
 
 431 cambia sólo versión/entrega, no gameplay430: verify.yml puede publicar un prerelease explícito de prueba después de todos los pasos exitosos (incluida evidencia/artifact), únicamente desde ramaactiva y no PR. contents:write permitecrear release/tag apuntandoSHAactual. Gateverificaciónvisualestable se mantiene separado, sin inventar aprobación. ExportChecks incluye JAR de candidato para recuperar/verificar bytes. Prerelease test-VERSION-RUN, latestfalse, notas advierten revisión visual incompleta y enlazanrun. Assets JAR,RELEASE.json,SHA256SUMS comprobados SHA/bytes/commit/run inmediatamente antes de publicar. Pendiente nuevoCI431; no pasar comando con URL hasta comprobarrelease existe.
+
+### Cierre 431 y formato del instalador solicitado
+
+Usuario detuvo espera del watcher y dio ejemplo de instalador de una línea conURL/tamaño/SHAfijos. Mantiene instrucción anterior SINfinally, SINgh/token/SINguardarps1. Corregir Markdown del ejemplo: URLliteral y [guid]/$_.Name sin escapes. Cada final debe incluir comando pegable de la versión publicada real; nunca volver a dar instalador de releaseinexistente.
+
+Se comprobó run43557399012 seguíaenprogreso tras stop; watcheroriginal había acabado sinconfirmarCI. Se inició watcher nuevo `jar-p-blico-de-special-pickaxes-cae91817`, terminó0. API: completed/success, fuente47e535100fbb348e809e7a68927819f3f83700b2. Bundle54 recuperado/verificado `/tmp/sp-ci431`, ahora incluyeJAR. XML83JUnit0fails/errors/skips; All263requiredtestspassed; cliente32/64keyboardSupreme9341, JAR/servidor/logs correctos.
+
+Release público creado por workflow: `test-5.10.431-43557399012`, prereleasetrue, latestfalse, sinaprobarvisióncompleta. AssetJAR746333222,536128bytes,digestGitHub `sha256:6b388089413289bc53253529a31d2d6e2d8f5f1ea070584bcd20835cfa32ae46`, stateuploaded. RELEASE.json746333224, SHA256SUMS746333223. GHreleaseviewmuestra digestnull porCLI peroAPIraw sítraedigestcorrecto; usarrawAPI.
+
+JARrealrecuperadoChecks `/tmp/sp-ci431/build/libs/special-pickaxes-1.20.1-5.10.431.jar`: hash/bytescoincidenconGitHub; zipcontieneMETA-INF/MANIFEST.MF ymods.toml. IntentodescargacurlURLpública devolvióredirectrealalCDN release-assets.githubusercontent.com y SSL_ERROR_SYSCALL porhostnolista; no afirmardescargadirectacompletada. URLasset verificadaporAPI/GitHubdigest, descargapúblicadisponiblefueraentorno. SininstalaciónWindows. No modificarPC.
+
+Final: comandoPSuna línea, URLdirecta https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-5.10.431-43557399012/special-pickaxes-1.20.1-5.10.431.jar, tamaño536128, hasharriba. VerificardescargaANTESmover/borrarsóloSpecialPickaxesviejos, validarhashdestino, cleanupcatch SINfinally. No guardarcomandoenarchivo.

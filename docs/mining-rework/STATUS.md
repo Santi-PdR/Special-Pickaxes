@@ -1,9 +1,21 @@
-# Estado actual — 5.10.430: rediseño minero validado; galería de trece picos entregada
+# Estado actual — 5.10.431: prerelease de prueba público y CI global exitoso
 
 429: nuevas secundarias mineras para siete familias, sin interacciones de combate
 en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base
 25→4; mineríaOP conservada. Trece firmas visuales propias, traducciones ES/EN y
 galería genuine icono+mano en preparación. 263 GameTests/83JUnit esperados, pendientes.
+
+431 fuente `47e535100fbb348e809e7a68927819f3f83700b2`,
+[run43557399012](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43557399012)
+completed/success. 83JUnit/263GameTests pasados, cliente32escenas/64tooltips,
+teclado-servidor yWorldShatter9341. Prerelease público
+[test-5.10.431-43557399012](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.431-43557399012)
+con JAR/RELEASE.json/SHA256SUMS, no marcado latest estable. Sin aprobaciónvisual
+completa. JAR536128bytes,SHA256
+`6b388089413289bc53253529a31d2d6e2d8f5f1ea070584bcd20835cfa32ae46`.
+Bytes recuperados por Checks y estructura/hash verificados; digest público del
+asset746333222 coincide. CDN de release bloqueado en este sandbox; no afirmar
+una descarga directa CDN completada ni instalación en Windows.
 
 **430 fuente `5f7f8443d1b6a16a80e8859d156f0d47399e9f49`,
 [run43551696313](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43551696313): completed/success.**
