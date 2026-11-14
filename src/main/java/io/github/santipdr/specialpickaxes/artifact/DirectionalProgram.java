@@ -86,7 +86,8 @@ public final class DirectionalProgram implements WorkProgram {
                 if(!WorldSafety.directionClear(actor,tool,kind,at)||shape==Shape.EXODIUM_SINK
                         &&(PlayerPlacedBlocks.get(actor.serverLevel()).contains(at)||!WorldSafety.vacant(old)&&!MiningDesigns.matrix(old)&&!ArtifactOres.isOre(old))
                         ||actor.serverLevel().getBlockState(at)!=old)return false;
-                boolean succeeded=!mine||old.isAir()||WorldSafety.mineQueued(actor,tool,kind,at,old);
+                boolean naturalOnly=shape==Shape.WORLDLOOM_BORE||shape==Shape.EXODIUM_SINK;
+                boolean succeeded=!mine||old.isAir()||(naturalOnly?WorldSafety.mineNaturalQueued(actor,tool,kind,at,old):WorldSafety.mineQueued(actor,tool,kind,at,old));
                 if(succeeded&&mine&&i==0&&kind==ArtifactKind.CHOIR)
                     ArtifactFeedback.resonantTunnelPulse(actor,at,direction,sliceDepth);
                 else if(succeeded&&mine&&i==0&&shape==Shape.WORLDLOOM_BORE)

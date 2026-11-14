@@ -77,7 +77,7 @@ public final class SeamMiningProgram implements WorkProgram {
             @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                 return !PlayerPlacedBlocks.get(actor.serverLevel()).contains(candidate.pos())
                         &&MiningDesigns.seamGeology(candidate.state())
-                        &&WorldSafety.mineQueued(actor,tool,kind,candidate.pos(),candidate.state());
+                        &&WorldSafety.mineNaturalQueued(actor,tool,kind,candidate.pos(),candidate.state());
             }
         };
     }

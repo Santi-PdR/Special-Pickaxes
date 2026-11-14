@@ -1,4 +1,4 @@
-# Estado actual — 5.10.433: segunda fase de legibilidad/interfaz/seguridad pendiente CI
+# Estado actual — 5.10.434: límites nativos y regresiones pendientes CI
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -224,3 +224,10 @@ modificaciones arbitrarias del mundo por cualquier otro mod.
 - Los commits posteriores de documentación no cambian la identidad de la fuente compilada.
 
 429 run43551389102: failure JUnit por bootstrap de ArtifactKind en los dos nuevos tests de geometría; 81/83 pasados. 430 separa geometría pura y añade verificación de trabajo completado. CI propio pendiente.
+
+434 pendiente CI: contexto de rotura nativa captura nivel/posición/permisos;
+propaga naturalOnly a Seam Ripper, radiales, Icarian Lift y rutas naturales
+Worldloom/Exodium. Tres regresiones adicionales (280 GameTests esperados).
+432 terminó con 86 JUnit pasados y 272/273 GameTests: falló la comprobación
+combinada de la pasarela sin apuntar. Fixture ahora despeja columna vertical y
+separa las aserciones de raycast/activación. No se publicó432. 433 sigue en CI.

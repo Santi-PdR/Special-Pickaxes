@@ -84,7 +84,7 @@ public final class RadialMiningProgram implements WorkProgram {
                 if(!player.serverLevel().hasChunkAt(pos))return false;
                 BlockState state=player.serverLevel().getBlockState(pos);
                 if(PlayerPlacedBlocks.get(player.serverLevel()).contains(pos)||!mineableGeology(state))return false;
-                return WorldSafety.mineQueued(player,tool,kind,pos,state);
+                return WorldSafety.mineNaturalQueued(player,tool,kind,pos,state);
             }
         };
     }

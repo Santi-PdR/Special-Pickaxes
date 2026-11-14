@@ -84,7 +84,7 @@ public final class IcarianLiftProgram implements WorkProgram {
             @Override public boolean stopOnFailure(){return true;}
             @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                 return !PlayerPlacedBlocks.get(actor.serverLevel()).contains(pos)
-                        &&WorldSafety.mineQueued(actor,tool,ArtifactKind.ICARUS,pos,state);
+                        &&WorldSafety.mineNaturalQueued(actor,tool,ArtifactKind.ICARUS,pos,state);
             }
         };
     }

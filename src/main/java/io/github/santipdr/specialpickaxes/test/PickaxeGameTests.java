@@ -186,6 +186,7 @@ public final class PickaxeGameTests {
     }
     private static BlockPos bridgeFixture(GameTestHelper h,ServerPlayer player){
         player.setPos(player.position().add(0,30,0));player.setXRot(-90);
+        for(int y=0;y<=35;y++)h.getLevel().setBlockAndUpdate(player.blockPosition().above(y),Blocks.AIR.defaultBlockState());
         var first=player.blockPosition().below().relative(player.getDirection());
         for(int n=0;n<9;n++)h.getLevel().setBlockAndUpdate(first.relative(player.getDirection(),n),Blocks.AIR.defaultBlockState());
         return first;
@@ -193,7 +194,8 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_196") public static void worldloomBridgeNeedsNoAimAndOnlyConsumesOffhand(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var level=h.getLevel();
         wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,3));var reserve=new ItemStack(Blocks.COBBLESTONE,64);wearer.getInventory().setItem(10,reserve);
-        h.assertTrue(ArtifactActions.target(wearer).isEmpty()&&ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"a ledge walkway activates while looking at empty sky");drain(wearer);
+        h.assertTrue(ArtifactActions.target(wearer).isEmpty(),"fixture looks into a cleared empty sky column");
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"a ledge walkway activates without any block aimed at");drain(wearer);
         h.assertTrue(wearer.getOffhandItem().isEmpty()&&reserve.getCount()==64,"exactly the offhand material is paid, never a matching inventory reserve");
         for(int n=0;n<3;n++)h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),n)).is(Blocks.COBBLESTONE),"paid floor cells are placed in order");
         h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),3)).isAir()&&!WorkQueue.busy(wearer),"the walkway stops immediately when offhand payment runs out");finish(h,wearer);
@@ -279,6 +281,27 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,move);
         try{h.assertTrue(!WorldSafety.transmute(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE,pos,state,Blocks.BASALT.defaultBlockState())&&h.getLevel().getBlockState(pos)==state,"transmutation does not complete with an actor moved by another mod's callback");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_210") public static void nativeMiningRejectsActorMovedInsideForgeBreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        Consumer<BlockEvent.BreakEvent> move=event->{if(event.getPlayer()==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,move);
+        try{h.assertTrue(!WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,pos,state)&&h.getLevel().getBlockState(pos)==state,"an external teleport invalidates native artifact breaking before world mutation");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_211") public static void nativeMiningRejectsSpectatorChangedInsideForgeBreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        Consumer<BlockEvent.BreakEvent> revoke=event->{if(event.getPlayer()==wearer)wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,revoke);
+        try{h.assertTrue(!WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,pos,state)&&h.getLevel().getBlockState(pos)==state,"game-mode revocation inside break listeners preserves the original block");}
+        finally{MinecraftForge.EVENT_BUS.unregister(revoke);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_212") public static void radialMiningRejectsProvenanceChangedByClaimListener(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var pos=target(h);var state=h.getLevel().getBlockState(pos);var program=new RadialMiningProgram(pos,0,ArtifactKind.HELLSPEC,0,null);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> mark=event->{if(event.player==wearer&&event.target.equals(pos))PlayerPlacedBlocks.get(h.getLevel()).mark(pos);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,mark);
+        try{h.assertTrue(!program.next(wearer).apply(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC)&&h.getLevel().getBlockState(pos)==state,"radial primaries use the same execution-time provenance boundary as alternates");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);}finish(h,wearer);
     }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
