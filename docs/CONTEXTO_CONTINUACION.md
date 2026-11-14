@@ -403,3 +403,14 @@ Al retomar snapshot HEADbase28b8ebf y archivos previosdirty: fetch ramaactiva1e9
 - MiningSignature orienta geometría con miradahorizontal, fallbackvertical/no-finito; ancla delante/abajo para reducir ocultacióncámara. Fase NaN se normaliza. Manual+SHIFT añadeperfil daño4base, tier5/speed64/uses32768 yXno combate; ES/EN corregidos.
 - Diez GameTests196–205 (total273esperado) y3JUnit (86esperado): pasarelaaire/pagos/denegación/obstáculo/NBT,3provenance natural,nearestsurvey/chunks/teleport. Recursos22/Python28/parser136/diffcheck correctos. Java noejecutadolocal, pendienteCI.
 - Se prepara segunda fase independiente de legibilidad de iconos/texturas y auditoría adicional; no afirmar aún implementada ni duración cumplida.
+
+## Tanda integral 433 — segunda fase pendiente CI
+
+- Adaptaciones de legibilidad reproducibles para Fault Choir, Worldloom y Hollow
+  Axiom; fuentes originales conservadas, manifest/runtime hashes actualizados.
+- Manual: teclas reales reasignadas, refresco por idioma/controles, límite correcto
+  para nombres largos y scrollbar calculado por el modelo seguro existente.
+- Pago/transmutación revalidan actor y permisos tras callbacks; Crisol revalida
+  origen natural también tras evento BreakEvent. Cuatro regresiones nuevas.
+- Local: 22 recursos +33 Python +parser136Java +diffcheck. Java/cliente por CI,
+  sin compilar localmente. No asumir aprobación visual ni instalación Windows.

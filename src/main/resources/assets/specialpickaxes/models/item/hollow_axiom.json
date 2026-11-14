@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "specialpickaxes:item/hollow_axiom"
+    "layer0": "specialpickaxes:item/hollow_axiom_v2"
   }
 }

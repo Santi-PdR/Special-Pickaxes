@@ -52,6 +52,11 @@ public final class WorldSafety {
                 // A claim listener can teleport, kill or revoke build permission without cancelling.
                 &&p.serverLevel()==level&&allowedWithoutEvent(p,level,pos);
     }
+    /** No new callbacks: validate a transaction's actor after external Forge listeners return. */
+    private static boolean sameActor(ServerPlayer p,net.minecraft.server.level.ServerLevel level,Vec3 origin,ItemStack tool,BlockPos pos){
+        return p.serverLevel()==level&&p.position().equals(origin)&&p.getMainHandItem()==tool&&!tool.isEmpty()
+                &&allowedWithoutEvent(p,level,pos);
+    }
     private static boolean allowedWithoutEvent(ServerPlayer p,net.minecraft.server.level.ServerLevel level,BlockPos pos){
         double range=ArtifactConfig.RANGE.get();
         return p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&p.mayBuild()&&!level.isOutsideBuildHeight(pos)
@@ -132,7 +137,8 @@ public final class WorldSafety {
         return placePaid(p,tool,kind,pos,state,true);
     }
     private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly) {
-        if(!allowed(p,kind,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
+        var level=p.serverLevel();var origin=p.position();
+        if(!allowed(p,kind,pos) || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             int first=offhandOnly?p.getInventory().getContainerSize()-1:0;
@@ -143,11 +149,11 @@ public final class WorldSafety {
             if(paymentSlot<0) return false;
         }
         var payment=paymentSlot<0?ItemStack.EMPTY:p.getInventory().getItem(paymentSlot);
-        var level=p.serverLevel();var snapshot=BlockSnapshot.create(level.dimension(),level,pos);
+        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);
         boolean accepted=false;
         try {
             if(!level.setBlock(pos,state,2) || ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP)
-                    || level.getBlockState(pos)!=state || p.getMainHandItem()!=tool || tool.isEmpty()) return false;
+                    || !sameActor(p,level,origin,tool,pos) || !level.hasChunkAt(pos) || level.getBlockState(pos)!=state) return false;
             if(!p.isCreative()) {
                 // A listener may replace/remove the payment stack. Never place for free after such a change.
                 if(p.getInventory().getItem(paymentSlot)!=payment || payment.isEmpty()
@@ -161,6 +167,7 @@ public final class WorldSafety {
         }
     }
     public static boolean transmute(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,BlockState next) {
+        var level=p.serverLevel();var origin=p.position();
         boolean crucibleSource=kind==ArtifactKind.CRUCIBLE&&crucibleSource(p,pos,expected);
         boolean validSource=kind==ArtifactKind.CRUCIBLE?crucibleSource:inert(expected);
         boolean validTool=kind==ArtifactKind.CRUCIBLE
@@ -169,14 +176,14 @@ public final class WorldSafety {
         if(expected==next || !validSource || !inert(next) || !allowed(p,kind,pos)
                 || !validTool || p.serverLevel().getBlockState(pos)!=expected
                 || barrier(p,pos) || !breakPermission(p,pos)) return false;
-        var level=p.serverLevel();
-        // Break-permission listeners can change the tool or introduce a physical barrier.
-        if(level.getBlockState(pos)!=expected||p.getMainHandItem()!=tool||tool.isEmpty()||barrier(p,pos)) return false;
+        // Break-permission listeners may move the actor, revoke permissions or mark a same-state replacement.
+        if(!sameActor(p,level,origin,tool,pos)||level.getBlockState(pos)!=expected||barrier(p,pos)
+                ||kind==ArtifactKind.CRUCIBLE&&!crucibleSource(p,pos,expected)) return false;
         var snapshot=BlockSnapshot.create(level.dimension(),level,pos);boolean accepted=false;
         try {
             if(!level.setBlock(pos,next,2)) return false;
             accepted=!ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP) && level.getBlockState(pos)==next
-                && p.getMainHandItem()==tool && !tool.isEmpty();
+                && sameActor(p,level,origin,tool,pos);
             return accepted;
         } finally {
             if(!accepted) restoreOwned(level,snapshot,pos,next);

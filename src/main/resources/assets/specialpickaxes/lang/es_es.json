@@ -417,7 +417,7 @@
   "screen.specialpickaxes.manual": "Manual de reliquias",
   "screen.specialpickaxes.manual_hint": "GUÍA DE PICOS",
   "screen.specialpickaxes.resize": "Aumenta la ventana para ver la guía",
-  "screen.specialpickaxes.copy_help": "Elige un pico; el Rompemundos usa sus habilidades R y X.",
+  "screen.specialpickaxes.copy_help": "Elige un pico; el Rompemundos usa sus habilidades %s y %s.",
   "screen.specialpickaxes.copy_mode_header": "Modo de copia de Worldbreaker · usa %s",
   "screen.specialpickaxes.selected": "Seleccionado: %s",
   "screen.specialpickaxes.passive": "PASIVA",

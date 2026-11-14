@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.432 — utilidad segura, orientación visual y guía; pendiente de CI.**
+**5.10.433 — utilidad, legibilidad y transacciones seguras; pendiente de CI.**
 Worldloom activa sin bloque apuntado, paga sólo offhand y corta la pasarela ante
 obstáculos/denegaciones/falta de material. Palimpsest prioriza las32menas naturales
 más cercanas y comunica la coordenada de la primera. Los trabajos naturales

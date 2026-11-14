@@ -11,7 +11,9 @@
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/seismic_pickaxe.png",
     "sha256": "a8957b6a166eb519b7e31ca8d27a055d1b3c19fc1702ba431d9a324012a390ff",
-    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "fault_choir_v2.png",
+    "runtime_sha256": "70b1cea19a5eb6c77bb997af67d258f1f5051a1d3064e93d3f8c13aa4c5fa8c4"
   },
   {
     "artifact": "eventide",
@@ -39,7 +41,9 @@
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/natural_pickaxe.png",
     "sha256": "88679b2c56e65544dc984fe82a6c45fa0954a4f46453f3fc45dfedfa13e5d873",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "worldloom_v2.png",
+    "runtime_sha256": "398b0b7f9c908d4b7549d16cff038368cbdcacb37d0da41f288de49086947057"
   },
   {
     "artifact": "icarus",
@@ -53,7 +57,9 @@
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/shadow_pickaxe.png",
     "sha256": "68415544cd16cbc80b04eebbcae993bfc3f75799f854cb05783e68ba556a840c",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "hollow_axiom_v2.png",
+    "runtime_sha256": "0882f093984a5bbf5ab964e0c426dab46d2d510c6a74054025f7a6cd9bda9eb2"
   },
   {
     "artifact": "worldbreaker",

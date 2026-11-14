@@ -60,10 +60,10 @@ public final class ArtifactManualScreen extends Screen {
         int nameX=x+PAD+24;
         Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?Component.translatable("screen.specialpickaxes.copy_mode_header",shownIcon.getHoverName())
-                :Component.translatable(selectingCopy()?"screen.specialpickaxes.copy_help":"screen.specialpickaxes.manual_hint");
+                :(selectingCopy()?Component.translatable("screen.specialpickaxes.copy_help",RelicKeys.name(RelicControl.Action.ACTIVATE),RelicKeys.name(RelicControl.Action.ALT_SKILL)):Component.translatable("screen.specialpickaxes.manual_hint"));
         int hintX=x+w-PAD-font.width(headerHint);
         int nameMaxWidth=Math.max(0,(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w
-                ?hintX-8:nameX+w-PAD)-nameX);
+                ?hintX-8:x+w-PAD)-nameX);
         String shownName=font.plainSubstrByWidth(shownIcon.getHoverName().getString(),nameMaxWidth);
         g.drawString(font,shownName,nameX,y+22,0xfff1e5c9,false);
         if(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w)
@@ -124,7 +124,7 @@ public final class ArtifactManualScreen extends Screen {
         result.add(section("manual4.limits",Component.translatable(abilityKind==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"),0xffd6e0e8));
         var controls=new ArrayList<Component>();
         for(var action:ArtifactTooltips.actions(stack,kind,mode))controls.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
-        controls.add(Component.translatable("key.specialpickaxes.manual").append(": I"));
+        controls.add(Component.translatable("key.specialpickaxes.manual").append(": ").append(RelicKeys.MANUAL.getTranslatedKeyMessage()));
         result.add(new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffd6e0e8));
         return result;
     }
@@ -133,7 +133,8 @@ public final class ArtifactManualScreen extends Screen {
         var tag=stack.getTag();
         String fingerprint=kind+"|"+abilityKind+"|"+mode+"|"+modeKey+"|"
                 +(tag==null?"":tag.getInt("artifactActivationCost")+":"+tag.getInt("artifactCooldown")+":"+tag.getString("copiedSkill")+":"+tag.getInt("copiedMode"));
-        fingerprint+="|"+twoColumns;
+        fingerprint+="|"+twoColumns+"|"+Minecraft.getInstance().getLanguageManager().getSelected()+"|"+RelicKeys.MANUAL.getTranslatedKeyMessage().getString();
+        for(var action:RelicControl.Action.values())fingerprint+="|"+RelicKeys.name(action).getString();
         if(layoutWidth==maxWidth&&fingerprint.equals(layoutFingerprint))return;
         layoutWidth=maxWidth;layoutFingerprint=fingerprint;
         if(maxWidth<32){leftCards=List.of();rightCards=List.of();contentHeight=0;scroll=0;return;}
@@ -186,7 +187,7 @@ public final class ArtifactManualScreen extends Screen {
         g.fill(x,top,x+2,bottom,0xff344555);
         int thumb=scrollThumbHeight(height);
         int travel=height-thumb;
-        int thumbY=top+(maxScroll==0?0:travel*scroll/maxScroll);
+        int thumbY=top+ManualScrollModel.thumbOffset(height,contentHeight,scroll);
         g.fill(x-2,thumbY,x+4,thumbY+thumb,0xffd4aa5d);
         g.fill(x-1,thumbY+1,x+3,thumbY+thumb-1,0xffffdfa0);
     }

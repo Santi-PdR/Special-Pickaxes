@@ -1,4 +1,12 @@
-# Estado actual — 5.10.432: primera fase de utilidad/efectos/interfaz pendiente CI
+# Estado actual — 5.10.433: segunda fase de legibilidad/interfaz/seguridad pendiente CI
+
+433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
+silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
+caché de idioma/controles y evita desbordar nombres largos. Pasarela/transmutación
+revalidan actor, permisos y procedencia tras eventos externos; rollback y pago
+protegidos. Cuatro GameTests nuevos (277 esperados), cinco Python nuevos (33
+pasados localmente); 22 validaciones de recursos y parser de 136 Java pasados.
+No build local. Resultados Java/cliente todavía pendientes; no aprobación visual.
 
 429: nuevas secundarias mineras para siete familias, sin interacciones de combate
 en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base

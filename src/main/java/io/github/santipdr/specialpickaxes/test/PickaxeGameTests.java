@@ -252,6 +252,34 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"a moved miner does not receive stale survey data or spend a cooldown");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_206") public static void paidPlacementRollsBackAfterListenerMovesMiner(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var pos=target(h).above();var payment=new ItemStack(Blocks.STONE,3);wearer.setItemInHand(InteractionHand.OFF_HAND,payment);
+        Consumer<BlockEvent.EntityPlaceEvent> move=event->{if(event.getEntity()==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,move);
+        try{h.assertTrue(!WorldSafety.placePaidOffhand(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState())&&h.getLevel().getBlockState(pos).isAir()&&payment.getCount()==3,"non-cancelling movement rolls back our tentative block without payment");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_207") public static void paidPlacementRollsBackAfterListenerRevokesBuildMode(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var pos=target(h).above();var payment=new ItemStack(Blocks.STONE,3);wearer.setItemInHand(InteractionHand.OFF_HAND,payment);
+        Consumer<BlockEvent.EntityPlaceEvent> revoke=event->{if(event.getEntity()==wearer)wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,revoke);
+        try{h.assertTrue(!WorldSafety.placePaidOffhand(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM,pos,Blocks.STONE.defaultBlockState())&&h.getLevel().getBlockState(pos).isAir()&&payment.getCount()==3,"spectator permission revocation prevents payment and restores the owned block");}
+        finally{MinecraftForge.EVENT_BUS.unregister(revoke);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_208") public static void crucibleRejectsNaturalProvenanceChangedInsideBreakPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        Consumer<BlockEvent.BreakEvent> mark=event->{if(event.getPlayer()==wearer&&event.getPos().equals(pos))PlayerPlacedBlocks.get(h.getLevel()).mark(pos);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mark);
+        try{h.assertTrue(!WorldSafety.transmute(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE,pos,state,Blocks.BASALT.defaultBlockState())&&h.getLevel().getBlockState(pos)==state,"same-state player provenance introduced inside break permission is not transmuted");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_209") public static void crucibleRollsBackAfterPlacementListenerMovesMiner(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        Consumer<BlockEvent.EntityPlaceEvent> move=event->{if(event.getEntity()==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,move);
+        try{h.assertTrue(!WorldSafety.transmute(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE,pos,state,Blocks.BASALT.defaultBlockState())&&h.getLevel().getBlockState(pos)==state,"transmutation does not complete with an actor moved by another mod's callback");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
