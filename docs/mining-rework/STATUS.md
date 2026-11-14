@@ -1,9 +1,14 @@
-# Estado actual — 5.10.427: nueva tanda pendiente de CI
+# Estado actual — 5.10.428: fixture Starfall corregido, pendiente de CI
 
 427: aterrizajes Eventide protegidos frente a reentrada/cambios durante permisos;
 Icarus valida caídas finitas; Starfall/Lode Sense/escaneos aliados recuperan plazos
 imposibles. Flashes Starfall y ripple Eventide tienen presupuesto global. Once
 GameTests (261 en fuente) y tres JUnit nuevos, pendientes de ejecución CI propia.
+
+427 `aa73158` / run43547927879 completed/failure: 81 JUnit pasados,
+260/261 GameTests. Falló únicamente exodiumStarfallCatchRechargesAfterThirtyTicks,
+que llamaba a tryCatchIncoming sin aplicar STARFALL_WARD. 428 añade la protección
+al fixture y conserva la comprobación en producción; CI propio pendiente.
 
 426: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
 en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras

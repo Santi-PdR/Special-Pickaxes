@@ -1828,7 +1828,9 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_71",timeoutTicks=80) public static void exodiumStarfallCatchRechargesAfterThirtyTicks(GameTestHelper h){
         h.assertTrue(StarfallWardEffect.chargeProgress(100,130)==0D&&StarfallWardEffect.chargeProgress(115,130)==.5D
                 &&StarfallWardEffect.chargeProgress(130,130)==1D,"the Starfall orbit visibly refills with its thirty-tick catch cooldown");
-        var wearer=player(h,ArtifactKind.EXODIUM);var shooter=EntityType.SKELETON.create(h.getLevel());
+        var wearer=player(h,ArtifactKind.EXODIUM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STARFALL_WARD.get(),100));
+        var shooter=EntityType.SKELETON.create(h.getLevel());
         shooter.setPos(wearer.getX()+6,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(shooter);
         var first=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);
         first.setPos(wearer.getX()+9,wearer.getY()+.9D,wearer.getZ());first.setDeltaMovement(-1D,0D,0D);h.getLevel().addFreshEntity(first);

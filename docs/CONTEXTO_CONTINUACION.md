@@ -332,3 +332,8 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - allyAuraScanDue: helper PersistedCooldown para scan20, compartido por once familias de auras. No se tocaron aún sharedHeartwoodReady/sharedNullVeilReady/curiosPassiveReady (requieren auditoría callback propia, no reemplazo ciego).
 - Once GameTests183–193: gravedad invalid/deadline/reentrada/movimiento/ward/origen, Starfall deadline+budget y wearer/nivel inválido, Icarus no finito/deadline, Lode Sense deadline/movimiento, aura Choir deadline. Fuente261; tres JUnit Starfall (recarga normal/extremos/wrap cadence), esperado81. No afirmar ejecutados hasta CI.
 - Local: recursos22, Python28, parser133, secret scan y diff-check OK. Sin build local, Windows ni control de PC/UI. Tier OP, radios, potencia y cero recetas conservados.
+
+### Resultado 427 y corrección 428
+
+- Fuente `aa7315888015a7c057606787f0900a38a88c13e6`, run43547927879 completed/failure. Bundle recuperado/verificado `/tmp/sp-ci427`. Build/JAR y 81 JUnit pasados; 260/261 GameTests, las once nuevas regresiones pasaron. Único fallo: exodiumStarfallCatchRechargesAfterThirtyTicks / batch71, primer catch.
+- Ese fixture no aplicaba STARFALL_WARD. El public helper ahora requiere bearer protegido (cubierto explícitamente por la nueva regresión189). 428 prepara la ward100 en el fixture71, sin relajar validación ni retirar assertions de recarga29/30. No cambia gameplay427. Nueva versión aún pendiente de CI propio; no certificar servidor/cliente de427, omitidos.
