@@ -1,4 +1,4 @@
-# Estado actual — 5.10.434: límites nativos y regresiones pendientes CI
+# Estado actual — 5.10.435: guía/copias y contexto minero pendientes CI
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -231,3 +231,10 @@ Worldloom/Exodium. Tres regresiones adicionales (280 GameTests esperados).
 432 terminó con 86 JUnit pasados y 272/273 GameTests: falló la comprobación
 combinada de la pasarela sin apuntar. Fixture ahora despeja columna vertical y
 separa las aserciones de raycast/activación. No se publicó432. 433 sigue en CI.
+
+435 pendiente CI: SHIFT y manual comparten identidad/modo copiado; mantienen
+pasivas propias. Tooltips no anuncian cambio de modo inexistente en picos de un
+solo modo o copias. Costes usan teclas reasignadas y aritmética long; caché y
+manual consumen la misma tarjeta de coste. Cinco regresiones nuevas (285
+GameTests esperados). La rotura captura actor antes, no después, del callback
+de permisos. Validadores estáticos pasados, Java/cliente aún pendientes.

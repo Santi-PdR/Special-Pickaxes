@@ -303,6 +303,38 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!program.next(wearer).apply(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC)&&h.getLevel().getBlockState(pos)==state,"radial primaries use the same execution-time provenance boundary as alternates");}
         finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);}finish(h,wearer);
     }
+    private static boolean tooltipHasKey(List<net.minecraft.network.chat.Component> lines,String key){
+        return lines.stream().anyMatch(line->line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text&&text.getKey().equals(key));
+    }
+    @GameTest(template="empty",batch="rework_each_213") public static void worldbreakerExpandedGuideMatchesCopiedSkillsButKeepsOwnPassives(GameTestHelper h){
+        var tool=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);tool.getOrCreateTag().putInt("copiedMode",8);
+        var lines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.expanded(tool,ArtifactKind.WORLDBREAKER,lines);
+        h.assertTrue(tooltipHasKey(lines,"mining.identity.paradox_crucible.calcite")&&tooltipHasKey(lines,"alternate.detail.specialpickaxes.paradox_crucible")&&tooltipHasKey(lines,"passive.specialpickaxes.worldbreaker"),"SHIFT shows copied mining and alternate but native Worldbreaker passive");
+        h.assertTrue(!ArtifactTooltips.actions(tool,ArtifactKind.WORLDBREAKER,0).contains(RelicControl.Action.MODE),"a copied mode is selected through the source pick, not a non-working C binding");h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_214") public static void invalidWorldbreakerCopyGuideFallsBackToNativeIdentity(GameTestHelper h){
+        var tool=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());tool.getOrCreateTag().putString("copiedSkill","missing");tool.getOrCreateTag().putInt("artifactMode",2);
+        h.assertTrue(ArtifactTooltips.abilityKind(tool,ArtifactKind.WORLDBREAKER)==ArtifactKind.WORLDBREAKER&&ArtifactTooltips.abilityMode(tool,ArtifactKind.WORLDBREAKER)==2,"unknown copied NBT keeps the native identity and mode");
+        var lines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.expanded(tool,ArtifactKind.WORLDBREAKER,lines);
+        h.assertTrue(tooltipHasKey(lines,"mining.identity.worldbreaker.cleave"),"invalid copied state never exposes missing translation keys");h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_215") public static void singleModeTooltipDoesNotAdvertiseModeCycling(GameTestHelper h){
+        var tool=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.HELLSPEC).get());var lines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.expanded(tool,ArtifactKind.HELLSPEC,lines);
+        h.assertTrue(tooltipHasKey(lines,"tooltip.specialpickaxes.controls_single")&&!tooltipHasKey(lines,"tooltip.specialpickaxes.controls"),"one-mode picks display only bindings they actually support");h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_216") public static void guideCostUsesReboundKeyComponentsAndLongCooldownMath(GameTestHelper h){
+        var tool=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get());tool.getOrCreateTag().putInt("artifactActivationCost",-10);tool.getOrCreateTag().putInt("artifactCooldown",Integer.MAX_VALUE);
+        var detail=ArtifactTooltips.costDetail(tool);var args=((net.minecraft.network.chat.contents.TranslatableContents)detail.getContents()).getArgs();
+        h.assertTrue(args.length==6&&args[0] instanceof net.minecraft.network.chat.Component&&args[3] instanceof net.minecraft.network.chat.Component&&args[1].equals(0),"shared cost card uses translated keybindings and rejects negative displayed cost");
+        h.assertTrue(Double.parseDouble(args[5].toString())>100000000D,"alternate cooldown display does not overflow when multiplying large synced values");h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_217") public static void miningRejectsSmallActorTeleportInsideClaimCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer)wearer.setPos(wearer.position().add(.25,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,pos,state)&&h.getLevel().getBlockState(pos)==state,"same-level claim movement invalidates the captured break even when the target remains in range");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

@@ -488,7 +488,7 @@
   "mining.short.specialpickaxes.hellspec": "Flor Infernal",
   "screen.specialpickaxes.melee": "EFECTO AL GOLPEAR",
   "screen.specialpickaxes.scroll": "Rueda para leer",
-  "manual4.cost_detail": "R: desgaste %s · %s s. X: desgaste %s · %s s.",
+  "manual4.cost_detail": "%s: desgaste %s · %s s. %s: desgaste %s · %s s.",
   "alternate.detail.specialpickaxes.palimpsest": "Sondea las 32 menas naturales cargadas más cercanas al bloque apuntado en un cubo de radio 6. Señala partículas e indica en el chat las coordenadas de la más cercana, incluso enterrada. No rompe bloques ni revela menas protegidas por claims.",
   "alternate.detail.specialpickaxes.fault_choir": "Excava una galería de arco, de 3 de ancho y 3 de alto, hasta 8 bloques al frente. Respeta bloques colocados, fluidos y protecciones.",
   "alternate.detail.specialpickaxes.eventide": "Pulsa X para atraer hasta 64 objetos sueltos propios o sin dueño en un radio de 16 bloques. No atrae criaturas ni proyectiles. R activa el Campo Gravitatorio.",
@@ -602,5 +602,6 @@
   "message.specialpickaxes.survey_found": "Sondeo: %s menas señaladas (máximo 32).",
   "manual4.tool_profile": "Perfil de herramienta",
   "manual4.tool_profile_detail": "Daño cuerpo a cuerpo base: 4 puntos, antes de encantamientos y efectos. Minería de tier 5, velocidad base 64 y 32768 usos. X es minería, construcción o utilidad: no ataca ni controla criaturas o proyectiles.",
-  "message.specialpickaxes.survey_nearest": "Mena natural más cercana al sondeo: X %s · Y %s · Z %s."
+  "message.specialpickaxes.survey_nearest": "Mena natural más cercana al sondeo: X %s · Y %s · Z %s.",
+  "tooltip.specialpickaxes.controls_single": "%s: usar / analizar / confirmar / pausar / reanudar / cancelar dominio · %s: técnica / cancelar selección o excavación · %s: manual"
 }

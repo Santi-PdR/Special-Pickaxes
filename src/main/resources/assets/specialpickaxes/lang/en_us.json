@@ -488,7 +488,7 @@
   "mining.short.specialpickaxes.hellspec": "Infernal Bloom",
   "screen.specialpickaxes.melee": "ON-HIT EFFECT",
   "screen.specialpickaxes.scroll": "Scroll to read",
-  "manual4.cost_detail": "R: durability %s · %s s. X: durability %s · %s s.",
+  "manual4.cost_detail": "%s: durability %s · %s s. %s: durability %s · %s s.",
   "alternate.detail.specialpickaxes.palimpsest": "Surveys the 32 nearest loaded natural ore cells in a six-block cube around the aimed block. Shows particles and posts the nearest coordinates in chat, even if buried. Does not break blocks or disclose claim-denied ore.",
   "alternate.detail.specialpickaxes.fault_choir": "Mines a three-wide, three-high arched gallery up to eight blocks forward. Respects placed blocks, fluids and claims.",
   "alternate.detail.specialpickaxes.eventide": "Press X to pull up to 64 loose items you own or that have no owner within 16 blocks. It does not pull creatures or projectiles. R activates the Gravity Field.",
@@ -602,5 +602,6 @@
   "message.specialpickaxes.survey_found": "Survey: %s ore cells marked (maximum 32).",
   "manual4.tool_profile": "Tool profile",
   "manual4.tool_profile_detail": "Base melee damage: 4 points, before enchantments and effects. Mining tier 5, base speed 64, and 32768 uses. X is mining, construction or utility: never attacks or controls creatures or projectiles.",
-  "message.specialpickaxes.survey_nearest": "Nearest natural ore to survey: X %s · Y %s · Z %s."
+  "message.specialpickaxes.survey_nearest": "Nearest natural ore to survey: X %s · Y %s · Z %s.",
+  "tooltip.specialpickaxes.controls_single": "%s: use / analyze / confirm / pause / resume / cancel domains · %s: technique / cancel a selection or excavation · %s: manual"
 }

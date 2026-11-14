@@ -93,12 +93,13 @@ public final class WorldSafety {
         return mine(p,tool,kind,pos,expected,checkDropPressure,false);
     }
     private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure,boolean naturalOnly) {
-        if(!allowed(p,kind,pos) || p.serverLevel().getBlockState(pos)!=expected || !harvestable(p,tool,pos)
-                ||naturalOnly&&PlayerPlacedBlocks.get(p.serverLevel()).contains(pos)) return false;
+        var level=p.serverLevel();var origin=p.position();
+        if(!allowed(p,kind,pos) || !sameActor(p,level,origin,tool,pos) || level.getBlockState(pos)!=expected || !harvestable(p,tool,pos)
+                ||naturalOnly&&PlayerPlacedBlocks.get(level).contains(pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(checkDropPressure&&dropPressure(p,pos))return false;
         // Keep the exact break context through item spawning so Iridium can tag only these drops.
-        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly,p.serverLevel(),p.position()));
+        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly,level,origin));
         boolean mined;
         try{mined=p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
         return mined;

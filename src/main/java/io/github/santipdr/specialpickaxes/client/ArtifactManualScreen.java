@@ -69,7 +69,7 @@ public final class ArtifactManualScreen extends Screen {
         if(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w)
             g.drawString(font,headerHint,hintX,y+22,0xffc0ccd8,false);
 
-        int mode=abilityKind==kind?ArtifactTooltips.mode(active):active.hasTag()?active.getTag().getInt("copiedMode"):0;
+        int mode=ArtifactTooltips.abilityMode(active,kind);
         String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
         var content=layout.content();int contentX=content.x(),contentTop=content.y(),contentBottom=content.bottom(),contentWidth=content.width();
         boolean twoColumns=layout.twoColumns();
@@ -118,9 +118,7 @@ public final class ArtifactManualScreen extends Screen {
             result.add(section("manual4.modes",allModes(abilityKind),0xffd6e0e8));
             result.add(section("manual4.mode",Component.translatable("mode.specialpickaxes."+modeKey),0xffffd079));
         }
-        int cost=stack.hasTag()&&stack.getTag().contains("artifactActivationCost")?stack.getTag().getInt("artifactActivationCost"):2;
-        int cooldown=stack.hasTag()&&stack.getTag().contains("artifactCooldown")?stack.getTag().getInt("artifactCooldown"):20;
-        result.add(section("manual4.cost",Component.translatable("manual4.cost_detail",cost,String.format(Locale.ROOT,"%.1f",cooldown/20D),cost,String.format(Locale.ROOT,"%.1f",Math.max(100,cooldown*5)/20D)),0xffd6e0e8));
+        result.add(section("manual4.cost",ArtifactTooltips.costDetail(stack),0xffd6e0e8));
         result.add(section("manual4.limits",Component.translatable(abilityKind==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"),0xffd6e0e8));
         var controls=new ArrayList<Component>();
         for(var action:ArtifactTooltips.actions(stack,kind,mode))controls.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
@@ -242,10 +240,7 @@ public final class ArtifactManualScreen extends Screen {
         for(int i=0;i<modes.length;i++){if(i>0)text.append(" · ");text.append(Component.translatable("mode.specialpickaxes."+modes[i]));}
         return text;
     }
-    private ArtifactKind copiedKind(ItemStack stack){
-        if(kind!=ArtifactKind.WORLDBREAKER||!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return kind;
-        try{return ArtifactKind.byId(stack.getTag().getString("copiedSkill"));}catch(IllegalArgumentException invalid){return kind;}
-    }
+    private ArtifactKind copiedKind(ItemStack stack){return ArtifactTooltips.abilityKind(stack,kind);}
     private static ArtifactKind copyChoice(String copied){
         if(copied==null||copied.isBlank())return ArtifactKind.WORLDBREAKER;
         try{return ArtifactKind.byId(copied);}catch(IllegalArgumentException invalid){return ArtifactKind.WORLDBREAKER;}
