@@ -617,7 +617,7 @@ public final class ArtifactPassives {
 
     private static boolean allyAuraScanDue(ServerPlayer owner,ArtifactKind kind,String key){
         var state=ArtifactState.of(owner,kind);long now=ArtifactState.now(owner);
-        if(state.getLong(key)>now)return false;
+        if(PersistedCooldown.active(now,state.getLong(key),ALLY_AURA_SCAN_TICKS))return false;
         state.putLong(key,now+ALLY_AURA_SCAN_TICKS);
         return true;
     }

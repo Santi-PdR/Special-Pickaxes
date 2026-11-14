@@ -41,16 +41,19 @@ public final class OreDropHighlight {
 
     /** Curios' Lode Sense gathers only ore drops marked to this wearer, without scanning veins. */
     public static int drawNearbyDrops(ServerPlayer owner){
-        var level=owner.serverLevel();long now=level.getGameTime();var data=owner.getPersistentData();
-        if(data.getLong(NEXT_LODE_SENSE)>now)return 0;
+        if(!owner.isAlive()||owner.isRemoved()||owner.isSpectator())return 0;
+        var level=owner.serverLevel();long now=ArtifactState.now(owner);var data=owner.getPersistentData();
+        if(PersistedCooldown.active(now,data.getLong(NEXT_LODE_SENSE),PASSIVE_PULL_INTERVAL))return 0;
         data.putLong(NEXT_LODE_SENSE,now+PASSIVE_PULL_INTERVAL);
-        var center=owner.position().add(0,owner.getBbHeight()*.55D,0);
+        var origin=owner.position();var center=origin.add(0,owner.getBbHeight()*.55D,0);
         var targets=EntitySelection.nearest(level,ItemEntity.class,owner.getBoundingBox().inflate(PASSIVE_PULL_RADIUS),
                 item->ArtifactTechniques.isIridiumRecallTarget(owner,item,center,PASSIVE_PULL_RADIUS),
                 center,PASSIVE_PULL_TARGETS,256);
         int moved=0,trails=0;
         for(var item:targets){
+            var itemPosition=item.position();
             if(!WorldSafety.allowed(owner,ArtifactKind.IRIDIUM,item.blockPosition())
+                    ||owner.serverLevel()!=level||!owner.position().equals(origin)||!item.position().equals(itemPosition)
                     ||!ArtifactTechniques.isIridiumRecallTarget(owner,item,center,PASSIVE_PULL_RADIUS))continue;
             Vec3 delta=center.subtract(item.position());double distanceSqr=delta.lengthSqr();
             if(distanceSqr<.64D)continue; // Leave items inside vanilla pickup reach alone.

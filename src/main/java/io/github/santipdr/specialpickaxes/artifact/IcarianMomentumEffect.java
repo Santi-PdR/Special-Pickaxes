@@ -17,7 +17,8 @@ public final class IcarianMomentumEffect extends MobEffect {
     /** Turns a meaningful protected landing into a short forward rebound, once every two seconds. */
     public static boolean convertLanding(ServerPlayer player,float fallDistance){
         long now=ArtifactState.now(player);
-        if(fallDistance<5F||player.getPersistentData().getLong(LANDING_READY)>now)return false;
+        if(!Float.isFinite(fallDistance)||fallDistance<5F||!player.isAlive()||player.isRemoved()||player.isSpectator()
+                ||PersistedCooldown.active(now,player.getPersistentData().getLong(LANDING_READY),40))return false;
         Vec3 look=player.getLookAngle();Vec3 forward=new Vec3(look.x,0,look.z);
         if(forward.lengthSqr()<.001D){Vec3 motion=player.getDeltaMovement();forward=new Vec3(motion.x,0,motion.z);}
         if(forward.lengthSqr()<.001D)return false;

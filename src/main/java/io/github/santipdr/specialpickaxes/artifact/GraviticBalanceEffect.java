@@ -24,7 +24,8 @@ public final class GraviticBalanceEffect extends MobEffect {
 
     /** A focused ground ripple shows that Eventide caught a dangerous fall without a generic hit burst. */
     public static void landingPulse(ServerPlayer player,float fallDistance){
-        if(!(player.level() instanceof ServerLevel level))return;
+        if(!Float.isFinite(fallDistance)||!(player.level() instanceof ServerLevel level)
+                ||!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),15,1))return;
         double intensity=Math.max(0D,Math.min(1D,fallDistance/12D));
         double phase=level.getGameTime()*.12D,radius=.52D+intensity*.62D;
         double x=player.getX(),y=player.getY()+.12D,z=player.getZ();
@@ -39,29 +40,48 @@ public final class GraviticBalanceEffect extends MobEffect {
         level.sendParticles(player,ParticleTypes.REVERSE_PORTAL,false,x,y+.04D,z,3,.12D,.015D,.12D,.012D);
     }
 
+    private static final java.util.Set<java.util.UUID> LANDING=new java.util.HashSet<>();
+
     /** Eventide turns a committed Curios landing into a brief, capped anti-chase gravity snare. */
     public static int landingSnare(ServerPlayer player,float fallDistance){
-        if(fallDistance<MIN_IMPACT_FALL||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get())
-                ||!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,player.blockPosition()))return 0;
-        var state=ArtifactState.of(player,ArtifactKind.EVENTIDE);long now=ArtifactState.now(player);
-        if(state.getLong("eventideImpactReady")>now)return 0;
-        Vec3 center=player.position();double radiusSqr=IMPACT_RADIUS*IMPACT_RADIUS;
-        var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(IMPACT_RADIUS),
-                target->target!=player&&target.isAlive()&&EntitySelection.isHostileCandidate(target,player)
-                        &&!target.isAlliedTo(player)&&target.distanceToSqr(center)<=radiusSqr
-                        &&(!(target instanceof net.minecraft.world.entity.player.Player other)||player.canHarmPlayer(other))
-                        &&WorldSafety.allowed(player,ArtifactKind.EVENTIDE,target.blockPosition()),
-                center,IMPACT_TARGETS,128);
-        int caught=0;
-        var tether=io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get();
-        for(var target:targets){
-            if(!ArtifactPassives.grantCombatEffect(target,tether,0,IMPACT_SNARE_TICKS))continue;
-            Vec3 targetCenter=target.position().add(0,target.getBbHeight()*.5D,0);
-            ArtifactFeedback.gravityTether(player,center.add(0,.35D,0),targetCenter);
-            caught++;
-        }
-        if(caught>0)state.putLong("eventideImpactReady",now+IMPACT_COOLDOWN);
-        return caught;
+        if(!Float.isFinite(fallDistance)||fallDistance<MIN_IMPACT_FALL||!player.isAlive()||player.isRemoved()||player.isSpectator()
+                ||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get())
+                ||!LANDING.add(player.getUUID()))return 0;
+        try{
+            var level=player.serverLevel();var center=player.position();
+            var balance=player.getEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get());
+            var state=ArtifactState.of(player,ArtifactKind.EVENTIDE);long now=ArtifactState.now(player);
+            if(PersistedCooldown.active(now,state.getLong("eventideImpactReady"),IMPACT_COOLDOWN)
+                    ||!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,player.blockPosition())
+                    ||!landingContext(player,level,center,balance))return 0;
+            var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(IMPACT_RADIUS),
+                    target->landingTarget(player,target,center),center,IMPACT_TARGETS,128);
+            int caught=0;var tether=io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_TETHER.get();
+            for(var target:targets){
+                if(!landingContext(player,level,center,balance))break;
+                var targetPosition=target.position();
+                if(!landingTarget(player,target,center)||!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,target.blockPosition())
+                        ||!landingContext(player,level,center,balance)||!target.position().equals(targetPosition)
+                        ||!landingTarget(player,target,center))continue;
+                if(caught==0&&PersistedCooldown.active(ArtifactState.now(player),state.getLong("eventideImpactReady"),IMPACT_COOLDOWN))break;
+                if(!ArtifactPassives.grantCombatEffect(target,tether,0,IMPACT_SNARE_TICKS))continue;
+                if(caught++==0)state.putLong("eventideImpactReady",ArtifactState.now(player)+IMPACT_COOLDOWN);
+                Vec3 targetCenter=target.position().add(0,target.getBbHeight()*.5D,0);
+                ArtifactFeedback.gravityTether(player,center.add(0,.35D,0),targetCenter);
+            }
+            return caught;
+        }finally{LANDING.remove(player.getUUID());}
+    }
+
+    private static boolean landingContext(ServerPlayer player,ServerLevel level,Vec3 origin,net.minecraft.world.effect.MobEffectInstance balance){
+        return player.serverLevel()==level&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()
+                &&player.position().equals(origin)&&player.getEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get())==balance;
+    }
+    private static boolean landingTarget(ServerPlayer player,LivingEntity target,Vec3 center){
+        return target!=player&&target.isAlive()&&!target.isRemoved()&&target.level()==player.level()
+                &&EntitySelection.isHostileCandidate(target,player)&&!target.isAlliedTo(player)&&!player.isAlliedTo(target)
+                &&target.distanceToSqr(center)<=IMPACT_RADIUS*IMPACT_RADIUS
+                &&(!(target instanceof net.minecraft.world.entity.player.Player other)||player.canHarmPlayer(other));
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){

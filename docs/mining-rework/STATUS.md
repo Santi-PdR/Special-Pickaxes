@@ -1,4 +1,9 @@
-# Estado actual — 5.10.426: CI global exitoso, sin aprobación visual completa
+# Estado actual — 5.10.427: nueva tanda pendiente de CI
+
+427: aterrizajes Eventide protegidos frente a reentrada/cambios durante permisos;
+Icarus valida caídas finitas; Starfall/Lode Sense/escaneos aliados recuperan plazos
+imposibles. Flashes Starfall y ripple Eventide tienen presupuesto global. Once
+GameTests (261 en fuente) y tres JUnit nuevos, pendientes de ejecución CI propia.
 
 426: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
 en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras

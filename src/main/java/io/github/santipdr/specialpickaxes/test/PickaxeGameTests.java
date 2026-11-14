@@ -154,6 +154,78 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
+        wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
+        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
+    }
+    @GameTest(template="empty",batch="rework_each_183") public static void landingSnareRejectsInvalidFallsAndRecoversImpossibleDeadline(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var mob=landingAttacker(h,wearer);var state=ArtifactState.of(wearer,ArtifactKind.EVENTIDE);state.putLong("eventideImpactReady",Long.MAX_VALUE);
+        for(float fall:new float[]{Float.NaN,Float.POSITIVE_INFINITY,Float.NEGATIVE_INFINITY,-1F,6F})h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,fall)==0,"invalid/short falls never trigger a snare");
+        h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,7F)==1&&GraviticBalanceEffect.landingSnare(wearer,7F)==0,"impossible deadline recovers but normal ten-second lockout remains");mob.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_184") public static void landingSnareRejectsPermissionReentry(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var mob=landingAttacker(h,wearer);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer){calls[0]++;h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,12F)==0,"nested landing cannot reenter permission or duplicate effects");}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,7F)==1&&calls[0]==2,"only origin and selected target permissions are posted");}finally{MinecraftForge.EVENT_BUS.unregister(listener);mob.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_185") public static void landingSnareRevalidatesTargetMovementAfterPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var mob=landingAttacker(h,wearer);var at=mob.blockPosition();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer&&event.target.equals(at))mob.setPos(mob.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,7F)==0&&!mob.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get())&&!ArtifactState.of(wearer,ArtifactKind.EVENTIDE).contains("eventideImpactReady"),"moved target is not snared under stale permission or charged cooldown");}finally{MinecraftForge.EVENT_BUS.unregister(listener);mob.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_186") public static void landingSnareRevalidatesBalanceRemovalAfterPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var mob=landingAttacker(h,wearer);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)wearer.removeEffect(SpecialPickaxes.GRAVITIC_BALANCE.get());};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,7F)==0&&!mob.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"revoked balance invalidates the landing before selecting opponents");}finally{MinecraftForge.EVENT_BUS.unregister(listener);mob.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_187") public static void landingSnareCannotUseOriginBeforeCasterTeleport(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var mob=landingAttacker(h,wearer);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(GraviticBalanceEffect.landingSnare(wearer,7F)==0&&!mob.hasEffect(SpecialPickaxes.GRAVITIC_TETHER.get()),"a claim callback moving the caster invalidates the captured landing origin");}finally{MinecraftForge.EVENT_BUS.unregister(listener);mob.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_188") public static void starfallRecoversImpossibleRechargeEvenWithNoParticleBudget(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STARFALL_WARD.get(),100));
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),wearer.getX()+3,wearer.getY()+.9D,wearer.getZ());arrow.setDeltaMovement(-1,0,0);h.getLevel().addFreshEntity(arrow);
+        var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);state.putLong("starfallCatchReady",Long.MAX_VALUE);wearer.getPersistentData().putLong("specialpickaxesStarfallFlashAtWorldTime",Long.MAX_VALUE);
+        long tick=h.getLevel().getServer().getTickCount();ArtifactFeedback.reserveAuraParticles(tick-1,1,1);ArtifactFeedback.reserveAuraParticles(tick,4096,1);
+        h.assertTrue(StarfallWardEffect.tryCatchIncoming(wearer,h.getLevel())&&!arrow.isAlive(),"invalid recharge recovers and exhausted cosmetic capacity never prevents catching");
+        h.assertTrue(wearer.getPersistentData().getLong("specialpickaxesStarfallFlashAtWorldTime")==ArtifactState.now(wearer)+5,"invalid flash deadline also recovers");
+        ArtifactFeedback.reserveAuraParticles(tick-1,1,1);finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_189") public static void starfallRejectsUnwardedSpectatorAndWrongLevelScans(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);var level=h.getLevel();var arrow=new net.minecraft.world.entity.projectile.Arrow(level,wearer.getX()+3,wearer.getY()+.9D,wearer.getZ());arrow.setDeltaMovement(-1,0,0);level.addFreshEntity(arrow);
+        h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,level),"public scanner does not create a ward for an unprotected player");
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STARFALL_WARD.get(),100));wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);
+        h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,level)&&arrow.isAlive(),"spectators consume neither projectiles nor recharge");
+        wearer.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);var nether=level.getServer().getLevel(net.minecraft.world.level.Level.NETHER);
+        h.assertTrue(!StarfallWardEffect.tryCatchIncoming(wearer,nether)&&arrow.isAlive(),"another dimension cannot be supplied as the scan level");arrow.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_190") public static void icarianLandingRejectsNonFiniteFallsAndRecoversItsDeadline(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);wearer.setYRot(0);wearer.setDeltaMovement(Vec3.ZERO);wearer.getPersistentData().putLong("specialpickaxesIcarianLandingReadyAtWorldTime",Long.MAX_VALUE);
+        for(float fall:new float[]{Float.NaN,Float.POSITIVE_INFINITY,Float.NEGATIVE_INFINITY})h.assertTrue(!IcarianMomentumEffect.convertLanding(wearer,fall)&&wearer.getDeltaMovement().equals(Vec3.ZERO),"invalid fall cannot corrupt movement or spend cooldown");
+        h.assertTrue(IcarianMomentumEffect.convertLanding(wearer,8F)&&!IcarianMomentumEffect.convertLanding(wearer,8F),"a corrupt deadline recovers while the ordinary two-second rebound interval remains");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_191") public static void lodeSenseRecoversImpossibleDeadlineWithoutDoublePull(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.setPos(wearer.position().add(0,20,0));var drop=new ItemEntity(h.getLevel(),wearer.getX()+3,wearer.getY(),wearer.getZ(),new ItemStack(Items.RAW_IRON));h.getLevel().addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);
+        wearer.getPersistentData().putLong("specialpickaxesLodeSenseNextAt",Long.MAX_VALUE);drop.setDeltaMovement(Vec3.ZERO);
+        h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==1&&OreDropHighlight.drawNearbyDrops(wearer)==0,"invalid deadline recovers and ordinary ten-tick throttle remains");drop.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_192") public static void lodeSenseRejectsDropsMovedDuringPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.setPos(wearer.position().add(0,20,0));var drop=new ItemEntity(h.getLevel(),wearer.getX()+3,wearer.getY(),wearer.getZ(),new ItemStack(Items.RAW_IRON));h.getLevel().addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);drop.setDeltaMovement(Vec3.ZERO);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)drop.setPos(drop.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
+        try{h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&drop.getDeltaMovement().equals(Vec3.ZERO),"permission at a former drop position cannot authorize a pull from its new position");}finally{MinecraftForge.EVENT_BUS.unregister(listener);drop.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_193") public static void choirAllyAuraRecoversFarFutureScanDeadline(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var ally=player(h,ArtifactKind.PALIMPSEST,"RecoveredAuraAlly");var board=h.getLevel().getScoreboard();var team=board.addPlayerTeam("recover_"+wearer.getUUID().toString().substring(0,6));
+        board.addPlayerToTeam(wearer.getScoreboardName(),team);board.addPlayerToTeam(ally.getScoreboardName(),team);ally.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(ally);
+        ArtifactState.of(wearer,ArtifactKind.CHOIR).putLong("choirMiningAuraScanAt",Long.MAX_VALUE);ArtifactPassives.tick(wearer,ArtifactKind.CHOIR);
+        h.assertTrue(ally.hasEffect(SpecialPickaxes.STRATA_FOCUS.get()),"a corrupt scan deadline no longer blocks allied mining support indefinitely");finish(h,ally);finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie wardAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_WARD.get(),100));
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setNoAi(true);

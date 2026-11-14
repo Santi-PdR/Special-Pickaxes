@@ -1,5 +1,13 @@
 # Special Pickaxes — mining rework
 
+**5.10.427 — aterrizajes, Starfall y Lode Sense; pendiente de CI.** Eventide
+selecciona objetivos sin callbacks de permisos dentro del selector y revalida
+origen, protección y objetivos antes del snare; evita reentrada. Icarus rechaza
+caídas no finitas. Starfall, aterrizajes, Lode Sense y escaneos aliados recuperan
+plazos imposibles manteniendo intervalos/potencia. Starfall valida bearer/nivel y
+presupuesta flashes; Lode Sense revalida posiciones después de permisos. Once
+GameTests y tres JUnit añadidos; pendientes de CI de esta fuente.
+
 **5.10.426 — defensa de Estasis y auras de mobs; CI global correcto.** La respuesta
 compartida de Estasis evita reentrada y revalida daño, ward y atacante después de
 callbacks de permisos. Recupera plazos imposibles sin alterar sus ocho segundos.

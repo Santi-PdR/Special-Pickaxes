@@ -40,8 +40,9 @@ public final class StarfallWardEffect extends MobEffect {
 
     /** Starfall catches one hostile shot whose current path would pass through the wearer's body. */
     public static boolean tryCatchIncoming(ServerPlayer wearer,ServerLevel level){
+        if(!validWearer(wearer,level))return false;
         var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
-        if(state.getLong("starfallCatchReady")>now)return false;
+        if(PersistedCooldown.active(now,state.getLong("starfallCatchReady"),CATCH_COOLDOWN_TICKS))return false;
         Vec3 center=wearer.position().add(0,wearer.getBbHeight()*.5D,0);
         var incoming=JegProjectileCompat.nearest(level,wearer.getBoundingBox().inflate(SCAN_RADIUS),shot->
                 isIncomingHostile(shot,wearer,center),center,1,256);
@@ -57,33 +58,41 @@ public final class StarfallWardEffect extends MobEffect {
         Projectile shot=event.getProjectile();
         if(!isHostileTo(shot,wearer))return false;
         var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
-        if(state.getLong("starfallCatchReady")>now)return false;
+        if(PersistedCooldown.active(now,state.getLong("starfallCatchReady"),CATCH_COOLDOWN_TICKS))return false;
+        if(!consumeCatch(wearer,shot))return false;
         event.setImpactResult(ProjectileImpactEvent.ImpactResult.STOP_AT_CURRENT_NO_DAMAGE);
-        return consumeCatch(wearer,shot);
+        return true;
+    }
+
+    private static boolean validWearer(ServerPlayer wearer,ServerLevel level){
+        return wearer.serverLevel()==level&&wearer.isAlive()&&!wearer.isRemoved()&&!wearer.isSpectator()
+                &&wearer.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get());
     }
 
     private static boolean consumeCatch(ServerPlayer wearer,Entity shot){
+        if(!validWearer(wearer,wearer.serverLevel())||shot.level()!=wearer.level()||!isHostileTo(shot,wearer))return false;
         var state=ArtifactState.of(wearer,ArtifactKind.EXODIUM);long now=ArtifactState.now(wearer);
-        if(state.getLong("starfallCatchReady")>now)return false;
-        shot.discard();state.putLong("starfallCatchReady",now+CATCH_COOLDOWN_TICKS);
+        if(PersistedCooldown.active(now,state.getLong("starfallCatchReady"),CATCH_COOLDOWN_TICKS))return false;
+        state.putLong("starfallCatchReady",now+CATCH_COOLDOWN_TICKS);shot.discard();
         projectileImpact(wearer);return true;
     }
 
     private static boolean isHostileTo(Entity shot,ServerPlayer wearer){
         if(!JegProjectileCompat.isProjectile(shot)||shot==wearer||!shot.isAlive())return false;
         Entity owner=JegProjectileCompat.owner(shot);
-        if(owner==wearer||owner!=null&&owner.isAlliedTo(wearer))return false;
+        if(owner==wearer||owner!=null&&(owner.isAlliedTo(wearer)||wearer.isAlliedTo(owner)))return false;
         return !(owner instanceof Player other)||wearer.canHarmPlayer(other);
     }
 
     /** Visual charge fraction: the orbit contracts after a catch and expands as the ward recharges. */
     public static double chargeProgress(long now,long readyAt){
-        return readyAt<=now?1D:1D-Math.min(1D,(readyAt-now)/(double)CATCH_COOLDOWN_TICKS);
+        return PersistedCooldown.active(now,readyAt,CATCH_COOLDOWN_TICKS)
+                ?1D-(readyAt-now)/(double)CATCH_COOLDOWN_TICKS:1D;
     }
 
     /** The four-point charge orbit is visible to the bearer and nearby teammates who share the ward. */
     public static ArrayList<ArtifactFeedback.AuraParticle> orbitParticles(LivingEntity wearer,int tick,double charge){
-        double boundedCharge=Math.max(0D,Math.min(1D,charge));
+        double boundedCharge=Double.isFinite(charge)?Math.max(0D,Math.min(1D,charge)):1D;
         double phase=tick*.045D,y=wearer.getY()+wearer.getBbHeight()*.56D;
         var particles=new ArrayList<ArtifactFeedback.AuraParticle>(5);
         for(int i=0;i<4;i++){
@@ -104,13 +113,13 @@ public final class StarfallWardEffect extends MobEffect {
 
     /** Skip trajectory broadphase while recharging; the exact impact hook stays active regardless. */
     public static boolean shouldPredictiveScan(int tickCount,int entityId,long now,long readyAt){
-        return readyAt<=now&&shouldPredictiveScan(tickCount,entityId);
+        return !PersistedCooldown.active(now,readyAt,CATCH_COOLDOWN_TICKS)&&shouldPredictiveScan(tickCount,entityId);
     }
 
     private static boolean isIncomingHostile(Entity shot,ServerPlayer wearer,Vec3 center){
         if(!JegProjectileCompat.isProjectile(shot)||shot==wearer||!shot.isAlive())return false;
         Entity owner=JegProjectileCompat.owner(shot);
-        if(owner==wearer||owner!=null&&owner.isAlliedTo(wearer))return false;
+        if(owner==wearer||owner!=null&&(owner.isAlliedTo(wearer)||wearer.isAlliedTo(owner)))return false;
         if(owner instanceof Player other&&!wearer.canHarmPlayer(other))return false;
         Vec3 motion=shot.getDeltaMovement();
         if(motion.lengthSqr()<.01D)return false;
@@ -124,14 +133,15 @@ public final class StarfallWardEffect extends MobEffect {
     public static void projectileImpact(ServerPlayer wearer){
         if(wearer.level().isClientSide||!(wearer.level() instanceof ServerLevel level))return;
         long now=ArtifactState.now(wearer);var data=wearer.getPersistentData();
-        if(data.getLong(NEXT_FLASH)>now)return;
+        if(PersistedCooldown.active(now,data.getLong(NEXT_FLASH),5))return;
         data.putLong(NEXT_FLASH,now+5L);
         double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.56D,z=wearer.getZ();
-        emitImpact(wearer,level,x,y,z);
         var center=wearer.position();
         var nearby=EntitySelection.nearest(level,ServerPlayer.class,wearer.getBoundingBox().inflate(8D),
-                listener->listener!=wearer&&listener.isAlive()&&listener.distanceToSqr(center)<=64D,
+                listener->listener!=wearer&&listener.isAlive()&&!listener.isSpectator()&&!wearer.isInvisibleTo(listener)&&listener.distanceToSqr(center)<=64D,
                 center,8,128);
+        if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),14,nearby.size()+1))return;
+        emitImpact(wearer,level,x,y,z);
         for(var listener:nearby)emitImpact(listener,level,x,y,z);
     }
 
@@ -146,11 +156,13 @@ public final class StarfallWardEffect extends MobEffect {
     public static void guardImpact(ServerPlayer protectedPlayer){
         if(protectedPlayer.level().isClientSide||!(protectedPlayer.level() instanceof ServerLevel level))return;
         long now=ArtifactState.now(protectedPlayer);var data=protectedPlayer.getPersistentData();
-        if(data.getLong(NEXT_FLASH)>now)return;
+        if(PersistedCooldown.active(now,data.getLong(NEXT_FLASH),5))return;
         data.putLong(NEXT_FLASH,now+5L);
         double x=protectedPlayer.getX(),y=protectedPlayer.getY()+protectedPlayer.getBbHeight()*.55D,z=protectedPlayer.getZ();
         double phase=level.getGameTime()*.18D;
-        for(var viewer:ArtifactFeedback.nearbyWardAudience(protectedPlayer)){
+        var audience=ArtifactFeedback.nearbyWardAudience(protectedPlayer);
+        if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),8,audience.size()))return;
+        for(var viewer:audience){
             for(int i=0;i<6;i++){
                 double angle=phase+i*Math.PI/3D;
                 level.sendParticles(viewer,GUARD_DUST,false,x+Math.cos(angle)*.48D,y+Math.sin(angle*2D)*.08D,
