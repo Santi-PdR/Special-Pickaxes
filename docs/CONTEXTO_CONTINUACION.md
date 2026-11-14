@@ -307,3 +307,9 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - GraviticTether.horizontalDrag acota amplifier negativo a cero; positivos conservan progresión y piso .35. Nunca acelera por NBT malformado. Vertical intacta.
 - Diez GameTests (173–182) añadidos: deadline/throttle, daño inválido/cancelado/ajeno, reentrada, ward removida, atacante movido, cancelación posterior, cleanup tras excepción, arrastre extremo y dos integraciones de aura/budget con y sin audiencia. Fuente total 250. Tres JUnit de niveles ordinarios/extremos, total esperado 78; todavía no afirmar ejecutados.
 - Local: recursos 22 y herramientas Python 28 pasaron; parser 132 fuentes Java, diff check y secret scan correctos. Sin build local, instalación Windows ni revisión visual de nueva versión. Tier OP y cero recetas intactos.
+
+### Resultado real 425 y corrección 426
+
+- `a9016ddf351fb28e13d1e9ec0f85043f061b972c`, run 43545570252 completed/failure. Bundle Checks 5 fragmentos recuperado/verificado `/tmp/sp-ci425`. Build/JAR y 78 JUnit pasaron (XML comprobado al cierre). All 250 required tests passed en log GameTest.
+- Fallo posterior: validate_runtime_logs detectó ERROR/IllegalStateException emitido por Forge EventBus al ejecutar la excepción intencional del fixture179. No era fallo de una assertion ni del gameplay. Servidor empaquetado/cliente omitidos. Se conserva este historial como failure, no CI verde.
+- 426 reemplaza ese fixture por permiso denegado, verifica daño/cooldown intactos y respuesta posterior válida tras quitar listener. Conserva finally del guard de producción; ya no se afirma cobertura de excepción en esa regresión. No se modifica escaneo/allowlists ni se ocultan logs. Sigue habiendo 250 GameTests/78 JUnit esperados; pendientes de CI propio.

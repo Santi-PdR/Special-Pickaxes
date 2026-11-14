@@ -1,9 +1,15 @@
-# Estado actual — 5.10.425: nueva tanda pendiente de CI
+# Estado actual — 5.10.426: fixture corregido, pendiente de CI
 
 425: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
 en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras
 beneficiosas sobre mobs ahora respetan audiencia/coste global. Diez GameTests
 (250 en fuente) y tres JUnit añadidos, pendientes de compilación/ejecución CI.
+
+425 / `a9016dd` / run 43545570252: failure global. Build y 78 JUnit OK;
+250 GameTests pasados. Escaneo de logs rechazó el error deliberado emitido por
+Forge al lanzar la excepción del fixture179. Servidor empaquetado y cliente
+omitidos. En 426 se conserva el escaneo sin excepciones/allowlists y se sustituye
+el fixture por denegación/reintento; no cambia el código de gameplay de 425.
 
 ## Evidencia verificada el 2026-11-13
 

@@ -229,13 +229,13 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,hit)&&hit.getAmount()==10F&&!wearer.getPersistentData().contains("specialpickaxesStasisReflexReadyAt"),"cancellation during permission does not spend the reflex");}
         finally{MinecraftForge.EVENT_BUS.unregister(listener);attacker.discard();}finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_179") public static void stasisReflexReleasesGuardAfterPermissionException(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);boolean[] threw={false};
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)throw new IllegalStateException("expected ward permission fixture");};
+    @GameTest(template="empty",batch="rework_each_179") public static void stasisReflexReleasesGuardAfterPermissionDenial(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var attacker=wardAttacker(h,wearer);var hit=wardHit(wearer,attacker,10F);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> listener=event->{if(event.player==wearer)event.setCanceled(true);};
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,listener);
-        try{StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F));}catch(IllegalStateException expected){threw[0]=true;}
+        try{h.assertTrue(!StasisWardEffect.answerHostileHit(wearer,hit)&&hit.getAmount()==10F&&!wearer.getPersistentData().contains("specialpickaxesStasisReflexReadyAt"),"claim denial changes neither damage nor cooldown");}
         finally{MinecraftForge.EVENT_BUS.unregister(listener);}
-        h.assertTrue(threw[0]&&StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F)),"finally releases the guard and permission failure does not spend the cooldown");attacker.discard();finish(h,wearer);
+        h.assertTrue(StasisWardEffect.answerHostileHit(wearer,wardHit(wearer,attacker,10F)),"finally releases the guard after denial so a later permitted response can commit");attacker.discard();finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_180") public static void graviticTetherMalformedAmplifierNeverAcceleratesTargets(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE);var attacker=wardAttacker(h,wearer);var tether=SpecialPickaxes.GRAVITIC_TETHER.get();
