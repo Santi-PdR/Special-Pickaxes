@@ -50,21 +50,29 @@ public final class ArtifactActions {
         try{return activate(p,tool,kind,secondary);}finally{ACTIVATING.remove(p.getUUID());}
     }
     public static boolean useAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
-        if(p.getMainHandItem()!=tool||tool.isEmpty()||!WorldSafety.allowed(p,kind,p.blockPosition()))return false;
+        if(!ACTIVATING.add(p.getUUID()))return false;
+        try{return activateAlternate(p,tool,kind);}finally{ACTIVATING.remove(p.getUUID());}
+    }
+    private static boolean activateAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind){
+        if(!kind.playable()||p.getMainHandItem()!=tool||tool.isEmpty()
+                ||!(tool.getItem() instanceof ArtifactItem item)||item.kind!=kind
+                ||!WorldSafety.allowed(p,kind,p.blockPosition())||p.getMainHandItem()!=tool||tool.isEmpty())return false;
         var data=ArtifactState.of(p,kind);long now=ArtifactState.now(p),ready=data.getLong("alternateReady");
-        if(ready>now){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(ready-now+19)/20));return false;}
+        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
+        if(PersistedCooldown.active(now,ready,cooldown)){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(ready-now+19)/20));return false;}
         int cost=EnchantmentScaling.activationCost(tool,kind);
         if(!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<=cost)return false;
         if(!ArtifactSkills.use(p,tool,kind))return false;
         if(!p.isCreative())tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);data.putLong("alternateReady",now+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
+        data.putLong("alternateReady",now+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         return true;
     }
     private static boolean activate(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary){
+        if(!kind.playable()||p.getMainHandItem()!=tool||tool.isEmpty())return false;
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
-        if(!WorldSafety.allowed(p,kind,p.blockPosition()) || tool.isEmpty()) return false;
+        if(!WorldSafety.allowed(p,kind,p.blockPosition())||tool.isEmpty()||p.getMainHandItem()!=tool)return false;
         var data=ArtifactState.of(p,kind);
-        if(data.getLong("ready")>ArtifactState.now(p)){ArtifactFeedback.message(p,"cooldown");ArtifactFeedback.cue(p,"error");return false;}
+        if(PersistedCooldown.active(ArtifactState.now(p),data.getLong("ready"),Math.max(10,ArtifactConfig.COOLDOWN.get()))){ArtifactFeedback.message(p,"cooldown");ArtifactFeedback.cue(p,"error");return false;}
         int cost=secondary?0:EnchantmentScaling.activationCost(tool,kind);
         if(!p.isCreative() && tool.getMaxDamage()-tool.getDamageValue()<=cost) return false;
         boolean done=secondary?secondary(p,kind):primary(p,tool,kind);

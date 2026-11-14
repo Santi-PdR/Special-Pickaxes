@@ -154,6 +154,53 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_160") public static void alternateEntryGuardCoversTheInitialPermissionCallback(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var level=h.getLevel();
+        var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
+        ArtifactState.of(wearer,ArtifactKind.EVENTIDE).putLong("alternateReady",Long.MAX_VALUE);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> recurse=event->{
+            if(event.player==wearer){calls[0]++;h.assertTrue(!ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE),
+                    "the outer entry point rejects recursion even before the initial caster permission finishes");}
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,recurse);
+        try{h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE)&&calls[0]>=1&&drop.getDeltaMovement().x<-.5,
+                "the real control path recovers its invalid cooldown and performs one successful pull");}
+        finally{MinecraftForge.EVENT_BUS.unregister(recurse);}
+        h.assertTrue(!ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE),"the committed ordinary cooldown remains effective");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_161") public static void primaryCannotStartAfterPermissionCallbackChangesTheTool(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var tool=wearer.getMainHandItem();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> swap=event->{if(event.player==wearer)wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,swap);
+        try{h.assertTrue(!ArtifactActions.use(wearer,tool,ArtifactKind.INTERREGNUM,false)&&!DomainFields.active(wearer),
+                "changing the held tool during the caster permission prevents domain creation");
+            h.assertTrue(tool.getDamageValue()==0&&!ArtifactState.of(wearer,ArtifactKind.INTERREGNUM).contains("ready"),"rejected activation spends neither durability nor cooldown");}
+        finally{MinecraftForge.EVENT_BUS.unregister(swap);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_162") public static void orchestrationRejectsDetachedToolsBeforePostingPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var tool=wearer.getMainHandItem();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> count=event->{if(event.player==wearer)calls[0]++;};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,count);
+        try{h.assertTrue(!ArtifactActions.use(wearer,tool.copy(),ArtifactKind.INTERREGNUM,false)
+                        &&!ArtifactActions.useAlternate(wearer,tool.copy(),ArtifactKind.INTERREGNUM)
+                        &&!ArtifactActions.useAlternate(wearer,tool,ArtifactKind.AXIOM)&&calls[0]==0,
+                "invalid entry requests never reach claim listeners or start abilities");}
+        finally{MinecraftForge.EVENT_BUS.unregister(count);}
+        finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_163") public static void guardedWorldbreakerStillExecutesItsCopiedAlternate(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDBREAKER);var tool=wearer.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.EVENTIDE.id);
+        var drop=new ItemEntity(h.getLevel(),wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);
+        h.assertTrue(ArtifactActions.useAlternate(wearer,tool,ArtifactKind.WORLDBREAKER)&&drop.getDeltaMovement().x<-.5,
+                "entry guards preserve Worldbreaker's copied Eventide alternate and full pull strength");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_164") public static void primaryRecoversItsImpossiblePersistedDeadline(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var state=ArtifactState.of(wearer,ArtifactKind.INTERREGNUM);state.putLong("ready",Long.MAX_VALUE);
+        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(wearer),
+                "the actual primary control path recovers a malformed future deadline");
+        h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_151") public static void palimpsestPulseRevalidatesTargetsMovedByClaims(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var mob=EntityType.ZOMBIE.create(h.getLevel());
         mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(mob);

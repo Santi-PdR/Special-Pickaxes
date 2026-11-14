@@ -1,5 +1,12 @@
 # Special Pickaxes — mining rework
 
+**5.10.422 — guardas en la ruta real de activación; pendiente de CI.** La guarda
+antirreentrada cubre también el primer evento del alternativo y comparte la
+protección con el primario. Ambos rechazan herramientas separadas y revalidan la
+mano después de permisos; la recuperación de cooldowns inválidos llega a la ruta
+usada por los controles. Se preservan las habilidades copiadas de Worldbreaker.
+Cinco GameTests adicionales: 232 en fuente, aún pendientes de CI propio.
+
 **5.10.421 — tanda amplia de combate, memorias y animación; pendiente de CI.**
 Palimpsest, Choir y Null Ward revalidan cada objetivo tras callbacks; los predicados
 de selección ya no emiten eventos. Choir conserva resonancias externas y Null Ward

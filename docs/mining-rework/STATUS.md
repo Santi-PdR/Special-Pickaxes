@@ -1,4 +1,4 @@
-# Estado actual — 5.10.421: tanda amplia pendiente de CI
+# Estado actual — 5.10.422: tanda amplia pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -17,6 +17,10 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | CI global success, evidencia cliente recuperada/verificada. Sin aprobación visual completa ni instalación. |
 | 5.10.419 | `4e6e60b` / [43537824437](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537824437) | Build/JUnit, 215 GameTests, JAR, servidor y logs success; cliente en curso. |
 | 5.10.420 | `0bade7a` / [43537968640](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537968640) | Build/JUnit, 218 GameTests, JAR, servidor y logs success; cliente en curso. |
+
+5.10.422 extiende guardas/revalidación a la ruta real de controles, recupera sus
+cooldowns y prueba Worldbreaker copiado. Cinco GameTests adicionales; total 232
+en fuente, pendientes del CI de esta versión.
 
 5.10.421 reúne cambios de combate, reentrada de alternativos, memorias tipadas y
 caducidad, presupuestos cosméticos y fundido de siete partículas. Añade nueve
