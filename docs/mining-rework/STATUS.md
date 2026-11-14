@@ -1,9 +1,20 @@
-# Estado actual — 5.10.426: fixture corregido, pendiente de CI
+# Estado actual — 5.10.426: CI global exitoso, sin aprobación visual completa
 
-425: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
+426: Estasis compartida protegida frente a reentrada, eventos inválidos y cambios
 en callbacks; recuperación de cooldown y arrastre Gravitic acotado. Tres auras
 beneficiosas sobre mobs ahora respetan audiencia/coste global. Diez GameTests
-(250 en fuente) y tres JUnit añadidos, pendientes de compilación/ejecución CI.
+(250 totales) y tres JUnit añadidos: ejecutados y pasados.
+
+**Fuente `4262a10c219873d49abba6a53509ed352b5a3c45`,
+[run 43546125974](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43546125974): completed/success.**
+78 JUnit, cero fallos/errores/skips; All 250 required tests passed. JAR/servidor/logs
+success; cliente real 32 escenas/64 tooltips, teclado-servidor activate/cancel y
+World Shatter 9341. Bundle 56 fragmentos recuperado/verificado `/tmp/sp-ci426`.
+Sólo una captura 426 inspeccionada, no aprobación visual completa/temporal.
+Publicación binaria skipped; no instalación Windows. Artefacto forge-validation
+14094209314 (43789979 bytes). Manifiesto de JAR 532425 bytes, SHA256
+`18f357ac5b551b744c626461bfaed64f3647f3fb04ba7f5843c8abfd8ddc32f0`.
+Se verificó el manifiesto del bundle, no una descarga/instalación del JAR.
 
 425 / `a9016dd` / run 43545570252: failure global. Build y 78 JUnit OK;
 250 GameTests pasados. Escaneo de logs rechazó el error deliberado emitido por

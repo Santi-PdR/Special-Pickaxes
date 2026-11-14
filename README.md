@@ -1,11 +1,11 @@
 # Special Pickaxes — mining rework
 
-**5.10.426 — defensa de Estasis y auras de mobs; pendiente de CI.** La respuesta
+**5.10.426 — defensa de Estasis y auras de mobs; CI global correcto.** La respuesta
 compartida de Estasis evita reentrada y revalida daño, ward y atacante después de
 callbacks de permisos. Recupera plazos imposibles sin alterar sus ocho segundos.
 Las auras beneficiosas de Hellspec/Estasis/Worldbreaker sobre mobs usan audiencia
 local y presupuesto global, igual que las demás. Gravitic Tether no acelera con
-amplificadores negativos. Diez GameTests y tres JUnit nuevos. En 425 pasaron 78 JUnit y 250 GameTests, pero el escaneo estricto rechazó el error intencional de un fixture. En 426 se prueba denegación/reintento sin provocar excepciones; CI propio pendiente.
+amplificadores negativos. Diez GameTests y tres JUnit nuevos. En 425 pasaron 78 JUnit y 250 GameTests, pero el escaneo estricto rechazó el error intencional de un fixture. En 426 se prueba denegación/reintento sin provocar excepciones. [CI 43546125974](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43546125974): 78 JUnit y 250 GameTests pasados, JAR/servidor/logs y cliente real correctos (32 escenas, 64 tooltips, controles). Sin aprobación visual completa ni instalación Windows.
 
 **5.10.424 — minería observada, calor y resonancia; CI global correcto.** Hellspec
 liga su caché térmica al origen/dimensión/tick y omite chunks descargados. Una
