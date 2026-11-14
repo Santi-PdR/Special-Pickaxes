@@ -414,3 +414,16 @@ Al retomar snapshot HEADbase28b8ebf y archivos previosdirty: fetch ramaactiva1e9
   origen natural también tras evento BreakEvent. Cuatro regresiones nuevas.
 - Local: 22 recursos +33 Python +parser136Java +diffcheck. Java/cliente por CI,
   sin compilar localmente. No asumir aprobación visual ni instalación Windows.
+
+## Vincular las fotos al JAR correcto
+
+`tools/pickaxe_gallery.py <evidencia>/build/client-smoke <salida-vacía>` valida
+ahora `<evidencia>/build/RELEASE.json` y el `manifest.json` del archivo de Checks.
+Comprueba cada retrato y lee los modelos/texturas del commit de la release con
+`git show`, sin checkout. Rechaza mezclar iconos locales modificados con capturas
+de una compilación distinta. El HTML/ZIP incluye `PROVENANCE.json` con commit,
+run y hashes de los trece pares. No ejecutar con capturas sin procedencia.
+
+`tools/verify_release.py` también compara los modelos, texturas runtime y metadatos
+de animación empaquetados con sus fuentes y hashes de procedencia: no basta con
+que existan trece PNG. Esto se ejecuta en CI, no constituye build local.

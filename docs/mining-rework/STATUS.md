@@ -1,4 +1,4 @@
-# Estado actual — 5.10.435: guía/copias y contexto minero pendientes CI
+# Estado actual — 5.10.436: verificación integral en curso
 
 433 (pendiente CI): tres adaptaciones reproducibles de legibilidad, sin cambiar
 silueta/alpha ni archivos originales. Manual respeta teclas reasignadas, invalida
@@ -238,3 +238,10 @@ solo modo o copias. Costes usan teclas reasignadas y aritmética long; caché y
 manual consumen la misma tarjeta de coste. Cinco regresiones nuevas (285
 GameTests esperados). La rotura captura actor antes, no después, del callback
 de permisos. Validadores estáticos pasados, Java/cliente aún pendientes.
+
+436 pendiente CI: galería atada a commit/run/manifest y hashes de retratos;
+verificación de bytes exactos y procedencia de modelos/texturas/animaciones del
+JAR. Dieciséis pruebas Python nuevas (49 pasadas localmente), sin build local.
+433 completó86JUnit y276/277GameTests: sólo falló el test combinado de pasarela
+anterior a separar/despejarfixture; sus cuatro nuevas regresiones de pago/Crisol
+pasaron. Ningún JAR432/433 publicado. 434/435 todavía en CI.

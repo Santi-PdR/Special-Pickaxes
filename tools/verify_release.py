@@ -5,9 +5,11 @@ root=pathlib.Path('.')
 version=re.search(r"^version\s*=\s*'([^']+)'",(root/'build.gradle').read_text(),re.M).group(1)
 jar=root/f'build/libs/special-pickaxes-1.20.1-{version}.jar'
 from mining_catalog import IDS as ids
+from packaged_item_assets import verify_packaged_item_assets
 sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 with zipfile.ZipFile(jar) as z:
  assert z.testzip() is None
+ assert verify_packaged_item_assets(z)==ids
  assert tomllib.loads(z.read('META-INF/mods.toml').decode())['mods'][0]['modId']=='specialpickaxes'
  manifest=z.read('META-INF/MANIFEST.MF').decode().replace('\r\n ','').replace('\r\n','\n')
  assert 'Build-Commit: '+sha in manifest,manifest
