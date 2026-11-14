@@ -1,6 +1,41 @@
 # Contexto de continuación — Special Pickaxes
 
-Actualizado: 2026-11-13
+Último resultado: CI43562331609, fuente5.10.439 verificada.
+
+## Resultado verificado — 5.10.439
+
+Fuente `f07795818b39ce3d7172d7c175cb06a8992bff10`;
+[CI43562331609](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43562331609)
+completed/success. 86JUnit, 0fallos/errores/omitidos; 287GameTests completos.
+Servidor empaquetado y logs limpios; cliente32escenas/64tooltips, teclas reales
+activar/cancelar y WorldShatter9341bloques verificados. 49Python y22recursos
+pasados en el workflow. No build local ni instalación Windows.
+
+[Prerelease de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.439-43562331609),
+no latest estable ni aprobación visual completa. JAR `special-pickaxes-1.20.1-5.10.439.jar`:
+541982bytes; SHA256 `37069f2693c3cbe3eb2cd7c9b65ff17dd4e266fdc9fae6d43416d5ea3b1e5c44`.
+Asset746466840 uploaded y digest API coincidente. Bytes recuperados por Checks,
+CRC/commit/hash y13modelos/texturas runtime verificados; no afirmar descarga CDN.
+
+Cambios de esta tanda: pasarela sin raycast y pago sólo offhand, detención ante
+obstáculo/claim/material agotado; sondeo nearest32natural con coordenadas;
+revalidación de actor/procedencia/permiso en minería nativa, radiales, IcarianLift,
+SeamRipper y rutas naturales; transmutación/pago con rollback tras callbacks;
+firmas orientadas; tres adaptaciones de legibilidad sin cambiar alpha/silueta;
+manual/SHIFT coherentes con copia, teclas reasignadas, costes y scroll/nombres.
+Conserva13picos, daño base4, tier5, velocidad de tier64 y32768usos; cero recetas.
+
+Fotos439: `artifacts/picos-5.10.439/` (ignorado por Git): PDF13páginas,
+ZIP26fotos+HTML+PDF+vista general+PROVENANCE.json. Capturas genuine del cliente
+439, hashes/commit/run verificados. No son imágenes generadas ni prueba de todas
+las fases de animación. Los registros «pendiente» que siguen son históricos.
+
+## Rama efectiva de esta sesión
+
+Rama actual obligatoria `arena/cec54523-special-pickaxes`; todos los commits de
+esta tanda están pusheados a ella, sin checkout/build local. Las menciones a
+`codex/test1-507-icons`/PR2 de las secciones antiguas son contexto histórico, no
+una instrucción de cambiar de rama ni una afirmación de actualizar ese PR.
 
 ## Objetivo del usuario
 

@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.439 — minería, guía y procedencia visual reforzadas; pendiente de CI.**
+**5.10.439 — minería, guía y procedencia visual reforzadas; CI completo verificado.**
 Worldloom activa sin bloque apuntado, paga sólo offhand y corta la pasarela ante
 obstáculos/denegaciones/falta de material. Palimpsest prioriza las32menas naturales
 más cercanas y comunica la coordenada de la primera. Los trabajos naturales
@@ -327,3 +327,11 @@ La versión 5.10.127 hace que el Pozo Estelar de Exodium tenga una sección bise
 La versión 5.10.125 reconoce también `undead_revamp2:bostroxore`, una mena mundial de Undead Revamped que no usa sufijo ni tag convencional; sus drops `rawbostrox` ahora entran en la extracción de Iridium y su iluminación.
 
 La versión 5.10.125 evita inferir geología a partir de sufijos fusionados como `lodestone`: solo usa tokens geológicos separados o IDs de worldgen aprobados, y mantiene la lista explícita para geología vanilla.
+
+### Verificación final de esta tanda
+
+[CI43562331609](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43562331609):
+86JUnit +287GameTests; cliente32escenas/64tooltips, servidor y logs limpios.
+[Descarga de prueba5.10.439](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.439-43562331609).
+No es aprobación estable ni instalación en Windows. Detalles/hashes en
+`docs/mining-rework/STATUS.md`.
