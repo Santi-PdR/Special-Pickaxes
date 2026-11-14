@@ -1,4 +1,4 @@
-# Estado actual — 5.10.420 pendiente de CI
+# Estado actual — 5.10.420: servidor verificado, cliente en curso
 
 ## Evidencia verificada el 2026-11-13
 
@@ -13,16 +13,17 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.414 | `1bbd645` / [43448248860](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43448248860) | CI global success: build/JUnit, 197 GameTests, servidor, logs, cliente y exportación de evidencia. 32 escenas/64 tooltips, 9341 bloques. Publicación binaria omitida; sin revisión visual completa. |
 | 5.10.415 | `74c4481` / [43449061170](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43449061170) | CI global success confirmado. Sin inferir aprobación visual ni instalación. |
 | 5.10.416 | `3e4eecb` / [43450387194](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43450387194) | CI global success; evidencia cliente recuperada/verificada (32 escenas, 64 tooltips y World Shatter). Sin aprobación visual completa ni instalación. |
-
 | 5.10.417 | `5ec7288` / [43452383160](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452383160) | Failure cliente por autenticación devolviendo HTML; bundle recuperado. Build/JUnit, 207 GameTests, servidor y logs pasaron. |
 | 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | CI global success, evidencia cliente recuperada/verificada. Sin aprobación visual completa ni instalación. |
+| 5.10.419 | `4e6e60b` / [43537824437](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537824437) | Build/JUnit, 215 GameTests, JAR, servidor y logs success; cliente en curso. |
+| 5.10.420 | `0bade7a` / [43537968640](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537968640) | Build/JUnit, 218 GameTests, JAR, servidor y logs success; cliente en curso. |
 
 5.10.420 añade cuatro JUnit y tres GameTests de recuperación de cooldowns
-persistentes sin cambiar cadencia normal. 218 GameTests en fuente, pendientes
-de su propio CI.
+persistentes sin cambiar cadencia normal. 218 GameTests pasados
+en su propio CI; cliente y resultado global aún pendientes.
 
 5.10.419 añade cuatro regresiones de movimiento/recolocación; 215 GameTests
-pendientes de CI para esa nueva fuente.
+pasados en su propio CI; cliente y resultado global aún pendientes.
 
 5.10.418 añade cuatro regresiones de Hellspec: atribución, reemplazos externos y
 objetivos movidos en callbacks; total 211 GameTests ya pasados por el CI de esa fuente.

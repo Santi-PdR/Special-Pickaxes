@@ -1,13 +1,13 @@
 # Special Pickaxes — mining rework
 
-**5.10.420 — recuperación de cooldowns persistentes; pendiente de CI.** Dawn
+**5.10.420 — recuperación de cooldowns persistentes; build/JUnit, 218 GameTests, JAR, servidor y logs correctos en CI; cliente pendiente.** Dawn
 Mending, Heartwood, comida de Worldloom y Null Veil descartan plazos imposibles
 fuera de su propio intervalo. Las curaciones usan el reloj común del servidor,
 no uno distinto por dimensión. No cambia la cadencia normal ni permite pulsos
 repetidos en el mismo tick. Cuatro JUnit y tres GameTests añadidos; 218 GameTests
-en fuente, aún pendientes de ejecución para esta versión.
+pasados por el CI de esta fuente; cliente/global todavía pendientes.
 
-**5.10.419 — desplazamientos y recolocación seguros; pendiente de CI.** La ruta
+**5.10.419 — desplazamientos y recolocación seguros; 215 GameTests y servidor correctos en CI; cliente pendiente.** La ruta
 usa un origen fijo y aborta si un callback cambia posición, dimensión, herramienta
 o estado de montura/sueño. Recomprueba colisión después del permiso y rechaza
 coordenadas no finitas antes de consultar el mundo. Un dominio cancelado o

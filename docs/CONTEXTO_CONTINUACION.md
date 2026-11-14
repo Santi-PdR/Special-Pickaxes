@@ -237,3 +237,9 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 - Dawn/Heartwood usan ahora tiempo del overworld del servidor, igual que ArtifactState, en vez de tiempo de dimensión local. Cadencias normales conservadas: 40/20 ticks de curación, 100 comida y 160 limpieza. No se modifican las cantidades ni tier/recetas.
 - Cuatro JUnit nuevos (intervalo completo, plazo demasiado futuro, extremos long y duración inválida). Tres GameTests nuevos (148–150) restauran cada pasiva con plazo Long.MAX_VALUE y verifican que un segundo pulso en el mismo tick sigue bloqueado. Total fuente: 218 GameTests, pendiente de CI para este commit.
 - Validación local: 22 recursos + 28 Python, parser 126 Java, diff-check y scan de secretos correctos. Java no compilado ni ejecutado localmente; sin instalación Windows.
+
+### Gates confirmados después de publicar 5.10.420
+
+- 5.10.419 `43537824437`, fuente `4e6e60bdd09ef5af61e8eeb578fc054cb38da028`: pasos 10–17 success: build/JUnit, verificación y seguridad JAR, 215 GameTests completos, servidor empaquetado, logs y dependencias cliente. Capturas reales en curso; resultado global desconocido. Monitor `ci-de-special-pickaxes-5-10-419-c86af63b`.
+- 5.10.420 `43537968640`, fuente `0bade7a25312c5ea8d58500a65d3439a37d7584c`: mismos pasos 10–17 success con 218 GameTests; capturas reales en curso, sin resultado global confirmado. Monitor `ci-de-special-pickaxes-5-10-420-032c3f8d`.
+- Secret scan final: 254 entradas versionadas, sin coincidencias. Working tree limpio antes de esta actualización documental. El siguiente commit documental usa `[skip ci]` sin omitir validación de código nuevo.
