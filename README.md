@@ -1,5 +1,12 @@
 # Special Pickaxes — mining rework
 
+**5.10.431 — entrega de prueba descargable, pendiente de CI/publicación.**
+Se conserva el gameplay validado en430. Tras CI completo exitoso en la rama de
+sesión se publica un **prerelease de prueba** con JAR/RELEASE.json/SHA256SUMS.
+No se marca como latest estable ni se atribuye aprobación visual. El instalador
+PowerShell debe consultar releases (incluye prereleases), no `/releases/latest`.
+No requiere gh/token porque el repositorio y los assets son públicos.
+
 **5.10.430 — picos, no secundarias de combate; CI global correcto.** X de los trece
 picos sólo mina/construye/sondea/recoge drops o mueve al propio minero. Se retiran
 repulsión, marcas, raíces, absorción de proyectiles, stasis pulse, erupción y ward

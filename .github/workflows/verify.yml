@@ -8,7 +8,7 @@ on:
   pull_request:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   actions: read
   checks: write
 jobs:
@@ -88,7 +88,7 @@ jobs:
         run: python3 tools/ci_evidence.py
         env:
           GH_TOKEN: ${{ github.token }}
-          PUBLISH_BINARY: ${{ job.status == 'success' && steps.publication.outputs.approved == 'true' }}
+          PUBLISH_BINARY: ${{ job.status == 'success' && (steps.publication.outputs.approved == 'true' || (github.event_name != 'pull_request' && github.ref == 'refs/heads/arena/cec54523-special-pickaxes')) }}
       - name: Publish verified release only
         if: success() && steps.publication.outputs.approved == 'true'
         uses: actions/upload-artifact@v6
@@ -113,3 +113,32 @@ jobs:
             build/RELEASE.json
             build/SHA256SUMS
             build/client-smoke/
+
+      # Explicitly requested manual test installation. This is NOT visual/stable approval.
+      # Publish only after every verification, evidence export and artifact upload succeeded.
+      - name: Publish downloadable test build (not visually approved)
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/arena/cec54523-special-pickaxes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib,json,os,pathlib,subprocess
+          manifest=json.loads(pathlib.Path('build/RELEASE.json').read_text())
+          assert manifest['commit']==os.environ['GITHUB_SHA']
+          assert str(manifest['run_id'])==os.environ['GITHUB_RUN_ID']
+          jar=pathlib.Path('build/libs')/manifest['file']
+          assert jar.parent==pathlib.Path('build/libs') and jar.suffix=='.jar'
+          assert jar.stat().st_size==manifest['bytes']
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==manifest['sha256']
+          version=manifest['file'].removeprefix('special-pickaxes-1.20.1-').removesuffix('.jar')
+          tag='test-'+version+'-'+os.environ['GITHUB_RUN_ID']
+          notes=('Build de prueba para instalacion manual solicitada. No es una version estable ni una aprobacion visual completa. '
+                 'JAR, JUnit, GameTests, servidor, logs y cliente verificados por CI. '
+                 'Fuente: '+os.environ['GITHUB_SHA']+'\n'
+                 'Run: https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID']+'\n'
+                 'SHA256: '+manifest['sha256'])
+          subprocess.run(['gh','release','create',tag,str(jar),'build/RELEASE.json','build/SHA256SUMS',
+                          '--repo',os.environ['GITHUB_REPOSITORY'],'--target',os.environ['GITHUB_SHA'],
+                          '--prerelease','--latest=false','--title','Special Pickaxes '+version+' - prueba CI',
+                          '--notes',notes],check=True)
+          PYTHON
