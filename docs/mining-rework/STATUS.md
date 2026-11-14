@@ -1,9 +1,18 @@
-# Estado actual — 5.10.430: corrección bootstrap JUnit, pendiente de CI
+# Estado actual — 5.10.430: rediseño minero validado; galería de trece picos entregada
 
 429: nuevas secundarias mineras para siete familias, sin interacciones de combate
 en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base
 25→4; mineríaOP conservada. Trece firmas visuales propias, traducciones ES/EN y
 galería genuine icono+mano en preparación. 263 GameTests/83JUnit esperados, pendientes.
+
+**430 fuente `5f7f8443d1b6a16a80e8859d156f0d47399e9f49`,
+[run43551696313](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43551696313): completed/success.**
+83 JUnit cero fallos/errores/skips;263GameTests pasados. JAR/servidor/logs y
+cliente32escenas/64tooltips, teclado y WorldShatter9341. Bundle54fragmentos
+recuperado/verificado con13capturas de mano. GaleríaPDF/HTML/ZIP en
+`/home/user/entrega-picos-5.10.430`; trecepares revisados en vista general, no
+aprobación temporal completa. Publishskipped, no instalación Windows.
+Detalle: [MINING-ALTERNATES-430.md](MINING-ALTERNATES-430.md).
 
 **Fuente `7904bf8a6be920e4b6227620cb3addd5a4a10e20`,
 [run 43548490641](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43548490641): completed/success.**
