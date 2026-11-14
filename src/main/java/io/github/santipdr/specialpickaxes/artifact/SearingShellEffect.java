@@ -17,6 +17,8 @@ import org.joml.Vector3f;
 /** Hellspec's fireproof passive with a small ember tell while the wearer burns or swims in lava. */
 public final class SearingShellEffect extends MobEffect {
     private static final String THERMAL_SCAN_TICK="specialpickaxesThermalMiningScanTick";
+    private static final String THERMAL_SCAN_POS="specialpickaxesThermalMiningScanPos";
+    private static final String THERMAL_SCAN_DIM="specialpickaxesThermalMiningScanDimension";
     private static final String THERMAL_SCAN_RESULT="specialpickaxesThermalMiningScanResult";
     private static final double THERMAL_MINING_MULTIPLIER=1.35D;
     private static final DustParticleOptions THERMAL_EMBER=new DustParticleOptions(new Vector3f(.98F,.34F,.12F),.72F);
@@ -30,16 +32,21 @@ public final class SearingShellEffect extends MobEffect {
         return THERMAL_MINING_MULTIPLIER;
     }
 
-    /** Checks a compact 5×3×5 area at most once per player per server tick. */
+    /** Checks a compact 5×3×5 loaded area once per origin/dimension/server tick. */
     public static boolean nearbyHeat(ServerPlayer player){
-        var level=player.serverLevel();long now=level.getGameTime();var data=player.getPersistentData();
-        if(data.contains(THERMAL_SCAN_TICK)&&data.getLong(THERMAL_SCAN_TICK)==now)return data.getBoolean(THERMAL_SCAN_RESULT);
-        BlockPos origin=player.blockPosition();boolean hot=false;
+        var level=player.serverLevel();long now=level.getServer().getTickCount();var data=player.getPersistentData();
+        BlockPos origin=player.blockPosition();String dimension=ArtifactState.dimension(player);
+        if(data.contains(THERMAL_SCAN_TICK,net.minecraft.nbt.Tag.TAG_LONG)&&data.getLong(THERMAL_SCAN_TICK)==now
+                &&data.contains(THERMAL_SCAN_POS,net.minecraft.nbt.Tag.TAG_LONG)&&data.getLong(THERMAL_SCAN_POS)==origin.asLong()
+                &&dimension.equals(data.getString(THERMAL_SCAN_DIM)))return data.getBoolean(THERMAL_SCAN_RESULT);
+        boolean hot=false;
         scan: for(BlockPos pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2))){
+            if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos))continue;
             var state=level.getBlockState(pos);
             if(isThermalSource(state)){hot=true;break scan;}
         }
         data.putLong(THERMAL_SCAN_TICK,now);data.putBoolean(THERMAL_SCAN_RESULT,hot);
+        data.putLong(THERMAL_SCAN_POS,origin.asLong());data.putString(THERMAL_SCAN_DIM,dimension);
         return hot;
     }
 

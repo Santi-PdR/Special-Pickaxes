@@ -154,6 +154,69 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_165") public static void thermalScanFollowsMovementWithinTheSameServerTick(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);wearer.setPos(wearer.position().add(0,20,0));var level=h.getLevel();
+        var hot=wearer.blockPosition();var cold=hot.east(10);
+        for(var origin:List.of(hot,cold))for(var pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2)))level.setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(hot.east(),Blocks.MAGMA_BLOCK.defaultBlockState());
+        h.assertTrue(SearingShellEffect.nearbyHeat(wearer),"the first loaded hot origin is detected");
+        wearer.setPos(Vec3.atBottomCenterOf(cold));
+        h.assertTrue(!SearingShellEffect.nearbyHeat(wearer),"a same-tick move does not reuse heat from another origin");
+        wearer.setPos(Vec3.atBottomCenterOf(hot));h.assertTrue(SearingShellEffect.nearbyHeat(wearer),"returning to heat rescans correctly");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_166") public static void thermalScanRejectsCachedResultsFromAnotherDimension(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);wearer.setPos(wearer.position().add(0,20,0));var level=h.getLevel();var origin=wearer.blockPosition();
+        for(var pos:BlockPos.betweenClosed(origin.offset(-2,-1,-2),origin.offset(2,1,2)))level.setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        h.assertTrue(!SearingShellEffect.nearbyHeat(wearer),"cold fixture starts without heat");
+        var data=wearer.getPersistentData();data.putString("specialpickaxesThermalMiningScanDimension","minecraft:the_nether");data.putBoolean("specialpickaxesThermalMiningScanResult",true);
+        h.assertTrue(!SearingShellEffect.nearbyHeat(wearer),"a cached result from another dimension is not reused at the same tick and coordinates");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_167") public static void thermalScanDoesNotLoadMissingChunks(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.HELLSPEC);var origin=new BlockPos(1000000,80,1000000);var level=h.getLevel();
+        h.assertTrue(!level.hasChunkAt(origin),"distant fixture chunk starts unloaded");wearer.setPos(Vec3.atBottomCenterOf(origin));
+        h.assertTrue(!SearingShellEffect.nearbyHeat(wearer)&&!level.hasChunkAt(origin),"scanning for heat skips missing chunks instead of loading them");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_168") public static void duplicateObservedBreaksCannotDoubleTheMiningStreak(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STRATA_FOCUS.get(),100));
+        StrataFocusEffect.clearPending();PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,at)&&!StrataFocusEffect.observeBreak(wearer,at),"duplicate observations for the same break/tick are rejected");
+        h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+        h.assertTrue(StrataFocusEffect.flushObservedBreaks()==1&&Math.abs(StrataFocusEffect.miningTempoMultiplier(wearer)-1.08D)<.001,
+                "one confirmed break grants one charge, not two");
+        h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+        h.assertTrue(StrataFocusEffect.observeBreak(wearer,at),"flushing releases dedup keys for a later real break at the same position");
+        StrataFocusEffect.forget(wearer);h.assertTrue(StrataFocusEffect.observeBreak(wearer,at),"forgetting also releases the pending dedup key");StrataFocusEffect.clearPending();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_169") public static void miningStreakRejectsCorruptAgesAndClampsLargeCounts(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STRATA_FOCUS.get(),100));
+        var data=wearer.getPersistentData();data.putInt("specialpickaxesStrataMiningStreak",Integer.MAX_VALUE);data.putLong("specialpickaxesStrataMiningStreakAt",ArtifactState.now(wearer));
+        data.putLong("specialpickaxesStrataMiningPulseAtWorldTime",Long.MAX_VALUE);
+        h.assertTrue(StrataFocusEffect.miningPulse(wearer,at)&&data.getInt("specialpickaxesStrataMiningStreak")==3,
+                "a malformed charge count clamps to three without overflowing and a stale visual deadline recovers");
+        h.assertTrue(!StrataFocusEffect.miningPulse(wearer,at),"the six-tick visual interval still blocks an immediate replay");
+        data.putLong("specialpickaxesStrataMiningStreakAt",Long.MIN_VALUE);
+        h.assertTrue(StrataFocusEffect.miningTempoMultiplier(wearer)==1D,"an overflowing/negative capture time never grants a fresh speed bonus");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_170") public static void stasisMiningFlashRecoversAnImpossibleDeadline(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var at=target(h);wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_RESONANCE.get(),100));
+        wearer.getPersistentData().putLong("specialpickaxesStasisResonancePulseAtWorldTime",Long.MAX_VALUE);
+        h.assertTrue(StasisResonanceEffect.miningPulse(wearer,at)&&!StasisResonanceEffect.miningPulse(wearer,at),
+                "the flash recovers a corrupt deadline while preserving the ordinary five-tick throttle");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_171") public static void lodeSurgeClampsCorruptStacksAndRejectsFarFutureExpiry(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var at=target(h);var state=ArtifactState.of(wearer,ArtifactKind.IRIDIUM);
+        state.putInt("lodeSurgeStacks",Integer.MAX_VALUE);state.putLong("lodeSurgeExpires",ArtifactState.now(wearer)+80);
+        h.assertTrue(ArtifactPassives.lodeSurge(wearer,at)==3&&wearer.getEffect(SpecialPickaxes.LODE_SURGE.get()).getAmplifier()==2,
+                "large stored stacks cannot overflow into negative amplifier levels");
+        state.putLong("lodeSurgeExpires",Long.MAX_VALUE);
+        h.assertTrue(ArtifactPassives.lodeSurge(wearer,at)==1,"an impossible persisted expiry starts a new streak rather than preserving stale maximum charge");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_172") public static void fullLodeSurgeMealRecoversItsDeadlineWithoutDoubleFeeding(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.getFoodData().setFoodLevel(10);wearer.getPersistentData().putLong("specialpickaxesLodePeakMealAt",Long.MAX_VALUE);
+        var surge=SpecialPickaxes.LODE_SURGE.get();surge.applyEffectTick(wearer,2);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==11,"peak meal recovers its invalid persisted deadline");
+        surge.applyEffectTick(wearer,2);h.assertTrue(wearer.getFoodData().getFoodLevel()==11,"a repeated effect tick cannot feed twice before the two-second cooldown");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_160") public static void alternateEntryGuardCoversTheInitialPermissionCallback(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE);var level=h.getLevel();
         var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);

@@ -19,9 +19,17 @@ public final class LodeSurgeEffect extends MobEffect {
 
     public LodeSurgeEffect(){super(MobEffectCategory.BENEFICIAL,0x68f2cb);}
 
+    public static int orePulseCost(int stacks){
+        int charge=Math.max(0,Math.min(3,stacks));return 3+charge+(charge==3?1:0);
+    }
+    /** Four motes to two viewers, plus the peak accent sent only to the recipient. */
+    public static int sharedPulseCost(int stacks){return 8+(stacks>=3?1:0);}
+
     /** Local sparkle confirms each charge without broadcasting a mining trail to the whole server. */
     public static void oreBreakPulse(ServerPlayer player,BlockPos pos,int stacks){
         if(!(player.level() instanceof ServerLevel level))return;
+        stacks=Math.max(0,Math.min(3,stacks));
+        if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),orePulseCost(stacks),1))return;
         double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;
         level.sendParticles(player,MINT,false,x,y,z,3+stacks, .18D,.18D,.18D,.012D);
         if(stacks==3)level.sendParticles(player,ParticleTypes.GLOW,false,x,y,z,1,.05D,.08D,.05D,.008D);
@@ -30,6 +38,7 @@ public final class LodeSurgeEffect extends MobEffect {
     /** The bounded Curios handoff is drawn only for the wearer and the teammate receiving it. */
     public static void sharedOrePulse(ServerPlayer owner,ServerPlayer ally,BlockPos ore,int stacks){
         if(owner.level()!=ally.level()||!(owner.level() instanceof ServerLevel level))return;
+        if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),sharedPulseCost(stacks),1))return;
         var start=new net.minecraft.world.phys.Vec3(ore.getX()+.5D,ore.getY()+.58D,ore.getZ()+.5D);
         var end=ally.position().add(0,ally.getBbHeight()*.58D,0);
         for(int i=1;i<=4;i++){
@@ -42,10 +51,11 @@ public final class LodeSurgeEffect extends MobEffect {
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
         if(entity.level().isClientSide||!(entity instanceof ServerPlayer player)||!(entity.level() instanceof ServerLevel level))return;
-        int charge=Math.min(2,amplifier);
+        int charge=Math.max(0,Math.min(2,amplifier));
         if(charge==2)feedAtPeak(player,level,player.getY()+player.getBbHeight()*.55D);
         if(player.tickCount%12!=0)return;
         int motes=2+charge;
+        if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),motes,1))return;
         double phase=player.tickCount*.12D,radius=.3D+charge*.055D;
         double y=player.getY()+player.getBbHeight()*.55D;
         for(int i=0;i<motes;i++){
@@ -65,10 +75,11 @@ public final class LodeSurgeEffect extends MobEffect {
     /** A full ore streak restores one food point at most every two seconds. */
     private static void feedAtPeak(ServerPlayer player,ServerLevel level,double y){
         var food=player.getFoodData();if(food.getFoodLevel()>=20)return;
-        long now=level.getGameTime();var data=player.getPersistentData();
-        if(data.getLong(NEXT_PEAK_MEAL)>now)return;
+        long now=ArtifactState.now(player);var data=player.getPersistentData();
+        if(PersistedCooldown.active(now,data.getLong(NEXT_PEAK_MEAL),PEAK_MEAL_COOLDOWN_TICKS))return;
         food.eat(1,.2F);data.putLong(NEXT_PEAK_MEAL,now+PEAK_MEAL_COOLDOWN_TICKS);
-        level.sendParticles(player,AMBER,false,player.getX(),y+.12D,player.getZ(),2,.08D,.1D,.08D,.008D);
+        if(ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),2,1))
+            level.sendParticles(player,AMBER,false,player.getX(),y+.12D,player.getZ(),2,.08D,.1D,.08D,.008D);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%4==0;}

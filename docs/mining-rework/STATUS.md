@@ -1,4 +1,4 @@
-# Estado actual — 5.10.423: CI global exitoso, sin aprobación visual completa
+# Estado actual — 5.10.424: nueva tanda pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -17,6 +17,10 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | CI global success, evidencia cliente recuperada/verificada. Sin aprobación visual completa ni instalación. |
 | 5.10.419 | `4e6e60b` / [43537824437](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537824437) | Build/JUnit, 215 GameTests, JAR, servidor y logs success; cliente en curso. |
 | 5.10.420 | `0bade7a` / [43537968640](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537968640) | Build/JUnit, 218 GameTests, JAR, servidor y logs success; cliente en curso. |
+
+5.10.424 mejora caché térmica sin cargar chunks, deduplicación/clock de roturas,
+recuperación y overflow de rachas, y presupuesto cosmético de Iridium. Ocho
+GameTests y tres JUnit añadidos; 240 GameTests pendientes de esta fuente.
 
 **Fuente `72b7b8b432913b3d78ba906920b5c7e88edce2ae`: [run 43540141390](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43540141390) completed/success.**
 72 JUnit sin fallos/errores/skips, 232 GameTests completos, JAR/servidor/logs y

@@ -308,8 +308,9 @@ public final class ArtifactPassives {
     /** Curios turns the wearer's ore rhythm into a bounded mining surge for nearby teammates. */
     public static int lodeSurge(ServerPlayer player,BlockPos pos,boolean shareWithAllies){
         var state=ArtifactState.of(player,ArtifactKind.IRIDIUM);long now=ArtifactState.now(player);
-        int stacks=now<=state.getLong("lodeSurgeExpires")
-                ?Math.min(3,state.getInt("lodeSurgeStacks")+1):1;
+        long expires=state.getLong("lodeSurgeExpires");int previous=Math.max(0,Math.min(3,state.getInt("lodeSurgeStacks")));
+        boolean live=previous>0&&(expires==now||PersistedCooldown.active(now,expires,80));
+        int stacks=live?Math.min(3,previous+1):1;
         state.putInt("lodeSurgeStacks",stacks);state.putLong("lodeSurgeExpires",now+80L);
         grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get(),stacks-1,80);
         LodeSurgeEffect.oreBreakPulse(player,pos,stacks);

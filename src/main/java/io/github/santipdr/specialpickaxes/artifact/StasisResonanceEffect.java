@@ -21,7 +21,7 @@ public final class StasisResonanceEffect extends MobEffect {
         if(player.level().isClientSide||!(player.level() instanceof ServerLevel level)
                 ||!player.hasEffect(io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get()))return false;
         long now=ArtifactState.now(player);var data=player.getPersistentData();
-        if(data.getLong(NEXT_MINING_PULSE)>now)return false;
+        if(PersistedCooldown.active(now,data.getLong(NEXT_MINING_PULSE),5))return false;
         data.putLong(NEXT_MINING_PULSE,now+5L);
         ArtifactFeedback.nearbyMiningPulse(player,broken,VIOLET_DUST,5,ParticleTypes.REVERSE_PORTAL,2);
         return true;
