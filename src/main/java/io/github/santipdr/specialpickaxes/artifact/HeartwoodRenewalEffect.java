@@ -21,12 +21,11 @@ public final class HeartwoodRenewalEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity,int amplifier) {
-        if(entity.level().isClientSide)return;
-        // Entity tickCount can reset when a player reconnects or respawns. World time
-        // keeps the persisted cooldown stable across those entity lifecycles.
-        long now=entity.level().getGameTime();
+        if(!(entity.level() instanceof ServerLevel serverLevel))return;
+        // Use the canonical server world clock across reconnects and dimension transfers.
+        long now=serverLevel.getServer().overworld().getGameTime();
         var data=entity.getPersistentData();
-        if(data.getLong(NEXT_PULSE)>now)return;
+        if(PersistedCooldown.active(now,data.getLong(NEXT_PULSE),20))return;
         if(entity.getHealth()>=entity.getMaxHealth())return;
         float before=entity.getHealth();
         entity.heal(1.0F+Math.max(0,amplifier)*.5F);

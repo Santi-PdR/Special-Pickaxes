@@ -26,7 +26,7 @@ public final class NullVeilEffect extends MobEffect {
 
     public static void pulse(ServerPlayer player){
         var state=ArtifactState.of(player,ArtifactKind.AXIOM);long now=ArtifactState.now(player);
-        if(state.getLong("nullVeilReady")>now)return;
+        if(PersistedCooldown.active(now,state.getLong("nullVeilReady"),COOLDOWN))return;
         var harmful=player.getActiveEffects().stream()
                 .filter(effect->effect.getEffect().getCategory()==MobEffectCategory.HARMFUL)
                 .min(Comparator.comparingInt((MobEffectInstance effect)->priority(effect.getEffect())).reversed()

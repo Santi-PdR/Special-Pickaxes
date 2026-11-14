@@ -441,7 +441,7 @@ public final class ArtifactPassives {
         if(!player.getFoodData().needsFood())return;
         var state=ArtifactState.of(player,ArtifactKind.WORLDLOOM);
         long now=ArtifactState.now(player);
-        if(state.getLong("rootSustainReady")>now)return;
+        if(PersistedCooldown.active(now,state.getLong("rootSustainReady"),100))return;
         player.getFoodData().eat(2,.25F);
         state.putLong("rootSustainReady",now+100);
         HeartwoodRenewalEffect.foodPulse(player);

@@ -1,4 +1,4 @@
-# Estado actual — 5.10.419 pendiente de CI
+# Estado actual — 5.10.420 pendiente de CI
 
 ## Evidencia verificada el 2026-11-13
 
@@ -16,6 +16,10 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 
 | 5.10.417 | `5ec7288` / [43452383160](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452383160) | Failure cliente por autenticación devolviendo HTML; bundle recuperado. Build/JUnit, 207 GameTests, servidor y logs pasaron. |
 | 5.10.418 | `cb2c5be` / [43452644898](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43452644898) | CI global success, evidencia cliente recuperada/verificada. Sin aprobación visual completa ni instalación. |
+
+5.10.420 añade cuatro JUnit y tres GameTests de recuperación de cooldowns
+persistentes sin cambiar cadencia normal. 218 GameTests en fuente, pendientes
+de su propio CI.
 
 5.10.419 añade cuatro regresiones de movimiento/recolocación; 215 GameTests
 pendientes de CI para esa nueva fuente.

@@ -154,6 +154,35 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_148") public static void healingPassivesRecoverStaleDeadlinesWithoutAcceleratingPulses(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);wearer.setHealth(10);
+        var data=wearer.getPersistentData();data.putLong("specialpickaxesDawnMendingAtWorldTime",Long.MAX_VALUE);
+        var dawn=SpecialPickaxes.DAWN_MENDING.get();dawn.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==11,"a corrupt far-future Dawn deadline does not permanently disable healing");
+        dawn.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==11,"the repaired Dawn deadline still prevents double healing");
+        data.putLong("specialpickaxesHeartwoodPulseAtWorldTime",Long.MAX_VALUE);
+        var renewal=SpecialPickaxes.HEARTWOOD_RENEWAL.get();renewal.applyEffectTick(wearer,0);
+        h.assertTrue(wearer.getHealth()==12,"Heartwood also recovers its stale persisted deadline");
+        renewal.applyEffectTick(wearer,0);h.assertTrue(wearer.getHealth()==12,"Heartwood cannot stack repeated pulses in one tick");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_149") public static void worldloomFoodRecoversStaleDeadlineAndKeepsItsCadence(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.getFoodData().setFoodLevel(10);
+        ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).putLong("rootSustainReady",Long.MAX_VALUE);
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==12,"stale food cooldown recovers without requiring an NBT reset");
+        ArtifactPassives.tick(wearer,ArtifactKind.WORLDLOOM);
+        h.assertTrue(wearer.getFoodData().getFoodLevel()==12,"food restoration still has its five-second interval");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_150") public static void nullVeilRecoversStaleDeadlineAndCleansesOnlyOneEffect(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.AXIOM);
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.WITHER,200));
+        wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(MobEffects.POISON,200));
+        ArtifactState.of(wearer,ArtifactKind.AXIOM).putLong("nullVeilReady",Long.MAX_VALUE);
+        NullVeilEffect.pulse(wearer);
+        h.assertTrue(!wearer.hasEffect(MobEffects.WITHER)&&wearer.hasEffect(MobEffects.POISON),"stale cleanse deadline recovers while respecting effect priority");
+        NullVeilEffect.pulse(wearer);
+        h.assertTrue(wearer.hasEffect(MobEffects.POISON),"the repaired eight-second cooldown prevents a second immediate cleanse");finish(h,wearer);
+    }
     @GameTest(template="empty",batch="rework_each_144") public static void movementDoesNotOverwritePositionChangedByPermissionCallback(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS);wearer.setPos(wearer.position().add(0,4,0));
         var origin=wearer.position();var external=origin.add(.3,0,0);int[] calls={0};

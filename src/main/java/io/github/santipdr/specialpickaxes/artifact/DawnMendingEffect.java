@@ -17,11 +17,11 @@ public final class DawnMendingEffect extends MobEffect {
     public DawnMendingEffect(){super(MobEffectCategory.BENEFICIAL,0xf3b950);}
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
-        if(entity.level().isClientSide)return;
-        // Persist cadence against the world clock; player tickCount resets on respawn.
-        long now=entity.level().getGameTime();
+        if(!(entity.level() instanceof ServerLevel serverLevel))return;
+        // Persist cadence against the canonical server clock, independent of the current dimension.
+        long now=serverLevel.getServer().overworld().getGameTime();
         var data=entity.getPersistentData();
-        if(data.getLong(NEXT_PULSE)>now)return;
+        if(PersistedCooldown.active(now,data.getLong(NEXT_PULSE),40))return;
         if(entity.getHealth()>=entity.getMaxHealth())return;
         float before=entity.getHealth();
         entity.heal(1F+.5F*Math.max(0,amplifier));

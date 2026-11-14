@@ -230,3 +230,10 @@ Lee primero este archivo y las skills `minecraft-modding` aplicables. Trabaja so
 
 - 5.10.417 `43452383160` completed/failure en cliente. Bundle verificado `/tmp/sp-ci417`: `AuthenticationUnavailableException` al consultar autenticación; respuesta HTML seguida de Gson `Expected BEGIN_OBJECT but was STRING`. El scanner provoca el fallo; no se añade allowlist ni se declara verde. Sus 207 GameTests/servidor habían pasado.
 - 5.10.418 `43452644898` completed/success. Bundle verificado `/tmp/sp-ci418` confirma 32 escenas/64 tooltips, controles teclado-servidor y World Shatter real (9341 bloques). Sin inspección visual de la galería de esa fuente ni instalación. JAR manifest: `special-pickaxes-1.20.1-5.10.418.jar`, 527455 bytes, SHA256 `eb25948d104c0f8dc031080895130de61df4e59a77c1a009d281042c26eadbbc`, fuente `cb2c5bec55b43b66ce69903cacf132dc02acba54`.
+
+## Cooldowns persistentes — 5.10.420
+
+- Se detectó que Dawn Mending/Heartwood/comida Worldloom/Null Veil comparaban únicamente readyAt>now: un plazo malformado o procedente de otro reloj/retroceso podía bloquear la pasiva indefinidamente. `PersistedCooldown.active` acepta solo el intervalo positivo dentro de la duración original, rechazando plazos demasiado futuros y overflow.
+- Dawn/Heartwood usan ahora tiempo del overworld del servidor, igual que ArtifactState, en vez de tiempo de dimensión local. Cadencias normales conservadas: 40/20 ticks de curación, 100 comida y 160 limpieza. No se modifican las cantidades ni tier/recetas.
+- Cuatro JUnit nuevos (intervalo completo, plazo demasiado futuro, extremos long y duración inválida). Tres GameTests nuevos (148–150) restauran cada pasiva con plazo Long.MAX_VALUE y verifican que un segundo pulso en el mismo tick sigue bloqueado. Total fuente: 218 GameTests, pendiente de CI para este commit.
+- Validación local: 22 recursos + 28 Python, parser 126 Java, diff-check y scan de secretos correctos. Java no compilado ni ejecutado localmente; sin instalación Windows.
