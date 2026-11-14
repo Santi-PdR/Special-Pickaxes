@@ -1,4 +1,4 @@
-# Estado actual — 5.10.423: aislamiento de regresiones, pendiente de CI
+# Estado actual — 5.10.423: CI global exitoso, sin aprobación visual completa
 
 ## Evidencia verificada el 2026-11-13
 
@@ -18,17 +18,23 @@ control de la PC. Las validaciones de una fuente no certifican cambios posterior
 | 5.10.419 | `4e6e60b` / [43537824437](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537824437) | Build/JUnit, 215 GameTests, JAR, servidor y logs success; cliente en curso. |
 | 5.10.420 | `0bade7a` / [43537968640](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43537968640) | Build/JUnit, 218 GameTests, JAR, servidor y logs success; cliente en curso. |
 
+**Fuente `72b7b8b432913b3d78ba906920b5c7e88edce2ae`: [run 43540141390](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43540141390) completed/success.**
+72 JUnit sin fallos/errores/skips, 232 GameTests completos, JAR/servidor/logs y
+cliente real (32 escenas, 64 tooltips, controles y 9341 bloques World Shatter).
+Bundle Checks recuperado/verificado en `/tmp/sp-ci423`; tres capturas revisadas,
+no galería completa. Publicación binaria skipped; no instalación Windows.
+
 421/422: build y 72 JUnit correctos, runs globales fallidos en un GameTest espacial
 distinto cada uno. Bundles recuperados. 423 aísla los fixtures sin borrar sus
-aserciones de gameplay; 232 GameTests pendientes del CI de esta nueva fuente.
+aserciones de gameplay; 232 GameTests ya pasados por el CI de esta nueva fuente.
 
 5.10.422 extiende guardas/revalidación a la ruta real de controles, recupera sus
 cooldowns y prueba Worldbreaker copiado. Cinco GameTests adicionales; total 232
-en fuente, pendientes del CI de esta versión.
+en fuente, ya pasados por el CI de 423, que conserva estos cambios.
 
 5.10.421 reúne cambios de combate, reentrada de alternativos, memorias tipadas y
 caducidad, presupuestos cosméticos y fundido de siete partículas. Añade nueve
-GameTests y ocho JUnit; 227 GameTests en fuente pendientes de CI propio.
+GameTests y ocho JUnit; 227 GameTests al añadirse; los cambios se conservan en 423, cuyo CI pasó 232.
 
 5.10.420 añade cuatro JUnit y tres GameTests de recuperación de cooldowns
 persistentes sin cambiar cadencia normal. 218 GameTests pasados
