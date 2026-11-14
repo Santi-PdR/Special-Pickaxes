@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.429 — picos, no secundarias de combate; pendiente de CI.** X de los trece
+**5.10.430 — picos, no secundarias de combate; pendiente de CI.** X de los trece
 picos sólo mina/construye/sondea/recoge drops o mueve al propio minero. Se retiran
 repulsión, marcas, raíces, absorción de proyectiles, stasis pulse, erupción y ward
 de las secundarias. Worldbreaker copia las versiones mineras. Daño base melee

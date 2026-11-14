@@ -125,15 +125,6 @@ public final class ArtifactTechniques {
         return dash(player, distance);
     }
 
-    /** Null Ward collapses nearby hostile shots into a player-only sculk pulse. */
-    private static final RelicParticleBudget NULL_WARD_VISUALS=new RelicParticleBudget(192);
-
-
-    /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
-
-
-
-
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
         // Keep only the nearest capped drops while inspecting a bounded number of entities.

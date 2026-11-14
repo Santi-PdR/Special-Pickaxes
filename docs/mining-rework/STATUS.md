@@ -1,4 +1,4 @@
-# Estado actual — 5.10.429: secundarias mineras y daño reducido, pendiente de CI
+# Estado actual — 5.10.430: corrección bootstrap JUnit, pendiente de CI
 
 429: nuevas secundarias mineras para siete familias, sin interacciones de combate
 en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base
@@ -193,3 +193,5 @@ modificaciones arbitrarias del mundo por cualquier otro mod.
 - Copia local: `artifacts/5.0.0/special-pickaxes-1.20.1-5.0.0.jar`.
 - Galería autocontenida: `artifacts/5.0.0/GALERIA.html` (95 capturas y hashes).
 - Los commits posteriores de documentación no cambian la identidad de la fuente compilada.
+
+429 run43551389102: failure JUnit por bootstrap de ArtifactKind en los dos nuevos tests de geometría; 81/83 pasados. 430 separa geometría pura y añade verificación de trabajo completado. CI propio pendiente.

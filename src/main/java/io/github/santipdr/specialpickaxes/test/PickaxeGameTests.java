@@ -168,6 +168,13 @@ public final class PickaxeGameTests {
         h.assertTrue(arrow.isAlive()&&arrow.getDeltaMovement().equals(arrowMotion)&&!DomainFields.active(wearer),"secondary never intercepts projectiles or creates a combat field");
         if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE),"exposure preserves the ore core");
         h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind),"ordinary cooldown still blocks a replay");
+        drain(wearer);
+        if(kind==ArtifactKind.CRUCIBLE)h.assertTrue(level.getBlockState(at).is(Blocks.CALCITE),"sample really rephases the aimed stone to the selected finish");
+        if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC)
+            h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
+        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).isAir(),"exposure clears adjacent stone and preserves its ore");
+        if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(wearer.getOffhandItem().getCount()<64,"the walkway consumes real offhand building material");
+        if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).is(Blocks.STONE),"survey is non-destructive");
         WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_194") public static void hellspecChimneyIsNotAMagmaAttack(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
