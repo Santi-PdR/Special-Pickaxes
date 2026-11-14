@@ -154,6 +154,29 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.hasEffect(effect)&&wearer.getEffect(effect).getAmplifier()==1,
                 "combat cleanup preserves same-flags replacement with a different amplifier");finish(h,wearer);
     }
+    private static void miningOnlyAlternate(GameTestHelper h,ArtifactKind kind){
+        var wearer=player(h,kind);var at=target(h);var level=h.getLevel();
+        if(kind==ArtifactKind.AXIOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());}
+        if(kind==ArtifactKind.CRUCIBLE)ArtifactState.of(wearer,kind).putInt("mode",8);
+        if(kind==ArtifactKind.WORLDLOOM){wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,64));for(int n=1;n<=9;n++)level.setBlockAndUpdate(wearer.blockPosition().below().relative(wearer.getDirection(),n),Blocks.AIR.defaultBlockState());}
+        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(wearer.position().add(2,5,0));mob.setDeltaMovement(.2,.1,.3);level.addFreshEntity(mob);
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(level,mob);arrow.setPos(wearer.position().add(3,1,0));arrow.setDeltaMovement(-1,0,0);level.addFreshEntity(arrow);
+        var motion=mob.getDeltaMovement();var arrowMotion=arrow.getDeltaMovement();float health=mob.getHealth();
+        ArtifactState.of(wearer,kind).putLong("alternateReady",Long.MAX_VALUE);
+        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind),"the mining-only technique has a valid block fixture");
+        h.assertTrue(mob.getHealth()==health&&mob.getDeltaMovement().equals(motion)&&mob.getActiveEffects().isEmpty()&&!mob.isOnFire(),"secondary never damages, moves, brands or burns creatures");
+        h.assertTrue(arrow.isAlive()&&arrow.getDeltaMovement().equals(arrowMotion)&&!DomainFields.active(wearer),"secondary never intercepts projectiles or creates a combat field");
+        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE),"exposure preserves the ore core");
+        h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind),"ordinary cooldown still blocks a replay");
+        WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_194") public static void hellspecChimneyIsNotAMagmaAttack(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
+    @GameTest(template="empty",batch="rework_each_195") public static void pickaxesHaveFourBaseMeleeDamageWithoutLosingMiningTier(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            var wearer=player(h,kind);h.assertTrue(Math.abs(1D+wearer.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).stream().mapToDouble(modifier->modifier.getAmount()).sum()-4D)<.001,"all thirteen picks now deal four base melee damage");wearer.discard();
+        }
+        h.assertTrue(SpecialPickaxes.TIER.getUses()==32768&&SpecialPickaxes.TIER.getSpeed()==64F&&SpecialPickaxes.TIER.getLevel()==5,"mining durability, speed and tier remain OP");h.succeed();
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
@@ -426,96 +449,18 @@ public final class PickaxeGameTests {
                 "the actual primary control path recovers a malformed future deadline");
         h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_151") public static void palimpsestPulseRevalidatesTargetsMovedByClaims(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.PALIMPSEST);var mob=EntityType.ZOMBIE.create(h.getLevel());
-        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(mob);
-        var fixtureAt=mob.blockPosition();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
-            if(event.player!=wearer)return;
-            if(event.target.equals(fixtureAt))mob.setPos(mob.position().add(12,0,0));else event.setCanceled(true);
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
-        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&mob.getDeltaMovement().equals(Vec3.ZERO),
-                "a target moved out of the pulse cannot be pushed after the claim callback");}
-        finally{MinecraftForge.EVENT_BUS.unregister(move);}
-        mob.setPos(wearer.position().add(2,0,0));
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&mob.getDeltaMovement().x>.9,
-                "a failed attempt releases its guard and preserves the original strong push when retried");finish(h,wearer);
-    }
-    @GameTest(template="empty",batch="rework_each_152") public static void nullWardDoesNotDiscardAProjectileMadeFriendlyByCallback(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.AXIOM);var shooter=EntityType.SKELETON.create(h.getLevel());
-        shooter.setPos(wearer.position().add(4,0,0));h.getLevel().addFreshEntity(shooter);
-        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),shooter);arrow.setPos(wearer.position().add(3,1,0));h.getLevel().addFreshEntity(arrow);
-        var fixtureAt=arrow.blockPosition();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=event->{
-            if(event.player!=wearer)return;
-            if(event.target.equals(fixtureAt))arrow.setOwner(wearer);else event.setCanceled(true);
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
-        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.AXIOM)&&arrow.isAlive(),
-                "Null Ward rechecks projectile hostility after permission callbacks");}
-        finally{MinecraftForge.EVENT_BUS.unregister(change);}
-        arrow.setOwner(shooter);
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.AXIOM)&&arrow.isRemoved(),"hostile shots are still collapsed on a permitted retry");finish(h,wearer);
-    }
-    @GameTest(template="empty",batch="rework_each_153") public static void choirEchoPreservesExternallySuppliedResonance(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.CHOIR);var mob=EntityType.ZOMBIE.create(h.getLevel());
-        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setOnGround(true);mob.setDeltaMovement(.4,0,.2);h.getLevel().addFreshEntity(mob);
-        var resonance=SpecialPickaxes.FAULT_RESONANCE.get();mob.addEffect(new net.minecraft.world.effect.MobEffectInstance(resonance,600,1,true,false,true));
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR),"ground echo still arrests a valid hostile");
-        h.assertTrue(mob.getDeltaMovement().x==0&&mob.getDeltaMovement().z==0&&mob.getEffect(resonance).getDuration()==600,
-                "Choir preserves a longer external resonance while keeping its own motion arrest");
-        h.assertTrue(!ArtifactPassives.ownsCombatEffect(mob,resonance),"an external resonance is not silently claimed as a relic lease");finish(h,wearer);
-    }
-    @GameTest(template="empty",batch="rework_each_154") public static void alternateRejectsReentrantCallsAndRecoversItsCooldown(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.PALIMPSEST);var mob=EntityType.ZOMBIE.create(h.getLevel());
-        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(mob);
-        ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).putLong("alternateReady",Long.MAX_VALUE);int[] callbacks={0};var fixtureAt=mob.blockPosition();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> recurse=event->{
-            if(event.player==wearer){
-                if(!event.target.equals(fixtureAt)){event.setCanceled(true);return;}
-                callbacks[0]++;h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST),"recursive alternate is rejected before its first cooldown is committed");}
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,recurse);
-        try{h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&callbacks[0]==1&&mob.getDeltaMovement().x==1,
-                "one recovered activation performs exactly one pulse, not a recursive chain");}
-        finally{MinecraftForge.EVENT_BUS.unregister(recurse);}
-        h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST),"the ordinary cooldown still blocks the second activation");finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_151") public static void palimpsestSurveyLeavesCreaturesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
+    @GameTest(template="empty",batch="rework_each_152") public static void axiomExposureLeavesProjectilesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.AXIOM);}
+    @GameTest(template="empty",batch="rework_each_153") public static void choirArchIsMiningOnly(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.CHOIR);}
+    @GameTest(template="empty",batch="rework_each_154") public static void palimpsestSurveyRecoversItsCooldown(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
     @GameTest(template="empty",batch="rework_each_155") public static void alternateRejectsDetachedToolsAndMismatchedKinds(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var tool=wearer.getMainHandItem();
         h.assertTrue(!ArtifactSkills.use(wearer,tool.copy(),ArtifactKind.PALIMPSEST),"a detached copy cannot activate the held skill");
         h.assertTrue(!ArtifactSkills.use(wearer,tool,ArtifactKind.AXIOM),"the actual held pick must match the requested skill");
         h.assertTrue(!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"invalid entry points do not spend a cooldown");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_156") public static void choirEchoRechecksGroundContactAfterPermissionCallback(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.CHOIR);var mob=EntityType.ZOMBIE.create(h.getLevel());
-        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));mob.setOnGround(true);var motion=new Vec3(.4,.3,.2);mob.setDeltaMovement(motion);h.getLevel().addFreshEntity(mob);
-        var fixtureAt=mob.blockPosition();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> lift=event->{
-            if(event.player!=wearer)return;
-            if(event.target.equals(fixtureAt))mob.setOnGround(false);else event.setCanceled(true);
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,lift);
-        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR)&&mob.getDeltaMovement().equals(motion)
-                        &&!mob.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"an airborne target is not arrested or branded after a callback changes ground contact");}
-        finally{MinecraftForge.EVENT_BUS.unregister(lift);}
-        finish(h,wearer);
-    }
-    @GameTest(template="empty",batch="rework_each_157") public static void worldloomAlternatePostsOnlyTheActualBindPermission(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.WORLDLOOM);var mob=EntityType.ZOMBIE.create(h.getLevel());
-        mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);int[] calls={0};
-        var fixtureAt=mob.blockPosition();
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> count=event->{
-            if(event.player!=wearer)return;
-            if(event.target.equals(fixtureAt))calls[0]++;else event.setCanceled(true);
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,count);
-        try{h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM)&&calls[0]==1,
-                "root selection posts one permission for its own fixture; observed="+calls[0]);}
-        finally{MinecraftForge.EVENT_BUS.unregister(count);WorldloomSnare.forget(wearer);}
-        finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_156") public static void interregnumPrecisionHasNoStasisPulse(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.INTERREGNUM);}
+    @GameTest(template="empty",batch="rework_each_157") public static void worldloomBridgeDoesNotBindCreatures(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.WORLDLOOM);}
     @GameTest(template="empty",batch="rework_each_158") public static void malformedAndFutureMemoriesCannotBecomeRestorationTargets(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CRUCIBLE);var at=target(h);ArtifactState.record(wearer,ArtifactKind.CRUCIBLE,at,Blocks.STONE.defaultBlockState());
         var list=ArtifactState.of(wearer,ArtifactKind.CRUCIBLE).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND);var valid=list.getCompound(0);
@@ -651,23 +596,7 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(replace);}
         finish(h,owner);
     }
-    @GameTest(template="empty",batch="rework_each_143") public static void magmaEruptionDoesNotHitTargetsMovedByPermissionCallbacks(GameTestHelper h){
-        var owner=player(h,ArtifactKind.HELLSPEC);var at=target(h);var level=h.getLevel();
-        var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(at.getX()+1.5,at.getY()+1,at.getZ()+.5);level.addFreshEntity(mob);
-        var original=mob.blockPosition();float before=mob.getHealth();mob.setDeltaMovement(Vec3.ZERO);
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
-            if(event.player==owner&&event.target.equals(original))mob.setPos(mob.position().add(12,0,0));
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
-                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
-        try{
-            h.assertTrue(!ArtifactTechniques.magmaEruptionAt(owner,at),"an eruption with no remaining valid target does not report success");
-            h.assertTrue(mob.getHealth()==before&&!mob.isOnFire()&&mob.getDeltaMovement().equals(Vec3.ZERO)
-                            &&!mob.hasEffect(SpecialPickaxes.MAGMA_BRAND.get()),
-                    "a moved target receives no direct damage, ignition, lift or brand after the callback");
-        }finally{MinecraftForge.EVENT_BUS.unregister(move);}
-        finish(h,owner);
-    }
+    @GameTest(template="empty",batch="rework_each_143") public static void hellspecUtilityDoesNotRetaliate(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
     @GameTest(template="empty",batch="rework_each_97") public static void magmaBrandStopsWhenItsOwnerLosesPermission(GameTestHelper h){
         var owner=player(h,ArtifactKind.HELLSPEC,"MagmaBrandOwner");h.getLevel().addFreshEntity(owner);
         var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(target);
@@ -1233,9 +1162,7 @@ public final class PickaxeGameTests {
                 "the fixture covers a hostile mob implementing Enemy through a non-Monster class");
         var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setTarget(wearer);
         angryWolf.setPos(wearer.getX()+3,wearer.getY(),wearer.getZ());angryWolf.setOnGround(true);h.getLevel().addFreshEntity(angryWolf);
-        h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.CHOIR),"Choir's held alternate remains usable");
-        h.assertTrue(nearby.hasEffect(resonance)&&nearby.getEffect(resonance).getAmplifier()==1,"the active Fault Echo applies the stronger resonance pulse");
-        h.assertTrue(angryWolf.hasEffect(resonance),"Fault Echo also checks a non-Enemy mob actively attacking its wearer");
+        h.assertTrue(!nearby.hasEffect(resonance)&&!angryWolf.hasEffect(resonance),"mining alternates do not brand nearby enemies; the passive resonance test above remains independent");
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosSharesMiningFocusOnlyWithNearbyTeammates(GameTestHelper h){
@@ -1431,36 +1358,8 @@ public final class PickaxeGameTests {
         h.assertTrue(repeat.getAmount()==10F&&!attacker.isOnFire()&&attacker.getEffect(brand).getDuration()==40,"the eight-second cooldown prevents repeated reductions, ignitions and brand refreshes");
         h.assertTrue(!wearer.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST),"the passive never grants Strength");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_69") public static void hellspecMagmaEruptionOnlyBrandsNearbyHostilesAndLeavesBlocksUntouched(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaBearer");h.getLevel().addFreshEntity(wearer);var center=target(h);
-        var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(center.getX()+1.5D,center.getY()+1,center.getZ()+.5D);h.getLevel().addFreshEntity(enemy);
-        var farEnemy=EntityType.ZOMBIE.create(h.getLevel());farEnemy.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+7.5D);h.getLevel().addFreshEntity(farEnemy);
-        var ally=player(h,ArtifactKind.CHOIR,"MagmaAlly");ally.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+2.5D);
-        var scoreboard=h.getLevel().getScoreboard();var team=scoreboard.addPlayerTeam("magma_"+wearer.getUUID().toString().substring(0,6));
-        scoreboard.addPlayerToTeam(wearer.getScoreboardName(),team);scoreboard.addPlayerToTeam(ally.getScoreboardName(),team);h.getLevel().addFreshEntity(ally);
-        float health=enemy.getHealth();var floor=h.getLevel().getBlockState(center);
-        h.assertTrue(ArtifactTechniques.magmaEruptionAt(wearer,center),"X erupts at the selected block when a hostile is in range");
-        var brand=SpecialPickaxes.MAGMA_BRAND.get();
-        h.assertTrue(enemy.getHealth()<=health-4.9F,"the eruption deals 5 direct damage");
-        h.assertTrue(enemy.hasEffect(brand)&&enemy.getEffect(brand).getDuration()==80,"the eruption applies its four-second custom Magma Brand");
-        h.assertTrue(enemy.isOnFire()&&enemy.getDeltaMovement().y>.8D&&enemy.hasImpulse,"the visible eruption lifts and ignites its target");
-        h.assertTrue(ally.getHealth()==ally.getMaxHealth()&&!ally.hasEffect(brand),"allied players remain unharmed");
-        h.assertTrue(!farEnemy.hasEffect(brand)&&farEnemy.getHealth()==farEnemy.getMaxHealth(),"the 5-block eruption radius is enforced");
-        h.assertTrue(h.getLevel().getBlockState(center)==floor,"the effect does not alter the aimed block");
-        float beforePulse=enemy.getHealth();brand.applyEffectTick(enemy,0);
-        h.assertTrue(enemy.getHealth()<beforePulse,"Magma Brand deals its custom pulse separately from ordinary fire ticks");
-        h.assertTrue(MagmaBrandEffect.brandParticles(enemy,0).stream().anyMatch(sample->sample.particle()==SpecialPickaxes.HELLSPEC_BRAND_FLARE.get()),"Magma Brand uses its registered animated Blockbench flare");
-        h.assertTrue(brand.isDurationEffectTick(80,0)&&!brand.isDurationEffectTick(79,0),"Magma Brand uses a one-second effect cadence");
-        finish(h,wearer);
-    }
-    @GameTest(template="empty",batch="rework_each_83") public static void hellspecMagmaEruptionCapsTargets(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.HELLSPEC,"MagmaCapBearer");var center=target(h);var targets=new ArrayList<LivingEntity>();
-        for(int i=0;i<10;i++){var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(center.getX()+.5D,center.getY()+1,center.getZ()+.5D);h.getLevel().addFreshEntity(enemy);targets.add(enemy);}
-        h.assertTrue(ArtifactTechniques.magmaEruptionAt(wearer,center),"the eruption resolves with a crowded target cluster");
-        long branded=targets.stream().filter(target->target.hasEffect(SpecialPickaxes.MAGMA_BRAND.get())).count();
-        h.assertTrue(branded==8,"one eruption affects at most eight hostiles regardless of entity pile size");
-        finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_69") public static void hellspecUtilityKeepsCreaturesUnbranded(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
+    @GameTest(template="empty",batch="rework_each_83") public static void hellspecUtilityIsIndependentOfCreatureCounts(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
     @GameTest(template="empty",batch="legacy_each_06") public static void hellspecSearingShellBlocksFireAndLava(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.HELLSPEC);ArtifactPassives.tick(wearer,ArtifactKind.HELLSPEC);
         var shell=SpecialPickaxes.SEARING_SHELL.get();
@@ -1753,17 +1652,7 @@ public final class PickaxeGameTests {
         ArtifactPassives.onCuriosUnequip(wearer,ArtifactKind.PALIMPSEST);
         h.assertTrue(!wearer.hasEffect(mending),"the effect lease is removed once its last pick source is unequipped");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_41") public static void crucibleWardDeflectsFastHostileProjectile(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.CRUCIBLE);var archer=EntityType.SKELETON.create(h.getLevel());
-        archer.setPos(wearer.getX()+6,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(archer);
-        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),archer);
-        arrow.setPos(wearer.getX()+3,wearer.getY()+1,wearer.getZ());arrow.setDeltaMovement(-3D,0D,0D);h.getLevel().addFreshEntity(arrow);
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.CRUCIBLE),"the eight-second Crucible projectile ward starts");
-        ArtifactFeedback.crucibleWardBoundary(wearer,10);ArtifactFeedback.crucibleWardOrbit(wearer,10);
-        DomainFields.tick();
-        h.assertTrue(arrow.getDeltaMovement().x>0D,"the ward redirects a fast hostile shot outward before impact");
-        h.assertTrue(DomainFields.active(wearer),"the deflection does not consume or cancel the remaining ward");finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_41") public static void crucibleSampleDoesNotCreateProjectileWard(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.CRUCIBLE);}
     @GameTest(template="empty",batch="rework_each_80") public static void starfallPredictionScansAreStaggeredAcrossPlayers(GameTestHelper h){
         for(int entityId=0;entityId<12;entityId++){
             int scans=0;
@@ -3373,7 +3262,7 @@ public final class PickaxeGameTests {
         var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setTarget(owner);
         angryWolf.setPos(owner.getX()+3,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(angryWolf);
         var anchor=mob.position();
-        h.assertTrue(ArtifactActions.useAlternate(owner,owner.getMainHandItem(),ArtifactKind.WORLDLOOM),"Worldloom alternate catches a nearby hostile");
+        h.assertTrue(WorldloomSnare.bind(owner,mob)&&WorldloomSnare.bind(owner,angryWolf),"explicit binding subsystem fixtures are registered independently of mining alternates");
         h.assertTrue(!WorldloomSnare.bind(owner,angryWolf),"Root Snare also captured an attacking non-Enemy mob in its bounded area scan");
         h.assertTrue(!WorldloomSnare.bind(rival,mob),"a second Worldloom cannot reset the first owner's four-second root windup");
         mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();

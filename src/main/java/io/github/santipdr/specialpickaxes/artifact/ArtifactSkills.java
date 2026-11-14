@@ -29,7 +29,7 @@ public final class ArtifactSkills {
         data.putLong("alternateReady", now + interval);
         ArtifactKind feedbackKind=feedbackKind(tool,kind);
         ArtifactFeedback.sound(player, feedbackKind, "alternate");
-        ArtifactFeedback.burst(player, feedbackKind, player.blockPosition(), 10);
+        MiningSignature.emit(player,feedbackKind);
         ArtifactFeedback.message(player, "alternate_used");
         return true;
     }

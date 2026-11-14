@@ -7,7 +7,8 @@ import zipfile
 
 MAX_EXPORT_BYTES = 2_000_000
 EXPORT_REPORT = 'build/evidence-export.json'
-PRIORITY_IMAGES = {'gallery-clean.jpg', 'inventory.jpg', 'supreme-executing.jpg', 'supreme-complete.jpg'}
+from mining_catalog import IDS
+PRIORITY_IMAGES = {'gallery-clean.jpg', 'inventory.jpg', 'supreme-executing.jpg', 'supreme-complete.jpg'} | {'portrait-'+pick+'.jpg' for pick in IDS}
 
 
 def make_bundle(contents, max_bytes=MAX_EXPORT_BYTES):

@@ -34,7 +34,7 @@ public final class SpecialPickaxes {
     private final Map<UUID,ArtifactKind> curiosPassives=new HashMap<>();
     private final List<Map<UUID,ServerPlayer>> passiveScanBuckets=createPassiveScanBuckets();
     public static final String ID="specialpickaxes";
-    public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(5,32768,64F,12F,50,
+    public static final Tier TIER=TierSortingRegistry.registerTier(new ForgeTier(5,32768,64F,2F,50,
         net.minecraft.tags.TagKey.create(Registries.BLOCK,new ResourceLocation(ID,"needs_artifact_tool")),() -> Ingredient.EMPTY),new ResourceLocation(ID,"artifact"),List.of(Tiers.NETHERITE),List.of());
     public static final DeferredRegister<Item> ITEMS=DeferredRegister.create(ForgeRegistries.ITEMS,ID);
     public static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,ID);

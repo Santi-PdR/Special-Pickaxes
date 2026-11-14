@@ -67,70 +67,15 @@ public final class ArtifactTechniques {
         return moved>0;
     }
 
-    private static boolean eatFromInventory(ServerPlayer player) {
-        if (!player.getFoodData().needsFood()) return false;
-        int bestSlot = -1, bestNutrition = 0;
-        float bestSaturation = 0;
-        net.minecraft.world.food.FoodProperties bestFood = null;
-        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
-            var stack = player.getInventory().getItem(slot);
-            if (stack.isEmpty()) continue;
-            var food = stack.getFoodProperties(player);
-            if (food == null) continue;
-            if (food.getNutrition() > bestNutrition || food.getNutrition() == bestNutrition && food.getSaturationModifier() > bestSaturation) {
-                bestSlot = slot;
-                bestNutrition = food.getNutrition();
-                bestSaturation = food.getSaturationModifier();
-                bestFood = food;
-            }
-        }
-        if (bestSlot < 0 || bestFood == null) return false;
-        var stack = player.getInventory().getItem(bestSlot);
-        player.getFoodData().eat(bestFood.getNutrition(), bestFood.getSaturationModifier());
-        if (!player.isCreative()) stack.shrink(1);
-        ArtifactFeedback.message(player, "food_used");
-        return true;
-    }
+
 
     /** Query predicates stay side-effect free; permissions are checked immediately before each mutation. */
-    private static boolean livingTarget(ServerPlayer player,LivingEntity entity,Vec3 center,double rangeSqr){
-        return player.isAlive()&&!player.isRemoved()&&entity.isAlive()&&!entity.isRemoved()
-                &&entity.level()==player.level()&&entity!=player&&!entity.isAlliedTo(player)
-                &&entity.position().distanceToSqr(center)<=rangeSqr
-                &&(!(entity instanceof Player other)||player.canHarmPlayer(other));
-    }
-    private static boolean knockbackPulse(ServerPlayer player,ArtifactKind kind,int radius,double strength,int cap){
-        var level=player.serverLevel();var tool=player.getMainHandItem();Vec3 center=player.position();
-        double rangeSqr=(double)radius*radius;int pushed=0;
-        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),
-                entity->livingTarget(player,entity,center,rangeSqr),center,cap);
-        for(var target:targets){
-            var at=target.blockPosition();
-            if(!WorldSafety.allowed(player,kind,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
-                    ||!target.blockPosition().equals(at)||!livingTarget(player,target,center,rangeSqr))continue;
-            Vec3 away=target.position().subtract(center);
-            if(away.lengthSqr()<.01D)continue;
-            target.setDeltaMovement(target.getDeltaMovement().add(away.normalize().scale(strength).add(0,.25D,0)));
-            target.hasImpulse=true;pushed++;
-        }
-        if(pushed>0)ArtifactFeedback.message(player,"targets_pushed",pushed);
-        return pushed>0;
-    }
 
-    private static boolean rotateCrucible(ServerPlayer player) {
-        ArtifactState.rotate(player, ArtifactKind.CRUCIBLE);
-        int mode = ArtifactState.mode(player, ArtifactKind.CRUCIBLE);
-        ArtifactFeedback.message(player, "named_mode", net.minecraft.network.chat.Component.translatable(
-                "mode.specialpickaxes." + ArtifactInteraction.modeKey(ArtifactKind.CRUCIBLE, mode)));
-        return true;
-    }
 
-    private static boolean arrestMotion(ServerPlayer player, ArtifactKind kind, BlockPos center, int radius, int cap) {
-        int stopped=DomainFields.stasisPulse(player,kind,center,radius,cap,40);
-        if(stopped>0)ArtifactFeedback.message(player, "motion_arrested", stopped);
-        if(stopped>0)ArtifactFeedback.burst(player,kind,center,8);
-        return stopped>0;
-    }
+
+
+
+
 
     private static boolean markSquare(ServerPlayer player, BlockPos center, int radius) {
         var level = player.serverLevel();
@@ -182,69 +127,12 @@ public final class ArtifactTechniques {
 
     /** Null Ward collapses nearby hostile shots into a player-only sculk pulse. */
     private static final RelicParticleBudget NULL_WARD_VISUALS=new RelicParticleBudget(192);
-    private static boolean nullWard(ServerPlayer player,int radius,int cap){
-        var level=player.serverLevel();var tool=player.getMainHandItem();
-        Vec3 center=player.position();double rangeSqr=(double)radius*radius;int collapsed=0;
-        var shots=DomainFields.projectilesNear(level,player.getBoundingBox().inflate(radius),center,cap,
-                projectile->projectile.isAlive()&&JegProjectileCompat.hostileTo(projectile,player,false)
-                        &&projectile.position().distanceToSqr(center)<=rangeSqr);
-        for(var projectile:shots){
-            var at=projectile.blockPosition();
-            if(!WorldSafety.allowed(player,ArtifactKind.AXIOM,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
-                    ||!projectile.isAlive()||projectile.level()!=level||!projectile.blockPosition().equals(at)
-                    ||!JegProjectileCompat.hostileTo(projectile,player,false)
-                    ||projectile.position().distanceToSqr(center)>rangeSqr)continue;
-            var point=projectile.position();
-            long tick=level.getServer().getTickCount();
-            if(NULL_WARD_VISUALS.tryReserve(tick,8)&&ArtifactFeedback.reserveAuraParticles(tick,8,1))
-                level.sendParticles(player,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,8,.12,.12,.12,.015);
-            projectile.discard();collapsed++;
-        }
-        if(collapsed==0)return false;
-        ArtifactFeedback.nullWard(player,radius);ArtifactFeedback.message(player,"nullward",collapsed);return true;
-    }
+
 
     /** Ground-borne echo arrests nearby grounded threats; allies and protected PvP targets are excluded. */
-    private static boolean faultEcho(ServerPlayer player,int radius,int cap){
-        var level=player.serverLevel();var tool=player.getMainHandItem();var center=player.position();
-        double rangeSqr=(double)radius*radius;
-        var targets=EntitySelection.nearest(level,LivingEntity.class,player.getBoundingBox().inflate(radius),
-                entity->livingTarget(player,entity,center,rangeSqr)&&entity.onGround()
-                        &&EntitySelection.isHostileCandidate(entity,player),center,cap);
-        int stopped=0;
-        for(var target:targets){
-            var at=target.blockPosition();
-            if(!WorldSafety.allowed(player,ArtifactKind.CHOIR,at)||player.serverLevel()!=level||player.getMainHandItem()!=tool
-                    ||!target.blockPosition().equals(at)||!livingTarget(player,target,center,rangeSqr)
-                    ||!target.onGround()||!EntitySelection.isHostileCandidate(target,player))continue;
-            target.setDeltaMovement(0,Math.min(0,target.getDeltaMovement().y),0);target.hasImpulse=true;
-            ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),1,40);
-            ArtifactFeedback.burst(player,ArtifactKind.CHOIR,target.blockPosition(),3);stopped++;
-        }
-        if(stopped==0)return false;
-        for(int i=0;i<12;i++){
-            double angle=i*Math.PI/6,x=center.x+Math.cos(angle)*radius,z=center.z+Math.sin(angle)*radius;
-            level.sendParticles(player,ParticleTypes.ELECTRIC_SPARK,false,x,player.getY()+.08,z,1,0,0,0,0);
-        }
-        ArtifactFeedback.message(player,"fault_echo",stopped);return true;
-    }
 
-    private static boolean rootSnare(ServerPlayer player,double range) {
-        Vec3 center=player.position();double rangeSqr=range*range;
-        var targets=EntitySelection.nearest(player.serverLevel(),LivingEntity.class,player.getBoundingBox().inflate(range),entity->{
-            if(!entity.isAlive()||entity==player||!EntitySelection.isHostileCandidate(entity,player)
-                    ||entity.isAlliedTo(player)||entity.position().distanceToSqr(center)>rangeSqr)return false;
-            return !(entity instanceof Player other)||player.canHarmPlayer(other);
-        },center,16);
-        var level=player.serverLevel();var tool=player.getMainHandItem();int bound=0;
-        for(var target:targets){
-            if(player.serverLevel()!=level||player.getMainHandItem()!=tool)break;
-            if(livingTarget(player,target,center,rangeSqr)&&EntitySelection.isHostileCandidate(target,player)
-                    &&WorldloomSnare.bind(player,target))bound++;
-        }
-        if(bound>0)ArtifactFeedback.message(player,"root_snared",bound);
-        return bound>0;
-    }
+
+
 
     private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
         Vec3 center = player.getEyePosition();
@@ -284,13 +172,7 @@ public final class ArtifactTechniques {
     }
 
     /** A clear, timed projectile ward follows its owner and catches fast shots every tick. */
-    private static boolean crucibleWard(ServerPlayer player,ItemStack tool) {
-        int radius=10,duration=160;
-        if(!DomainFields.start(player,tool,ArtifactKind.CRUCIBLE,player.blockPosition(),radius,duration))return false;
-        ArtifactFeedback.ring(player,ArtifactKind.CRUCIBLE,player.blockPosition(),radius);
-        ArtifactFeedback.message(player,"crucible_ward_started");
-        return true;
-    }
+
 
     private static boolean seamFace(ServerPlayer player,ItemStack tool) {
         var target=ArtifactActions.target(player);if(target.isEmpty())return false;
@@ -318,64 +200,16 @@ public final class ArtifactTechniques {
         return true;
     }
 
-    private static boolean magmaEruption(ServerPlayer player) {
-        var aimed=ArtifactActions.target(player);
-        return aimed.isPresent()&&magmaEruptionAt(player,aimed.get());
-    }
 
-    /** Hellspec X erupts at the aimed ground point; it affects entities only and never edits blocks. */
-    public static boolean magmaEruptionAt(ServerPlayer player,BlockPos centerBlock) {
-        var level=player.serverLevel();var center=centerBlock.immutable();
-        if(!level.hasChunkAt(center)||!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,center))return false;
-        Vec3 origin=new Vec3(center.getX()+.5D,center.getY()+.65D,center.getZ()+.5D);
-        double radius=5D;
-        var tool=player.getMainHandItem();
-        var targets=EntitySelection.nearest(level,LivingEntity.class,
-                new net.minecraft.world.phys.AABB(center).inflate(radius,4D,radius),
-                entity->eruptionTarget(player,entity,origin,radius),origin,8,512);
-        var affected=new ArrayList<LivingEntity>();
-        for(var target:targets){
-            var at=target.blockPosition();
-            if(!WorldSafety.allowed(player,ArtifactKind.HELLSPEC,at)
-                    ||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty()
-                    ||!target.blockPosition().equals(at)||!eruptionTarget(player,target,origin,radius))continue;
-            Vec3 away=target.position().subtract(origin);Vec3 horizontal=new Vec3(away.x,0,away.z);
-            if(horizontal.lengthSqr()<1.0E-4D)horizontal=new Vec3(0,0,1);
-            else horizontal=horizontal.normalize();
-            target.setDeltaMovement(target.getDeltaMovement().scale(.2D).add(horizontal.scale(.38D)).add(0,.95D,0));
-            target.hasImpulse=true;target.setSecondsOnFire(3);
-            target.hurt(level.damageSources().playerAttack(player),5F);
-            MagmaBrandEffect.applyFrom(player,target,80,0);affected.add(target);
-        }
-        if(affected.isEmpty())return false;
-        ArtifactFeedback.magmaEruption(player,center,affected);
-        ArtifactFeedback.message(player,"magma_eruption",affected.size());
-        return true;
-    }
-    private static boolean eruptionTarget(ServerPlayer player,LivingEntity entity,Vec3 origin,double radius){
-        if(!player.isAlive()||!entity.isAlive()||entity.isRemoved()||entity.level()!=player.level()
-                ||entity==player||entity.isAlliedTo(player)||entity instanceof Player other&&!player.canHarmPlayer(other)
-                ||!player.hasLineOfSight(entity))return false;
-        Vec3 delta=entity.position().add(0,entity.getBbHeight()*.5D,0).subtract(origin);
-        return delta.x*delta.x+delta.z*delta.z<=radius*radius&&Math.abs(delta.y)<=4D;
-    }
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
-            case PALIMPSEST -> knockbackPulse(player, kind, 6, 1.0, 24);
-            case CHOIR -> faultEcho(player, 6, 4);
+            case PALIMPSEST,CHOIR,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
             case EVENTIDE -> magnetDrops(player,tool,16,64);
-            case CRUCIBLE -> crucibleWard(player,tool);
-            case INTERREGNUM -> ArtifactState.mode(player,kind)==1
-                    ? arrestMotion(player,kind,player.blockPosition(),8,24)
-                    : DomainFields.relocate(player,aimed(player));
-            case WORLDLOOM -> rootSnare(player, 10);
             case ICARUS -> icarianLift(player,tool);
-            case AXIOM -> nullWard(player,8,24);
-            case WORLDBREAKER -> echo(player, tool, 2);
+            case WORLDBREAKER -> echo(player,tool,2);
             case EXODIUM -> starfallSink(player,tool);
-            case IRIDIUM -> recallIridiumDrops(player, IRIDIUM_RECALL_RADIUS, 96);
-            case HELLSPEC -> magmaEruption(player);
+            case IRIDIUM -> recallIridiumDrops(player,IRIDIUM_RECALL_RADIUS,96);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };

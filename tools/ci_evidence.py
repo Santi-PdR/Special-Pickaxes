@@ -4,6 +4,14 @@ Only explicit build products are exported. No environment, credentials or world 
 """
 import base64,hashlib,json,os,pathlib,subprocess,time
 from evidence_bundle import make_bundle
+# Keep one genuine in-game held screenshot per tool in the bounded review bundle.
+# Resize only; never synthesize a hand view from the inventory sprite.
+from mining_catalog import IDS
+capture_dir=pathlib.Path('build/client-smoke')
+for pick in IDS:
+ candidates=sorted(capture_dir.glob('ux-'+pick+'-*.jpg'))
+ if candidates:
+  subprocess.run(['java','tools/ResizePortrait.java',str(candidates[0]),str(capture_dir/('portrait-'+pick+'.jpg'))],check=True)
 root=pathlib.Path('.'); files=[]
 for pattern in ['build/client-smoke/*.jpg','build/client-smoke/image-manifest.json','build/client-smoke/client.log','build/RELEASE.json','build/SHA256SUMS','build/test-results/test/*.xml','run/logs/gametest.log','run/logs/latest.log','run/*test*.xml','build/packaged-smoke/console.log','build/verification-*.log']:
  files.extend(root.glob(pattern))

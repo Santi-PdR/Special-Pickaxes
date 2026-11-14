@@ -80,7 +80,8 @@ public final class ArtifactActions {
         int cooldown=secondary?10:ArtifactConfig.COOLDOWN.get();
         data.putLong("ready",ArtifactState.now(p)+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
         tool.hurtAndBreak(cost,p,who -> who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-        ArtifactFeedback.sound(p,ArtifactSkills.feedbackKind(tool,kind));return true;
+        ArtifactFeedback.sound(p,ArtifactSkills.feedbackKind(tool,kind));
+        if(!secondary)MiningSignature.emit(p,ArtifactSkills.feedbackKind(tool,kind));return true;
     }
     private static boolean secondary(ServerPlayer p,ArtifactKind kind) {
         switch(kind) {

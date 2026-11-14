@@ -1,5 +1,14 @@
 # Special Pickaxes — mining rework
 
+**5.10.429 — picos, no secundarias de combate; pendiente de CI.** X de los trece
+picos sólo mina/construye/sondea/recoge drops o mueve al propio minero. Se retiran
+repulsión, marcas, raíces, absorción de proyectiles, stasis pulse, erupción y ward
+de las secundarias. Worldbreaker copia las versiones mineras. Daño base melee
+reducido de 25 a 4 (antes de encantamientos/efectos externos), conservando tier5,
+velocidad64 y durabilidad32768. Cada pico tiene una firma geométrica de activación
+propia y acotada. Iconos reales + capturas en mano por los trece, en preparación.
+Las primarias y pasivas defensivas existentes no se eliminan en este cambio.
+
 **5.10.428 — aterrizajes, Starfall y Lode Sense; CI global correcto.** Eventide
 selecciona objetivos sin callbacks de permisos dentro del selector y revalida
 origen, protección y objetivos antes del snare; evita reentrada. Icarus rechaza

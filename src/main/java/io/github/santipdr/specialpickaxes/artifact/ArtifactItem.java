@@ -16,7 +16,7 @@ import java.util.List;
 public final class ArtifactItem extends PickaxeItem {
     public final ArtifactKind kind;
     public ArtifactItem(ArtifactKind kind) {
-        super(SpecialPickaxes.TIER,12,-2.4F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.IRIDIUM||kind==ArtifactKind.HELLSPEC?Rarity.EPIC:Rarity.RARE));this.kind=kind;
+        super(SpecialPickaxes.TIER,1,-2.4F,new Item.Properties().fireResistant().rarity(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ATLAS||kind==ArtifactKind.CHRONICLE||kind==ArtifactKind.TESSELLATOR||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.IRIDIUM||kind==ArtifactKind.HELLSPEC?Rarity.EPIC:Rarity.RARE));this.kind=kind;
     }
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);

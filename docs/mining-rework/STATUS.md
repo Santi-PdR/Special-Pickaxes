@@ -1,4 +1,9 @@
-# Estado actual — 5.10.428: CI global exitoso, sin aprobación visual completa
+# Estado actual — 5.10.429: secundarias mineras y daño reducido, pendiente de CI
+
+429: nuevas secundarias mineras para siete familias, sin interacciones de combate
+en X; conserva utilidades de las restantes y copia Worldbreaker. Daño melee base
+25→4; mineríaOP conservada. Trece firmas visuales propias, traducciones ES/EN y
+galería genuine icono+mano en preparación. 263 GameTests/83JUnit esperados, pendientes.
 
 **Fuente `7904bf8a6be920e4b6227620cb3addd5a4a10e20`,
 [run 43548490641](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43548490641): completed/success.**
