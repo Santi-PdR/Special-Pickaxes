@@ -918,6 +918,41 @@ public final class PickaxeGameTests {
         try{ArtifactPassives.tick(p,ArtifactKind.CHOIR);h.assertTrue(calls[0]==1&&!second.hasEffect(SpecialPickaxes.STRATA_FOCUS.get()),"a bounded nearest-first query is revalidated before each later grant");
         }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
     }
+    private static ServerPlayer pulseObserver(GameTestHelper h,ServerPlayer wearer,String name,double distance){
+        var observer=player(h,ArtifactKind.ICARUS,name);observer.setPos(wearer.position().add(distance,0,0));h.getLevel().addFreshEntity(observer);return observer;
+    }
+    @GameTest(template="empty",batch="rework_each_297") public static void hiddenWearersDoNotLeakThroughCachedWardOrMiningAudiences(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var observer=pulseObserver(h,p,"HiddenSourceObserver",2);
+        h.assertTrue(ArtifactFeedback.nearbyWardAudience(p).contains(observer),"visible source initially has a nearby viewer");p.setInvisible(true);
+        h.assertTrue(!ArtifactFeedback.nearbyWardAudience(p).contains(observer)&&!ArtifactFeedback.miningPulseAudience(p,p.blockPosition()).contains(observer),"both fresh mining and cached ward audiences respect the source's visibility to the viewer");
+        h.assertTrue(ArtifactFeedback.nearbyWardAudience(p).contains(p),"the hidden wearer still sees their own private feedback");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_298") public static void anInvisibleObserverCanStillSeeAVisibleWearersPulse(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var observer=pulseObserver(h,p,"HiddenViewer",2);observer.setInvisible(true);
+        h.assertTrue(ArtifactFeedback.nearbyWardAudience(p).contains(observer)&&ArtifactFeedback.miningPulseAudience(p,p.blockPosition()).contains(observer),"visibility is tested from source to observer, not backwards");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_299") public static void cachedWardAudienceDropsAViewerWhoLeavesWithinTheSameTick(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var observer=pulseObserver(h,p,"DepartingViewer",2);
+        h.assertTrue(ArtifactFeedback.nearbyWardAudience(p).contains(observer),"viewer was captured in the local audience");observer.setPos(observer.position().add(30,0,0));
+        h.assertTrue(!ArtifactFeedback.nearbyWardAudience(p).contains(observer),"cache reuse does not send the next pulse to an out-of-range viewer");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_300") public static void miningFlashesReserveTheExactClampedCostForAllFourViewers(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);for(int i=0;i<3;i++)pulseObserver(h,p,"PulseBudget"+i,2+i);
+        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,1,1);
+        ArtifactFeedback.nearbyMiningPulse(p,p.blockPosition(),net.minecraft.core.particles.ParticleTypes.GLOW,5,net.minecraft.core.particles.ParticleTypes.END_ROD,2);
+        h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4076)&&!ArtifactFeedback.reserveMiningParticles(p,1),"three primary plus two accent motes reserve twenty particles for four viewers");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_301") public static void saturatedCosmeticsDoNotPreventTheStasisMiningCadence(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);p.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.STASIS_RESONANCE.get(),100));
+        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,1,1);h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4096),"fill the current cosmetic allowance");
+        h.assertTrue(StasisResonanceEffect.miningPulse(p,p.blockPosition())&&p.hasEffect(SpecialPickaxes.STASIS_RESONANCE.get())&&!ArtifactFeedback.reserveMiningParticles(p,1),"skipped mining flash neither removes the effect nor bypasses its normal cadence");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_302") public static void remainingActiveMiningCuesDebitTheirExactParticleCounts(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var at=p.blockPosition();ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,1,1);
+        ArtifactFeedback.strataTempoPeak(p);ArtifactFeedback.crucibleWardOrbit(p,4);ArtifactFeedback.crucibleWardBoundary(p,4);ArtifactFeedback.crucibleDeflect(p,p.position());
+        ArtifactFeedback.worldloomBoreProgress(p,at,Direction.SOUTH,0);ArtifactFeedback.worldloomBoreProgress(p,at,Direction.SOUTH,3);
+        h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4038)&&!ArtifactFeedback.reserveMiningParticles(p,1),"peak16+orbit8+boundary16+deflect5+two bore slices5/8 equals58 particles");finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

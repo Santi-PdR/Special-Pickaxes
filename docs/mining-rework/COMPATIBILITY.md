@@ -1,3 +1,16 @@
+## API Curios contrastada para 5.10.462 (no prueba de instalación)
+
+Se contrastaron las firmas públicas del puente contra el commit oficial
+`a91da6ba2396f6ed9042c8a47a471ca5efc97da8` de la rama1.20.x:
+https://github.com/TheIllusiveC4/Curios/tree/a91da6ba2396f6ed9042c8a47a471ca5efc97da8/src/main/java/top/theillusivec4/curios/api
+
+getCuriosInventory devuelve LazyOptional; getStacksHandler("pickaxe") devuelve
+Optional; getStacks devuelve IDynamicStackHandler, con getSlots/getStackInSlot.
+La confirmación lee únicamente el índice capturado, comprobando límites actuales.
+Una fuente movida a otra ranura invalida el trabajo anterior. Los adaptadores
+simulados siguen cubriendo la identidad; no se certifica Curios/Ghouls real ni
+el coste interno de proveedores externos de inventario.
+
 ## Evidencia vigente 5.10.460
 
 CI43678491078 pasó117JUnit/358GameTests, servidor empaquetado y cliente real.

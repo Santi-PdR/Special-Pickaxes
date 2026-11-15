@@ -58,27 +58,43 @@ public final class CuriosCompat {
         return equipped==null?ItemStack.EMPTY:equipped.stack();
     }
 
+    /** Check only the captured slot at a transaction boundary: never rescan up to 64 slots per ore callback. */
+    public static ItemStack pickInSlotFresh(LivingEntity entity,int slot){
+        Access methods=ACCESS;if(methods==null||!CurioSlotScan.contains(CurioSlotScan.MAX_SLOTS,slot))return ItemStack.EMPTY;
+        try{
+            Object stacks=pickStacks(entity,methods);
+            if(stacks==null||!CurioSlotScan.contains(slotCount(stacks,methods),slot))return ItemStack.EMPTY;
+            Object value=methods.stackInSlot.invoke(stacks,slot);
+            return value instanceof ItemStack stack&&!stack.isEmpty()&&stack.getItem() instanceof ArtifactItem?stack:ItemStack.EMPTY;
+        }catch(ReflectiveOperationException|LinkageError|IllegalArgumentException ignored){return ItemStack.EMPTY;}
+    }
+
     private static Equipped findUncached(LivingEntity entity,Access methods) {
         try {
-            Object lazy = methods.inventory.invoke(null, entity);
-            Object handler = lazy instanceof net.minecraftforge.common.util.LazyOptional<?> inventory ? inventory.orElse(null) : null;
-            if (handler == null) return null;
-            Object stacksOptional = methods.stacksHandler.invoke(handler, "pickaxe");
-            Object stacksHandler = optionalValue(stacksOptional);
-            if (stacksHandler == null) return null;
-            Object stacks = methods.stacks.invoke(stacksHandler);
+            Object stacks=pickStacks(entity,methods);
             if(stacks==null)return null;
-            Object reported=methods.slots.invoke(stacks);
-            if(!(reported instanceof Integer slots))return null;
-            int count = CurioSlotScan.limit(slots);
-            for (int slot = 0; slot < count; slot++) {
-                Object value = methods.stackInSlot.invoke(stacks, slot);
-                if (value instanceof ItemStack stack && !stack.isEmpty() && stack.getItem() instanceof ArtifactItem) return new Equipped(stack, slot);
+            int count=slotCount(stacks,methods);
+            for(int slot=0;slot<count;slot++){
+                Object value=methods.stackInSlot.invoke(stacks,slot);
+                if(value instanceof ItemStack stack&&!stack.isEmpty()&&stack.getItem() instanceof ArtifactItem)return new Equipped(stack,slot);
             }
-        } catch (ReflectiveOperationException | LinkageError ignored) {
+        } catch(ReflectiveOperationException|LinkageError|IllegalArgumentException ignored){
             // Curios is optional. Missing API or a changed slot simply disables this bridge.
         }
         return null;
+    }
+
+    private static Object pickStacks(LivingEntity entity,Access methods) throws ReflectiveOperationException {
+        Object lazy=methods.inventory.invoke(null,entity);
+        Object handler=lazy instanceof net.minecraftforge.common.util.LazyOptional<?> inventory?inventory.orElse(null):null;
+        if(handler==null)return null;
+        Object stacksHandler=optionalValue(methods.stacksHandler.invoke(handler,"pickaxe"));
+        return stacksHandler==null?null:methods.stacks.invoke(stacksHandler);
+    }
+
+    private static int slotCount(Object stacks,Access methods) throws ReflectiveOperationException {
+        Object reported=methods.slots.invoke(stacks);
+        return reported instanceof Integer slots?CurioSlotScan.limit(slots):0;
     }
 
     private static Object optionalValue(Object optional) throws ReflectiveOperationException {

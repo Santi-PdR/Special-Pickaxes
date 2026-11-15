@@ -41,7 +41,13 @@ public final class MiningObservations {
     }
     /** Snapshot a vanilla break when Iridium is in Curios and another tool is held. */
     public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state) {
-        return captureCuriosIridium(player,curioPick,pos,state,()->CuriosCompat.currentPick(player));
+        var equipped=CuriosCompat.findFresh(player);
+        return equipped!=null&&equipped.stack()==curioPick&&captureCuriosIridium(player,equipped,pos,state);
+    }
+    /** A discovered source keeps its original slot; only that slot is read during confirmation. */
+    public static boolean captureCuriosIridium(ServerPlayer player,CuriosCompat.Equipped equipped,BlockPos pos,BlockState state){
+        return equipped!=null&&captureCuriosIridium(player,equipped.stack(),pos,state,
+                ()->CuriosCompat.pickInSlotFresh(player,equipped.slot()));
     }
     /** Inventory adapters supply a live slot lookup, not a snapshot captured before the break. */
     public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state,

@@ -65,14 +65,24 @@ public final class ArtifactFeedback {
     /** Curios mining flashes reach the wearer and at most three close observers. */
     public static void nearbyMiningPulse(ServerPlayer wearer,BlockPos pos,ParticleOptions primary,int primaryCount,
                                          ParticleOptions accent,int accentCount){
-        var level=wearer.serverLevel();double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;
-        var center=new Vec3(x,y,z);
-        emitMiningPulse(wearer,level,center,primary,primaryCount,accent,accentCount);
-        var nearby=EntitySelection.nearest(level,ServerPlayer.class,new AABB(x,y,z,x,y,z).inflate(12D),
-                viewer->viewer!=wearer&&viewer.isAlive()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(wearer)
-                        &&viewer.distanceToSqr(center)<=144D,
-                center,3,128);
-        for(var viewer:nearby)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
+        int count=MiningPulseCost.perViewer(primaryCount,accentCount);
+        if(count==0)return;
+        var level=wearer.serverLevel();var audience=miningPulseAudience(wearer,pos);
+        if(!reserveAuraParticles(level.getServer().getTickCount(),count,audience.size()))return;
+        var center=new Vec3(pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D);
+        for(var viewer:audience)emitMiningPulse(viewer,level,center,primary,primaryCount,accent,accentCount);
+    }
+    public static List<ServerPlayer> miningPulseAudience(ServerPlayer wearer,BlockPos pos){
+        if(!wearer.isAlive()||wearer.isRemoved()||wearer.isSpectator())return List.of();
+        var center=new Vec3(pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D);
+        var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
+        audience.addAll(EntitySelection.nearest(wearer.serverLevel(),ServerPlayer.class,
+                new AABB(center,center).inflate(12D),viewer->viewer!=wearer&&wardViewer(wearer,viewer,center),center,3,128));
+        return List.copyOf(audience);
+    }
+    private static boolean wardViewer(ServerPlayer wearer,ServerPlayer viewer,Vec3 center){
+        return viewer.isAlive()&&!viewer.isRemoved()&&!viewer.isSpectator()&&viewer.serverLevel()==wearer.serverLevel()
+                &&!wearer.isInvisibleTo(viewer)&&viewer.distanceToSqr(center)<=144D;
     }
     /** Choir's Curios mining share is shown as a quiet, wearer-and-ally-only thread when the ally gains it. */
     public static void choirMiningLink(ServerPlayer wearer,ServerPlayer ally){
@@ -285,14 +295,14 @@ public final class ArtifactFeedback {
     }
     /** Includes the bearer and chooses at most three nearby, non-spectating observers. */
     public static List<ServerPlayer> nearbyWardAudience(ServerPlayer wearer){
+        if(!wearer.isAlive()||wearer.isRemoved()||wearer.isSpectator())return List.of();
         var level=wearer.serverLevel();var center=wearer.position();long tick=level.getGameTime();
         var previous=WARD_AUDIENCE_CACHE.get(wearer.getUUID());
         if(previous!=null&&previous.level()==level&&previous.tick()==tick&&previous.center().distanceToSqr(center)<1.0E-6D)
-            return previous.audience();
+            return previous.audience().stream().filter(viewer->viewer==wearer||wardViewer(wearer,viewer,center)).toList();
         var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
         var nearby=EntitySelection.nearest(level,ServerPlayer.class,wearer.getBoundingBox().inflate(12D),
-                viewer->viewer!=wearer&&viewer.isAlive()&&!viewer.isSpectator()&&!viewer.isInvisibleTo(wearer)
-                        &&viewer.distanceToSqr(center)<=144D,
+                viewer->viewer!=wearer&&wardViewer(wearer,viewer,center),
                 center,3,128);
         audience.addAll(nearby);var result=List.copyOf(audience);
         WARD_AUDIENCE_CACHE.put(wearer.getUUID(),new WardAudienceCache(level,tick,center,result));
@@ -330,6 +340,7 @@ public final class ArtifactFeedback {
     }
     /** A private, one-shot halo marks the transition into the full Strata tempo bonus. */
     public static void strataTempoPeak(ServerPlayer wearer){
+        if(!reserveMiningParticles(wearer,16))return;
         var level=wearer.serverLevel();double x=wearer.getX(),y=wearer.getY()+wearer.getBbHeight()*.52D,z=wearer.getZ();
         double phase=level.getGameTime()*.08D;
         var cyan=new DustParticleOptions(new Vector3f(.35F,.9F,1F),.92F);
@@ -346,7 +357,7 @@ public final class ArtifactFeedback {
                                         ParticleOptions primary,int primaryCount,ParticleOptions accent,int accentCount){
         // A few deliberate points read as a rising cut through the block, while the former
         // random cloud looked identical for Stasis and Strata and cost more particle packets.
-        int motes=Math.min(3,Math.max(0,primaryCount));
+        int motes=MiningPulseCost.visible(primaryCount);
         double phase=level.getGameTime()*.22D+center.x*.71D+center.z*.39D;
         for(int i=0;i<motes;i++){
             double progress=(i+1D)/(motes+1D);
@@ -355,8 +366,8 @@ public final class ArtifactFeedback {
             level.sendParticles(viewer,primary,false,center.x+Math.cos(angle)*radius,
                     center.y+progress*.48D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
         }
-        for(int i=0;i<Math.min(3,Math.max(0,accentCount));i++){
-            double angle=level.getGameTime()*.3D+i*Math.PI*2D/Math.max(1,accentCount);
+        for(int i=0;i<MiningPulseCost.visible(accentCount);i++){
+            double angle=level.getGameTime()*.3D+i*Math.PI*2D/Math.max(1,MiningPulseCost.visible(accentCount));
             double radius=.035D*i;
             level.sendParticles(viewer,accent,false,center.x+Math.cos(angle)*radius,
                     center.y+.42D+i*.025D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
@@ -498,6 +509,7 @@ public final class ArtifactFeedback {
     }
     /** A slow double-height orbit marks the projectile ward while spending fewer particle packets. */
     public static void crucibleWardOrbit(ServerPlayer p,int radius){
+        if(!reserveMiningParticles(p,8))return;
         var level=p.serverLevel();double phase=level.getGameTime()*.075D;
         for(int i=0;i<8;i++){
             double angle=phase+i*Math.PI/4D;
@@ -510,6 +522,7 @@ public final class ArtifactFeedback {
     }
     /** A small moving double rail makes the full ward radius readable once per second. */
     public static void crucibleWardBoundary(ServerPlayer p,int radius){
+        if(!reserveMiningParticles(p,16))return;
         var level=p.serverLevel();double phase=level.getGameTime()*.035D;
         for(int i=0;i<8;i++){
             double angle=phase+i*Math.PI/4D;
@@ -521,12 +534,14 @@ public final class ArtifactFeedback {
     }
     /** One wearer-only interception spark, rate-limited by the active ward field. */
     public static void crucibleDeflect(ServerPlayer p,Vec3 impact){
+        if(!reserveMiningParticles(p,5))return;
         var level=p.serverLevel();
         level.sendParticles(p,ParticleTypes.END_ROD,false,impact.x,impact.y,impact.z,3,.035D,.035D,.035D,.012D);
         level.sendParticles(p,ParticleTypes.WAX_ON,false,impact.x,impact.y,impact.z,2,.045D,.045D,.045D,.008D);
     }
     /** A bounded vine spiral advances around the rim once per successful Worldloom tunnel slice. */
     public static void worldloomBoreProgress(ServerPlayer p,BlockPos section,net.minecraft.core.Direction direction,int depth){
+        if(!reserveMiningParticles(p,depth%4==3?8:5))return;
         var level=p.serverLevel();double phase=depth*.31D+level.getGameTime()*.035D;
         double cx=section.getX()+.5D,cy=section.getY()+.5D,cz=section.getZ()+.5D;
         for(int i=0;i<4;i++){
@@ -604,6 +619,7 @@ public final class ArtifactFeedback {
         var mote=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),.78F+tier*.16F);
         double phase=level.getGameTime()*.11D,cx=center.getX()+.5D,cy=center.getY()+.12D,cz=center.getZ()+.5D;
         int count=3+tier*2;
+        if(!reserveMiningParticles(p,count))return;
         for(int i=0;i<count;i++){
             double progress=(i+1D)/count,angle=phase+progress*Math.PI*2D*tier,radius=.42D*(1D-progress);
             double x=cx+Math.cos(angle)*radius,z=cz+Math.sin(angle)*radius,y=cy+progress*.78D;
@@ -612,6 +628,7 @@ public final class ArtifactFeedback {
     }
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
     public static void gravityCollapse(ServerPlayer p,BlockPos center,int drops){
+        if(!reserveMiningParticles(p,46)){message(p,"gravity_collapse",drops);return;}
         var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;
         var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.6F);
         level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,24,1.4,.9,1.4,.12);
@@ -752,6 +769,9 @@ public final class ArtifactFeedback {
         // A capped wireframe remains legible while bounding particle packets per field update.
         // Side loops omit corners because the front/back edges already draw them.
         int segments=Math.max(4,Math.min(6,radius));
+        int cost=12;
+        for(int i=0;i<=segments;i++)cost+=(i>0&&i<segments?4:2)*(i%2==0||i==segments?2:1);
+        if(!reserveMiningParticles(p,cost))return;
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
             p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
@@ -770,6 +790,7 @@ public final class ArtifactFeedback {
     }
     /** Three great circles match Eventide's actual spherical influence radius. */
     private static void eventideDomain(ServerPlayer p,BlockPos center,int radius){
+        if(!reserveMiningParticles(p,78))return;
         int color=ArtifactKind.EVENTIDE.color;
         var boundary=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),.9F);
         boolean repel=(ArtifactState.mode(p,ArtifactKind.EVENTIDE)&1)!=0;

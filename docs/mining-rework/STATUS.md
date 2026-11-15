@@ -1,3 +1,29 @@
+# 5.10.462 — consultas de ranura, privacidad y partículas; pendiente de CI
+
+Las observaciones del puente Curios conservan la ranura descubierta y la leen
+fresca directamente al confirmar, en vez de recorrer hasta64entradas en cada
+revalidación. El evento pasa Equipped a la captura para no repetir la búsqueda
+inicial. La fuente no migra a otra ranura ni acepta una copia equivalente.
+CurioSlotScan.contains impide índices negativos, fuera de inventario o más allá
+del límite. Dos JUnit nuevos cubren fronteras. Se contrastaron las firmas de
+CuriosApi/ICuriosItemHandler/ICurioStacksHandler/IDynamicStackHandler con la rama
+oficial1.20.x commit a91da6ba2396f6ed9042c8a47a471ca5efc97da8; esto no sustituye
+probar Curios instalado.
+
+Los flashes mineros Strata/Stasis ahora reservan el coste real para toda su
+audiencia (máximo4personas), con conteos primario/acento limitados a3cada uno.
+PicoStrata, órbita/borde/desvíoCrucible, progresoWorldloom, carga/colapsoEventide
+y wireframes de dominio también descuentan partículas. La lógica y mensajes
+siguen funcionando al omitir cosméticos. Tres JUnit verifican el coste clamped.
+
+Se corrige la dirección de visibilidad: se pregunta si el portador es invisible
+al observador, no al revés. La audiencia cacheada filtra de nuevo distancia,
+dimensión, vida/espectador y visibilidad antes de reutilizarse dentro del tick.
+Seis GameTests cubren privacidad, salida del radio, reserva exacta de20/58motes
+y Stasis bajo saturación cosmética. Incluye461. Esperados122JUnit/370GameTests.
+Local25recursos/66Python conPillow/parser153Java/secrets/diffcheck correctos;
+sin build local. Sin ataques/daño/recetas nuevos ni cambios de secundarias.
+
 # 5.10.461 — entregas de auras coherentes; pendiente de CI
 
 AuraShareContext congela el nivel y posición del portador y revalida cada
