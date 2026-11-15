@@ -3,10 +3,18 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from mining_catalog import IDS, apply
+from mining_catalog import IDS, apply, keybound_how
 
 
 class MiningCatalogTests(unittest.TestCase):
+    def test_instruction_action_letters_become_indexed_key_arguments(self):
+        self.assertEqual(keybound_how('Press R. C switches modes; X recalls drops.'),
+                         'Press %1$s. %2$s switches modes; %3$s recalls drops.')
+
+    def test_key_replacement_never_alters_names_or_existing_arguments(self):
+        text = 'CARVE and CORE DRILL remain names; %1$s is already bound.'
+        self.assertEqual(keybound_how(text), text)
+
     def test_text_refresh_never_deletes_runtime_or_provenance_assets(self):
         # Use a disposable resource tree, never mutate the real source assets during tests.
         with tempfile.TemporaryDirectory() as directory:

@@ -93,6 +93,14 @@ class Resources(unittest.TestCase):
                 self.assertEqual(data["message.specialpickaxes." + key].count("%s"), expected,
                                  f"{locale}/{key}: matches the Java feedback arguments")
 
+    def test_mining_instructions_never_hardcode_rebindable_action_letters(self):
+        for locale in ("en_us", "es_es"):
+            data = json.loads((ROOT / f"assets/specialpickaxes/lang/{locale}.json").read_text())
+            for key, text in data.items():
+                if key.startswith("mining.how."):
+                    self.assertNotRegex(text, r"\b[RCX]\b", f"{locale}/{key}: use keybind arguments")
+                    self.assertTrue(set(re.findall(r"%(\d+)\$s", text)) <= {"1", "2", "3"})
+
     def test_json(self):
         for pattern in ["*.json", "*.mcmeta"]:
             for path in ROOT.rglob(pattern):
@@ -194,7 +202,7 @@ class Resources(unittest.TestCase):
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{language}.json").read_text())
             for section in ["regional", "proximity"]:
                 how = data[f"mining.how.paradox_crucible.{section}"].casefold()
-                self.assertIn(" c ", how, f"{language}/{section}: instructions must use the C mode key")
+                self.assertIn("%2$s", how, f"{language}/{section}: instructions must use the configured mode binding")
                 self.assertNotIn("offhand", how, f"{language}/{section}: stale offhand instructions")
                 self.assertNotIn("mano secundaria", how, f"{language}/{section}: stale offhand instructions")
             self.assertTrue(all(data.get(f"mode.specialpickaxes.{mode}") for mode in expected_outputs), language)

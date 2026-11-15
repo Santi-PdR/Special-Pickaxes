@@ -7,7 +7,7 @@ import json,struct,zlib,hashlib
 from dawn_bloom_asset import write_png
 
 ROOT=Path('src/main/resources/assets/specialpickaxes')
-VARIANTS={'fault_choir':.72,'worldloom':.78,'hollow_axiom':.78,'seam_ripper':.72,'eventide':.72}
+VARIANTS={'fault_choir':.72,'worldloom':.78,'hollow_axiom':.78,'seam_ripper':.72,'eventide':.72,'icarus':.82}
 
 
 def read_rgba(path):

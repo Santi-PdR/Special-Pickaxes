@@ -1,5 +1,6 @@
 """Current playable mining roster and canonical mode text; no texture synthesis."""
 import json
+import re
 from pathlib import Path
 
 IDS=['palimpsest', 'fault_choir', 'eventide', 'paradox_crucible', 'interregnum', 'worldloom', 'icarus', 'hollow_axiom', 'worldbreaker', 'exodium', 'iridium', 'hellspec', 'seam_ripper']
@@ -224,6 +225,9 @@ MODES={'palimpsest': {'vein': ('VEIN ECHO: harvest the connected ore vein.',
                                'ese material exacto, hasta 256. Conserva menas, bloques colocados, fluidos y '
                                'máquinas.')}}
 
+def keybound_how(text):
+ return re.sub(r"\b[RCX]\b", lambda match: {'R':'%1$s','C':'%2$s','X':'%3$s'}.get(match[0],match[0]), text)
+
 def apply():
  root=Path('src/main/resources')
  for lang in ['en_us','es_es']:
@@ -231,7 +235,7 @@ def apply():
   for artifact,modes in MODES.items():
    for mode,text in modes.items():
     d[f'mining.identity.{artifact}.{mode}']=text[1 if es else 0]
-    d[f'mining.how.{artifact}.{mode}']=text[3 if es else 2]
+    d[f'mining.how.{artifact}.{mode}']=keybound_how(text[3 if es else 2])
     labels={'shelter':'REFUGIO','bridge':'PUENTE','wall':'PARED','regional':'REGIONAL','proximity':'PROXIMIDAD','stasis':'ESTASIS','forward':'ADELANTE','reverse':'ATRÁS','restore':'RECONSTRUIR','selective':'SELECTIVO','gravity_in':'HACIA EL CENTRO','gravity_out':'HACIA EL BORDE','rotate0':'ORIGINAL','rotate90':'90°','rotate180':'180°','rotate270':'270°','mirror_x':'REFLEXIÓN X','mirror_z':'REFLEXIÓN Z'}
     d[f'mode.specialpickaxes.{mode}']=labels.get(mode,mode.replace('_',' ').upper()) if es else mode.replace('_',' ').upper()
   d['manual4.wear']='Desgaste al activar: %s; enfriamiento %s s.' if es else 'Activation wear: %s; cooldown %s s.'

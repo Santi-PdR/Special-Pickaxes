@@ -106,7 +106,7 @@ public final class ArtifactManualScreen extends Screen {
     private List<Section> sections(ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey){
         var result=new ArrayList<Section>();
         result.add(section("screen.specialpickaxes.main",Component.translatable("mining.identity."+abilityKind.id+"."+modeKey),0xffe4edf4));
-        result.add(section("manual4.how",Component.translatable("mining.how."+abilityKind.id+"."+modeKey),0xffc7d4df));
+        result.add(section("manual4.how",ArtifactTooltips.how(abilityKind,modeKey),0xffc7d4df));
         result.add(section("screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+abilityKind.id),0xffffd385));
         result.add(section("manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"),0xffa7d9ef));
         result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));

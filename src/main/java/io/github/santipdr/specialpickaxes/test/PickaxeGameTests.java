@@ -588,6 +588,16 @@ public final class PickaxeGameTests {
             h.assertTrue(level.getBlockState(at)==state&&level.getBlockState(next)==state,"newly placed origin is not admitted as a bridge to another natural block");}
         finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(level).unmark(at);finish(h,wearer);}
     }
+    @GameTest(template="empty",batch="rework_each_259") public static void instructionComponentsCarryLiveBindingsForEveryPlayableMode(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues())for(var mode:ArtifactInteraction.modes(kind)){
+            var how=ArtifactTooltips.how(kind,mode);
+            h.assertTrue(how.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents,"instruction is translatable");
+            var args=((net.minecraft.network.chat.contents.TranslatableContents)how.getContents()).getArgs();
+            h.assertTrue(args.length==3,"primary/mode/alternate binding arguments exist for "+kind.id+"/"+mode);
+            for(var arg:args)h.assertTrue(arg instanceof net.minecraft.network.chat.Component binding
+                    &&binding.getContents() instanceof net.minecraft.network.chat.contents.KeybindContents,"instruction argument is a live keybind, not a literal letter");
+        }h.succeed();
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

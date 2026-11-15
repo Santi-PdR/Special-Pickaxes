@@ -1,3 +1,15 @@
+# 5.10.453 — instrucciones reasignables y legibilidad: pendiente de CI
+
+Las instrucciones largas ya no fijan las letras R/C/X: se traducen con componentes
+keybind para acción, modo y secundaria, en SHIFT y manual. El regenerador de
+catálogo conserva el contrato. Cliente CI comprueba instrucciones con activación
+reasignada a O, además del tooltip compacto. Una regresión recorre los modos de
+los13picos; dos Python y una prueba de recursos comprueban traducciones.
+Icarus usa una sexta adaptación reproducible de contraste (.82), conservando
+alpha/silueta y el original; no se declara redibujo ni aprobación visual completa.
+Local25recursos/63Python/parser143Java/diffcheck; esperados102JUnit/327GameTests.
+452/run43669594248 ya completó CI correctamente;453 debe repetirla con cambios.
+
 # 5.10.452 — previsualización completa: pendiente de CI
 
 El muestreo de previews ahora incluye el principio y el final del plan y reparte

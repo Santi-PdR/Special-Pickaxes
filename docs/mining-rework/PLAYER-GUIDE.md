@@ -7,7 +7,8 @@ se registra en `STATUS.md`. No certifica compatibilidad con el pack Ghouls compl
 ## Controles predeterminados
 
 Se pueden reasignar en Opciones → Controles → Special Pickaxes; los tooltips usan
-la tecla configurada, no una letra fija.
+la tecla configurada, no una letra fija. Las instrucciones largas del manual y
+de SHIFT también siguen las teclas de acción, modo y secundaria reasignadas.
 
 | Tecla | Acción |
 |---|---|
@@ -97,3 +98,8 @@ captura fija de CI no demuestra la animación completa ni una medición de TPS.
 13 retratos, el commit y los iconos exactos antes de crear el PDF de 13 páginas,
 26 imágenes individuales, HTML, procedencia y ZIP con hashes. Requiere Pillow;
 no compila el mod, no arranca el juego y no controla la interfaz del usuario.
+
+Las colocaciones pagadas rechazan cambios de creativo/supervivencia durante un
+callback de permisos o colocación: no dejan material gratis ni gastan un pago
+antiguo. Los previews usan hasta 24 muestras distribuidas por todo el plan,
+incluido su extremo final, sin aumentar el presupuesto de partículas.

@@ -32,6 +32,10 @@ public final class ClientTooltipValidation {
                     if(!io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.regional(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))
                             &&lines.stream().noneMatch(line->line.getString().startsWith(bind.getTranslatedKeyMessage().getString())))
                         throw new IllegalStateException("Tooltip ignored rebound key: "+bind.getTranslatedKeyMessage().getString()+" in "+lines);
+                    String how=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.how(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.SEAM_RIPPER,"connected").getString();
+                    if(!how.contains(" "+bind.getTranslatedKeyMessage().getString()+".")||how.contains("%1$s"))
+                        throw new IllegalStateException("Instruction prose ignored rebound key: "+how);
+                    com.mojang.logging.LogUtils.getLogger().info("INSTRUCTION_BINDINGS_REBOUND_OK");
                 }finally{bind.setKey(old);net.minecraft.client.KeyMapping.resetMapping();}
                 bindingsChecked=true;com.mojang.logging.LogUtils.getLogger().info("KEY_BINDINGS_REGISTERED_AND_REBOUND_OK");
             }

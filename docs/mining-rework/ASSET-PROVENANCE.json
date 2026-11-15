@@ -52,7 +52,9 @@
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/elytra_pickaxe.png",
     "sha256": "064ddf43fbb77112b19573335a6860674a501f748a69a841476e372f28418d56",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "icarus_v2.png",
+    "runtime_sha256": "6a02b37d820d8a7da89fd2ad90112acc19039505670ae004f7595655a44fba73"
   },
   {
     "artifact": "hollow_axiom",
