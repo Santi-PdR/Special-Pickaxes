@@ -471,6 +471,15 @@ public final class PickaxeGameTests {
                 &&!ArtifactState.of(wearer,ArtifactKind.EXODIUM).contains("alternateReady"),"Starfall does not queue a shaft from a stale caster origin");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,wearer);}
     }
+    @GameTest(template="empty",batch="rework_each_241") public static void shiftQuickReferenceKeepsTheFullManualOutOfTheTooltip(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());var lines=new ArrayList<net.minecraft.network.chat.Component>();
+            ArtifactTooltips.presentation(stack,kind,lines,true);
+            h.assertTrue(lines.size()==12&&tooltipHasKey(lines,"manual4.what")&&tooltipHasKey(lines,"manual4.how")
+                    &&tooltipHasKey(lines,"manual4.cost")&&tooltipHasKey(lines,"tooltip.specialpickaxes.quick_controls"),"SHIFT keeps actionable instructions, costs and dynamic manual key: "+kind.id);
+            h.assertTrue(!tooltipHasKey(lines,"manual4.tool_profile_detail")&&!tooltipHasKey(lines,"manual4.modes"),"long profile and mode lists belong to the scrollable manual");
+        }h.succeed();
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

@@ -22,7 +22,8 @@ la tecla configurada, no una letra fija.
 | V | Cancelar el trabajo o selección. |
 
 El tooltip compacto muestra tres líneas; **mantén SHIFT** para ampliar instrucciones,
-pasivas, costes y controles. El manual permite consultar los detalles y elegir qué
+costes y controles. Las pasivas, el perfil completo y la lista de modos están en
+el manual desplazable, evitando desbordar la pantalla con SHIFT. El manual permite elegir qué
 pico copia Worldbreaker. Las teclas R/X actúan sobre la herramienta en la mano
 principal: Curios aplica pasivas, no añade un segundo conjunto de habilidades activas.
 

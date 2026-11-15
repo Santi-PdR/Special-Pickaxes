@@ -1,3 +1,13 @@
+# 5.10.446 — SHIFT legible, pendiente de CI
+
+Inspección de la captura real444worldbreaker-carve: SHIFT recuperó detalles pero
+la ficha completa se salía por arriba. Separa referencia rápida de12líneas lógicas
+(qué/cómo/alternativa/coste/tecla de manual) y manual completo desplazable, que
+conserva pasivas/perfil/modos. Cliente CI ahora calcula wrapping a320px y exige
+que tooltip completo quepa enel viewport capturado. No seoculta clipping
+suprimiendo la prueba. Una regresión recorre13picos.309GameTests esperados.
+24recursos/54Python local, parser139Java; compilación/runtime pendientes.
+
 # 5.10.445 — corrección de tag de fixture, pendiente de CI
 
 444/run43662073543 falló al escanear logs del cliente: needs_higher_tool exigía

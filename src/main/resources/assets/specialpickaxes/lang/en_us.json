@@ -618,5 +618,6 @@
   "message.specialpickaxes.alternate_hint.exodium": "Aim at natural stone or ore for the downward shaft.",
   "message.specialpickaxes.alternate_hint.iridium": "Only your Iridium-marked ore drops within 48 blocks can be recalled.",
   "message.specialpickaxes.alternate_hint.hellspec": "Aim at natural mineable stone or ore to cut the chimney.",
-  "message.specialpickaxes.alternate_hint.seam_ripper": "Aim at a permitted natural stone face; ores and placed blocks are preserved."
+  "message.specialpickaxes.alternate_hint.seam_ripper": "Aim at a permitted natural stone face; ores and placed blocks are preserved.",
+  "tooltip.specialpickaxes.quick_controls": "%s: use · %s: alternate · %s: full manual, modes and passives"
 }

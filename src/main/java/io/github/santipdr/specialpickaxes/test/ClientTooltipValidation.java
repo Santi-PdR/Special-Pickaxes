@@ -42,6 +42,10 @@ public final class ClientTooltipValidation {
                 if(shift?lines.size()<10:lines.size()!=3)throw new IllegalStateException("Final stack tooltip contract mismatch: "+key+" "+lines.size());
                 boolean details=lines.stream().anyMatch(line->line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text&&text.getKey().equals("manual4.what"));
                 if(details!=shift)throw new IllegalStateException("Forge tooltip event lost or leaked expanded details: "+key);
+                int wrappedLines=lines.stream().mapToInt(line->mc.font.split(line,320).size()).sum();
+                if(wrappedLines*mc.font.lineHeight+16>mc.getWindow().getGuiScaledHeight())
+                    throw new IllegalStateException("Tooltip overflows the captured viewport: "+key+" wrappedLines="+wrappedLines);
+                com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VIEWPORT_FITS {} wrappedLines={}",key,wrappedLines);
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_STACK_EVENT_VALIDATED {} lines={}",key,lines.size());
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }

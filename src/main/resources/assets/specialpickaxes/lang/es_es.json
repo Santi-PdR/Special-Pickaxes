@@ -618,5 +618,6 @@
   "message.specialpickaxes.alternate_hint.exodium": "Apunta a piedra o mena natural para iniciar el pozo descendente.",
   "message.specialpickaxes.alternate_hint.iridium": "Sólo recupera tus drops de mena marcados por Iridio a menos de 48bloques.",
   "message.specialpickaxes.alternate_hint.hellspec": "Apunta a piedra o mena natural picable para abrir la chimenea.",
-  "message.specialpickaxes.alternate_hint.seam_ripper": "Apunta a una cara de piedra natural permitida; conserva menas y bloques colocados."
+  "message.specialpickaxes.alternate_hint.seam_ripper": "Apunta a una cara de piedra natural permitida; conserva menas y bloques colocados.",
+  "tooltip.specialpickaxes.quick_controls": "%s: usar · %s: alternativa · %s: manual completo, modos y pasivas"
 }
