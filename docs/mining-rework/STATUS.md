@@ -1,3 +1,13 @@
+# 5.10.449 — colocación múltiple Forge, pendiente de CI
+
+EntityMultiPlaceEvent hereda EntityPlaceEvent, pero getPos sólo cubre la primera
+celda. El rastreador ahora recorre snapshots del mismo nivel, sin cargar chunks,
+con las mismas exclusiones de fluidos/blockentities. Protege construcciones de
+colocación múltiple frente a minería de terreno natural. Tres GameTests cubren
+todas las celdas/cancelación/exclusiones.321GameTests y97JUnit esperados.
+Conserva447/448. Local24recursos/54Python/parser141Java/diffcheck correctos.
+Aún no verificada;446permanece la última confirmada.
+
 # 5.10.448 — controles recuperables, pendiente de CI
 
 El throttle de inputs rechaza diferencias negativas por overflow: inputTick

@@ -111,12 +111,17 @@ public final class SpecialPickaxes {
         if(e.getPlayer() instanceof ServerPlayer p&&(WorldSafety.changedDuringBreakEvent(p,e.getPos())||p.getMainHandItem().getItem() instanceof ArtifactItem&&WorldSafety.barrier(p,e.getPos())))e.setCanceled(true);
     }
     private void trackPlayerPlacedBlocks(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent e){
-        if(!e.isCanceled()&&e.getEntity() instanceof net.minecraft.world.entity.player.Player
-                &&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level
-                &&level.getFluidState(e.getPos()).isEmpty()){
-            var state=level.getBlockState(e.getPos());
-            if(!state.hasBlockEntity()&&ArtifactTools.effective(state))PlayerPlacedBlocks.get(level).mark(e.getPos());
-        }
+        if(e.isCanceled()||!(e.getEntity() instanceof net.minecraft.world.entity.player.Player)
+                ||!(e.getLevel() instanceof net.minecraft.server.level.ServerLevel level))return;
+        if(e instanceof net.minecraftforge.event.level.BlockEvent.EntityMultiPlaceEvent multi){
+            for(var snapshot:multi.getReplacedBlockSnapshots())
+                if(snapshot.getLevel()==level)trackPlacedCell(level,snapshot.getPos());
+        }else trackPlacedCell(level,e.getPos());
+    }
+    private static void trackPlacedCell(net.minecraft.server.level.ServerLevel level,net.minecraft.core.BlockPos pos){
+        if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos)||!level.getFluidState(pos).isEmpty())return;
+        var state=level.getBlockState(pos);
+        if(!state.hasBlockEntity()&&ArtifactTools.effective(state))PlayerPlacedBlocks.get(level).mark(pos);
     }
     private void schedulePlacedBlockCleanup(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(!e.isCanceled()&&e.getLevel() instanceof net.minecraft.server.level.ServerLevel level)

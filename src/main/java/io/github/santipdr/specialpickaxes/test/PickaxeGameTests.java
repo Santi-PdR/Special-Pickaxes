@@ -543,6 +543,27 @@ public final class PickaxeGameTests {
         h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,program)&&WorkQueue.togglePause(wearer),"job is explicitly paused");
         h.assertTrue(!RelicControl.execute(wearer,ArtifactKind.PALIMPSEST,RelicControl.Action.PAUSE)&&WorkQueue.status(wearer).equals("paused"),"blocked chunk resume must not report successful input or play a success cue");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_251") public static void multiPlacementMarksEveryPlacedGeologicalCell(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var level=h.getLevel();var a=target(h);var b=a.east();var data=PlayerPlacedBlocks.get(level);data.unmark(a);data.unmark(b);
+        var snapshots=List.of(net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,a),net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,b));
+        level.setBlockAndUpdate(a,Blocks.GRANITE.defaultBlockState());level.setBlockAndUpdate(b,Blocks.ANDESITE.defaultBlockState());
+        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityMultiPlaceEvent(snapshots,Blocks.STONE.defaultBlockState(),wearer));
+        h.assertTrue(data.contains(a)&&data.contains(b),"Forge multi-place protects all snapshot positions, not only event.getPos");
+        data.unmark(a);data.unmark(b);finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_252") public static void cancelledMultiPlacementNeverCreatesProvenance(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var level=h.getLevel();var a=target(h);var b=a.east();var data=PlayerPlacedBlocks.get(level);data.unmark(a);data.unmark(b);
+        var snapshots=List.of(net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,a),net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,b));
+        level.setBlockAndUpdate(b,Blocks.GRANITE.defaultBlockState());var event=new BlockEvent.EntityMultiPlaceEvent(snapshots,Blocks.STONE.defaultBlockState(),wearer);event.setCanceled(true);MinecraftForge.EVENT_BUS.post(event);
+        h.assertTrue(!data.contains(a)&&!data.contains(b),"cancelled multi-place cannot label natural terrain as player construction");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_253") public static void multiPlacementStillRejectsContainersAndFluids(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);var level=h.getLevel();var a=target(h);var b=a.east();var c=a.east(2);var data=PlayerPlacedBlocks.get(level);for(var pos:List.of(a,b,c))data.unmark(pos);
+        var snapshots=List.of(net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,a),net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,b),net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(),level,c));
+        level.setBlockAndUpdate(a,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(b,Blocks.CHEST.defaultBlockState());level.setBlockAndUpdate(c,Blocks.WATER.defaultBlockState());
+        MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityMultiPlaceEvent(snapshots,Blocks.STONE.defaultBlockState(),wearer));
+        h.assertTrue(data.contains(a)&&!data.contains(b)&&!data.contains(c),"multi-place uses the same inert bookkeeping exclusions for every cell");data.unmark(a);level.setBlockAndUpdate(c,Blocks.AIR.defaultBlockState());finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
