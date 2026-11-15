@@ -6,10 +6,10 @@ The Exodium, Iridium and Hellspec reference sprites were copied from the user's 
 - `textures/item/iridium_v2.png`
 - `textures/item/hellspec_v2.png`
 
-The Worldbreaker runtime icon is also an original 32×32 pixel-art redraw. Its concept was generated and then cleaned into a crisp sprite using the in-repository Worldbreaker icon as a silhouette reference; the original texture remains preserved unchanged.
+A former Worldbreaker runtime icon was an original 32×32 pixel-art redraw, with a generated concept and manual cleanup. That historical artwork is retained in the repository, but it is **not the current runtime icon**. Since 5.10.458 the runtime uses the reproducible readability adaptation listed below.
 
-Fault Choir, Worldloom, Hollow Axiom, Seam Ripper, Eventide, Icarus, Palimpsest and Worldbreaker use non-destructive readability adaptations
-(`fault_choir_v2.png`, `worldloom_v2.png`, `hollow_axiom_v2.png`, `seam_ripper_v2.png`, `eventide_v2.png`, `icarus_v2.png`, `palimpsest_v2.png`) of their existing
+Fault Choir, Worldloom, Hollow Axiom, Seam Ripper, Eventide, Icarus, Palimpsest, Worldbreaker and Interregnum use non-destructive readability adaptations
+(`fault_choir_v2.png`, `worldloom_v2.png`, `hollow_axiom_v2.png`, `seam_ripper_v2.png`, `eventide_v2.png`, `icarus_v2.png`, `palimpsest_v2.png`, `worldbreaker_v2.png`, `interregnum_v2.png`) of their existing
 reference sprites. These are **not original redraws**. `tools/item_readability_asset.py`
 brightens RGB shadows monotonically and doubles the original pixel grid without
 changing alpha or silhouette. Original reference PNGs remain unchanged. The source

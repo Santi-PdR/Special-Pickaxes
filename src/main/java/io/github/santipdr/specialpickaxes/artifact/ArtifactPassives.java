@@ -312,27 +312,38 @@ public final class ArtifactPassives {
 
     /** Curios turns the wearer's ore rhythm into a bounded mining surge for nearby teammates. */
     public static int lodeSurge(ServerPlayer player,BlockPos pos,boolean shareWithAllies){
+        return lodeSurgeObserved(player,pos,shareWithAllies,()->true);
+    }
+    static int lodeSurgeObserved(ServerPlayer player,BlockPos pos,boolean shareWithAllies,java.util.function.BooleanSupplier sourceStillValid){
+        var level=player.serverLevel();var origin=player.position();
         var state=ArtifactState.of(player,ArtifactKind.IRIDIUM);long now=ArtifactState.now(player);
         long expires=state.getLong("lodeSurgeExpires");int previous=Math.max(0,Math.min(3,state.getInt("lodeSurgeStacks")));
         boolean live=previous>0&&(expires==now||PersistedCooldown.active(now,expires,80));
         int stacks=live?Math.min(3,previous+1):1;
         state.putInt("lodeSurgeStacks",stacks);state.putLong("lodeSurgeExpires",now+80L);
         grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get(),stacks-1,80);
+        // MobEffectEvent callbacks can move the miner or remove the source equipment.
+        if(!player.isAlive()||player.isRemoved()||player.serverLevel()!=level||!player.position().equals(origin)||!sourceStillValid.getAsBoolean())return stacks;
         LodeSurgeEffect.oreBreakPulse(player,pos,stacks);
-        if(shareWithAllies)shareLodeSurge(player,pos,stacks);
+        if(shareWithAllies)shareLodeSurge(player,pos,stacks,sourceStillValid);
         return stacks;
     }
 
-    private static void shareLodeSurge(ServerPlayer owner,BlockPos ore,int stacks){
+    private static void shareLodeSurge(ServerPlayer owner,BlockPos ore,int stacks,java.util.function.BooleanSupplier sourceStillValid){
         if(!allyAuraScanDue(owner,ArtifactKind.IRIDIUM,"iridiumLodeAuraScanAt"))return;
-        var center=owner.position();double rangeSqr=36D;
+        var level=owner.serverLevel();var center=owner.position();double rangeSqr=36D;
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                         ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var surge=io.github.santipdr.specialpickaxes.SpecialPickaxes.LODE_SURGE.get();
         for(var ally:allies){
+            if(!owner.isAlive()||owner.isRemoved()||owner.serverLevel()!=level||!owner.position().equals(center)||!sourceStillValid.getAsBoolean())return;
+            if(!ally.isAlive()||ally.isRemoved()||ally.serverLevel()!=level||!ally.isAlliedTo(owner)||ally.distanceToSqr(center)>rangeSqr)continue;
+            var allyOrigin=ally.position();
             grantCombatEffect(ally,surge,stacks-1,80);
-            LodeSurgeEffect.sharedOrePulse(owner,ally,ore,stacks);
+            if(!owner.isAlive()||owner.isRemoved()||owner.serverLevel()!=level||!owner.position().equals(center)||!sourceStillValid.getAsBoolean())return;
+            if(ally.isAlive()&&!ally.isRemoved()&&ally.serverLevel()==level&&ally.position().equals(allyOrigin)&&ally.isAlliedTo(owner))
+                LodeSurgeEffect.sharedOrePulse(owner,ally,ore,stacks);
         }
     }
 

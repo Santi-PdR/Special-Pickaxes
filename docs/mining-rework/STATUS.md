@@ -1,3 +1,22 @@
+# 5.10.460 — revalidación tras efectos e Interregnum legible; pendiente de CI
+
+MiningObservations vuelve a validar herramienta, fuente Curios y actor después
+de Lode Surge: MobEffectEvent también puede cambiar el equipo o mover al minero.
+No continúa con propiedad de drops ni comparte a compañeros desde el nuevo
+contexto. Lode Surge conserva la concesión ya autorizada, pero omite pulsos y
+transferencias pendientes si se invalida la fuente durante el callback; no
+revierte efectos ajenos. También revalida al portador y a cada aliado entre las
+concesiones compartidas. Dos GameTests usan MobEffectEvent.Added real para
+quitar la fuente o mover al portador durante la concesión.
+
+Interregnum añade la novena adaptación de contraste reproducible, gamma.86,
+con referencia/alpha/silueta preservados. Los créditos distinguen ahora el
+redibujo histórico Worldbreaker de su adaptación runtime actual, eliminando
+la afirmación contradictoria. No cambia daño, recetas ni secundarias.
+
+Incluye459. Esperados114JUnit/358GameTests. Local25recursos/63Python conPillow,
+parser148Java/secrets/diffcheck correctos; no build local. CI pendiente.
+
 # 5.10.459 — equipo diferido y firmas adicionales seguras; pendiente de CI
 
 Iridium Curios conserva un EquipmentLease de identidad: se consulta la ranura

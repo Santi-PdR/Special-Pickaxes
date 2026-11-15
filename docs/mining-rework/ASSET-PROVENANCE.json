@@ -38,7 +38,9 @@
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/lighningpickaxe.png",
     "sha256": "52d872e1f8d421055f1f712cc75ed9e081ec768a94ec78edf91e225ccee6f64b",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "interregnum_v2.png",
+    "runtime_sha256": "019149d7a06c858b813f71c0802e24bc5fb7bfee491830d39a20e89c8125a675"
   },
   {
     "artifact": "worldloom",

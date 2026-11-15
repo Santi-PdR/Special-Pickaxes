@@ -843,6 +843,32 @@ public final class PickaxeGameTests {
             h.assertTrue(!target.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"a changed actor receives no stale extra melee signature");
         }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
     }
+    @GameTest(template="empty",batch="rework_each_289") public static void oreObservationStopsIfAddingSurgeUnequipsItsSource(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var ally=player(h,ArtifactKind.ICARUS,"SurgeAlly289");var board=h.getLevel().getScoreboard();
+        var team=board.addPlayerTeam("surge_"+p.getUUID().toString().substring(0,6));board.addPlayerToTeam(p.getScoreboardName(),team);board.addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(p.position().add(3,0,0));h.getLevel().addFreshEntity(ally);
+        var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"observation admitted with source still equipped");h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);int[] callbacks={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> change=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==SpecialPickaxes.LODE_SURGE.get()){callbacks[0]++;slot.set(ItemStack.EMPTY);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,change);
+        try{MiningObservations.flush();h.assertTrue(callbacks[0]==1&&!ally.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"effect callback invalidation stops sharing and ownership of pending drops");
+        }finally{MinecraftForge.EVENT_BUS.unregister(change);board.removePlayerTeam(team);finish(h,ally);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_290") public static void oreObservationStopsIfAddingSurgeMovesTheMiner(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var ally=player(h,ArtifactKind.ICARUS,"SurgeAlly290");var board=h.getLevel().getScoreboard();
+        var team=board.addPlayerTeam("surge_"+p.getUUID().toString().substring(0,6));board.addPlayerToTeam(p.getScoreboardName(),team);board.addPlayerToTeam(ally.getScoreboardName(),team);
+        ally.setPos(p.position().add(3,0,0));h.getLevel().addFreshEntity(ally);
+        var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"observation admitted with source still equipped");h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);int[] callbacks={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> change=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==SpecialPickaxes.LODE_SURGE.get()){callbacks[0]++;p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,change);
+        try{MiningObservations.flush();h.assertTrue(callbacks[0]==1&&!ally.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"effect callback invalidation stops sharing and ownership of pending drops");
+        }finally{MinecraftForge.EVENT_BUS.unregister(change);board.removePlayerTeam(team);finish(h,ally);finish(h,p);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

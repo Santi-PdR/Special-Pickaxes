@@ -1,3 +1,13 @@
+## Revisión 5.10.460 — pendiente de CI
+
+Las roturas diferidas de Iridium sólo completan sus efectos si conservas la
+herramienta y el mismo pico Curios: una copia nueva no hereda trabajo pendiente.
+Si otro mod te mueve o quita la fuente al conceder Lode Surge, no se continúa
+marcando drops ni compartiendo ese evento con compañeros desde otra posición.
+Los efectos ya concedidos no se borran arbitrariamente. Interregnum recibe una
+adaptación de contraste manteniendo el dibujo y la transparencia originales.
+Daño reducido, potencia minera, cero recetas y secundarias mineras sin cambios.
+
 ## Revisión 5.10.458 (incluye457; CI completa correcta)
 
 Los cambios de posición o permisos efectuados por claims durante una pasiva

@@ -55,19 +55,25 @@ public final class MiningObservations {
         int budget=512;
         while(budget-->0 && !PENDING.isEmpty()) {
             var o=PENDING.removeFirst();var p=o.player;
-            if(!p.isAlive() || p.isRemoved() || p.isSpectator() || p.level().dimension()!=o.dimension
-                    // Queued/Curios ore observations also belong to the original held tool.
-                    || p.getMainHandItem()!=o.tool || o.tool.isEmpty()
-                    || o.curioSource!=null&&(!o.curioSource.active()||o.curioSource.expected().isEmpty())
-                    || !ObservationWindow.fresh(p.server.getTickCount(),o.time) || !p.serverLevel().hasChunkAt(o.pos)) continue;
+            if(!valid(o))continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)){
-                    ArtifactPassives.lodeSurge(p,o.pos,o.curioSource!=null);
+                    var level=p.serverLevel();var origin=p.position();
+                    ArtifactPassives.lodeSurgeObserved(p,o.pos,o.curioSource!=null,()->valid(o));
+                    // Adding a mob effect invokes external Forge callbacks too.
+                    if(!valid(o)||p.serverLevel()!=level||!p.position().equals(origin))continue;
                     if(o.dropsBeforeComplete)highlightNewOreDrops(p,o);
                 }
                 if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
+    }
+    private static boolean valid(Observation o){
+        var p=o.player;
+        return p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&p.level().dimension()==o.dimension
+                &&p.getMainHandItem()==o.tool&&!o.tool.isEmpty()
+                &&ObservationWindow.fresh(p.server.getTickCount(),o.time)&&p.serverLevel().hasChunkAt(o.pos)
+                &&(o.curioSource==null||!o.curioSource.expected().isEmpty()&&o.curioSource.active());
     }
     private static DropSnapshot dropSnapshot(ServerPlayer p,BlockPos pos) {
         var snapshot=new HashMap<UUID,ItemStack>();
