@@ -1,3 +1,13 @@
+## Esperas CI con resultado inequívoco y menor uso de API
+
+wait_ci.py consulta sólo los metadatos de un run concreto a intervalos
+limitados, sin descargar repetidamente todos sus jobs/Checks. Comprueba ID y
+SHA completos; sólo conclusion=success termina con0. Fallos/cancelaciones
+terminan con1, errores de consulta/identidad con2 y vencimiento con124.
+La consulta fallida por cuota/autenticación no se reintenta en bucle. Diez
+Python verifican transiciones, identidad, códigos, timeout y entradas inválidas.
+Total local87Python conPillow. La espera sigue sin contarse como trabajo activo.
+
 # 5.10.467 — contexto de colapso Eventide; pendiente de CI
 
 Eventide no acepta cargas provenientes de una copia separada de la herramienta
