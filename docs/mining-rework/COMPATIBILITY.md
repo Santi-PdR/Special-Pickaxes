@@ -1,3 +1,11 @@
+## Evidencia vigente 5.10.460
+
+CI43678491078 pasó117JUnit/358GameTests, servidor empaquetado y cliente real.
+Las pruebas de ranura son adaptadores simulados explícitos. MobEffectEvent.Added
+real se usa para invalidar fuente/posición durante Lode Surge; se comprueba que
+no hay transferencia posterior a compañeros ni propiedad de drops pendientes.
+No se probó una instalación real de Curios ni un modpack Ghouls completo.
+
 ## Límite defensivo del puente opcional en 5.10.460
 
 La ranura Curios `pickaxe` tiene tamaño1 en los recursos del mod. Si otro
@@ -7,7 +15,7 @@ null o tipos incompatibles en las fronteras comprobadas. Se mantienen el caché
 cosmético por tick y las consultas frescas en eventos/transacciones. Este límite
 y la identidad de equipo tienen pruebas puras; eso no certifica un Curios real.
 
-## Revisión 5.10.459 — pendiente de CI
+## Revisión 5.10.459 — incluida y verificada en460
 
 La minería diferida Curios lee la fuente actual de la ranura, sin aceptar
 una copia equivalente del ItemStack original. El puente sigue siendo opcional

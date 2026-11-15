@@ -1,4 +1,4 @@
-## Revisión 5.10.460 — pendiente de CI
+## Revisión 5.10.460 — CI completa correcta
 
 Las roturas diferidas de Iridium sólo completan sus efectos si conservas la
 herramienta y el mismo pico Curios: una copia nueva no hereda trabajo pendiente.

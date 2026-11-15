@@ -1,3 +1,18 @@
+## Entrega verificada 5.10.460
+
+- Fuente runtime: `c39a7b9df7bceee184ff3f264571e7108421a508`.
+- CI43678491078 completed/success:117JUnit sin fallos/errores/omisiones,
+ 358GameTests; servidor empaquetado y logs validados.
+- Cliente real:32escenas/64tooltips; ALTERNATE_BINDINGS_REBOUND_OK presente.
+- Prerelease: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.460-43678491078
+- JAR559543bytes,SHA256`381b5279d3e914c1ec3a74ed995a6882cfa6a248957209dc7f759bb7db36db10`.
+- Asset749898528 uploaded; tamaño/digest API coinciden con RELEASE.json CI.
+- Evidencia:/tmp/sp-ci460,recuperable por fetch_ci_evidence con fuente/run.
+- Galería:artifacts/picos-5.10.460/ PDF13páginas/ZIP26imágenes;CRC/procedencia
+ correctos. Nombres es_es y SHA256 de traducciones ligados al commit del JAR.
+- Local25recursos/66Python conPillow/parser150Java/secrets/diffcheck correctos.
+- No buildlocal ni accesoWindows ni certificaciónCurios/Ghouls real/animaciones completas.
+
 ## Galería 460 — etiquetas verificadas en español
 
 El PDF y HTML muestran los nombres españoles del propio mod, no títulos
@@ -9,7 +24,7 @@ eliden sólo si no caben, conservando el nombre completo en la procedencia.
 Los ZIP mantienen IDs canónicos en los nombres de archivo y las26imágenes
 exactas. Local66Python conPillow/25recursos/parser150Java/diffcheck correctos.
 
-# 5.10.460 — revalidación tras efectos e Interregnum legible; pendiente de CI
+# 5.10.460 — revalidación tras efectos e Interregnum legible; CI correcta
 
 MiningObservations vuelve a validar herramienta, fuente Curios y actor después
 de Lode Surge: MobEffectEvent también puede cambiar el equipo o mover al minero.
@@ -30,7 +45,7 @@ de hacer casts ciegos, y limita el escaneo de la ranura pickaxe a64entradas
 (el slot predeterminado sigue siendo1). Tres JUnit cubren límites normales,
 negativos y extremos. Incluye459. Esperados117JUnit/358GameTests. Local25recursos/
 63Python conPillow/parser150Java/secrets/diffcheck correctos; no build local.
-CI pendiente.
+Verificado por CI43678491078:117JUnit/358GameTests.
 
 # 5.10.459 — equipo diferido y firmas adicionales seguras; pendiente de CI
 

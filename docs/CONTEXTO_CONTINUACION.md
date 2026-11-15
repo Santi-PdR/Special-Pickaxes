@@ -1,3 +1,46 @@
+# Estado vigente para continuación — 5.10.460
+
+Este encabezado reemplaza el historial anterior; rama arena/cec54523-special-pickaxes.
+
+## Entrega verificada 5.10.460
+
+- Fuente runtime: `c39a7b9df7bceee184ff3f264571e7108421a508`.
+- CI43678491078 completed/success:117JUnit sin fallos/errores/omisiones,
+ 358GameTests; servidor empaquetado y logs validados.
+- Cliente real:32escenas/64tooltips; ALTERNATE_BINDINGS_REBOUND_OK presente.
+- Prerelease: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.460-43678491078
+- JAR559543bytes,SHA256`381b5279d3e914c1ec3a74ed995a6882cfa6a248957209dc7f759bb7db36db10`.
+- Asset749898528 uploaded; tamaño/digest API coinciden con RELEASE.json CI.
+- Evidencia:/tmp/sp-ci460,recuperable por fetch_ci_evidence con fuente/run.
+- Galería:artifacts/picos-5.10.460/ PDF13páginas/ZIP26imágenes;CRC/procedencia
+ correctos. Nombres es_es y SHA256 de traducciones ligados al commit del JAR.
+- Local25recursos/66Python conPillow/parser150Java/secrets/diffcheck correctos.
+- No buildlocal ni accesoWindows ni certificaciónCurios/Ghouls real/animaciones completas.
+
+- 459: EquipmentLease<T> almacena identidad+lookup vivo;4JUnit. CuriosCompat
+ findFresh/currentPick omiten caché en fronteras; eventos mining/hurt usan fresh.
+ MiningObservations captura lease opcional y lo verifica en admisión/flush.
+ Overload público de captura recibe Supplier<ItemStack> para adaptadores reales;
+ GameTests modelan ranura conAtomicReference, sinfingirCuriosreal.7GTnuevos.
+ ArtifactItem.hurtEnemy usaPassiveReactionContext antes de firmas adicionales.
+- 460: lodeSurgeObserved revalida trasMobEffectEvent y entrealiados. Flush
+ revalida estado/fuente/posición trasllamada para no marcar drops obsoletos.
+ No revierteefectosyaautorizados.2GTnuevosconMobEffectEvent.Added.
+ CurioSlotScan limita64entradas;3JUnit;tipos/null de proveedor comprobados.
+- Interregnum_v2 gamma.86 esnovenaVARIANTS,referenciaintacta. Créditos aclaran
+ que redrawWorldbreakerhistórico ya no esruntime desde458.
+- Galeríausa nombresespañolesverificadoscontra gitblobdelcommit;SHAlang en
+ PROVENANCE.json;HTMLescapado,títulosPDFadaptativos,IDsZIPsinmodificar.
+ 3Pythonextra=66conPillow. No cambian13picos/daño4/recetas0/secundariasmineras.
+- Pendiente: comprobar proveedorCuriosreal, rendimiento de lecturas frescas
+ cuando otrosmods amplían ranuras o añadenmuchasroturas, callbacks no cubiertos
+ en otrasaurascompartidas. No afirmar que están probados por esta tanda.
+- No accesoWindows: finalsiemprePowerShell literalconURL/tamaño/hashreales,
+ destino D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods;
+ validaTEMPantesmover/desthash/borrasólospecial-pickaxesanteriores,singh/token/finally/PS1.
+- No contar esperasCI como trabajoefectivo. Esta tanda esperó925sCI: no usar
+ esa espera para afirmar que se cumplieron30minefectivos. Sincheckout/buildlocal/UIautomation.
+
 # Estado vigente para continuación — 5.10.458
 
 Este encabezado reemplaza el historial anterior. Rama arena/cec54523-special-pickaxes.

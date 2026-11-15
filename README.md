@@ -1,5 +1,31 @@
 # Special Pickaxes — mining rework
 
+**5.10.460 — prueba publicada; CI completa correcta.**
+
+[CI43678491078](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43678491078)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.460-43678491078).
+117 JUnit sin fallos, errores ni omisiones;358GameTests,servidor empaquetado y
+logs limpios. Cliente real:32escenas/64tooltips.
+
+Iridium conserva la identidad del pico Curios durante las roturas diferidas:
+quitarlo, vaciarlo o sustituirlo invalida la observación. Si un callback al
+conceder Lode Surge mueve al minero o retira la fuente, no sigue marcando drops
+ni compartiendo desde ese contexto. El puente opcional usa consultas frescas
+en eventos/transacciones y limita proveedores anómalos a64ranuras.
+Las firmas adicionales de golpes normales también revalidan a ambos actores;
+no se añade daño ni ataques. Se mantienen13picos,daño4,potencia minera,cero
+recetas y secundarias sin combate.
+
+Interregnum incorpora la novena adaptación reproducible de contraste con
+alpha/silueta/referencia preservados. Galería:13iconos/13capturas reales enmano,
+con nombres españoles cuya traducción coincide con el commit del JAR.
+
+JAR:**559.543bytes**,SHA256:
+`381b5279d3e914c1ec3a74ed995a6882cfa6a248957209dc7f759bb7db36db10`.
+Los tests de equipo usan proveedores simulados de ranura, no Curios instalado.
+Prerelease de prueba: no certificaciónGhouls, aprobación visual estable ni
+instalaciónWindows comprobada.
+
 **5.10.458 — prueba publicada; CI completa correcta.**
 
 [CI 43676520675](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43676520675)
