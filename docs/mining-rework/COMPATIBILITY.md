@@ -1,9 +1,9 @@
-# Compatibilidad — revisión440/441 pendiente de CI
+# Compatibilidad — revisión 446 validada en CI, pack completo no certificado
 
 Las filas históricas describen decisiones, no una certificación del pack completo.
 La revisión441 conserva la detección de menas sin tags de herramienta, pero
 respeta requisitos de tiers superiores explícitos en TierSortingRegistry de Forge.
-No se ha ejecutado Ghouls completo. Tres nuevos GameTests cubren tier superior,
+No se ha ejecutado Ghouls completo. CI43663630681 pasó los309GameTests; tres de ellos cubren tier superior,
 minería ordinaria OP y rechazo en la frontera de rotura.
 
 # Compatibilidad del catálogo 5.10.345
@@ -18,7 +18,7 @@ Backpacks, Better Combat y otros mods del pack.
 | Sistema | Comportamiento deliberado | Límite de esta revisión |
 |---|---|---|
 | Terramity | Los picos propios usan tier V; las herramientas tienen velocidad base 64 o superior, 32.768 de durabilidad y encantabilidad 50. Las menas y geología Forge se consideran picables aunque un mod no declare nivel de herramienta. | El código y GameTests confirman el tier V frente al Exodium de Terramity tier IV; la comparación local registrada para el Exodium es velocidad 20, durabilidad 8.124 y encantabilidad 50. No se ejecutó el pack completo. |
-| Advanced XRay / JourneyMap / Jade | Palimpsest puede sondear hasta32menas naturales cercanas en chunks cargados, respetando permisos; no es un bloqueo de XRay. Iridium extrae menas existentes por tandas y resalta sus drops; el mod no bloquea XRay. | No se comprobó convivencia visual en juego con shaders, LOD o configuración de servidor real. |
+| Advanced XRay / JourneyMap / Jade | Palimpsest puede sondear hasta 32 menas naturales cercanas en chunks cargados, respetando permisos; no es un bloqueo de XRay. Iridium extrae menas existentes por tandas y resalta sus drops; el mod no bloquea XRay. | No se comprobó convivencia visual en juego con shaders, LOD o configuración de servidor real. |
 | Create / máquinas / cofres | Las habilidades de área excluyen block entities y fluidos; el Crucible solo cambia estados geológicos predeterminados y seguros. | No se probó automatización móvil o máquinas de terceros. |
 | SecurityCraft / claims | Las operaciones consultan `mayInteract`, `mayBuild` y eventos Forge de habilidad/rotura. Una denegación detiene el paso y no salta la barrera. | Un mod que no participe de los hooks Forge puede aplicar reglas propias no observables. |
 | ToolLeveling / encantamientos | Se conserva el nivel de Efficiency, Fortune, Silk Touch, Unbreaking y Mending en el NBT; el cálculo de trabajo y la cola siguen acotados. | No se probó el progreso/XP de ToolLeveling dentro del pack completo. |

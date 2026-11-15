@@ -1,3 +1,33 @@
+# Resultado actual — 5.10.446 verificada y publicada como prueba
+
+Fuente `63057f66abb6acd765f2dc5172c3f6fdd02a7c92`.
+CI [43663630681](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43663630681)
+completed/success. Evidencia Checks recuperada con manifiesto verificado.
+
+-92JUnit,0fallos,0errores,0skips;309GameTests completos.
+-Servidor empaquetado y escaneo de logs de servidor/GameTests/cliente limpios.
+-32escenas,64tooltips normales/SHIFT,64marcadores viewportfit/stackevent;
+ controles de teclado al servidor yWorldShatter9341completados.
+-24recursos enCI;54Python envenvlocal conPillow. El render PDF opcional se
+ omite enel unittestCI sinPillow;53restantes pasan. No se confunde conJUnit.
+-JAR548113bytes,SHA256`ebf010a1ca26379eaed0f4428323e73485a57bf5757bbd24661a7522ed3c0bb0`;
+ JARrecuperado íntegro,CRC/hashOK,sinrecetas,worldgen,clases/tags de fixtures.
+-Release`test-5.10.446-43663630681`,prerelease=true,asset749449808uploaded;
+ tamaño/digestAPI coinciden. No se afirma descargaCDN desdeWindows.
+-Galería`artifacts/picos-5.10.446/`:PDF13páginas,26imágenes originales,
+ HTML,PROVENANCE,SHA256SUMS yZIPCRCcorrecto. Íconos ligados acommit exacto.
+ Capturas reales, no equivalen a aprobación de animación completa.
+
+Inspeccionadas capturasSHIFTWorldbreaker446 ySeamRipper446. Worldbreaker ya
+muestra nombre/qué/cómo/alternativa/coste/tecla manual sinclipping visible enesa
+captura. No se aprueba automáticamente todo el catálogo niGhouls/shaders/TPS.
+
+Fallos441/443/444 por tagfixture requerido encliente no se reescriben como éxito;
+445 corrige referencia opcional.446 añade referenciaSHIFT legible con gatealtura.
+No hubo checkout,buildlocal,instalaciónWindows ni automatización de interfaz local.
+
+## Historial de desarrollo (las notas «pendiente» siguientes son históricas)
+
 # 5.10.446 — SHIFT legible, pendiente de CI
 
 Inspección de la captura real444worldbreaker-carve: SHIFT recuperó detalles pero

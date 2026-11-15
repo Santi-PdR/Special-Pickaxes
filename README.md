@@ -1,12 +1,24 @@
 # Special Pickaxes — mining rework
 
-**5.10.441 — drops, tooltip SHIFT real, tiers Forge y efectos acotados; pendiente de CI.**
-Worldloom activa sin bloque apuntado, paga sólo offhand y corta la pasarela ante
-obstáculos/denegaciones/falta de material. Palimpsest prioriza las32menas naturales
-más cercanas y comunica la coordenada de la primera. Los trabajos naturales
-revalidan procedencia player-placed incluso durante callbacks de rotura. Firmas
-alineadas con la mirada y nueva ficha de herramienta en manual/SHIFT. Diez
-GameTests y tres JUnit añadidos; aún pendientes de ejecución Java en CI.
+**5.10.446 — prueba publicada; CI completo correcto.**
+
+[CI43663630681](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43663630681)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.446-43663630681).
+92JUnit sin fallos/errores/skips,309GameTests,servidor empaquetado y logs limpios.
+Cliente:32escenas,64tooltips con comprobación de altura y entrada real hasta
+WorldShatter9341. SHIFT es una referencia rápida que cabe en la ventana probada;
+manual desplazable conserva perfil/pasivas/modos. No es aprobación visual total.
+
+Drops revalidan contexto/propiedad tras claims y mantienen velocidad acotada;
+minería respeta tiers superiores explícitos de Forge sin perder potencia normal.
+Más pulsos cosméticos comparten presupuesto. SeamRipper tiene adaptación de
+contraste reproducible. Colas revalidan permisos/herramienta incluso entre
+preparación y aplicación. Mensajes ES/EN orientan sobre rechazo y coste.
+El actualizador de catálogo ya no elimina iconos_v2; guía de13picos actualizada.
+
+JAR:548113bytes,SHA256
+`ebf010a1ca26379eaed0f4428323e73485a57bf5757bbd24661a7522ed3c0bb0`.
+El prerelease no es latest estable ni confirma instalación Windows o packGhouls.
 
 **5.10.431 — prueba descargable publicada; CI global correcto.**
 Se conserva el gameplay validado en430. Tras CI completo exitoso en la rama de
