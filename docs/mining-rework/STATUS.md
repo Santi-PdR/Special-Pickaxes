@@ -1,4 +1,18 @@
-# 5.10.458 — regresiones de defensa propia y contraste Worldbreaker; pendiente de CI
+## Entrega verificada 5.10.458
+
+- Fuente runtime: `f5082b28de716b0f0089946a34b1f2e42a8b909a`.
+- CI43676520675 completed/success:110JUnit sin fallos/errores/omisiones,
+ 349GameTests, servidor empaquetado correcto y logs validados.
+- Cliente real:32escenas/64tooltips; ALTERNATE_BINDINGS_REBOUND_OK presente.
+- Prerelease: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.458-43676520675
+- JAR555724bytes,SHA256`3d763a1c7218094f92367fe21d48f404277d08c59f3a13317ddbb6fac8d3a83b`.
+- Asset749837917 uploaded: tamaño/digest API coinciden con RELEASE.json CI.
+- Evidencia:/tmp/sp-ci458; galería artifacts/picos-5.10.458/ PDF13páginas,
+  ZIP26imágenes, procedencia exacta por commit/manifest y CRC correcto.
+- Local25recursos/63Python conPillow/parser146Java/secrets/diffcheck correctos.
+- No build local, no instalaciónWindows ni certificación de Ghouls/animaciones completas.
+
+# 5.10.458 — regresiones de defensa propia y contraste Worldbreaker; CI correcta
 
 Distingue las firmas Curios de defensa propia de las respuestas que consultan
 claims: Palimpsest, Worldbreaker e Iridium conservan su defensa en aventura sin
@@ -11,10 +25,10 @@ item_readability_asset.py con gamma.86. Es la octava adaptación reproducible;
 no un redibujo. Tests verifican alpha/silueta, brillo no decreciente, modelo y
 bytes reproducidos. Conserva su nombre de textura runtime para compatibilidad.
 
-Incluye457. Esperados110JUnit/349GameTests; sin build local. Local25recursos,
-63Python conPillow/parser146Java/secrets/diffcheck correctos. CI pendiente.
+Incluye457. Verificados110JUnit/349GameTests; sin build local. Local25recursos,
+63Python conPillow/parser146Java/secrets/diffcheck correctos. CI43676520675 verde.
 
-# 5.10.457 — pasivas seguras y presupuesto de enlaces; pendiente de CI
+# 5.10.457 — pasivas seguras y presupuesto de enlaces; incluidas y verificadas en458
 
 PassiveReactionContext fija jugador, atacante, nivel y posiciones antes de
 consultar claims. Tras callbacks no aplica represalias a actores movidos,

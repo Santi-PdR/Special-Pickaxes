@@ -1,3 +1,13 @@
+## Regresiones verificadas en 5.10.458
+
+La CI43676520675 probó movimiento del portador/atacante y revocación de permiso
+por listeners de AbilityUseEvent, sin cancelar el evento. No se aplica la
+represalia a actores cambiados; el efecto defensivo propio Heartwood conserva
+su función. Null Veil compartido no consume el contador si cambia el contexto.
+Las observaciones Iridium diferidas no sobreviven a cambios de herramienta ni
+a transición a espectador. Esto no certifica equipar/desequipar Curios real en
+el mismo tick, todos los plugins de claims ni un modpack Ghouls completo.
+
 # Compatibilidad — revisión 453 validada en CI, pack completo no certificado
 
 Las filas históricas describen decisiones, no una certificación del pack completo.

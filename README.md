@@ -1,5 +1,26 @@
 # Special Pickaxes — mining rework
 
+**5.10.458 — prueba publicada; CI completa correcta.**
+
+[CI 43676520675](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43676520675)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.458-43676520675).
+110 JUnit sin fallos, errores ni omisiones; 349 GameTests, servidor empaquetado
+y logs limpios. Cliente real:32escenas/64tooltips.
+
+Las pasivas no siguen a un atacante o portador movido durante callbacks de
+claims. Iridium descarta observaciones diferidas si cambia la herramienta o el
+jugador pasa a espectador. Los siete enlaces antiguos entre aliados también
+reservan partículas para ambos espectadores. La defensa propia de Palimpsest,
+Worldbreaker e Iridium sigue disponible sin permiso de construcción.
+Worldbreaker recibe una adaptación de contraste reproducible con alpha,
+silueta y referencia original preservadas. No se añaden ataques ni recetas;
+se mantienen los13picos, daño4, potencia minera y secundarias sin combate.
+
+JAR:**555.724bytes**,SHA256:
+`3d763a1c7218094f92367fe21d48f404277d08c59f3a13317ddbb6fac8d3a83b`.
+Galería de esta revisión:13iconos/13capturas reales enmano. Prerelease de prueba,
+no aprobación visual estable ni certificaciónGhouls ni instalaciónWindows.
+
 **5.10.456 — prueba publicada; CI completa correcta.**
 
 [CI 43674513875](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43674513875)

@@ -1,3 +1,45 @@
+# Estado vigente para continuación — 5.10.458
+
+Este encabezado reemplaza el historial anterior. Rama arena/cec54523-special-pickaxes.
+
+## Entrega verificada 5.10.458
+
+- Fuente runtime: `f5082b28de716b0f0089946a34b1f2e42a8b909a`.
+- CI43676520675 completed/success:110JUnit sin fallos/errores/omisiones,
+ 349GameTests, servidor empaquetado correcto y logs validados.
+- Cliente real:32escenas/64tooltips; ALTERNATE_BINDINGS_REBOUND_OK presente.
+- Prerelease: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.458-43676520675
+- JAR555724bytes,SHA256`3d763a1c7218094f92367fe21d48f404277d08c59f3a13317ddbb6fac8d3a83b`.
+- Asset749837917 uploaded: tamaño/digest API coinciden con RELEASE.json CI.
+- Evidencia:/tmp/sp-ci458; galería artifacts/picos-5.10.458/ PDF13páginas,
+  ZIP26imágenes, procedencia exacta por commit/manifest y CRC correcto.
+- Local25recursos/63Python conPillow/parser146Java/secrets/diffcheck correctos.
+- No build local, no instalaciónWindows ni certificación de Ghouls/animaciones completas.
+
+- Runtime457/458: PassiveReactionContext captura actor/atacante/nivel/posiciones,
+  revalida tras claims y evita represalias a actores cambiados. Heartwood
+  conserva defensa propia; Null Veil no gasta recarga si se invalida el contexto.
+- ObservacionesIridium queued/Curios exigen herramienta original también sin
+  applyHeldMiningEffects; al pasar a espectador se descartan. No se ha añadido
+  una verificación de la ranura real Curios durante flush: sigue pendiente auditar
+  cambios de equipoCurios dentro del mismo tick y la caché opcional.
+- Siete enlaces antiguos reservan exactamente58partículas entre ambos viewers:
+  Choir6/Stasis8/Eventide10/Heartwood10/NullVeil8/Worldbreaker8/Crucible8.
+- La prueba de presupuesto fuerza otro tick mediante reservaPOSITIVA1, no0;
+  reserveAuraParticles rechaza0 sin reiniciar presupuesto. Fixf5082b2 incluido.
+- 458 conserva firmas sólo defensivas dePalimpsest/Worldbreaker/Iridium sin
+  permiso de construir. GT cubre3firmas; otro cubreNullVeilmovido yNBTcorrupto.
+- Worldbreaker_v2 mantiene nombre runtime, ahora reproduciblegamma.86 desde
+  referencia intacta;octavaentradaVARIANTS. Imágenes originales no modificadas.
+- No accesoWindows. Final siempre PowerShell literal verificando tamaño/hash,
+  destino D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods;
+  borrar sólo special-pickaxes-*.jar anteriores, sin gh/token/finally/archivoPS1.
+- Al inicio se detectó HEAD restaurado albase28b8ebf pero árbol igualaremoto69c523d:
+  se comprobóhash de cada archivo remoto y se alineó índice/HEAD con resetmixed
+  FETCH_HEAD sin checkout ni borrar archivos. Árbol limpio antes de mejoras.
+- No afirmar mínimo30minefectivos por haber esperadoCI14min. No confundir
+  tiempo de espera con trabajo activo. No compilar local ni automatizarUI.
+
 # Estado vigente para continuación — 5.10.456
 
 Este encabezado reemplaza los anteriores, conservados como historial.

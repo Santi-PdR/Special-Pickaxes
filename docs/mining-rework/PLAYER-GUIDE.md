@@ -1,4 +1,4 @@
-## Revisión 5.10.457 (pendiente de pruebas remotas)
+## Revisión 5.10.458 (incluye457; CI completa correcta)
 
 Los cambios de posición o permisos efectuados por claims durante una pasiva
 no redirigen su respuesta a una ubicación nueva. Cambiar de herramienta antes
