@@ -1,3 +1,16 @@
+# 5.10.455 — recargas y referencias secundarias, pendiente de CI
+
+Al reconectar se sincroniza sólo el tiempo restante de plazos válidos, no un
+Integer.MAX_VALUE derivado de NBT corrupto. Tres JUnit y tres GameTests cubren
+plazos válidos, inválidos y el mayor intervalo legítimo de principal/secundaria.
+Las descripciones de secundarias también usan keybinds, no letras R/X fijas;
+el cliente reasigna principal a O y secundaria a P para validar Eventide, además
+del test de instrucciones principal existente. Sintonía Curios reserva20partículas
+antes de emitir; saltarla no impide pasivas. Palimpsest: séptima adaptación de
+contraste reproducible, gamma.84, alpha/silueta/original preservados.
+454/run43672786521 pasó CI completa.455 debe repetirla:110JUnit/334GameTests
+esperados; local25recursos/63Python/parser145Java/diffcheck correctos.
+
 # 5.10.454 — ascenso sin recaptura, pendiente de CI
 
 Icarian Lift detecta que el minero salió de su eje o fue teletransportado fuera

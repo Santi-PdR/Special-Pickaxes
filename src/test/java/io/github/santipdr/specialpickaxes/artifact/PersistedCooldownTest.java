@@ -24,4 +24,22 @@ class PersistedCooldownTest {
         assertFalse(PersistedCooldown.active(100,101,0));
         assertThrows(IllegalArgumentException.class,()->PersistedCooldown.active(100,101,-1));
     }
+    @Test void synchronizedRemainingPreservesOnlyTheRealInterval(){
+        for(int elapsed=0;elapsed<40;elapsed++)assertEquals(40-elapsed,PersistedCooldown.remaining(100+elapsed,140,40));
+        assertEquals(0,PersistedCooldown.remaining(140,140,40));
+        assertEquals(0,PersistedCooldown.remaining(141,140,40));
+    }
+    @Test void corruptedOrRolledBackDeadlinesCannotCreateYearsOfVisualCooldown(){
+        assertEquals(0,PersistedCooldown.remaining(100,Long.MAX_VALUE,160));
+        assertEquals(0,PersistedCooldown.remaining(Long.MIN_VALUE,Long.MAX_VALUE,160));
+        assertEquals(0,PersistedCooldown.remaining(Long.MAX_VALUE,Long.MIN_VALUE,160));
+        assertEquals(0,PersistedCooldown.remaining(99,140,40));
+        assertEquals(0,PersistedCooldown.remaining(0,100000,100));
+    }
+    @Test void synchronizedRemainingHandlesExactLongEdgesWithoutNarrowingOverflow(){
+        assertEquals(20,PersistedCooldown.remaining(Long.MIN_VALUE,Long.MIN_VALUE+20,20));
+        assertEquals(20,PersistedCooldown.remaining(Long.MAX_VALUE-20,Long.MAX_VALUE,20));
+        assertEquals(0,PersistedCooldown.remaining(100,101,0));
+        assertThrows(IllegalArgumentException.class,()->PersistedCooldown.remaining(100,101,-1));
+    }
 }

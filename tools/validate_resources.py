@@ -97,7 +97,7 @@ class Resources(unittest.TestCase):
         for locale in ("en_us", "es_es"):
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{locale}.json").read_text())
             for key, text in data.items():
-                if key.startswith("mining.how."):
+                if key.startswith(("mining.how.", "alternate.detail.specialpickaxes.")):
                     self.assertNotRegex(text, r"\b[RCX]\b", f"{locale}/{key}: use keybind arguments")
                     self.assertTrue(set(re.findall(r"%(\d+)\$s", text)) <= {"1", "2", "3"})
 

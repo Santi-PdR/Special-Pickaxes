@@ -11,4 +11,8 @@ public final class PersistedCooldown {
         // The positive difference also rejects subtraction overflow at the long extremes.
         return readyAt>now&&remaining>0&&remaining<=interval;
     }
+    /** Remaining ticks are safe to synchronize only after validating the original interval. */
+    public static int remaining(long now,long readyAt,int interval){
+        return active(now,readyAt,interval)?(int)(readyAt-now):0;
+    }
 }

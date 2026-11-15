@@ -4,7 +4,9 @@
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/adamantiumpickaxe.png",
     "sha256": "19e4ad13e6576279a8f1b35d066572f72f9f0dfadc359c2e6efb7e3944627903",
-    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "palimpsest_v2.png",
+    "runtime_sha256": "59a8d637306f31cc4b843d0835ba28b784e4a4bb0a2c13093471fac328ef83c2"
   },
   {
     "artifact": "fault_choir",

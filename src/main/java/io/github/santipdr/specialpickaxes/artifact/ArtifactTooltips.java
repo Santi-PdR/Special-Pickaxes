@@ -19,7 +19,7 @@ public final class ArtifactTooltips {
         var ability=abilityKind(stack,kind);String mode=ArtifactInteraction.modeKey(ability,abilityMode(stack,kind));
         section(lines,"manual4.what",Component.translatable("mining.identity."+ability.id+"."+mode));
         section(lines,"manual4.how",how(ability,mode));
-        section(lines,"screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+ability.id));
+        section(lines,"screen.specialpickaxes.alternate",alternate(ability));
         section(lines,"manual4.cost",costDetail(stack));
         section(lines,"manual4.controls",Component.translatable("tooltip.specialpickaxes.quick_controls",
                 Component.keybind("key.specialpickaxes.activate"),Component.keybind("key.specialpickaxes.alt_skill"),
@@ -27,9 +27,14 @@ public final class ArtifactTooltips {
     }
     /** Instruction prose uses the same live bindings as the compact controls and manual footer. */
     public static Component how(ArtifactKind ability,String mode){
-        return Component.translatable("mining.how."+ability.id+"."+mode,
-                Component.keybind("key.specialpickaxes.activate"),Component.keybind("key.specialpickaxes.mode"),
-                Component.keybind("key.specialpickaxes.alt_skill"));
+        return instruction("mining.how."+ability.id+"."+mode);
+    }
+    public static Component alternate(ArtifactKind ability){
+        return instruction("alternate.detail.specialpickaxes."+ability.id);
+    }
+    private static Component instruction(String key){
+        return Component.translatable(key,Component.keybind("key.specialpickaxes.activate"),
+                Component.keybind("key.specialpickaxes.mode"),Component.keybind("key.specialpickaxes.alt_skill"));
     }
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
         var ability=abilityKind(stack,k);
@@ -81,7 +86,7 @@ public final class ArtifactTooltips {
         String mode=ArtifactInteraction.modeKey(ability,abilityMode(stack,k));
         section(lines,"manual4.what",Component.translatable("mining.identity."+ability.id+"."+mode));
         section(lines,"manual4.how",how(ability,mode));
-        section(lines,"screen.specialpickaxes.alternate",Component.translatable("alternate.detail.specialpickaxes."+ability.id));
+        section(lines,"screen.specialpickaxes.alternate",alternate(ability));
         section(lines,"manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"));
         section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));

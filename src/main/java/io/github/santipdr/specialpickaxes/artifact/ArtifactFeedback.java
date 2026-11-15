@@ -392,6 +392,7 @@ public final class ArtifactFeedback {
     }
     /** A private helix confirms which passive profile has entered the Curios slot. */
     public static void curiosAttunement(ServerPlayer player,ArtifactKind kind){
+        if(!reserveMiningParticles(player,20))return;
         var level=player.serverLevel();int rgb=kind.color;
         var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),.92F);
         Vec3 origin=player.position().add(0,.12D,0);long phase=level.getGameTime();

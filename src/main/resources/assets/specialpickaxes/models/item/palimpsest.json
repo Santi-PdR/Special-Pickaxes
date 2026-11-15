@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "specialpickaxes:item/palimpsest"
+    "layer0": "specialpickaxes:item/palimpsest_v2"
   }
 }

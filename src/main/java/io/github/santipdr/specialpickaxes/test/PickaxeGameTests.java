@@ -590,6 +590,11 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_259") public static void instructionComponentsCarryLiveBindingsForEveryPlayableMode(GameTestHelper h){
         for(var kind:ArtifactKind.playableValues())for(var mode:ArtifactInteraction.modes(kind)){
+            var alternate=ArtifactTooltips.alternate(kind);
+            var alternateArgs=((net.minecraft.network.chat.contents.TranslatableContents)alternate.getContents()).getArgs();
+            h.assertTrue(alternateArgs.length==3,"alternate prose includes live binding arguments");
+            for(var arg:alternateArgs)h.assertTrue(arg instanceof net.minecraft.network.chat.Component binding
+                    &&binding.getContents() instanceof net.minecraft.network.chat.contents.KeybindContents,"alternate instruction uses keybind components");
             var how=ArtifactTooltips.how(kind,mode);
             h.assertTrue(how.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents,"instruction is translatable");
             var args=((net.minecraft.network.chat.contents.TranslatableContents)how.getContents()).getArgs();
@@ -620,6 +625,35 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var lift=new IcarianLiftProgram(base,20);
         WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);var departure=wearer.position().add(0,7,0);wearer.setPos(departure);drain(wearer);
         h.assertTrue(lift.departed()&&wearer.position().equals(departure)&&!WorkQueue.busy(wearer),"same-column external teleport is not undone by the old lift");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_263") public static void loginIgnoresCorruptDeadlineButRestoresTheOtherValidCooldown(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var state=ArtifactState.of(wearer,ArtifactKind.EVENTIDE);long now=ArtifactState.now(wearer);var item=wearer.getMainHandItem().getItem();
+        state.putLong("ready",Long.MAX_VALUE);state.putLong("alternateReady",now+40);
+        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+            h.assertTrue(wearer.getCooldowns().isOnCooldown(item),"the valid alternate interval is restored");
+            for(int n=0;n<40;n++)wearer.getCooldowns().tick();
+            h.assertTrue(!wearer.getCooldowns().isOnCooldown(item),"an invalid primary deadline cannot strand the icon after the real forty ticks");
+        }finally{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(wearer));finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_264") public static void loginNeverSynchronizesAnImpossibleCooldown(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var state=ArtifactState.of(wearer,ArtifactKind.IRIDIUM);state.putLong("ready",Long.MAX_VALUE);state.putLong("alternateReady",Long.MIN_VALUE);
+        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+            h.assertTrue(!wearer.getCooldowns().isOnCooldown(wearer.getMainHandItem().getItem()),"corrupt NBT does not create an Integer.MAX_VALUE item cooldown");
+        }finally{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(wearer));finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_265") public static void loginPreservesTheLongerOfTwoLegitimateCooldowns(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CHOIR);var state=ArtifactState.of(wearer,ArtifactKind.CHOIR);long now=ArtifactState.now(wearer);var item=wearer.getMainHandItem().getItem();
+        state.putLong("ready",now+10);state.putLong("alternateReady",now+80);
+        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+            for(int n=0;n<79;n++)wearer.getCooldowns().tick();h.assertTrue(wearer.getCooldowns().isOnCooldown(item),"last alternate tick is retained");
+            wearer.getCooldowns().tick();h.assertTrue(!wearer.getCooldowns().isOnCooldown(item),"normal eighty-tick interval expires exactly");
+        }finally{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(wearer));finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_266") public static void skippedAttunementParticlesNeverPreventThePassive(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);wearer.setOnGround(false);
+        for(int n=0;n<4096&&ArtifactFeedback.reserveMiningParticles(wearer,1);n++){}
+        ArtifactFeedback.curiosAttunement(wearer,ArtifactKind.ICARUS);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
+        h.assertTrue(wearer.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get()),"equipping a pick still grants its passive even if cosmetic attunement has no allowance");finish(h,wearer);
     }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));

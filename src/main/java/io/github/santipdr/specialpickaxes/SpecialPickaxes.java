@@ -187,8 +187,9 @@ public final class SpecialPickaxes {
         if(e.getEntity() instanceof ServerPlayer p) { trackPassivePlayer(p);for(var kind:ArtifactKind.playableValues()) {
             ArtifactState.prune(p,kind);
             var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
-            long ticks=Math.max(state.getLong("ready"),state.getLong("alternateReady"))-now;
-            if(ticks>0) p.getCooldowns().addCooldown(PICKS.get(kind).get(),(int)Math.min(ticks,Integer.MAX_VALUE));
+            int ticks=Math.max(PersistedCooldown.remaining(now,state.getLong("ready"),Math.max(10,ArtifactConfig.COOLDOWN.get())),
+                    PersistedCooldown.remaining(now,state.getLong("alternateReady"),Math.max(100,ArtifactConfig.COOLDOWN.get()*5)));
+            if(ticks>0)p.getCooldowns().addCooldown(PICKS.get(kind).get(),ticks);
         } }
     }
     private void speed(PlayerEvent.BreakSpeed e) {

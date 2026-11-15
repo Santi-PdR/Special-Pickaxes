@@ -26,6 +26,7 @@ public final class ClientTooltipValidation {
                     if(action!=io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.CONFIRM&&action!=io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.PAUSE&&action!=io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.SELECT&&action!=io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.CANCEL&&!registered.contains(keys[action.ordinal()]))throw new IllegalStateException("Missing registered binding: "+action);
                 if(!registered.contains(io.github.santipdr.specialpickaxes.client.RelicKeys.MANUAL))throw new IllegalStateException("Missing manual binding");
                 var bind=keys[0];var old=bind.getKey();
+                var alternateBind=keys[io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ALT_SKILL.ordinal()];var oldAlternate=alternateBind.getKey();
                 try{
                     bind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_O));
                     var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
@@ -35,8 +36,14 @@ public final class ClientTooltipValidation {
                     String how=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.how(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.SEAM_RIPPER,"connected").getString();
                     if(!how.contains(" "+bind.getTranslatedKeyMessage().getString()+".")||how.contains("%1$s"))
                         throw new IllegalStateException("Instruction prose ignored rebound key: "+how);
+                    alternateBind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_P));
+                    String alternate=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.alternate(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.EVENTIDE).getString();
+                    if(!alternate.contains(" "+alternateBind.getTranslatedKeyMessage().getString()+" ")
+                            ||!alternate.contains(" "+bind.getTranslatedKeyMessage().getString()+" ")||alternate.contains("%3$s"))
+                        throw new IllegalStateException("Alternate prose ignored rebound controls: "+alternate);
+                    com.mojang.logging.LogUtils.getLogger().info("ALTERNATE_BINDINGS_REBOUND_OK");
                     com.mojang.logging.LogUtils.getLogger().info("INSTRUCTION_BINDINGS_REBOUND_OK");
-                }finally{bind.setKey(old);net.minecraft.client.KeyMapping.resetMapping();}
+                }finally{bind.setKey(old);alternateBind.setKey(oldAlternate);net.minecraft.client.KeyMapping.resetMapping();}
                 bindingsChecked=true;com.mojang.logging.LogUtils.getLogger().info("KEY_BINDINGS_REGISTERED_AND_REBOUND_OK");
             }
             boolean shift=net.minecraft.client.gui.screens.Screen.hasShiftDown();String key=item.kind.id+"-"+io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.modeKey(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))+(shift?"-shift":"-normal");

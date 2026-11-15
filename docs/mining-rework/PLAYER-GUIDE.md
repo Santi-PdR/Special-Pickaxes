@@ -103,3 +103,8 @@ Las colocaciones pagadas rechazan cambios de creativo/supervivencia durante un
 callback de permisos o colocación: no dejan material gratis ni gastan un pago
 antiguo. Los previews usan hasta 24 muestras distribuidas por todo el plan,
 incluido su extremo final, sin aumentar el presupuesto de partículas.
+
+El ascensor de Icarus se detiene si sales de su eje o un mod te teletransporta
+fuera del avance esperado: no continúa cortando ni te arrastra a tu posición
+anterior. Las partículas de sintonía Curios pueden omitirse por presupuesto sin
+impedir las pasivas. Al reconectar sólo se sincronizan recargas con plazos válidos.
