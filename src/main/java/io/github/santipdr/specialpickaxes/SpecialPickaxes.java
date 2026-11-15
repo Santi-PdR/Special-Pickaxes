@@ -184,13 +184,17 @@ public final class SpecialPickaxes {
         if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);DomainFields.stop(p);WorldloomSnare.forget(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { trackPassivePlayer(p);for(var kind:ArtifactKind.playableValues()) {
+        if(e.getEntity() instanceof ServerPlayer p) { trackPassivePlayer(p);restoreCooldowns(p); }
+    }
+    /** Restore our persisted item overlays without invoking unrelated Forge login handlers. */
+    public static void restoreCooldowns(ServerPlayer p) {
+        for(var kind:ArtifactKind.playableValues()) {
             ArtifactState.prune(p,kind);
             var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
             int ticks=Math.max(PersistedCooldown.remaining(now,state.getLong("ready"),Math.max(10,ArtifactConfig.COOLDOWN.get())),
                     PersistedCooldown.remaining(now,state.getLong("alternateReady"),Math.max(100,ArtifactConfig.COOLDOWN.get()*5)));
             if(ticks>0)p.getCooldowns().addCooldown(PICKS.get(kind).get(),ticks);
-        } }
+        }
     }
     private void speed(PlayerEvent.BreakSpeed e) {
         var p=e.getEntity();

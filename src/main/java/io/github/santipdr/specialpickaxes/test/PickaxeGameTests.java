@@ -629,7 +629,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_263") public static void loginIgnoresCorruptDeadlineButRestoresTheOtherValidCooldown(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE);var state=ArtifactState.of(wearer,ArtifactKind.EVENTIDE);long now=ArtifactState.now(wearer);var item=wearer.getMainHandItem().getItem();
         state.putLong("ready",Long.MAX_VALUE);state.putLong("alternateReady",now+40);
-        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+        try{SpecialPickaxes.restoreCooldowns(wearer);
             h.assertTrue(wearer.getCooldowns().isOnCooldown(item),"the valid alternate interval is restored");
             for(int n=0;n<40;n++)wearer.getCooldowns().tick();
             h.assertTrue(!wearer.getCooldowns().isOnCooldown(item),"an invalid primary deadline cannot strand the icon after the real forty ticks");
@@ -637,14 +637,14 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_264") public static void loginNeverSynchronizesAnImpossibleCooldown(GameTestHelper h){
         var wearer=player(h,ArtifactKind.IRIDIUM);var state=ArtifactState.of(wearer,ArtifactKind.IRIDIUM);state.putLong("ready",Long.MAX_VALUE);state.putLong("alternateReady",Long.MIN_VALUE);
-        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+        try{SpecialPickaxes.restoreCooldowns(wearer);
             h.assertTrue(!wearer.getCooldowns().isOnCooldown(wearer.getMainHandItem().getItem()),"corrupt NBT does not create an Integer.MAX_VALUE item cooldown");
         }finally{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(wearer));finish(h,wearer);}
     }
     @GameTest(template="empty",batch="rework_each_265") public static void loginPreservesTheLongerOfTwoLegitimateCooldowns(GameTestHelper h){
         var wearer=player(h,ArtifactKind.CHOIR);var state=ArtifactState.of(wearer,ArtifactKind.CHOIR);long now=ArtifactState.now(wearer);var item=wearer.getMainHandItem().getItem();
         state.putLong("ready",now+10);state.putLong("alternateReady",now+80);
-        try{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(wearer));
+        try{SpecialPickaxes.restoreCooldowns(wearer);
             for(int n=0;n<79;n++)wearer.getCooldowns().tick();h.assertTrue(wearer.getCooldowns().isOnCooldown(item),"last alternate tick is retained");
             wearer.getCooldowns().tick();h.assertTrue(!wearer.getCooldowns().isOnCooldown(item),"normal eighty-tick interval expires exactly");
         }finally{MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(wearer));finish(h,wearer);}
