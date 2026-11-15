@@ -1,3 +1,24 @@
+# 5.10.457 — pasivas seguras y presupuesto de enlaces; pendiente de CI
+
+PassiveReactionContext fija jugador, atacante, nivel y posiciones antes de
+consultar claims. Tras callbacks no aplica represalias a actores movidos,
+muertos, aliados o desautorizados; Null Veil no consume su recarga si el
+contexto dejó de ser válido. Heartwood conserva su defensa propia, pero no
+aplica raíces a un atacante movido por otro mod. No se añaden ataques ni se
+modifican las secundarias mineras. Cuatro GameTests nuevos cubren movimiento
+del atacante/del portador, revocación de construcción y defensa Heartwood.
+
+MiningObservations exige la herramienta original también en observaciones
+Iridium encoladas/Curios, y descarta al pasar a espectador. Dos GameTests
+comprueban que no conceden Lode Surge ni propiedad de drops tras invalidarse.
+Los siete enlaces antiguos de efectos compartidos también reservan ahora su
+coste real para ambos espectadores, incluyendo el acento de Worldbreaker.
+Un GameTest exige exactamente 58 partículas para los siete enlaces juntos.
+
+Local: 25 recursos, 63 Python con Pillow, 146 Java parseados, secrets y diffcheck
+correctos. Sin build local. Esperados 110 JUnit y 347 GameTests; no afirmar
+resultados remotos hasta recuperar evidencia CI. Base visual preservada.
+
 ## Entrega verificada 5.10.456
 
 - Fuente: `95b36f35908e32db1f630dfd6523cb2704da0da1`.

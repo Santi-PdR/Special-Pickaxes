@@ -95,7 +95,7 @@ public final class ArtifactPassives {
         state.putLong("sharedHeartwoodReady",now+160);
         event.setAmount(event.getAmount()*.9F);
         grantCombatEffect(player,renewal,0,60);
-        if(WorldSafety.allowed(player,ArtifactKind.WORLDLOOM,attacker.blockPosition())){
+        if(PassiveReactionContext.capture(player,attacker).allowed(ArtifactKind.WORLDLOOM)){
             grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_GRASP.get(),0,60);
             ArtifactFeedback.burst(player,ArtifactKind.WORLDLOOM,attacker.blockPosition(),5);
         }
@@ -117,7 +117,7 @@ public final class ArtifactPassives {
         }
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return false;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return false;
-        if(!WorldSafety.allowed(player,ArtifactKind.AXIOM,attacker.blockPosition()))return false;
+        if(!PassiveReactionContext.capture(player,attacker).allowed(ArtifactKind.AXIOM))return false;
         var state=ArtifactState.of(player,ArtifactKind.AXIOM);long now=ArtifactState.now(player);
         if(PersistedCooldown.active(now,state.getLong("sharedNullVeilReady"),160))return false;
         state.putLong("sharedNullVeilReady",now+160);
@@ -150,10 +150,13 @@ public final class ArtifactPassives {
         }
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
+        var reaction=PassiveReactionContext.capture(player,attacker);
         boolean retaliationAllowed=switch(kind){
-            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> WorldSafety.allowed(player,kind,attacker.blockPosition());
+            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> reaction.allowed(kind);
             default -> false;
         };
+        // A non-cancelling claim hook can still teleport, kill or ally either actor.
+        if(!reaction.valid())return;
         if(!retaliationAllowed&&switch(kind){
             case CHOIR,CRUCIBLE,ICARUS,AXIOM,EXODIUM -> true;
             default -> false;

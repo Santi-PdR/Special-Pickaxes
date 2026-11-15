@@ -1,3 +1,12 @@
+## Revisión 5.10.457 (pendiente de pruebas remotas)
+
+Los cambios de posición o permisos efectuados por claims durante una pasiva
+no redirigen su respuesta a una ubicación nueva. Cambiar de herramienta antes
+de confirmar una rotura diferida de Iridium, o pasar a espectador, descarta esa
+observación: no añade ritmo minero ni marca drops ajenos. Los enlaces visuales
+entre aliados comparten el límite cosmético; perder el enlace por saturación no
+elimina la protección. No cambia el daño, las recetas ni las secundarias.
+
 # Guía del catálogo minero
 
 Forge 1.20.1, Java 17. Catálogo de **13 picos**, sin recetas de fabricación.

@@ -706,6 +706,68 @@ public final class PickaxeGameTests {
         var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);var second=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);
         h.assertTrue(ArtifactPassives.onSharedHeartwoodGuard(p,first)&&Math.abs(first.getAmount()-9F)<.001F&&!ArtifactPassives.onSharedHeartwoodGuard(p,second)&&second.getAmount()==10F,"shared renewal recovers from corrupt future NBT without granting repeated counters");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_273") public static void curiosCounterDoesNotFollowTeleportedAttacker(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=e->{if(e.player==p){attacker.setPos(attacker.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(attacker),10F);
+        try{ArtifactPassives.onCuriosDamage(p,hit,ArtifactKind.CHOIR);
+            h.assertTrue(hit.getAmount()==10F&&!attacker.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get())&&ArtifactState.of(p,ArtifactKind.CHOIR).getLong("curiosPassiveReady")==0,"changed claim context neither applies the stale counter nor spends its cooldown");
+        }finally{p.getAbilities().mayBuild=true;MinecraftForge.EVENT_BUS.unregister(change);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_274") public static void curiosCounterDoesNotFollowTeleportedWearer(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=e->{if(e.player==p){p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(attacker),10F);
+        try{ArtifactPassives.onCuriosDamage(p,hit,ArtifactKind.CHOIR);
+            h.assertTrue(hit.getAmount()==10F&&!attacker.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get())&&ArtifactState.of(p,ArtifactKind.CHOIR).getLong("curiosPassiveReady")==0,"changed claim context neither applies the stale counter nor spends its cooldown");
+        }finally{p.getAbilities().mayBuild=true;MinecraftForge.EVENT_BUS.unregister(change);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_275") public static void curiosCounterStopsAfterClaimRevokesBuildPermission(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=e->{if(e.player==p){p.getAbilities().mayBuild=false;}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(attacker),10F);
+        try{ArtifactPassives.onCuriosDamage(p,hit,ArtifactKind.CHOIR);
+            h.assertTrue(hit.getAmount()==10F&&!attacker.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get())&&ArtifactState.of(p,ArtifactKind.CHOIR).getLong("curiosPassiveReady")==0,"changed claim context neither applies the stale counter nor spends its cooldown");
+        }finally{p.getAbilities().mayBuild=true;MinecraftForge.EVENT_BUS.unregister(change);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_276") public static void sharedHeartwoodNeverRootsAnAttackerMovedByClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.HEARTWOOD_RENEWAL.get(),100));
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p)attacker.setPos(attacker.position().add(0,0,1));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(attacker),10F);
+        try{h.assertTrue(ArtifactPassives.onSharedHeartwoodGuard(p,hit)&&Math.abs(hit.getAmount()-9F)<.001F&&!attacker.hasEffect(SpecialPickaxes.HEARTWOOD_GRASP.get()),"independent self defense remains, but a moved attacker receives no stale root");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_277") public static void deferredIridiumObservationRejectsAChangedHeldTool(GameTestHelper h){
+        var p=player(h,ArtifactKind.IRIDIUM);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        h.assertTrue(MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,pos,ore,false),"queued-style ore observation captured");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.STICK));MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"invalidated observation grants no surge or ownership of drops");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_278") public static void deferredIridiumObservationRejectsSpectatorTransition(GameTestHelper h){
+        var p=player(h,ArtifactKind.IRIDIUM);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        h.assertTrue(MiningObservations.capture(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,pos,ore,false),"queued-style ore observation captured");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
+        var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        p.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"invalidated observation grants no surge or ownership of drops");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_279") public static void allLegacySharedLinksReserveTheirExactTwoViewerCost(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR,"LinkBudgetOwner");var ally=player(h,ArtifactKind.ICARUS,"LinkBudgetAlly");
+        // Force a fresh allowance when the first real-tick link is requested.
+        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,0,1);
+        ArtifactFeedback.choirMiningLink(p,ally);ArtifactFeedback.stasisWardLink(p,ally);
+        ArtifactFeedback.graviticBalanceLink(p,ally);ArtifactFeedback.heartwoodRenewalLink(p,ally);
+        ArtifactFeedback.nullVeilLink(p,ally);ArtifactFeedback.worldbreakerAegisLink(p,ally);ArtifactFeedback.crucibleMantleLink(p,ally);
+        h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4038)&&!ArtifactFeedback.reserveMiningParticles(p,1),"all seven legacy links reserve exactly 58 particles including both viewers and Worldbreaker's accent");
+        finish(h,ally);finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

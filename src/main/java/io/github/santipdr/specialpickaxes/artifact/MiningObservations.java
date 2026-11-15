@@ -48,8 +48,9 @@ public final class MiningObservations {
         int budget=512;
         while(budget-->0 && !PENDING.isEmpty()) {
             var o=PENDING.removeFirst();var p=o.player;
-            if(!p.isAlive() || p.isRemoved() || p.level().dimension()!=o.dimension
-                    || (o.applyHeldMiningEffects&&(p.getMainHandItem()!=o.tool||o.tool.isEmpty()))
+            if(!p.isAlive() || p.isRemoved() || p.isSpectator() || p.level().dimension()!=o.dimension
+                    // Queued/Curios ore observations also belong to the original held tool.
+                    || p.getMainHandItem()!=o.tool || o.tool.isEmpty()
                     || !ObservationWindow.fresh(p.server.getTickCount(),o.time) || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)){
