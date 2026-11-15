@@ -98,6 +98,17 @@ jobs:
             build/libs/*.jar
             build/RELEASE.json
             build/SHA256SUMS
+      # Actions artifact download requires a signed-in GitHub user; no public release or Checks binary.
+      - name: Retain personal test build for authenticated download
+        if: success()
+        uses: actions/upload-artifact@v6
+        with:
+          name: special-pickaxes-${{ steps.mod-version.outputs.value }}-personal
+          retention-days: 7
+          path: |
+            build/libs/*.jar
+            build/RELEASE.json
+            build/SHA256SUMS
       - if: always()
         uses: actions/upload-artifact@v6
         with:
