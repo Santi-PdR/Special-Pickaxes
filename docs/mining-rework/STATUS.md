@@ -1,3 +1,16 @@
+# 5.10.466 — desvío Crucible con permiso en ejecución; pendiente de CI
+
+La selección de proyectiles del campo Crucible deja de ejecutar listeners de
+permisos dentro de la iteración de entidades. Primero reúne hasta32candidatos
+con presupuesto de inspección256; después comprueba permisos por candidato y
+revalida identidad/contexto del campo, posición exacta del proyectil, vida,
+dimensión, propietario hostil y trayectoria antes de cambiar la velocidad.
+Una traslación sub-bloque o cambio a propietario aliado cancela el desvío;
+si se mueve el portador, termina el lote. No añade daño ni altera entidades
+aliadas. Tres GameTests309–311 cubren esos cambios durante el callback.
+Incluye465. Esperados126JUnit/379GameTests; pendientes de CI.
+Local parser155Java,25recursos,73Python conPillow y diffcheck correctos.
+
 # 5.10.465 — entregas de campos resistentes a callbacks; pendiente de CI
 
 Revisión de Stasis colocado: sus entregas de efectos podían continuar después

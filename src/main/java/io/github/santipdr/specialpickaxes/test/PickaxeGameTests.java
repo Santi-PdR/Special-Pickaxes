@@ -1013,6 +1013,34 @@ public final class PickaxeGameTests {
         try{DomainFields.tick();h.assertTrue(calls[0]==1&&!p.hasEffect(SpecialPickaxes.DOMINION.get())&&!p.hasEffect(MobEffects.NIGHT_VISION),"claim approval cannot continue a field tick at a callback-chosen location");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
     }
+    private static net.minecraft.world.entity.projectile.Arrow fieldWardArrow(GameTestHelper h,ServerPlayer owner){
+        var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),owner.getX()+3,owner.getY()+.9D,owner.getZ());
+        arrow.setDeltaMovement(-1,0,0);h.getLevel().addFreshEntity(arrow);return arrow;
+    }
+    @GameTest(template="empty",batch="rework_each_309") public static void crucibleFieldDoesNotDeflectAProjectileMovedByClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);p.tickCount=1;var arrow=fieldWardArrow(h,p);var original=arrow.position();int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,p.blockPosition(),8),"ward starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p&&e.target.equals(BlockPos.containing(original))){calls[0]++;arrow.setPos(original.add(.1,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&arrow.position().equals(original.add(.1,0,0))&&arrow.getDeltaMovement().equals(new Vec3(-1,0,0)),"a sub-block displacement inside permission callbacks invalidates the deflection");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);arrow.discard();finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_310") public static void crucibleFieldStopsAfterItsOwnerMovesInsideClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);p.tickCount=1;var arrow=fieldWardArrow(h,p);var original=arrow.blockPosition();int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,p.blockPosition(),8),"ward starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p&&e.target.equals(original)){calls[0]++;p.setPos(p.position().add(.1,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&arrow.getDeltaMovement().equals(new Vec3(-1,0,0)),"ward cannot resume at the listener-chosen wearer position");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);arrow.discard();finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_311") public static void crucibleFieldRechecksProjectileOwnershipAfterClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);var ally=player(h,ArtifactKind.ICARUS,"WardArrowAlly");var team=auraTeam(h,p,ally);p.tickCount=1;var arrow=fieldWardArrow(h,p);var original=arrow.blockPosition();int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,p.blockPosition(),8),"ward starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=e->{if(e.player==p&&e.target.equals(original)){calls[0]++;arrow.setOwner(ally);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&arrow.getOwner()==ally&&arrow.getDeltaMovement().equals(new Vec3(-1,0,0)),"newly allied projectile ownership prevents a pending deflection");}
+        finally{MinecraftForge.EVENT_BUS.unregister(change);arrow.discard();h.getLevel().getScoreboard().removePlayerTeam(team);finish(h,ally);finish(h,p);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

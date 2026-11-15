@@ -276,13 +276,18 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.CRUCIBLE) {
                 if(p.tickCount%20==0)ArtifactFeedback.crucibleWardBoundary(p,f.radius);
                 Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
+                // Selection predicates must not invoke external claim callbacks during entity iteration.
                 var projectiles=projectilesNear(level,new AABB(f.center).inflate(f.radius+24),center,cap,e->e.isAlive()
-                        &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr)
-                        &&WorldSafety.allowed(p,f.kind,e.blockPosition()),CRUCIBLE_PROJECTILE_INSPECTION_BUDGET);
+                        &&hostileProjectile(e,p,false)&&withinProjectilePath(e,center,rangeSqr),CRUCIBLE_PROJECTILE_INSPECTION_BUDGET);
                 for(var projectile:projectiles){
-                    if(FIELDS.get(p.getUUID())!=f||p.serverLevel()!=level||p.getMainHandItem()!=f.tool)break;
+                    if(!fieldTickValid(f,tickOrigin))break;
                     if(!projectile.isAlive()||projectile.level()!=level||!hostileProjectile(projectile,p,false)
                             ||!withinProjectilePath(projectile,center,rangeSqr))continue;
+                    var checkedPosition=projectile.position();
+                    if(!WorldSafety.allowed(p,f.kind,projectile.blockPosition()))continue;
+                    if(!fieldTickValid(f,tickOrigin))break;
+                    if(!projectile.isAlive()||projectile.level()!=level||!projectile.position().equals(checkedPosition)
+                            ||!hostileProjectile(projectile,p,false)||!withinProjectilePath(projectile,center,rangeSqr))continue;
                     Vec3 away=projectile.position().subtract(p.position()).normalize();
                     if(away.lengthSqr()<.01)away=p.getLookAngle().normalize();
                     double speed=Math.min(4.0,Math.max(1.5,projectile.getDeltaMovement().length()));
