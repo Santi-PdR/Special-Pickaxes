@@ -241,7 +241,6 @@ def apply():
   path.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
  for tag in ['pickaxes','axes','shovels']:
   (root/f'data/minecraft/tags/items/{tag}.json').write_text(json.dumps({'replace':False,'values':['specialpickaxes:'+id for id in IDS]},indent=2)+'\n')
- for folder in ['models/item','textures/item']:
-  for path in (root/f'assets/specialpickaxes/{folder}').iterdir():
-   if path.name.split('.')[0] not in IDS:path.unlink()
+ # Assets (including runtime variants and provenance sources) are never garbage-collected here.
+ # The catalog updater owns text/tags only; asset removal requires an explicit reviewed change.
 if __name__=='__main__':apply()

@@ -1,3 +1,15 @@
+# 5.10.444 — pendiente de CI
+
+Mantenimiento integral: el actualizador del catálogo ya no elimina iconos_v2,
+fuentes preservadas ni metadatos de animación. Regresión con árbol desechable.
+Guía de13picos actualizada: elimina secundarias obsoletas de combate y explica
+controles, durabilidad, permisos y alcance real de las comprobaciones.
+La prueba multivariante de revocación sólo declara éxito al terminar las4familias.
+Exportador PDF/ZIP comprobado con fixtures temporales:13páginas,26imágenes,
+bytes originales, hashes yCRC; no son fotos de juego ni se entregan como tales.
+Local:23recursos y54Python pasan envenvconPillow (sinPillow:53pasan/1skip),
+parser139Java/diffcheckOK.308GameTests/92JUnit esperados pendientes deCI.
+
 # 5.10.443 — revisión integral pendiente de CI
 
 Cierra la ventana entre WorkProgram.next y apply: no aplica pasos con actor

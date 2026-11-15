@@ -1,32 +1,98 @@
-# Guía del catálogo 5.9.0
+# Guía del catálogo minero
 
-R activa la habilidad principal de minería; X la técnica secundaria; C cambia de modo; I abre el
-Manual con la textura, pasiva y habilidades. Curios solo aplica las pasivas del pico equipado; no tiene botones propios. B arma una selección regional,
-los clics izquierdos fijan esquinas, Enter confirma solo cuando aparece LISTO,
-V cancela y K pausa/reanuda. R también reanuda un trabajo pausado por drops.
+Forge 1.20.1, Java 17. Catálogo de **13 picos**, sin recetas de fabricación.
+Esta guía describe el comportamiento implementado; el resultado de cada revisión
+se registra en `STATUS.md`. No certifica compatibilidad con el pack Ghouls completo.
 
-Todos los picos tienen técnica principal R, técnica alternativa X y una pasiva.
-El tooltip resume esas tres líneas; abre el Manual con I para ver instrucciones.
-Al equiparlos en Curios solo se aplican sus pasivas.
+## Controles predeterminados
 
-| Pico | Habilidades principales y alternativas |
+Se pueden reasignar en Opciones → Controles → Special Pickaxes; los tooltips usan
+la tecla configurada, no una letra fija.
+
+| Tecla | Acción |
 |---|---|
-| Palimpsest | Extrae vetas conectadas; X activa una onda de empuje contra hostiles cercanos. |
-| Choir of Faults | Abre un túnel seguro 2×2 de 20 bloques hacia delante; X abre una perforación corta y segura 2×2. |
-| Eventide — La Noche que Pesa | Mantiene el campo gravitatorio; X atrae drops sueltos cercanos. |
-| Paradox Crucible | Selecciona una región y transmuta geología, incluida calcita y obsidiana; X desvía proyectiles hostiles cercanos. |
-| Crown of Stasis | Alterna dominio marcado de 16×16 y aura; X traslada el dominio conservando su tiempo o detiene amenazas en modo Aura. Los compañeros reciben sus beneficios dentro del borde. |
-| Loom of the First Quarry | Excava una esfera de geología natural de radio 8; X atrae un objetivo hostil hacia ti. |
-| Tear of Icarus | Perfora hacia delante; X empuja al objetivo que miras; Caída lenta es pasiva en el aire. Sus efectos usan partículas doradas, de encantamiento y vara de End. |
-| Hollow Axiom | Excava una malla radial de roca natural y conserva las menas; X pliega un objetivo hostil hacia ti. |
-| Worldbreaker | Conserva sus cortes y selección regional; el Manual permite elegir por icono qué técnicas R/X copiar. |
-| Exodium Starfall | Lanza minera de 13×9 hasta 48 bloques; X te pliega detrás de un objetivo visible, en espacio seguro. |
-| Iridium Lodebreaker | Busca menas de Forge y vanilla en un volumen 29×15×29 por tandas, extrae hasta 192, ilumina sus drops y X los atrae hacia ti. |
-| Hellspec Infernal Bloom | Excava geología y menas; la resistencia al fuego es pasiva y X convierte lava fuente apuntada en obsidiana. |
+| R | Activar la técnica principal; con trabajo activo pausa/reanuda, y cuando está LISTO confirma. |
+| X | Técnica secundaria de utilidad minera; si hay trabajo/selección activa, lo cancela primero. No ataca ni controla criaturas/proyectiles. |
+| C | Cambiar modo cuando el pico tiene varios. |
+| I | Abrir el manual del pico en mano, o del equipado en Curios si la mano no lleva uno. |
+| B | Armar selección regional, cuando el modo lo permite. |
+| Clic izquierdo | Marcar esquinas durante la selección. |
+| Enter | Confirmar una región cuando termina el análisis y aparece LISTO. |
+| K | Pausar/reanudar trabajo; confirmar también exige conservar la herramienta original. |
+| V | Cancelar el trabajo o selección. |
 
-R/X corresponden al pico cuando lo usas en la mano. Al equiparlo en Curios conserva sus pasivas, incluida Visión nocturna, sin habilidades activas adicionales. No se aplica Fuerza. Curios es opcional.
+El tooltip compacto muestra tres líneas; **mantén SHIFT** para ampliar instrucciones,
+pasivas, costes y controles. El manual permite consultar los detalles y elegir qué
+pico copia Worldbreaker. Las teclas R/X actúan sobre la herramienta en la mano
+principal: Curios aplica pasivas, no añade un segundo conjunto de habilidades activas.
 
-Las excavaciones se procesan en el scheduler global, verifican cada bloque y
-pausan ante congestión de drops. No cargan chunks ni atraviesan fluidos, máquinas,
-bedrock, claims o celdas protegidas. El modo regional baja a cero la velocidad de
-rotura mientras eliges esquinas, para evitar romper bloques por accidente.
+## Qué hace cada pico
+
+| Pico | Técnica principal R | Secundaria X |
+|---|---|---|
+| Palimpsest | Sigue una veta conectada de mena. | Sondea hasta 32 menas naturales cercanas al objetivo, sin romperlas. |
+| Fault Choir | Túnel 2×2 hasta 20 bloques hacia delante. | Galería arqueada de 3 de ancho, 3 de alto y 8 de largo; conserva esquinas superiores. |
+| Eventide | Campo gravitatorio marcado; C cambia su polaridad. | Atrae hasta 64 drops cercanos no reservados a otro jugador, en radio 16. |
+| Paradox Crucible | Transmuta geología natural en una región o por proximidad; C selecciona material. | Convierte una muestra natural al material seleccionado. |
+| Interregnum | Dominio de estasis marcado o aura, según el modo. | Extracción de precisión de un bloque natural picable; no mueve ni activa un campo contra criaturas. |
+| Worldloom | Excava una esfera de geología natural de radio 8. | Pasarela de hasta 9 bloques desde tus pies hacia delante, pagada con bloques inertes sin NBT de la mano secundaria. |
+| Icarus | Perforación hacia delante. | Ascensor minero 1×2 que desplaza de forma segura al propio minero; no funciona montado o durmiendo. |
+| Hollow Axiom | Excava roca en un volumen radial conservando las menas. | Despeja geología de las seis caras contiguas a la mena apuntada, preservando el núcleo. |
+| Worldbreaker | Cortes direccionales, pozo vertical, cuña escalonada y selección regional; puede copiar otro pico desde el manual. | Ejecuta la utilidad minera del pico copiado. Necesita elegir origen primero. |
+| Exodium | Lanza minera 13×9 hasta 48 bloques hacia delante. | Pozo octogonal de sección 5×5 hasta 32 bloques hacia abajo. |
+| Iridium | Busca y extrae menas cargadas desde el centro de un volumen elipsoidal 29×15×29, por tandas. | Recupera hasta 96 drops de tus menas marcadas por Iridium, en radio 48. |
+| Hellspec | Cantera de cinco pétalos de geología y menas naturales. | Chimenea 3×3 hasta 12 bloques por encima del objetivo. |
+| Seam Ripper | Filón conectado de piedra natural del mismo material, hasta 256 bloques. | Barrido 7×7 de la cara de piedra natural apuntada; conserva menas y bloques colocados. |
+
+Las secundarias no tienen acciones de combate. Las **primarias de campo, pasivas
+defensivas y firmas de golpe preexistentes** no se han eliminado: no confundas la
+restricción de X con una eliminación global de toda interacción con criaturas.
+
+## Coste y potencia minera
+
+- Daño base melee sin encantamientos: **4 puntos**, no los 25 anteriores. No es un
+  límite universal al daño final de encantamientos, otros mods o efectos.
+- Tier V, durabilidad base 32.768 y velocidad minera base 64; los perfiles de cada
+  pico aumentan la velocidad en sus materiales especializados.
+- Las menas extranjeras pueden reconocerse aun sin tags vanilla de herramienta.
+  La revisión 441 y posteriores respetan requisitos explícitos de tiers superiores
+  registrados en Forge; esto no sustituye una prueba con cada mod instalado.
+- Por defecto, activar cuesta 2 de durabilidad y la principal recarga 1 segundo.
+  La secundaria recarga al menos 5 segundos. Configuración y encantamientos pueden
+  modificar costes o trabajo; SHIFT/manual muestran el perfil sincronizado.
+- Una activación necesita dejar **al menos un punto de durabilidad**. Si no alcanza,
+  repara el pico. Una secundaria rechazada por falta de operación no consume su
+  durabilidad de activación ni su enfriamiento.
+
+## Si una técnica no funciona
+
+1. Conserva el pico original en la mano principal. Cambiarlo por una copia con el
+   mismo NBT no permite reanudar su trabajo anterior.
+2. Revisa objetivo, modo y material. Eventide necesita drops elegibles; Iridium
+   necesita tus drops marcados; Worldloom requiere material en la otra mano y la
+   primera celda de suelo libre; Worldbreaker necesita un origen seleccionado.
+3. Espera el enfriamiento indicado. Repara si no queda durabilidad suficiente.
+4. Para regiones, espera el análisis y confirma; no basta con marcar esquinas.
+5. Si hay congestión de drops, recógelos y reanuda. Si falta un chunk, vuelve a
+   cargarlo normalmente; las habilidades no fuerzan su carga.
+6. Revisa permisos del servidor, modo de juego y límites de trabajos activos.
+   Un rechazo no autoriza a saltarse un claim ni a continuar tras un cambio de permisos.
+
+Las operaciones de área se reparten por ticks y comprueban cada bloque. Las rutas
+se detienen ante sus barreras; las operaciones protegen fluidos, bedrock, máquinas
+y celdas no autorizadas. Los modos regionales reducen la velocidad manual durante
+selección/preparación/ejecución para evitar roturas accidentales, no la ponen a cero.
+El seguimiento de bloques colocados no reconstruye el historial anterior a la
+instalación del mod: no puede identificar toda construcción antigua.
+
+Los efectos y sonidos son cosméticos limitados. Si se agota el presupuesto de
+partículas, puede omitirse una señal sin cancelar una excavación autorizada. Una
+captura fija de CI no demuestra la animación completa ni una medición de TPS.
+
+## Galería vinculada a una versión
+
+`tools/fetch_ci_evidence.py` recupera la evidencia con manifiesto de un run.
+`tools/gallery_deliverable.py <carpeta-client-smoke> <salida-vacía>` valida los
+13 retratos, el commit y los iconos exactos antes de crear el PDF de 13 páginas,
+26 imágenes individuales, HTML, procedencia y ZIP con hashes. Requiere Pillow;
+no compila el mod, no arranca el juego y no controla la interfaz del usuario.

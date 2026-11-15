@@ -458,8 +458,10 @@ public final class PickaxeGameTests {
             MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,revoke);
             try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind)&&!WorkQueue.busy(wearer)
                     &&!ArtifactState.of(wearer,kind).contains("alternateReady"),"claim revocation rejects "+kind+" before scheduling or spending cooldown");}
-            finally{MinecraftForge.EVENT_BUS.unregister(revoke);wearer.getAbilities().mayBuild=true;finish(h,wearer);}
+            finally{MinecraftForge.EVENT_BUS.unregister(revoke);wearer.getAbilities().mayBuild=true;
+                CompanionActions.stop(wearer);ArtifactInteraction.clear(wearer);WorkQueue.cancel(wearer);DomainFields.stop(wearer);}
         }
+        h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_240") public static void starfallSinkRejectsClaimThatMovesCaster(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EXODIUM);var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
