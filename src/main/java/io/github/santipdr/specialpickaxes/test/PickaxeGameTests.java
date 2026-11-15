@@ -761,7 +761,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_279") public static void allLegacySharedLinksReserveTheirExactTwoViewerCost(GameTestHelper h){
         var p=player(h,ArtifactKind.CHOIR,"LinkBudgetOwner");var ally=player(h,ArtifactKind.ICARUS,"LinkBudgetAlly");
         // Force a fresh allowance when the first real-tick link is requested.
-        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,0,1);
+        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,1,1);
         ArtifactFeedback.choirMiningLink(p,ally);ArtifactFeedback.stasisWardLink(p,ally);
         ArtifactFeedback.graviticBalanceLink(p,ally);ArtifactFeedback.heartwoodRenewalLink(p,ally);
         ArtifactFeedback.nullVeilLink(p,ally);ArtifactFeedback.worldbreakerAegisLink(p,ally);ArtifactFeedback.crucibleMantleLink(p,ally);
