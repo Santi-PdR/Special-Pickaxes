@@ -61,7 +61,7 @@ public final class MiningAlternates {
     }
 
     private static boolean context(ServerPlayer player,ItemStack tool,net.minecraft.server.level.ServerLevel level,net.minecraft.world.phys.Vec3 origin){
-        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.serverLevel()==level
+        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()&&player.serverLevel()==level
                 &&player.position().equals(origin)&&player.getMainHandItem()==tool&&!tool.isEmpty();
     }
 

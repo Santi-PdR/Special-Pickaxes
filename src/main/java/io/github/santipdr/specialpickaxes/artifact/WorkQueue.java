@@ -67,6 +67,8 @@ public final class WorkQueue {
     }else if(j.paused){
         if(j.region!=null&&!j.region.loaded(p)){ArtifactFeedback.message(p,"chunk_pause");return false;}
         if(dropBackpressured(j,p)){ArtifactFeedback.message(p,"drop_pause");return false;}
+        if(JOBS.get(p.getUUID())!=j)return false;
+        if(!validActor(j,p)){cancel(p);return false;}
         j.paused=false;
     }else j.paused=true;return true;}
     public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,WorkProgram region){
@@ -121,9 +123,11 @@ public final class WorkQueue {
                     job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
                 }
                 if(JOBS.get(id)!=job||job.paused)break;
+                if(!validActor(job,p)){job.aborted=true;break;}
                 budget--;lastAttempts++;
                 WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);
                 if(JOBS.get(id)!=job)break;
+                if(!validActor(job,p)){job.aborted=true;break;}
                 job.completed++;
                 try {
                     running=true;boolean ok=step.apply(p,job.tool,job.kind);

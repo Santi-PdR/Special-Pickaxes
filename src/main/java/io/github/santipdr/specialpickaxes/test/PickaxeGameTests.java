@@ -439,6 +439,36 @@ public final class PickaxeGameTests {
         tool.setDamageValue(tool.getMaxDamage()-3);
         h.assertTrue(ArtifactActions.canSpendDurability(wearer,tool,2),"a repair leaving a spare point permits activation");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_238") public static void streamingNextCannotDisarmTheActorThenRunOneMoreStep(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);int[] applied={0};
+        WorkProgram program=new WorkProgram(){
+            public int remaining(){return 1;}public boolean awaiting(){return false;}public boolean executing(){return true;}
+            public boolean done(){return false;}public void confirm(){}public boolean loaded(ServerPlayer p){return true;}
+            public WorkStep next(ServerPlayer p){p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);return new WorkStep(){
+                public BlockPos pos(){return at;}public boolean apply(ServerPlayer actor,ItemStack t,ArtifactKind k){applied[0]++;return true;}
+            };}
+        };
+        h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,program),"stream starts");WorkQueue.tick();
+        h.assertTrue(applied[0]==0&&!WorkQueue.busy(wearer),"actor is revalidated between next and apply, not after a stale mutation");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_239") public static void miningAlternatesRejectBuildPermissionRevokedByClaim(GameTestHelper h){
+        for(var kind:List.of(ArtifactKind.PALIMPSEST,ArtifactKind.CHOIR,ArtifactKind.SEAM_RIPPER,ArtifactKind.EXODIUM)){
+            var wearer=player(h,kind);var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+            Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> revoke=event->{if(event.player==wearer)wearer.getAbilities().mayBuild=false;};
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,revoke);
+            try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind)&&!WorkQueue.busy(wearer)
+                    &&!ArtifactState.of(wearer,kind).contains("alternateReady"),"claim revocation rejects "+kind+" before scheduling or spending cooldown");}
+            finally{MinecraftForge.EVENT_BUS.unregister(revoke);wearer.getAbilities().mayBuild=true;finish(h,wearer);}
+        }
+    }
+    @GameTest(template="empty",batch="rework_each_240") public static void starfallSinkRejectsClaimThatMovesCaster(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EXODIUM);var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer)wearer.setPos(wearer.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.EXODIUM)&&!WorkQueue.busy(wearer)
+                &&!ArtifactState.of(wearer,ArtifactKind.EXODIUM).contains("alternateReady"),"Starfall does not queue a shaft from a stale caster origin");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,wearer);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

@@ -1,3 +1,13 @@
+# 5.10.443 — revisión integral pendiente de CI
+
+Cierra la ventana entre WorkProgram.next y apply: no aplica pasos con actor
+invalidado. Secundarias mineras rechazan permisos revocados en callbacks;
+Starfall y Seam Ripper comparten la captura de contexto del resto de utilidades.
+308GameTests esperados,92JUnit esperados (no confirmados en esta revisión).
+Local:23recursos,52Python,parser139Java,diffcheck. Galería reproducible con
+`tools/gallery_deliverable.py`, sin arrancar juego ni automatizar interfaz local.
+No entregar443como verificada sinCI;439sigue siendo la última confirmada.
+
 # 5.10.442 — pendiente de CI, no entregar como verificada
 
 Mensajes ES/EN de secundaria sin objetivo incluyen una orientación específica

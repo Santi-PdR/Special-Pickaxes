@@ -173,10 +173,10 @@ public final class ArtifactTechniques {
 
     private static boolean seamFace(ServerPlayer player,ItemStack tool) {
         var hit=ArtifactActions.targetHit(player);if(hit.isEmpty())return false;
-        var level=player.serverLevel();var actorOrigin=player.position();var origin=hit.get().getBlockPos();var state=level.getBlockState(origin);
+        var context=HeldUtilityContext.capture(player,tool);var level=player.serverLevel();var origin=hit.get().getBlockPos();var state=level.getBlockState(origin);
         if(!MiningDesigns.seamGeology(state)||PlayerPlacedBlocks.get(level).contains(origin)
                 ||!WorldSafety.allowed(player,ArtifactKind.SEAM_RIPPER,origin)
-                ||player.serverLevel()!=level||!player.position().equals(actorOrigin)||player.getMainHandItem()!=tool||tool.isEmpty()
+                ||!context.valid()
                 ||!level.hasChunkAt(origin)||level.getBlockState(origin)!=state||PlayerPlacedBlocks.get(level).contains(origin))return false;
         Direction face=hit.get().getDirection();
         Direction u=face.getAxis()==Direction.Axis.Y?Direction.EAST:Direction.UP;
@@ -212,8 +212,10 @@ public final class ArtifactTechniques {
 
     private static boolean starfallSink(ServerPlayer player,ItemStack tool){
         var aimed=ArtifactActions.target(player);if(aimed.isEmpty())return false;
+        var context=HeldUtilityContext.capture(player,tool);
         BlockPos center=aimed.get();var level=player.serverLevel();var state=level.getBlockState(center);
-        if(!WorldSafety.allowed(player,ArtifactKind.EXODIUM,center)
+        if(!WorldSafety.allowed(player,ArtifactKind.EXODIUM,center)||!context.valid()
+                ||!level.hasChunkAt(center)||level.getBlockState(center)!=state
                 ||PlayerPlacedBlocks.get(level).contains(center)
                 ||!MiningDesigns.matrix(state)&&!ArtifactOres.isOre(state)
                 ||!WorldSafety.harvestable(player,tool,center))return false;

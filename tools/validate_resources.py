@@ -68,6 +68,20 @@ class Resources(unittest.TestCase):
         self.assertTrue(all(clock == "level.getServer().getTickCount()" for clock in reservations),
                         "dimension/world clocks cannot reset the shared server allowance")
 
+    def test_activation_feedback_is_complete_in_both_languages(self):
+        languages = {locale: json.loads((ROOT / f"assets/specialpickaxes/lang/{locale}.json").read_text())
+                     for locale in ("en_us", "es_es")}
+        placeholders = {"alternate_no_target": 1, "alternate_cooldown": 1,
+                        "primary_cooldown": 1, "insufficient_durability": 2}
+        for locale, data in languages.items():
+            for pick in IDS:
+                hint = data[f"message.specialpickaxes.alternate_hint.{pick}"]
+                self.assertGreater(len(hint), 20, f"{locale}/{pick}: useful, translated recovery guidance")
+                self.assertNotIn("%s", hint, "per-pick hints have no unbound arguments")
+            for key, expected in placeholders.items():
+                self.assertEqual(data["message.specialpickaxes." + key].count("%s"), expected,
+                                 f"{locale}/{key}: matches the Java feedback arguments")
+
     def test_json(self):
         for pattern in ["*.json", "*.mcmeta"]:
             for path in ROOT.rglob(pattern):
