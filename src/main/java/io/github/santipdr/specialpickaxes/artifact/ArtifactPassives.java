@@ -91,7 +91,7 @@ public final class ArtifactPassives {
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return false;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return false;
         var state=ArtifactState.of(player,ArtifactKind.WORLDLOOM);long now=ArtifactState.now(player);
-        if(state.getLong("sharedHeartwoodReady")>now)return false;
+        if(PersistedCooldown.active(now,state.getLong("sharedHeartwoodReady"),160))return false;
         state.putLong("sharedHeartwoodReady",now+160);
         event.setAmount(event.getAmount()*.9F);
         grantCombatEffect(player,renewal,0,60);
@@ -119,7 +119,7 @@ public final class ArtifactPassives {
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return false;
         if(!WorldSafety.allowed(player,ArtifactKind.AXIOM,attacker.blockPosition()))return false;
         var state=ArtifactState.of(player,ArtifactKind.AXIOM);long now=ArtifactState.now(player);
-        if(state.getLong("sharedNullVeilReady")>now)return false;
+        if(PersistedCooldown.active(now,state.getLong("sharedNullVeilReady"),160))return false;
         state.putLong("sharedNullVeilReady",now+160);
         event.setAmount(event.getAmount()*.85F);
         grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_MARK.get(),0,60);
@@ -159,7 +159,7 @@ public final class ArtifactPassives {
             default -> false;
         })return;
         var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
-        if(state.getLong("curiosPassiveReady")>now)return;
+        if(PersistedCooldown.active(now,state.getLong("curiosPassiveReady"),160))return;
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
             case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),0,80);}

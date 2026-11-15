@@ -655,6 +655,57 @@ public final class PickaxeGameTests {
         ArtifactFeedback.curiosAttunement(wearer,ArtifactKind.ICARUS);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
         h.assertTrue(wearer.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get()),"equipping a pick still grants its passive even if cosmetic attunement has no allowance");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_267") public static void exchangeRejectsMovementDuringClaimCallbacks(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(2,0,0);var level=h.getLevel();
+        level.setBlockAndUpdate(b,Blocks.BASALT.defaultBlockState());var destination=p.position().add(0,0,1);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p)p.setPos(destination);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState()),"claim-time movement invalidates the original transaction");
+            h.assertTrue(level.getBlockState(a).is(Blocks.STONE)&&level.getBlockState(b).is(Blocks.BASALT)&&p.position().equals(destination),"no writes and no external movement undone");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_268") public static void exchangeRejectsMovementDuringBreakCallbacks(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(2,0,0);var level=h.getLevel();
+        level.setBlockAndUpdate(b,Blocks.BASALT.defaultBlockState());var destination=p.position().add(0,0,1);
+        Consumer<BlockEvent.BreakEvent> move=e->{if(e.getPlayer()==p)p.setPos(destination);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.BreakEvent.class,move);
+        try{h.assertTrue(!WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState()),"break-time movement prevents tentative writes");
+            h.assertTrue(level.getBlockState(a).is(Blocks.STONE)&&level.getBlockState(b).is(Blocks.BASALT)&&p.position().equals(destination),"states and external movement preserved");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_269") public static void exchangeRollsBackIfFirstPlacementRevokesBuildPermission(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(2,0,0);var level=h.getLevel();int[] calls={0};
+        level.setBlockAndUpdate(b,Blocks.BASALT.defaultBlockState());
+        Consumer<BlockEvent.EntityPlaceEvent> revoke=e->{if(e.getEntity()==p){calls[0]++;p.getAbilities().mayBuild=false;}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,revoke);
+        try{h.assertTrue(!WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState()),"permission revocation rejects tentative pair");
+            h.assertTrue(calls[0]==1&&level.getBlockState(a).is(Blocks.STONE)&&level.getBlockState(b).is(Blocks.BASALT),"second callback skipped and both owned writes restored");
+        }finally{p.getAbilities().mayBuild=true;MinecraftForge.EVENT_BUS.unregister(revoke);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_270") public static void exchangeRollsBackIfSecondPlacementMovesActor(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var a=target(h);var b=a.offset(2,0,0);var level=h.getLevel();int[] calls={0};
+        level.setBlockAndUpdate(b,Blocks.BASALT.defaultBlockState());var destination=p.position().add(0,0,1);
+        Consumer<BlockEvent.EntityPlaceEvent> move=e->{if(e.getEntity()==p&&++calls[0]==2)p.setPos(destination);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,BlockEvent.EntityPlaceEvent.class,move);
+        try{h.assertTrue(!WorldSafety.exchange(p,p.getMainHandItem(),a,b,Blocks.STONE.defaultBlockState(),Blocks.BASALT.defaultBlockState()),"second callback cannot approve a transaction after moving its actor");
+            h.assertTrue(calls[0]==2&&level.getBlockState(a).is(Blocks.STONE)&&level.getBlockState(b).is(Blocks.BASALT)&&p.position().equals(destination),"both blocks restored without reverting teleport");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_271") public static void corruptCuriosCounterDeadlineRecoversButStillThrottles(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        var state=ArtifactState.of(p,ArtifactKind.PALIMPSEST);state.putLong("curiosPassiveReady",Long.MAX_VALUE);
+        var source=h.getLevel().damageSources().mobAttack(attacker);
+        var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);ArtifactPassives.onCuriosDamage(p,first,ArtifactKind.PALIMPSEST);
+        var second=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);ArtifactPassives.onCuriosDamage(p,second,ArtifactKind.PALIMPSEST);
+        h.assertTrue(Math.abs(first.getAmount()-9F)<.001F&&second.getAmount()==10F&&state.getLong("curiosPassiveReady")==ArtifactState.now(p)+160,"corrupt deadline recovers once, never bypassing the real eight-second interval");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_272") public static void corruptSharedHeartwoodDeadlineRecoversButStillThrottles(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        p.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.HEARTWOOD_RENEWAL.get(),100));
+        var state=ArtifactState.of(p,ArtifactKind.WORLDLOOM);state.putLong("sharedHeartwoodReady",Long.MAX_VALUE);var source=h.getLevel().damageSources().mobAttack(attacker);
+        var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);var second=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);
+        h.assertTrue(ArtifactPassives.onSharedHeartwoodGuard(p,first)&&Math.abs(first.getAmount()-9F)<.001F&&!ArtifactPassives.onSharedHeartwoodGuard(p,second)&&second.getAmount()==10F,"shared renewal recovers from corrupt future NBT without granting repeated counters");finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

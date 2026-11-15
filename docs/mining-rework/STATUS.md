@@ -1,3 +1,20 @@
+# 5.10.456 — intercambios transaccionales y plazos de pasivas; pendiente de CI
+
+WorldSafety.exchange conserva nivel, posición y herramienta originales desde
+antes del primer permiso. Revalida ambas posiciones antes de escribir, entre
+los dos callbacks de colocación y al confirmar. Si un listener mueve al actor o
+revoca construcción, no confirma; revierte sólo escrituras que todavía le
+pertenecen, sin deshacer el movimiento externo. Cuatro GameTests cubren cambios
+en permisos, rotura, primera y segunda colocación.
+
+Los plazos de ocho segundos de los contadores Curios y de Heartwood/Null Veil
+compartidos usan la política validada PersistedCooldown: un plazo imposible no
+bloquea la pasiva indefinidamente. Dos GameTests nuevos comprueban recuperación
+y bloqueo de repetición real. Esperados 110 JUnit y 340 GameTests, no ejecutados
+localmente. La CI 455 inicial falló por tres pruebas que publicaban login Forge
+con una conexión simulada: se extrajo restoreCooldowns, usada tanto por login
+real como por pruebas; no se omitieron pruebas ni se relajaron los logs.
+
 # 5.10.455 — recargas y referencias secundarias, pendiente de CI
 
 Al reconectar se sincroniza sólo el tiempo restante de plazos válidos, no un
