@@ -1,3 +1,12 @@
+# 5.10.442 — pendiente de CI, no entregar como verificada
+
+Mensajes ES/EN de secundaria sin objetivo incluyen una orientación específica
+por pico; cooldown principal/secundario muestra segundos restantes y el rechazo
+por durabilidad explica el mínimo necesario. Reanudación y ejecución de colas
+revalidan actor, herramienta exacta y permiso de construcción también después
+de callbacks. Tres regresiones adicionales:305GameTests esperados, no comprobados.
+Local:22recursos,49Python y parser139Java pasan; no se ejecutó build local.
+
 # Estado actual — 5.10.441: segunda fase pendiente de CI
 
 441: tiers explícitos Forge respetados aunque la mena se reconozca por nombre;

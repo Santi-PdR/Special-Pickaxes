@@ -19,11 +19,11 @@ public final class ArtifactSkills {
         long now = ArtifactState.now(player);
         int interval=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
         if (PersistedCooldown.active(now,data.getLong("alternateReady"),interval)) {
-            ArtifactFeedback.message(player, "cooldown");
+            ArtifactFeedback.message(player,"alternate_cooldown",Math.max(1,(data.getLong("alternateReady")-now+19)/20));
             return false;
         }
         if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) {
-            ArtifactFeedback.message(player, "alternate_no_target");
+            ArtifactFeedback.message(player,"alternate_no_target",net.minecraft.network.chat.Component.translatable("message.specialpickaxes.alternate_hint."+feedbackKind(tool,kind).id));
             return false;
         }
         data.putLong("alternateReady", now + interval);

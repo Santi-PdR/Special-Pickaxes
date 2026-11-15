@@ -415,6 +415,30 @@ public final class PickaxeGameTests {
         for(int count:new int[]{Integer.MIN_VALUE,-1,0,Integer.MAX_VALUE})h.assertTrue(!ArtifactFeedback.reserveMiningParticles(wearer,count),"invalid or excessive mining particles never reserve a burst");
         h.assertTrue(ArtifactFeedback.reserveMiningParticles(wearer,1),"invalid reservations do not corrupt the ordinary visual allowance");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_235") public static void revokedBuildPermissionStopsTheCurrentQueueTurn(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);int[] applied={0};
+        WorkStep revoke=new WorkStep(){public BlockPos pos(){return at;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){applied[0]++;p.getAbilities().mayBuild=false;return true;}};
+        WorkStep next=new WorkStep(){public BlockPos pos(){return at;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){applied[0]++;return true;}};
+        try{
+            h.assertTrue(WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(revoke,next)),"queue starts");WorkQueue.tick();
+            h.assertTrue(applied[0]==1&&!WorkQueue.busy(wearer),"revocation inside callback cancels before another scheduled step");
+        }finally{wearer.getAbilities().mayBuild=true;finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_236") public static void staleHeldToolCannotResumePausedWork(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);
+        WorkStep step=new WorkStep(){public BlockPos pos(){return at;}public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return true;}};
+        WorkQueue.start(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,List.of(step));
+        h.assertTrue(WorkQueue.togglePause(wearer),"pause accepted with original tool");
+        wearer.setItemInHand(InteractionHand.MAIN_HAND,wearer.getMainHandItem().copy());
+        h.assertTrue(!WorkQueue.togglePause(wearer)&&!WorkQueue.busy(wearer),"equal NBT does not allow a replacement stack to resume the old job");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_237") public static void activationPreservesOneDurabilityPoint(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var tool=wearer.getMainHandItem();
+        tool.setDamageValue(tool.getMaxDamage()-2);
+        h.assertTrue(!ArtifactActions.canSpendDurability(wearer,tool,2),"an activation cannot spend the last point");
+        tool.setDamageValue(tool.getMaxDamage()-3);
+        h.assertTrue(ArtifactActions.canSpendDurability(wearer,tool,2),"a repair leaving a spare point permits activation");finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

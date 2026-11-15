@@ -41,7 +41,11 @@ public final class WorkQueue {
     }
     /** Remove player-bound descent state on logout, death replacement, or dimension travel. */
     public static void forget(ServerPlayer p){CORE_DRILL_GUARDS.remove(p.getUUID());}
-    public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&(p.getMainHandItem()!=j.tool||p.level().dimension()!=j.dimension||!p.isAlive()))cancel(p);}
+    private static boolean validActor(Job job,ServerPlayer player){
+        return job.player==player&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
+                &&player.getMainHandItem()==job.tool&&!job.tool.isEmpty()&&player.level().dimension()==job.dimension;
+    }
+    public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&!validActor(j,p))cancel(p);}
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
     public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
     public static String status(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?"idle":j.region!=null&&j.region.awaiting()?"ready":j.paused?"paused":j.region!=null&&!j.region.executing()?"preparing":"executing";}
@@ -53,8 +57,10 @@ public final class WorkQueue {
         if(snapshotBytes>limit-used){ArtifactFeedback.message(p,"region_memory_limit",ArtifactConfig.REGION_MEMORY_MIB.get());return false;}
         return true;
     }
-    public static boolean togglePause(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j==null)return false;if(j.region!=null&&j.region.awaiting()){
-        int cost=EnchantmentScaling.activationCost(j.tool,j.kind);if(!p.isCreative()&&j.tool.getMaxDamage()-j.tool.getDamageValue()<=cost)return false;
+    public static boolean togglePause(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j==null)return false;
+        if(!validActor(j,p)){cancel(p);return false;}
+        if(j.region!=null&&j.region.awaiting()){
+        int cost=EnchantmentScaling.activationCost(j.tool,j.kind);if(!ArtifactActions.canSpendDurability(p,j.tool,cost))return false;
         j.tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND));if(j.region instanceof RegionWork r&&(j.kind==ArtifactKind.CHRONICLE&&r.mode==0))ArtifactState.of(p,j.kind).remove("memory");
         ArtifactState.of(p,j.kind).putLong("ready",ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get());p.getCooldowns().addCooldown(j.tool.getItem(),ArtifactConfig.COOLDOWN.get());
         j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;
@@ -97,8 +103,7 @@ public final class WorkQueue {
         while(turns-->0 && budget>0 && !ORDER.isEmpty()) {
             visited++;UUID id=ORDER.removeFirst();var job=JOBS.get(id);if(job==null) continue;
             var p=job.player;
-            if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=job.tool || job.tool.isEmpty()
-                    || p.level().dimension()!=job.dimension || ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
+            if(!validActor(job,p)||ArtifactState.now(p)>job.deadline) { JOBS.remove(id);if(p.isAlive()&&!p.isRemoved()){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}continue; }
             // Keep aerial mining safe even while the same active job is paused for confirmation, chunks, or drops.
             if(protectsFall(p))p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
             if(JOBS.get(id)!=job)continue;
@@ -133,8 +138,7 @@ public final class WorkQueue {
                     LogUtils.getLogger().error("Artifact job {} cancelled after exception",job.kind.id,error);job.steps.clear();job.aborted=true;break;
                 } finally { running=false; }
                 if(JOBS.get(id)!=job||job.paused)break;
-                if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=job.dimension
-                        ||job.tool.isEmpty()||p.getMainHandItem()!=job.tool){job.steps.clear();job.aborted=true;break;}
+                if(!validActor(job,p)){job.steps.clear();job.aborted=true;break;}
             }
             // A native break/claim callback may cancel or replace this exact job.
             // Never requeue it, emit stale completion, or remove the replacement.

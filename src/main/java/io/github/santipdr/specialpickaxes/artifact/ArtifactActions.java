@@ -65,7 +65,7 @@ public final class ArtifactActions {
         int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
         if(PersistedCooldown.active(now,ready,cooldown)){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(ready-now+19)/20));return false;}
         int cost=EnchantmentScaling.activationCost(tool,kind);
-        if(!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<=cost)return false;
+        if(!canSpendDurability(p,tool,cost))return false;
         if(!ArtifactSkills.use(p,tool,kind))return false;
         if(!p.isCreative())tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         data.putLong("alternateReady",now+cooldown);p.getCooldowns().addCooldown(tool.getItem(),cooldown);
@@ -76,9 +76,10 @@ public final class ArtifactActions {
         if(secondary && WorkQueue.busy(p)) { WorkQueue.cancel(p);ArtifactFeedback.message(p,"cancelled");return true; }
         if(!WorldSafety.allowed(p,kind,p.blockPosition())||tool.isEmpty()||p.getMainHandItem()!=tool)return false;
         var data=ArtifactState.of(p,kind);
-        if(PersistedCooldown.active(ArtifactState.now(p),data.getLong("ready"),Math.max(10,ArtifactConfig.COOLDOWN.get()))){ArtifactFeedback.message(p,"cooldown");ArtifactFeedback.cue(p,"error");return false;}
+        long now=ArtifactState.now(p),ready=data.getLong("ready");
+        if(PersistedCooldown.active(now,ready,Math.max(10,ArtifactConfig.COOLDOWN.get()))){ArtifactFeedback.message(p,"primary_cooldown",Math.max(1,(ready-now+19)/20));ArtifactFeedback.cue(p,"error");return false;}
         int cost=secondary?0:EnchantmentScaling.activationCost(tool,kind);
-        if(!p.isCreative() && tool.getMaxDamage()-tool.getDamageValue()<=cost) return false;
+        if(!canSpendDurability(p,tool,cost))return false;
         boolean done=secondary?secondary(p,kind):primary(p,tool,kind);
         if(!done) { ArtifactFeedback.message(p,"no_target");return false; }
         int cooldown=secondary?10:ArtifactConfig.COOLDOWN.get();
@@ -86,6 +87,13 @@ public final class ArtifactActions {
         tool.hurtAndBreak(cost,p,who -> who.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         ArtifactFeedback.sound(p,ArtifactSkills.feedbackKind(tool,kind));
         if(!secondary)MiningSignature.emit(p,ArtifactSkills.feedbackKind(tool,kind));return true;
+    }
+    /** Keep one durability point so an activation cannot destroy the pick before its scheduled job runs. */
+    public static boolean canSpendDurability(ServerPlayer player,ItemStack tool,int cost){
+        if(cost<0)throw new IllegalArgumentException("Negative activation cost");
+        int remaining=Math.max(0,tool.getMaxDamage()-tool.getDamageValue());
+        if(player.isCreative()||remaining>cost)return true;
+        ArtifactFeedback.message(player,"insufficient_durability",cost+1,remaining);return false;
     }
     private static boolean secondary(ServerPlayer p,ArtifactKind kind) {
         switch(kind) {
