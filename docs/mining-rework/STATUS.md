@@ -1,3 +1,14 @@
+# 5.10.464 — permiso en el ancla de raíces; pendiente de CI
+
+WorldloomSnare ya comprobaba permisos en la posición actual, pero no en el
+ancla capturada cuando el objetivo había sido desplazado a otro bloque.
+Ahora verifica ambos destinos antes de devolverlo, incluyendo identidad del
+binding, posición y elegibilidad después del callback. Una denegación libera
+el vínculo sin teletransportar ni bloquear el movimiento. Un GameTest con
+windup real, objetivo desplazado y ancla denegada verifica también que pueda
+iniciarse un vínculo nuevo después. No cambia las secundarias mineras.
+Incluye463. Esperados126JUnit/372GameTests; pendientes de CI.
+
 ## Seguridad CI: retirada histórica idempotente, sin fail-open
 
 El run43680877100 falló antes de compilar en withdraw_unvalidated.py; no había

@@ -91,6 +91,15 @@ public final class WorldloomSnare {
                 continue;
             }
             BlockPos at=BlockPos.containing(binding.anchor);
+            // A target can cross a claim boundary while displaced from its captured anchor.
+            // Permission at its current position alone cannot authorize moving it back there.
+            if(!at.equals(checkedPosition)){
+                boolean anchorAllowed=WorldSafety.allowed(owner,ArtifactKind.WORLDLOOM,at);
+                if(BINDINGS.get(target.getUUID())!=binding)continue;
+                if(!anchorAllowed||!validTarget(owner,target,level)||!target.blockPosition().equals(checkedPosition)){
+                    BINDINGS.remove(target.getUUID(),binding);continue;
+                }
+            }
             if(level.hasChunkAt(at)){
                 var box=target.getBoundingBox().move(binding.anchor.subtract(target.position()));
                 if(level.noCollision(target,box))target.setPos(binding.anchor);
