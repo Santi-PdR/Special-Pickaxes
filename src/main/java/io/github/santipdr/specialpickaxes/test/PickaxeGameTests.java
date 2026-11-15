@@ -3680,11 +3680,15 @@ public final class PickaxeGameTests {
         // GameTest reuses world coordinates; remove any stale provenance from an earlier fixture.
         var placed=PlayerPlacedBlocks.get(p.serverLevel());placed.unmark(center);placed.unmark(matrix);placed.unmark(ore);
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
-        var rayTarget=ArtifactActions.target(p);var seed=h.getLevel().getBlockState(center);
+        // Enlarged neighbouring fixtures must not become this regression's accidental ray target.
+        for(int distance=1;distance<=3;distance++)h.getLevel().setBlockAndUpdate(center.north(distance),Blocks.AIR.defaultBlockState());
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));
+        var rayTarget=ArtifactActions.target(p);h.assertTrue(rayTarget.filter(center::equals).isPresent(),"Axiom fixture aims at its own explicit center: "+rayTarget);
+        var seed=h.getLevel().getBlockState(center);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.AXIOM,center),harvestable=WorldSafety.harvestable(p,p.getMainHandItem(),center);
         boolean activated=ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false);
         h.assertTrue(activated,"axiom activation (ray="+rayTarget+", center="+center+", allowed="+allowed+", matrix="+MiningDesigns.matrix(seed)+", ore="+ArtifactOres.isOre(seed)+", placed="+PlayerPlacedBlocks.get(p.serverLevel()).contains(center)+", harvestable="+harvestable+")");for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed");
+        h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed at configured shell (radius="+ArtifactConfig.MAX_RADIUS.get()+", matrix="+matrix+", state="+h.getLevel().getBlockState(matrix)+", marked="+placed.contains(matrix)+", work="+WorkQueue.remaining(p)+", status="+WorkQueue.status(p)+")");
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"hollow core and ore preserved");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_80") public static void axiomNullcutFeedbackFlowsTowardItsPreservedCore(GameTestHelper h){
