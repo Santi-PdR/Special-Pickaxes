@@ -1,3 +1,13 @@
+## Primera compilación5.11.0:129JUnit correctos; dos expectativas históricas actualizadas
+
+CI43731818984 compiló y pasó129JUnit. GameTests detectó dos contratos antiguos:
+Seam aún exigía preservar la fila4del barrido anterior7×7y Axiom esperaba
+extraer una celda a9cuando el radio por defecto ahora12deja esa celda dentro
+del núcleo preservado. Se actualizan fixtures a borde7/fuera8para15×15y
+radio_configurado−1para la envolvente de Axiom. Se conservan las aserciones de
+ore/build protection, cara posterior intacta y núcleo preservado. No se
+eliminan pruebas ni se acepta ese run fallido como validación del rediseño.
+
 # 5.11.0 — reestructuración visual y habilidades OP; pendiente de CI
 
 ## Cambio visual solicitado

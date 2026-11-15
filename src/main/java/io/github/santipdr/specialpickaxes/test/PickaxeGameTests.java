@@ -2051,10 +2051,10 @@ public final class PickaxeGameTests {
         h.assertTrue(level.getBlockState(placed).is(Blocks.STONE),"player-placed geology is preserved");
         PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_24") public static void seamRipperAlternateMinesTheVisibleSevenBySevenFace(GameTestHelper h) {
+    @GameTest(template="empty",batch="rework_each_24") public static void seamRipperAlternateMinesTheVisibleFifteenByFifteenFace(GameTestHelper h) {
         var p=player(h,ArtifactKind.SEAM_RIPPER);var center=target(h);var level=h.getLevel();
         var east=center.east();var above=center.above();var ore=center.west();var placed=center.below();
-        var outer=center.above(3);var beyond=center.above(4);var outside=center.south();
+        var outer=center.above(7);var beyond=center.above(8);var outside=center.south();
         for(var pos:List.of(center,east,above,ore,placed,outer,beyond,outside))PlayerPlacedBlocks.get(level).unmark(pos);
         level.setBlockAndUpdate(east,Blocks.TUFF.defaultBlockState());level.setBlockAndUpdate(above,Blocks.DIORITE.defaultBlockState());
         level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());
@@ -2065,10 +2065,10 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER),"X mines a visible geology face without offhand materials");
         for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(level.getBlockState(center).isAir()&&level.getBlockState(east).isAir()&&level.getBlockState(above).isAir()
-                        &&level.getBlockState(outer).isAir(),"natural geology through the outer ring of the 7x7 target face is mined");
+                        &&level.getBlockState(outer).isAir(),"natural geology through the outer ring of the 15x15 target face is mined");
         h.assertTrue(level.getBlockState(ore).is(Blocks.DIAMOND_ORE)&&level.getBlockState(placed).is(Blocks.STONE)
                         &&level.getBlockState(beyond).is(Blocks.ANDESITE)&&level.getBlockState(outside).is(Blocks.ANDESITE),
-                "ores, placed blocks, cells beyond the 7x7 boundary and blocks behind the face are preserved");
+                "ores, placed blocks, cells beyond the 15x15 boundary and blocks behind the face are preserved");
         PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_25") public static void choirCuriosCounterAppliesCustomFaultResonance(GameTestHelper h){
@@ -3676,7 +3676,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!WorkQueue.busy(p),"the foreign-fluid stop ends the queue cleanly");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_13") public static void axiomPeelsConnectedMatrix(GameTestHelper h) {
-        var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(9,0,0);var ore=center.above();
+        var p=player(h,ArtifactKind.AXIOM);var center=target(h);var matrix=center.offset(ArtifactConfig.MAX_RADIUS.get()-1,0,0);var ore=center.above();
         // GameTest reuses world coordinates; remove any stale provenance from an earlier fixture.
         var placed=PlayerPlacedBlocks.get(p.serverLevel());placed.unmark(center);placed.unmark(matrix);placed.unmark(ore);
         h.getLevel().setBlockAndUpdate(matrix,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
