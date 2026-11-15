@@ -17,7 +17,7 @@ public final class ArtifactSkills {
     private static boolean perform(ServerPlayer player,ItemStack tool,ArtifactKind kind){
         var data = ArtifactState.of(player, kind);
         long now = ArtifactState.now(player);
-        int interval=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
+        int interval=Math.max(40,ArtifactConfig.COOLDOWN.get()*4);
         if (PersistedCooldown.active(now,data.getLong("alternateReady"),interval)) {
             ArtifactFeedback.message(player,"alternate_cooldown",Math.max(1,(data.getLong("alternateReady")-now+19)/20));
             return false;

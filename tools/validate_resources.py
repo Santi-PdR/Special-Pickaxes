@@ -218,7 +218,7 @@ class Resources(unittest.TestCase):
             self.assertEqual(model["textures"]["layer0"], "specialpickaxes:item/" + runtime_stem)
             runtime_png = (ROOT / "assets/specialpickaxes/textures/item" / runtime_texture).read_bytes()
             if record.get("runtime_texture"):
-                self.assertEqual(struct.unpack(">II", runtime_png[16:24]), (32, 32), artifact + " runtime icon must be 32x32")
+                self.assertEqual(struct.unpack(">II", runtime_png[16:24]), tuple(record.get("runtime_dimensions", [32,32])), artifact + " runtime icon must preserve source dimensions")
             hashes.add(hashlib.sha256(runtime_png).hexdigest())
         self.assertEqual(len(hashes), len(IDS))
 

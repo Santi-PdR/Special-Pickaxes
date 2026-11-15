@@ -166,7 +166,7 @@ public final class WorldloomSnare {
     private static void emitCaughtPulse(Binding binding,long age){
         if(!reserveVisualParticles(binding.level.getServer().getTickCount(),ROOT_PARTICLES))return;
         double angle=age*.22D,x=binding.anchor.x,y=binding.anchor.y+.08D,z=binding.anchor.z;
-        binding.level.sendParticles(io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDLOOM_ROOT_CLAMP.get(),
+        AbilityVfx.retired(binding.level,io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDLOOM_ROOT_CLAMP.get(),
                 x+Math.cos(angle)*.12D,y,z+Math.sin(angle)*.12D,ROOT_PARTICLES,0,0,0,0);
     }
 
@@ -178,7 +178,7 @@ public final class WorldloomSnare {
     private static void emit(Binding binding,double x,double y,double z,int count,double dx,double dy,double dz,double speed){
         // The server's normal tracking range delivers the effect to nearby viewers
         // without iterating every player in the level or sending it across dimensions.
-        binding.level.sendParticles(VINE_PARTICLE,x,y,z,count,dx,dy,dz,speed);
+        AbilityVfx.retired(binding.level,VINE_PARTICLE,x,y,z,count,dx,dy,dz,speed);
     }
 
     public static void forget(ServerPlayer owner){BINDINGS.values().removeIf(binding->binding.owner==owner);}

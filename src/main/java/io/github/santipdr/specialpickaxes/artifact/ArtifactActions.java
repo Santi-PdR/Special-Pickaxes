@@ -51,18 +51,18 @@ public final class ArtifactActions {
     }
     public static boolean use(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean secondary) {
         if(!ACTIVATING.add(p.getUUID()))return false;
-        try{return activate(p,tool,kind,secondary);}finally{ACTIVATING.remove(p.getUUID());}
+        try{boolean success=activate(p,tool,kind,secondary);if(success&&!secondary)AbilityVfx.cast(p,ArtifactSkills.feedbackKind(tool,kind));return success;}finally{ACTIVATING.remove(p.getUUID());}
     }
     public static boolean useAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(!ACTIVATING.add(p.getUUID()))return false;
-        try{return activateAlternate(p,tool,kind);}finally{ACTIVATING.remove(p.getUUID());}
+        try{boolean success=activateAlternate(p,tool,kind);if(success)AbilityVfx.cast(p,ArtifactSkills.feedbackKind(tool,kind));return success;}finally{ACTIVATING.remove(p.getUUID());}
     }
     private static boolean activateAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind){
         if(!kind.playable()||p.getMainHandItem()!=tool||tool.isEmpty()
                 ||!(tool.getItem() instanceof ArtifactItem item)||item.kind!=kind
                 ||!WorldSafety.allowed(p,kind,p.blockPosition())||p.getMainHandItem()!=tool||tool.isEmpty())return false;
         var data=ArtifactState.of(p,kind);long now=ArtifactState.now(p),ready=data.getLong("alternateReady");
-        int cooldown=Math.max(100,ArtifactConfig.COOLDOWN.get()*5);
+        int cooldown=Math.max(40,ArtifactConfig.COOLDOWN.get()*4);
         if(PersistedCooldown.active(now,ready,cooldown)){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(ready-now+19)/20));return false;}
         int cost=EnchantmentScaling.activationCost(tool,kind);
         if(!canSpendDurability(p,tool,cost))return false;

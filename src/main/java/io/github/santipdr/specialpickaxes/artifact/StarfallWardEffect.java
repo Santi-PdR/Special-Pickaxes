@@ -146,10 +146,10 @@ public final class StarfallWardEffect extends MobEffect {
     }
 
     private static void emitImpact(ServerPlayer viewer,ServerLevel level,double x,double y,double z){
-        level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y,z,3,.2D,.18D,.2D,.015D);
-        level.sendParticles(viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
+        AbilityVfx.retired(level,viewer,ParticleTypes.END_ROD,false,x,y,z,3,.2D,.18D,.2D,.015D);
+        AbilityVfx.retired(level,viewer,STARDUST,false,x,y,z,5,.3D,.24D,.3D,.01D);
         // One bounded spark burst gives the catch a readable, star-shaped snap without a particle loop.
-        level.sendParticles(viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
+        AbilityVfx.retired(level,viewer,ParticleTypes.ELECTRIC_SPARK,false,x,y,z,6,.38D,.32D,.38D,.025D);
     }
 
     /** The shared damage-reduction ward gets a distinct, smaller flash under the same per-player throttle. */
@@ -165,10 +165,10 @@ public final class StarfallWardEffect extends MobEffect {
         for(var viewer:audience){
             for(int i=0;i<6;i++){
                 double angle=phase+i*Math.PI/3D;
-                level.sendParticles(viewer,GUARD_DUST,false,x+Math.cos(angle)*.48D,y+Math.sin(angle*2D)*.08D,
+                AbilityVfx.retired(level,viewer,GUARD_DUST,false,x+Math.cos(angle)*.48D,y+Math.sin(angle*2D)*.08D,
                         z+Math.sin(angle)*.48D,1,0,0,0,0);
             }
-            level.sendParticles(viewer,ParticleTypes.END_ROD,false,x,y,z,2,.09D,.12D,.09D,.008D);
+            AbilityVfx.retired(level,viewer,ParticleTypes.END_ROD,false,x,y,z,2,.09D,.12D,.09D,.008D);
         }
     }
 

@@ -56,7 +56,7 @@ public final class RelicControl {
     }
     private static boolean confirm(ServerPlayer p){
         if(!WorkQueue.status(p).equals("ready")||!WorkQueue.togglePause(p))return false;
-        ArtifactFeedback.cue(p,"confirm");return true;
+        ArtifactFeedback.cue(p,"confirm");AbilityVfx.cast(p,ArtifactSkills.feedbackKind(p.getMainHandItem(),((ArtifactItem)p.getMainHandItem().getItem()).kind));return true;
     }
     private static boolean cancel(ServerPlayer p,ArtifactKind kind){
         boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);

@@ -23,28 +23,29 @@ public final class MiningAlternates {
         if(kind==ArtifactKind.WORLDLOOM){
             if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
             var floor=player.blockPosition().below();
-            for(int depth=1;depth<=9;depth++){
+            for(int depth=1;depth<=32;depth++){
                 var at=floor.relative(forward,depth);
                 if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir())break;
                 steps.add(new WorkStep.Place(at,block.getBlock().defaultBlockState(),true));
             }
         }else if(kind==ArtifactKind.AXIOM){
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;
-            for(var direction:Direction.values())addMine(player,steps,origin.relative(direction),false);
+            return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,false));
         }else if(kind==ArtifactKind.CRUCIBLE){
             var state=level.getBlockState(origin);
             var materials=new net.minecraft.world.level.block.Block[]{Blocks.STONE,Blocks.DEEPSLATE,Blocks.GRANITE,Blocks.DIORITE,Blocks.ANDESITE,Blocks.DIRT,Blocks.BASALT,Blocks.OBSIDIAN,Blocks.CALCITE,Blocks.TUFF,Blocks.DRIPSTONE_BLOCK,Blocks.GRAVEL};
             var next=materials[Math.floorMod(ArtifactState.mode(player,kind),materials.length)].defaultBlockState();
-            if(state!=next&&WorldSafety.inert(state)&&!PlayerPlacedBlocks.get(level).contains(origin))steps.add(new WorkStep.Rephase(origin,state,next));
+            if(!WorldSafety.inert(state)||PlayerPlacedBlocks.get(level).contains(origin))return false;
+            return WorkQueue.startRegion(player,tool,kind,new RadialMiningProgram(origin,12,kind,ArtifactState.mode(player,kind),next));
         }else if(kind==ArtifactKind.INTERREGNUM){
-            addMine(player,steps,origin,true);
+            return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,true));
         }else if(kind==ArtifactKind.CHOIR){
-            for(int depth=0;depth<8;depth++)for(int width=-1;width<=1;width++)for(int height=0;height<3;height++){
-                if(height==2&&width!=0)continue;
+            for(int depth=0;depth<24;depth++)for(int width=-3;width<=3;width++)for(int height=0;height<5;height++){
+                if(height==4&&Math.abs(width)>1)continue;
                 addMine(player,steps,origin.relative(forward,depth).relative(side,width).above(height),true);
             }
         }else if(kind==ArtifactKind.HELLSPEC){
-            for(int height=0;height<12;height++)for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
+            for(int height=0;height<32;height++)for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)
                 addMine(player,steps,origin.offset(x,height,z),true);
         }else return false;
         if(steps.isEmpty()||!WorkQueue.start(player,tool,kind,steps))return false;
@@ -92,7 +93,7 @@ public final class MiningAlternates {
             if(!level.hasChunkAt(at)||level.getBlockState(at)!=hit.getValue()||PlayerPlacedBlocks.get(level).contains(at))continue;
             if(nearest==null)nearest=at;
             if(ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),1,1))
-                level.sendParticles(player,net.minecraft.core.particles.ParticleTypes.END_ROD,true,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+                AbilityVfx.retired(level,player,net.minecraft.core.particles.ParticleTypes.END_ROD,true,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
             found++;
         }
         if(nearest!=null)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.specialpickaxes.survey_nearest",nearest.getX(),nearest.getY(),nearest.getZ()),false);

@@ -52,10 +52,10 @@ public final class ArtifactManualScreen extends Screen {
         ArtifactKind abilityKind=copiedKind(active);
         g.fill(x-1,y-1,x+w+1,y+h+1,0xff090e15);
         g.fill(x,y,x+w,y+h,0xf2111925);
-        g.fill(x,y,x+w,y+40,0xff1c2b39);
-        g.fill(x,y,x+4,y+40,0xffd4aa5d);
-        g.fill(x+4,y+39,x+w,y+41,0xffd4aa5d);
-        g.drawCenteredString(font,title,width/2,y+4,0xffffd477);
+        g.fill(x,y,x+w,y+40,0xff182029);
+        g.fill(x,y,x+4,y+40,0xff7298a6);
+        g.fill(x+4,y+39,x+w,y+41,0xff7298a6);
+        g.drawCenteredString(font,title,width/2,y+4,0xffedf3f6);
 
         ItemStack shownIcon=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?new ItemStack(SpecialPickaxes.PICKS.get(abilityKind).get()):headerIcon;
@@ -99,35 +99,22 @@ public final class ArtifactManualScreen extends Screen {
             Component state=copied.isBlank()?selection:Component.translatable("screen.specialpickaxes.copy_mode",selection);
             Component selected=Component.translatable("screen.specialpickaxes.selected",state);
             int selectedWidth=Math.max(0,w-2*PAD-font.width(Component.translatable("screen.specialpickaxes.close"))-12);
-            g.drawString(font,font.plainSubstrByWidth(selected.getString(),selectedWidth),x+PAD,layout.footerY(),0xffffd477,false);
+            g.drawString(font,font.plainSubstrByWidth(selected.getString(),selectedWidth),x+PAD,layout.footerY(),0xffedf3f6,false);
         }
         Component close=Component.translatable("screen.specialpickaxes.close");
         g.drawString(font,close,x+w-PAD-font.width(close),layout.footerY(),0xffaebdca,false);
         super.render(g,mouseX,mouseY,partial);
     }
 
+    /** Three purposeful blocks: what the primary does, what the alternate does, and live key bindings. */
     private List<Section> sections(ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey){
-        var result=new ArrayList<Section>();
-        result.add(section("screen.specialpickaxes.main",Component.translatable("mining.identity."+abilityKind.id+"."+modeKey),0xffe4edf4));
-        result.add(section("manual4.how",ArtifactTooltips.how(abilityKind,modeKey),0xffc7d4df));
-        result.add(section("screen.specialpickaxes.alternate",ArtifactTooltips.alternate(abilityKind),0xffffd385));
-        result.add(section("manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"),0xffa7d9ef));
-        result.add(section("screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+kind.id),0xffffc4aa));
-        result.add(section("screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+kind.id),0xff9de8c1));
-        var curiosInfo=new ArrayList<Component>();curiosInfo.add(Component.translatable("screen.specialpickaxes.curios_passive"));
-        curiosInfo.add(Component.translatable("curios.detail.specialpickaxes."+kind.id));
-        result.add(new Section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios"),curiosInfo,0xffb9d4ff));
-        if(ArtifactInteraction.modeCount(abilityKind)>1){
-            result.add(section("manual4.modes",allModes(abilityKind),0xffd6e0e8));
-            result.add(section("manual4.mode",Component.translatable("mode.specialpickaxes."+modeKey),0xffffd079));
-        }
-        result.add(section("manual4.cost",ArtifactTooltips.costDetail(stack),0xffd6e0e8));
-        result.add(section("manual4.limits",Component.translatable(abilityKind==ArtifactKind.SEAM_RIPPER?"limits.specialpickaxes.seam_ripper":"mining.limits"),0xffd6e0e8));
         var controls=new ArrayList<Component>();
-        for(var action:ArtifactTooltips.actions(stack,kind,mode))controls.add(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT)).append(": ").append(RelicKeys.name(action)));
-        controls.add(Component.translatable("key.specialpickaxes.manual").append(": ").append(RelicKeys.MANUAL.getTranslatedKeyMessage()));
-        result.add(new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffd6e0e8));
-        return result;
+        for(var action:ArtifactTooltips.actions(stack,kind,mode))
+            controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT))));
+        return List.of(
+                section("screen.specialpickaxes.main",Component.translatable("guide.main."+abilityKind.id),0xffa9d9ec),
+                section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
+                new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffc6ced8));
     }
 
     private void ensureCards(int maxWidth,boolean twoColumns,ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey,int viewportTop,int viewportBottom){
@@ -166,11 +153,11 @@ public final class ArtifactManualScreen extends Screen {
             if(cardBottom>viewportTop){
                 g.fill(x,cursor,x+cardWidth,cardBottom,0xff111a23);
                 g.fill(x+1,cursor+1,x+cardWidth-1,cardBottom-1,0xff1b2733);
-                g.fill(x,cursor,x+cardWidth,cursor+1,0xff435667);
+                g.fill(x,cursor,x+cardWidth,cursor+1,0xff33414e);
                 g.fill(x,cardBottom-1,x+cardWidth,cardBottom,0xff0b1118);
-                g.fill(x,cursor,x+3,cardBottom,card.section.color);
-                g.fill(x+3,cursor+1,x+cardWidth-1,cursor+18,0xff243443);
-                g.fill(x+3,cursor+17,x+cardWidth-1,cursor+18,0xff314555);
+                g.fill(x,cursor,x+2,cursor+18,card.section.color);
+                g.fill(x+3,cursor+1,x+cardWidth-1,cursor+18,0xff1b2630);
+
                 int headingWidth=Math.max(0,cardWidth-20);
                 String heading=font.plainSubstrByWidth(card.section.heading.getString(),headingWidth);
                 g.drawString(font,heading,x+10,cursor+5,card.section.color,false);
@@ -188,7 +175,7 @@ public final class ArtifactManualScreen extends Screen {
         int thumb=scrollThumbHeight(height);
         int travel=height-thumb;
         int thumbY=top+ManualScrollModel.thumbOffset(height,contentHeight,scroll);
-        g.fill(x-2,thumbY,x+4,thumbY+thumb,0xffd4aa5d);
+        g.fill(x-2,thumbY,x+4,thumbY+thumb,0xff7298a6);
         g.fill(x-1,thumbY+1,x+3,thumbY+thumb-1,0xffffdfa0);
     }
 

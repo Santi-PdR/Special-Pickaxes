@@ -24,7 +24,7 @@ import java.util.Set;
 public final class ArtifactTechniques {
     public static final int IRIDIUM_RECALL_RADIUS=48;
     private static final int IRIDIUM_RECALL_INSPECTION_LIMIT=4096;
-    private static final int SEAM_FACE_RADIUS=3;
+    private static final int SEAM_FACE_RADIUS=7;
     private static final int SEAM_FACE_CELLS=(SEAM_FACE_RADIUS*2+1)*(SEAM_FACE_RADIUS*2+1);
     private ArtifactTechniques() {}
 
@@ -93,7 +93,7 @@ public final class ArtifactTechniques {
     }
 
     private static void particle(net.minecraft.server.level.ServerLevel level, ServerPlayer player, DustParticleOptions color, BlockPos pos) {
-        if (level.hasChunkAt(pos)) level.sendParticles(player, color, false, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5, 3, .08, .03, .08, 0);
+        if (level.hasChunkAt(pos)) AbilityVfx.retired(level,player, color, false, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5, 3, .08, .03, .08, 0);
     }
 
     private static boolean icarianLift(ServerPlayer player,ItemStack tool) {
@@ -103,7 +103,7 @@ public final class ArtifactTechniques {
         boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(base,availableRise));
         if(started){
             ArtifactFeedback.message(player,"icarian_lift_started");
-            if(ArtifactFeedback.reserveMiningParticles(player,12))player.serverLevel().sendParticles(player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
+            if(ArtifactFeedback.reserveMiningParticles(player,12))AbilityVfx.retired(player.serverLevel(),player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
         }
         return started;
     }
@@ -200,9 +200,10 @@ public final class ArtifactTechniques {
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
             case PALIMPSEST,CHOIR,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
-            case EVENTIDE -> magnetDrops(player,tool,16,64);
+            case EVENTIDE -> magnetDrops(player,tool,48,256);
             case ICARUS -> icarianLift(player,tool);
-            case WORLDBREAKER -> echo(player,tool,2);
+            case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):
+                    WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(aimed(player),kind,true));
             case EXODIUM -> starfallSink(player,tool);
             case IRIDIUM -> recallIridiumDrops(player,tool,IRIDIUM_RECALL_RADIUS,96);
             case SEAM_RIPPER -> seamFace(player,tool);

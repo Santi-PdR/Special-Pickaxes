@@ -21,16 +21,16 @@ class PackagedItemAssetTests(unittest.TestCase):
         self.files['models/item/worldloom.json']=b'{"parent":"minecraft:item/handheld","textures":{"layer0":"specialpickaxes:item/worldloom"}}'
         with self.assertRaisesRegex(ValueError,'Stale or modified'):self.verify()
     def test_old_cached_icon_is_rejected_even_if_it_is_a_valid_png(self):
-        self.files['textures/item/worldloom_v2.png']=(ASSETS/'textures/item/worldloom.png').read_bytes()
+        self.files['textures/item/worldloom_external.png']=(ASSETS/'textures/item/worldloom.png').read_bytes()
         with self.assertRaisesRegex(ValueError,'Stale or modified'):self.verify()
     def test_missing_runtime_texture_is_rejected(self):
-        del self.files['textures/item/worldloom_v2.png']
+        del self.files['textures/item/worldloom_external.png']
         with self.assertRaisesRegex(ValueError,'Missing packaged item resource'):self.verify()
     def test_wrong_provenance_digest_is_rejected(self):
         self.records[0]['runtime_sha256']='0'*64
         with self.assertRaisesRegex(ValueError,'provenance mismatch'):self.verify()
     def test_unexpected_animation_metadata_is_rejected(self):
-        self.files['textures/item/worldloom_v2.png.mcmeta']=b'{}'
+        self.files['textures/item/worldloom_external.png.mcmeta']=b'{}'
         with self.assertRaisesRegex(ValueError,'Unexpected animation metadata'):self.verify()
     def test_incomplete_provenance_is_rejected(self):
         self.records.pop()

@@ -50,7 +50,7 @@ public final class ArtifactItem extends PickaxeItem {
         if(damaged&&attacker instanceof ServerPlayer player) {
             if(!PassiveReactionContext.capture(player,target).allowed(kind))return damaged;
             switch(kind) {
-                case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,true,true)); }
+                case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,false,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,false,true)); }
                 case CHOIR -> ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),1,100);
                 case EVENTIDE -> {
                     ArtifactPassives.grantCombatEffect(target,SpecialPickaxes.GRAVITIC_TETHER.get(),1,80);
@@ -63,14 +63,14 @@ public final class ArtifactItem extends PickaxeItem {
                 }
                 case CRUCIBLE -> target.setSecondsOnFire(8);
                 case INTERREGNUM -> ArtifactPassives.grantCombatEffect(target,SpecialPickaxes.STASIS_CRUSH.get(),0,160);
-                case WORLDLOOM -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,3,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,0,false,true,true)); }
-                case ICARUS -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,200,0,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.JUMP,160,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED,120,1,false,true,true)); }
+                case WORLDLOOM -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,240,3,false,false,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,0,false,false,true)); }
+                case ICARUS -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,200,0,false,false,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.JUMP,160,1,false,false,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED,120,1,false,false,true)); }
                 case AXIOM -> {
-                    target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,200,0,false,true,true));
+                    target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.GLOWING,200,0,false,false,true));
                     ArtifactPassives.grantCombatEffect(target,SpecialPickaxes.NULL_MARK.get(),0,100);
                     ArtifactFeedback.burst(player,kind,target.blockPosition(),8);
                 }
-                case WORLDBREAKER -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,1,false,true,true));
+                case WORLDBREAKER -> player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,100,1,false,false,true));
                 default -> { }
             }
         }
@@ -113,7 +113,7 @@ public final class ArtifactItem extends PickaxeItem {
             ArtifactInteraction.display(p,tool,kind);
         }
     }
-    @Override public boolean isFoil(ItemStack stack) { return kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.ATLAS; }
+    @Override public boolean isFoil(ItemStack stack) { return false; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         boolean expanded=net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT
                 &&io.github.santipdr.specialpickaxes.client.ArtifactTooltipEvents.shiftDown();

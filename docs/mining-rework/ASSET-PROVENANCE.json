@@ -4,116 +4,233 @@
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/adamantiumpickaxe.png",
     "sha256": "19e4ad13e6576279a8f1b35d066572f72f9f0dfadc359c2e6efb7e3944627903",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "palimpsest_v2.png",
-    "runtime_sha256": "59a8d637306f31cc4b843d0835ba28b784e4a4bb0a2c13093471fac328ef83c2"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "palimpsest_external.png",
+    "runtime_sha256": "17e85506c4a5119d514b3bea5b07600e05c7a0792ac1ad339b519b3a4f4c3b74",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/hallowed_pickaxe.png",
+    "external_source_sha256": "17e85506c4a5119d514b3bea5b07600e05c7a0792ac1ad339b519b3a4f4c3b74",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "fault_choir",
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/seismic_pickaxe.png",
     "sha256": "a8957b6a166eb519b7e31ca8d27a055d1b3c19fc1702ba431d9a324012a390ff",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "fault_choir_v2.png",
-    "runtime_sha256": "70b1cea19a5eb6c77bb997af67d258f1f5051a1d3064e93d3f8c13aa4c5fa8c4"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "fault_choir_external.png",
+    "runtime_sha256": "5fc8dbbb798ec5fcf970903fceecd89bf7f9518348ad41759b221c209c77d7e6",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/aquarium_pickaxe.png",
+    "external_source_sha256": "5fc8dbbb798ec5fcf970903fceecd89bf7f9518348ad41759b221c209c77d7e6",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "eventide",
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/schizo_pickaxe.png",
     "sha256": "eccae34b08471a6684b054adce12826919c5bfa9f7ea057430f7225a3a741b9a",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "eventide_v2.png",
-    "runtime_sha256": "cda5f66371ae4749aa85c155d044f6df124661f4be20efbc0f7283117abaae31"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "eventide_external.png",
+    "runtime_sha256": "5a9084e25e94d682dca820a472bfb6a5df46bb2b2c2ff042dff4dcc23da55b7e",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/stormyx_pickaxe.png",
+    "external_source_sha256": "5a9084e25e94d682dca820a472bfb6a5df46bb2b2c2ff042dff4dcc23da55b7e",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "paradox_crucible",
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/fire_pickaxe.png",
     "sha256": "b0d60836e9ca8d3db42ac47647317ba5e1a1db479456f62c98977f6921de312c",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "paradox_crucible_v2.png",
-    "runtime_sha256": "ea229b0f61fdc25ab4d905d2a1c9cc2a6672ab878ca6935b4bc01a936d3d7654"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "paradox_crucible_external.png",
+    "runtime_sha256": "73f0afb4523500614b24a957274341a7c4acf8fa5c17b72bf7e8cfee9a188ff3",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/legendary_banglum_pickaxe.png",
+    "external_source_sha256": "73f0afb4523500614b24a957274341a7c4acf8fa5c17b72bf7e8cfee9a188ff3",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "interregnum",
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/lighningpickaxe.png",
     "sha256": "52d872e1f8d421055f1f712cc75ed9e081ec768a94ec78edf91e225ccee6f64b",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "interregnum_v2.png",
-    "runtime_sha256": "019149d7a06c858b813f71c0802e24bc5fb7bfee491830d39a20e89c8125a675"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "interregnum_external.png",
+    "runtime_sha256": "07bec6bab48adcd2a6291fcd38d3e07783fc696c9724905c90fe2ae293ff7c82",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/mythril_pickaxe.png",
+    "external_source_sha256": "07bec6bab48adcd2a6291fcd38d3e07783fc696c9724905c90fe2ae293ff7c82",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "worldloom",
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/natural_pickaxe.png",
     "sha256": "88679b2c56e65544dc984fe82a6c45fa0954a4f46453f3fc45dfedfa13e5d873",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "worldloom_v2.png",
-    "runtime_sha256": "398b0b7f9c908d4b7549d16cff038368cbdcacb37d0da41f288de49086947057"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "worldloom_external.png",
+    "runtime_sha256": "a4d32b16913a682f4f56c131b8bcef3201779418ac64f1d64f5808fdcf4779be",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/prometheum_pickaxe.png",
+    "external_source_sha256": "a4d32b16913a682f4f56c131b8bcef3201779418ac64f1d64f5808fdcf4779be",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "icarus",
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/elytra_pickaxe.png",
     "sha256": "064ddf43fbb77112b19573335a6860674a501f748a69a841476e372f28418d56",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "icarus_v2.png",
-    "runtime_sha256": "6a02b37d820d8a7da89fd2ad90112acc19039505670ae004f7595655a44fba73"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "icarus_external.png",
+    "runtime_sha256": "9d2dfb52c717ebb63441d9ed92f2b368053c043b195249b2badc7f677526adbc",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/star_platinum_pickaxe.png",
+    "external_source_sha256": "9d2dfb52c717ebb63441d9ed92f2b368053c043b195249b2badc7f677526adbc",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "hollow_axiom",
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/shadow_pickaxe.png",
     "sha256": "68415544cd16cbc80b04eebbcae993bfc3f75799f854cb05783e68ba556a840c",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "hollow_axiom_v2.png",
-    "runtime_sha256": "0882f093984a5bbf5ab964e0c426dab46d2d510c6a74054025f7a6cd9bda9eb2"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "hollow_axiom_external.png",
+    "runtime_sha256": "990d4cefcca27a3fea802f807248407e47b130c04841290511061331f3732946",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/adamantite_pickaxe.png",
+    "external_source_sha256": "990d4cefcca27a3fea802f807248407e47b130c04841290511061331f3732946",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "worldbreaker",
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/inferno_reaver.png",
     "sha256": "9a7571d66f96386f09e1a70e4633b4ef253d3a9258c6a03836fce37b5f1416a7",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "worldbreaker_v2.png",
-    "runtime_sha256": "ce576c71c42706de19b04c90861022bb651b6a84352a93647cdac6790b597fdd"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "worldbreaker_external.png",
+    "runtime_sha256": "a407d33f86725de01ebeb087c9eae3b9d429ad60efb0e9c50348b9356cc69a94",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/metallurgium_pickaxe.png",
+    "external_source_sha256": "a407d33f86725de01ebeb087c9eae3b9d429ad60efb0e9c50348b9356cc69a94",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "exodium",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/exodium_pickaxe.png",
     "sha256": "3908b3d7b6e101a6517c3c29aac6da167f85c8460444e61f4b7c7816bc0acb1e",
-    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
-    "runtime_texture": "exodium_v2.png",
-    "runtime_sha256": "7ca3a6710f7008ce046c80c81bbd243f5a8bebdb60512524be8387f60f913c3a"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "exodium_external.png",
+    "runtime_sha256": "884c5ba2a9fbff9c7d6328ce49e32f8a67494535321e9cb274f264624d475cab",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/celestium_pickaxe.png",
+    "external_source_sha256": "884c5ba2a9fbff9c7d6328ce49e32f8a67494535321e9cb274f264624d475cab",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "iridium",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/iridium_pickaxe.png",
     "sha256": "bf7a1762354030256ebc3cc099617d760530c990bb5e9f497b3fab2465e67ee5",
-    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
-    "runtime_texture": "iridium_v2.png",
-    "runtime_sha256": "859947db9b23195d66e03dea0448bf864c8faae4eae5bf58d027ece5fda31f91"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "iridium_external.png",
+    "runtime_sha256": "3d082bd2cfc54c4bf3d621a4bad6cd69bea4ab14d3d3eb62e81d3047761a1458",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/orichalcum_pickaxe.png",
+    "external_source_sha256": "3d082bd2cfc54c4bf3d621a4bad6cd69bea4ab14d3d3eb62e81d3047761a1458",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "hellspec",
     "archive": "docs/mining-rework/reference-archives/terramity-pickaxes.zip",
     "entry": "assets/terramity/textures/item/hellspec_pickaxe.png",
     "sha256": "1bad527651745b25844edd661acee8e8c0974ab9eed904166481e90b19584e80",
-    "adaptation": "The authorized reference sprite remains unchanged in the repository. Runtime uses an original hand-pixelled 32×32 redraw, developed from a generated concept and cleaned into a crisp sprite; no pixels are copied from the reference.",
-    "runtime_texture": "hellspec_v2.png",
-    "runtime_sha256": "d209556a0be1647fe95d74aba628a1591bf9ca6fc413927e53e1facf5a0316d0"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "hellspec_external.png",
+    "runtime_sha256": "2a6e24f5bc9f53c99dc1964cf55651ca449d36853ea913a6fa78b1fd4e078688",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/palladium_pickaxe.png",
+    "external_source_sha256": "2a6e24f5bc9f53c99dc1964cf55651ca449d36853ea913a6fa78b1fd4e078688",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   },
   {
     "artifact": "seam_ripper",
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/pickaxe1.png",
     "sha256": "683b855ba19dd188df760ac121a20d46762e43177ec3d432e48896f3753ce386",
-    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
-    "runtime_texture": "seam_ripper_v2.png",
-    "runtime_sha256": "0231609aabfdd6a0553c410db663e35c7d73f6b1757532431988b345a3b2f81a"
+    "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
+    "runtime_texture": "seam_ripper_external.png",
+    "runtime_sha256": "a682673caeb5f5ee6fe39381a4af6791626d09abf5ff103ff5cd35ea0dc58bc0",
+    "external_repository": "Noaaan/MythicMetals",
+    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
+    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/carmot_pickaxe.png",
+    "external_source_sha256": "a682673caeb5f5ee6fe39381a4af6791626d09abf5ff103ff5cd35ea0dc58bc0",
+    "runtime_dimensions": [
+      16,
+      16
+    ],
+    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
   }
 ]

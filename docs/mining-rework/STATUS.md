@@ -1,3 +1,46 @@
+# 5.11.0 — reestructuración visual y habilidades OP; pendiente de CI
+
+## Cambio visual solicitado
+Los13modelos apuntan a sprites originales de Mythic Metals, sin editar píxeles,
+recolorear, escalar ni generar arte. Fuente fija1cc825572b1e3a8697af197fa58da34636521ce4;
+manifest registra ruta/dimensiones/SHA256de cada fuente. Créditos y términos
+originales incluidos. Son assets reservados para la compilación personal
+solicitada: publicación automática de binarios desactivada, también enChecks.
+No se afirma permiso general de redistribución ni aprobación estética del usuario.
+
+## VFX y UI
+Se retira el suscriptor de auras de mano/Curios. Todos los emisores antiguos
+pasan por la API retirada que no emite. No quedan envíos vanilla en el paquete
+artifact: solo AbilityVfx emite una ráfaga breve de sprites custom, tras éxito
+de activación/confirmación;16partículas por jugador/tick,256globales. Los campos
+persistentes no mandan bordes/partículas y los efectos no muestran partículas
+de poción. Se conservan las geometrías antiguas para regresiones y futura limpieza.
+Manual: solo habilidad principal, secundaria y controles reasignados; sin perfil,
+melee, costes, límites, curios ni párrafos de relleno. Panel más compacto,
+colores neutros, scroll/clipping y selector de copia conservados.
+
+## Potencia sin tick spikes
+Presupuesto base8→32por jugador,96→192global; escaneo de menas32→96;
+vein limit256→1024; campo600→1200ticks; enfriamiento principal20→10ticks,
+secundarias mínimo100→40ticks. Las configs existentes no se sobrescriben.
+Stasis cambia un bloque por Fractura Temporal11×11×11streaming con drops,
+protección de construcciones, bedrock y claims. Axiom expone ese volumen sin
+romper menas; Crucible transmuta esfera radio12; Choir galería7×5×24;
+Hellspec chimenea7×7×32; Worldloom puente32; Eventide botín256/radio48;
+Worldbreaker obtiene secundaria nativa11cúbicos; Seam barrido15×15;
+Exodium pozo hasta64. Icarus e Iridium conservan sus mecánicas y reciben
+las mejoras compartidas de velocidad/enfriamiento; no se afirma un rediseño
+completo de todas sus primarias. Se mantienen daño4y secundarias mineras.
+
+## Pruebas
+TresJUnit nuevos:1331celdas únicas, centro primero/copia inmutable e índices
+inválidos. TresGameTests nuevos: excavación volumétrica real, claims en ejecución
+y registros custom/deduplicación VFX. Esperados129JUnit/385GameTests.
+Local25recursos/87Python/parser158Java verdes; falta javac/Forge/cliente real.
+La entrega467 inferior es histórica, no certifica esta reestructuración.
+
+## Historial
+
 # Estado vigente — 5.10.467 verificada
 
 ## Entrega verificada 5.10.467

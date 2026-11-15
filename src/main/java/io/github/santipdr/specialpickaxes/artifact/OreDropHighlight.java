@@ -32,7 +32,7 @@ public final class OreDropHighlight {
         if(fresh){
             if(reserveShard(level)){
                 // The shard is private Curios feedback; only the item entity's glow is shared with nearby players.
-                level.sendParticles(owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
+                AbilityVfx.retired(level,owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
                         false,drop.getX(),drop.getY()+drop.getBbHeight()*.5D,drop.getZ(),1,0,.012D,0,0);
             }
         }
@@ -75,7 +75,7 @@ public final class OreDropHighlight {
     private static void emitLodeSenseTrail(ServerPlayer owner,Vec3 drop,Vec3 wearer){
         var level=owner.serverLevel();if(!reserveShard(level))return;
         Vec3 point=drop.lerp(wearer,.42D);
-        level.sendParticles(owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
+        AbilityVfx.retired(level,owner,io.github.santipdr.specialpickaxes.SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),
                 false,point.x,point.y,point.z,1,0,0,0,0);
     }
 }

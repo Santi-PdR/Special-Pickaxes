@@ -93,8 +93,8 @@ public final class ArtifactFeedback {
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.58D,0);
         for(int i=1;i<=3;i++){
             Vec3 point=start.lerp(end,i/4D);
-            level.sendParticles(wearer,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,CHOIR_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A single private thread shows which teammate just received Stasis' Curios ward. */
@@ -106,8 +106,8 @@ public final class ArtifactFeedback {
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.58D,0);
         for(int i=1;i<=4;i++){
             Vec3 point=StasisWardLinkGeometry.point(start,end,i);
-            level.sendParticles(wearer,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,STASIS_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A single bowed violet thread marks Eventide sharing its controlled-fall ward with an ally. */
@@ -119,8 +119,8 @@ public final class ArtifactFeedback {
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=5;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.34D);
-            level.sendParticles(wearer,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,GRAVITY_LINK,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A small vine-and-gleam arc shows Worldloom's renewal reaching a newly supported teammate. */
@@ -133,8 +133,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=5;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.22D);
             var particle=(i&1)==0?WORLDLOOM_GLEAM:WORLDLOOM_ROOT;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A short violet splice marks Axiom's shared Null Veil only for its bearer and the new ally. */
@@ -147,8 +147,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=4;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.29D);
             var particle=(i&1)==0?ParticleTypes.SCULK_SOUL:NULL_VEIL_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** Three slate motes identify which teammate just entered Worldbreaker's Aegis formation. */
@@ -160,12 +160,12 @@ public final class ArtifactFeedback {
         Vec3 end=ally.position().add(0,ally.getBbHeight()*.62D,0);
         for(int i=1;i<=3;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.14D);
-            level.sendParticles(wearer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,1,0,0,0,0);
         }
         Vec3 midpoint=CurioAuraGeometry.sharedAllyLinkPoint(start,end,2,.14D);
-        level.sendParticles(wearer,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
-        level.sendParticles(ally,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
+        AbilityVfx.retired(level,wearer,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
+        AbilityVfx.retired(level,ally,ParticleTypes.WAX_ON,false,midpoint.x,midpoint.y,midpoint.z,1,0,0,0,0);
     }
     /** A small ember current marks Crucible's fire-and-lava ward reaching a new teammate. */
     public static void crucibleMantleLink(ServerPlayer wearer,ServerPlayer ally){
@@ -177,8 +177,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=4;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.25D);
             var particle=(i&1)==0?ParticleTypes.SMALL_FLAME:CRUCIBLE_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** Five cold star stitches mark Exodium's projectile ward reaching a teammate. */
@@ -191,8 +191,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=5;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.31D);
             var particle=(i&1)==0?ParticleTypes.END_ROD:STARFALL_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A short ember arc identifies Hellspec's fireproof shell on a newly protected ally. */
@@ -205,8 +205,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=4;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.38D);
             var particle=(i&1)==0?ParticleTypes.LAVA:SEARING_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A compact mint crystal stitch marks Iridium lending its hit-triggered armor ward. */
@@ -219,8 +219,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=4;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.19D);
             var particle=(i&1)==0?ParticleTypes.END_ROD:LODEGUARD_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
     /** A short golden feather current shows Icarus sharing controlled glide with a falling ally. */
@@ -233,8 +233,8 @@ public final class ArtifactFeedback {
         for(int i=1;i<=5;i++){
             Vec3 point=CurioAuraGeometry.sharedAllyLinkPoint(start,end,i,.27D);
             var particle=(i==3||i==4)?ParticleTypes.END_ROD:ICARIAN_LINK;
-            level.sendParticles(wearer,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
-            level.sendParticles(ally,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
+            AbilityVfx.retired(level,wearer,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
+            AbilityVfx.retired(level,ally,particle,false,point.x,point.y,point.z,1,0,.015D,0,0);
         }
     }
     /** A compact close-range ripple marks Stasis' eight-second shared counter. */
@@ -262,7 +262,7 @@ public final class ArtifactFeedback {
         if(!reserveAuraParticles(level.getServer().getTickCount(),particleCount,audience.size()))return;
         for(var viewer:audience)for(var sample:particles){
             var at=sample.position();
-            level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,sample.count(),
+            AbilityVfx.retired(level,viewer,sample.particle(),false,at.x,at.y,at.z,sample.count(),
                     sample.dx(),sample.dy(),sample.dz(),sample.speed());
         }
     }
@@ -272,7 +272,7 @@ public final class ArtifactFeedback {
         if(entity instanceof ServerPlayer wearer){nearbyWardPulse(wearer,particles);return;}
         var audience=entityAuraAudience(level,entity);
         if(audience.isEmpty()||!reserveAuraParticles(level.getServer().getTickCount(),particleCount(particles),audience.size()))return;
-        for(var viewer:audience)for(var sample:particles){var at=sample.position();level.sendParticles(viewer,sample.particle(),false,at.x,at.y,at.z,
+        for(var viewer:audience)for(var sample:particles){var at=sample.position();AbilityVfx.retired(level,viewer,sample.particle(),false,at.x,at.y,at.z,
                 sample.count(),sample.dx(),sample.dy(),sample.dz(),sample.speed());}
     }
     /** Selects at most eight nearest visible players inside 24 blocks for a mob's cosmetic pulse. */
@@ -319,10 +319,10 @@ public final class ArtifactFeedback {
         var side=new Vec3(-horizontal.z,0,horizontal.x);var audience=nearbyWardAudience(wearer);
         for(int i=0;i<6;i++){
             var point=worldbreakerAegisShardPoint(eyeLine,horizontal,side,i);
-            for(var viewer:audience)level.sendParticles(viewer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,
+            for(var viewer:audience)AbilityVfx.retired(level,viewer,WORLDBREAKER_SHARD,false,point.x,point.y,point.z,
                     1,.018D,.018D,.018D,.008D);
         }
-        for(var viewer:audience)level.sendParticles(viewer,ParticleTypes.END_ROD,false,
+        for(var viewer:audience)AbilityVfx.retired(level,viewer,ParticleTypes.END_ROD,false,
                 eyeLine.x+horizontal.x*.45D,eyeLine.y,eyeLine.z+horizontal.z*.45D,2,.035D,.08D,.035D,.004D);
     }
     public static Vec3 worldbreakerAegisShardPoint(Vec3 center,Vec3 towards,Vec3 side,int sample){
@@ -349,11 +349,11 @@ public final class ArtifactFeedback {
         var gold=new DustParticleOptions(new Vector3f(1F,.82F,.42F),1.18F);
         for(int i=0;i<12;i++){
             double progress=i/11D,angle=phase+progress*Math.PI*2D,radius=.34D+progress*.22D;
-            level.sendParticles(wearer,(i&1)==0?gold:cyan,false,x+Math.cos(angle)*radius,
+            AbilityVfx.retired(level,wearer,(i&1)==0?gold:cyan,false,x+Math.cos(angle)*radius,
                     y-.22D+progress*.58D,z+Math.sin(angle)*radius,1,0,0,0,0);
         }
-        level.sendParticles(wearer,ParticleTypes.END_ROD,false,x,y+.36D,z,2,.06D,.08D,.06D,.006D);
-        level.sendParticles(wearer,ParticleTypes.GLOW,false,x,y+.12D,z,2,.08D,.12D,.08D,.004D);
+        AbilityVfx.retired(level,wearer,ParticleTypes.END_ROD,false,x,y+.36D,z,2,.06D,.08D,.06D,.006D);
+        AbilityVfx.retired(level,wearer,ParticleTypes.GLOW,false,x,y+.12D,z,2,.08D,.12D,.08D,.004D);
     }
     private static void emitMiningPulse(ServerPlayer viewer,net.minecraft.server.level.ServerLevel level,Vec3 center,
                                         ParticleOptions primary,int primaryCount,ParticleOptions accent,int accentCount){
@@ -365,13 +365,13 @@ public final class ArtifactFeedback {
             double progress=(i+1D)/(motes+1D);
             double angle=phase+progress*Math.PI*1.4D;
             double radius=.12D+progress*.38D;
-            level.sendParticles(viewer,primary,false,center.x+Math.cos(angle)*radius,
+            AbilityVfx.retired(level,viewer,primary,false,center.x+Math.cos(angle)*radius,
                     center.y+progress*.48D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
         }
         for(int i=0;i<MiningPulseCost.visible(accentCount);i++){
             double angle=level.getGameTime()*.3D+i*Math.PI*2D/Math.max(1,MiningPulseCost.visible(accentCount));
             double radius=.035D*i;
-            level.sendParticles(viewer,accent,false,center.x+Math.cos(angle)*radius,
+            AbilityVfx.retired(level,viewer,accent,false,center.x+Math.cos(angle)*radius,
                     center.y+.42D+i*.025D,center.z+Math.sin(angle)*radius,1,0,0,0,0);
         }
     }
@@ -418,11 +418,11 @@ public final class ArtifactFeedback {
         Vec3 origin=player.position().add(0,.12D,0);long phase=level.getGameTime();
         for(int i=0;i<12;i++){
             Vec3 point=curiosAttunementPoint(origin,i,phase);
-            level.sendParticles(player,i==11?ParticleTypes.GLOW:dust,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,player,i==11?ParticleTypes.GLOW:dust,false,point.x,point.y,point.z,1,0,0,0,0);
         }
         for(int i=0;i<8;i++){
             double angle=phase*.08D+i*Math.PI/4D;
-            level.sendParticles(player,dust,false,origin.x+Math.cos(angle)*.48D,origin.y,origin.z+Math.sin(angle)*.48D,1,0,0,0,0);
+            AbilityVfx.retired(level,player,dust,false,origin.x+Math.cos(angle)*.48D,origin.y,origin.z+Math.sin(angle)*.48D,1,0,0,0,0);
         }
     }
     /** Stable sample geometry for the Curios attunement helix; all points stay within half a block. */
@@ -454,8 +454,8 @@ public final class ArtifactFeedback {
             case CAUSEWAY->net.minecraft.core.particles.ParticleTypes.WAX_ON;
             case COUNTERSEAL->net.minecraft.core.particles.ParticleTypes.SOUL;
             case COVENANT->net.minecraft.core.particles.ParticleTypes.ENCHANT;};
-        if(count>1)p.serverLevel().sendParticles(p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
-        p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
+        if(count>1)AbilityVfx.retired(p.serverLevel(),p,accent,false,pos.getX()+0.5,pos.getY()+0.7,pos.getZ()+0.5,Math.min(3,count),0.15,0.15,0.15,0.02);
+        AbilityVfx.retired(p.serverLevel(),p,dust,false,pos.getX()+0.5,pos.getY()+0.6,pos.getZ()+0.5,Math.min(8,count),0.25,0.25,0.25,0);
     }
     /** Iridium's ore extraction gets a distinct, private resonance spiral instead of the shared burst. */
     public static void iridiumLodePulse(ServerPlayer p,BlockPos pos){
@@ -466,10 +466,10 @@ public final class ArtifactFeedback {
         double x=pos.getX()+.5D,y=pos.getY()+.52D,z=pos.getZ()+.5D;
         for(int i=0;i<5;i++){
             double progress=i/4D,angle=phase+progress*Math.PI*1.7D,radius=.08D+progress*.29D;
-            level.sendParticles(p,(i&1)==0?cyan:pearl,false,x+Math.cos(angle)*radius,
+            AbilityVfx.retired(level,p,(i&1)==0?cyan:pearl,false,x+Math.cos(angle)*radius,
                     y-.2D+progress*.42D,z+Math.sin(angle)*radius,1,0,0,0,0);
         }
-        level.sendParticles(p,ParticleTypes.GLOW,false,x,y+.24D,z,1,0,0,0,0);
+        AbilityVfx.retired(level,p,ParticleTypes.GLOW,false,x,y+.24D,z,1,0,0,0,0);
     }
     /** Nullcut fragments stream from each removed shell block toward the core it preserves. */
     public static void axiomNullcutPulse(ServerPlayer p,BlockPos mined,BlockPos core){
@@ -479,10 +479,10 @@ public final class ArtifactFeedback {
         var cyan=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.08F);
         for(int streak=0;streak<2;streak++){
             var point=source.lerp(nucleus,streak*.28D);
-            level.sendParticles(p,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,0,
+            AbilityVfx.retired(level,p,ParticleTypes.SCULK_SOUL,false,point.x,point.y,point.z,0,
                     inward.x,inward.y,inward.z,.045D);
         }
-        level.sendParticles(p,cyan,false,source.x,source.y,source.z,2,.08D,.08D,.08D,0);
+        AbilityVfx.retired(level,p,cyan,false,source.x,source.y,source.z,2,.08D,.08D,.08D,0);
     }
     /** Unit direction from the shell fragment back toward the protected nucleus. */
     public static Vec3 axiomNullcutDirection(BlockPos mined,BlockPos core){
@@ -493,7 +493,7 @@ public final class ArtifactFeedback {
     public static boolean seamTrail(ServerPlayer p,BlockPos from,BlockPos to) {
         if(from==null||to==null||from.distSqr(to)>5D||!reserveMiningParticles(p,1))return false;
         var point=Vec3.atCenterOf(from).lerp(Vec3.atCenterOf(to),.5D).add(0,.62D,0);
-        p.serverLevel().sendParticles(p,ParticleTypes.SCRAPE,false,point.x,point.y,point.z,1,0,0,0,0);
+        AbilityVfx.retired(p.serverLevel(),p,ParticleTypes.SCRAPE,false,point.x,point.y,point.z,1,0,0,0,0);
         return true;
     }
     /** At most four adjacent links are sent per mining pulse, to this pick's wearer only. */
@@ -507,7 +507,7 @@ public final class ArtifactFeedback {
     public static void crucibleRephase(ServerPlayer p,BlockPos pos,net.minecraft.world.level.block.state.BlockState material){
         if(!reserveMiningParticles(p,5))return;
         var fragments=new BlockParticleOption(ParticleTypes.BLOCK,material);
-        p.serverLevel().sendParticles(p,fragments,false,pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D,5,.18D,.2D,.18D,.055D);
+        AbilityVfx.retired(p.serverLevel(),p,fragments,false,pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D,5,.18D,.2D,.18D,.055D);
     }
     /** A slow double-height orbit marks the projectile ward while spending fewer particle packets. */
     public static void crucibleWardOrbit(ServerPlayer p,int radius){
@@ -518,7 +518,7 @@ public final class ArtifactFeedback {
             int band=i&1;double r=Math.max(1,radius-band*.8D);
             double x=p.getX()+Math.cos(angle)*r,z=p.getZ()+Math.sin(angle)*r;
             double y=p.getY()+.18D+band*1.05D+Math.sin(angle*2D)*.08D;
-            level.sendParticles(p,(i&2)==0?ParticleTypes.SMALL_FLAME:ParticleTypes.WAX_ON,
+            AbilityVfx.retired(level,p,(i&2)==0?ParticleTypes.SMALL_FLAME:ParticleTypes.WAX_ON,
                     false,x,y,z,1,0,.015D,0,.002D);
         }
     }
@@ -530,16 +530,16 @@ public final class ArtifactFeedback {
             double angle=phase+i*Math.PI/4D;
             double x=p.getX()+Math.cos(angle)*radius,z=p.getZ()+Math.sin(angle)*radius;
             var particle=(i&1)==0?ParticleTypes.END_ROD:ParticleTypes.WAX_ON;
-            level.sendParticles(p,particle,false,x,p.getY()+.12D,z,1,0,0,0,0);
-            level.sendParticles(p,particle,false,x,p.getY()+1.8D,z,1,0,0,0,0);
+            AbilityVfx.retired(level,p,particle,false,x,p.getY()+.12D,z,1,0,0,0,0);
+            AbilityVfx.retired(level,p,particle,false,x,p.getY()+1.8D,z,1,0,0,0,0);
         }
     }
     /** One wearer-only interception spark, rate-limited by the active ward field. */
     public static void crucibleDeflect(ServerPlayer p,Vec3 impact){
         if(!reserveMiningParticles(p,5))return;
         var level=p.serverLevel();
-        level.sendParticles(p,ParticleTypes.END_ROD,false,impact.x,impact.y,impact.z,3,.035D,.035D,.035D,.012D);
-        level.sendParticles(p,ParticleTypes.WAX_ON,false,impact.x,impact.y,impact.z,2,.045D,.045D,.045D,.008D);
+        AbilityVfx.retired(level,p,ParticleTypes.END_ROD,false,impact.x,impact.y,impact.z,3,.035D,.035D,.035D,.012D);
+        AbilityVfx.retired(level,p,ParticleTypes.WAX_ON,false,impact.x,impact.y,impact.z,2,.045D,.045D,.045D,.008D);
     }
     /** A bounded vine spiral advances around the rim once per successful Worldloom tunnel slice. */
     public static void worldloomBoreProgress(ServerPlayer p,BlockPos section,net.minecraft.core.Direction direction,int depth){
@@ -554,8 +554,8 @@ public final class ArtifactFeedback {
                 case Y->{x+=a;z+=b;}
                 case Z->{x+=a;y+=b;}
             }
-            level.sendParticles(p,WORLDLOOM_ROOT,false,x,y,z,1,0,.018D,0,.002D);
-            if(i==0||depth%4==3)level.sendParticles(p,WORLDLOOM_GLEAM,false,x,y,z,1,0,0,0,0);
+            AbilityVfx.retired(level,p,WORLDLOOM_ROOT,false,x,y,z,1,0,.018D,0,.002D);
+            if(i==0||depth%4==3)AbilityVfx.retired(level,p,WORLDLOOM_GLEAM,false,x,y,z,1,0,0,0,0);
         }
     }
     public static void ring(ServerPlayer p,ArtifactKind kind,BlockPos center,int radius) {
@@ -580,7 +580,7 @@ public final class ArtifactFeedback {
             for(int i=0;i<samples;i++){
                 double y=1-2*(i+0.5)/samples,ring=Math.sqrt(Math.max(0,1-y*y)),angle=i*2.399963229728653;
                 double x=Math.cos(angle)*ring,z=Math.sin(angle)*ring;
-                p.serverLevel().sendParticles(p,color,false,center.getX()+0.5+x*r,center.getY()+0.5+y*r,center.getZ()+0.5+z*r,1,0,0,0,0);
+                AbilityVfx.retired(p.serverLevel(),p,color,false,center.getX()+0.5+x*r,center.getY()+0.5+y*r,center.getZ()+0.5+z*r,1,0,0,0,0);
             }
         }
     }
@@ -590,7 +590,7 @@ public final class ArtifactFeedback {
         for(int depth:new int[]{0,8,15})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++)if(Math.abs(u)==2||Math.abs(v)==2){
             BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
                 case X->c.offset(0,v,u);case Y->c.offset(u,0,v);case Z->c.offset(u,v,0);};
-            if(level.hasChunkAt(at))level.sendParticles(p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+            if(level.hasChunkAt(at))AbilityVfx.retired(level,p,green,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
     /** A restrained perimeter ripple marks every other completed cross-section of Choir's tunnel. */
@@ -609,11 +609,11 @@ public final class ArtifactFeedback {
         var cyan=new DustParticleOptions(new Vector3f(.24F,.9F,1F),.72F);
         for(int i=0;i<4;i++){
             double angle=phase+i*Math.PI*.5D;
-            level.sendParticles(p,cyan,false,cx+ax*Math.cos(angle)*.34D+bx*Math.sin(angle)*.34D,
+            AbilityVfx.retired(level,p,cyan,false,cx+ax*Math.cos(angle)*.34D+bx*Math.sin(angle)*.34D,
                     cy+ay*Math.cos(angle)*.34D+by*Math.sin(angle)*.34D,
                     cz+az*Math.cos(angle)*.34D+bz*Math.sin(angle)*.34D,1,0,0,0,0);
         }
-        if(depth%5==0)level.sendParticles(p,ParticleTypes.SCULK_CHARGE_POP,false,cx,cy,cz,1,.02D,.02D,.02D,.004D);
+        if(depth%5==0)AbilityVfx.retired(level,p,ParticleTypes.SCULK_CHARGE_POP,false,cx,cy,cz,1,.02D,.02D,.02D,.004D);
     }
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
     public static void gravityChargePulse(ServerPlayer p,BlockPos center,int charge){
@@ -625,7 +625,7 @@ public final class ArtifactFeedback {
         for(int i=0;i<count;i++){
             double progress=(i+1D)/count,angle=phase+progress*Math.PI*2D*tier,radius=.42D*(1D-progress);
             double x=cx+Math.cos(angle)*radius,z=cz+Math.sin(angle)*radius,y=cy+progress*.78D;
-            level.sendParticles(p,(i&1)==0?mote:ParticleTypes.REVERSE_PORTAL,false,x,y,z,1,0,0,0,0);
+            AbilityVfx.retired(level,p,(i&1)==0?mote:ParticleTypes.REVERSE_PORTAL,false,x,y,z,1,0,0,0,0);
         }
     }
     /** Eventide's mining charge collapses its field and draws eligible loose drops to its wearer. */
@@ -633,10 +633,10 @@ public final class ArtifactFeedback {
         if(!reserveMiningParticles(p,46)){message(p,"gravity_collapse",drops);return;}
         var level=p.serverLevel();int rgb=ArtifactKind.EVENTIDE.color;
         var core=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.6F);
-        level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,24,1.4,.9,1.4,.12);
-        level.sendParticles(p,core,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,14,.9,.65,.9,.015);
+        AbilityVfx.retired(level,p,ParticleTypes.REVERSE_PORTAL,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,24,1.4,.9,1.4,.12);
+        AbilityVfx.retired(level,p,core,false,center.getX()+.5,center.getY()+.5,center.getZ()+.5,14,.9,.65,.9,.015);
         var eye=p.getEyePosition();
-        level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,eye.x,eye.y,eye.z,8,.35,.45,.35,.08);
+        AbilityVfx.retired(level,p,ParticleTypes.REVERSE_PORTAL,false,eye.x,eye.y,eye.z,8,.35,.45,.35,.08);
         ring(p,ArtifactKind.EVENTIDE,center,8);
         message(p,"gravity_collapse",drops);
     }
@@ -647,10 +647,10 @@ public final class ArtifactFeedback {
         var violet=GRAVITY_TETHER_DUST;
         for(int i=1;i<=4;i++){
             var point=gravityTetherPoint(from,to,i/5D);
-            level.sendParticles(p,violet,false,point.x,point.y,point.z,1,0,0,0,0);
-            if((i&1)==0)level.sendParticles(p,ParticleTypes.REVERSE_PORTAL,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,p,violet,false,point.x,point.y,point.z,1,0,0,0,0);
+            if((i&1)==0)AbilityVfx.retired(level,p,ParticleTypes.REVERSE_PORTAL,false,point.x,point.y,point.z,1,0,0,0,0);
         }
-        level.sendParticles(p,ParticleTypes.END_ROD,false,to.x,to.y,to.z,1,0,0,0,0);
+        AbilityVfx.retired(level,p,ParticleTypes.END_ROD,false,to.x,to.y,to.z,1,0,0,0,0);
     }
     /** A short, bounded spiral lets Eventide's pull read as a deliberate gravity path. */
     public static Vec3 gravityTetherPoint(Vec3 from,Vec3 to,double progress){
@@ -671,18 +671,18 @@ public final class ArtifactFeedback {
             if(Math.abs(u)==2&&Math.abs(v)==2)continue;
             if(Math.abs(u)!=2&&Math.abs(v)!=2)continue;
             var at=origin.below(depth).offset(u,0,v);
-            if(level.hasChunkAt(at))level.sendParticles(p,rim,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+            if(level.hasChunkAt(at))AbilityVfx.retired(level,p,rim,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
         for(int depth:new int[]{0,8,16,24,31}){
             var at=origin.below(depth);
-            if(level.hasChunkAt(at))level.sendParticles(p,core,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+            if(level.hasChunkAt(at))AbilityVfx.retired(level,p,core,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
     }
     /** A short falling-star pulse marks each live Exodium excavation step without broadcasting to distant players. */
     public static void starfallWork(ServerPlayer p,BlockPos at){
         if(!reserveMiningParticles(p,1))return;
         var level=p.serverLevel();double x=at.getX()+.5,y=at.getY()+.65,z=at.getZ()+.5;
-        level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.EXODIUM_STARFALL.get(),
+        AbilityVfx.retired(level,p,io.github.santipdr.specialpickaxes.SpecialPickaxes.EXODIUM_STARFALL.get(),
                 false,x,y,z,1,.015D,.025D,.015D,.004D);
     }
     /** Compact landing burst confirms that Icarian Lift actually reached open sky. */
@@ -692,10 +692,10 @@ public final class ArtifactFeedback {
         var sky=new DustParticleOptions(new Vector3f(.72F,.9F,1F),1.35F);
         for(int i=0;i<12;i++){
             double angle=i*Math.PI/6;
-            level.sendParticles(p,sky,false,x+Math.cos(angle)*.85D,y,z+Math.sin(angle)*.85D,1,0,.35D,0,.005D);
+            AbilityVfx.retired(level,p,sky,false,x+Math.cos(angle)*.85D,y,z+Math.sin(angle)*.85D,1,0,.35D,0,.005D);
         }
-        level.sendParticles(p,ParticleTypes.END_ROD,false,x,y+.8D,z,8,.28D,.38D,.28D,.025D);
-        level.sendParticles(p,ParticleTypes.CLOUD,false,x,y+.1D,z,5,.35D,.05D,.35D,.015D);
+        AbilityVfx.retired(level,p,ParticleTypes.END_ROD,false,x,y+.8D,z,8,.28D,.38D,.28D,.025D);
+        AbilityVfx.retired(level,p,ParticleTypes.CLOUD,false,x,y+.1D,z,5,.35D,.05D,.35D,.015D);
     }
     /** Personal ascent helix: six rising cyan points that never broadcast to distant players. */
     public static void icarianAscent(ServerPlayer p){
@@ -705,16 +705,16 @@ public final class ArtifactFeedback {
             double angle=phase+i*Math.PI/3D;
             int risingPoint=(i+(p.tickCount/2))%6;
             double height=.08D+risingPoint*.12D;
-            level.sendParticles(p,ICARIAN_ASCENT_SKY,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
+            AbilityVfx.retired(level,p,ICARIAN_ASCENT_SKY,false,x+Math.cos(angle)*.48D,y+height,z+Math.sin(angle)*.48D,1,0,.04D,0,0);
         }
-        level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHER.get(),false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
+        AbilityVfx.retired(level,p,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHER.get(),false,x,y+.92D,z,1,.08D,.12D,.08D,.01D);
     }
     public static void nullWard(ServerPlayer p,int radius){
         var center=p.blockPosition();ring(p,ArtifactKind.AXIOM,center,radius);
         var soul=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.35F);
         for(int i=0;i<16;i++){
             double angle=i*Math.PI/8;
-            p.serverLevel().sendParticles(p,soul,false,p.getX()+Math.cos(angle)*radius,p.getY()+.8,p.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,soul,false,p.getX()+Math.cos(angle)*radius,p.getY()+.8,p.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
         }
     }
     /** Bounded ember outlines make Hellspec's core-and-petal quarry legible before it starts. */
@@ -726,14 +726,14 @@ public final class ArtifactFeedback {
         if(!reserveMiningParticles(p,(outline.size()+stride-1)/stride+15))return;
         for(int i=0;i<outline.size();i+=stride){
             var offset=outline.get(i);var at=center.offset(offset);
-            if(level.hasChunkAt(at))level.sendParticles(p,offset.getY()==0?ember:heart,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
+            if(level.hasChunkAt(at))AbilityVfx.retired(level,p,offset.getY()==0?ember:heart,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
         int[][] cores={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
         for(int[] offset:cores){
             var at=center.offset(offset[0],0,offset[1]);
             if(level.hasChunkAt(at)){
-                level.sendParticles(p,heart,false,at.getX()+.5,at.getY()+.4,at.getZ()+.5,2,.08,.1,.08,0);
-                level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,1,0,0,0,0);
+                AbilityVfx.retired(level,p,heart,false,at.getX()+.5,at.getY()+.4,at.getZ()+.5,2,.08,.1,.08,0);
+                AbilityVfx.retired(level,p,io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),false,at.getX()+.5,at.getY()+.55,at.getZ()+.5,1,0,0,0,0);
             }
         }
     }
@@ -745,16 +745,16 @@ public final class ArtifactFeedback {
         for(int i=0;i<16;i++){
             double angle=i*Math.PI/8D,x=cx+Math.cos(angle)*4.35D,z=cz+Math.sin(angle)*4.35D;
             if(!level.hasChunkAt(BlockPos.containing(x,cy,z)))continue;
-            level.sendParticles(ring,x,cy,z,1,0,0,0,0);
-            if((i&3)==0)level.sendParticles(ParticleTypes.SMOKE,x,cy+.12D,z,1,.025D,.08D,.025D,.002D);
+            AbilityVfx.retired(level,ring,x,cy,z,1,0,0,0,0);
+            if((i&3)==0)AbilityVfx.retired(level,ParticleTypes.SMOKE,x,cy+.12D,z,1,.025D,.08D,.025D,.002D);
         }
         for(int i=0;i<5;i++){
             double angle=i*Math.PI*2D/5D,x=cx+Math.cos(angle)*1.75D,z=cz+Math.sin(angle)*1.75D;
             if(!level.hasChunkAt(BlockPos.containing(x,cy,z)))continue;
-            level.sendParticles(core,x,cy+.2D,z,2,.08D,.08D,.08D,.004D);
-            level.sendParticles(io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),x,cy+.42D,z,1,0,0,0,0);
-            level.sendParticles(ParticleTypes.FLAME,x,cy+.65D,z,3,.12D,.72D,.12D,.018D);
-            level.sendParticles(ParticleTypes.LAVA,x,cy+.85D,z,2,.08D,.5D,.08D,.006D);
+            AbilityVfx.retired(level,core,x,cy+.2D,z,2,.08D,.08D,.08D,.004D);
+            AbilityVfx.retired(level,io.github.santipdr.specialpickaxes.SpecialPickaxes.HELLSPEC_BRAND_FLARE.get(),x,cy+.42D,z,1,0,0,0,0);
+            AbilityVfx.retired(level,ParticleTypes.FLAME,x,cy+.65D,z,3,.12D,.72D,.12D,.018D);
+            AbilityVfx.retired(level,ParticleTypes.LAVA,x,cy+.85D,z,2,.08D,.5D,.08D,.006D);
         }
         for(var target:targets){
             // Reuse the brand's authored flare and bounded local audience instead of eight broadcast sparks.
@@ -776,19 +776,19 @@ public final class ArtifactFeedback {
         if(!reserveMiningParticles(p,cost))return;
         for(int i=0;i<=segments;i++){
             double t=i/(double)segments,x=minX+(maxX-minX)*t,z=minZ+(maxZ-minZ)*t;
-            p.serverLevel().sendParticles(p,dust,false,x,y,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,x,y,maxZ,1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,dust,false,x,y,minZ,1,0,0,0,0);AbilityVfx.retired(p.serverLevel(),p,dust,false,x,y,maxZ,1,0,0,0,0);
             if(i>0&&i<segments){
-                p.serverLevel().sendParticles(p,dust,false,minX,y,z,1,0,0,0,0);p.serverLevel().sendParticles(p,dust,false,maxX,y,z,1,0,0,0,0);
+                AbilityVfx.retired(p.serverLevel(),p,dust,false,minX,y,z,1,0,0,0,0);AbilityVfx.retired(p.serverLevel(),p,dust,false,maxX,y,z,1,0,0,0,0);
             }
             if(i%2==0||i==segments){
-                p.serverLevel().sendParticles(p,crown,false,x,topY,minZ,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,x,topY,maxZ,1,0,0,0,0);
+                AbilityVfx.retired(p.serverLevel(),p,crown,false,x,topY,minZ,1,0,0,0,0);AbilityVfx.retired(p.serverLevel(),p,crown,false,x,topY,maxZ,1,0,0,0,0);
                 if(i>0&&i<segments){
-                    p.serverLevel().sendParticles(p,crown,false,minX,topY,z,1,0,0,0,0);p.serverLevel().sendParticles(p,crown,false,maxX,topY,z,1,0,0,0,0);
+                    AbilityVfx.retired(p.serverLevel(),p,crown,false,minX,topY,z,1,0,0,0,0);AbilityVfx.retired(p.serverLevel(),p,crown,false,maxX,topY,z,1,0,0,0,0);
                 }
             }
         }
         for(int dx:new int[]{-radius,radius})for(int dz:new int[]{-radius,radius})for(int i=1;i<=3;i++)
-            p.serverLevel().sendParticles(p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,i==2?crown:dust,false,center.getX()+dx+0.5,center.getY()-halfHeight+i*(halfHeight*2D/4),center.getZ()+dz+0.5,1,0,0,0,0);
     }
     /** Three great circles match Eventide's actual spherical influence radius. */
     private static void eventideDomain(ServerPlayer p,BlockPos center,int radius){
@@ -799,13 +799,13 @@ public final class ArtifactFeedback {
         var flow=repel?new DustParticleOptions(new Vector3f(1F,.48F,.78F),.98F):boundary;
         for(int plane=0;plane<3;plane++)for(int i=0;i<24;i++){
             Vec3 point=eventideSpherePoint(center,radius,plane,Math.PI*2D*i/24D);
-            p.serverLevel().sendParticles(p,boundary,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,boundary,false,point.x,point.y,point.z,1,0,0,0,0);
         }
         Vec3 origin=Vec3.atCenterOf(center);
         for(int axis=0;axis<6;axis++){
             Vec3 normal=eventideFlowDirection(0,axis);
             Vec3 point=origin.add(normal.scale(radius)),velocity=eventideFlowDirection(repel?1:0,axis).scale(.12D);
-            p.serverLevel().sendParticles(p,flow,false,point.x,point.y,point.z,0,velocity.x,velocity.y,velocity.z,.08D);
+            AbilityVfx.retired(p.serverLevel(),p,flow,false,point.x,point.y,point.z,0,velocity.x,velocity.y,velocity.z,.08D);
         }
     }
     /** Samples one of the field's three great circles. Every point lies exactly on its influence sphere. */
@@ -838,7 +838,7 @@ public final class ArtifactFeedback {
             var point=start.lerp(end,i/16.0);if(!p.serverLevel().hasChunkAt(BlockPos.containing(point))) continue;
             int color=i%2==0?kind.color:0xffd783;
             var dust=new DustParticleOptions(new Vector3f(((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F),1.3F);
-            p.serverLevel().sendParticles(p,dust,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,dust,false,point.x,point.y,point.z,1,0,0,0,0);
         }
     }
 
@@ -855,7 +855,7 @@ public final class ArtifactFeedback {
         for(int axis=0;axis<3;axis++)for(int a=0;a<2;a++)for(int b=0;b<2;b++)for(int j=0;j<=6;j++){
             double[] low={v.min().getX(),v.min().getY(),v.min().getZ()},size={v.width(),v.height(),v.depth()},q=low.clone();
             q[axis]+=size[axis]*j/6;q[(axis+1)%3]+=size[(axis+1)%3]*a;q[(axis+2)%3]+=size[(axis+2)%3]*b;
-            p.serverLevel().sendParticles(p,dust,false,q[0],q[1],q[2],1,0,0,0,0);
+            AbilityVfx.retired(p.serverLevel(),p,dust,false,q[0],q[1],q[2],1,0,0,0,0);
         }
     }
 
@@ -866,13 +866,13 @@ public final class ArtifactFeedback {
                 double fraction=i/23D,x,y;
                 if(kind==ArtifactKind.KEYSTONE){x=v.min().getX()+fraction*(v.width()-1)+0.5;y=v.min().getY()+Math.round((v.height()-1)*(1-Math.pow(2*fraction-1,2)))+0.5;}
                 else {double a=fraction*Math.PI*2;x=v.min().getX()+v.width()*(1+Math.cos(a))/2;y=v.min().getY()+v.height()*(1+Math.sin(a))/2;}
-                double z=end==0?v.min().getZ()+0.5:v.max().getZ()+0.5;p.serverLevel().sendParticles(p,dust,false,x,y,z,1,0,0,0,0);
+                double z=end==0?v.min().getZ()+0.5:v.max().getZ()+0.5;AbilityVfx.retired(p.serverLevel(),p,dust,false,x,y,z,1,0,0,0,0);
             }
         }
         if(kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.WORLDBREAKER&&mode==4){
             int count=0;for(var memory:ArtifactState.memories(p,kind)){
                 var pos=memory.pos();if(v.contains(pos)&&p.serverLevel().hasChunkAt(pos)&&p.serverLevel().getBlockState(pos).isAir()){
-                    p.serverLevel().sendParticles(p,dust,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,2,0.2,0.2,0.2,0);if(++count>=24)break;
+                    AbilityVfx.retired(p.serverLevel(),p,dust,false,pos.getX()+0.5,pos.getY()+0.5,pos.getZ()+0.5,2,0.2,0.2,0.2,0);if(++count>=24)break;
                 }
             }
         }

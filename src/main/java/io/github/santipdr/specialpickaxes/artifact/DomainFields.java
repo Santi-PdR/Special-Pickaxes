@@ -305,7 +305,7 @@ public final class DomainFields {
             }
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
-                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
+                    p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,false,true));
                 if(!fieldTickValid(f,tickOrigin))continue;
                 if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
                 if(!fieldTickValid(f,tickOrigin))continue;

@@ -48,8 +48,8 @@ public final class RelicEffects {
                 double radius=.2D+t*.62D,angle=a+Math.PI/4D;
                 x=Math.cos(angle)*radius;y=.12D+t*.95D;z=Math.sin(angle)*radius;
             }
-            if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
-            else p.serverLevel().sendParticles(p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
+            if(k==ArtifactKind.EVENTIDE){double sign=ArtifactState.mode(p,k)==1?1:-1;AbilityVfx.retired(p.serverLevel(),p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,0,sign*x,sign*y,sign*z,.08);}
+            else AbilityVfx.retired(p.serverLevel(),p,particle,false,center.x+x*scale,center.y+y*scale,center.z+z*scale,1,0,0,0,0);
         }
     }
 
@@ -67,9 +67,9 @@ public final class RelicEffects {
         for(int i=0;i<count;i++){
             Vec3 point=icarianWingPoint(center,i,phaseOffset);
             ParticleOptions feather=(i/2)%3==0?gold:pearl;
-            level.sendParticles(player,feather,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,player,feather,false,point.x,point.y,point.z,1,0,0,0,0);
         }
-        if(phase.equals("complete"))level.sendParticles(player,ParticleTypes.END_ROD,false,
+        if(phase.equals("complete"))AbilityVfx.retired(level,player,ParticleTypes.END_ROD,false,
                 center.x,center.y+.72D,center.z,2,.035D,.11D,.035D,.004D);
     }
 

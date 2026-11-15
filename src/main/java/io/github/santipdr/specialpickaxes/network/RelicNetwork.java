@@ -59,12 +59,11 @@ public final class RelicNetwork {
     }
     private static void sendStasisBoundary(ServerPlayer owner,BlockPos center,int radius,int halfHeight,
                                            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,boolean visible){
-        double x=center.getX()+.5D,y=center.getY()+.5D,z=center.getZ()+.5D;
-        CHANNEL.send(PacketDistributor.NEAR.with(()->new PacketDistributor.TargetPoint(x,y,z,48D,dimension)),
-                new StasisBoundaryMessage(owner.getUUID(),dimension.location().toString(),center.asLong(),radius,halfHeight,visible));
+        // Persistent field cosmetics deliberately retired: successful activation has one custom burst.
+
     }
-    public static void forget(net.minecraft.server.level.ServerPlayer p){SEEN.remove(p.getUUID());}
-    public static void clear(){SEEN.clear();}
+    public static void forget(net.minecraft.server.level.ServerPlayer p){SEEN.remove(p.getUUID());AbilityVfx.forget(p);}
+    public static void clear(){SEEN.clear();AbilityVfx.clear();}
     public static void register(){
         CHANNEL.messageBuilder(Intent.class,0,NetworkDirection.PLAY_TO_SERVER)
             .encoder((m,b)->{b.writeEnum(m.kind());b.writeEnum(m.action());b.writeVarLong(m.sequence());b.writeUUID(m.toolIdentity());})

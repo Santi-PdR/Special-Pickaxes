@@ -17,7 +17,7 @@ public final class DirectionalProgram implements WorkProgram {
     }
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape,ArtifactKind kind){
         this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;this.kind=kind;
-        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->32;case RESONANT_TUNNEL->20;case WORLDLOOM_BORE->16;};
+        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->64;case RESONANT_TUNNEL->20;case WORLDLOOM_BORE->16;};
         prepare();
     }
     public boolean isCoreDrill(){return shape==Shape.CORE_DRILL;}

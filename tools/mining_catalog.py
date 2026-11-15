@@ -7,9 +7,9 @@ IDS=['palimpsest', 'fault_choir', 'eventide', 'paradox_crucible', 'interregnum',
 MODES={'palimpsest': {'vein': ('VEIN ECHO: harvest the connected ore vein.',
                          'ECO DE VETA: extrae la veta conectada.',
                          'Aim at an exposed ore and activate. It searches a 12-block radius and mines up to '
-                         '256 connected blocks by default, respecting Fortune, protections and normal drops.',
+                         '1024 connected blocks by default, respecting Fortune, protections and normal drops.',
                          'Apunta a una mena expuesta y activa. Busca en un radio de 12 bloques y extrae '
-                         'hasta 256 bloques conectados por defecto; respeta Fortuna, protecciones y drops '
+                         'hasta 1024 bloques conectados por defecto; respeta Fortuna, protecciones y drops '
                          'normales.')},
  'fault_choir': {'forward': ('RESONANT TUNNEL: 2×2 bore, 20 blocks forward.',
                              'TÚNEL RESONANTE: perforación 2×2 de 20 bloques.',

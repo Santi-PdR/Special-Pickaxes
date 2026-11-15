@@ -1,16 +1,18 @@
-# Pickaxe texture credits
+# Runtime pickaxe artwork — third-party originals
 
-The Exodium, Iridium and Hellspec reference sprites were copied from the user's local Terramity 0.9.8 instance JAR with permission. Their source entries and original SHA-256 hashes are recorded in `docs/mining-rework/ASSET-PROVENANCE.json`. Those reference files remain unchanged; the runtime icons are original 32×32 pixel-art redraws:
+All thirteen runtime icons are **unmodified Mythic Metals pickaxe sprites**, not AI images or redraws by this project.
+Source: https://github.com/Noaaan/MythicMetals/tree/1cc825572b1e3a8697af197fa58da34636521ce4
 
-- `textures/item/exodium_v2.png`
-- `textures/item/iridium_v2.png`
-- `textures/item/hellspec_v2.png`
+Exact per-pick paths, source commit, original dimensions and SHA256 are recorded in
+`docs/mining-rework/ASSET-PROVENANCE.json`. There is no brightness filter, resampling or manual pixel editing.
+Original artist acknowledgments are reproduced in `MYTHICMETALS_CREDITS.md`;
+asset terms are reproduced verbatim in `MYTHICMETALS_LICENSE_ASSETS`.
 
-A former Worldbreaker runtime icon was an original 32×32 pixel-art redraw, with a generated concept and manual cleanup. That historical artwork is retained in the repository, but it is **not the current runtime icon**. Since 5.10.458 the runtime uses the reproducible readability adaptation listed below.
+Mythic Metals assets are all rights reserved by their respective artists. These
+are selected for the user's explicitly requested personal build. Public source
+availability does not imply unrestricted redistribution rights. Do not publish
+this build as a public binary without the necessary permissions. The workflow
+must not automatically publish this personal-use revision as a public release.
 
-Fault Choir, Worldloom, Hollow Axiom, Seam Ripper, Eventide, Icarus, Palimpsest, Worldbreaker, Interregnum and Paradox Crucible use non-destructive readability adaptations
-(`fault_choir_v2.png`, `worldloom_v2.png`, `hollow_axiom_v2.png`, `seam_ripper_v2.png`, `eventide_v2.png`, `icarus_v2.png`, `palimpsest_v2.png`, `worldbreaker_v2.png`, `interregnum_v2.png`, `paradox_crucible_v2.png`) of their existing
-reference sprites. These are **not original redraws**. `tools/item_readability_asset.py`
-brightens RGB shadows monotonically and doubles the original pixel grid without
-changing alpha or silhouette. Original reference PNGs remain unchanged. The source
-archive attribution and hashes, plus runtime hashes, are in the provenance manifest.
+Historical local references and rejected `_v2` artwork are retained for provenance
+only and are not referenced by any of the thirteen current item models.

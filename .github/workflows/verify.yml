@@ -88,9 +88,9 @@ jobs:
         run: python3 tools/ci_evidence.py
         env:
           GH_TOKEN: ${{ github.token }}
-          PUBLISH_BINARY: ${{ job.status == 'success' && (steps.publication.outputs.approved == 'true' || (github.event_name != 'pull_request' && github.ref == 'refs/heads/arena/cec54523-special-pickaxes')) }}
+          PUBLISH_BINARY: 'false' # Personal-use third-party art: do not export a public binary.
       - name: Publish verified release only
-        if: success() && steps.publication.outputs.approved == 'true'
+        if: success() && steps.publication.outputs.approved == 'true' && vars.ALLOW_PUBLIC_ASSET_REDISTRIBUTION == 'true'
         uses: actions/upload-artifact@v6
         with:
           name: special-pickaxes-${{ steps.mod-version.outputs.value }}-verified
@@ -117,7 +117,7 @@ jobs:
       # Explicitly requested manual test installation. This is NOT visual/stable approval.
       # Publish only after every verification, evidence export and artifact upload succeeded.
       - name: Publish downloadable test build (not visually approved)
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/arena/cec54523-special-pickaxes'
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/arena/cec54523-special-pickaxes' && vars.ALLOW_PUBLIC_ASSET_REDISTRIBUTION == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

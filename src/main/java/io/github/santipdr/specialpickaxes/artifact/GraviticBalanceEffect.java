@@ -33,11 +33,11 @@ public final class GraviticBalanceEffect extends MobEffect {
         for(int i=0;i<8;i++){
             double angle=phase+i*Math.PI/4D;
             double px=x+Math.cos(angle)*radius,pz=z+Math.sin(angle)*radius;
-            level.sendParticles(player,violet,false,px,y,pz,1,0,.035D,0,.002D);
-            if((i&1)==0)level.sendParticles(player,ParticleTypes.REVERSE_PORTAL,false,
+            AbilityVfx.retired(level,player,violet,false,px,y,pz,1,0,.035D,0,.002D);
+            if((i&1)==0)AbilityVfx.retired(level,player,ParticleTypes.REVERSE_PORTAL,false,
                     x+Math.cos(angle)*radius*.58D,y+.08D,z+Math.sin(angle)*radius*.58D,1,0,0,0,0);
         }
-        level.sendParticles(player,ParticleTypes.REVERSE_PORTAL,false,x,y+.04D,z,3,.12D,.015D,.12D,.012D);
+        AbilityVfx.retired(level,player,ParticleTypes.REVERSE_PORTAL,false,x,y+.04D,z,3,.12D,.015D,.12D,.012D);
     }
 
     private static final java.util.Set<java.util.UUID> LANDING=new java.util.HashSet<>();

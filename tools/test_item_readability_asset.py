@@ -27,7 +27,7 @@ class ItemReadabilityTests(unittest.TestCase):
     def test_runtime_models_use_variants_not_the_preserved_sources(self):
         for name in VARIANTS:
             model=json.loads((ROOT/'models/item'/f'{name}.json').read_text())
-            self.assertEqual(model['textures']['layer0'],'specialpickaxes:item/'+name+'_v2')
+            self.assertEqual(model['textures']['layer0'],'specialpickaxes:item/'+name+'_external')
     def test_invalid_gamma_is_rejected(self):
         for gamma in (-1,0,2):
             with self.assertRaises(ValueError):readable([[(1,2,3,4)]],gamma)

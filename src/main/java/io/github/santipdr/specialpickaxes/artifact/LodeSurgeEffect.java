@@ -31,8 +31,8 @@ public final class LodeSurgeEffect extends MobEffect {
         stacks=Math.max(0,Math.min(3,stacks));
         if(!ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),orePulseCost(stacks),1))return;
         double x=pos.getX()+.5D,y=pos.getY()+.58D,z=pos.getZ()+.5D;
-        level.sendParticles(player,MINT,false,x,y,z,3+stacks, .18D,.18D,.18D,.012D);
-        if(stacks==3)level.sendParticles(player,ParticleTypes.GLOW,false,x,y,z,1,.05D,.08D,.05D,.008D);
+        AbilityVfx.retired(level,player,MINT,false,x,y,z,3+stacks, .18D,.18D,.18D,.012D);
+        if(stacks==3)AbilityVfx.retired(level,player,ParticleTypes.GLOW,false,x,y,z,1,.05D,.08D,.05D,.008D);
     }
 
     /** The bounded Curios handoff is drawn only for the wearer and the teammate receiving it. */
@@ -43,10 +43,10 @@ public final class LodeSurgeEffect extends MobEffect {
         var end=ally.position().add(0,ally.getBbHeight()*.58D,0);
         for(int i=1;i<=4;i++){
             var point=start.lerp(end,i/5D);
-            level.sendParticles(owner,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
-            level.sendParticles(ally,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,owner,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
+            AbilityVfx.retired(level,ally,MINT,false,point.x,point.y,point.z,1,0,0,0,0);
         }
-        if(stacks>=3)level.sendParticles(ally,ParticleTypes.GLOW,false,end.x,end.y,end.z,1,.04D,.04D,.04D,.005D);
+        if(stacks>=3)AbilityVfx.retired(level,ally,ParticleTypes.GLOW,false,end.x,end.y,end.z,1,.04D,.04D,.04D,.005D);
     }
 
     @Override public void applyEffectTick(LivingEntity entity,int amplifier){
@@ -66,7 +66,7 @@ public final class LodeSurgeEffect extends MobEffect {
             double lift=(progress-.5D)*charge*.12D;
             double helix=Math.sin(angle*2D+phase*.35D)*(.025D+charge*.018D);
             var particle=charge==2&&i==motes-1?ParticleTypes.END_ROD:((i+charge)&1)==0?MINT:AMBER;
-            level.sendParticles(player,particle,false,
+            AbilityVfx.retired(level,player,particle,false,
                     player.getX()+Math.cos(angle)*radius,y+lift+helix,
                     player.getZ()+Math.sin(angle)*radius,1,0,0,0,0);
         }
@@ -79,7 +79,7 @@ public final class LodeSurgeEffect extends MobEffect {
         if(PersistedCooldown.active(now,data.getLong(NEXT_PEAK_MEAL),PEAK_MEAL_COOLDOWN_TICKS))return;
         food.eat(1,.2F);data.putLong(NEXT_PEAK_MEAL,now+PEAK_MEAL_COOLDOWN_TICKS);
         if(ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),2,1))
-            level.sendParticles(player,AMBER,false,player.getX(),y+.12D,player.getZ(),2,.08D,.1D,.08D,.008D);
+            AbilityVfx.retired(level,player,AMBER,false,player.getX(),y+.12D,player.getZ(),2,.08D,.1D,.08D,.008D);
     }
 
     @Override public boolean isDurationEffectTick(int duration,int amplifier){return duration%4==0;}

@@ -1072,6 +1072,37 @@ public final class PickaxeGameTests {
             h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the real captured tool still reaches its ordinary24break threshold");
         }finally{drop.discard();finish(h,p);}
     }
+    @GameTest(template="empty",batch="rework_each_315") public static void temporalRiftHarvestsAVolumeInsteadOfOneBlock(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var far=at.east(4);var ore=at.above(3);var placed=at.west(3);var barrier=at.north(2);
+        for(var pos:List.of(at,far,ore,placed,barrier))PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
+        h.getLevel().setBlockAndUpdate(far,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
+        h.getLevel().setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
+        try{
+            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"rift activation has a real target");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(far).isAir()&&h.getLevel().getBlockState(ore).isAir(),"the rift harvests distant rock and ore throughout its11cubed volume");
+            h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.STONE)&&h.getLevel().getBlockState(barrier).is(Blocks.BEDROCK),"OP excavation preserves builds and bedrock");
+        }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_316") public static void temporalRiftRechecksClaimsAtExecution(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var protectedCell=at.east();h.getLevel().setBlockAndUpdate(protectedCell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(protectedCell);
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,new TemporalRiftProgram(at,ArtifactKind.INTERREGNUM,true)),"rift scheduled");int[] vetoes={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=e->{if(e.player==p&&e.target.equals(protectedCell)){vetoes[0]++;e.setCanceled(true);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+        try{drain(p);h.assertTrue(vetoes[0]>0&&h.getLevel().getBlockState(protectedCell).is(Blocks.STONE),"claim denial is honored during the queued execution, not just activation");}
+        finally{MinecraftForge.EVENT_BUS.unregister(deny);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_317") public static void everyAbilityParticleIsCustomAndBurstsAreDeduplicated(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);AbilityVfx.clear();
+        for(var kind:ArtifactKind.playableValues()){
+            var key=net.minecraftforge.registries.ForgeRegistries.PARTICLE_TYPES.getKey(AbilityVfx.particle(kind));
+            h.assertTrue(key!=null&&key.getNamespace().equals(SpecialPickaxes.ID),"no vanilla particle fallback: "+kind);
+        }
+        h.assertTrue(AbilityVfx.cast(p,ArtifactKind.INTERREGNUM)&&!AbilityVfx.cast(p,ArtifactKind.INTERREGNUM),"same-tick activation cannot multiply particle packets");
+        h.assertTrue(!AbilityVfx.retired(h.getLevel(),p,net.minecraft.core.particles.ParticleTypes.FLAME,false,p.getX(),p.getY(),p.getZ(),100,0,0,0,0),"retired passive/vanilla cosmetic calls emit nothing");
+        AbilityVfx.forget(p);finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
