@@ -953,6 +953,12 @@ public final class PickaxeGameTests {
         ArtifactFeedback.worldloomBoreProgress(p,at,Direction.SOUTH,0);ArtifactFeedback.worldloomBoreProgress(p,at,Direction.SOUTH,3);
         h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4038)&&!ArtifactFeedback.reserveMiningParticles(p,1),"peak16+orbit8+boundary16+deflect5+two bore slices5/8 equals58 particles");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_303") public static void placedStasisRecoversItsDeadlineWithAnExplicitRayTarget(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var state=ArtifactState.of(p,ArtifactKind.INTERREGNUM);state.putInt("mode",0);state.putLong("ready",Long.MAX_VALUE);
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
+        h.assertTrue(ArtifactActions.target(p).filter(at::equals).isPresent(),"the placed-field cooldown regression has its own deterministic target");
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
@@ -1221,6 +1227,8 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_164") public static void primaryRecoversItsImpossiblePersistedDeadline(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);var state=ArtifactState.of(wearer,ArtifactKind.INTERREGNUM);state.putLong("ready",Long.MAX_VALUE);
+        // This regression concerns a deadline, not a ray hitting an unrelated neighbouring test structure.
+        state.putInt("mode",1);
         h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(wearer),
                 "the actual primary control path recovers a malformed future deadline");
         h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);

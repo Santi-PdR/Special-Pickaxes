@@ -1,3 +1,14 @@
+## Regresión intermitente detectada en CI histórica460
+
+El run43679707143 (commit sólo de documentación2248a09) falló en
+primaryRecoversItsImpossiblePersistedDeadline. Ese test activaba Stasis colocado
+sin crear un objetivo: dependía de que el raycast encontrase otra estructura
+vecina. La prueba de plazo usa ahora el modo aura, cuyo objetivo es el propio
+portador. Se añade otra prueba del modo colocado con bloque propio, mirada y
+comprobación explícita del raycast antes de activar; conserva las aserciones
+reales de campo activo y deadline configurado. No se ignoran fallos ni se
+relaja el escáner. Esperados126JUnit/371GameTests en463, pendientes de CI.
+
 # 5.10.463 — manual tras recargas y contraste Crucible; pendiente de CI
 
 ManualLayoutRevision liga las tarjetas envueltas al ancho, controles/contenido
