@@ -1,4 +1,16 @@
-# 5.10.456 — intercambios transaccionales y plazos de pasivas; pendiente de CI
+## Entrega verificada 5.10.456
+
+- Fuente: `95b36f35908e32db1f630dfd6523cb2704da0da1`.
+- CI: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43674513875
+- Prerelease: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.456-43674513875
+- JAR 553744 bytes; SHA256 `40700d0844c55e267ba41349c5022bb1969a15ca0d46e333df99b3cb557cbdfa`.
+- Asset GitHub749778973 uploaded: tamaño y digest API coinciden con RELEASE.json.
+- Marcadores reales de cliente: ALTERNATE_BINDINGS_REBOUND_OK e INSTRUCTION_BINDINGS_REBOUND_OK.
+- Galería: `artifacts/picos-5.10.456/`, PDF13páginas, ZIP26imágenes con CRC correcto;
+  procedencia vinculada a manifest CI y recursos exactos del commit.
+- No certifica todas las animaciones, Ghouls ni una instalación Windows.
+
+# 5.10.456 — CI completa correcta; prerelease de prueba publicado
 
 WorldSafety.exchange conserva nivel, posición y herramienta originales desde
 antes del primer permiso. Revalida ambas posiciones antes de escribir, entre
@@ -10,8 +22,9 @@ en permisos, rotura, primera y segunda colocación.
 Los plazos de ocho segundos de los contadores Curios y de Heartwood/Null Veil
 compartidos usan la política validada PersistedCooldown: un plazo imposible no
 bloquea la pasiva indefinidamente. Dos GameTests nuevos comprueban recuperación
-y bloqueo de repetición real. Esperados 110 JUnit y 340 GameTests, no ejecutados
-localmente. La CI 455 inicial falló por tres pruebas que publicaban login Forge
+y bloqueo de repetición real. CI 43674513875 completed/success: 110 JUnit sin
+fallos/errores/omisiones y 340 GameTests; servidor empaquetado correcto, logs
+validados, cliente con 32 escenas y 64 tooltips. Sin build local. La CI 455 inicial falló por tres pruebas que publicaban login Forge
 con una conexión simulada: se extrajo restoreCooldowns, usada tanto por login
 real como por pruebas; no se omitieron pruebas ni se relajaron los logs.
 
@@ -28,7 +41,7 @@ contraste reproducible, gamma.84, alpha/silueta/original preservados.
 454/run43672786521 pasó CI completa.455 debe repetirla:110JUnit/334GameTests
 esperados; local25recursos/63Python/parser145Java/diffcheck correctos.
 
-# 5.10.454 — ascenso sin recaptura, pendiente de CI
+# 5.10.454 — ascenso sin recaptura; CI correcta
 
 Icarian Lift detecta que el minero salió de su eje o fue teletransportado fuera
 del progreso esperado. Termina sin seguir cortando ni arrastrarlo de vuelta;
@@ -36,7 +49,9 @@ respeta saltos normales con tolerancia vertical. Salir no provoca carga de chunk
 ni consultas de congestión antes de parar. Mensaje ES/EN explica la detención.
 Tres GameTests y cinco JUnit nuevos: esperados330GameTests/107JUnit. Mantiene
 ascenso normal, barreras y fluidos bajo sus regresiones existentes. Local25recursos,
-63Python/parser145Java/diffcheck correctos. Sin buildlocal; CI pendiente.
+63Python/parser145Java/diffcheck correctos. Sin build local. CI43672786521
+completed/success:107JUnit sin fallos/errores/omisiones y330GameTests.
+Estos cambios quedan incluidos en456, cuya CI completa también pasó.
 
 # Resultado actual: 5.10.453 verificada y publicada como prueba
 

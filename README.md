@@ -1,5 +1,29 @@
 # Special Pickaxes — mining rework
 
+**5.10.456 — prueba publicada; CI completa correcta.**
+
+[CI 43674513875](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43674513875)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.456-43674513875).
+110 JUnit sin fallos, errores ni omisiones; 340 GameTests, servidor empaquetado
+y logs validados. Cliente: 32 escenas, 64 tooltips y descripciones con las teclas
+principal/secundaria reasignadas a O/P.
+
+Icarus termina el ascenso cuando el minero abandona el eje o recibe un teletransporte;
+no lo arrastra de vuelta. La reconexión restaura sólo recargas válidas de ambas
+habilidades. Los intercambios de bloques revalidan actor y permisos durante los
+callbacks y revierten sus propias escrituras ante cambios externos. Los plazos
+imposibles de contadores Curios y compartidos ya no los bloquean indefinidamente.
+La sintonía respeta el presupuesto de partículas. Palimpsest incorpora una
+adaptación reproducible de contraste que preserva el original y su silueta.
+
+Se mantienen 13 picos mineros, potencia minera, daño base 4, cero recetas y
+secundarias sin combate. Galería de esta revisión: 13 iconos y 13 capturas reales
+en mano. No es aprobación visual estable, certificación Ghouls ni instalación
+Windows comprobada.
+
+JAR: **553.744 bytes**, SHA-256:
+`40700d0844c55e267ba41349c5022bb1969a15ca0d46e333df99b3cb557cbdfa`.
+
 **5.10.453 — prueba publicada; CI completo correcto.**
 
 [CI 43671030909](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43671030909)

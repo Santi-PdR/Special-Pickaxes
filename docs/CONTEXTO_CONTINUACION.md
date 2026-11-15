@@ -1,3 +1,38 @@
+# Estado vigente para continuación — 5.10.456
+
+Este encabezado reemplaza los anteriores, conservados como historial.
+Rama `arena/cec54523-special-pickaxes`; sin checkout ni build local.
+
+- Fuente runtime `95b36f35908e32db1f630dfd6523cb2704da0da1`.
+- CI43674513875 completed/success:110JUnit,0fallos/errores/omisiones;
+  340GameTests; servidor empaquetado/logs correctos;32escenas/64tooltips.
+- Cliente validó ALTERNATE_BINDINGS_REBOUND_OK e INSTRUCTION_BINDINGS_REBOUND_OK.
+- JAR553744bytes,SHA256`40700d0844c55e267ba41349c5022bb1969a15ca0d46e333df99b3cb557cbdfa`.
+- Asset749778973 uploaded, tamaño/digestAPI coincidentes; prerelease de prueba.
+- URL: https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-5.10.456-43674513875/special-pickaxes-1.20.1-5.10.456.jar
+- Evidencia:/tmp/sp-ci456 (temporal); recuperable por tools/fetch_ci_evidence.py.
+- Galería:artifacts/picos-5.10.456/ PDF13páginas/ZIP26imágenes,procedencia/CRC comprobados.
+- 454:IcarianShaft y Lift paran al salir del eje/teletransportarse;5JUnit+3GT.
+- 455:PersistedCooldown.remaining y login normalizado;3JUnit+3GT;20partículas
+  presupuestadas para sintonía Curios+1GT;prosa secundarias con keybinds
+  reales y clienteO/P;Palimpsest_v2 gamma.84 sin tocar original.
+- CI455inicial43673912854 falló por publicar login Forge de fake player sin
+  canalNetty. Se extrajo restoreCooldowns para probar la misma lógica sin
+  disparar handlers ajenos; no se relajaron escáneres ni se omitieron pruebas.
+- 456:exchange captura actor antes de permisos/revalida ambas posiciones
+  antes de escribir/entre callbacks/al confirmar;4GT. Plazos Curios y guardas
+  compartidas usan política160ticks;2GT recuperación y bloqueo real.
+- Local:25recursos/63Python conPillow/parser145Java/secrets/diffcheck OK.
+- Pendientes de auditoría más profunda: pasivas tras callbacks que muevan
+  atacante/caster;MiningObservations/Curios al cambiar equipo entre captura y
+  flush. No afirmar que están corregidos por esta revisión.
+- Mantener13picos,daño4,potencia minera,secundarias sinmobs,cero recetas.
+- No accesoWindows. Final siempre PowerShell literal verificando tamaño/hash
+  antes de mover, destino D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods;
+  borrar sólo special-pickaxes-*.jar anteriores, sin gh/token/finally/archivoPS1.
+- No confundir esperasCI con trabajo efectivo ni afirmar tiempo mínimo cumplido
+  sin evidencia. Tampoco certificar animaciones completas/Ghouls/estable.
+
 # Estado vigente para continuación — 5.10.453
 
 Este encabezado reemplaza las conclusiones antiguas que siguen como historial.
