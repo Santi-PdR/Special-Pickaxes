@@ -1,29 +1,30 @@
 # Special Pickaxes — mining rework
 
-**5.10.450 — prueba publicada; CI completo correcto.**
+**5.10.453 — prueba publicada; CI completo correcto.**
 
-[CI 43667431107](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43667431107)
-y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.450-43667431107).
-97 JUnit sin fallos, errores ni omisiones; 321 GameTests, servidor empaquetado y
-logs limpios. Cliente: 32 escenas, 64 tooltips con comprobación de altura,
-controles al servidor y WorldShatter de 9.341 bloques.
+[CI 43671030909](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43671030909)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.453-43671030909).
+102 JUnit sin fallos, errores ni omisiones; 327 GameTests, servidor empaquetado y
+logs limpios. Cliente: 32 escenas, 64 tooltips comprobados y controles al servidor
+hasta WorldShatter de 9.341 bloques. Se verificó también una instrucción larga
+con la tecla de activación reasignada.
 
-Las construcciones recolocadas conservan su procedencia ante limpiezas diferidas;
-las colocaciones múltiples de Forge protegen todas las celdas válidas. Iridium
-revalida el stack del drop tras claims también en su atracción pasiva. Contornos
-y trazas comparten presupuesto cosmético. Eventide tiene una adaptación de
-contraste reproducible que preserva la silueta. Los controles se recuperan de
-relojes persistidos corruptos y ya no anuncian éxito cuando una reanudación falla.
-La evidencia de CI se separa por intento y checksum para evitar mezclas.
+Las colocaciones pagadas rechazan cambios de creativo/supervivencia durante
+callbacks: sin slot negativo, bloques gratuitos ni pérdida del pago. Seam Ripper
+revalida el actor y la procedencia después del permiso antes de descubrir vecinos.
+Los previews cubren todo el plan, incluido su extremo, con un máximo de 24 puntos.
+Las instrucciones largas del manual y SHIFT usan las teclas configuradas, no
+letras fijas. Icarus recibe una adaptación reproducible de contraste que conserva
+el original, la transparencia y la silueta; no es un redibujo.
 
-Se conservan las mejoras de 446: SHIFT legible en la ventana probada, manual
-completo, tiers Forge explícitos, mensajes de rechazo, potencia minera y cero
-recetas. Las secundarias siguen siendo utilidades mineras, no de combate.
+Se mantienen potencia minera, tiers Forge explícitos, secundarias sin combate,
+daño base de 4 y cero recetas. La galería contiene los 13 iconos y 13 retratos
+reales de esta revisión. No equivale a aprobar todas las animaciones o Ghouls.
 
-JAR: **550.032 bytes**, SHA-256:
-`ac50c5e88fbec79089708136b36997bd2adc7feb3f1e0ea35c8d71ce866c0fb5`.
-Es un prerelease de prueba, no una aprobación visual completa ni una certificación
-de Ghouls/shaders/TPS. No confirma instalación en Windows.
+JAR: **551.671 bytes**, SHA-256:
+`8d9a95ad465fec905eb1724e6c592640d64362bdbec45fd9566f9b07183a7967`.
+Es un prerelease de prueba, no una versión estable aprobada visualmente ni una
+instalación Windows comprobada.
 
 **5.10.431 — prueba descargable publicada; CI global correcto.**
 Se conserva el gameplay validado en430. Tras CI completo exitoso en la rama de

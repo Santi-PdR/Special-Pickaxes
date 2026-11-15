@@ -1,9 +1,9 @@
-# Compatibilidad — revisión 450 validada en CI, pack completo no certificado
+# Compatibilidad — revisión 453 validada en CI, pack completo no certificado
 
 Las filas históricas describen decisiones, no una certificación del pack completo.
 La revisión441 conserva la detección de menas sin tags de herramienta, pero
 respeta requisitos de tiers superiores explícitos en TierSortingRegistry de Forge.
-No se ha ejecutado Ghouls completo. CI 43667431107 pasó los 321 GameTests; tres de ellos cubren tier superior,
+No se ha ejecutado Ghouls completo. CI 43671030909 pasó los 327 GameTests; tres de ellos cubren tier superior,
 minería ordinaria OP y rechazo en la frontera de rotura.
 
 # Compatibilidad del catálogo 5.10.345
@@ -53,3 +53,11 @@ La limpieza tras rotura no borra marcas nuevas de una recolocación. Los eventos
 Forge de colocación múltiple registran cada celda elegible del mismo nivel. Esto
 mejora la convivencia con constructores que emiten EntityMultiPlaceEvent, pero
 no identifica bloques antiguos ni colocaciones de mods que no emiten esos hooks.
+
+## Transacciones y controles (453)
+
+Las colocaciones pagadas rechazan cambios de modo creativo/supervivencia hechos
+por listeners durante la transacción, sin gastar su material capturado. El
+descubrimiento de Seam Ripper también revalida procedencia tras el claim. Las
+instrucciones del manual y SHIFT usan las teclas configuradas; no se afirma
+compatibilidad visual completa con interfaces de terceros.

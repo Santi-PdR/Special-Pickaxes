@@ -1,3 +1,47 @@
+# Resultado actual: 5.10.453 verificada y publicada como prueba
+
+- **Fuente:** `25fd933b670bae285c37b90059971e38ef1946ea`.
+- **CI:** [43671030909](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43671030909), completed/success.
+- **Java:** 102 JUnit, cero fallos/errores/omisiones; 327 GameTests completos.
+- **Recursos:** 25 pruebas en CI. Herramientas Python: 63 pasan localmente con
+  Pillow; en CI sin Pillow pasan 62 y se omite sólo el renderer opcional del PDF.
+- **Runtime:** servidor empaquetado y logs de servidor/GameTests/cliente limpios.
+  Cliente con 32 escenas, 64 comprobaciones de tooltip final y altura, controles
+  al servidor y WorldShatter de 9.341 bloques. Marcador nuevo
+  `INSTRUCTION_BINDINGS_REBOUND_OK` observado una vez tras reasignar activación a O.
+- **JAR:** `special-pickaxes-1.20.1-5.10.453.jar`, 551.671 bytes, SHA-256
+  `8d9a95ad465fec905eb1724e6c592640d64362bdbec45fd9566f9b07183a7967`.
+  Recuperado íntegro mediante Checks; tamaño/hash/CRC correctos. Los trece modelos
+  y recursos coinciden con sus fuentes y procedencia. Sin recetas, worldgen ni fixtures.
+- **Publicación:** prerelease `test-5.10.453-43671030909`, asset 749676275 uploaded;
+  tamaño y digest de API coinciden con el JAR verificado.
+- **Galería:** `artifacts/picos-5.10.453/los-13-picos.pdf`, 13 páginas, 26 imágenes
+  exactas, HTML, PROVENANCE y SHA256SUMS. ZIP con CRC correcto. Se inspeccionaron
+  el retrato Icarus y SHIFT Fault Choir de esta revisión; no se certifican todas
+  las animaciones ni el pack Ghouls/shaders/TPS.
+
+## Cambios comprobados en esta tanda
+
+1. La colocación pagada conserva el contexto creativo inicial, revalida antes de
+   escribir y después del evento, y revierte su propia escritura si el modo cambia.
+   Cuatro regresiones cubren ambas direcciones en claims y eventos de colocación.
+2. Seam Ripper no admite un bloque marcado por un callback como origen de
+   descubrimiento de más terreno. Se revalidan contexto, estado y procedencia.
+3. Preview de hasta 24 puntos uniformes, incluyendo ambos extremos. Cinco JUnit
+   cubren límites, planes pequeños, unicidad, espaciado y aritmética con int máximo.
+4. Instrucciones de manual/SHIFT con keybinds para acción, modo y secundaria.
+   El regenerador conserva placeholders; regresión recorre modos de los 13 picos.
+5. Sexta adaptación de legibilidad: Icarus, gamma .82, alpha/silueta/original intactos.
+
+452/run43669594248 pasó 102 JUnit y 326 GameTests antes del cambio de instrucciones.
+El verificador histórico debe usar 326 para ese log: compararlo con el catálogo
+actual de 327 lo rechaza correctamente. 453 repitió toda la CI con 327 completos.
+
+No hubo checkout, build local, instalación Windows ni automatización de interfaz
+local. La publicación de prueba sigue separada del gate visual estable.
+
+## Historial (las notas «pendiente» siguientes preceden al resultado actual)
+
 # 5.10.453 — instrucciones reasignables y legibilidad: pendiente de CI
 
 Las instrucciones largas ya no fijan las letras R/C/X: se traducen con componentes

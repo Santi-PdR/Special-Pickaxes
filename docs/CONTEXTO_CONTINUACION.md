@@ -1,3 +1,32 @@
+# Estado vigente para continuación — 5.10.453
+
+Este encabezado reemplaza las conclusiones antiguas que siguen como historial.
+Rama de sesión: `arena/cec54523-special-pickaxes`, sin checkout ni build local.
+
+- Fuente verificada: `25fd933b670bae285c37b90059971e38ef1946ea`.
+- CI43671030909 completed/success:102JUnit sin fallos/errores/omisiones,
+ 327GameTests; servidor/logs/cliente32escenas64tooltips correctos.
+- Nuevo marcador cliente INSTRUCTION_BINDINGS_REBOUND_OK; viewport64 correcto.
+- JAR551671bytes,SHA256`8d9a95ad465fec905eb1724e6c592640d64362bdbec45fd9566f9b07183a7967`.
+- URL directa: https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-5.10.453-43671030909/special-pickaxes-1.20.1-5.10.453.jar
+- Asset749676275 uploaded; digestAPI coincide. Prerelease, no aprobación estable.
+- Galería persistente ignorada porGit: artifacts/picos-5.10.453/, PDF13páginas,
+ 26imágenes/HTML/PROVENANCE/SHA256SUMS yZIPCRCcorrecto.
+- Evidencia temporal:/tmp/sp-ci453; puede desaparecer entre turnos. Recuperar con
+ tools/fetch_ci_evidence.py usando fuente/run y un destino nuevo.
+- Runtime reciente: colocación pagada congela creativeAtStart; SeamMiningProgram
+ revalida HeldUtilityContext y procedencia tras claim; PreviewSampling.index
+ distribuye24muestras incluyendo extremos sin overflow. Icarus_v2 gamma.82.
+- Instrucciones largas: ArtifactTooltips.how usa tres keybinds; lang how usa
+ %1$s/%2$s/%3$s. mining_catalog.keybound_how conserva el contrato al regenerar.
+- Último local:25recursos/63Python conPillow/parser143Java. CI omite únicamente
+ rendererPDFopcional enPython sinPillow;62restantes pasan. JUnit no tiene skips.
+- No accesoWindows ni instalación afirmada. Final siempre PowerShell pegable,
+ URL/tamaño/hash fijos, valida antes de borrar sólo SpecialPickaxes antiguos;
+ sin gh/token/finally/guardarps1. Instancia test-1 en D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods.
+
+## Historial anterior — no usar versiones ni HEAD antiguos como estado vigente
+
 # Contexto de continuación — Special Pickaxes
 
 Último resultado: CI43562331609, fuente5.10.439 verificada.
