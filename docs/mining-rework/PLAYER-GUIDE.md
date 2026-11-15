@@ -1,3 +1,18 @@
+## Revisión 5.10.467 — CI completa correcta
+
+Los campos no siguen entregando beneficios ni alterando proyectiles/drops
+después de que otro mod invalide el contexto durante sus callbacks. En
+particular Stasis corta entregas pendientes, Crucible respeta la nueva
+propiedad/posición del proyectil y Eventide no carga desde copias de herramienta.
+Worldloom vuelve a comprobar permisos en el ancla antes de devolver al objetivo.
+Se conservan los beneficios ya autorizados: no hay rollback arbitrario de efectos.
+El manual se recompone tras recargar idioma; Crucible tiene contraste adaptado
+sin reemplazar el dibujo original. No se añade daño ni combate a secundarias.
+126JUnit/382GameTests, cliente32escenas/64tooltips y servidor empaquetado verdes.
+Esto es una prerelease de prueba, no aprobación del pack Ghouls completo.
+
+## Historial de cambios (los pendientes inferiores son históricos)
+
 ## Revisión 5.10.463 — pendiente de CI
 
 Las auras compartidas detienen entregas pendientes si un mod mueve al portador

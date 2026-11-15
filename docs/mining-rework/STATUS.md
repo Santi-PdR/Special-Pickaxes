@@ -1,3 +1,43 @@
+# Estado vigente — 5.10.467 verificada
+
+## Entrega verificada 5.10.467
+
+- Runtime: `fe56becab9ce5d368116d031d3f7bca6b9a2dcf7`.
+- [CI43683204081](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43683204081): completed/success.
+- **126JUnit**, cero fallos/errores/omisiones; **382GameTests** completos.
+- Cliente real:32escenas/64tooltips; `ALTERNATE_BINDINGS_REBOUND_OK`.
+- Servidor empaquetado: `PACKAGED_SERVER_SMOKE_OK`; logs de runtime limpios.
+- [Prerelease de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.467-43683204081).
+- JAR: **567058bytes**. SHA256:
+  `957c7481a45fac57cb5a1ed543453edbed57c4dbc250c90123e9b0e831c6d626`.
+  Tamaño/digest del asset GitHub coinciden con RELEASE.json y SHA256SUMS de CI.
+- Galería `artifacts/picos-5.10.467/`:13páginas PDF,26imágenes reales enZIP;
+  CRC, traducciones es_es y assets comprobados contra el commit del runtime.
+- Local:87Python conPillow,25recursos,parser155Java,secretos/diffcheck correctos.
+- Sin compilación local Java ni instalaciónWindows; no certifica Curios instalado,
+  Ghouls completo ni animaciones completas. Las esperasCI no son trabajo efectivo.
+
+### Cambios acumulados desde460
+
+- Manual: reconstruye tarjetas tras recargar el idioma, reinicializar y cerrar;
+  misma cadena de locale no equivale a mismos recursos.
+- Cosméticos: presupuesto real por audiencia y revalidación de visibilidad/rango
+  aun al reutilizar una audiencia cacheada en el mismo tick.
+- Curios: confirmación fresca sólo en la ranura original, sin rescaneo completo
+  por cada callback; identidad exacta de la fuente preservada.
+- Stasis: detiene beneficios pendientes al detener/reemplazar el campo o mover
+  al portador/receptor durante permisos o efectos; no revierte beneficios previos.
+- Crucible: selección acotada sin callbacks de permisos en el iterador; revalida
+  proyectil, propietario, posición exacta y contexto antes del desvío.
+- Eventide: sólo carga la herramienta capturada; un cambio de contexto cancela
+  pulls pendientes y la confirmación cosmética del colapso invalidado.
+- Worldloom: exige permiso también en el ancla antes de devolver un objetivo.
+- CI: logs vacíos no cuentan como evidencia, GameTests requieren éxito explícito,
+  retirada histórica idempotente y espera por run/SHA con salida inequívoca.
+- Se mantienen13picos jugables, daño4, cero recetas y secundarias sólo mineras.
+
+## Historial técnico (los pendientes siguientes son históricos)
+
 ## Esperas CI con resultado inequívoco y menor uso de API
 
 wait_ci.py consulta sólo los metadatos de un run concreto a intervalos

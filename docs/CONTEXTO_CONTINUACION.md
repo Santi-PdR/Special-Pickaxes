@@ -1,3 +1,55 @@
+# Estado vigente para continuación — 5.10.467
+
+Rama: `arena/cec54523-special-pickaxes`. Este encabezado reemplaza los estados históricos inferiores.
+
+## Entrega verificada 5.10.467
+
+- Runtime: `fe56becab9ce5d368116d031d3f7bca6b9a2dcf7`.
+- [CI43683204081](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43683204081): completed/success.
+- **126JUnit**, cero fallos/errores/omisiones; **382GameTests** completos.
+- Cliente real:32escenas/64tooltips; `ALTERNATE_BINDINGS_REBOUND_OK`.
+- Servidor empaquetado: `PACKAGED_SERVER_SMOKE_OK`; logs de runtime limpios.
+- [Prerelease de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.467-43683204081).
+- JAR: **567058bytes**. SHA256:
+  `957c7481a45fac57cb5a1ed543453edbed57c4dbc250c90123e9b0e831c6d626`.
+  Tamaño/digest del asset GitHub coinciden con RELEASE.json y SHA256SUMS de CI.
+- Galería `artifacts/picos-5.10.467/`:13páginas PDF,26imágenes reales enZIP;
+  CRC, traducciones es_es y assets comprobados contra el commit del runtime.
+- Local:87Python conPillow,25recursos,parser155Java,secretos/diffcheck correctos.
+- Sin compilación local Java ni instalaciónWindows; no certifica Curios instalado,
+  Ghouls completo ni animaciones completas. Las esperasCI no son trabajo efectivo.
+
+### Cambios acumulados desde460
+
+- Manual: reconstruye tarjetas tras recargar el idioma, reinicializar y cerrar;
+  misma cadena de locale no equivale a mismos recursos.
+- Cosméticos: presupuesto real por audiencia y revalidación de visibilidad/rango
+  aun al reutilizar una audiencia cacheada en el mismo tick.
+- Curios: confirmación fresca sólo en la ranura original, sin rescaneo completo
+  por cada callback; identidad exacta de la fuente preservada.
+- Stasis: detiene beneficios pendientes al detener/reemplazar el campo o mover
+  al portador/receptor durante permisos o efectos; no revierte beneficios previos.
+- Crucible: selección acotada sin callbacks de permisos en el iterador; revalida
+  proyectil, propietario, posición exacta y contexto antes del desvío.
+- Eventide: sólo carga la herramienta capturada; un cambio de contexto cancela
+  pulls pendientes y la confirmación cosmética del colapso invalidado.
+- Worldloom: exige permiso también en el ancla antes de devolver un objetivo.
+- CI: logs vacíos no cuentan como evidencia, GameTests requieren éxito explícito,
+  retirada histórica idempotente y espera por run/SHA con salida inequívoca.
+- Se mantienen13picos jugables, daño4, cero recetas y secundarias sólo mineras.
+
+### Reproducir verificación sin mezclar versiones
+
+`python3 tools/fetch_ci_evidence.py fe56becab9ce5d368116d031d3f7bca6b9a2dcf7 43683204081 /tmp/sp-ci467`
+
+`python3 tools/verify_gametests.py /tmp/sp-ci467/build/verification-gametest.log`
+
+Ese comando cuenta tests del árbol actual: sirve para467 con382tests; para
+históricos usar validate_log(text,conteo_historico), no el conteo del HEAD nuevo.
+La evidencia/tmp es recuperable, no persistencia garantizada. `.tools/python`
+es el venv local conPillow y `.tools/parser/check.mjs` el parser sintáctico.
+No confundir éste con compilación/resolución de símbolos javac/Forge.
+
 # Estado vigente para continuación — 5.10.460
 
 Este encabezado reemplaza el historial anterior; rama arena/cec54523-special-pickaxes.
