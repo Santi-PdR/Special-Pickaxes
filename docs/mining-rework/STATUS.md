@@ -1,3 +1,13 @@
+# 5.10.448 — controles recuperables, pendiente de CI
+
+El throttle de inputs rechaza diferencias negativas por overflow: inputTick
+Long.MIN_VALUE no puede bloquear controles indefinidamente. Cinco JUnit puros
+cubren límites/rollback/extremos. Pausa/reanudación ya propaga un rechazo real
+por chunks/drops envezde informar éxito y emitir cue. Dos GameTests nuevos.
+Conserva cambios447: procedencia con tickets,passivepull,Eventide y contornos.
+Esperados97JUnit/318GameTests. Local24recursos/54Python/parser141Java correctos.
+No buildlocal ni lanzamiento de interfaz local.446sigue última verificada.
+
 # 5.10.447 — nueva tanda integral pendiente de CI
 
 La limpieza diferida de procedencia usa tickets: una colocación/recolocación

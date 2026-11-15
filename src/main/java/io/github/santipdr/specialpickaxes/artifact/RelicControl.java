@@ -14,11 +14,11 @@ public final class RelicControl {
         if(action==Action.CANCEL)return cancel(p,k);
         // Bound packet spam without preventing an emergency cancellation.
         var data=ArtifactState.of(p,k);long now=ArtifactState.now(p);
-        if(data.contains("inputTick")&&data.getLong("inputTick")<=now&&now-data.getLong("inputTick")<2)return false;data.putLong("inputTick",now);
+        if(data.contains("inputTick")&&InputThrottle.recent(now,data.getLong("inputTick"),2))return false;data.putLong("inputTick",now);
         switch(action){
             case PAUSE:
                 if(!WorkQueue.busy(p)||WorkQueue.status(p).equals("ready"))return false;
-                WorkQueue.togglePause(p);p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
+                if(!WorkQueue.togglePause(p))return false;p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
             case CONFIRM:
                 return confirm(p);
             case SELECT:

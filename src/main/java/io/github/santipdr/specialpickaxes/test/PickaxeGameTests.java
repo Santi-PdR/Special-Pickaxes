@@ -528,6 +528,21 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactInteraction.left(wearer,at,false)&&ArtifactInteraction.left(wearer,at.above(),false)
                 &&ArtifactInteraction.cornerCount(wearer)==2,"denied wireframe particles do not swallow corners or cancel selection");finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_249") public static void controlsRecoverFromSubtractionOverflowInPersistedInput(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.EVENTIDE);var data=ArtifactState.of(wearer,ArtifactKind.EVENTIDE);data.putLong("inputTick",Long.MIN_VALUE);
+        h.assertTrue(RelicControl.execute(wearer,ArtifactKind.EVENTIDE,RelicControl.Action.MODE)&&ArtifactState.mode(wearer,ArtifactKind.EVENTIDE)==1,"ancient malformed input does not lock the mode control");
+        h.assertTrue(!RelicControl.execute(wearer,ArtifactKind.EVENTIDE,RelicControl.Action.MODE),"ordinary immediate repeats are still throttled");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_250") public static void pauseControlReportsBlockedResumeAsRejected(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);
+        WorkProgram program=new WorkProgram(){
+            public int remaining(){return 1;}public boolean awaiting(){return false;}public boolean executing(){return true;}
+            public boolean done(){return false;}public void confirm(){}public boolean loaded(ServerPlayer p){return false;}
+            public WorkStep next(ServerPlayer p){return new WorkStep(){public BlockPos pos(){return at;}public boolean apply(ServerPlayer actor,ItemStack t,ArtifactKind k){return true;}};}
+        };
+        h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST,program)&&WorkQueue.togglePause(wearer),"job is explicitly paused");
+        h.assertTrue(!RelicControl.execute(wearer,ArtifactKind.PALIMPSEST,RelicControl.Action.PAUSE)&&WorkQueue.status(wearer).equals("paused"),"blocked chunk resume must not report successful input or play a success cue");finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
