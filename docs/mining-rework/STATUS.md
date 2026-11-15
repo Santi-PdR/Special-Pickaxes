@@ -1,3 +1,13 @@
+## CI464: correcciones tras dos fallos, nueva ejecución pendiente
+
+43681212818 compiló pero falló en dosGameTests. La audiencia revalidada había
+perdido la identidad de lista estable que comprueba el test77: se conserva la
+lista original sólo si todos sus miembros siguen siendo elegibles; si no,
+se devuelve la filtrada sin repetir el escaneo. La prueba nueva304 se ejecuta
+ahora síncronamente con reloj restaurado en finally, sin81ticks de otros
+subsistemas; separa las aserciones para identificar un eventual fallo.
+No se declara verde ni se publica galería464 con este resultado.
+
 ## Corrección de compilación del manual
 
 CI43681067221 confirmó retirada histórica sin escrituras (40Checks,0updates),

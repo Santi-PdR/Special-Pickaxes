@@ -298,8 +298,10 @@ public final class ArtifactFeedback {
         if(!wearer.isAlive()||wearer.isRemoved()||wearer.isSpectator())return List.of();
         var level=wearer.serverLevel();var center=wearer.position();long tick=level.getGameTime();
         var previous=WARD_AUDIENCE_CACHE.get(wearer.getUUID());
-        if(previous!=null&&previous.level()==level&&previous.tick()==tick&&previous.center().distanceToSqr(center)<1.0E-6D)
-            return previous.audience().stream().filter(viewer->viewer==wearer||wardViewer(wearer,viewer,center)).toList();
+        if(previous!=null&&previous.level()==level&&previous.tick()==tick&&previous.center().distanceToSqr(center)<1.0E-6D){
+            var filtered=previous.audience().stream().filter(viewer->viewer==wearer||wardViewer(wearer,viewer,center)).toList();
+            return filtered.size()==previous.audience().size()?previous.audience():filtered;
+        }
         var audience=new java.util.ArrayList<ServerPlayer>(4);audience.add(wearer);
         var nearby=EntitySelection.nearest(level,ServerPlayer.class,wearer.getBoundingBox().inflate(12D),
                 viewer->viewer!=wearer&&wardViewer(wearer,viewer,center),

@@ -959,23 +959,27 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.target(p).filter(at::equals).isPresent(),"the placed-field cooldown regression has its own deterministic target");
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_304",timeoutTicks=120) public static void worldloomRechecksPermissionAtTheCapturedAnchor(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_304") public static void worldloomRechecksPermissionAtTheCapturedAnchor(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);var mob=EntityType.SLIME.create(h.getLevel());
         mob.setNoAi(true);mob.setNoGravity(true);mob.setPos(owner.position().add(2,0,0));h.getLevel().addFreshEntity(mob);
-        h.assertTrue(WorldloomSnare.bind(owner,mob),"root binding starts");
-        h.runAfterDelay(81,()->{
-            WorldloomSnare.tick();var anchor=mob.blockPosition();var displaced=mob.position().add(2,0,0);mob.setPos(displaced);var motion=new Vec3(.3,.1,0);mob.setDeltaMovement(motion);int[] denied={0};
+        var clock=h.getLevel().getServer().getWorldData().overworldData();long originalTime=clock.getGameTime();
+        try{
+            h.assertTrue(WorldloomSnare.bind(owner,mob),"root binding starts");
+            clock.setGameTime(originalTime+80);WorldloomSnare.tick();
+            var anchor=mob.blockPosition();var displaced=mob.position().add(2,0,0);mob.setPos(displaced);var motion=new Vec3(.3,.1,0);mob.setDeltaMovement(motion);int[] denied={0};
             Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
                 if(event.player==owner&&event.target.equals(anchor)){denied[0]++;event.setCanceled(true);}
             };
             MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
             try{
                 WorldloomSnare.tick();
-                h.assertTrue(denied[0]==1&&mob.position().equals(displaced)&&mob.getDeltaMovement().equals(motion),"approval at the current position does not allow teleporting back into a newly denied anchor");
+                h.assertTrue(denied[0]==1,"the displaced root must request permission at its captured anchor; requests="+denied[0]);
+                h.assertTrue(mob.position().equals(displaced),"denied anchor does not teleport the target");
+                h.assertTrue(mob.getDeltaMovement().equals(motion),"denied anchor does not lock target motion");
                 h.assertTrue(WorldloomSnare.bind(owner,mob),"the denied root was removed and no longer blocks a fresh permitted binding");
-            }finally{MinecraftForge.EVENT_BUS.unregister(deny);WorldloomSnare.forget(owner);mob.discard();}
-            finish(h,owner);
-        });
+            }finally{MinecraftForge.EVENT_BUS.unregister(deny);}
+        }finally{clock.setGameTime(originalTime);WorldloomSnare.forget(owner);mob.discard();}
+        finish(h,owner);
     }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
