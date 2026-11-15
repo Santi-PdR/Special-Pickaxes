@@ -16,15 +16,18 @@ public final class ArtifactManualScreen extends Screen {
     private final ItemStack headerIcon;
     private final List<ArtifactKind> choices=Arrays.stream(ArtifactKind.playableValues()).toList();
     private final Map<ArtifactKind,ItemStack> choiceIcons=new EnumMap<>(ArtifactKind.class);
-    private int scroll,choiceScroll,contentHeight,layoutWidth=-1,scrollbarGrabOffset;
+    private int scroll,choiceScroll,contentHeight,scrollbarGrabOffset;
     private boolean draggingScrollbar;
-    private String layoutFingerprint="";
+    private final ManualLayoutRevision layoutRevision=new ManualLayoutRevision();
     private List<Card> leftCards=List.of(),rightCards=List.of();
     private record Section(String key,Component heading,List<Component> body,int color) {}
     private record Card(Section section,List<net.minecraft.util.FormattedCharSequence> lines,int height) {}
 
     public ArtifactManualScreen(ArtifactKind kind){super(Component.translatable("screen.specialpickaxes.manual"));this.kind=kind;this.headerIcon=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());}
     @Override public boolean isPauseScreen(){return false;}
+    @Override protected void init(){
+        super.init();layoutRevision.invalidate();draggingScrollbar=false;
+    }
     private boolean selectingCopy(){return kind==ArtifactKind.WORLDBREAKER&&canChooseCopy();}
     private ManualScreenLayout.Layout layout(){return ManualScreenLayout.calculate(width,height,selectingCopy());}
 
@@ -133,8 +136,7 @@ public final class ArtifactManualScreen extends Screen {
                 +(tag==null?"":tag.getInt("artifactActivationCost")+":"+tag.getInt("artifactCooldown")+":"+tag.getString("copiedSkill")+":"+tag.getInt("copiedMode"));
         fingerprint+="|"+twoColumns+"|"+Minecraft.getInstance().getLanguageManager().getSelected()+"|"+RelicKeys.MANUAL.getTranslatedKeyMessage().getString();
         for(var action:RelicControl.Action.values())fingerprint+="|"+RelicKeys.name(action).getString();
-        if(layoutWidth==maxWidth&&fingerprint.equals(layoutFingerprint))return;
-        layoutWidth=maxWidth;layoutFingerprint=fingerprint;
+        if(!layoutRevision.refresh(maxWidth,fingerprint,net.minecraft.locale.Language.getInstance()))return;
         if(maxWidth<32){leftCards=List.of();rightCards=List.of();contentHeight=0;scroll=0;return;}
         List<Section> sections=sections(stack,abilityKind,mode,modeKey);
         var left=new ArrayList<Card>();var right=new ArrayList<Card>();int leftHeight=0,rightHeight=0;

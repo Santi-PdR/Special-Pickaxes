@@ -31,7 +31,9 @@
     "archive": "referencias/UltimatePickaxes/ultimatepickaxes-1.0.17-1.20.1.jar",
     "entry": "assets/ultimatepickaxes/textures/item/fire_pickaxe.png",
     "sha256": "b0d60836e9ca8d3db42ac47647317ba5e1a1db479456f62c98977f6921de312c",
-    "adaptation": "Reference sprite reused unchanged with permission; item model, effect palette and behavior remain independent."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "paradox_crucible_v2.png",
+    "runtime_sha256": "ea229b0f61fdc25ab4d905d2a1c9cc2a6672ab878ca6935b4bc01a936d3d7654"
   },
   {
     "artifact": "interregnum",

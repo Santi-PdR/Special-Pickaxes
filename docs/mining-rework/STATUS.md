@@ -1,3 +1,20 @@
+# 5.10.463 — manual tras recargas y contraste Crucible; pendiente de CI
+
+ManualLayoutRevision liga las tarjetas envueltas al ancho, controles/contenido
+y a la identidad de Language, no sólo al nombre es_es/en_us. Una recarga de
+recursos con el mismo idioma invalida el texto cacheado. init también invalida
+las tarjetas y termina un arrastre de scrollbar pendiente, manteniendo el
+scroll sujeto al nuevo tamaño de contenido. Cuatro JUnit puros comprueban
+caché estable, identidad tras recarga, controles/ancho e invalidación explícita.
+No se afirma haber probado un resourcepack externo real.
+
+Paradox Crucible recibe la décima adaptación de contraste reproducible,
+gamma.86, con original, alpha y silueta conservados. Se mantiene el modelo
+handheld y el nombre canónico del pico. No es un redibujo original.
+Incluye461/462. Esperados126JUnit/370GameTests; sin build local.
+Local25recursos/66Python conPillow/parser155Java/secrets/diffcheck correctos.
+Sin daño/ataques/recetas nuevos; las secundarias siguen siendo mineras.
+
 # 5.10.462 — consultas de ranura, privacidad y partículas; pendiente de CI
 
 Las observaciones del puente Curios conservan la ranura descubierta y la leen

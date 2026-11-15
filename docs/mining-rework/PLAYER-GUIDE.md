@@ -1,3 +1,13 @@
+## Revisión 5.10.463 — pendiente de CI
+
+Las auras compartidas detienen entregas pendientes si un mod mueve al portador
+o a un compañero durante un efecto. Los flashes de minería y varios contornos
+respetan el presupuesto cosmético sin quitar sus beneficios. Las partículas
+ya no revelan al portador invisible por comprobar la visibilidad al revés.
+El manual vuelve a maquetar tras reinicializarse o cambiar la instancia de
+idioma, incluso si el nombre del idioma no cambió. Crucible tiene una adaptación
+reproducible de contraste conservando el dibujo original.
+
 ## Revisión 5.10.460 — CI completa correcta
 
 Las roturas diferidas de Iridium sólo completan sus efectos si conservas la
