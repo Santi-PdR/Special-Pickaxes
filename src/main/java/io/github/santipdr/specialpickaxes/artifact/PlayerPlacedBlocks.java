@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.core.BlockPos;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.ArrayDeque;
 import java.util.Map;
@@ -19,7 +20,9 @@ public final class PlayerPlacedBlocks extends SavedData {
     private static final ArrayDeque<PendingCleanup> PENDING = new ArrayDeque<>();
     private static final Map<ServerLevel, PlayerPlacedBlocks> LOADED = new WeakHashMap<>();
     private static int sweepClock;
-    private record PendingCleanup(ServerLevel level, long position, Block originalBlock) {}
+    private record PendingCleanup(ServerLevel level, long position, Block originalBlock,long ticket) {}
+    private final Long2LongOpenHashMap cleanupTickets=new Long2LongOpenHashMap();
+    private long nextCleanupTicket;
     private final LongOpenHashSet positions = new LongOpenHashSet();
     private LongIterator staleScan;
 
@@ -35,9 +38,12 @@ public final class PlayerPlacedBlocks extends SavedData {
     }
 
     public void mark(BlockPos pos) {
+        // A new placement invalidates a break observation even if this cell was already marked.
+        cleanupTickets.remove(pos.asLong());
         if (positions.add(pos.asLong())) { staleScan = null; setDirty(); }
     }
     public void unmark(BlockPos pos) {
+        cleanupTickets.remove(pos.asLong());
         if (positions.remove(pos.asLong())) { staleScan = null; setDirty(); }
     }
 
@@ -47,13 +53,19 @@ public final class PlayerPlacedBlocks extends SavedData {
     public static void scheduleCleanup(ServerLevel level, BlockPos pos) {
         var data = LOADED.get(level);
         if (data == null || !data.contains(pos) || PENDING.size() >= MAX_PENDING_CLEANUPS || !level.hasChunkAt(pos)) return;
-        PENDING.addLast(new PendingCleanup(level, pos.asLong(), level.getBlockState(pos).getBlock()));
+        long ticket=++data.nextCleanupTicket;
+        data.cleanupTickets.put(pos.asLong(),ticket);
+        PENDING.addLast(new PendingCleanup(level,pos.asLong(),level.getBlockState(pos).getBlock(),ticket));
     }
 
     /** Bounded cleanup: cancelled breaks keep their protection; removed/replaced cells release saved data. */
     public static void tickCleanup() {
         for (int i = 0, count = Math.min(CLEANUP_PER_TICK, PENDING.size()); i < count; i++) {
             var pending = PENDING.removeFirst();
+            var data=LOADED.get(pending.level());
+            if(data==null||!data.cleanupTickets.containsKey(pending.position())
+                    ||data.cleanupTickets.get(pending.position())!=pending.ticket())continue;
+            data.cleanupTickets.remove(pending.position());
             var pos = BlockPos.of(pending.position());
             if (!pending.level().hasChunkAt(pos)) continue;
             var current = pending.level().getBlockState(pos);

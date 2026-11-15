@@ -480,6 +480,54 @@ public final class PickaxeGameTests {
             h.assertTrue(!tooltipHasKey(lines,"manual4.tool_profile_detail")&&!tooltipHasKey(lines,"manual4.modes"),"long profile and mode lists belong to the scrollable manual");
         }h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_242") public static void deferredBreakCleanupPreservesAPlayersReplacementBlock(GameTestHelper h){
+        var level=h.getLevel();var at=target(h);var data=PlayerPlacedBlocks.get(level);
+        data.mark(at);PlayerPlacedBlocks.scheduleCleanup(level,at);
+        level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());data.mark(at);PlayerPlacedBlocks.tickCleanup();
+        h.assertTrue(data.contains(at),"a replacement placed before deferred cleanup retains provenance");data.unmark(at);h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_243") public static void cleanupTicketCannotEraseAnUnmarkedThenRemarkedCell(GameTestHelper h){
+        var level=h.getLevel();var at=target(h);var data=PlayerPlacedBlocks.get(level);
+        data.mark(at);PlayerPlacedBlocks.scheduleCleanup(level,at);data.unmark(at);
+        level.setBlockAndUpdate(at,Blocks.ANDESITE.defaultBlockState());data.mark(at);PlayerPlacedBlocks.tickCleanup();
+        h.assertTrue(data.contains(at),"unmark/remark invalidates the former break ticket");data.unmark(at);h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_244") public static void mostRecentBreakTicketOwnsProvenanceCleanup(GameTestHelper h){
+        var level=h.getLevel();var at=target(h);var data=PlayerPlacedBlocks.get(level);
+        data.mark(at);PlayerPlacedBlocks.scheduleCleanup(level,at);
+        level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());PlayerPlacedBlocks.scheduleCleanup(level,at);PlayerPlacedBlocks.tickCleanup();
+        h.assertTrue(data.contains(at),"latest unchanged block wins over the older observed stone");
+        PlayerPlacedBlocks.scheduleCleanup(level,at);level.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());PlayerPlacedBlocks.tickCleanup();
+        h.assertTrue(!data.contains(at),"a later completed break still releases the marker");h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_245") public static void passiveLodeSenseRejectsStackReplacementDuringClaims(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.setPos(wearer.position().add(0,20,0));
+        var drop=new ItemEntity(h.getLevel(),wearer.getX()+3,wearer.getY(),wearer.getZ(),new ItemStack(Items.RAW_IRON));h.getLevel().addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);drop.setDeltaMovement(Vec3.ZERO);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> swap=event->{if(event.player==wearer)drop.setItem(new ItemStack(Items.DIAMOND));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,swap);
+        try{h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&drop.getDeltaMovement().equals(Vec3.ZERO),"permission for an old item stack cannot authorize a replacement");}
+        finally{MinecraftForge.EVENT_BUS.unregister(swap);drop.discard();finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_246") public static void passiveLodeSenseStopsAfterClaimRevokesBuildPermission(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.setPos(wearer.position().add(0,20,0));
+        var drop=new ItemEntity(h.getLevel(),wearer.getX()+3,wearer.getY(),wearer.getZ(),new ItemStack(Items.RAW_IRON));h.getLevel().addFreshEntity(drop);OreDropHighlight.mark(drop,wearer);drop.setDeltaMovement(Vec3.ZERO);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> revoke=event->{if(event.player==wearer)wearer.getAbilities().mayBuild=false;};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,revoke);
+        try{h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&drop.getDeltaMovement().equals(Vec3.ZERO),"revoked actor cannot move loose drops");}
+        finally{MinecraftForge.EVENT_BUS.unregister(revoke);wearer.getAbilities().mayBuild=true;drop.discard();finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_247") public static void passiveLodeSenseCannotRunInAdventureBuildRestriction(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);wearer.getAbilities().mayBuild=false;
+        try{h.assertTrue(OreDropHighlight.drawNearbyDrops(wearer)==0&&!wearer.getPersistentData().contains("specialpickaxesLodeSenseNextAt"),"denied actor neither scans drops nor spends a pull interval");}
+        finally{wearer.getAbilities().mayBuild=true;finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_248") public static void saturatedWireframeBudgetNeverPreventsRegionSelection(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.CRUCIBLE);var tool=wearer.getMainHandItem();var at=target(h);
+        h.assertTrue(ArtifactInteraction.use(wearer,tool,ArtifactKind.CRUCIBLE,false),"regional selection arms");
+        for(int n=0;n<4096&&ArtifactFeedback.reserveMiningParticles(wearer,1);n++){}
+        h.assertTrue(ArtifactInteraction.left(wearer,at,false)&&ArtifactInteraction.left(wearer,at.above(),false)
+                &&ArtifactInteraction.cornerCount(wearer)==2,"denied wireframe particles do not swallow corners or cancel selection");finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

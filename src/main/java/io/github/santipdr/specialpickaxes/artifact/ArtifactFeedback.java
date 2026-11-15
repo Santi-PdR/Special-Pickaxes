@@ -801,6 +801,7 @@ public final class ArtifactFeedback {
         }
     }
     public static void trace(ServerPlayer p,ArtifactKind kind,BlockPos a,BlockPos b) {
+        if(!reserveMiningParticles(p,17))return;
         var start=net.minecraft.world.phys.Vec3.atCenterOf(a);var end=net.minecraft.world.phys.Vec3.atCenterOf(b);
         for(int i=0;i<=16;i++) {
             var point=start.lerp(end,i/16.0);if(!p.serverLevel().hasChunkAt(BlockPos.containing(point))) continue;
@@ -817,6 +818,7 @@ public final class ArtifactFeedback {
         RelicEffects.emit(p,item.kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
     }
     public static void box(ServerPlayer p,ArtifactKind kind,SelectionVolume v,boolean target){
+        if(!reserveMiningParticles(p,84))return;
         int rgb=target?0xffd783:kind.color;var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),0.8F);
         // Fixed packet budget independent of volume. Only the selecting player receives wireframe particles.
         for(int axis=0;axis<3;axis++)for(int a=0;a<2;a++)for(int b=0;b<2;b++)for(int j=0;j<=6;j++){

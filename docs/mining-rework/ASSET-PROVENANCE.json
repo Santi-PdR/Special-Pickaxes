@@ -20,7 +20,9 @@
     "archive": "referencias/PicksOfPower/POP-1.0-1.20.1.jar",
     "entry": "assets/picks_of_power/textures/item/schizo_pickaxe.png",
     "sha256": "eccae34b08471a6684b054adce12826919c5bfa9f7ea057430f7225a3a741b9a",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "eventide_v2.png",
+    "runtime_sha256": "cda5f66371ae4749aa85c155d044f6df124661f4be20efbc0f7283117abaae31"
   },
   {
     "artifact": "paradox_crucible",

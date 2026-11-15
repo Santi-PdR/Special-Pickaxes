@@ -1,3 +1,14 @@
+# 5.10.447 — nueva tanda integral pendiente de CI
+
+La limpieza diferida de procedencia usa tickets: una colocación/recolocación
+invalida el break anterior, sin borrar la protección del bloque nuevo. El mapa
+transitorio sólo conserva posiciones con limpieza pendiente; no se serializa.
+Lode Sense revalida mayBuild/actor y stack exacto tras claims. Wireframes y trazas
+comparten presupuesto cosmético sin impedir selección. Eventide obtiene adaptación
+RGB reproducible 32px, conserva alpha/silueta/original. Siete regresiones nuevas,
+316GameTests esperados. Local24recursos/54Python/parser139Java correctos.
+Sin buildlocal; compilar/servidor/cliente/publicación pendientes de CI.
+
 # Resultado actual — 5.10.446 verificada y publicada como prueba
 
 Fuente `63057f66abb6acd765f2dc5172c3f6fdd02a7c92`.
