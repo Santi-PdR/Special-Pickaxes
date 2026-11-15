@@ -1,3 +1,15 @@
+## Seguridad CI: retirada histórica idempotente, sin fail-open
+
+El run43680877100 falló antes de compilar en withdraw_unvalidated.py; no había
+log exportado de ese paso. No se atribuye una causa concreta sin ese stderr.
+La rutina anterior reescribía todos los Checks históricos ya retirados en cada
+run. Ahora sólo modifica los que aún no tienen el marcador completo, pagina
+más allá de100resultados y exporta verification-withdraw.log también al fallar.
+Reintenta de forma limitada sólo errores transitorios; autenticación o fallo
+persistente siguen bloqueando. Es compatible con gh antiguo sin --slurp.
+Siete Python verifican idempotencia, alcance, paginación y bloqueo de errores.
+Local73Python conPillow/25recursos/parser155Java/diffcheck correctos.
+
 ## Regresión intermitente detectada en CI histórica460
 
 El run43679707143 (commit sólo de documentación2248a09) falló en
