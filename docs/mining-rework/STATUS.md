@@ -1,3 +1,11 @@
+## Corrección de compilación del manual
+
+CI43681067221 confirmó retirada histórica sin escrituras (40Checks,0updates),
+pero detectó dos referencias a campos sustituidos en removed() del manual.
+Corregidas a layoutRevision.invalidate(), igual que init(). El parser local
+sólo comprueba sintaxis, no resolución de símbolos; no sustituye javac/Forge.
+La corrección y464 siguen pendientes de compilación y pruebas completas.
+
 # 5.10.464 — permiso en el ancla de raíces; pendiente de CI
 
 WorldloomSnare ya comprobaba permisos en la posición actual, pero no en el
