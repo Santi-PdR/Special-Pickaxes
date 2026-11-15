@@ -564,6 +564,30 @@ public final class PickaxeGameTests {
         MinecraftForge.EVENT_BUS.post(new BlockEvent.EntityMultiPlaceEvent(snapshots,Blocks.STONE.defaultBlockState(),wearer));
         h.assertTrue(data.contains(a)&&!data.contains(b)&&!data.contains(c),"multi-place uses the same inert bookkeeping exclusions for every cell");data.unmark(a);level.setBlockAndUpdate(c,Blocks.AIR.defaultBlockState());finish(h,wearer);
     }
+    @GameTest(template="empty",batch="rework_each_254") public static void paidPlacementRejectsCreativeToSurvivalInsidePlaceEvent(GameTestHelper h){paidPlacementModeChange(h,true,false);}
+    @GameTest(template="empty",batch="rework_each_255") public static void paidPlacementRejectsSurvivalToCreativeInsidePlaceEvent(GameTestHelper h){paidPlacementModeChange(h,false,false);}
+    @GameTest(template="empty",batch="rework_each_256") public static void paidPlacementRejectsCreativeToSurvivalInsideClaim(GameTestHelper h){paidPlacementModeChange(h,true,true);}
+    @GameTest(template="empty",batch="rework_each_257") public static void paidPlacementRejectsSurvivalToCreativeInsideClaim(GameTestHelper h){paidPlacementModeChange(h,false,true);}
+    private static void paidPlacementModeChange(GameTestHelper h,boolean creative,boolean duringClaim){
+        var wearer=player(h,ArtifactKind.WORLDLOOM);wearer.gameMode.changeGameModeForPlayer(creative?GameType.CREATIVE:GameType.SURVIVAL);
+        var at=target(h).above(10);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());var payment=new ItemStack(Blocks.STONE,3);wearer.setItemInHand(InteractionHand.OFF_HAND,payment);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> claim=event->{if(duringClaim&&event.player==wearer)wearer.gameMode.changeGameModeForPlayer(creative?GameType.SURVIVAL:GameType.CREATIVE);};
+        Consumer<BlockEvent.EntityPlaceEvent> place=event->{if(!duringClaim&&event.getEntity()==wearer)wearer.gameMode.changeGameModeForPlayer(creative?GameType.SURVIVAL:GameType.CREATIVE);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,claim);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,place);
+        try{h.assertTrue(!WorldSafety.placePaidOffhand(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM,at,Blocks.STONE.defaultBlockState())
+                &&h.getLevel().getBlockState(at).isAir()&&payment.getCount()==3,"gamemode changes abort the payment transaction without a free block, negative slot access or lost material");}
+        finally{MinecraftForge.EVENT_BUS.unregister(claim);MinecraftForge.EVENT_BUS.unregister(place);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);wearer.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_258") public static void seamDiscoveryCannotTraverseNewPlacementMarkedDuringClaims(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.SEAM_RIPPER);var level=h.getLevel();var at=target(h).above(20);var next=at.east();var state=Blocks.GRANITE.defaultBlockState();
+        for(var pos:List.of(at,next)){level.setBlockAndUpdate(pos,state);PlayerPlacedBlocks.get(level).unmark(pos);}
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> mark=event->{if(event.player==wearer&&event.target.equals(at))PlayerPlacedBlocks.get(level).mark(at);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,mark);
+        try{h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.SEAM_RIPPER,new SeamMiningProgram(at,state)),"discovery starts");drain(wearer);
+            h.assertTrue(level.getBlockState(at)==state&&level.getBlockState(next)==state,"newly placed origin is not admitted as a bridge to another natural block");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(level).unmark(at);finish(h,wearer);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

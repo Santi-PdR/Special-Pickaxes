@@ -52,9 +52,10 @@ public final class SeamMiningProgram implements WorkProgram {
             return new WorkStep(){
                 @Override public BlockPos pos(){return pos;}
                 @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-                    var level=actor.serverLevel();
+                    var level=actor.serverLevel();var context=HeldUtilityContext.capture(actor,tool);
                     if(!level.hasChunkAt(pos)||PlayerPlacedBlocks.get(level).contains(pos)||!MiningDesigns.seamGeology(material)
-                            ||!WorldSafety.allowed(actor,ArtifactKind.SEAM_RIPPER,pos)||level.getBlockState(pos)!=material)return false;
+                            ||!WorldSafety.allowed(actor,ArtifactKind.SEAM_RIPPER,pos)||!context.valid()
+                            ||!level.hasChunkAt(pos)||level.getBlockState(pos)!=material||PlayerPlacedBlocks.get(level).contains(pos))return false;
                     if(candidates.size()<MINING_LIMIT)candidates.add(new Candidate(pos,material));
                     for(var offset:NEIGHBOR_OFFSETS){
                         var adjacent=pos.offset(offset.getX(),offset.getY(),offset.getZ());

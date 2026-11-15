@@ -1,3 +1,15 @@
+# 5.10.451 — construcción y descubrimiento: pendiente de CI
+
+Una transacción de colocación pagada conserva el estado creativo inicial y rechaza
+cambios durante claims o eventos de colocación. Evita material gratuito al pasar
+a creativo y consultar el slot -1 al pasar de creativo a supervivencia. Cuatro
+regresiones cubren ambas direcciones y ambas fases sin perder material.
+El descubrimiento de Seam Ripper revalida actor y procedencia después del claim:
+un bloque recién marcado no sirve de puente para descubrir terreno detrás.
+Una regresión adicional; 326 GameTests y 97 JUnit esperados, no confirmados aún.
+Local: 24 recursos, 61 Python con Pillow, parser de 141 Java y diffcheck correctos.
+Sin build local ni automatización de interfaz local; última verificada: 450.
+
 # Resultado actual: 5.10.450 verificada y publicada como prueba
 
 - **Fuente:** `b1f495880c1debcc029422e3841120b52992e9a9`.

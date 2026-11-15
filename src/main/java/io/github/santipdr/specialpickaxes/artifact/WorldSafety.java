@@ -138,8 +138,8 @@ public final class WorldSafety {
         return placePaid(p,tool,kind,pos,state,true);
     }
     private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly) {
-        var level=p.serverLevel();var origin=p.position();
-        if(!allowed(p,kind,pos) || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
+        var level=p.serverLevel();var origin=p.position();boolean creativeAtStart=p.isCreative();
+        if(!allowed(p,kind,pos) || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             int first=offhandOnly?p.getInventory().getContainerSize()-1:0;
@@ -154,7 +154,7 @@ public final class WorldSafety {
         boolean accepted=false;
         try {
             if(!level.setBlock(pos,state,2) || ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP)
-                    || !sameActor(p,level,origin,tool,pos) || !level.hasChunkAt(pos) || level.getBlockState(pos)!=state) return false;
+                    || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || !level.hasChunkAt(pos) || level.getBlockState(pos)!=state) return false;
             if(!p.isCreative()) {
                 // A listener may replace/remove the payment stack. Never place for free after such a change.
                 if(p.getInventory().getItem(paymentSlot)!=payment || payment.isEmpty()
