@@ -349,8 +349,8 @@ public final class PickaxeGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
     }
     private static void pullRejectsChangedContext(GameTestHelper h,ArtifactKind kind,int mutation){
-        var wearer=player(h,kind);wearer.setPos(wearer.position().add(0,40,0));var level=h.getLevel();var tool=wearer.getMainHandItem();
-        for(var prior:level.getEntitiesOfClass(ItemEntity.class,wearer.getBoundingBox().inflate(20)))prior.discard();
+        var wearer=player(h,kind);wearer.setPos(wearer.position().add(0,100,0));var level=h.getLevel();var tool=wearer.getMainHandItem();
+        for(var prior:level.getEntitiesOfClass(ItemEntity.class,wearer.getBoundingBox().inflate(50)))prior.discard();
         var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
         if(kind==ArtifactKind.IRIDIUM)OreDropHighlight.mark(drop,wearer);var at=drop.blockPosition();int[] calls={0};
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=event->{
@@ -3687,7 +3687,14 @@ public final class PickaxeGameTests {
         var seed=h.getLevel().getBlockState(center);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.AXIOM,center),harvestable=WorldSafety.harvestable(p,p.getMainHandItem(),center);
         boolean activated=ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false);
-        h.assertTrue(activated,"axiom activation (ray="+rayTarget+", center="+center+", allowed="+allowed+", matrix="+MiningDesigns.matrix(seed)+", ore="+ArtifactOres.isOre(seed)+", placed="+PlayerPlacedBlocks.get(p.serverLevel()).contains(center)+", harvestable="+harvestable+")");for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(activated,"axiom activation (ray="+rayTarget+", center="+center+", allowed="+allowed+", matrix="+MiningDesigns.matrix(seed)+", ore="+ArtifactOres.isOre(seed)+", placed="+PlayerPlacedBlocks.get(p.serverLevel()).contains(center)+", harvestable="+harvestable+")");
+        // Manual scheduler ticks do not tick item entities: model loot collection here, rather
+        // than bypassing the production drop-pressure pause or filling it with unmerged drops.
+        for(int tick=0;tick<2000&&WorkQueue.busy(p);tick++){
+            for(var drop:h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(center).inflate(22)))drop.discard();
+            if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+            WorkQueue.tick();
+        }
         h.assertTrue(h.getLevel().getBlockState(matrix).isAir(),"matrix removed at configured shell (radius="+ArtifactConfig.MAX_RADIUS.get()+", matrix="+matrix+", state="+h.getLevel().getBlockState(matrix)+", marked="+placed.contains(matrix)+", work="+WorkQueue.remaining(p)+", status="+WorkQueue.status(p)+")");
         h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE) && h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"hollow core and ore preserved");finish(h,p);
     }

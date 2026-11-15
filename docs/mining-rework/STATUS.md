@@ -1,3 +1,14 @@
+## Diagnóstico de la segunda regresión Axiom
+
+CI43733112154 mostró status=paused y885pasos pendientes: el scheduler se
+había detenido correctamente por acumulación de drops en el test de ticks
+manuales sin tick de entidades (sin merge/recogida). La prueba ahora modela
+recogida entre turnos y reanuda por el control normal, sin subir ni quitar el
+límite de256drops. El radio ampliado de Eventide también requería aislar el
+fixture negativo de botín a100bloques de altura y limpiar todo su radio50,
+no solo20. Conserva rechazo/cooldown/durabilidad y contexto mutado intactos.
+Los runs fallidos no se consideran aprobación de5.11.0.
+
 ## Primera compilación5.11.0:129JUnit correctos; dos expectativas históricas actualizadas
 
 CI43731818984 compiló y pasó129JUnit. GameTests detectó dos contratos antiguos:
