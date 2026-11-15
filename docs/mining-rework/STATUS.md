@@ -1,3 +1,16 @@
+# 5.10.450 — validación repetida y evidencias por intento, pendiente de CI
+
+449/run43666174413 pasó97JUnit(cero fallos/errores/skips),321GameTests y
+servidor empaquetado. Cliente completó escenas/controles/WorldShatter9341pero
+logs detectaron AuthenticationUnavailableException al contactar servicio externo
+Minecraft. No se ignora el error ni se certifica449verde. Se repite CI íntegro.
+
+Exportación Checks identifica intento; recuperación selecciona un conjunto completo
+por intento/digest, nunca mezcla chunks ni cae a evidencia vieja si el intento más
+reciente está incompleto. Compatible con exports históricos, siete regresiones
+Python y límite de128chunks. Local24recursos/61Python pasan conPillow; sinPillow
+60pasan/1skip(rendereropcional). Runtimegameplayidéntico449,versión450.
+
 # 5.10.449 — colocación múltiple Forge, pendiente de CI
 
 EntityMultiPlaceEvent hereda EntityPlaceEvent, pero getPos sólo cubre la primera

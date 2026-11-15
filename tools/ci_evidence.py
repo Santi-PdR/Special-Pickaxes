@@ -28,7 +28,7 @@ print(f'Exporting {len(manifest)} files, {len(data)} compressed bytes in {len(ch
 for i,chunk in enumerate(chunks):
  payload={'name':f'Build evidence {i+1:02d}/{len(chunks):02d}', 'head_sha':os.environ['GITHUB_SHA'],
   'status':'completed','conclusion':'neutral','output':{'title':'Downloadable build and verification evidence',
-   'summary':f'Run {os.environ["GITHUB_RUN_ID"]}. ZIP base64 chunk {i+1}/{len(chunks)}. SHA256(zip): {hashlib.sha256(data).hexdigest()}',
+   'summary':f'Run {os.environ["GITHUB_RUN_ID"]}. Attempt {os.environ.get("GITHUB_RUN_ATTEMPT","1")}. ZIP base64 chunk {i+1}/{len(chunks)}. SHA256(zip): {hashlib.sha256(data).hexdigest()}',
    'text':'```base64\n'+chunk+'\n```'}}
  # Content-creation endpoints have separate secondary limits from the core API quota.
  for attempt in range(4):
