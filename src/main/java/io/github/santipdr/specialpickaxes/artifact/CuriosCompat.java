@@ -61,13 +61,16 @@ public final class CuriosCompat {
     private static Equipped findUncached(LivingEntity entity,Access methods) {
         try {
             Object lazy = methods.inventory.invoke(null, entity);
-            Object handler = lazy == null ? null : ((net.minecraftforge.common.util.LazyOptional<?>) lazy).orElse(null);
+            Object handler = lazy instanceof net.minecraftforge.common.util.LazyOptional<?> inventory ? inventory.orElse(null) : null;
             if (handler == null) return null;
             Object stacksOptional = methods.stacksHandler.invoke(handler, "pickaxe");
             Object stacksHandler = optionalValue(stacksOptional);
             if (stacksHandler == null) return null;
             Object stacks = methods.stacks.invoke(stacksHandler);
-            int count = (int) methods.slots.invoke(stacks);
+            if(stacks==null)return null;
+            Object reported=methods.slots.invoke(stacks);
+            if(!(reported instanceof Integer slots))return null;
+            int count = CurioSlotScan.limit(slots);
             for (int slot = 0; slot < count; slot++) {
                 Object value = methods.stackInSlot.invoke(stacks, slot);
                 if (value instanceof ItemStack stack && !stack.isEmpty() && stack.getItem() instanceof ArtifactItem) return new Equipped(stack, slot);

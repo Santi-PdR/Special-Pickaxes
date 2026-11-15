@@ -1,3 +1,12 @@
+## Límite defensivo del puente opcional en 5.10.460
+
+La ranura Curios `pickaxe` tiene tamaño1 en los recursos del mod. Si otro
+proveedor la amplía, el puente inspecciona como máximo las primeras64entradas;
+no encuentra picos que sólo estén después de ese límite. Rechaza respuestas
+null o tipos incompatibles en las fronteras comprobadas. Se mantienen el caché
+cosmético por tick y las consultas frescas en eventos/transacciones. Este límite
+y la identidad de equipo tienen pruebas puras; eso no certifica un Curios real.
+
 ## Revisión 5.10.459 — pendiente de CI
 
 La minería diferida Curios lee la fuente actual de la ranura, sin aceptar

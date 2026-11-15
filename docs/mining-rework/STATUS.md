@@ -14,8 +14,12 @@ con referencia/alpha/silueta preservados. Los créditos distinguen ahora el
 redibujo histórico Worldbreaker de su adaptación runtime actual, eliminando
 la afirmación contradictoria. No cambia daño, recetas ni secundarias.
 
-Incluye459. Esperados114JUnit/358GameTests. Local25recursos/63Python conPillow,
-parser148Java/secrets/diffcheck correctos; no build local. CI pendiente.
+El puente opcional ignora respuestas incompatibles/null del proveedor en vez
+de hacer casts ciegos, y limita el escaneo de la ranura pickaxe a64entradas
+(el slot predeterminado sigue siendo1). Tres JUnit cubren límites normales,
+negativos y extremos. Incluye459. Esperados117JUnit/358GameTests. Local25recursos/
+63Python conPillow/parser150Java/secrets/diffcheck correctos; no build local.
+CI pendiente.
 
 # 5.10.459 — equipo diferido y firmas adicionales seguras; pendiente de CI
 
