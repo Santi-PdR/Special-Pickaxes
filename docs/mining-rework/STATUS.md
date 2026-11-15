@@ -1,3 +1,18 @@
+## 5.11.0 — validación verde confirmada
+
+- Commit probado: `9ca5fa1a16244697aab6baccbeb37f68178acffd`.
+- CI: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43735290477 — success.
+- 129JUnit, sin fallos/errores/omitidos;385GameTests requeridos aprobados.
+- Cliente real, controles reasignados, tooltips y servidor empaquetado: pasos CI aprobados.
+- Galería de13páginas/26imágenes generada a partir de capturas y recursos verificados.
+- JAR: `special-pickaxes-1.20.1-5.11.0.jar`,572854bytes.
+- SHA256: `c4eb4acf51f8ebc7e8ad3292f4a003238968b68ff429dcb2f360096b56a98643`.
+- Descarga autenticada temporal (7días): https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43735290477/artifacts/14170384567
+- Sin release público nuevo. Autenticación no equivale a permiso de redistribución de assets.
+- No valida Windows/Ghouls, todas las animaciones, ni aprobación estética. Manual
+  simplificado; su revisión visual completa y mejoras específicas de Icarus/Iridium
+  siguen pendientes. Buffs compartidos sí integrados. No afirmar rediseño total terminado.
+
 ## Cliente real detectó una regresión de traducción
 
 CI43733821509 llegó al cliente gráfico tras las pruebas de servidor, pero su
