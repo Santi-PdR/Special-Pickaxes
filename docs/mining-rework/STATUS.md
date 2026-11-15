@@ -1,3 +1,20 @@
+# 5.10.461 — entregas de auras coherentes; pendiente de CI
+
+AuraShareContext congela el nivel y posición del portador y revalida cada
+aliado antes/después de callbacks de efectos. Once auras compartidas ya no
+continúan una selección vieja si el portador se mueve, un aliado sale del
+rango, cambia su relación o deja de ser elegible. Stasis comprueba de nuevo
+entre absorción y ward; Heartwood entre renovación y alimento. Icarus exige
+que ambos sigan en el aire. La parte ya autorizada no se revierte arbitrariamente.
+El tick completo tampoco sigue al portador movido al conceder Night Vision o
+su firma propia. Los enlaces de éxito exigen que el efecto se haya concedido.
+
+Seis GameTests nuevos cubren movimiento del destinatario/portador, concesión
+doble, salida de rango y veto real de MobEffectEvent.Applicable sin enlace
+engañoso ni gasto cosmético. Esperados117JUnit/364GameTests; sin build local.
+Local25recursos/66Python conPillow/parser151Java/secrets/diffcheck correctos.
+No añade ataques, daño, recetas ni cambios en las secundarias mineras.
+
 ## Entrega verificada 5.10.460
 
 - Fuente runtime: `c39a7b9df7bceee184ff3f264571e7108421a508`.

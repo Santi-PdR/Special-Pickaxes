@@ -239,59 +239,81 @@ public final class ArtifactPassives {
     }
 
     public static void tick(ServerPlayer player, ArtifactKind kind) {
+        var ownerContext=AuraShareContext.capture(player,36D);
+        if(!ownerContext.ownerValid())return;
         grantNightVision(player);
+        if(!ownerContext.ownerValid())return;
         switch (kind) {
-            case PALIMPSEST -> { grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get(), 0, PASSIVE_LEASE_TICKS); grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS); }
+            case PALIMPSEST -> {
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_MENDING.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
+                grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
+            }
             case CHOIR -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareChoirMiningFocus(player);
             }
             case EVENTIDE -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareGraviticBalance(player);
             }
             // Keep the thermal ward leased before contact so its attack hook can cancel the first lava/fire tick.
             case CRUCIBLE -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareCrucibleMantle(player);
             }
             case INTERREGNUM -> {
                 grantAbsorption(player,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareStasisWard(player);
             }
             case WORLDLOOM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 sustain(player);
                 shareHeartwood(player);
             }
             case ICARUS -> {
                 if(!player.onGround()){
                     grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                     shareIcarianMomentum(player);
                 }
                 else removeLease(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get());
             }
             case AXIOM -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareNullVeil(player);
             }
             case WORLDBREAKER -> {
                 grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get(),0,PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareWorldbreakerAegis(player);
             }
             case EXODIUM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_WARD.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareStarfallGuard(player);
             }
             case IRIDIUM -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 OreDropHighlight.drawNearbyDrops(player);
             }
             case HELLSPEC -> {
                 grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get(), 0, PASSIVE_LEASE_TICKS);
+                if(!ownerContext.ownerValid())return;
                 shareSearingShell(player);
             }
             case SEAM_RIPPER -> grant(player, io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get(), 1, PASSIVE_LEASE_TICKS);
@@ -468,15 +490,20 @@ public final class ArtifactPassives {
     private static void shareStasisWard(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.INTERREGNUM,"stasisAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,8,256);
         var ward=io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyAnchored=!ally.hasEffect(ward);
             grantAbsorption(ally,PASSIVE_LEASE_TICKS);
+            if(!recipient.valid())continue;
             grant(ally,ward,0,PASSIVE_LEASE_TICKS);
-            if(newlyAnchored)ArtifactFeedback.stasisWardLink(owner,ally);
+            if(newlyAnchored&&recipient.valid()&&ally.hasEffect(ward))ArtifactFeedback.stasisWardLink(owner,ally);
         }
     }
 
@@ -484,14 +511,18 @@ public final class ArtifactPassives {
     private static void shareGraviticBalance(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.EVENTIDE,"eventideBalanceAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var balance=io.github.santipdr.specialpickaxes.SpecialPickaxes.GRAVITIC_BALANCE.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyAnchored=!ally.hasEffect(balance);
             grant(ally,balance,0,PASSIVE_LEASE_TICKS);
-            if(newlyAnchored)ArtifactFeedback.graviticBalanceLink(owner,ally);
+            if(newlyAnchored&&recipient.valid()&&ally.hasEffect(balance))ArtifactFeedback.graviticBalanceLink(owner,ally);
         }
     }
 
@@ -499,15 +530,20 @@ public final class ArtifactPassives {
     private static void shareHeartwood(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.WORLDLOOM,"heartwoodAuraScanAt"))return;
         var center=owner.position();double rangeSqr=25D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(5),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,4,128);
         var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyRenewed=!ally.hasEffect(renewal);
             grant(ally,renewal,0,PASSIVE_LEASE_TICKS);
+            if(!recipient.valid())continue;
             sustain(ally);
-            if(newlyRenewed)ArtifactFeedback.heartwoodRenewalLink(owner,ally);
+            if(newlyRenewed&&recipient.valid()&&ally.hasEffect(renewal))ArtifactFeedback.heartwoodRenewalLink(owner,ally);
         }
     }
 
@@ -515,14 +551,18 @@ public final class ArtifactPassives {
     private static void shareChoirMiningFocus(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.CHOIR,"choirMiningAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var focus=io.github.santipdr.specialpickaxes.SpecialPickaxes.STRATA_FOCUS.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyFocused=!ally.hasEffect(focus);
             grant(ally,focus,0,PASSIVE_LEASE_TICKS);
-            if(newlyFocused)ArtifactFeedback.choirMiningLink(owner,ally);
+            if(newlyFocused&&recipient.valid()&&ally.hasEffect(focus))ArtifactFeedback.choirMiningLink(owner,ally);
         }
     }
 
@@ -530,14 +570,18 @@ public final class ArtifactPassives {
     private static void shareNullVeil(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.AXIOM,"axiomNullVeilAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var veil=io.github.santipdr.specialpickaxes.SpecialPickaxes.NULL_VEIL.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyVeiled=!ally.hasEffect(veil);
             grant(ally,veil,0,PASSIVE_LEASE_TICKS);
-            if(newlyVeiled&&ally.hasEffect(veil))ArtifactFeedback.nullVeilLink(owner,ally);
+            if(newlyVeiled&&recipient.valid()&&ally.hasEffect(veil))ArtifactFeedback.nullVeilLink(owner,ally);
         }
     }
 
@@ -545,14 +589,18 @@ public final class ArtifactPassives {
     private static void shareCrucibleMantle(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.CRUCIBLE,"crucibleMantleAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var mantle=io.github.santipdr.specialpickaxes.SpecialPickaxes.CRUCIBLE_MANTLE.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyShielded=!ally.hasEffect(mantle);
             grant(ally,mantle,0,PASSIVE_LEASE_TICKS);
-            if(newlyShielded&&ally.hasEffect(mantle))ArtifactFeedback.crucibleMantleLink(owner,ally);
+            if(newlyShielded&&recipient.valid()&&ally.hasEffect(mantle))ArtifactFeedback.crucibleMantleLink(owner,ally);
         }
     }
 
@@ -560,14 +608,18 @@ public final class ArtifactPassives {
     private static void shareSearingShell(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.HELLSPEC,"hellspecSearingAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var shell=io.github.santipdr.specialpickaxes.SpecialPickaxes.SEARING_SHELL.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyShielded=!ally.hasEffect(shell);
             grant(ally,shell,0,PASSIVE_LEASE_TICKS);
-            if(newlyShielded&&ally.hasEffect(shell))ArtifactFeedback.searingShellLink(owner,ally);
+            if(newlyShielded&&recipient.valid()&&ally.hasEffect(shell))ArtifactFeedback.searingShellLink(owner,ally);
         }
     }
 
@@ -575,14 +627,18 @@ public final class ArtifactPassives {
     private static void shareWorldbreakerAegis(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.WORLDBREAKER,"worldbreakerAuraScanAt"))return;
         var center=owner.position();double rangeSqr=25D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(5),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var aegis=io.github.santipdr.specialpickaxes.SpecialPickaxes.WORLDBREAKER_AEGIS.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyAnchored=!ally.hasEffect(aegis);
             grant(ally,aegis,0,PASSIVE_LEASE_TICKS);
-            if(newlyAnchored&&ally.hasEffect(aegis))ArtifactFeedback.worldbreakerAegisLink(owner,ally);
+            if(newlyAnchored&&recipient.valid()&&ally.hasEffect(aegis))ArtifactFeedback.worldbreakerAegisLink(owner,ally);
         }
     }
 
@@ -590,44 +646,57 @@ public final class ArtifactPassives {
     private static void shareStarfallGuard(ServerPlayer owner){
         if(!allyAuraScanDue(owner,ArtifactKind.EXODIUM,"starfallAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var guard=io.github.santipdr.specialpickaxes.SpecialPickaxes.STARFALL_GUARD.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyGuarded=!ally.hasEffect(guard);
             grant(ally,guard,0,PASSIVE_LEASE_TICKS);
-            if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.starfallGuardLink(owner,ally);
+            if(newlyGuarded&&recipient.valid()&&ally.hasEffect(guard))ArtifactFeedback.starfallGuardLink(owner,ally);
         }
     }
 
     /** Iridium's Curios counter lends its four-second crystal armor ward to up to three nearby allies. */
     private static void shareLodeguard(ServerPlayer owner){
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&ally.isAlliedTo(owner)&&ally.distanceToSqr(center)<=rangeSqr,
                 center,3,128);
         var guard=io.github.santipdr.specialpickaxes.SpecialPickaxes.LODEGUARD.get();
         for(var ally:allies){
+            if(!context.ownerValid())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid())continue;
             boolean newlyGuarded=!ally.hasEffect(guard);
             grantCombatEffect(ally,guard,0,80);
-            if(newlyGuarded&&ally.hasEffect(guard))ArtifactFeedback.lodeguardLink(owner,ally);
+            if(newlyGuarded&&recipient.valid()&&ally.hasEffect(guard))ArtifactFeedback.lodeguardLink(owner,ally);
         }
     }
 
     /** An airborne Icarus wearer lends a brief controlled glide to two nearest airborne teammates. */
     private static void shareIcarianMomentum(ServerPlayer owner){
+        if(owner.onGround())return;
         if(!allyAuraScanDue(owner,ArtifactKind.ICARUS,"icarianWindAuraScanAt"))return;
         var center=owner.position();double rangeSqr=36D;
+        var context=AuraShareContext.capture(owner,rangeSqr);
         var allies=EntitySelection.nearest(owner.serverLevel(),ServerPlayer.class,owner.getBoundingBox().inflate(6),ally->
                 ally!=owner&&ally.isAlive()&&!ally.onGround()&&ally.isAlliedTo(owner)
                         &&ally.distanceToSqr(center)<=rangeSqr,
                 center,2,128);
         var glide=io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get();
         for(var ally:allies){
+            if(!context.ownerValid()||owner.onGround())return;
+            var recipient=context.recipient(ally);
+            if(!recipient.valid()||ally.onGround())continue;
             boolean newlyLifted=!ally.hasEffect(glide);
             grantCombatEffect(ally,glide,0,PASSIVE_LEASE_TICKS);
-            if(newlyLifted&&ally.hasEffect(glide))ArtifactFeedback.icarianWindLink(owner,ally);
+            if(newlyLifted&&!owner.onGround()&&!ally.onGround()&&recipient.valid()&&ally.hasEffect(glide))ArtifactFeedback.icarianWindLink(owner,ally);
         }
     }
 

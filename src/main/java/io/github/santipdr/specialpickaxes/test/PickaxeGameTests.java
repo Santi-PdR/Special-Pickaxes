@@ -869,6 +869,55 @@ public final class PickaxeGameTests {
         try{MiningObservations.flush();h.assertTrue(callbacks[0]==1&&!ally.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"effect callback invalidation stops sharing and ownership of pending drops");
         }finally{MinecraftForge.EVENT_BUS.unregister(change);board.removePlayerTeam(team);finish(h,ally);finish(h,p);}
     }
+    private static net.minecraft.world.scores.PlayerTeam auraTeam(GameTestHelper h,ServerPlayer owner,ServerPlayer... allies){
+        var board=h.getLevel().getScoreboard();var team=board.addPlayerTeam("aura_"+owner.getUUID().toString().substring(0,6));
+        board.addPlayerToTeam(owner.getScoreboardName(),team);
+        for(int i=0;i<allies.length;i++){var ally=allies[i];board.addPlayerToTeam(ally.getScoreboardName(),team);ally.setPos(owner.position().add(i+2,0,0));h.getLevel().addFreshEntity(ally);}
+        return team;
+    }
+    @GameTest(template="empty",batch="rework_each_291") public static void heartwoodDoesNotFeedAnAllyMovedDuringRenewalGrant(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var ally=player(h,ArtifactKind.ICARUS,"MovingRenewal");var team=auraTeam(h,p,ally);ally.getFoodData().setFoodLevel(10);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==ally&&e.getEffectInstance().getEffect()==SpecialPickaxes.HEARTWOOD_RENEWAL.get()){calls[0]++;ally.setPos(ally.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{ArtifactPassives.tick(p,ArtifactKind.WORLDLOOM);h.assertTrue(calls[0]==1&&ally.getFoodData().getFoodLevel()==10,"renewal callback movement prevents the pending sustain handoff");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_292") public static void stasisDoesNotAddASecondWardAfterAbsorptionMovesItsAlly(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var ally=player(h,ArtifactKind.ICARUS,"MovingAbsorption");var team=auraTeam(h,p,ally);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==ally&&e.getEffectInstance().getEffect()==MobEffects.ABSORPTION){calls[0]++;ally.setPos(ally.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{ArtifactPassives.tick(p,ArtifactKind.INTERREGNUM);h.assertTrue(calls[0]==1&&!ally.hasEffect(SpecialPickaxes.STASIS_WARD.get()),"a moved recipient cannot receive the transaction's second effect");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_293") public static void choirStopsItsRemainingHandoffsWhenTheOwnerMoves(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var first=player(h,ArtifactKind.ICARUS,"FirstFocus");var second=player(h,ArtifactKind.ICARUS,"SecondFocus");var team=auraTeam(h,p,first,second);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==first&&e.getEffectInstance().getEffect()==SpecialPickaxes.STRATA_FOCUS.get()){calls[0]++;p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{ArtifactPassives.tick(p,ArtifactKind.CHOIR);h.assertTrue(calls[0]==1&&first.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&!second.hasEffect(SpecialPickaxes.STRATA_FOCUS.get()),"already authorized first grant remains, but the moved bearer cannot continue the old selection");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_294") public static void aPassiveTickDoesNotFollowItsOwnerMovedDuringNightVision(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var ally=player(h,ArtifactKind.ICARUS,"NightVisionAlly");var team=auraTeam(h,p,ally);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==MobEffects.NIGHT_VISION){calls[0]++;p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{ArtifactPassives.tick(p,ArtifactKind.CHOIR);h.assertTrue(calls[0]==1&&!p.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&!ally.hasEffect(SpecialPickaxes.STRATA_FOCUS.get()),"the rest of a passive tick cannot resume at an externally chosen location");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_295") public static void aDeniedChoirGrantDoesNotDrawASuccessfulLink(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var ally=player(h,ArtifactKind.ICARUS,"DeniedFocus");var team=auraTeam(h,p,ally);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Applicable> deny=e->{if(e.getEntity()==ally&&e.getEffectInstance().getEffect()==SpecialPickaxes.STRATA_FOCUS.get()){calls[0]++;e.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Applicable.class,deny);
+        ArtifactFeedback.reserveAuraParticles((long)p.server.getTickCount()+10000,1,1);
+        try{ArtifactPassives.tick(p,ArtifactKind.CHOIR);h.assertTrue(calls[0]>0&&!ally.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&ArtifactFeedback.reserveMiningParticles(p,4096),"vetoed focus emits no misleading success thread or particle debit");
+        }finally{MinecraftForge.EVENT_BUS.unregister(deny);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_296") public static void aSelectedAllyMovedOutOfRangeBeforeItsTurnReceivesNoAura(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var first=player(h,ArtifactKind.ICARUS,"RangeFirst");var second=player(h,ArtifactKind.ICARUS,"RangeSecond");var team=auraTeam(h,p,first,second);int[] calls={0};
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==first&&e.getEffectInstance().getEffect()==SpecialPickaxes.STRATA_FOCUS.get()){calls[0]++;second.setPos(second.position().add(20,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{ArtifactPassives.tick(p,ArtifactKind.CHOIR);h.assertTrue(calls[0]==1&&!second.hasEffect(SpecialPickaxes.STRATA_FOCUS.get()),"a bounded nearest-first query is revalidated before each later grant");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);}finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
