@@ -491,7 +491,7 @@
   "manual4.cost_detail": "%s: desgaste %s · %s s. %s: desgaste %s · %s s.",
   "alternate.detail.specialpickaxes.palimpsest": "Sondea las 32 menas naturales cargadas más cercanas al bloque apuntado en un cubo de radio 6. Señala partículas e indica en el chat las coordenadas de la más cercana, incluso enterrada. No rompe bloques ni revela menas protegidas por claims.",
   "alternate.detail.specialpickaxes.fault_choir": "Excava una galería abovedada de hasta siete bloques de ancho, cinco de alto y24de largo.",
-  "alternate.detail.specialpickaxes.eventide": "Atrae hasta256objetos libres o propios en48bloques. No roba botín reservado.",
+  "alternate.detail.specialpickaxes.eventide": "Pulsa %3$s para atraer hasta256objetos libres o propios en48bloques. %1$s ancla el campo gravitatorio. No roba botín reservado.",
   "alternate.detail.specialpickaxes.paradox_crucible": "Transmuta una esfera de roca natural de radio12 al material elegido, por turnos en el servidor.",
   "alternate.detail.specialpickaxes.interregnum": "Excava un volumen de 11×11×11 de roca natural y mena. Conserva los drops normales y respeta construcciones y protecciones.",
   "alternate.detail.specialpickaxes.worldloom": "Construye un puente recto de hasta32bloques, pagado solo con la mano secundaria. Se detiene ante obstáculos o falta de material.",

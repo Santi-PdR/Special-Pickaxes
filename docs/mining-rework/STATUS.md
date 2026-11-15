@@ -1,3 +1,13 @@
+## Cliente real detectó una regresión de traducción
+
+CI43733821509 llegó al cliente gráfico tras las pruebas de servidor, pero su
+comprobación de teclas reasignadas detectó que la nueva descripción ampliada
+Eventide había perdido%1$s/%3$s. Restaurados ambos controles dinámicos, sin
+volver a la prosa larga del manual. Nuevo Python cubre los dos idiomas.
+El fallo se repitió por frame y el ZIP comprimido superó128MiBdescomprimido:
+el extractor mantuvo su límite y se usó el Check de diagnóstico acotado,
+sin elevar presupuestos ni declarar aprobado el run fallido. Nueva CI pendiente.
+
 ## Diagnóstico de la segunda regresión Axiom
 
 CI43733112154 mostró status=paused y885pasos pendientes: el scheduler se

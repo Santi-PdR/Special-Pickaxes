@@ -491,7 +491,7 @@
   "manual4.cost_detail": "%s: durability %s · %s s. %s: durability %s · %s s.",
   "alternate.detail.specialpickaxes.palimpsest": "Surveys the 32 nearest loaded natural ore cells in a six-block cube around the aimed block. Shows particles and posts the nearest coordinates in chat, even if buried. Does not break blocks or disclose claim-denied ore.",
   "alternate.detail.specialpickaxes.fault_choir": "Excavates a vaulted gallery up to seven blocks wide, five high and24forward.",
-  "alternate.detail.specialpickaxes.eventide": "Draws up to256unclaimed or owned items within48blocks toward you. Never steals reserved loot.",
+  "alternate.detail.specialpickaxes.eventide": "Press %3$s to pull up to256unclaimed or owned items within48blocks. %1$s anchors the Gravity Field. Reserved loot is untouched.",
   "alternate.detail.specialpickaxes.paradox_crucible": "Transmutes a natural rock sphere of radius12 into the selected material, queued on the server.",
   "alternate.detail.specialpickaxes.interregnum": "Excavates an 11×11×11 volume of natural rock and ore. Normal drops, placed-block protection and claim checks remain active.",
   "alternate.detail.specialpickaxes.worldloom": "Builds a straight bridge up to32blocks long, paid only from the offhand. Stops at obstacles or missing material.",

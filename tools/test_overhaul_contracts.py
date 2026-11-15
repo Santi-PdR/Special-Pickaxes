@@ -61,3 +61,10 @@ class OverhaulContracts(unittest.TestCase):
         self.assertIn("PUBLISH_BINARY: 'false'", workflow)
         publication = workflow.split('- name: Publish downloadable test build', 1)[1].split('env:', 1)[0]
         self.assertIn("vars.ALLOW_PUBLIC_ASSET_REDISTRIBUTION == 'true'", publication)
+
+    def test_expanded_eventide_instruction_keeps_both_rebindable_controls(self):
+        for locale in ('en_us', 'es_es'):
+            texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
+            text = texts['alternate.detail.specialpickaxes.eventide']
+            self.assertIn(' %3$s ', text)
+            self.assertIn(' %1$s ', text)
