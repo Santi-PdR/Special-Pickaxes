@@ -1,3 +1,12 @@
+# Estado actual — 5.10.440: primera fase pendiente de CI
+
+440: snapshot de actor/herramienta y posición/stack exactos de drops tras permisos
+para Eventide/Iridium. Movimiento de drops finito y acotado, incluso con
+velocidades inválidas/extremas de otros mods. Tooltip SHIFT reconstruido también
+en ItemTooltipEvent; CI ahora valida getTooltipLines completo, no sólo el builder.
+Diez GameTests nuevos (297 esperados), seis JUnit nuevos (92 esperados).
+Local:22recursos/49Python/parser139Java/diffcheck. Sin build local.
+
 # Estado actual — 5.10.439: CI completo y prerelease de prueba verificados
 
 ## Resultado verificado — 5.10.439

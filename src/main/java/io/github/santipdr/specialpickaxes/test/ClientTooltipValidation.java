@@ -37,11 +37,12 @@ public final class ClientTooltipValidation {
             }
             boolean shift=net.minecraft.client.gui.screens.Screen.hasShiftDown();String key=item.kind.id+"-"+io.github.santipdr.specialpickaxes.artifact.ArtifactInteraction.modeKey(item.kind,io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.mode(mc.player.getMainHandItem()))+(shift?"-shift":"-normal");
             if(CHECKED.add(key)){
-                // Exercise the item's tooltip builder directly: Minecraft's stack-level tooltip
-                // query can retain a compact list created before the synthetic Shift press.
-                var lines=new java.util.ArrayList<net.minecraft.network.chat.Component>();
-                item.appendHoverText(mc.player.getMainHandItem().copy(),mc.level,lines,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
-                if(shift?lines.size()<9:lines.size()!=2)throw new IllegalStateException("Tooltip contract mismatch: "+key+" "+lines.size());
+                // Include Forge ItemTooltipEvent: checking only appendHoverText hid an event that erased SHIFT.
+                var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+                if(shift?lines.size()<10:lines.size()!=3)throw new IllegalStateException("Final stack tooltip contract mismatch: "+key+" "+lines.size());
+                boolean details=lines.stream().anyMatch(line->line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text&&text.getKey().equals("manual4.what"));
+                if(details!=shift)throw new IllegalStateException("Forge tooltip event lost or leaked expanded details: "+key);
+                com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_STACK_EVENT_VALIDATED {} lines={}",key,lines.size());
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }
             e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);

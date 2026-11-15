@@ -348,6 +348,42 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.SEAM_RIPPER)&&!WorkQueue.busy(wearer)&&!ArtifactState.of(wearer,ArtifactKind.SEAM_RIPPER).contains("alternateReady"),"a moved actor does not queue a stale face or spend cooldown");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
     }
+    private static void pullRejectsChangedContext(GameTestHelper h,ArtifactKind kind,int mutation){
+        var wearer=player(h,kind);wearer.setPos(wearer.position().add(0,40,0));var level=h.getLevel();var tool=wearer.getMainHandItem();
+        for(var prior:level.getEntitiesOfClass(ItemEntity.class,wearer.getBoundingBox().inflate(20)))prior.discard();
+        var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
+        if(kind==ArtifactKind.IRIDIUM)OreDropHighlight.mark(drop,wearer);var at=drop.blockPosition();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=event->{
+            if(event.player!=wearer||!event.target.equals(at))return;calls[0]++;
+            switch(mutation){
+                case 0->wearer.setPos(wearer.position().add(.25,0,0));
+                case 1->drop.setPos(drop.position().add(.1,0,0));
+                case 2->wearer.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+                case 3->drop.setItem(new ItemStack(Items.EMERALD));
+                default->wearer.gameMode.changeGameModeForPlayer(GameType.SPECTATOR);
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        try{h.assertTrue(!ArtifactSkills.use(wearer,tool,kind)&&calls[0]==1&&drop.getDeltaMovement().equals(Vec3.ZERO),"a mutated actor/drop/tool is not pulled using stale permission");
+            h.assertTrue(!ArtifactState.of(wearer,kind).contains("alternateReady")&&tool.getDamageValue()==0,"rejected utility does not spend durability/cooldown");}
+        finally{MinecraftForge.EVENT_BUS.unregister(change);drop.discard();}finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_220") public static void eventidePullRejectsSmallCasterTeleport(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,0);}
+    @GameTest(template="empty",batch="rework_each_221") public static void eventidePullRejectsSameCellDropMovement(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,1);}
+    @GameTest(template="empty",batch="rework_each_222") public static void eventidePullRejectsDisarmedCaster(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,2);}
+    @GameTest(template="empty",batch="rework_each_223") public static void eventidePullRejectsReplacedItemStack(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,3);}
+    @GameTest(template="empty",batch="rework_each_224") public static void iridiumRecallRejectsSmallCasterTeleport(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,0);}
+    @GameTest(template="empty",batch="rework_each_225") public static void iridiumRecallRejectsSameCellDropMovement(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,1);}
+    @GameTest(template="empty",batch="rework_each_226") public static void iridiumRecallRejectsDisarmedCaster(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,2);}
+    @GameTest(template="empty",batch="rework_each_227") public static void iridiumRecallRejectsReplacedItemStack(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,3);}
+    @GameTest(template="empty",batch="rework_each_228") public static void iridiumRecallRejectsSpectatorRevocation(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,4);}
+    @GameTest(template="empty",batch="rework_each_229") public static void tooltipPresentationPreservesShiftDetailsForAllPicks(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
+            ArtifactTooltips.presentation(stack,kind,compact,false);ArtifactTooltips.presentation(stack,kind,expanded,true);
+            h.assertTrue(compact.size()==2&&!tooltipHasKey(compact,"manual4.what")&&expanded.size()>9&&tooltipHasKey(expanded,"manual4.what"),"the final presentation distinguishes compact/SHIFT for "+kind.id);
+        }h.succeed();
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

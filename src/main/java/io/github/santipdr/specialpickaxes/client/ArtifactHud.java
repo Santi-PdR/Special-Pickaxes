@@ -22,6 +22,6 @@ public final class ArtifactHud {
     @SubscribeEvent public static void levels(net.minecraftforge.event.entity.player.ItemTooltipEvent e){
         if(!(e.getItemStack().getItem() instanceof ArtifactItem item))return;
         var lines=e.getToolTip();Component name=lines.isEmpty()?e.getItemStack().getHoverName():lines.get(0);lines.clear();lines.add(item.kind==io.github.santipdr.specialpickaxes.artifact.ArtifactKind.WORLDBREAKER?name.copy().withStyle(net.minecraft.ChatFormatting.GOLD):name);
-        io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.compact(e.getItemStack(),item.kind,lines);
+        io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.presentation(e.getItemStack(),item.kind,lines,ArtifactTooltipEvents.shiftDown());
     }
 }

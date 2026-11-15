@@ -44,6 +44,7 @@ public final class ArtifactTechniques {
     }
 
     private static boolean magnetDrops(ServerPlayer player,ItemStack tool,int radius,int cap) {
+        var context=HeldUtilityContext.capture(player,tool);
         Vec3 center = player.getEyePosition();
         int moved = 0,visualized=0;
         var level=player.serverLevel();
@@ -51,15 +52,16 @@ public final class ArtifactTechniques {
                 e->e.isAlive()&&DropOwnership.allows(player,e)
                         &&e.position().distanceToSqr(center)<=(double)radius*radius,center,cap);
         for (var drop : drops) {
-            var checkedPosition=drop.blockPosition();
-            if(!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,checkedPosition)
-                    ||player.serverLevel()!=level||player.getMainHandItem()!=tool||tool.isEmpty()
-                    ||!drop.isAlive()||drop.level()!=level||!drop.blockPosition().equals(checkedPosition)
-                    ||!DropOwnership.allows(player,drop)||drop.position().distanceToSqr(center)>(double)radius*radius)continue;
+            var checkedPosition=drop.position();var checkedStack=drop.getItem();
+            boolean allowed=WorldSafety.allowed(player,ArtifactKind.EVENTIDE,drop.blockPosition());
+            if(!context.valid())break;
+            if(!allowed||!drop.isAlive()||drop.level()!=level||!drop.position().equals(checkedPosition)
+                    ||drop.getItem()!=checkedStack||drop.getItem().isEmpty()||!DropOwnership.allows(player,drop)
+                    ||drop.position().distanceToSqr(center)>(double)radius*radius)continue;
             Vec3 delta = center.subtract(drop.position());
             if (delta.lengthSqr() < .25) continue;
             if(visualized<12){ArtifactFeedback.gravityTether(player,drop.position(),center);visualized++;}
-            drop.setDeltaMovement(delta.normalize().scale(.65));
+            drop.setDeltaMovement(UtilityPullMotion.velocity(delta,Vec3.ZERO,0,.65,.65));
             drop.hasImpulse = true;
             if (++moved >= cap) break;
         }
@@ -125,7 +127,8 @@ public final class ArtifactTechniques {
         return dash(player, distance);
     }
 
-    private static boolean recallIridiumDrops(ServerPlayer player, int radius, int cap) {
+    private static boolean recallIridiumDrops(ServerPlayer player,ItemStack tool,int radius,int cap) {
+        var context=HeldUtilityContext.capture(player,tool);
         Vec3 center = player.getEyePosition();
         // Keep only the nearest capped drops while inspecting a bounded number of entities.
         // This avoids allocating and sorting thousands of candidates in dense farms.
@@ -135,12 +138,15 @@ public final class ArtifactTechniques {
         int recalled=0,visualized=0;
         for(var item:targets){
             if(recalled>=cap)break;
-            if(!WorldSafety.allowed(player,ArtifactKind.IRIDIUM,item.blockPosition())
+            var checkedPosition=item.position();var checkedStack=item.getItem();
+            boolean allowed=WorldSafety.allowed(player,ArtifactKind.IRIDIUM,item.blockPosition());
+            if(!context.valid())break;
+            if(!allowed||!item.position().equals(checkedPosition)||item.getItem()!=checkedStack
                     ||!isIridiumRecallTarget(player,item,center,radius))continue;
             Vec3 delta = center.subtract(item.position());
             item.setGlowingTag(true);
             if(delta.lengthSqr()>=.25){
-                item.setDeltaMovement(item.getDeltaMovement().scale(.2).add(delta.normalize().scale(.85)));
+                item.setDeltaMovement(UtilityPullMotion.velocity(delta,item.getDeltaMovement(),.2,.85,1.05));
                 item.hasImpulse=true;
             }
             if(visualized<24){ArtifactFeedback.burst(player,ArtifactKind.IRIDIUM,item.blockPosition(),4);visualized++;}
@@ -153,7 +159,7 @@ public final class ArtifactTechniques {
     /** Shared eligibility rule for the spatial query and its radius/ownership regression tests. */
     public static boolean isIridiumRecallTarget(ServerPlayer player,ItemEntity item,Vec3 center,double radius){
         var data=item.getPersistentData();
-        return player.isAlive()&&item.isAlive()&&item.level()==player.level()
+        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&item.isAlive()&&!item.getItem().isEmpty()&&item.level()==player.level()
                 &&Double.isFinite(radius)&&radius>=0D
                 &&DropOwnership.allows(player,item)
                 &&data.getBoolean("specialpickaxesIridiumOreDrop")
@@ -198,7 +204,7 @@ public final class ArtifactTechniques {
             case ICARUS -> icarianLift(player,tool);
             case WORLDBREAKER -> echo(player,tool,2);
             case EXODIUM -> starfallSink(player,tool);
-            case IRIDIUM -> recallIridiumDrops(player,IRIDIUM_RECALL_RADIUS,96);
+            case IRIDIUM -> recallIridiumDrops(player,tool,IRIDIUM_RECALL_RADIUS,96);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };

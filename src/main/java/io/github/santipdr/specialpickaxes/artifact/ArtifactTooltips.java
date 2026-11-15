@@ -9,6 +9,11 @@ import java.util.*;
 public final class ArtifactTooltips {
     private ArtifactTooltips(){}
     public static int mode(ItemStack stack){return stack.hasTag()&&stack.getTag().contains("artifactMode")?stack.getTag().getInt("artifactMode"):0;}
+    /** Shared final presentation, including the Forge tooltip event's reconstruction. */
+    public static void presentation(ItemStack stack,ArtifactKind kind,List<Component> lines,boolean expanded){
+        compact(stack,kind,lines);
+        if(expanded)expanded(stack,kind,lines);
+    }
     public static void compact(ItemStack stack,ArtifactKind k,List<Component> lines){
         var ability=abilityKind(stack,k);
         lines.add(Component.translatable("tooltip.specialpickaxes.r", Component.keybind("key.specialpickaxes.activate"),

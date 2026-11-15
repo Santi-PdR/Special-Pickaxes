@@ -57,9 +57,7 @@ public final class OreDropHighlight {
                     ||!ArtifactTechniques.isIridiumRecallTarget(owner,item,center,PASSIVE_PULL_RADIUS))continue;
             Vec3 delta=center.subtract(item.position());double distanceSqr=delta.lengthSqr();
             if(distanceSqr<.64D)continue; // Leave items inside vanilla pickup reach alone.
-            Vec3 pull=delta.normalize().scale(.28D);
-            Vec3 motion=item.getDeltaMovement().scale(.55D).add(pull);
-            if(motion.lengthSqr()>.36D)motion=motion.normalize().scale(.6D);
+            Vec3 motion=UtilityPullMotion.velocity(delta,item.getDeltaMovement(),.55D,.28D,.6D);
             item.setDeltaMovement(motion);item.hasImpulse=true;moved++;
             if(trails<MAX_PULL_TRAILS){emitLodeSenseTrail(owner,item.position(),center);trails++;}
         }
