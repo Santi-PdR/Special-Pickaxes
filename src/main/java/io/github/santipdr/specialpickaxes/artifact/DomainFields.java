@@ -171,22 +171,24 @@ public final class DomainFields {
     }
     public static void feed(ServerPlayer p,ItemStack tool,BlockPos pos,net.minecraft.world.level.block.state.BlockState minedState) {
         var field=FIELDS.get(p.getUUID());
-        if(field==null||!contains(p,pos))return;
+        if(field==null||field.tool!=tool||tool.isEmpty()||!fieldTickValid(field,p.position())||!contains(p,pos))return;
         field.expires=Math.min(ArtifactState.now(p)+ArtifactConfig.FIELD_TIME.get(),field.expires+20);
         if(field.kind==ArtifactKind.EVENTIDE){
             field.gravityCharge++;
             if(field.gravityCharge>=EVENTIDE_COLLAPSE_CHARGE){
                 field.gravityCharge=0;
                 field.collapsePullUntil=ArtifactState.now(p)+60;
-                int pulled=pullDrops(field);
-                ArtifactFeedback.gravityCollapse(p,field.center,pulled);
+                var origin=p.position();int pulled=pullDrops(field);
+                if(fieldTickValid(field,origin))ArtifactFeedback.gravityCollapse(p,field.center,pulled);
             } else if(field.gravityCharge%6==0) {
                 ArtifactFeedback.gravityChargePulse(p,field.center,field.gravityCharge);
             }
         }
     }
     private static int pullDrops(Field field){
-        var player=field.owner;var level=player.serverLevel();var center=Vec3.atCenterOf(field.center);var pullTo=player.getEyePosition();
+        var player=field.owner;var level=player.serverLevel();var origin=player.position();
+        if(!fieldTickValid(field,origin))return 0;
+        var center=Vec3.atCenterOf(field.center);var pullTo=player.getEyePosition();
         var drops=EntitySelection.nearest(level,net.minecraft.world.entity.item.ItemEntity.class,
                 new AABB(field.center).inflate(EVENTIDE_COLLAPSE_RADIUS),item->item.isAlive()
                         &&DropOwnership.allows(player,item)
@@ -194,11 +196,12 @@ public final class DomainFields {
                 center,EVENTIDE_COLLAPSE_DROP_CAP);
         int moved=0;
         for(var item:drops){
-            var checkedPosition=item.blockPosition();
-            if(!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,checkedPosition)
-                    ||FIELDS.get(player.getUUID())!=field||player.getMainHandItem()!=field.tool||field.tool.isEmpty()
-                    ||!item.isAlive()||item.level()!=level||player.serverLevel()!=level
-                    ||!item.blockPosition().equals(checkedPosition)||!DropOwnership.allows(player,item)
+            if(!fieldTickValid(field,origin))break;
+            var checkedPosition=item.position();
+            if(!WorldSafety.allowed(player,ArtifactKind.EVENTIDE,item.blockPosition()))continue;
+            if(!fieldTickValid(field,origin))break;
+            if(!item.isAlive()||item.level()!=level||player.serverLevel()!=level
+                    ||!item.position().equals(checkedPosition)||!DropOwnership.allows(player,item)
                     ||item.position().distanceToSqr(center)>(double)EVENTIDE_COLLAPSE_RADIUS*EVENTIDE_COLLAPSE_RADIUS)continue;
             var delta=pullTo.subtract(item.position());
             if(delta.lengthSqr()<.04D)continue;
@@ -305,7 +308,7 @@ public final class DomainFields {
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
                 if(!fieldTickValid(f,tickOrigin))continue;
                 if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
-                if(FIELDS.get(p.getUUID())!=f)continue;
+                if(!fieldTickValid(f,tickOrigin))continue;
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
             }
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==1){if(p.tickCount%20==0){f.center=p.blockPosition().immutable();ArtifactFeedback.domain(p,f.kind,f.center,2,2);}continue;}

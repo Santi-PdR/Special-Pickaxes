@@ -1,3 +1,28 @@
+# 5.10.467 — contexto de colapso Eventide; pendiente de CI
+
+Eventide no acepta cargas provenientes de una copia separada de la herramienta
+del campo. Su colapso conserva la posición del portador al seleccionar drops:
+si un listener lo mueve o reemplaza/detiene el campo, termina el lote y no
+emite una confirmación de colapso desde el contexto invalidado. También exige
+posición exacta del drop después del permiso, no sólo coincidencia de bloque.
+Tres GameTests312–314 verifican desplazamiento sub-bloque del drop, movimiento
+del portador y copias de herramienta sin carga; comprueban que24roturas con
+la herramienta real siguen alcanzando el umbral normal.
+Incluye465/466. Esperados126JUnit/382GameTests, pendientes de CI.
+Local77Python conPillow/25recursos/parser155Java/secretos/diffcheck correctos.
+
+## 464: verificación completa recuperada
+
+Run43681728499 completed/success, commit7471264a42d254c3d6034706bcb24f3eeb80988f.
+EvidenciaChecks descargada y SHA de cada archivo comprobado:126JUnit sin
+fallos/errores/omisiones;372GameTests. Logs de GameTests,cliente y servidor
+empaquetado limpios. Cliente32escenas/64tooltips. Se generó galería464 con
+13páginas y26imágenes comprobando assets/nombres españoles contra el commit.
+Inspección de la captura Crucible confirma el pico en mano, no toda su animación.
+JAR566321bytes, SHA256d8df8ab1220d1d4fc5d939dbf235dbee6227783e4dbe0933fcf54fb35adb33ab.
+Esta evidencia no valida465–467. La API GitHub alcanzó su cuota de lectura;
+no se confunde con fallo de credenciales ni se omiten validaciones por ello.
+
 ## Endurecimiento de evidencias CI (sin omitir fallos)
 
 El verificador de GameTests exige ahora tanto el conteo completo como la línea

@@ -1041,6 +1041,37 @@ public final class PickaxeGameTests {
         try{DomainFields.tick();h.assertTrue(calls[0]==1&&arrow.getOwner()==ally&&arrow.getDeltaMovement().equals(new Vec3(-1,0,0)),"newly allied projectile ownership prevents a pending deflection");}
         finally{MinecraftForge.EVENT_BUS.unregister(change);arrow.discard();h.getLevel().getScoreboard().removePlayerTeam(team);finish(h,ally);finish(h,p);}
     }
+    private static ItemEntity collapseDrop(GameTestHelper h,ServerPlayer owner){
+        var item=new ItemEntity(h.getLevel(),owner.getX()+3,owner.getY()+.3,owner.getZ(),new ItemStack(Items.DIAMOND));item.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(item);return item;
+    }
+    @GameTest(template="empty",batch="rework_each_312") public static void eventideCollapseRejectsASubBlockDropMoveInsideClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=collapseDrop(h,p);var at=drop.position();int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,p.blockPosition(),8),"gravity field starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p){calls[0]++;drop.setPos(at.add(.1,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{for(int i=0;i<24;i++)DomainFields.feed(p,p.getMainHandItem(),p.blockPosition(),Blocks.STONE.defaultBlockState());h.assertTrue(calls[0]==1&&drop.getDeltaMovement().equals(Vec3.ZERO),"a drop moved within its block cannot inherit the old pull approval");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);drop.discard();finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_313") public static void eventideCollapseStopsWhenClaimCallbacksMoveTheOwner(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=collapseDrop(h,p);int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,p.blockPosition(),8),"gravity field starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p){calls[0]++;p.setPos(p.position().add(.1,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{for(int i=0;i<24;i++)DomainFields.feed(p,p.getMainHandItem(),p.blockPosition(),Blocks.STONE.defaultBlockState());h.assertTrue(calls[0]==1&&drop.getDeltaMovement().equals(Vec3.ZERO),"gravity does not pull toward a stale eye position after claim-listener movement");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);drop.discard();finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_314") public static void detachedStacksCannotChargeEventideFields(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();var drop=collapseDrop(h,p);
+        h.assertTrue(DomainFields.start(p,tool,ArtifactKind.EVENTIDE,p.blockPosition(),8),"gravity field starts");
+        try{
+            for(int i=0;i<24;i++)DomainFields.feed(p,tool.copy(),p.blockPosition(),Blocks.STONE.defaultBlockState());
+            h.assertTrue(drop.getDeltaMovement().equals(Vec3.ZERO),"equal detached stacks cannot charge the held field");
+            for(int i=0;i<23;i++)DomainFields.feed(p,tool,p.blockPosition(),Blocks.STONE.defaultBlockState());
+            h.assertTrue(drop.getDeltaMovement().equals(Vec3.ZERO),"invalid feeds did not contribute to the threshold");
+            DomainFields.feed(p,tool,p.blockPosition(),Blocks.STONE.defaultBlockState());
+            h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the real captured tool still reaches its ordinary24break threshold");
+        }finally{drop.discard();finish(h,p);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
