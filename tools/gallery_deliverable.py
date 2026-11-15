@@ -35,6 +35,7 @@ def make_deliverable(captures, destination):
     pages, cards, files = [], [], {}
     for index, item in enumerate(provenance['items'], 1):
         name = item['artifact']
+        display_name = item.get('display_name', name.replace('_', ' ').title())
         texture = ASSETS / 'textures' / (item['texture'].split(':', 1)[1] + '.png')
         icon_bytes = texture.read_bytes()
         portrait_bytes = (captures / ('portrait-' + name + '.jpg')).read_bytes()
@@ -42,7 +43,15 @@ def make_deliverable(captures, destination):
         files['en-mano-' + name + '.jpg'] = portrait_bytes
         page = Image.new('RGB', (1440, 1080), '#111b28')
         draw = ImageDraw.Draw(page)
-        draw.text((54, 38), f'{index:02d} / 13  {name.replace("_", " ").title()}', fill='white', font=font(38))
+        title = f'{index:02d} / 13  {display_name}'
+        title_size = 38
+        while title_size > 18 and draw.textlength(title, font=font(title_size)) > 1332:
+            title_size -= 1
+        if draw.textlength(title, font=font(title_size)) > 1332:
+            while title and draw.textlength(title + '…', font=font(title_size)) > 1332:
+                title = title[:-1]
+            title += '…'
+        draw.text((54, 38), title, fill='white', font=font(title_size))
         draw.text((54, 94), f'Special Pickaxes {version} | Forge 1.20.1 | CI {provenance["run_id"]}', fill='#b4cfdf', font=font(21))
         with Image.open(io.BytesIO(icon_bytes)) as source:
             icon = source.convert('RGBA').resize((320, 320), Image.Resampling.NEAREST)
@@ -56,14 +65,15 @@ def make_deliverable(captures, destination):
         draw.text((54, 1003), 'Fuente: ' + provenance['commit'], fill='#9fb4c6', font=font(19))
         pages.append(page)
         safe = html.escape(name)
-        cards.append(f'<article><h2>{safe.replace("_", " ")}</h2><img class="icon" src="icono-{safe}.png" alt="Icono de {safe}"><img class="hand" src="en-mano-{safe}.jpg" alt="Captura CI de {safe} en mano"></article>')
+        label = html.escape(display_name)
+        cards.append(f'<article><h2>{label}</h2><img class="icon" src="icono-{safe}.png" alt="Icono de {label}"><img class="hand" src="en-mano-{safe}.jpg" alt="Captura CI de {label} en mano"></article>')
     pdf = io.BytesIO()
     pages[0].save(pdf, format='PDF', save_all=True, append_images=pages[1:], resolution=120)
     files['los-13-picos.pdf'] = pdf.getvalue()
     provenance['scope'] = 'Exact runtime icons and CI still portraits; not approval of complete animations or a full modpack.'
     provenance['version'] = version
     files['PROVENANCE.json'] = (json.dumps(provenance, indent=2, ensure_ascii=False) + '\n').encode()
-    files['index.html'] = (f'<!doctype html><html lang="es"><meta charset="utf-8"><title>Los 13 picos — {version}</title><style>body{{background:#111b28;color:#e5eff8;font:18px system-ui;max-width:1200px;margin:2rem auto;padding:1rem}}article{{border-top:1px solid #536879;padding:1rem 0}}img{{max-width:100%;vertical-align:middle}}.icon{{width:192px;image-rendering:pixelated}}.hand{{width:900px}}h2{{text-transform:capitalize}}</style><h1>Los 13 picos — {version}</h1><p>Iconos del recurso y capturas reales CI. No es una certificacion de animaciones completas ni del pack Ghouls.</p>' + ''.join(cards) + '</html>').encode()
+    files['index.html'] = (f'<!doctype html><html lang="es"><meta charset="utf-8"><title>Los 13 picos — {version}</title><style>body{{background:#111b28;color:#e5eff8;font:18px system-ui;max-width:1200px;margin:2rem auto;padding:1rem}}article{{border-top:1px solid #536879;padding:1rem 0}}img{{max-width:100%;vertical-align:middle}}.icon{{width:192px;image-rendering:pixelated}}.hand{{width:900px}}</style><h1>Los 13 picos — {version}</h1><p>Iconos del recurso y capturas reales CI. No es una certificacion de animaciones completas ni del pack Ghouls.</p>' + ''.join(cards) + '</html>').encode()
     sums = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in sorted(files.items()))
     files['SHA256SUMS'] = sums.encode()
     for name, data in files.items():

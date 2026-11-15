@@ -38,8 +38,17 @@ def validate_gallery(captures, release_path=None, read_at_commit=git_blob, asset
         raise ValueError('Duplicate gallery evidence entries')
     release_relative = release_path.resolve().relative_to(evidence_root.resolve()).as_posix()
     verify_evidence(release_path, entries.get(release_relative))
-    output = {'commit': commit, 'run_id': str(release['run_id']), 'release_file': release['file'], 'items': []}
+    language_path = assets / 'lang/es_es.json'
+    language_bytes = language_path.read_bytes()
+    if language_bytes != read_at_commit(commit, language_path):
+        raise ValueError('Local gallery labels do not match captured release')
+    translations = json.loads(language_bytes)
+    output = {'commit': commit, 'run_id': str(release['run_id']), 'release_file': release['file'],
+              'locale': 'es_es', 'language_sha256': digest(language_bytes), 'items': []}
     for name in IDS:
+        display_name = translations.get('item.specialpickaxes.' + name)
+        if not isinstance(display_name, str) or not display_name.strip():
+            raise ValueError('Missing localized gallery name: ' + name)
         model_path = assets / 'models/item' / (name + '.json')
         model_bytes = model_path.read_bytes()
         if model_bytes != read_at_commit(commit, model_path):
@@ -57,7 +66,7 @@ def validate_gallery(captures, release_path=None, read_at_commit=git_blob, asset
         portrait = captures / ('portrait-' + name + '.jpg')
         relative = portrait.resolve().relative_to(evidence_root.resolve()).as_posix()
         portrait_hash = verify_evidence(portrait, entries.get(relative))
-        output['items'].append({'artifact': name, 'model_sha256': digest(model_bytes),
+        output['items'].append({'artifact': name, 'display_name': display_name, 'model_sha256': digest(model_bytes),
                                 'texture': texture, 'texture_sha256': digest(texture_bytes),
                                 'portrait_sha256': portrait_hash})
     return output

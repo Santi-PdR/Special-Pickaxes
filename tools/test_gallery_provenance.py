@@ -17,6 +17,9 @@ class GalleryProvenanceTests(unittest.TestCase):
             model.write_text(json.dumps({'textures':{'layer0':'specialpickaxes:item/'+name}}));self.blobs[model]=model.read_bytes()
             icon=self.assets/'textures/item'/f'{name}.png';icon.parent.mkdir(parents=True,exist_ok=True);icon.write_bytes(name.encode());self.blobs[icon]=icon.read_bytes()
             self.write_evidence(self.captures/f'portrait-{name}.jpg',('unit-fixture-'+name).encode())
+        self.language=self.assets/'lang/es_es.json';self.language.parent.mkdir(parents=True)
+        self.language.write_text(json.dumps({'item.specialpickaxes.'+name:'Nombre '+name for name in IDS}))
+        self.blobs[self.language]=self.language.read_bytes()
         self.save_manifest()
     def write_evidence(self,path,data):
         path.write_bytes(data);self.manifest.append({'path':path.relative_to(self.root).as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
@@ -27,6 +30,9 @@ class GalleryProvenanceTests(unittest.TestCase):
     def test_valid_gallery_records_all_thirteen_assets_and_portraits(self):
         result=self.validate();self.assertEqual(len(result['items']),13);self.assertEqual(result['commit'],'a'*40)
         self.assertEqual(result['items'][0]['artifact'],IDS[0])
+        self.assertEqual(result['items'][0]['display_name'],'Nombre '+IDS[0])
+        self.assertEqual(result['locale'],'es_es')
+        self.assertEqual(result['language_sha256'],hashlib.sha256(self.language.read_bytes()).hexdigest())
     def test_icon_from_a_different_version_is_rejected(self):
         (self.assets/'textures/item/palimpsest.png').write_bytes(b'new icon')
         with self.assertRaisesRegex(ValueError,'icon does not match'):self.validate()
@@ -48,3 +54,14 @@ class GalleryProvenanceTests(unittest.TestCase):
     def test_duplicate_evidence_manifest_entry_is_rejected(self):
         self.manifest.append(self.manifest[-1]);self.save_manifest()
         with self.assertRaisesRegex(ValueError,'Duplicate gallery evidence'):self.validate()
+
+    def test_labels_from_a_different_release_are_rejected(self):
+        self.language.write_text('{}')
+        with self.assertRaisesRegex(ValueError,'labels do not match'):self.validate()
+    def test_missing_localized_name_is_rejected(self):
+        self.language.write_text('{}');self.blobs[self.language]=self.language.read_bytes()
+        with self.assertRaisesRegex(ValueError,'Missing localized'):self.validate()
+    def test_non_text_localized_name_is_rejected(self):
+        data=json.loads(self.language.read_text());data['item.specialpickaxes.'+IDS[0]]=123
+        self.language.write_text(json.dumps(data));self.blobs[self.language]=self.language.read_bytes()
+        with self.assertRaisesRegex(ValueError,'Missing localized'):self.validate()

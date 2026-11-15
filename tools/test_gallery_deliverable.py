@@ -53,7 +53,7 @@ class GalleryDeliverableTests(unittest.TestCase):
             for name in IDS:
                 (assets / f'textures/item/{name}.png').write_bytes(icon)
                 (captures / f'portrait-{name}.jpg').write_bytes(portrait)
-                items.append({'artifact': name, 'texture': 'specialpickaxes:item/' + name})
+                items.append({'artifact': name, 'display_name': 'Pico <'+name+'> & prueba', 'texture': 'specialpickaxes:item/' + name})
             provenance = {'release_file': 'special-pickaxes-1.20.1-5.10.443.jar',
                           'commit': 'a' * 40, 'run_id': '123', 'items': items}
             with patch('gallery_deliverable.ASSETS', assets), patch('gallery_deliverable.validate_gallery', return_value=provenance):
@@ -65,6 +65,9 @@ class GalleryDeliverableTests(unittest.TestCase):
             self.assertIn(b'/Count 13', pathlib.Path(result['pdf']).read_bytes())
             with zipfile.ZipFile(result['zip']) as archive:
                 self.assertIsNone(archive.testzip())
+                page=archive.read('index.html').decode()
+                self.assertIn('Pico &lt;palimpsest&gt; &amp; prueba',page)
+                self.assertNotIn('Pico <palimpsest>',page)
                 self.assertEqual(sum(name.startswith(('icono-', 'en-mano-')) for name in archive.namelist()), 26)
                 for name in IDS:
                     self.assertEqual(archive.read(f'icono-{name}.png'), icon)

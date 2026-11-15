@@ -1,3 +1,14 @@
+## Galería 460 — etiquetas verificadas en español
+
+El PDF y HTML muestran los nombres españoles del propio mod, no títulos
+inventados a partir del ID. Se exige que es_es.json coincida byte a byte con
+el commit del JAR capturado; su SHA256/locale quedan en PROVENANCE.json. Tres
+pruebas rechazan traducciones de otra versión, nombres ausentes y valores que
+no son texto. Los nombres HTML se escapan; los títulos PDF ajustan tamaño y
+eliden sólo si no caben, conservando el nombre completo en la procedencia.
+Los ZIP mantienen IDs canónicos en los nombres de archivo y las26imágenes
+exactas. Local66Python conPillow/25recursos/parser150Java/diffcheck correctos.
+
 # 5.10.460 — revalidación tras efectos e Interregnum legible; pendiente de CI
 
 MiningObservations vuelve a validar herramienta, fuente Curios y actor después
