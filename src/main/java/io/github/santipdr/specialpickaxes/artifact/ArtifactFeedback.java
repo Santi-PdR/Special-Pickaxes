@@ -794,9 +794,9 @@ public final class ArtifactFeedback {
         return StasisBoundaryGeometry.perimeterPoint(center,radius,distance,center.getY()+.08D);
     }
     public static void preview(ServerPlayer p,ArtifactKind kind,java.util.List<WorkStep> steps) {
-        int stride=Math.max(1,steps.size()/24);
-        for(int i=0,count=0;i<steps.size() && count<24;i+=stride,count++) {
-            var pos=steps.get(i).pos();
+        int samples=Math.min(24,steps.size());
+        for(int sample=0;sample<samples;sample++) {
+            var pos=steps.get(PreviewSampling.index(steps.size(),sample,samples)).pos();
             if(p.serverLevel().hasChunkAt(pos)) burst(p,kind,pos,1);
         }
     }

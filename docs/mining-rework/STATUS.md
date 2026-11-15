@@ -1,3 +1,14 @@
+# 5.10.452 — previsualización completa: pendiente de CI
+
+El muestreo de previews ahora incluye el principio y el final del plan y reparte
+hasta 24 puntos uniformes. El stride anterior sólo mostraba la primera mitad de
+planes de 25–47 pasos y omitía finales de chimeneas/caras mayores. No aumenta
+paquetes ni toca bloques para dibujar. Cinco JUnit puros prueban orden, unicidad,
+intervalos, casos pequeños e índices de tamaño Integer.MAX_VALUE sin overflow.
+Conserva las transacciones y descubrimiento natural de451. Esperados102JUnit,
+326GameTests. Local24recursos/61Python/parser143Java/diffcheck correctos.
+No verificada todavía; última validación completa:450.
+
 # 5.10.451 — construcción y descubrimiento: pendiente de CI
 
 Una transacción de colocación pagada conserva el estado creativo inicial y rechaza
