@@ -31,6 +31,20 @@ class GameTestLogValidation(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_log('=== 0 GAME TESTS COMPLETE ===', 0)
 
+    def test_complete_count_without_success_confirmation_is_rejected(self):
+        for suffix in ('', '\nAll 152 required tests passed', '\nAll 154 required tests passed'):
+            with self.subTest(suffix=suffix), self.assertRaises(ValueError):
+                validate_log('=== 153 GAME TESTS COMPLETE ==='+suffix, 153)
+
+    def test_individual_failure_cannot_be_hidden_by_a_success_summary(self):
+        for failure in ('[Server thread/ERROR] broken failed!', 'broken failed!'):
+            with self.subTest(failure=failure), self.assertRaises(ValueError):
+                validate_log(failure+'\n=== 153 GAME TESTS COMPLETE ===\nAll 153 required tests passed', 153)
+
+    def test_contradictory_success_summaries_are_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_log('=== 153 GAME TESTS COMPLETE ===\nAll 152 required tests passed\nAll 153 required tests passed', 153)
+
     def test_discovery_counts_all_test_classes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

@@ -1,3 +1,12 @@
+## Endurecimiento de evidencias CI (sin omitir fallos)
+
+El verificador de GameTests exige ahora tanto el conteo completo como la línea
+All N required tests passed con el mismoN. También rechaza fallos individuales
+o líneasERROR aunque aparezca una confirmación posterior contradictoria.
+El escáner de runtime rechaza logs vacíos/blancos como evidencia insuficiente.
+Cuatro pruebas Python adicionales cubren estos falsos positivos;77Python
+conPillow y25recursos correctos localmente. No prueba por sí mismo Minecraft.
+
 # 5.10.466 — desvío Crucible con permiso en ejecución; pendiente de CI
 
 La selección de proyectiles del campo Crucible deja de ejecutar listeners de

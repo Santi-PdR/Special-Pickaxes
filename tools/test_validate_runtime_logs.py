@@ -36,6 +36,11 @@ class RuntimeLogValidation(unittest.TestCase):
         self.assertIn(':2:', issues[0])
         self.assertIn(':3:', issues[1])
 
+    def test_empty_or_whitespace_only_logs_are_not_evidence(self):
+        for text in ('', '  \n\t'):
+            with self.subTest(text=text):
+                self.assertEqual(len(self.scan(text)), 1)
+
     def test_missing_log_and_directory_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             self.assertEqual(len(scan_logs([pathlib.Path(directory) / 'absent.log', directory])), 2)

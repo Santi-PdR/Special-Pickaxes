@@ -16,7 +16,11 @@ def scan_logs(paths):
         if not path.is_file():
             issues.append(f'Missing log: {path}')
             continue
-        for number, line in enumerate(path.read_text(errors='replace').splitlines(), 1):
+        text = path.read_text(errors='replace')
+        if not text.strip():
+            issues.append(f'Empty log: {path}')
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
             if PATTERN.search(line):
                 issues.append(f'{path}:{number}: {line}')
     return issues

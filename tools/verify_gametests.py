@@ -15,8 +15,11 @@ def validate_log(text, expected):
     counts = re.findall(r'=+\s*(\d+) GAME TESTS COMPLETE\s*=+', text, re.I)
     if not counts or any(int(count) != expected for count in counts):
         raise ValueError(f'Missing or inconsistent completed GameTest summary for {expected} tests; observed {counts}')
-    if re.search(r'\b[1-9]\d* required tests? failed', text, re.I):
+    if re.search(r'\b[1-9]\d* required tests? failed|\bfailed!|\[.*?/ERROR\]', text, re.I):
         raise ValueError('GameTests reported failures')
+    passed = re.findall(r'\bAll (\d+) required tests passed\b', text, re.I)
+    if not passed or any(int(count) != expected for count in passed):
+        raise ValueError(f'Missing or inconsistent successful GameTest summary for {expected} tests; observed {passed}')
     return expected
 
 
