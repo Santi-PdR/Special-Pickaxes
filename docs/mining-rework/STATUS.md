@@ -1,3 +1,19 @@
+# 5.10.458 — regresiones de defensa propia y contraste Worldbreaker; pendiente de CI
+
+Distingue las firmas Curios de defensa propia de las respuestas que consultan
+claims: Palimpsest, Worldbreaker e Iridium conservan su defensa en aventura sin
+permiso de construcción. Un GameTest recorre los tres. Otro cubre Null Veil
+compartido: no gasta recarga si un claim mueve al atacante; tras estabilizarse,
+recupera un plazo corrupto pero mantiene los ocho segundos reales.
+
+Worldbreaker_v2 se reproduce ahora desde la referencia conservada mediante
+item_readability_asset.py con gamma.86. Es la octava adaptación reproducible;
+no un redibujo. Tests verifican alpha/silueta, brillo no decreciente, modelo y
+bytes reproducidos. Conserva su nombre de textura runtime para compatibilidad.
+
+Incluye457. Esperados110JUnit/349GameTests; sin build local. Local25recursos,
+63Python conPillow/parser146Java/secrets/diffcheck correctos. CI pendiente.
+
 # 5.10.457 — pasivas seguras y presupuesto de enlaces; pendiente de CI
 
 PassiveReactionContext fija jugador, atacante, nivel y posiciones antes de

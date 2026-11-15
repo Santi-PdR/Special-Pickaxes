@@ -151,12 +151,14 @@ public final class ArtifactPassives {
         if(attacker==null||attacker==player||attacker.isAlliedTo(player))return;
         if(attacker instanceof Player other&&!player.canHarmPlayer(other))return;
         var reaction=PassiveReactionContext.capture(player,attacker);
-        boolean retaliationAllowed=switch(kind){
-            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> reaction.allowed(kind);
+        boolean checksRetaliation=switch(kind){
+            case CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,SEAM_RIPPER -> true;
             default -> false;
         };
+        boolean retaliationAllowed=checksRetaliation&&reaction.allowed(kind);
         // A non-cancelling claim hook can still teleport, kill or ally either actor.
-        if(!reaction.valid())return;
+        // Self-only signatures do not require permission to build.
+        if(checksRetaliation&&!reaction.valid())return;
         if(!retaliationAllowed&&switch(kind){
             case CHOIR,CRUCIBLE,ICARUS,AXIOM,EXODIUM -> true;
             default -> false;

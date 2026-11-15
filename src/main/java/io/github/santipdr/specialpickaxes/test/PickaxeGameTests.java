@@ -768,6 +768,27 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4038)&&!ArtifactFeedback.reserveMiningParticles(p,1),"all seven legacy links reserve exactly 58 particles including both viewers and Worldbreaker's accent");
         finish(h,ally);finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_280") public static void selfOnlyCuriosDefensesDoNotRequireBuildPermission(GameTestHelper h){
+        for(var kind:List.of(ArtifactKind.PALIMPSEST,ArtifactKind.WORLDBREAKER,ArtifactKind.IRIDIUM)){
+            var p=player(h,kind);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+            p.getAbilities().mayBuild=false;
+            var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(attacker),10F);
+            try{ArtifactPassives.onCuriosDamage(p,hit,kind);h.assertTrue(hit.getAmount()<10F&&ArtifactState.of(p,kind).getLong("curiosPassiveReady")==ArtifactState.now(p)+160,"self-only defense remains available to adventure players without invoking claims");
+            }finally{p.getAbilities().mayBuild=true;CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);}
+        }h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_281") public static void sharedNullVeilRejectsMovedAttackerWithoutSpendingItsCounter(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);ArtifactPassives.tick(p,ArtifactKind.AXIOM);
+        var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p)attacker.setPos(attacker.position().add(0,0,1));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        var source=h.getLevel().damageSources().mobAttack(attacker);var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);
+        try{h.assertTrue(!ArtifactPassives.onSharedNullVeilGuard(p,hit)&&hit.getAmount()==10F&&!attacker.hasEffect(SpecialPickaxes.NULL_MARK.get())&&ArtifactState.of(p,ArtifactKind.AXIOM).getLong("sharedNullVeilReady")==0,"moved target neither marked nor charged against the ally's shared cooldown");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);}
+        var state=ArtifactState.of(p,ArtifactKind.AXIOM);state.putLong("sharedNullVeilReady",Long.MAX_VALUE);
+        var valid=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);
+        h.assertTrue(ArtifactPassives.onSharedNullVeilGuard(p,valid)&&Math.abs(valid.getAmount()-8.5F)<.001F&&!ArtifactPassives.onSharedNullVeilGuard(p,repeat),"corrupt future deadline recovers exactly once after context is stable");finish(h,p);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
