@@ -1,3 +1,21 @@
+# 5.10.465 — entregas de campos resistentes a callbacks; pendiente de CI
+
+Revisión de Stasis colocado: sus entregas de efectos podían continuar después
+que un listener detuviera/reemplazara el campo o moviera al portador/receptor.
+Ahora se revalida identidad exacta del campo y herramienta, vida, dimensión,
+posición capturada, vencimiento y pertenencia al campo antes/después de cada
+efecto. Para compañeros se exige alianza recíproca y no espectador. Si cambia
+el contexto se detienen los siguientes efectos/alimento, sin revertir efectos
+ya autorizados ni eliminar un campo sustituto. Eventide también revalida tras
+su efecto de prisa antes de continuar. La posición de entrada al tick se
+conserva a través del callback de permisos inicial.
+
+Cuatro GameTests nuevos305–308: detener durante Dominion, mover receptor
+sin salir del campo, sustituir por otro campo y mover portador en permisos.
+Esperados126JUnit/376GameTests. Local73Python conPillow,25recursos,
+parser155Java,escáner secretos y diffcheck correctos; no compilación local.
+Incluye464, cuya ejecución43681728499 seguía pendiente al preparar este cambio.
+
 ## CI464: correcciones tras dos fallos, nueva ejecución pendiente
 
 43681212818 compiló pero falló en dosGameTests. La audiencia revalidada había

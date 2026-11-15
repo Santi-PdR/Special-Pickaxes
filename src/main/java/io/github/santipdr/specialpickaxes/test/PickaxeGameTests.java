@@ -981,6 +981,38 @@ public final class PickaxeGameTests {
         }finally{clock.setGameTime(originalTime);WorldloomSnare.forget(owner);mob.discard();}
         finish(h,owner);
     }
+    @GameTest(template="empty",batch="rework_each_305") public static void stoppedStasisCannotContinueItsPendingOwnerBenefits(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);p.getFoodData().setFoodLevel(10);p.tickCount=0;int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition(),8),"placed Stasis starts");
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> stop=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==SpecialPickaxes.DOMINION.get()){calls[0]++;DomainFields.stop(p);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,stop);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&!DomainFields.active(p)&&!p.hasEffect(MobEffects.NIGHT_VISION)&&!p.hasEffect(MobEffects.REGENERATION)&&p.getFoodData().getFoodLevel()==10,"stopping the field during its first effect prevents later buffs and food");}
+        finally{MinecraftForge.EVENT_BUS.unregister(stop);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_306") public static void placedStasisDoesNotFollowAMovedRecipient(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var ally=player(h,ArtifactKind.ICARUS,"FieldRecipient");var team=auraTeam(h,p,ally);ally.getFoodData().setFoodLevel(10);p.tickCount=0;ally.tickCount=0;int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition(),8),"placed Stasis starts");
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> move=e->{if(e.getEntity()==ally&&e.getEffectInstance().getEffect()==SpecialPickaxes.DOMINION.get()){calls[0]++;ally.setPos(ally.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,move);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&!ally.hasEffect(SpecialPickaxes.STASIS_WARD.get())&&!ally.hasEffect(SpecialPickaxes.STASIS_RESONANCE.get())&&ally.getFoodData().getFoodLevel()==10,"recipient movement stops the remaining field handoff even while still inside its bounds");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);h.getLevel().getScoreboard().removePlayerTeam(team);finish(h,ally);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_307") public static void replacedStasisDoesNotGrantTheOldFieldsRemainingBenefits(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);p.tickCount=0;p.getFoodData().setFoodLevel(10);int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition(),8),"original field starts");
+        Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> replace=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==SpecialPickaxes.DOMINION.get()){calls[0]++;DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition().east(20),2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,replace);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&DomainFields.active(p)&&!DomainFields.contains(p,p.blockPosition())&&!p.hasEffect(MobEffects.NIGHT_VISION)&&p.getFoodData().getFoodLevel()==10,"a replacement remains active but cannot inherit the old tick's benefits");}
+        finally{MinecraftForge.EVENT_BUS.unregister(replace);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_308") public static void stasisClaimCallbackMovementStopsTheCurrentTick(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);p.tickCount=0;int[] calls={0};
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition(),8),"field starts");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p){calls[0]++;p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{DomainFields.tick();h.assertTrue(calls[0]==1&&!p.hasEffect(SpecialPickaxes.DOMINION.get())&&!p.hasEffect(MobEffects.NIGHT_VISION),"claim approval cannot continue a field tick at a callback-chosen location");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

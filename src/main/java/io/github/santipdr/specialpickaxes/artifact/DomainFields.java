@@ -207,10 +207,52 @@ public final class DomainFields {
         }
         return moved;
     }
+    /** Effect callbacks may stop/replace a field or move either participant mid-handoff. */
+    private static boolean fieldTickValid(Field field,Vec3 origin){
+        var owner=field.owner;
+        return FIELDS.get(owner.getUUID())==field&&owner.isAlive()&&!owner.isRemoved()&&!owner.isSpectator()
+                &&owner.getMainHandItem()==field.tool&&!field.tool.isEmpty()
+                &&owner.level().dimension()==field.dimension&&owner.position().equals(origin)
+                &&ArtifactState.now(owner)<=field.expires;
+    }
+    private static boolean fieldRecipientValid(Field field,Vec3 origin,ServerPlayer recipient,Vec3 recipientOrigin){
+        var owner=field.owner;
+        return fieldTickValid(field,origin)&&recipient.isAlive()&&!recipient.isRemoved()&&!recipient.isSpectator()
+                &&recipient.level()==owner.level()&&recipient.position().equals(recipientOrigin)
+                &&contains(owner,recipient.blockPosition())
+                &&(recipient==owner||recipient.isAlliedTo(owner)&&owner.isAlliedTo(recipient));
+    }
+    private static boolean fieldEffect(Field field,Vec3 origin,ServerPlayer recipient,Vec3 recipientOrigin,
+                                       net.minecraft.world.effect.MobEffect effect,int amplifier,int duration){
+        if(!fieldRecipientValid(field,origin,recipient,recipientOrigin))return false;
+        ArtifactPassives.grantCombatEffect(recipient,effect,amplifier,duration);
+        return fieldRecipientValid(field,origin,recipient,recipientOrigin);
+    }
+    private static boolean sustainStasisOwner(Field field,Vec3 origin){
+        var owner=field.owner;var registry=io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION;
+        if(!fieldEffect(field,origin,owner,origin,registry.get(),0,12)
+                ||!fieldEffect(field,origin,owner,origin,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,40))return false;
+        if(field.mode==0){
+            if(!fieldEffect(field,origin,owner,origin,net.minecraft.world.effect.MobEffects.REGENERATION,4,12)
+                    ||!fieldEffect(field,origin,owner,origin,net.minecraft.world.effect.MobEffects.ABSORPTION,3,40)
+                    ||!fieldEffect(field,origin,owner,origin,net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,1,12))return false;
+            if(owner.tickCount%20==0)owner.getFoodData().eat(1,0.2F);
+        }else if(owner.tickCount%100==0)owner.getFoodData().eat(1,0.2F);
+        return true;
+    }
+    private static void sustainStasisAlly(Field field,Vec3 origin,ServerPlayer ally){
+        var recipientOrigin=ally.position();
+        if(!fieldEffect(field,origin,ally,recipientOrigin,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,40)
+                ||!fieldEffect(field,origin,ally,recipientOrigin,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,40)
+                ||!fieldEffect(field,origin,ally,recipientOrigin,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,80)
+                ||!fieldEffect(field,origin,ally,recipientOrigin,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get(),0,40)
+                ||!fieldEffect(field,origin,ally,recipientOrigin,net.minecraft.world.effect.MobEffects.REGENERATION,1,40))return;
+        if(ally.tickCount%100==0)ally.getFoodData().eat(1,0.2F);
+    }
     public static void tick() {
         tickPulses();
         for(var f:new ArrayList<>(FIELDS.values())) {
-            var p=f.owner;var level=p.serverLevel();
+            var p=f.owner;var level=p.serverLevel();var tickOrigin=p.position();
             if(FIELDS.get(p.getUUID())!=f)continue;
             if(f.kind==ArtifactKind.CRUCIBLE)f.center=p.blockPosition();
             if(!p.isAlive() || p.isRemoved() || p.getMainHandItem()!=f.tool || f.tool.isEmpty()
@@ -220,30 +262,17 @@ public final class DomainFields {
                 if(FIELDS.remove(p.getUUID(),f))release(f);
                 continue;
             }
-            if(FIELDS.get(p.getUUID())!=f||p.getMainHandItem()!=f.tool||f.tool.isEmpty()||p.level().dimension()!=f.dimension)continue;
-            if(f.kind==ArtifactKind.INTERREGNUM && contains(p,p.blockPosition())) {
-                ArtifactPassives.grantCombatEffect(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,12);
-                ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,40);
-                if(f.mode==0){
-                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.REGENERATION,4,12);
-                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.ABSORPTION,3,40);
-                    ArtifactPassives.grantCombatEffect(p,net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,1,12);
-                    if(p.tickCount%20==0)p.getFoodData().eat(1,0.2F);
-                } else if(p.tickCount%100==0)p.getFoodData().eat(1,0.2F);
-            }
+            if(!fieldTickValid(f,tickOrigin))continue;
+            if(f.kind==ArtifactKind.INTERREGNUM&&contains(p,p.blockPosition())&&!sustainStasisOwner(f,tickOrigin))continue;
             if(f.kind==ArtifactKind.INTERREGNUM&&f.mode==0&&p.tickCount%10==0){
-                var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);int supported=0;
+                var bounds=new AABB(f.center).inflate(f.radius+1,Math.max(2,f.radius/2)+1,f.radius+1);
                 for(var ally:EntitySelection.nearest(level,ServerPlayer.class,bounds,
                         q->q!=p&&q.isAlive()&&q.isAlliedTo(p)&&contains(p,q.blockPosition()),Vec3.atCenterOf(f.center),16)){
-                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.DOMINION.get(),0,40);
-                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_WARD.get(),0,40);
-                    ArtifactPassives.grantCombatEffect(ally,net.minecraft.world.effect.MobEffects.NIGHT_VISION,0,80);
-                    ArtifactPassives.grantCombatEffect(ally,io.github.santipdr.specialpickaxes.SpecialPickaxes.STASIS_RESONANCE.get(),0,40);
-                    ArtifactPassives.grantCombatEffect(ally,net.minecraft.world.effect.MobEffects.REGENERATION,1,40);
-                    if(ally.tickCount%100==0)ally.getFoodData().eat(1,0.2F);
-                    if(++supported>=16)break;
+                    if(!fieldTickValid(f,tickOrigin))break;
+                    sustainStasisAlly(f,tickOrigin,ally);
                 }
             }
+            if(!fieldTickValid(f,tickOrigin))continue;
             if(f.kind==ArtifactKind.CRUCIBLE) {
                 if(p.tickCount%20==0)ArtifactFeedback.crucibleWardBoundary(p,f.radius);
                 Vec3 center=Vec3.atCenterOf(f.center);double rangeSqr=(double)f.radius*f.radius;int cap=32,changed=0;
@@ -269,6 +298,7 @@ public final class DomainFields {
             if(f.kind==ArtifactKind.EVENTIDE) {
                 if(contains(p,p.blockPosition()))
                     p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,12,2,false,true,true));
+                if(!fieldTickValid(f,tickOrigin))continue;
                 if(f.collapsePullUntil>ArtifactState.now(p)&&p.tickCount%5==0)pullDrops(f);
                 if(FIELDS.get(p.getUUID())!=f)continue;
                 if(p.tickCount%20==0){ArtifactFeedback.ring(p,f.kind,f.center,f.radius);RelicEffects.emit(p,f.kind,"sustain",Vec3.atCenterOf(f.center));}
