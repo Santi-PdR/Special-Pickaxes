@@ -25,12 +25,18 @@ public final class TestOres {
     public static Block STRUCTURAL_STONE;
     public static Block DATAPACK_TERRAIN;
     public static Block RATE_ONLY_BLOCK;
+    public static Block HIGHER_TIER_ORE;
 
     private TestOres(){}
 
     @SubscribeEvent public static void register(RegisterEvent event){
         if(!Boolean.getBoolean("specialpickaxes.testOres"))return;
         event.register(ForgeRegistries.Keys.BLOCKS,helper->{
+            var requirement=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,new ResourceLocation("pickaxe_compat_test","needs_higher_tool"));
+            net.minecraftforge.common.TierSortingRegistry.registerTier(new net.minecraftforge.common.ForgeTier(6,100,1,0,0,requirement,()->net.minecraft.world.item.crafting.Ingredient.EMPTY),
+                    new ResourceLocation("pickaxe_compat_test","higher_than_artifact"),java.util.List.of(io.github.santipdr.specialpickaxes.SpecialPickaxes.TIER),java.util.List.of());
+            HIGHER_TIER_ORE=new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).requiresCorrectToolForDrops());
+            helper.register(new ResourceLocation("pickaxe_compat_test","superior_ore"),HIGHER_TIER_ORE);
             NAMED_ORE=new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE));
             TAGGED_ORE=new Block(BlockBehaviour.Properties.copy(Blocks.AMETHYST_BLOCK));
             HOST_ROCK=new Block(BlockBehaviour.Properties.copy(Blocks.STONE));

@@ -102,6 +102,8 @@
     "archive": "referencias/ElementalUtilityPickaxes/utility_pickaxe-1.0.6-forge-1.20.1.jar",
     "entry": "assets/more_pickaxe/textures/item/pickaxe1.png",
     "sha256": "683b855ba19dd188df760ac121a20d46762e43177ec3d432e48896f3753ce386",
-    "adaptation": "Independent item model, effect palette and behavior; reference sprite retained without destructive repainting."
+    "adaptation": "Non-destructive contrast/readability adaptation of the existing reference sprite. Original source retained unchanged; silhouette and alpha preserved on a 2x nearest-neighbor grid. Reproducible with tools/item_readability_asset.py.",
+    "runtime_texture": "seam_ripper_v2.png",
+    "runtime_sha256": "0231609aabfdd6a0553c410db663e35c7d73f6b1757532431988b345a3b2f81a"
   }
 ]

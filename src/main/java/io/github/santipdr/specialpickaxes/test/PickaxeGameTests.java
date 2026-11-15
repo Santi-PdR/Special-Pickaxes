@@ -384,6 +384,37 @@ public final class PickaxeGameTests {
             h.assertTrue(compact.size()==2&&!tooltipHasKey(compact,"manual4.what")&&expanded.size()>9&&tooltipHasKey(expanded,"manual4.what"),"the final presentation distinguishes compact/SHIFT for "+kind.id);
         }h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_230") public static void explicitHigherForgeTierIsNotBypassedByOreInference(GameTestHelper h){
+        var state=TestOres.HIGHER_TIER_ORE.defaultBlockState();
+        h.assertTrue(ArtifactOres.isOre(state)&&ArtifactTools.effective(state),"compatibility fixture is recognized as foreign ore");
+        for(var kind:ArtifactKind.playableValues()){
+            var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());
+            h.assertTrue(!stack.isCorrectToolForDrops(state),"tier V cannot bypass a pack's explicitly higher Forge tier: "+kind.id);
+        }h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_231") public static void normalAndForeignOreHarvestRemainsOpAtTierFive(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());
+            for(var state:List.of(Blocks.OBSIDIAN.defaultBlockState(),Blocks.DIAMOND_ORE.defaultBlockState(),Blocks.DEEPSLATE.defaultBlockState(),TestOres.NAMED_ORE.defaultBlockState(),TestOres.TAGGED_ORE.defaultBlockState()))
+                h.assertTrue(stack.isCorrectToolForDrops(state)&&stack.getDestroySpeed(state)>=64,"ordinary tier/foreign ore compatibility and OP speed remain intact: "+kind.id);
+        }h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_232") public static void queuedMiningPreservesExplicitlyHigherTierOre(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.IRIDIUM);var pos=target(h);var state=TestOres.HIGHER_TIER_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,state);
+        h.assertTrue(!WorldSafety.harvestable(wearer,wearer.getMainHandItem(),pos)&&!WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state)&&h.getLevel().getBlockState(pos)==state,"native queued boundary preserves a block above the tool's explicit tier");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_233") public static void visualBackpressureNeverPreventsNativeMining(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.INTERREGNUM);var pos=target(h);var state=h.getLevel().getBlockState(pos);
+        for(int n=0;n<4096&&ArtifactFeedback.reserveMiningParticles(wearer,1);n++){}
+        h.assertTrue(!ArtifactFeedback.reserveMiningParticles(wearer,1),"the shared mining/aura allowance is saturated for this server tick");
+        ArtifactFeedback.burst(wearer,ArtifactKind.INTERREGNUM,pos,4);
+        h.assertTrue(WorldSafety.mine(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,pos,state)&&h.getLevel().getBlockState(pos).isAir(),"skipped cosmetics do not block permitted excavation");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_234") public static void invalidMiningVisualReservationsCannotBypassTheSharedCap(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);
+        for(int count:new int[]{Integer.MIN_VALUE,-1,0,Integer.MAX_VALUE})h.assertTrue(!ArtifactFeedback.reserveMiningParticles(wearer,count),"invalid or excessive mining particles never reserve a burst");
+        h.assertTrue(ArtifactFeedback.reserveMiningParticles(wearer,1),"invalid reservations do not corrupt the ordinary visual allowance");finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

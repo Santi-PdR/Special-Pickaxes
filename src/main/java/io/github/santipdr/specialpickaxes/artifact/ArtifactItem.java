@@ -40,9 +40,10 @@ public final class ArtifactItem extends PickaxeItem {
             default->64F;
         };
     }
-    // Artifact tier V is above Terramity's Exodium tier IV and keeps modded mining blocks harvestable.
-    // Keep harvesting enabled for modded pickaxe blocks even when their mod omits tier tags.
-    @Override public boolean isCorrectToolForDrops(BlockState state) { return ArtifactTools.effective(state); }
+    // Tier V still supports foreign ores without vanilla tool tags, but must honor explicit higher Forge tiers.
+    @Override public boolean isCorrectToolForDrops(BlockState state) {
+        return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state);
+    }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
         boolean damaged=super.hurtEnemy(stack,target,attacker);

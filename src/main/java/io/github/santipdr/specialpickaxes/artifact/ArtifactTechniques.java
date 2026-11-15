@@ -103,7 +103,7 @@ public final class ArtifactTechniques {
         boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(base,availableRise));
         if(started){
             ArtifactFeedback.message(player,"icarian_lift_started");
-            player.serverLevel().sendParticles(player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
+            if(ArtifactFeedback.reserveMiningParticles(player,12))player.serverLevel().sendParticles(player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
         }
         return started;
     }

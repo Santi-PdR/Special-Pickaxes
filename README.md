@@ -1,6 +1,6 @@
 # Special Pickaxes — mining rework
 
-**5.10.440 — atracción de drops y tooltip SHIFT real; pendiente de CI.**
+**5.10.441 — drops, tooltip SHIFT real, tiers Forge y efectos acotados; pendiente de CI.**
 Worldloom activa sin bloque apuntado, paga sólo offhand y corta la pasarela ante
 obstáculos/denegaciones/falta de material. Palimpsest prioriza las32menas naturales
 más cercanas y comunica la coordenada de la primera. Los trabajos naturales

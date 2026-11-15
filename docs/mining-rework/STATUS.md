@@ -1,3 +1,14 @@
+# Estado actual — 5.10.441: segunda fase pendiente de CI
+
+441: tiers explícitos Forge respetados aunque la mena se reconozca por nombre;
+regresiones mantienen tier5/velocidad64+ en bloques vanilla y menas extranjeras.
+SeamRipper32px: adaptación de contraste reproducible, alpha/silueta/fuente intactos.
+Bursts/previews y pulsos de trabajo de las13familias cubiertos por reservas para
+más rutas mineras (no se afirma que todo feedback legado use el mismo presupuesto).
+Paleta de bursts reutilizada; saturación visual nunca cancela minería.
+Cinco GameTests adicionales,302esperados;92JUnit esperados. Local22recursos,
+49Python, parser139Java ydiffcheck pasados. Java/cliente pendientes, sin buildlocal.
+
 # Estado actual — 5.10.440: primera fase pendiente de CI
 
 440: snapshot de actor/herramienta y posición/stack exactos de drops tras permisos

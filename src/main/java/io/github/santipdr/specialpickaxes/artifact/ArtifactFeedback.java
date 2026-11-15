@@ -47,6 +47,18 @@ public final class ArtifactFeedback {
     private static final DustParticleOptions ICARIAN_ASCENT_SKY=new DustParticleOptions(new Vector3f(.58F,.84F,1F),1.05F);
     private static final BlockParticleOption WORLDBREAKER_SHARD=new BlockParticleOption(ParticleTypes.BLOCK,
             net.minecraft.world.level.block.Blocks.DEEPSLATE_TILES.defaultBlockState());
+    private static final java.util.Map<ArtifactKind,DustParticleOptions> BURST_DUST=createBurstDust();
+    private static final DustParticleOptions GRAVITY_TETHER_DUST=new DustParticleOptions(new Vector3f(.66F,.48F,.96F),1.05F);
+    private static java.util.Map<ArtifactKind,DustParticleOptions> createBurstDust(){
+        var palette=new java.util.EnumMap<ArtifactKind,DustParticleOptions>(ArtifactKind.class);
+        for(var kind:ArtifactKind.values()){
+            int rgb=kind.color;palette.put(kind,new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.3F));
+        }return java.util.Map.copyOf(palette);
+    }
+    /** Private mining cues share the aura allowance; skipping cosmetics must never stop work or feedback text. */
+    public static boolean reserveMiningParticles(ServerPlayer wearer,int count){
+        return reserveAuraParticles(wearer.serverLevel().getServer().getTickCount(),count,1);
+    }
     private ArtifactFeedback() {}
     public static void forget(ServerPlayer player){SOUND_READY.remove(player.getUUID());LISTENER_SOUND_READY.remove(player.getUUID());WARD_AUDIENCE_CACHE.remove(player.getUUID());}
     public static void clearSounds(){SOUND_READY.clear();LISTENER_SOUND_READY.clear();WARD_AUDIENCE_CACHE.clear();}
@@ -399,8 +411,9 @@ public final class ArtifactFeedback {
         return origin.add(Math.cos(angle)*radius,progress*.92D,Math.sin(angle)*radius);
     }
     public static void burst(ServerPlayer p,ArtifactKind kind,BlockPos pos,int count) {
-        int rgb=kind.color;
-        var dust=new DustParticleOptions(new Vector3f(((rgb>>16)&255)/255F,((rgb>>8)&255)/255F,(rgb&255)/255F),1.3F);
+        count=Math.max(0,Math.min(8,count));
+        if(count==0||!reserveMiningParticles(p,count+(count>1?Math.min(3,count):0)))return;
+        var dust=BURST_DUST.get(kind);
         net.minecraft.core.particles.ParticleOptions accent=switch(kind){
             case PALIMPSEST,CHRONICLE->net.minecraft.core.particles.ParticleTypes.ENCHANT;
             case CHOIR,MERIDIAN->net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK;
@@ -425,6 +438,7 @@ public final class ArtifactFeedback {
     }
     /** Iridium's ore extraction gets a distinct, private resonance spiral instead of the shared burst. */
     public static void iridiumLodePulse(ServerPlayer p,BlockPos pos){
+        if(!reserveMiningParticles(p,6))return;
         var level=p.serverLevel();double phase=level.getGameTime()*.24D;
         var cyan=new DustParticleOptions(new Vector3f(.42F,.94F,1F),1.12F);
         var pearl=new DustParticleOptions(new Vector3f(.9F,1F,1F),.82F);
@@ -438,6 +452,7 @@ public final class ArtifactFeedback {
     }
     /** Nullcut fragments stream from each removed shell block toward the core it preserves. */
     public static void axiomNullcutPulse(ServerPlayer p,BlockPos mined,BlockPos core){
+        if(!reserveMiningParticles(p,4))return;
         var level=p.serverLevel();var source=Vec3.atCenterOf(mined).add(0,.16D,0);var nucleus=Vec3.atCenterOf(core).add(0,.16D,0);
         Vec3 inward=axiomNullcutDirection(mined,core);
         var cyan=new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.08F);
@@ -455,7 +470,7 @@ public final class ArtifactFeedback {
     }
     /** A short private scar marks the midpoint between adjacent Seam Ripper breaks. */
     public static boolean seamTrail(ServerPlayer p,BlockPos from,BlockPos to) {
-        if(from==null||to==null||from.distSqr(to)>5D)return false;
+        if(from==null||to==null||from.distSqr(to)>5D||!reserveMiningParticles(p,1))return false;
         var point=Vec3.atCenterOf(from).lerp(Vec3.atCenterOf(to),.5D).add(0,.62D,0);
         p.serverLevel().sendParticles(p,ParticleTypes.SCRAPE,false,point.x,point.y,point.z,1,0,0,0,0);
         return true;
@@ -469,6 +484,7 @@ public final class ArtifactFeedback {
     }
     /** The Crucible sheds particles of its chosen output, making each conversion legible at a glance. */
     public static void crucibleRephase(ServerPlayer p,BlockPos pos,net.minecraft.world.level.block.state.BlockState material){
+        if(!reserveMiningParticles(p,5))return;
         var fragments=new BlockParticleOption(ParticleTypes.BLOCK,material);
         p.serverLevel().sendParticles(p,fragments,false,pos.getX()+.5D,pos.getY()+.58D,pos.getZ()+.5D,5,.18D,.2D,.18D,.055D);
     }
@@ -531,6 +547,7 @@ public final class ArtifactFeedback {
         var outer=hollow?new DustParticleOptions(new Vector3f(.24F,.88F,1F),1.3F):dust;
         var core=hollow?new DustParticleOptions(new Vector3f(.72F,.42F,1F),1.45F):dust;
         int count=Math.max(12,Math.min(hollow?128:64,points));
+        if(!reserveMiningParticles(p,count+(innerRadius>0?Math.max(12,count/2):0)))return;
         for(int shell=0;shell<(innerRadius>0?2:1);shell++){
             double r=shell==0?radius:innerRadius;
             int samples=shell==0?count:Math.max(12,count/2);
@@ -543,6 +560,7 @@ public final class ArtifactFeedback {
         }
     }
     public static void worldloomBore(ServerPlayer p,BlockPos origin,net.minecraft.core.Direction direction){
+        if(!reserveMiningParticles(p,48))return;
         var level=p.serverLevel();var green=new DustParticleOptions(new Vector3f(.28F,.9F,.42F),1.25F);
         for(int depth:new int[]{0,8,15})for(int u=-2;u<=2;u++)for(int v=-2;v<=2;v++)if(Math.abs(u)==2||Math.abs(v)==2){
             BlockPos c=origin.relative(direction,depth);BlockPos at=switch(direction.getAxis()){
@@ -554,7 +572,7 @@ public final class ArtifactFeedback {
     public static boolean resonantTunnelPulseDue(int depth){return depth>=0&&depth<20&&(depth&1)==0;}
     public static int resonantTunnelParticleCount(int depth){return resonantTunnelPulseDue(depth)?4+(depth%5==0?1:0):0;}
     public static void resonantTunnelPulse(ServerPlayer p,BlockPos first,net.minecraft.core.Direction direction,int depth){
-        if(resonantTunnelParticleCount(depth)==0)return;
+        if(resonantTunnelParticleCount(depth)==0||!reserveMiningParticles(p,resonantTunnelParticleCount(depth)))return;
         var level=p.serverLevel();double cx=first.getX()+.5D,cy=first.getY()+.5D,cz=first.getZ()+.5D;
         double ax=0,ay=0,az=0,bx=0,by=0,bz=0;
         switch(direction.getAxis()){
@@ -597,8 +615,9 @@ public final class ArtifactFeedback {
     }
     /** Personal, capped tethers mark Eventide's Curios counter and drop pull without particle spam. */
     public static void gravityTether(ServerPlayer p,Vec3 from,Vec3 to){
+        if(!reserveMiningParticles(p,7))return;
         var level=p.serverLevel();
-        var violet=new DustParticleOptions(new Vector3f(.66F,.48F,.96F),1.05F);
+        var violet=GRAVITY_TETHER_DUST;
         for(int i=1;i<=4;i++){
             var point=gravityTetherPoint(from,to,i/5D);
             level.sendParticles(p,violet,false,point.x,point.y,point.z,1,0,0,0,0);
@@ -617,6 +636,7 @@ public final class ArtifactFeedback {
     }
     /** Bounded octagonal previews show the depth and beveled section of Exodium's Starfall Sink. */
     public static void starfallSink(ServerPlayer p,BlockPos origin){
+        if(!reserveMiningParticles(p,65))return;
         var level=p.serverLevel();
         var rim=new DustParticleOptions(new Vector3f(1F,.34F,.72F),1.35F);
         var core=new DustParticleOptions(new Vector3f(.96F,.83F,1F),1.15F);
@@ -633,12 +653,14 @@ public final class ArtifactFeedback {
     }
     /** A short falling-star pulse marks each live Exodium excavation step without broadcasting to distant players. */
     public static void starfallWork(ServerPlayer p,BlockPos at){
+        if(!reserveMiningParticles(p,1))return;
         var level=p.serverLevel();double x=at.getX()+.5,y=at.getY()+.65,z=at.getZ()+.5;
         level.sendParticles(p,io.github.santipdr.specialpickaxes.SpecialPickaxes.EXODIUM_STARFALL.get(),
                 false,x,y,z,1,.015D,.025D,.015D,.004D);
     }
     /** Compact landing burst confirms that Icarian Lift actually reached open sky. */
     public static void icarianSurface(ServerPlayer p){
+        if(!reserveMiningParticles(p,20))return;
         var level=p.serverLevel();double x=p.getX(),y=p.getY()+.15D,z=p.getZ();
         var sky=new DustParticleOptions(new Vector3f(.72F,.9F,1F),1.35F);
         for(int i=0;i<12;i++){
@@ -650,6 +672,7 @@ public final class ArtifactFeedback {
     }
     /** Personal ascent helix: six rising cyan points that never broadcast to distant players. */
     public static void icarianAscent(ServerPlayer p){
+        if(!reserveMiningParticles(p,7))return;
         var level=p.serverLevel();double phase=p.tickCount*.22D,x=p.getX(),y=p.getY()+.15D,z=p.getZ();
         for(int i=0;i<6;i++){
             double angle=phase+i*Math.PI/3D;
@@ -673,6 +696,7 @@ public final class ArtifactFeedback {
         var heart=new DustParticleOptions(new Vector3f(1F,.72F,.12F),1.5F);
         var level=p.serverLevel();var outline=HellspecBloomShape.boundary();
         int stride=Math.max(1,(outline.size()+191)/192);
+        if(!reserveMiningParticles(p,(outline.size()+stride-1)/stride+15))return;
         for(int i=0;i<outline.size();i+=stride){
             var offset=outline.get(i);var at=center.offset(offset);
             if(level.hasChunkAt(at))level.sendParticles(p,offset.getY()==0?ember:heart,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
