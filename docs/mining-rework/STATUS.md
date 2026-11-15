@@ -1,3 +1,51 @@
+# Resultado actual: 5.10.450 verificada y publicada como prueba
+
+- **Fuente:** `b1f495880c1debcc029422e3841120b52992e9a9`.
+- **CI:** [43667431107](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43667431107), completed/success.
+- **Pruebas Java:** 97 JUnit, cero fallos, errores u omisiones; 321 GameTests completos.
+- **Recursos/herramientas:** 24 pruebas de recursos en CI; 61 Python correctas en
+  venv local con Pillow. En el unittest de CI sin Pillow se omite únicamente el
+  render opcional del PDF: 60 pasan y 1 se omite. No se confunde con JUnit.
+- **Servidor/cliente:** servidor empaquetado y logs limpios. Cliente completo:
+  32 escenas, 64 tooltips, 64 comprobaciones de viewport y del evento final,
+  controles al servidor y WorldShatter de 9.341 bloques.
+- **JAR:** `special-pickaxes-1.20.1-5.10.450.jar`, 550.032 bytes, SHA-256
+  `ac50c5e88fbec79089708136b36997bd2adc7feb3f1e0ea35c8d71ce866c0fb5`.
+  Recuperado íntegro mediante Checks; tamaño, hash y CRC correctos. Trece iconos
+  y modelos coinciden con la procedencia exacta; sin recetas, worldgen ni fixtures.
+- **Publicación:** prerelease `test-5.10.450-43667431107`, asset 749577195 uploaded;
+  digest y tamaño de la API coinciden con el archivo verificado.
+- **Galería:** `artifacts/picos-5.10.450/los-13-picos.pdf` (13 páginas), ZIP con
+  26 imágenes exactas, HTML, procedencia y SHA256SUMS; CRC del ZIP correcto.
+  Revisada vista comparativa de los 13 retratos reales. Esto no aprueba toda la
+  animación temporal ni todo el pack Ghouls.
+
+## Cambios de esta tanda
+
+1. Tickets de limpieza de procedencia: recolocar un bloque invalida observaciones
+   antiguas sin borrar la marca nueva; sólo se mantienen tickets pendientes.
+2. Forge EntityMultiPlaceEvent: cada snapshot válido del mismo mundo se registra,
+   con exclusiones de fluidos y contenedores; no se fuerzan chunks.
+3. Lode Sense: se revalidan permisos, actor y stack exacto después de callbacks.
+4. Contornos de selección y trazas comparten presupuesto visual. Agotarlo no
+   cancela la selección ni la minería autorizada.
+5. Eventide: quinta adaptación de legibilidad reproducible, sin cambiar alpha,
+   silueta ni el original preservado.
+6. Controles: recuperación ante inputTick corrupto por overflow; una reanudación
+   denegada ya no devuelve éxito ni emite su señal de confirmación.
+7. Evidencia Checks: selección por intento/digest, rechazo de exportaciones
+   incompletas nuevas sin recurrir a una antigua; compatible con historial.
+
+449 falló por AuthenticationUnavailableException del servicio externo Minecraft,
+aunque completó las escenas y las pruebas de servidor. No se ignoró el escáner:
+450 repitió la validación completa y sus logs están limpios. Se conservan las
+notas históricas siguientes para no reescribir ese fallo como éxito.
+
+No hubo checkout, build local, instalación Windows ni automatización de interfaz
+local. La publicación es de prueba; el gate visual de versión estable sigue separado.
+
+## Historial (las notas «pendiente» siguientes son anteriores al resultado actual)
+
 # 5.10.450 — validación repetida y evidencias por intento, pendiente de CI
 
 449/run43666174413 pasó97JUnit(cero fallos/errores/skips),321GameTests y

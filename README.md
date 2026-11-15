@@ -1,24 +1,29 @@
 # Special Pickaxes — mining rework
 
-**5.10.446 — prueba publicada; CI completo correcto.**
+**5.10.450 — prueba publicada; CI completo correcto.**
 
-[CI43663630681](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43663630681)
-y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.446-43663630681).
-92JUnit sin fallos/errores/skips,309GameTests,servidor empaquetado y logs limpios.
-Cliente:32escenas,64tooltips con comprobación de altura y entrada real hasta
-WorldShatter9341. SHIFT es una referencia rápida que cabe en la ventana probada;
-manual desplazable conserva perfil/pasivas/modos. No es aprobación visual total.
+[CI 43667431107](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43667431107)
+y [descarga de prueba](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.450-43667431107).
+97 JUnit sin fallos, errores ni omisiones; 321 GameTests, servidor empaquetado y
+logs limpios. Cliente: 32 escenas, 64 tooltips con comprobación de altura,
+controles al servidor y WorldShatter de 9.341 bloques.
 
-Drops revalidan contexto/propiedad tras claims y mantienen velocidad acotada;
-minería respeta tiers superiores explícitos de Forge sin perder potencia normal.
-Más pulsos cosméticos comparten presupuesto. SeamRipper tiene adaptación de
-contraste reproducible. Colas revalidan permisos/herramienta incluso entre
-preparación y aplicación. Mensajes ES/EN orientan sobre rechazo y coste.
-El actualizador de catálogo ya no elimina iconos_v2; guía de13picos actualizada.
+Las construcciones recolocadas conservan su procedencia ante limpiezas diferidas;
+las colocaciones múltiples de Forge protegen todas las celdas válidas. Iridium
+revalida el stack del drop tras claims también en su atracción pasiva. Contornos
+y trazas comparten presupuesto cosmético. Eventide tiene una adaptación de
+contraste reproducible que preserva la silueta. Los controles se recuperan de
+relojes persistidos corruptos y ya no anuncian éxito cuando una reanudación falla.
+La evidencia de CI se separa por intento y checksum para evitar mezclas.
 
-JAR:548113bytes,SHA256
-`ebf010a1ca26379eaed0f4428323e73485a57bf5757bbd24661a7522ed3c0bb0`.
-El prerelease no es latest estable ni confirma instalación Windows o packGhouls.
+Se conservan las mejoras de 446: SHIFT legible en la ventana probada, manual
+completo, tiers Forge explícitos, mensajes de rechazo, potencia minera y cero
+recetas. Las secundarias siguen siendo utilidades mineras, no de combate.
+
+JAR: **550.032 bytes**, SHA-256:
+`ac50c5e88fbec79089708136b36997bd2adc7feb3f1e0ea35c8d71ce866c0fb5`.
+Es un prerelease de prueba, no una aprobación visual completa ni una certificación
+de Ghouls/shaders/TPS. No confirma instalación en Windows.
 
 **5.10.431 — prueba descargable publicada; CI global correcto.**
 Se conserva el gameplay validado en430. Tras CI completo exitoso en la rama de

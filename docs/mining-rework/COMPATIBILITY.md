@@ -1,9 +1,9 @@
-# Compatibilidad — revisión 446 validada en CI, pack completo no certificado
+# Compatibilidad — revisión 450 validada en CI, pack completo no certificado
 
 Las filas históricas describen decisiones, no una certificación del pack completo.
 La revisión441 conserva la detección de menas sin tags de herramienta, pero
 respeta requisitos de tiers superiores explícitos en TierSortingRegistry de Forge.
-No se ha ejecutado Ghouls completo. CI43663630681 pasó los309GameTests; tres de ellos cubren tier superior,
+No se ha ejecutado Ghouls completo. CI 43667431107 pasó los 321 GameTests; tres de ellos cubren tier superior,
 minería ordinaria OP y rechazo en la frontera de rotura.
 
 # Compatibilidad del catálogo 5.10.345
@@ -46,3 +46,10 @@ Las transformaciones protegen geología marcada al colocarla desde esta versión
 Vanilla no conserva el historial de colocación para bloques preexistentes; por
 eso no se afirma que pueda distinguir cada bloque natural de cada bloque antiguo
 colocado por jugador.
+
+## Procedencia de construcciones (450)
+
+La limpieza tras rotura no borra marcas nuevas de una recolocación. Los eventos
+Forge de colocación múltiple registran cada celda elegible del mismo nivel. Esto
+mejora la convivencia con constructores que emiten EntityMultiPlaceEvent, pero
+no identifica bloques antiguos ni colocaciones de mods que no emiten esos hooks.
