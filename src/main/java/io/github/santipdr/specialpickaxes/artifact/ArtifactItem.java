@@ -48,8 +48,7 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {
         boolean damaged=super.hurtEnemy(stack,target,attacker);
         if(damaged&&attacker instanceof ServerPlayer player) {
-            if(target.isAlliedTo(player)||target instanceof Player other&&!player.canHarmPlayer(other)
-                    ||!WorldSafety.allowed(player,kind,target.blockPosition()))return damaged;
+            if(!PassiveReactionContext.capture(player,target).allowed(kind))return damaged;
             switch(kind) {
                 case PALIMPSEST -> { player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,200,1,false,true,true)); player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.ABSORPTION,160,1,false,true,true)); }
                 case CHOIR -> ArtifactPassives.grantCombatEffect(target,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),1,100);

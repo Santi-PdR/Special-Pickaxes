@@ -1,3 +1,14 @@
+## Revisión 5.10.459 — pendiente de CI
+
+La minería diferida Curios lee la fuente actual de la ranura, sin aceptar
+una copia equivalente del ItemStack original. El puente sigue siendo opcional
+por reflexión: no introduce dependencia obligatoria de Curios. El lookup fresco
+se reserva para eventos/transacciones; las consultas cosméticas siguen cacheadas.
+Los proveedores de inventario alternativos deben pasar un lookup vivo a
+MiningObservations.captureCuriosIridium, no una captura constante. Los GameTests
+modelan la ranura mediante AtomicReference; no prueban una distribución real
+de Curios. Sigue pendiente una prueba del modpack Ghouls instalado.
+
 ## Regresiones verificadas en 5.10.458
 
 La CI43676520675 probó movimiento del portador/atacante y revocación de permiso

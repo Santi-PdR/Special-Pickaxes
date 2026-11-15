@@ -45,6 +45,19 @@ public final class CuriosCompat {
         return equipped;
     }
 
+    /** Mutation/event boundaries cannot rely on an earlier lookup from this same tick. */
+    public static Equipped findFresh(LivingEntity entity){
+        Access methods=ACCESS;if(methods==null)return null;
+        Equipped equipped=findUncached(entity,methods);
+        FIND_CACHE.put(entity,new Cached(entity.tickCount,equipped));
+        return equipped;
+    }
+
+    public static ItemStack currentPick(LivingEntity entity){
+        var equipped=findFresh(entity);
+        return equipped==null?ItemStack.EMPTY:equipped.stack();
+    }
+
     private static Equipped findUncached(LivingEntity entity,Access methods) {
         try {
             Object lazy = methods.inventory.invoke(null, entity);
@@ -57,7 +70,7 @@ public final class CuriosCompat {
             int count = (int) methods.slots.invoke(stacks);
             for (int slot = 0; slot < count; slot++) {
                 Object value = methods.stackInSlot.invoke(stacks, slot);
-                if (value instanceof ItemStack stack && stack.getItem() instanceof ArtifactItem) return new Equipped(stack, slot);
+                if (value instanceof ItemStack stack && !stack.isEmpty() && stack.getItem() instanceof ArtifactItem) return new Equipped(stack, slot);
             }
         } catch (ReflectiveOperationException | LinkageError ignored) {
             // Curios is optional. Missing API or a changed slot simply disables this bridge.

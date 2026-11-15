@@ -15,7 +15,7 @@ public final class MiningObservations {
     private static final int DROP_QUERY_LIMIT=256;
     private record Observation(ServerPlayer player,ItemStack tool,ArtifactKind kind,BlockPos pos,
                                BlockState state,ResourceKey<Level> dimension,int time,Map<UUID,ItemStack> dropsBefore,
-                               boolean dropsBeforeComplete,boolean applyHeldMiningEffects,boolean shareCuriosPassive) {}
+                               boolean dropsBeforeComplete,boolean applyHeldMiningEffects,EquipmentLease<ItemStack> curioSource) {}
     private record DropSnapshot(Map<UUID,ItemStack> stacks,boolean complete) {}
     private static final ArrayDeque<Observation> PENDING=new ArrayDeque<>();
     private MiningObservations() {}
@@ -23,10 +23,12 @@ public final class MiningObservations {
         return capture(p,tool,kind,pos,state,true);
     }
     public static boolean capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean applyHeldMiningEffects) {
-        return capture(p,tool,kind,pos,state,applyHeldMiningEffects,false);
+        return capture(p,tool,kind,pos,state,applyHeldMiningEffects,null);
     }
     private static boolean capture(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,
-                                   boolean applyHeldMiningEffects,boolean shareCuriosPassive) {
+                                   boolean applyHeldMiningEffects,EquipmentLease<ItemStack> curioSource) {
+        if(!p.isAlive()||p.isRemoved()||p.isSpectator()||tool.isEmpty()||p.getMainHandItem()!=tool
+                ||curioSource!=null&&(!curioSource.active()||curioSource.expected().isEmpty()))return false;
         boolean trackOreDrops=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state);
         // Queued Iridium breaks never chain held-mining effects.
         boolean queuedIridiumOre=WorkQueue.running()&&trackOreDrops;
@@ -34,15 +36,20 @@ public final class MiningObservations {
         boolean tagDropsAtSpawn=trackOreDrops&&WorldSafety.capturesIridiumDrops();
         DropSnapshot snapshot=trackOreDrops&&!tagDropsAtSpawn?dropSnapshot(p,pos):new DropSnapshot(Map.of(),!tagDropsAtSpawn);
         PENDING.addLast(new Observation(p,tool,kind,pos.immutable(),state,p.level().dimension(),p.server.getTickCount(),snapshot.stacks(),snapshot.complete(),
-                applyHeldMiningEffects&&!queuedIridiumOre,shareCuriosPassive));
+                applyHeldMiningEffects&&!queuedIridiumOre,curioSource));
         return true;
     }
     /** Snapshot a vanilla break when Iridium is in Curios and another tool is held. */
     public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state) {
+        return captureCuriosIridium(player,curioPick,pos,state,()->CuriosCompat.currentPick(player));
+    }
+    /** Inventory adapters supply a live slot lookup, not a snapshot captured before the break. */
+    public static boolean captureCuriosIridium(ServerPlayer player,ItemStack curioPick,BlockPos pos,BlockState state,
+                                               java.util.function.Supplier<ItemStack> currentPick) {
         if(curioPick.isEmpty()||!(curioPick.getItem() instanceof ArtifactItem equipped)||equipped.kind!=ArtifactKind.IRIDIUM
                 ||!ArtifactOres.isOre(state))return false;
         if(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return false;
-        return capture(player,player.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state,false,true);
+        return capture(player,player.getMainHandItem(),ArtifactKind.IRIDIUM,pos,state,false,new EquipmentLease<>(curioPick,currentPick));
     }
     public static void flush() {
         int budget=512;
@@ -51,10 +58,11 @@ public final class MiningObservations {
             if(!p.isAlive() || p.isRemoved() || p.isSpectator() || p.level().dimension()!=o.dimension
                     // Queued/Curios ore observations also belong to the original held tool.
                     || p.getMainHandItem()!=o.tool || o.tool.isEmpty()
+                    || o.curioSource!=null&&(!o.curioSource.active()||o.curioSource.expected().isEmpty())
                     || !ObservationWindow.fresh(p.server.getTickCount(),o.time) || !p.serverLevel().hasChunkAt(o.pos)) continue;
             if(p.serverLevel().getBlockState(o.pos).isAir()) {
                 if(o.kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(o.state)){
-                    ArtifactPassives.lodeSurge(p,o.pos,o.shareCuriosPassive);
+                    ArtifactPassives.lodeSurge(p,o.pos,o.curioSource!=null);
                     if(o.dropsBeforeComplete)highlightNewOreDrops(p,o);
                 }
                 if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);

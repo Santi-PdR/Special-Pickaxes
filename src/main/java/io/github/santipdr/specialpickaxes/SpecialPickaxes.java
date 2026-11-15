@@ -133,7 +133,7 @@ public final class SpecialPickaxes {
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
         StrataFocusEffect.observeBreak(p,e.getPos(),e.getState());
         if(!ArtifactOres.isOre(e.getState()))return;
-        var equipped=CuriosCompat.find(p);
+        var equipped=CuriosCompat.findFresh(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped.stack(),e.getPos(),e.getState());
     }
     private void entityJoin(net.minecraftforge.event.entity.EntityJoinLevelEvent e){
@@ -238,7 +238,7 @@ public final class SpecialPickaxes {
             boolean sharedStarfallGuard=ArtifactPassives.onSharedStarfallGuard(p,e);
             ArtifactPassives.onSharedHeartwoodGuard(p,e);
             ArtifactPassives.onSharedNullVeilGuard(p,e);
-            var equipped=CuriosCompat.find(p);
+            var equipped=CuriosCompat.findFresh(p);
             if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind!=ArtifactKind.INTERREGNUM)
                 ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
         }

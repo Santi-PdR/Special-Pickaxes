@@ -789,6 +789,60 @@ public final class PickaxeGameTests {
         var valid=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);var repeat=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);
         h.assertTrue(ArtifactPassives.onSharedNullVeilGuard(p,valid)&&Math.abs(valid.getAmount()-8.5F)<.001F&&!ArtifactPassives.onSharedNullVeilGuard(p,repeat),"corrupt future deadline recovers exactly once after context is stable");finish(h,p);
     }
+    @GameTest(template="empty",batch="rework_each_282") public static void curiosOreObservationRejectsRemovedSource(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"live adapter slot admits the original equipped source");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        slot.set(ItemStack.EMPTY);MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"replaced or removed equipment cannot acquire surge or drop ownership from the old observation");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_283") public static void curiosOreObservationRejectsEqualReplacement(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"live adapter slot admits the original equipped source");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        slot.set(source.copy());MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"replaced or removed equipment cannot acquire surge or drop ownership from the old observation");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_284") public static void curiosOreObservationRejectsEmptiedSource(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"live adapter slot admits the original equipped source");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        source.setCount(0);MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"replaced or removed equipment cannot acquire surge or drop ownership from the old observation");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_285") public static void curiosOreObservationRejectsDifferentRelic(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,source,pos,ore,slot::get),"live adapter slot admits the original equipped source");
+        h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);
+        slot.set(new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.ICARUS).get()));MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&!drop.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"replaced or removed equipment cannot acquire surge or drop ownership from the old observation");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_286") public static void staleCuriosSourceIsRejectedBeforeObservingTheBreak(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var pos=target(h);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
+        var stale=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());
+        h.assertTrue(!MiningObservations.captureCuriosIridium(p,stale,pos,ore,()->ItemStack.EMPTY),"a snapshot that is already unequipped never queues an observation");
+        h.assertTrue(!MiningObservations.capture(p,ItemStack.EMPTY,ArtifactKind.IRIDIUM,pos,ore,false),"empty held tool is rejected at admission too");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_287") public static void meleeSignatureDoesNotFollowAttackerMovedByClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(target);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p){target.setPos(target.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{var tool=p.getMainHandItem();h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,p),"native tool hit bookkeeping is preserved");
+            h.assertTrue(!target.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"a changed actor receives no stale extra melee signature");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="rework_each_288") public static void meleeSignatureDoesNotFollowMinerMovedByClaims(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var target=EntityType.ZOMBIE.create(h.getLevel());target.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(target);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p){p.setPos(p.position().add(0,0,1));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{var tool=p.getMainHandItem();h.assertTrue(((ArtifactItem)tool.getItem()).hurtEnemy(tool,target,p),"native tool hit bookkeeping is preserved");
+            h.assertTrue(!target.hasEffect(SpecialPickaxes.FAULT_RESONANCE.get()),"a changed actor receives no stale extra melee signature");
+        }finally{MinecraftForge.EVENT_BUS.unregister(move);finish(h,p);}
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;
@@ -3506,7 +3560,7 @@ public final class PickaxeGameTests {
         var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(pos,ore);
         var unrelated=new ItemEntity(h.getLevel(),pos.getX()+.3,pos.getY()+.2,pos.getZ()+.3,new ItemStack(Items.ROTTEN_FLESH));
         h.getLevel().addFreshEntity(unrelated);var curioIridium=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());
-        h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,pos,ore),"Curios Iridium observes an ore break while Choir is held");
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,pos,ore,()->curioIridium),"Curios Iridium observes an ore break while Choir is held");
         h.assertTrue(!MiningObservations.captureCuriosIridium(p,p.getMainHandItem(),pos,ore),"held Iridium does not create a duplicate Curios observation");
         h.getLevel().setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
         var drop=new ItemEntity(h.getLevel(),pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,new ItemStack(Items.DIAMOND,2));h.getLevel().addFreshEntity(drop);
@@ -3520,7 +3574,7 @@ public final class PickaxeGameTests {
         h.assertTrue(!OreDropHighlight.mark(drop,p),"a repeated observation does not replay the animated Iridium shard");
         h.assertTrue(!unrelated.isCurrentlyGlowing()&&!unrelated.getPersistentData().contains("specialpickaxesIridiumOreDrop"),"a nearby pre-existing item is not marked");
         var moddedPos=pos.east(3);var moddedOre=TestOres.TAGGED_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(moddedPos,moddedOre);
-        h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,moddedPos,moddedOre),"Iridium observes a foreign ore identified only by its modded ore-family tag");
+        h.assertTrue(MiningObservations.captureCuriosIridium(p,curioIridium,moddedPos,moddedOre,()->curioIridium),"Iridium observes a foreign ore identified only by its modded ore-family tag");
         h.getLevel().setBlockAndUpdate(moddedPos,Blocks.AIR.defaultBlockState());
         var moddedDrop=new ItemEntity(h.getLevel(),moddedPos.getX()+.5,moddedPos.getY()+.25,moddedPos.getZ()+.5,new ItemStack(Items.EMERALD));h.getLevel().addFreshEntity(moddedDrop);MiningObservations.flush();
         h.assertTrue(p.getEffect(lodeSurge).getAmplifier()==1,"a second foreign ore break builds the second speed charge");
@@ -3528,7 +3582,7 @@ public final class PickaxeGameTests {
         var queuedPos=pos.east(10);var queuedOre=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(queuedPos,queuedOre);
         var capturedDuringJob=new boolean[1];java.util.function.Consumer<net.minecraftforge.event.level.BlockEvent.BreakEvent> observeQueuedOre=event->{
             if(event.getPlayer()==p&&event.getPos().equals(queuedPos))capturedDuringJob[0]=WorkQueue.running()
-                    &&MiningObservations.captureCuriosIridium(p,curioIridium,queuedPos,queuedOre);
+                    &&MiningObservations.captureCuriosIridium(p,curioIridium,queuedPos,queuedOre,()->curioIridium);
         };
         MinecraftForge.EVENT_BUS.addListener(observeQueuedOre);
         try{h.assertTrue(WorkQueue.start(p,p.getMainHandItem(),ArtifactKind.CHOIR,List.of(new WorkStep.Mine(queuedPos,queuedOre))),"Choir queues an ore break while Curios Iridium is equipped");WorkQueue.tick();}

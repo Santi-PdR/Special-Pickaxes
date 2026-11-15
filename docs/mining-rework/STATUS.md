@@ -1,3 +1,26 @@
+# 5.10.459 — equipo diferido y firmas adicionales seguras; pendiente de CI
+
+Iridium Curios conserva un EquipmentLease de identidad: se consulta la ranura
+actual al admitir y confirmar la observación; una copia equivalente no sustituye
+la fuente original. Cambios/quitar/vaciar el pico invalidan ritmo y marcado de
+drops pendientes. Los adaptadores de inventario pueden proporcionar un lookup
+vivo; el puente integrado usa CuriosCompat.currentPick/findFresh, sin reutilizar
+la caché del tick en estas fronteras. Las consultas visuales conservan caché.
+Los eventos de minería y daño del mod obtienen equipo fresco. No se añaden
+recetas, daño ni secundarias de combate.
+
+Se rechazan observaciones con actor inválido/herramienta vacía o distinta antes
+de consultar drops. ArtifactItem reutiliza PassiveReactionContext antes de
+las firmas adicionales de un golpe normal: si claims mueven alguno de los
+actores, conserva el bookkeeping nativo pero no añade el efecto obsoleto.
+
+Cuatro JUnit de identidad de equipo y siete GameTests nuevos. Los tests de
+inventario usan proveedores de ranura simulados explícitos, no una instalación
+real de Curios ni una certificación de esa integración. Pruebas anteriores de
+LodeSurge ahora declaran ese adaptador en vez de fingir equipo real.
+Esperados114JUnit/356GameTests. Local25recursos/63Python conPillow/parser148Java,
+secrets/diffcheck correctos; sin build local. CI pendiente.
+
 ## Entrega verificada 5.10.458
 
 - Fuente runtime: `f5082b28de716b0f0089946a34b1f2e42a8b909a`.
