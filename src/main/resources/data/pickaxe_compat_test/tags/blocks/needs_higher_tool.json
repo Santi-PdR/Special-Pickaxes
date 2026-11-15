@@ -1,1 +1,6 @@
-{"replace":false,"values":["pickaxe_compat_test:superior_ore"]}
+{
+  "replace": false,
+  "values": [
+    {"id": "pickaxe_compat_test:superior_ore", "required": false}
+  ]
+}

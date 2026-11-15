@@ -25,6 +25,17 @@ class Resources(unittest.TestCase):
         self.assertIn("exclude 'data/pickaxe_compat_test/**'", pathlib.Path("build.gradle").read_text())
         self.assertIn("n.startswith('data/pickaxe_compat_test/')", pathlib.Path("tools/verify_release.py").read_text())
 
+    def test_foreign_fixture_tag_entries_are_optional_outside_gametest(self):
+        # Dev runClient loads resources without registering testOres; optional does not mean
+        # untested: GameTests separately assert membership and the superior tier rejection.
+        tags = ROOT / "data/pickaxe_compat_test/tags"
+        for path in tags.rglob("*.json"):
+            for entry in json.loads(path.read_text())["values"]:
+                identity = entry if isinstance(entry, str) else entry["id"]
+                if identity.lstrip("#").startswith(("pickaxe_compat_test:", "terramity:")):
+                    self.assertIsInstance(entry, dict, str(path))
+                    self.assertIs(entry.get("required"), False, str(path))
+
     def test_all_registered_particles_have_atlases_and_renderers(self):
         source = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/SpecialPickaxes.java").read_text()
         renderers = pathlib.Path("src/main/java/io/github/santipdr/specialpickaxes/client/SpecialParticleRenderers.java").read_text()

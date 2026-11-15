@@ -1,3 +1,14 @@
+# 5.10.445 — corrección de tag de fixture, pendiente de CI
+
+444/run43662073543 falló al escanear logs del cliente: needs_higher_tool exigía
+superior_ore aunque testOres no registra el bloque enrunClient. No se silencia el
+escáner: referencia opcional como las demás fixtures; regresión recorre tags de
+fixtures y exige optional enreferencias ajenas. Los GameTests conservan asserts
+de membership/tier para que optional no oculte una fixture ausente enservidor.
+444 sí pasó92JUnit(sinfallos/errores/skips),308GameTests,servidor empaquetado;
+cliente llegó a32escenas/64tooltips/WorldShatter9341pero no se certifica verde.
+445mantiene las mejoras runtime y debe repetir todaCI.
+
 # 5.10.444 — pendiente de CI
 
 Mantenimiento integral: el actualizador del catálogo ya no elimina iconos_v2,
