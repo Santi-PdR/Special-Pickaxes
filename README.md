@@ -1,3 +1,21 @@
+# Special Pickaxes — 5.11.0, reestructuración en validación
+
+**No instalar467esperando este rediseño: los enlaces inferiores son históricos.**
+
+-13sprites originales de Mythic Metals, exactos al commit fuente; sin arte generado
+ ni filtros sobre los picos. Créditos/licencia de assets incluidos.
+- VFX custom breves solo al activar habilidades; sin auras pasivas ni partículas
+ vanilla permanentes. Manual reducido a dos habilidades y controles reasignados.
+- Stasis: Fractura Temporal11×11×11; secundarias de excavación ampliadas y perfil
+ de trabajo más rápido, siempre sujeto a permisos y presupuestos de servidor.
+- Uso personal: publicación automática de binarios desactivada. No se atribuye
+ permiso general de redistribución de los sprites.
+- CI nueva pendiente. Las pruebas de467no validan5.11.0.
+
+Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
+
+## Historial de entregas anteriores
+
 # Special Pickaxes — mining rework
 
 ## Entrega verificada 5.10.467

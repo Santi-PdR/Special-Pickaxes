@@ -1,3 +1,30 @@
+# Rediseño 5.11.0 — pendiente de validar en cliente
+
+Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
+arte generado. Las partículas de equipamiento/Curios y bordes persistentes se
+retiran. Solo una activación válida muestra una ráfaga de partículas custom.
+El manual presenta tres bloques: principal, secundaria y controles actuales.
+
+Corona de Stasis ya no extrae un solo bloque: Fractura Temporal abre un volumen
+de11×11×11, extrayendo roca y mineral con drops normales. La cola evita ejecutar
+1331mutaciones en un tick y conserva claims, bedrock y bloques construidos.
+Axiom vacía ese volumen conservando menas; Crucible transmuta una esfera de
+radio12; Choir abre una galería7×5×24; Hellspec una chimenea7×7×32; Worldloom
+construye un puente de32bloques pagados; Eventide atrae botín libre/propio en48
+bloques; Worldbreaker tiene fractura nativa o secundaria copiada; Seam barre
+15×15; Exodium baja hasta64. Icarus/Iridium conservan sus mecánicas principales.
+
+Defaults de mundo nuevo:32intentos por jugador/tick,192globales, menas96,
+secundaria mínima2segundos, primarias0.5segundos. Los mundos existentes conservan
+los valores de su serverconfig: cambiarlo explícitamente si se quiere el nuevo
+perfil; no borres configuraciones ajenas ni mundos. Las habilidades se pueden
+cancelar con el control mostrado en el manual. Usa una copia de seguridad.
+
+No hay publicación automática de binarios de estos assets personales; no es
+una aprobación visual ni de compatibilidad con todo Ghouls.
+
+## Historial
+
 ## Revisión 5.10.467 — CI completa correcta
 
 Los campos no siguen entregando beneficios ni alterando proyectiles/drops
