@@ -1,3 +1,13 @@
+# 5.10.454 — ascenso sin recaptura, pendiente de CI
+
+Icarian Lift detecta que el minero salió de su eje o fue teletransportado fuera
+del progreso esperado. Termina sin seguir cortando ni arrastrarlo de vuelta;
+respeta saltos normales con tolerancia vertical. Salir no provoca carga de chunks
+ni consultas de congestión antes de parar. Mensaje ES/EN explica la detención.
+Tres GameTests y cinco JUnit nuevos: esperados330GameTests/107JUnit. Mantiene
+ascenso normal, barreras y fluidos bajo sus regresiones existentes. Local25recursos,
+63Python/parser145Java/diffcheck correctos. Sin buildlocal; CI pendiente.
+
 # Resultado actual: 5.10.453 verificada y publicada como prueba
 
 - **Fuente:** `25fd933b670bae285c37b90059971e38ef1946ea`.

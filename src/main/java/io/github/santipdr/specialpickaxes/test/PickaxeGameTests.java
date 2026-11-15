@@ -598,6 +598,29 @@ public final class PickaxeGameTests {
                     &&binding.getContents() instanceof net.minecraft.network.chat.contents.KeybindContents,"instruction argument is a live keybind, not a literal letter");
         }h.succeed();
     }
+    @GameTest(template="empty",batch="rework_each_260") public static void icarianLiftDoesNotRecaptureAMinerWhoLeftTheShaft(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
+        for(int y=1;y<=5;y++)h.getLevel().setBlockAndUpdate(base.above(y),state);
+        var lift=new IcarianLiftProgram(base,20);h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift),"lift starts");
+        var departure=wearer.position().add(2,0,0);wearer.setPos(departure);drain(wearer);
+        h.assertTrue(lift.departed()&&!WorkQueue.busy(wearer)&&wearer.position().equals(departure),"leaving the shaft ends work without teleporting the miner back");
+        for(int y=1;y<=5;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y))==state,"no abandoned shaft block is cut");finish(h,wearer);
+    }
+    @GameTest(template="empty",batch="rework_each_261") public static void icarianLiftStopsAfterDepartureBetweenBudgetedTurns(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
+        for(int y=1;y<=5;y++)h.getLevel().setBlockAndUpdate(base.above(y),state);
+        var lift=new IcarianLiftProgram(base,20);int previous=ArtifactConfig.PER_PLAYER.get();
+        try{ArtifactConfig.PER_PLAYER.set(1);WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure");
+            var departure=wearer.position().add(0,0,2);wearer.setPos(departure);drain(wearer);
+            h.assertTrue(lift.departed()&&wearer.position().equals(departure)&&h.getLevel().getBlockState(base.above(2))==state,"a later turn does not resume excavation or movement from a stale shaft");
+        }finally{ArtifactConfig.PER_PLAYER.set(previous);finish(h,wearer);}
+    }
+    @GameTest(template="empty",batch="rework_each_262") public static void icarianLiftPreservesExternalVerticalTeleport(GameTestHelper h){
+        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var lift=new IcarianLiftProgram(base,20);
+        WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);var departure=wearer.position().add(0,7,0);wearer.setPos(departure);drain(wearer);
+        h.assertTrue(lift.departed()&&wearer.position().equals(departure)&&!WorkQueue.busy(wearer),"same-column external teleport is not undone by the old lift");finish(h,wearer);
+    }
     private static net.minecraft.world.entity.monster.Zombie landingAttacker(GameTestHelper h,ServerPlayer wearer){
         wearer.setPos(wearer.position().add(0,20,0));wearer.addEffect(new net.minecraft.world.effect.MobEffectInstance(SpecialPickaxes.GRAVITIC_BALANCE.get(),100));
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setNoAi(true);mob.setPos(wearer.position().add(2,0,0));h.getLevel().addFreshEntity(mob);return mob;

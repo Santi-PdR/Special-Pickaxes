@@ -619,5 +619,6 @@
   "message.specialpickaxes.alternate_hint.iridium": "Sólo recupera tus drops de mena marcados por Iridio a menos de 48bloques.",
   "message.specialpickaxes.alternate_hint.hellspec": "Apunta a piedra o mena natural picable para abrir la chimenea.",
   "message.specialpickaxes.alternate_hint.seam_ripper": "Apunta a una cara de piedra natural permitida; conserva menas y bloques colocados.",
-  "tooltip.specialpickaxes.quick_controls": "%s: usar · %s: alternativa · %s: manual completo, modos y pasivas"
+  "tooltip.specialpickaxes.quick_controls": "%s: usar · %s: alternativa · %s: manual completo, modos y pasivas",
+  "message.specialpickaxes.icarian_lift_departed": "Ascenso detenido: saliste de su eje. Se conservó tu nueva posición."
 }

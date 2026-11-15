@@ -12,7 +12,7 @@ public final class IcarianLiftProgram implements WorkProgram {
     private final int maxRise;
     private int rise,index;
     private boolean finished;
-    private boolean surfaced,blocked,fluidBlocked,heightCapped;
+    private boolean surfaced,blocked,fluidBlocked,heightCapped,departed;
 
     public IcarianLiftProgram(BlockPos base,int maxRise){this.base=base.immutable();this.maxRise=Math.max(0,Math.min(MAX_WORLD_RISE,maxRise));}
 
@@ -28,16 +28,18 @@ public final class IcarianLiftProgram implements WorkProgram {
     @Override public boolean done(){return finished;}
     @Override public void confirm(){}
     public boolean surfaced(){return surfaced;}
+    public boolean departed(){return departed;}
+    private boolean onShaft(ServerPlayer player){return !player.isPassenger()&&!player.isSleeping()&&IcarianShaft.contains(base,rise,player.position());}
     public boolean blocked(){return blocked;}
     public boolean fluidBlocked(){return fluidBlocked;}
     public boolean heightCapped(){return heightCapped;}
     private void finishAtBarrier(){finished=true;blocked=true;}
     private void finishAtFluid(){finished=true;blocked=true;fluidBlocked=true;}
     private void finishAtHeight(){finished=true;heightCapped=true;}
-    @Override public boolean loaded(ServerPlayer p){return finished||index>=cells()||p.serverLevel().isOutsideBuildHeight(nextPos())||p.serverLevel().hasChunkAt(nextPos());}
+    @Override public boolean loaded(ServerPlayer p){return finished||!onShaft(p)||index>=cells()||p.serverLevel().isOutsideBuildHeight(nextPos())||p.serverLevel().hasChunkAt(nextPos());}
 
     @Override public boolean backpressured(ServerPlayer p){
-        if(finished||index>=cells())return false;
+        if(finished||!onShaft(p)||index>=cells())return false;
         BlockPos pos=nextPos();var level=p.serverLevel();
         if(!level.hasChunkAt(pos))return false;
         var state=level.getBlockState(pos);
@@ -49,6 +51,7 @@ public final class IcarianLiftProgram implements WorkProgram {
 
     @Override public WorkStep next(ServerPlayer p){
         if(finished)return completed(base);
+        if(!onShaft(p)){finished=true;departed=true;return completed(p.blockPosition());}
         if(index>=cells()){
             if(rise>=maxRise){finishAtHeight();return completed(base.offset(0,rise,0));}
             int nextRise=rise+1;
