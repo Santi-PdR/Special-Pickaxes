@@ -1,3 +1,15 @@
+## 5.11.6 — implementación guardada; validación bloqueada en dependencias
+
+Segundo run43910619548(884282d68e126fb42aa9eccfbf72545d40bf8a5e)también
+falló al resolver ForgeGradle, antes de compilar. Evidencia descargada y comprobada:
+no hay JUnit/GameTests ni JAR5.11.6validado. No se cambió arbitrariamente versión
+del plugin ni se omitió validación. Último binario verde sigue5.11.5/CI43904324802.
+Los cambios Worldloom y nuevas pruebas están subidos;97Python sin omitidos
+con Pillow y25recursos correctos. Secrets313sin firmas. JUnit de geometría y
+GameTests nuevos siguen pendientes de ejecución por la resolución de dependencias.
+Próximo paso: recuperar acceso al repositorio de ForgeGradle y volver a ejecutar
+build/test/GameTests/cliente/servidor antes de entregar binario5.11.6.
+
 ## Diagnóstico inicial 5.11.6
 
 Run43910083914falló ANTES de compilar: no se resolvió el plugin
