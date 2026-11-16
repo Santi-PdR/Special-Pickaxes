@@ -1,4 +1,13 @@
 pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'net.minecraftforge.gradle') {
+                // Resolve the published implementation directly, without requiring a separate
+                // plugin-marker artifact. Keep the same ForgeGradle version constraint.
+                useModule("net.minecraftforge.gradle:ForgeGradle:${requested.version}")
+            }
+        }
+    }
     repositories {
         gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }

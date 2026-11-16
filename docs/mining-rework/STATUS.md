@@ -1,3 +1,13 @@
+## 5.11.6 — corrección de resolución de plugin en validación
+
+Se conserva ForgeGradle[6.0,6.2)y el repositorio oficial. settings.gradle
+resuelve explícitamente `net.minecraftforge.gradle:ForgeGradle` por useModule,
+sin depender del artefacto marcador separado que falló en ambos runs anteriores.
+Coordenadas contrastadas con build.gradle oficial FG_6.0(groupnet.minecraftforge.gradle,
+proyectoForgeGradle, idnet.minecraftforge.gradle). No se sustituye por mirrors ni
+se deshabilita TLS. CIbuild añade--info para guardar causas HTTP/resolución
+si el módulo también falla. Esto es una corrección pendiente, no CIverde.
+
 ## 5.11.6 — implementación guardada; validación bloqueada en dependencias
 
 Segundo run43910619548(884282d68e126fb42aa9eccfbf72545d40bf8a5e)también
