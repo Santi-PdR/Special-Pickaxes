@@ -1,3 +1,18 @@
+## Última comprobación43923206173: Forge sigue sin servir dependencias
+
+SHA `cf067062d49472ea36677e10e502dc6f00b97608`: failure de :classpath,
+antes de Java/tests. Ahora faltan POMoficiales de unsafe0.2.0,srgutils0.6.2,
+DiffPatch2.0.12yJarJarSelector0.3.19. Los404no son prueba de que esas versiones
+sean inválidas: el upstream devolvió distintos artefactos ausentes entre runs.
+No se aplican más cambios arbitrarios de resolución ni versiones para ocultarlo.
+El wrapper transmitió la evidencia y mantuvo salida no-cero, sin reintento de
+artefactos ausentes. Local109Python sin omitidos con Pillow y25recursos correctos.
+
+Inicio manual por workflow_dispatchsigue403por permisos de la integración;
+push sí funciona y los cambios están guardados. No hay build5.11.6aprobada.
+Última build verde5.11.5. Retomar cadena CI completa cuando Forge se recupere;
+no declarar las mejoras Worldloom verificadas por disponer solo de testsPython.
+
 ## Diagnóstico Gradle con memoria acotada y salida en vivo
 
 workflow_dispatch rechazado403Resource not accessible by integration; no es
