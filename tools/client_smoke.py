@@ -89,6 +89,9 @@ try:
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
    capture_screen(str(out/('ux-'+id+'.png')))
    capture_screen(str(out/('ux-shift-'+id+'.png')), 'shift')
+   # Open the actual guide with its registered key; capture every mode, including copies.
+   capture_screen(str(out/('manual-'+id+'.png')), 'manual')
+   press_screen('close')
    press_screen('confirm' if id=='paradox_crucible-regional' else 'activate')
    activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
@@ -130,6 +133,9 @@ finally:
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
+manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
+if len(manual_frames)<len(scenes):raise SystemExit('Not every live manual scene rendered: '+str(len(manual_frames)))
+if any(not (out/('manual-'+scene+'.png')).exists() for scene in scenes):raise SystemExit('Missing real manual capture')
 subprocess.run(['python3','tools/validate_runtime_logs.py',str(out/'client.log')],check=True)
 text=(out/'client.log').read_text().lower()
 for issue in ['missing texture','unable to load model','unable to bake','using missing texture']:

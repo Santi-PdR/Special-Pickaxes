@@ -13,6 +13,14 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ClientTooltipValidation {
     private static boolean bindingsChecked;
+    private static net.minecraft.client.gui.screens.Screen lastManual;
+    @SubscribeEvent public static void manualRendered(net.minecraftforge.client.event.ScreenEvent.Render.Post event){
+        if(!Boolean.getBoolean("specialpickaxes.clientSmoke")
+                ||!(event.getScreen() instanceof io.github.santipdr.specialpickaxes.client.ArtifactManualScreen)
+                ||event.getScreen()==lastManual)return;
+        lastManual=event.getScreen();
+        com.mojang.logging.LogUtils.getLogger().info("MANUAL_SCREEN_RENDERED {}x{}",lastManual.width,lastManual.height);
+    }
     private static final java.util.Set<String> CHECKED=new java.util.HashSet<>();
     @SubscribeEvent public static void draw(RenderGuiOverlayEvent.Post e){
         if(!Boolean.getBoolean("specialpickaxes.clientSmoke")||e.getOverlay()!=VanillaGuiOverlay.HOTBAR.type())return;
