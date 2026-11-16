@@ -68,3 +68,18 @@ class OverhaulContracts(unittest.TestCase):
             text = texts['alternate.detail.specialpickaxes.eventide']
             self.assertIn(' %3$s ', text)
             self.assertIn(' %1$s ', text)
+
+    def test_multimode_guides_explain_every_selected_mode_in_both_languages(self):
+        modes = {
+            'eventide': ['gravity_in', 'gravity_out'],
+            'interregnum': ['domain', 'aura'],
+            'icarus': ['forward', 'wide'],
+            'worldbreaker': ['carve', 'fracture', 'cleave', 'core_drill', 'world_shatter', 'region_break'],
+            'paradox_crucible': ['stone', 'deepslate', 'granite', 'diorite', 'andesite', 'dirt', 'basalt', 'obsidian', 'calcite', 'tuff', 'dripstone', 'gravel'],
+        }
+        for locale in ('en_us', 'es_es'):
+            texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
+            for artifact, variants in modes.items():
+                descriptions = [texts['guide.main.' + artifact + '.' + mode] for mode in variants]
+                self.assertEqual(len(descriptions), len(set(descriptions)))
+                self.assertTrue(all(15 < len(text) < 180 for text in descriptions))

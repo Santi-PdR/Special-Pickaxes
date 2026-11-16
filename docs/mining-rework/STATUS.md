@@ -1,3 +1,18 @@
+## 5.11.2 — identidad visual de activación y manual por modo (pendiente CI)
+
+Las ráfagas custom dejan de usar un anillo idéntico: alas ascendentes Icarus,
+espiral Iridium, retícula Seam, onda Choir, caída Exodium, hélice Hellspec/Crucible,
+raíles Worldloom, corte circular Axiom y pulso Palimpsest. Mismos16puntos por
+activación,256globales/tick y deduplicación por jugador; sin suscriptor ambiental
+ni texturas generadas. Marco horizontal estable incluso mirando arriba/abajo.
+Pruebas JUnit nuevas: puntos únicos/finitos/acotados, orientación y rechazo de índices.
+
+Descripciones específicas bilingües para TODOS los modos de picos multimodo,
+incluyendo los12materiales de Crucible y6excavaciones Worldbreaker. El manual
+conserva sus tres bloques, controles reasignables y seguimiento del modo copiado.
+Python comprueba cobertura/distinción/longitud de cada descripción. No se afirma
+aprobación estética ni compatibilidad con Ghouls/Windows; nueva CI pendiente.
+
 ## 5.11.1 — CI verde y manual capturado
 
 Commit probado `ed4410bbec763561d11370f3f230ca7e40c107c8`, ejecución

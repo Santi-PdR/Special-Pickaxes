@@ -26,17 +26,17 @@ public final class AbilityVfx {
             default -> SpecialPickaxes.EXODIUM_STARFALL.get();
         };
     }
-    /** A compact ring below the crosshair; at most one successful cast burst per player per tick. */
+    /** Distinct custom cast silhouettes; at most one successful burst per player per tick. */
     public static boolean cast(ServerPlayer player,ArtifactKind kind){
         if(!kind.playable()||!player.isAlive()||player.isRemoved()||player.isSpectator())return false;
         int tick=player.server.getTickCount();
         if(LAST_CAST.getOrDefault(player.getUUID(),tick-1)==tick||!BUDGET.tryReserve(tick,16))return false;
         LAST_CAST.put(player.getUUID(),tick);
         var center=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(1.5)).add(0,.25,0);
-        for(int i=0;i<16;i++){
-            double angle=i*Math.PI/8,radius=.35+(i%2)*.2;
-            player.serverLevel().sendParticles(player,particle(kind),false,center.x+Math.cos(angle)*radius,
-                    center.y,center.z+Math.sin(angle)*radius,1,0,.015,0,0);
+        for(int i=0;i<AbilityBurstShape.COUNT;i++){
+            var point=center.add(AbilityBurstShape.orient(AbilityBurstShape.offset(kind,i),player.getLookAngle()));
+            player.serverLevel().sendParticles(player,particle(kind),false,point.x,
+                    point.y,point.z,1,0,.015,0,0);
         }
         return true;
     }
