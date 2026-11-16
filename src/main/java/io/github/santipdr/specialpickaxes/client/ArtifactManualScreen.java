@@ -109,8 +109,18 @@ public final class ArtifactManualScreen extends Screen {
     /** Three purposeful blocks: what the primary does, what the alternate does, and live key bindings. */
     private List<Section> sections(ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey){
         var controls=new ArrayList<Component>();
-        for(var action:ArtifactTooltips.actions(stack,kind,mode))
-            controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT))));
+        boolean regional=ArtifactInteraction.regional(abilityKind,mode);
+        for(var action:ArtifactTooltips.actions(stack,kind,mode)){
+            String description=switch(action){
+                case ACTIVATE -> regional?"guide.control.region":
+                        abilityKind==ArtifactKind.EVENTIDE||abilityKind==ArtifactKind.INTERREGNUM
+                                ?"guide.control.field":"guide.control.activate";
+                case ALT_SKILL -> "guide.control.alternate";
+                default -> "key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT);
+            };
+            controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable(description)));
+        }
+        if(regional)controls.add(Component.translatable("guide.control.corners"));
         return List.of(
                 section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
                 section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),

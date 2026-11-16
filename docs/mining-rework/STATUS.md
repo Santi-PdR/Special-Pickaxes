@@ -1,3 +1,26 @@
+## Estado local 5.11.3: subida bloqueada por conexión
+
+Commit de implementación `f5e49eb`. Los intentos de push devolvieron
+`gnutls_handshake() failed: The TLS connection was non-properly terminated`;
+`gh api rate_limit` devolvió EOF. No fue un error de credenciales y no se pidieron.
+Cambios guardados localmente, aún sin CI nueva ni binario5.11.3validado.
+Local:95Python sin omitidos con Pillow,25recursos,162Java parseados sin errores;
+el parser no sustituye javac/JUnit/GameTests. Secrets311entradas sin firmas.
+Último binario validado sigue siendo5.11.2/441d256/CI43796976117.
+
+## 5.11.3 — controles claros y manual compacto (CI pendiente)
+
+El manual diferencia activación/pausa, campos que se desactivan con la misma
+tecla, regiones que requieren esquinas y alternativa que cancela trabajo/selección.
+Regiones muestran el gesto real de clic izquierdo para ambas esquinas; teclas
+siguen resolviéndose en vivo y el contexto sigue la habilidad copiada.
+Panel máximo reducido340→260píxeles de GUI para evitar grandes zonas vacías.
+Scroll, clipping, teclado y selector se conservan.
+
+Tres JUnit nuevos cubren128combinaciones de geometría GUI, panel compacto y
+los260altos de scrollbar. Python cubre traducciones de los cinco controles.
+Pendiente CI/inspección gráfica; no se asume resultado antes de ejecutarla.
+
 ## 5.11.2 — validación confirmada
 
 Commit probado `441d2569bd03e8d2ae81c39d45ddbf824d958676`.

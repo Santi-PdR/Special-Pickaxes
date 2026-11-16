@@ -2,7 +2,7 @@ package io.github.santipdr.specialpickaxes.artifact;
 
 /** Pure geometry for the relic guide, shared with headless layout tests. */
 public final class ManualScreenLayout {
-    private static final int MAX_WIDTH=760,MAX_HEIGHT=340,PAD=14;
+    private static final int MAX_WIDTH=760,MAX_HEIGHT=260,PAD=14;
     private ManualScreenLayout(){}
 
     public record Box(int x,int y,int width,int height){

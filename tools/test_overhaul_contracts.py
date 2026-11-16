@@ -83,3 +83,13 @@ class OverhaulContracts(unittest.TestCase):
                 descriptions = [texts['guide.main.' + artifact + '.' + mode] for mode in variants]
                 self.assertEqual(len(descriptions), len(set(descriptions)))
                 self.assertTrue(all(15 < len(text) < 180 for text in descriptions))
+
+    def test_manual_controls_explain_cancel_corners_and_field_toggles(self):
+        for locale in ('en_us', 'es_es'):
+            texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
+            for action in ('activate', 'region', 'alternate', 'corners', 'field'):
+                self.assertTrue(15 < len(texts['guide.control.' + action]) < 150)
+        source = (ROOT / 'client/ArtifactManualScreen.java').read_text()
+        self.assertIn('if(regional)controls.add', source)
+        self.assertIn('RelicKeys.name(action)', source)
+        self.assertIn('abilityKind==ArtifactKind.INTERREGNUM', source)

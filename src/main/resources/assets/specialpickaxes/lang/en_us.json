@@ -670,5 +670,10 @@
   "guide.main.eventide.gravity_in": "Anchor a gravitational field that draws threats inward.",
   "guide.main.eventide.gravity_out": "Anchor a repulsion field that pushes threats away.",
   "guide.main.interregnum.domain": "Anchor a fixed stasis domain and mine at extreme speed inside it.",
-  "guide.main.interregnum.aura": "Carry a moving stasis aura and mine at extreme speed around you."
+  "guide.main.interregnum.aura": "Carry a moving stasis aura and mine at extreme speed around you.",
+  "guide.control.activate": "Activate · press again to pause / resume",
+  "guide.control.region": "Start selection / confirm · pause / resume work",
+  "guide.control.alternate": "Use alternate · cancel current work or selection",
+  "guide.control.corners": "Left click two blocks to set corners; then confirm.",
+  "guide.control.field": "Activate field · press again to deactivate"
 }

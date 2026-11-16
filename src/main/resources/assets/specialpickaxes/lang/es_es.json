@@ -670,5 +670,10 @@
   "guide.main.eventide.gravity_in": "Ancla un campo gravitatorio que atrae las amenazas hacia su centro.",
   "guide.main.eventide.gravity_out": "Ancla un campo de repulsión que aleja las amenazas.",
   "guide.main.interregnum.domain": "Ancla un dominio de estasis fijo y mina a velocidad extrema en su interior.",
-  "guide.main.interregnum.aura": "Lleva un aura de estasis móvil y mina a velocidad extrema a tu alrededor."
+  "guide.main.interregnum.aura": "Lleva un aura de estasis móvil y mina a velocidad extrema a tu alrededor.",
+  "guide.control.activate": "Activar · pulsa de nuevo para pausar / reanudar",
+  "guide.control.region": "Iniciar selección / confirmar · pausar / reanudar trabajo",
+  "guide.control.alternate": "Usar alternativa · cancelar trabajo o selección actual",
+  "guide.control.corners": "Clic izquierdo en dos bloques para marcar esquinas; después confirma.",
+  "guide.control.field": "Activar campo · pulsa de nuevo para desactivar"
 }
