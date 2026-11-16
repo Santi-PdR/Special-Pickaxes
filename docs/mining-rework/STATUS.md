@@ -1,3 +1,18 @@
+## Manual: scroll preciso para trackpad (pendiente CI)
+
+Se añadió `ManualWheelScroll`, un acumulador fraccional independiente para el
+contenido y el selector de copias. Sustituye el salto fijo por cada evento mínimo:
+un notch conserva el recorrido habitual, pero los deltas pequeños se acumulan.
+La inversión de dirección descarta el residuo anterior; los extremos no acumulan
+presión. NaN/infinito se rechazan y desplazamientos enormes se saturan sin overflow.
+Resize, cierre, navegación por teclado y arrastre reinician el residuo correspondiente.
+
+Cinco JUnit nuevos cubren fracciones, extremos, inversión/reset, entradas inválidas
+y separación de regiones. Aún NO ejecutados: falta CI/Java funcional. Localmente
+109 Python, 25 recursos y análisis sintáctico de 166 Java correctos; el parser no
+sustituye compilación ni validación visual. Se conserva versión 5.11.6 sin publicar,
+con Worldloom y este cambio pendientes. Último binario validado sigue 5.11.5.
+
 ## Última comprobación43923206173: Forge sigue sin servir dependencias
 
 SHA `cf067062d49472ea36677e10e502dc6f00b97608`: failure de :classpath,

@@ -18,6 +18,7 @@ public final class ArtifactManualScreen extends Screen {
     private final Map<ArtifactKind,ItemStack> choiceIcons=new EnumMap<>(ArtifactKind.class);
     private int scroll,choiceScroll,contentHeight,scrollbarGrabOffset;
     private boolean draggingScrollbar;
+    private final ManualWheelScroll contentWheel=new ManualWheelScroll(),pickerWheel=new ManualWheelScroll();
     private final ManualLayoutRevision layoutRevision=new ManualLayoutRevision();
     private List<Card> leftCards=List.of(),rightCards=List.of();
     private record Section(String key,Component heading,List<Component> body,int color) {}
@@ -26,7 +27,7 @@ public final class ArtifactManualScreen extends Screen {
     public ArtifactManualScreen(ArtifactKind kind){super(Component.translatable("screen.specialpickaxes.manual"));this.kind=kind;this.headerIcon=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());}
     @Override public boolean isPauseScreen(){return false;}
     @Override protected void init(){
-        super.init();layoutRevision.invalidate();draggingScrollbar=false;
+        super.init();layoutRevision.invalidate();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();
     }
     private boolean selectingCopy(){return kind==ArtifactKind.WORLDBREAKER&&canChooseCopy();}
     private ManualScreenLayout.Layout layout(){return ManualScreenLayout.calculate(width,height,selectingCopy());}
@@ -35,10 +36,10 @@ public final class ArtifactManualScreen extends Screen {
     @Override public boolean keyPressed(int keyCode,int scanCode,int modifiers){
         var content=layout().content();int maxScroll=Math.max(0,contentHeight-content.height());
         int page=Math.max(24,content.height()-LINE_HEIGHT);
-        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN){scroll=clamp(scroll+page,maxScroll);return true;}
-        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP){scroll=clamp(scroll-page,maxScroll);return true;}
-        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME){scroll=0;return true;}
-        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_END){scroll=maxScroll;return true;}
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN){contentWheel.reset();scroll=clamp(scroll+page,maxScroll);return true;}
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP){contentWheel.reset();scroll=clamp(scroll-page,maxScroll);return true;}
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME){contentWheel.reset();scroll=0;return true;}
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_END){contentWheel.reset();scroll=maxScroll;return true;}
         return super.keyPressed(keyCode,scanCode,modifiers);
     }
 
@@ -262,11 +263,11 @@ public final class ArtifactManualScreen extends Screen {
     @Override public boolean mouseScrolled(double mouseX,double mouseY,double delta){
         var layout=layout();var picker=layout.picker();
         if(layout.pickerVisible()&&mouseX>=picker.x()&&mouseX<picker.right()&&mouseY>=picker.y()&&mouseY<picker.bottom()){
-            choiceScroll=clamp(choiceScroll-(int)Math.signum(delta)*CHOICE_CELL*2,Math.max(0,choices.size()*CHOICE_CELL-picker.width()));return true;
+            choiceScroll=pickerWheel.move(choiceScroll,Math.max(0,choices.size()*CHOICE_CELL-picker.width()),delta,CHOICE_CELL*2);return true;
         }
         var content=layout.content();
         if(content.width()>0&&content.height()>0&&mouseX>=content.x()&&mouseX<content.right()+6&&mouseY>=content.y()&&mouseY<content.bottom()){
-            scroll=clamp(scroll-(int)Math.signum(delta)*28,Math.max(0,contentHeight-content.height()));return true;
+            scroll=contentWheel.move(scroll,Math.max(0,contentHeight-content.height()),delta,28);return true;
         }
         return super.mouseScrolled(mouseX,mouseY,delta);
     }
@@ -276,6 +277,7 @@ public final class ArtifactManualScreen extends Screen {
         var content=layout.content();int maxScroll=ManualScrollModel.maxScroll(contentHeight,content.height());
         int barX=content.right()+2;
         if(button==0&&maxScroll>0&&mouseX>=barX-2&&mouseX<barX+4&&mouseY>=content.y()&&mouseY<content.bottom()){
+            contentWheel.reset();
             int thumb=scrollThumbHeight(content.height());int travel=content.height()-thumb;
             int thumbY=content.y()+ManualScrollModel.thumbOffset(content.height(),contentHeight,scroll);
             if(mouseY>=thumbY&&mouseY<thumbY+thumb)scrollbarGrabOffset=(int)mouseY-thumbY;
@@ -298,7 +300,7 @@ public final class ArtifactManualScreen extends Screen {
         return super.mouseReleased(mouseX,mouseY,button);
     }
     @Override public void removed(){
-        super.removed();draggingScrollbar=false;leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
+        super.removed();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
 }
