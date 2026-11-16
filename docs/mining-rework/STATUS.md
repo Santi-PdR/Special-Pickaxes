@@ -1,3 +1,12 @@
+## ForgeGradle fijado a la versión observada en evidencia
+
+Run43915566706mostró404(Resource missing)para maven-metadata.xml de ForgeGradle
+en ambos repositorios. Se fija6.0.54, cuya descarga/carga exacta consta en el
+run43912465024(POM,module,JAR). No es una versión inventada ni actualización
+aotra rama: evita metadata de rango dinámico y hace reproducible la resolución.
+Los tests de dependencias nuevos comprueban versión fija, módulo oficial y
+exclusión de coordenadas que no corresponden a Maven Central. CI pendiente.
+
 ## Diagnóstico HTTP confirmado y selección de repositorios
 
 Run43912465024sí descargó y cargó ForgeGradle6.0.54 desde el repositorio
