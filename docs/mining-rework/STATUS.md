@@ -1,3 +1,19 @@
+## 5.11.6 — último resultado: plugin resuelto, JARs de dependencias ausentes
+
+HEAD probado `3af29cd1f8a3e23ac1c175bcf253f454b6d8c072`, run43916095262:
+failure durante configuración:classpath. ForgeGradle6.0.54ya se resuelve,
+pero el repositorio oficial devolvió Resource missing para JARs requeridos:
+net.minecraftforge:JarJarSelector:0.3.19,net.minecraftforge:srgutils:0.6.2,
+y artefactos proxy como gson2.10.1/jsr305/checker-qual. No hubo compilaciónJava,
+JUnit/GameTests ni nuevo binario. No cambiar versiones de esas dependencias
+al azar ni añadir repositorios ajenos para ocultar el fallo del upstream.
+
+Quedan guardados diagnóstico--info, resolución directa/pin del plugin y
+selección oficial de Central. Local100Python sin omitidos con Pillow y25recursos
+correctos. Estos tests son de fuente/recursos, NO prueba de disponibilidad Maven.
+Último binario validado sigue5.11.5/CI43904324802. Worldloom5.11.6implementado
+pero pendiente de que se recuperen las descargas y pase toda la cadena de CI.
+
 ## ForgeGradle fijado a la versión observada en evidencia
 
 Run43915566706mostró404(Resource missing)para maven-metadata.xml de ForgeGradle
