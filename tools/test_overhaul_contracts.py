@@ -104,3 +104,14 @@ class OverhaulContracts(unittest.TestCase):
                     self.assertNotIn('7×7', value, key)
             self.assertIn('1024', texts['guide.main.seam_ripper'])
             self.assertIn('15×15', texts['guide.alt.seam_ripper'])
+
+    def test_worldloom_instructions_match_enlarged_natural_bore_without_retired_outline(self):
+        for locale in ('en_us', 'es_es'):
+            texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
+            for key in ('guide.main.worldloom', 'mining.identity.worldloom.quarry', 'mining.how.worldloom.quarry'):
+                self.assertIn('7×7', texts[key])
+                self.assertIn('48', texts[key])
+                self.assertNotIn('outline', texts[key].lower())
+                self.assertNotIn('contorno', texts[key].lower())
+            self.assertIn('%1$s', texts['mining.how.worldloom.quarry'])
+            self.assertIn('32', texts['tooltip.specialpickaxes.secondary.worldloom'])

@@ -61,6 +61,52 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="rework_each_319") public static void worldloomExpandedBorePreservesOresAndPlacedBlocks(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var level=h.getLevel();
+        var origin=h.absolutePos(new BlockPos(5,60,7));var placed=PlayerPlacedBlocks.get(level);
+        p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-4.5);
+        for(int depth=0;depth<48;depth++)for(var at:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,depth)){
+            placed.unmark(at);level.setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+        }
+        var ore=origin.south(40);var owned=origin.south(41);
+        var beyond=origin.south(48);var outside=origin.offset(4,0,20);
+        level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());placed.mark(owned);
+        level.setBlockAndUpdate(beyond,Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
+        try{
+            h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,
+                    new DirectionalProgram(origin,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,ArtifactKind.WORLDLOOM)),"expanded natural bore queues");
+            for(int tick=0;tick<1000&&WorkQueue.busy(p);tick++){
+                for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                        new net.minecraft.world.phys.AABB(origin.south(24)).inflate(30)))drop.discard();
+                if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+                WorkQueue.tick();
+            }
+            h.assertTrue(!WorkQueue.busy(p),"expanded bore finishes under normal budgets");
+            int removed=0;
+            for(int depth=0;depth<48;depth++)for(var at:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,depth))
+                if(level.getBlockState(at).isAir())removed++;
+            h.assertTrue(removed==2350,"2352 planned cells minus two preserved cells: "+removed);
+            h.assertTrue(level.getBlockState(ore).is(Blocks.DIAMOND_ORE)&&level.getBlockState(owned).is(Blocks.STONE),"ore and placed geology remain intact");
+            h.assertTrue(level.getBlockState(beyond).is(Blocks.STONE)&&level.getBlockState(outside).is(Blocks.STONE),"exact depth and width boundaries");
+        }finally{placed.unmark(owned);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        h.succeed();
+    }
+
+    @GameTest(template="empty",batch="rework_each_320") public static void worldloomExpandedSectionStopsBeforeMachines(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var origin=h.absolutePos(new BlockPos(5,60,7));var level=h.getLevel();
+        for(var at:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,0)){
+            PlayerPlacedBlocks.get(level).unmark(at);level.setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
+        }
+        var machine=origin.offset(3,3,0);level.setBlockAndUpdate(machine,Blocks.CHEST.defaultBlockState());
+        var behind=origin.south();level.setBlockAndUpdate(behind,Blocks.STONE.defaultBlockState());
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,
+                new DirectionalProgram(origin,Direction.SOUTH,DirectionalProgram.Shape.WORLDLOOM_BORE,ArtifactKind.WORLDLOOM)),"machine barrier fixture queues");
+        for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(!WorkQueue.busy(p)&&level.getBlockState(machine).is(Blocks.CHEST),"machine terminates route intact");
+        h.assertTrue(level.getBlockState(origin).is(Blocks.STONE)&&level.getBlockState(behind).is(Blocks.STONE),"whole-section preflight prevents partial excavation through machine barrier");
+        finish(h,p);
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

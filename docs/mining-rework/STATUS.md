@@ -1,3 +1,18 @@
+## 5.11.6 — Worldloom ampliado (CI pendiente)
+
+Primaria de5×5×16a7×7×48:2352celdas potenciales frente a400. Sin cambiar
+presupuestos por turno, carga de chunks ni seguridad de secciones. Conserva
+menas y roca colocada; máquinas/fluidos/claims siguen siendo barreras que
+terminan la ruta antes de atravesarlas. Secundaria conserva puente pagado32.
+Textos bilingües principales/secundarios corregidos: sin contorno verde retirado
+ni antigua promesa de inmovilización de hostiles en la secundaria block-only.
+
+Nuevo GameTest exige2350bloques extraídos de2352, preserva mena/placed y
+límites laterales/de profundidad. Otro exige que una máquina en el borde nuevo
+cancele antes de excavar la sección. JUnit de perfiles ahora exige identidad
+única SIN la excepción anterior de Worldloom/core drill; área actual49.
+Pendiente CI antes de afirmar compilación y cliente/servidor aprobados.
+
 ## 5.11.5 — Fault Choir validado
 
 Commit probado `ec7b0f0e2de3ec343e46ebaedee7e500a5dde4e4`.
