@@ -1,3 +1,15 @@
+## Reintento acotado de resolución, no de pruebas
+
+Run43917878613superó classpath de plugins y falló configurando _compileJava_1
+por Read timed out en eventbus6.0.5.module oficial. No compiló ni ejecutó testsJava.
+Se incorpora tools/gradle_dependency_retry.py: como máximo2intentos, espera60s,
+solo fallo de configuración/resolución con timeout/429 y ANTES de cualquier
+>Task. Compilación/tests, artefactos ausentes, fallosTLS/autorización y señales
+no se reintentan. Siempre devuelve el estado final y conserva todos los logs.
+Cinco pruebas de wrapper cubren éxito tras timeout, límite2, exclusiones,
+clasificación429y señales. La suiteCI de juego/cliente sigue sin omisiones.
+Nueva ejecución pendiente; no afirmar validación antes del resultado real.
+
 ## 5.11.6 — aislamiento del classpath de plugins (CI pendiente)
 
 settings.gradle ahora separa ForgePluginArtifacts(solo net.minecraftforge y

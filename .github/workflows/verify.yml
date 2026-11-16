@@ -33,7 +33,7 @@ jobs:
       - run: |
           mkdir -p build
           set -o pipefail
-          ./gradlew build test --stacktrace --info 2>&1 | tee build/verification-build.log
+          python3 tools/gradle_dependency_retry.py -- ./gradlew build test --stacktrace --info 2>&1 | tee build/verification-build.log
       - run: python3 tools/verify_release.py
       - id: mod-version
         run: |
