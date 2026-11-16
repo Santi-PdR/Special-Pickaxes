@@ -1,3 +1,22 @@
+## 5.11.5 — Fault Choir validado
+
+Commit probado `ec7b0f0e2de3ec343e46ebaedee7e500a5dde4e4`.
+CI https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43904324802 : success.
+138JUnit sin fallos/errores/omitidos;386GameTests aprobados;cliente gráfico y
+servidor empaquetado aprobados. Local96Python con Pillow sin omitidos,25recursos.
+Inspeccionado manual Choir español1280×720: descripción5×5/48correcta, sin recortes.
+
+Primer run43903383765detectó perfil idéntico al taladro centrado en el test de
+identidad geométrica. Corregido sin quitar la aserción: sección Choir alineada
+con pies(-1..3respecto al origen de cabeza),5×5completa/1200celdas. Conserva
+pruebas de barreras, exactitud de longitud y celdas exteriores intactas.
+
+JAR `special-pickaxes-1.20.1-5.11.5.jar`,579138bytes;
+SHA256 `8081ee1275b83da7e252479f32c24f0bb2eb818824fdad28b5413dcba996a388`.
+Artefacto autenticado temporal:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43904324802/artifacts/14246481087
+Sin release público ni afirmación de compatibilidad Windows/Ghouls/animaciones completas.
+
 ## 5.11.5 — galería Fault Choir (CI pendiente)
 
 Primaria ampliada de2×2×20(80celdas) a5×5×48(1200celdas),15veces el
