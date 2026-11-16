@@ -1,3 +1,14 @@
+## Diagnóstico Gradle con memoria acotada y salida en vivo
+
+workflow_dispatch rechazado403Resource not accessible by integration; no es
+necesario pedir tokens al usuario. Nueva CI se dispara por push del ejecutor.
+El wrapper deja de acumular stdout completo en memoria: transmite todo a CI
+y guarda cola256000caracteres. Si hubo truncado, no reintenta con evidencia
+incompleta. Estado final real, límite2y exclusión de fallos de pruebas intactos.
+Tres tests nuevos ejecutan subprocesos Python reales y verifican log sin duplicar,
+estado9preservado y truncado acotado que deniega reintento. CI nueva pendiente.
+No se afirma compilación5.11.6ni recuperación del artefacto mergetool hasta verla.
+
 ## Resultado último run43919178874: bloqueo externo concreto, sin reintento indebido
 
 SHA probado `f6575a8e0df327f300603fb39c3720c7707154d5`: failure antes de

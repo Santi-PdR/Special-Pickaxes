@@ -1,7 +1,10 @@
 import subprocess
+import contextlib
+import io
+import sys
 import unittest
 from unittest.mock import Mock
-from gradle_dependency_retry import run, transient_resolution_failure
+from gradle_dependency_retry import run, execute, transient_resolution_failure, MAX_DIAGNOSTIC_CHARS
 
 TIMEOUT = "A problem occurred configuring root project.\nCould not resolve files for ':_compileJava_1'.\nRead timed out\n"
 
@@ -45,3 +48,28 @@ class DependencyRetryTests(unittest.TestCase):
         self.assertEqual(1, run(['./gradlew'], runner, Mock()))
         with self.assertRaises(ValueError):
             run([], runner, Mock())
+
+    def test_real_executor_streams_output_and_keeps_the_real_exit_status(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            result = execute([sys.executable, '-c', "print('live output'); raise SystemExit(9)"])
+        self.assertEqual(9, result.returncode)
+        self.assertEqual('live output\n', output.getvalue())
+        self.assertTrue(result.streamed)
+        self.assertEqual('live output\n', result.stdout)
+
+    def test_truncated_diagnostics_are_bounded_and_cannot_authorize_retry(self):
+        output = io.StringIO()
+        script = "print('x' * " + str(MAX_DIAGNOSTIC_CHARS + 1000) + "); print(" + repr(TIMEOUT) + "); raise SystemExit(1)"
+        with contextlib.redirect_stdout(output):
+            result = execute([sys.executable, '-c', script])
+        self.assertGreater(len(output.getvalue()), MAX_DIAGNOSTIC_CHARS)
+        self.assertLess(len(result.stdout), MAX_DIAGNOSTIC_CHARS + 100)
+        self.assertFalse(transient_resolution_failure(result.stdout))
+
+    def test_streamed_logs_are_not_printed_twice(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = run([sys.executable, '-c', "print('one unique log line')"])
+        self.assertEqual(0, code)
+        self.assertEqual(1, output.getvalue().count('one unique log line'))

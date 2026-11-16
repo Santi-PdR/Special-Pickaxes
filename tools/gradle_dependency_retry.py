@@ -21,13 +21,46 @@ def transient_resolution_failure(text):
                                              '429 from server', '429 Too Many Requests'))
 
 
-def run(command, runner=subprocess.run, sleeper=time.sleep):
+MAX_DIAGNOSTIC_CHARS = 256_000
+
+
+def execute(command, **unused):
+    """Stream the complete log to CI, retain only a bounded tail for classification.
+
+    A task marker seen before tail eviction must still forbid a retry. Truncated
+    diagnostics also fail closed: incomplete evidence is not enough to retry.
+    """
+    tail = ''
+    truncated = False
+    with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                          text=True, errors='replace') as process:
+        while True:
+            chunk = process.stdout.read(4096)
+            if not chunk:
+                break
+            print(chunk, end='', flush=True)
+            tail += chunk
+            if len(tail) > MAX_DIAGNOSTIC_CHARS:
+                truncated = True
+                tail = tail[-MAX_DIAGNOSTIC_CHARS:]
+        code = process.wait()
+    if truncated:
+        # The classifier already refuses output with a task marker. Do not infer
+        # that no tasks ran from a tail whose early evidence has been evicted.
+        tail = '> Task :diagnostic_tail_truncated_no_retry\n' + tail
+    result = subprocess.CompletedProcess(command, code, tail)
+    result.streamed = True
+    return result
+
+
+def run(command, runner=execute, sleeper=time.sleep):
     if not command:
         raise ValueError('Missing Gradle command')
     for attempt in range(1, 3):
         print(f'DEPENDENCY_ATTEMPT {attempt}/2', flush=True)
         result = runner(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        print(result.stdout, end='' if result.stdout.endswith('\n') else '\n', flush=True)
+        if not getattr(result, 'streamed', False):
+            print(result.stdout, end='' if result.stdout.endswith('\n') else '\n', flush=True)
         if result.returncode == 0:
             return 0
         if attempt == 2 or not transient_resolution_failure(result.stdout):
