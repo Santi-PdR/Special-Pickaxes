@@ -9,7 +9,7 @@ import java.util.*;
 /** Incremental, bounded same-material geology search followed by scheduled extraction. */
 public final class SeamMiningProgram implements WorkProgram {
     private record Candidate(BlockPos pos,BlockState state) {}
-    private static final int SCAN_LIMIT=512,MINING_LIMIT=256;
+    public static final int SCAN_LIMIT=2048,MINING_LIMIT=1024;
     private static final List<BlockPos> NEIGHBOR_OFFSETS=createNeighborOffsets();
     private final BlockPos origin;
     private final BlockState material;
@@ -47,7 +47,7 @@ public final class SeamMiningProgram implements WorkProgram {
     }
 
     @Override public WorkStep next(ServerPlayer p){
-        if(scanning&&inspected<SCAN_LIMIT&&!frontier.isEmpty()){
+        if(scanning&&inspected<SCAN_LIMIT&&candidates.size()<MINING_LIMIT&&!frontier.isEmpty()){
             var pos=frontier.removeFirst();inspected++;
             return new WorkStep(){
                 @Override public BlockPos pos(){return pos;}

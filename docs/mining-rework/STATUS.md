@@ -1,3 +1,17 @@
+## 5.11.4 — Seam Ripper ampliado (CI pendiente)
+
+Primaria: tope1024bloques (antes256), búsqueda hasta2048posiciones (antes512).
+La búsqueda termina al reunir1024candidatos: evita inspeccionar roca que ya
+no se extraería. Sin cambiar presupuesto por turno, pausa por drops, chunks,
+material exacto ni revalidación de claims/bloques colocados antes de excavar.
+Textos bilingües Seam sincronizados con1024y secundaria15×15; se elimina una
+promesa de rastro luminoso continuo que el rediseño event-only ya no emite.
+
+Nuevo GameTest construye1331bloques aislados, modela recogida entre turnos y
+exige exactamente1024retirados preservando mena y roca marcada por jugador.
+Python impide reintroducir límites256/512o cara7×7en los textos Seam.
+Pendiente compilación/cliente/servidor CI; no se declara verde anticipadamente.
+
 ## 5.11.3 — conexión recuperada y CI verde
 
 Se recuperó la conexión; se restauraron los cambios pendientes sobre el HEAD

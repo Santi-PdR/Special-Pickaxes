@@ -93,3 +93,14 @@ class OverhaulContracts(unittest.TestCase):
         self.assertIn('if(regional)controls.add', source)
         self.assertIn('RelicKeys.name(action)', source)
         self.assertIn('abilityKind==ArtifactKind.INTERREGNUM', source)
+
+    def test_seam_guides_no_longer_advertise_retired_limits_or_continuous_trails(self):
+        for locale in ('en_us', 'es_es'):
+            texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
+            for key, value in texts.items():
+                if 'seam_ripper' in key:
+                    self.assertNotIn('256', value, key)
+                    self.assertNotIn('512', value, key)
+                    self.assertNotIn('7×7', value, key)
+            self.assertIn('1024', texts['guide.main.seam_ripper'])
+            self.assertIn('15×15', texts['guide.alt.seam_ripper'])

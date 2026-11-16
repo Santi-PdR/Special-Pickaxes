@@ -31,6 +31,36 @@ public final class MiningReworkGameTests {
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());return p;
     }
     private static void finish(GameTestHelper h,ServerPlayer p){RelicNetwork.forget(p);WorkQueue.cancel(p);ArtifactInteraction.clear(p);h.succeed();}
+    @GameTest(template="empty",batch="rework_each_318") public static void seamExpandedExtractionStopsAt1024AndPreservesProtectedCells(GameTestHelper h){
+        var p=player(h,ArtifactKind.SEAM_RIPPER);var level=h.getLevel();
+        var center=h.absolutePos(new BlockPos(5,60,7));
+        p.setPos(center.getX()+.5,center.getY(),center.getZ()-7.5);
+        var placed=PlayerPlacedBlocks.get(level);
+        for(int x=-5;x<=5;x++)for(int y=-5;y<=5;y++)for(int z=-5;z<=5;z++){
+            var at=center.offset(x,y,z);placed.unmark(at);level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());
+        }
+        var protectedPos=center.above();var ore=center.below();
+        placed.mark(protectedPos);level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        try{
+            h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.SEAM_RIPPER,
+                    new SeamMiningProgram(center,Blocks.GRANITE.defaultBlockState())),"expanded seam queues");
+            for(int tick=0;tick<1000&&WorkQueue.busy(p);tick++){
+                for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                        new net.minecraft.world.phys.AABB(center).inflate(10)))drop.discard();
+                if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+                WorkQueue.tick();
+            }
+            h.assertTrue(!WorkQueue.busy(p),"bounded search and mining finish");
+            int removed=0;
+            for(int x=-5;x<=5;x++)for(int y=-5;y<=5;y++)for(int z=-5;z<=5;z++)
+                if(level.getBlockState(center.offset(x,y,z)).isAir())removed++;
+            h.assertTrue(removed==1024,"exact enlarged mining limit, not the old256 or the entire1331 volume: "+removed);
+            h.assertTrue(level.getBlockState(protectedPos).is(Blocks.GRANITE)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),
+                    "placed rock and ore survive the expanded extraction");
+        }finally{placed.unmark(protectedPos);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());
