@@ -627,11 +627,11 @@
   "guide.main.paradox_crucible": "Select a region and transform its natural rock into the chosen material.",
   "guide.main.interregnum": "Stop nearby threats and mine at extreme speed. Choose placed domain or personal aura.",
   "guide.main.worldloom": "Carve a broad bore through natural rock while preserving ores.",
-  "guide.main.icarus": "Excavate a tunnel and advance through it. Change mode for a wider cut.",
+  "guide.main.icarus": "Excavate and ride an 11×7 tunnel; switch to a 15×9 cut for massive clearance.",
   "guide.main.hollow_axiom": "Hollow out natural rock around your target, exposing its ore.",
   "guide.main.worldbreaker": "Choose an excavation mode or copy another pickaxe from the selector above.",
   "guide.main.exodium": "Fire a massive excavation lance through the terrain.",
-  "guide.main.iridium": "Harvest surrounding ores without excavating the surrounding mountain.",
+  "guide.main.iridium": "Extract ores in a 24-block horizontal radius and 12 blocks vertically, nearest first. Leaves the surrounding rock intact.",
   "guide.main.hellspec": "Unleash a volcanic excavation that harvests stone and ore.",
   "guide.main.seam_ripper": "Follow and extract a connected seam of matching rock.",
   "guide.alt.palimpsest": "Locate nearby hidden ore and report the nearest deposit.",
@@ -644,7 +644,9 @@
   "guide.alt.hollow_axiom": "Strip a broad area of rock around exposed ore.",
   "guide.alt.worldbreaker": "Use the copied technique, or unleash native World Shatter when no pick is copied.",
   "guide.alt.exodium": "Open a deep, octagonal extraction shaft.",
-  "guide.alt.iridium": "Recall a large batch of your recent ore drops.",
+  "guide.alt.iridium": "Recall up to 96 of your marked ore drops within 48 blocks, nearest first. Other players’ loot stays untouched.",
   "guide.alt.hellspec": "Excavate a towering chimney, harvesting every eligible ore.",
-  "guide.alt.seam_ripper": "Sweep a broad face of natural rock in one queued cut."
+  "guide.alt.seam_ripper": "Sweep a broad face of natural rock in one queued cut.",
+  "guide.main.icarus.forward": "Excavate an 11×7 tunnel in your look direction and advance after each cleared slice.",
+  "guide.main.icarus.wide": "Excavate and ride a 15×9 tunnel. Stops at barriers; never teleports through blocked terrain."
 }

@@ -30,7 +30,7 @@ public final class DirectionalProgram implements WorkProgram {
         if(depth<0||depth>192)throw new IllegalArgumentException("slice depth");
         var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
-            case ICARUS->{w=3;h=2;}case ICARUS_WIDE->{w=4;h=3;}case EXODIUM_LANCE->{w=6;h=4;}case EXODIUM_SINK->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
+            case ICARUS->{w=5;h=3;}case ICARUS_WIDE->{w=7;h=4;}case EXODIUM_LANCE->{w=6;h=4;}case EXODIUM_SINK->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
             case RESONANT_TUNNEL->{w=0;h=0;}
             case WORLDLOOM_BORE->{w=2;h=2;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}

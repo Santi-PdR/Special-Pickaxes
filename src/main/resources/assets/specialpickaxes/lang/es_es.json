@@ -627,11 +627,11 @@
   "guide.main.paradox_crucible": "Selecciona una región y transforma su roca natural al material elegido.",
   "guide.main.interregnum": "Detén amenazas y mina a velocidad extrema. Elige dominio fijo o aura personal.",
   "guide.main.worldloom": "Perfora la roca natural con un túnel ancho, conservando las menas.",
-  "guide.main.icarus": "Excava un túnel y avanza por él. Cambia de modo para ampliar el corte.",
+  "guide.main.icarus": "Excava y recorre un túnel de 11×7; cambia al corte de 15×9 para abrir grandes galerías.",
   "guide.main.hollow_axiom": "Vacía la roca natural alrededor del objetivo y deja sus minerales expuestos.",
   "guide.main.worldbreaker": "Elige un modo de excavación o copia otro pico desde el selector superior.",
   "guide.main.exodium": "Abre una enorme perforación a través del terreno.",
-  "guide.main.iridium": "Extrae las menas cercanas sin vaciar toda la montaña.",
+  "guide.main.iridium": "Extrae menas en un radio horizontal de 24 bloques y 12 en vertical, empezando por las cercanas. Conserva la roca circundante.",
   "guide.main.hellspec": "Desata una excavación volcánica que extrae roca y mineral.",
   "guide.main.seam_ripper": "Sigue y extrae una veta conectada de la misma roca.",
   "guide.alt.palimpsest": "Localiza menas ocultas e indica el depósito más cercano.",
@@ -644,7 +644,9 @@
   "guide.alt.hollow_axiom": "Retira una amplia zona de roca alrededor del mineral expuesto.",
   "guide.alt.worldbreaker": "Usa la técnica copiada o desata Ruptura Mundial si no has copiado otro pico.",
   "guide.alt.exodium": "Abre un profundo pozo octogonal de extracción.",
-  "guide.alt.iridium": "Recupera un gran lote de tus drops de mineral recientes.",
+  "guide.alt.iridium": "Recupera hasta 96 drops de mena marcados como tuyos en 48 bloques, empezando por los cercanos. No roba botín ajeno.",
   "guide.alt.hellspec": "Excava una enorme chimenea y extrae todas las menas válidas.",
-  "guide.alt.seam_ripper": "Barre una amplia cara de roca natural en un corte encolado."
+  "guide.alt.seam_ripper": "Barre una amplia cara de roca natural en un corte encolado.",
+  "guide.main.icarus.forward": "Excava un túnel de 11×7 hacia donde miras y avanza tras despejar cada sección.",
+  "guide.main.icarus.wide": "Excava y recorre un túnel de 15×9. Se detiene ante barreras; no atraviesa terreno bloqueado."
 }

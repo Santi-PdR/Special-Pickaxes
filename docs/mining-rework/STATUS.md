@@ -1,3 +1,20 @@
+## 5.11.1 — segunda fase en validación
+
+- Icarus: cortes específicos ampliados de7×5/9×7 a11×7/15×9. Conserva
+  comprobación previa por sección, movimiento seguro y presupuesto compartido.
+  La secundaria conserva el ascenso hasta superficie y sus barreras de fluidos.
+- Iridium: extracción elipsoidal de radio24/altura±12 (antes14/±7).
+  Plan único inmutable precalculado; el mundo solo se consulta gradualmente
+  bajo ORE_SCAN_BUDGET y presupuesto global, sin forzar chunks. Añadido rechazo
+  explícito de alturas fuera del mundo. Recall sigue48/96 y ownership intactos.
+- Manual: descripción primaria sensible al modo real, incluido modo copiado de
+  Worldbreaker; Icarus muestra la geometría del corte elegido. Iridium explica
+  alcance y recall sin relleno. Continúan tres bloques: primaria/secundaria/teclas.
+- Nuevos JUnit: unicidad/orden/límites/inmutabilidad del plan Iridium y geometría
+  Icarus en las seis direcciones. Pendientes de compilación/ejecución en CI.
+- Local:93Python (1omitido sin Pillow),25recursos; no Java local.
+- No se afirma validación visual del manual ni compatibilidad Windows/Ghouls.
+
 ## 5.11.0 — validación verde confirmada
 
 - Commit probado: `9ca5fa1a16244697aab6baccbeb37f68178acffd`.

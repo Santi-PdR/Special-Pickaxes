@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
-/** Responsive per-pick guide. Long-form details live here instead of cluttering item tooltips. */
+/** Responsive ability reference: primary, alternate, and current controls only. */
 public final class ArtifactManualScreen extends Screen {
     private static final int PAD=14, LINE_HEIGHT=10, CHOICE_CELL=24;
     private final ArtifactKind kind;
@@ -112,9 +112,16 @@ public final class ArtifactManualScreen extends Screen {
         for(var action:ArtifactTooltips.actions(stack,kind,mode))
             controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable("key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT))));
         return List.of(
-                section("screen.specialpickaxes.main",Component.translatable("guide.main."+abilityKind.id),0xffa9d9ec),
+                section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
                 section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
                 new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffc6ced8));
+    }
+
+    /** Mode-aware descriptions also follow Worldbreaker's copied mode, not its native mode. */
+    private Component primaryDescription(ArtifactKind abilityKind,String modeKey){
+        String specific="guide.main."+abilityKind.id+"."+modeKey;
+        String key=net.minecraft.locale.Language.getInstance().has(specific)?specific:"guide.main."+abilityKind.id;
+        return Component.translatable(key);
     }
 
     private void ensureCards(int maxWidth,boolean twoColumns,ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey,int viewportTop,int viewportBottom){

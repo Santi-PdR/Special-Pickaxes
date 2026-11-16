@@ -8,7 +8,7 @@ import java.util.*;
 
 /** Center-out Iridium extraction. Each loaded ore is mined as soon as it is reached. */
 public final class OrefallProgram implements WorkProgram {
-    private static final int RADIUS=14,HALF_HEIGHT=7;
+    public static final int RADIUS=24,HALF_HEIGHT=12;
     private static final List<BlockPos> SCAN_OFFSETS=createScanOffsets();
     private final BlockPos center;
     private final int limit;
@@ -21,6 +21,9 @@ public final class OrefallProgram implements WorkProgram {
         this.center=center.immutable();
         this.limit=Math.min(SCAN_OFFSETS.size(),ArtifactConfig.JOB_LIMIT.get());
     }
+
+    /** Shared immutable plan; no per-cast cube allocation or synchronous world scan. */
+    public static List<BlockPos> scanOffsets(){return SCAN_OFFSETS;}
 
     private static List<BlockPos> createScanOffsets(){
         var offsets=new ArrayList<BlockPos>();
@@ -59,7 +62,7 @@ public final class OrefallProgram implements WorkProgram {
             @Override public BlockPos pos(){return pos;}
             @Override public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
                 var level=actor.serverLevel();
-                if(!level.hasChunkAt(pos))return false;
+                if(level.isOutsideBuildHeight(pos)||!level.hasChunkAt(pos))return false;
                 BlockState state=level.getBlockState(pos);
                 if(!ArtifactOres.isOre(state)||!WorldSafety.mineQueued(actor,tool,ArtifactKind.IRIDIUM,pos,state))return false;
                 mined++;
