@@ -1,3 +1,21 @@
+## 5.11.1 — CI verde y manual capturado
+
+Commit probado `ed4410bbec763561d11370f3f230ca7e40c107c8`, ejecución
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43794533685 : success.
+131JUnit sin fallos/errores/omitidos;385GameTests aprobados;cliente gráfico y
+servidor empaquetado aprobados.32aperturas reales de manual confirmadas por
+ScreenEvent.Render.Post y capturas requeridas antes de activar cada escena.
+Inspección visual local de la captura Icarus-forward: tres bloques concisos,
+texto11×7correcto, controles visibles y sin desbordamiento en1280×720.
+Esto no certifica visualmente los demás tamaños/idiomas/copia ni todas las animaciones.
+
+JAR `special-pickaxes-1.20.1-5.11.1.jar`:573312bytes,
+SHA256 `1d985e616b468ca552943a78c501fbf8ad53ba5ae45e0b1e7123937454927a70`.
+Descarga autenticada temporal:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43794533685/artifacts/14194616616
+Sin release público nuevo. Capturas completas en forge-validation del mismo run.
+Local actualizado:93Python sin omitidos tras instalar Pillow;25recursos correctos.
+
 ## 5.11.1 — segunda fase en validación
 
 - Icarus: cortes específicos ampliados de7×5/9×7 a11×7/15×9. Conserva
