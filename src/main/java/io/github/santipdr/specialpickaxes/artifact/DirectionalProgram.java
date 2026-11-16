@@ -38,7 +38,9 @@ public final class DirectionalProgram implements WorkProgram {
             default->{w=Math.min(24,3+depth/3);h=Math.min(10,2+depth/10);}
         }
         int uMin=-w,uMax=w;
-        int vMin=-h,vMax=h;
+        // Choir's gallery is foot-aligned: one cell below the head-level origin,
+        // three above. Keep its profile distinct from centered downward/core bores.
+        int vMin=shape==Shape.RESONANT_TUNNEL?-1:-h,vMax=shape==Shape.RESONANT_TUNNEL?3:h;
         for(int u=uMin;u<=uMax;u++)for(int v=vMin;v<=vMax;v++){
             // Starfall's shaft has clipped corners, giving it a distinct octagonal cut instead of a plain 5×5 bore.
             if(shape==Shape.EXODIUM_SINK&&Math.abs(u)==2&&Math.abs(v)==2)continue;

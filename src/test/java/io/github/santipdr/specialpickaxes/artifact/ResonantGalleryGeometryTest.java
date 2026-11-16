@@ -19,7 +19,7 @@ class ResonantGalleryGeometryTest {
                     assertTrue(all.add(cell));
                     assertEquals(direction.getAxis().choose(center.getX(),center.getY(),center.getZ()),
                             direction.getAxis().choose(cell.getX(),cell.getY(),cell.getZ()));
-                    assertTrue(cell.distSqr(center)<=8);
+                    assertTrue(cell.distSqr(center)<=13);
                 }
             }
             assertEquals(1200,all.size());
