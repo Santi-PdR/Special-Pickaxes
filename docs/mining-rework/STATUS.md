@@ -1,3 +1,18 @@
+## Resultado último run43919178874: bloqueo externo concreto, sin reintento indebido
+
+SHA probado `f6575a8e0df327f300603fb39c3720c7707154d5`: failure antes de
+compilar, ya con classpath de plugin resuelto. Falta el artefacto oficial
+`net.minecraftforge:mergetool:1.1.7:api`, URL:
+https://maven.minecraftforge.net/net/minecraftforge/mergetool/1.1.7/mergetool-1.1.7-api.jar
+Log contiene DEPENDENCY_ATTEMPT1/2y Could not find; correctamente NO hubo
+segundo intento. No hubo JUnit/GameTests ni binario5.11.6validado. No sustituir
+mergetool por otra versión/artefacto arbitrario para eludir el fallo upstream.
+
+Local106Python sin omitidos(Pillow instalado),25recursos; secrets316sin firmas.
+Cambios y diagnóstico guardados en la rama. Última entrega validada continúa
+5.11.5(ec7b0f0/CI43904324802). Próximo paso es comprobar recuperación de este
+artefacto y ejecutar la cadena completa; no seguir acumulando buffs sin validación.
+
 ## Reintento acotado de resolución, no de pruebas
 
 Run43917878613superó classpath de plugins y falló configurando _compileJava_1
