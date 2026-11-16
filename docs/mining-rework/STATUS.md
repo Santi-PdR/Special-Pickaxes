@@ -1,3 +1,19 @@
+## 5.11.4 — buff Seam validado
+
+Commit probado `bba971017124e3d4be5bebcfade52ba4fab4f4b0`.
+CI https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43891412754 : success.
+137JUnit sin fallos/errores/omitidos;386GameTests aprobados, incluido el nuevo
+fixture de1331bloques con exactamente1024retirados y protección de mena/placed.
+Cliente gráfico y servidor empaquetado aprobados. Local96Python sin omitidos,
+25recursos correctos; secrets311sin firmas. Inspeccionada captura real Seam
+español1280×720: alcance1024/15×15correcto y controles visibles sin recortes.
+
+JAR `special-pickaxes-1.20.1-5.11.4.jar`,579210bytes;
+SHA256 `437fb6e66ebf1ebd08d8ea0460edaad61bf44763a8db64a1913c4d58d2b9d2bf`.
+Artefacto autenticado temporal:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43891412754/artifacts/14238671596
+Sin release público ni afirmación de compatibilidad Windows/Ghouls/animaciones completas.
+
 ## 5.11.4 — Seam Ripper ampliado (CI pendiente)
 
 Primaria: tope1024bloques (antes256), búsqueda hasta2048posiciones (antes512).
