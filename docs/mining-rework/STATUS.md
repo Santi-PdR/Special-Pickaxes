@@ -1,3 +1,12 @@
+## Diagnóstico inicial 5.11.6
+
+Run43910083914falló ANTES de compilar: no se resolvió el plugin
+net.minecraftforge.gradle:[6.0,6.2)desde los repositorios de plugins.
+No hubo ejecución JUnit/GameTests ni JAR validado. Se intentó rerun fallido,
+pero GitHub lo rechazó. Nuevo commit añade geometría Worldloom en seis ejes
+y dispara otra ejecución sin saltar fases ni rebajar pruebas. Local97Python
+sin omitidos con Pillow y25recursos correctos. Nueva CI pendiente.
+
 ## 5.11.6 — Worldloom ampliado (CI pendiente)
 
 Primaria de5×5×16a7×7×48:2352celdas potenciales frente a400. Sin cambiar
