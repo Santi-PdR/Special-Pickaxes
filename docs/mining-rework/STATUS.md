@@ -1,3 +1,13 @@
+## Resultado CI del scroll preciso
+
+Run 43925814163, SHA `6c21d3caf75c2b8a988b2e864cda531497bbe7d7`: failure
+antes de compilar por dependencias Forge. Primer intento: timeout de DiffPatch y
+JarJarMetadata. El wrapper hizo su único reintento autorizado; segundo intento:
+DiffPatch ausente. Se conservó fallo final, sin JUnit/GameTests ejecutados.
+Los cinco JUnit del scroll siguen pendientes. No hay captura ni binario nuevo
+validado. Local: 109 Python, 25 recursos, parser 166 Java; secrets 318 sin firmas.
+No confundir esas comprobaciones locales con compilación del mod o test visual.
+
 ## Manual: scroll preciso para trackpad (pendiente CI)
 
 Se añadió `ManualWheelScroll`, un acumulador fraccional independiente para el
