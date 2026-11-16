@@ -1,3 +1,21 @@
+## 5.11.3 — conexión recuperada y CI verde
+
+Se recuperó la conexión; se restauraron los cambios pendientes sobre el HEAD
+remoto sin sobrescribir trabajo. Commit probado `651b7538ff39cee09f738a776d2097130980c5d6`.
+CI https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43884854097 : success.
+137JUnit sin fallos/errores/omitidos;385GameTests aprobados;cliente gráfico,
+32manuales renderizados y servidor empaquetado aprobados.
+
+Inspeccionadas capturas reales Crucible-stone e Interregnum-aura a1280×720/español:
+texto visible, instrucciones contextuales correctas y panel compacto sin clipping.
+No certifica todas las escalas/idiomas/animaciones ni Windows/Ghouls.
+
+JAR `special-pickaxes-1.20.1-5.11.3.jar`,579220bytes;
+SHA256 `315ca708224193c88dfc8b93f81beb6ce55c2eebdd88712a4d50183f1c76d238`.
+Artefacto autenticado temporal:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43884854097/artifacts/14236145832
+Sin release público nuevo. Las notas de bloqueo siguientes son históricas/resueltas.
+
 ## Estado local 5.11.3: subida bloqueada por conexión
 
 Commit de implementación `f5e49eb`. Los intentos de push devolvieron
