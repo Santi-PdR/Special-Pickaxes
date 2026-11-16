@@ -1,3 +1,14 @@
+## 5.11.6 — aislamiento del classpath de plugins (CI pendiente)
+
+settings.gradle ahora separa ForgePluginArtifacts(solo net.minecraftforge y
+subgrupos)de CentralPluginDependencies(resto, endpoint oficial repo1).
+Esto corrige el caso previo donde Gradle encontraba el POM de gson/jsr305 en
+el proxy Forge y quedaba vinculado a ese repositorio aunque allí faltara el JAR.
+Se elimina el fallback de Plugin Portal: los únicos plugins son Java incorporado
+y ForgeGradle directo. Sin cambios de versiones ni de pruebas de juego.
+Nuevo test de fuente cubre ambos filtros. No garantiza disponibilidad del upstream;
+JarJarSelector/srgutils aún requieren que Forge sirva sus artefactos oficiales.
+
 ## 5.11.6 — último resultado: plugin resuelto, JARs de dependencias ausentes
 
 HEAD probado `3af29cd1f8a3e23ac1c175bcf253f454b6d8c072`, run43916095262:

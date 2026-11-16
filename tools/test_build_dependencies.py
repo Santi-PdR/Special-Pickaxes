@@ -22,3 +22,11 @@ class BuildDependencyContracts(unittest.TestCase):
         self.assertIn("https://maven.minecraftforge.net/", settings)
         self.assertNotIn('allowInsecureProtocol', settings)
         self.assertNotIn('http://', settings)
+
+    def test_plugin_classpath_does_not_take_general_libraries_from_forge_proxy(self):
+        settings = Path('settings.gradle').read_text()
+        self.assertIn("name = 'ForgePluginArtifacts'", settings)
+        self.assertIn("name = 'CentralPluginDependencies'", settings)
+        self.assertIn("includeGroupByRegex 'net\\\\.minecraftforge(\\\\..*)?'", settings)
+        self.assertIn("excludeGroupByRegex 'net\\\\.minecraftforge(\\\\..*)?'", settings)
+        self.assertNotIn('gradlePluginPortal()', settings)

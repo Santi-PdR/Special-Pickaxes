@@ -9,8 +9,16 @@ pluginManagement {
         }
     }
     repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        gradlePluginPortal()
+        maven {
+            name = 'ForgePluginArtifacts'
+            url = 'https://maven.minecraftforge.net/'
+            content { includeGroupByRegex 'net\\.minecraftforge(\\..*)?' }
+        }
+        maven {
+            name = 'CentralPluginDependencies'
+            url = 'https://repo1.maven.org/maven2/'
+            content { excludeGroupByRegex 'net\\.minecraftforge(\\..*)?' }
+        }
     }
 }
 rootProject.name = 'special-pickaxes'
