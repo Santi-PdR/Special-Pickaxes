@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class AbilityBurstShapeTest {
     @Test void everyPlayableBurstHasSixteenDistinctFiniteBoundedPoints(){
         assertEquals(16,AbilityBurstShape.COUNT);
-        for(var kind:ArtifactKind.playableValues()){
+        for(var kind:AbilityBurstShape.Shape.values()){
             var points=new HashSet<Vec3>();
             for(int i=0;i<AbilityBurstShape.COUNT;i++){
                 var point=AbilityBurstShape.offset(kind,i);
                 assertTrue(Double.isFinite(point.lengthSqr()));
                 assertTrue(point.lengthSqr()<4);
-                assertTrue(points.add(point),kind.id+" duplicate "+i);
+                assertTrue(points.add(point),kind.name()+" duplicate "+i);
             }
         }
     }
@@ -27,7 +27,7 @@ class AbilityBurstShapeTest {
         }
     }
     @Test void invalidIndicesAreRejected(){
-        assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(ArtifactKind.ICARUS,-1));
-        assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(ArtifactKind.ICARUS,16));
+        assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(AbilityBurstShape.Shape.ICARUS,-1));
+        assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(AbilityBurstShape.Shape.ICARUS,16));
     }
 }

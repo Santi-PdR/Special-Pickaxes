@@ -4,11 +4,12 @@ import net.minecraft.world.phys.Vec3;
 
 /** Pure, deterministic cast silhouettes. No tick state, random allocation or world access. */
 public final class AbilityBurstShape {
+    public enum Shape { PALIMPSEST, CHOIR, EVENTIDE, CRUCIBLE, INTERREGNUM, WORLDLOOM, ICARUS, AXIOM, WORLDBREAKER, EXODIUM, IRIDIUM, HELLSPEC, SEAM_RIPPER }
     public static final int COUNT=16;
     private AbilityBurstShape(){}
 
     /** Local coordinates: x=right, y=up, z=forward. Every burst stays within two blocks. */
-    public static Vec3 offset(ArtifactKind kind,int index){
+    public static Vec3 offset(Shape kind,int index){
         if(index<0||index>=COUNT)throw new IllegalArgumentException("burst index");
         double t=index/(double)(COUNT-1),angle=index*Math.PI/8;
         double radius=.35+(index%2)*.2;

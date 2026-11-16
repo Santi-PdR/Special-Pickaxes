@@ -33,8 +33,9 @@ public final class AbilityVfx {
         if(LAST_CAST.getOrDefault(player.getUUID(),tick-1)==tick||!BUDGET.tryReserve(tick,16))return false;
         LAST_CAST.put(player.getUUID(),tick);
         var center=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(1.5)).add(0,.25,0);
+        var shape=AbilityBurstShape.Shape.valueOf(kind.name());
         for(int i=0;i<AbilityBurstShape.COUNT;i++){
-            var point=center.add(AbilityBurstShape.orient(AbilityBurstShape.offset(kind,i),player.getLookAngle()));
+            var point=center.add(AbilityBurstShape.orient(AbilityBurstShape.offset(shape,i),player.getLookAngle()));
             player.serverLevel().sendParticles(player,particle(kind),false,point.x,
                     point.y,point.z,1,0,.015,0,0);
         }
