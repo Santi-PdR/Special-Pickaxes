@@ -1,3 +1,23 @@
+## 5.11.2 — validación confirmada
+
+Commit probado `441d2569bd03e8d2ae81c39d45ddbf824d958676`.
+CI https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43796976117 : success.
+134JUnit sin fallos/errores/omitidos;385GameTests aprobados;cliente gráfico,
+32manuales renderizados y servidor empaquetado aprobados. Local94Python sin
+omitidos y25recursos correctos. Inspeccionadas capturas reales de Icarus-wide y
+Eventide-gravity_out en1280×720: descripción específica correcta y texto visible.
+No es una evaluación visual completa de VFX, otros tamaños/idiomas o modpacks.
+
+Primer intento43796716602falló en JUnit por inicializar ArtifactKind/SoundEvents
+sin bootstrap de Minecraft. Se desacopló la geometría pura mediante Shapeenum;
+no se omitieron pruebas ni se relajaron sus aserciones. Nuevo intento todo verde.
+
+JAR `special-pickaxes-1.20.1-5.11.2.jar`,577902bytes;
+SHA256 `fd8db251184a4a282a31e798fcecbaf10a9834fe91229844b37bfa7383e04ab7`.
+Artefacto autenticado temporal:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43796976117/artifacts/14195168983
+Sin release público. No afirma redistribución autorizada de assets ni prueba Windows/Ghouls.
+
 ## 5.11.2 — identidad visual de activación y manual por modo (pendiente CI)
 
 Las ráfagas custom dejan de usar un anillo idéntico: alas ascendentes Icarus,
