@@ -1605,14 +1605,24 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_05") public static void choirReplayMatchesState(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);
-        for(int depth=0;depth<20;depth++)for(var pos:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.RESONANT_TUNNEL,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());
+        for(int depth=0;depth<48;depth++)for(var pos:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.RESONANT_TUNNEL,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());
+        var beyond=origin.relative(Direction.SOUTH,48);h.getLevel().setBlockAndUpdate(beyond,Blocks.STONE.defaultBlockState());
+        var outside=origin.offset(3,0,8);h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
         var behind=p.blockPosition().relative(Direction.NORTH,2);h.getLevel().setBlockAndUpdate(behind,Blocks.STONE.defaultBlockState());
         h.assertTrue(java.util.stream.IntStream.range(0,20).filter(ArtifactFeedback::resonantTunnelPulseDue).count()==10
                 &&!ArtifactFeedback.resonantTunnelPulseDue(20),"the private tunnel ripple is capped at ten samples for the 20-block route");
         h.assertTrue(java.util.stream.IntStream.range(0,20).map(ArtifactFeedback::resonantTunnelParticleCount).sum()==42
                 &&ArtifactFeedback.resonantTunnelParticleCount(20)==0,"the four-point tunnel outline stays targeted and below 42 particles per full bore");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"forward resonance tunnel starts");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(origin.relative(Direction.SOUTH,19)).isAir(),"2x2 tunnel advances twenty blocks forward");
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"forward resonance tunnel starts");
+        // Manual queue ticks do not merge or collect item entities; model collection.
+        for(int tick=0;tick<1000&&WorkQueue.busy(p);tick++){
+            for(var drop:h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(origin.relative(Direction.SOUTH,24)).inflate(30)))drop.discard();
+            if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+            WorkQueue.tick();
+        }
+        h.assertTrue(!WorkQueue.busy(p),"the bounded route completes");
+        h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(origin.relative(Direction.SOUTH,47)).isAir(),"5x5 tunnel advances forty-eight blocks forward");
+        h.assertTrue(h.getLevel().getBlockState(beyond).is(Blocks.STONE)&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"stops at exact route and cross-section limits");
         h.assertTrue(h.getLevel().getBlockState(behind).is(Blocks.STONE),"tunnel leaves blocks behind untouched");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void eventideMiningNotCombat(GameTestHelper h) {

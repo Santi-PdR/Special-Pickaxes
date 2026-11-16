@@ -1,3 +1,17 @@
+## 5.11.5 — galería Fault Choir (CI pendiente)
+
+Primaria ampliada de2×2×20(80celdas) a5×5×48(1200celdas),15veces el
+volumen potencial. Sigue comprobación previa por sección, revalidación antes
+minado, scheduler compartido y pausa por drops. Secundaria mantiene galería
+abovedada7×5×24. Sin aumentar partículas ni reactivar contornos retirados.
+Textos bilingües sincronizados; tooltip secundario ya no promete combate obsoleto.
+
+JUnit nuevo verifica1200celdas únicas en seis direcciones y límites de sección.
+GameTest de recorrido comprueba último bloque47, preserva48y borde lateral3,
+modelando recogida entre ticks manuales sin relajar límite de drops. Se conservan
+pruebas de funciones antiguas de feedback, que no reactivan emisiones.
+Pendiente CI antes de afirmar compilación/juego/cliente aprobado.
+
 ## 5.11.4 — buff Seam validado
 
 Commit probado `bba971017124e3d4be5bebcfade52ba4fab4f4b0`.

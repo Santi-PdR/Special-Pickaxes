@@ -17,7 +17,7 @@ public final class DirectionalProgram implements WorkProgram {
     }
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape,ArtifactKind kind){
         this.origin=origin.immutable();this.direction=shape==Shape.CORE_DRILL?Direction.DOWN:direction;this.shape=shape;this.kind=kind;
-        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->64;case RESONANT_TUNNEL->20;case WORLDLOOM_BORE->16;};
+        length=switch(shape){case CARVE->64;case FRACTURE->48;case CLEAVE->9;case CORE_DRILL->192;case WORLD_SHATTER->96;case ICARUS,ICARUS_WIDE->ArtifactConfig.BORE_LENGTH.get();case EXODIUM_LANCE->48;case EXODIUM_SINK->64;case RESONANT_TUNNEL->48;case WORLDLOOM_BORE->16;};
         prepare();
     }
     public boolean isCoreDrill(){return shape==Shape.CORE_DRILL;}
@@ -31,14 +31,14 @@ public final class DirectionalProgram implements WorkProgram {
         var slice=new ArrayList<BlockPos>();int w,h;
         switch(shape){
             case ICARUS->{w=5;h=3;}case ICARUS_WIDE->{w=7;h=4;}case EXODIUM_LANCE->{w=6;h=4;}case EXODIUM_SINK->{w=2;h=2;}case CORE_DRILL->{w=2;h=2;}case CARVE->{w=3;h=3;}
-            case RESONANT_TUNNEL->{w=0;h=0;}
+            case RESONANT_TUNNEL->{w=2;h=2;}
             case WORLDLOOM_BORE->{w=2;h=2;}
             case FRACTURE->{w=Math.min(20,2+depth/2);h=3;}
             case CLEAVE->{w=12;h=5;}
             default->{w=Math.min(24,3+depth/3);h=Math.min(10,2+depth/10);}
         }
-        int uMin=shape==Shape.RESONANT_TUNNEL?-1:-w,uMax=shape==Shape.RESONANT_TUNNEL?0:w;
-        int vMin=shape==Shape.RESONANT_TUNNEL?-1:-h,vMax=shape==Shape.RESONANT_TUNNEL?0:h;
+        int uMin=-w,uMax=w;
+        int vMin=-h,vMax=h;
         for(int u=uMin;u<=uMax;u++)for(int v=vMin;v<=vMax;v++){
             // Starfall's shaft has clipped corners, giving it a distinct octagonal cut instead of a plain 5×5 bore.
             if(shape==Shape.EXODIUM_SINK&&Math.abs(u)==2&&Math.abs(v)==2)continue;

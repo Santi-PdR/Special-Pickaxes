@@ -263,10 +263,10 @@ class Resources(unittest.TestCase):
     def test_choir_manual_matches_live_tunnel(self):
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
-            self.assertIn("2×2", data["identity.specialpickaxes.fault_choir"])
-            self.assertIn("20", data["identity.specialpickaxes.fault_choir"])
-            self.assertIn("2×2", data["play4.fault_choir"])
-            self.assertIn("20", data["play4.fault_choir"])
+            self.assertIn("5×5", data["identity.specialpickaxes.fault_choir"])
+            self.assertIn("48", data["identity.specialpickaxes.fault_choir"])
+            self.assertIn("5×5", data["play4.fault_choir"])
+            self.assertIn("48", data["play4.fault_choir"])
             self.assertNotIn("replay", data["identity.specialpickaxes.fault_choir"].lower())
             self.assertNotIn("repite", data["identity.specialpickaxes.fault_choir"].lower())
             combat_term = "Fault Resonance" if lang == "en_us" else "Resonancia de Falla"
