@@ -9,8 +9,8 @@ pluginManagement {
         }
     }
     repositories {
-        gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }
+        gradlePluginPortal()
     }
 }
 rootProject.name = 'special-pickaxes'

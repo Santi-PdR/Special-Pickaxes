@@ -1,3 +1,17 @@
+## Diagnóstico HTTP confirmado y selección de repositorios
+
+Run43912465024sí descargó y cargó ForgeGradle6.0.54 desde el repositorio
+oficial: el paso useModule superó el fallo inicial. Luego falló al resolver
+_compileJava_1por HTTP429Too Many Requests de Maven Central, incluso para
+coordenadas Forge/Minecraft inexistentes allí; también registró timeout de Forge.
+No se ejecutaron testsJava. No afirmar corrección completa de infraestructura.
+
+Se prioriza Forge oficial para plugins y se usa el otro endpoint oficial de
+Central(repo1.maven.org)para dependencias generales, excluyendo grupos
+net.minecraft/net.minecraftforge/cpw.mods de consultas a Central. No se cambia
+versión de Forge/Gradle ni se usan repositorios no oficiales ni TLS inseguro.
+Nueva ejecución pendiente; los errores de red no se convierten en aprobaciones.
+
 ## 5.11.6 — corrección de resolución de plugin en validación
 
 Se conserva ForgeGradle[6.0,6.2)y el repositorio oficial. settings.gradle

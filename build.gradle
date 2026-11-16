@@ -30,7 +30,19 @@ minecraft {
         }
     }
 }
-repositories { mavenCentral() }
+repositories {
+    // Forge/Minecraft coordinates do not belong to Central. A 429 there must not
+    // prevent Gradle reaching ForgeGradle's generated Minecraft repository.
+    maven {
+        name = 'MavenCentralOfficial'
+        url = 'https://repo1.maven.org/maven2/'
+        content {
+            excludeGroupByRegex 'net\\.minecraftforge(\\..*)?'
+            excludeGroup 'net.minecraft'
+            excludeGroup 'cpw.mods'
+        }
+    }
+}
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.4.10'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
