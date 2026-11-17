@@ -4233,7 +4233,7 @@ public final class PickaxeGameTests {
                 h.assertTrue(mob.position().distanceToSqr(caughtPosition)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"closing roots pin the hostile after four seconds for four seconds");
                 WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
                 h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
-                mob.discard();angryWolf.discard();RelicNetwork.forget(rival);finish(h,owner);
+                mob.discard();angryWolf.discard();io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(rival);finish(h,owner);
             });
         });
     }
