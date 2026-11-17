@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.11.10
+# Special Pickaxes — 5.11.11
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -10,7 +10,9 @@
   y se detiene ante máquinas, fluidos y zonas protegidas. Secundaria: calzada de
   hasta 64 bloques, pagada exclusivamente desde la mano secundaria.
 - Choir: primaria 5×5×48; secundaria abovedada 9×7×48, hasta 2.832 celdas.
-- Hellspec: secundaria de chimenea 11×11×48, hasta 5.808 celdas.
+- Hellspec: primaria de cinco pétalos de hasta 1.679 celdas, envolvente 25×7×25
+  (antes 353; conserva íntegra la cantera anterior). Secundaria de chimenea
+  11×11×48, hasta 5.808 celdas.
   Ambas secundarias procesan el volumen por turnos, sin una lista de bloques al activar;
   respetan permisos, bloques colocados, máquinas y presión de drops, sin cargar chunks.
 - Choir/Hellspec muestran el número de celdas al iniciar; ambas excavaciones
@@ -19,16 +21,16 @@
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Icarus: cortes 11×7 / 15×9. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427):
-  151 JUnit, 397 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480):
+  154 JUnit, 398 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427/artifacts/14369880511)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480/artifacts/14374521019)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `45d5cbbe02e4814c807d36458b0460ed4ded5eff`.
-JAR: `special-pickaxes-1.20.1-5.11.10.jar` — 590.073 bytes.
-SHA-256: `49b497246fab43a7caf87a4924d1209df2c7c566e0eef5ca05ae48d62634fccc`.
+Commit probado: `b8ea8da5e484be2cb04b4eef7c2a1c742fb91b7d`.
+JAR: `special-pickaxes-1.20.1-5.11.11.jar` — 590.258 bytes.
+SHA-256: `5ef01cbb5e801deef17fce42c2f0dbf4d515564c21988757119a2c5a95dec615`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

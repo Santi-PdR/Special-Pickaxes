@@ -1,8 +1,8 @@
-# Rediseño 5.11.10 — build de prueba verificada
+# Rediseño 5.11.11 — build de prueba verificada
 
-CI `44170280427` aprobada sobre `45d5cbbe02e4814c807d36458b0460ed4ded5eff`:
-151 JUnit y 397 GameTests, cliente gráfico y servidor empaquetado.
-La 5.11.10 comparte geometría radial precalculada y reutiliza iconos del manual.
+CI `44181772480` aprobada sobre `b8ea8da5e484be2cb04b4eef7c2a1c742fb91b7d`:
+154 JUnit y 398 GameTests, cliente gráfico y servidor empaquetado.
+La 5.11.11 amplía la primaria de Hellspec a 1679 celdas, con envolvente de25×7×25.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni

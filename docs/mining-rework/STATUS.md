@@ -1,3 +1,15 @@
+## 5.11.11 — complete CI verified
+
+Runtime commit `b8ea8da5e484be2cb04b4eef7c2a1c742fb91b7d`, [CI 44181772480](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480): SUCCESS. 154 JUnit with zero failures/errors/skips, all 398 required GameTests, packaged server and graphical client checks passed, including strict runtime-log validation. Local 116 Python tests (no skips), 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci51111-green` (temporary, not a durable publication).
+
+Hellspec primary grows from 353 to 1,679 cells (~4.76×), retaining the whole previous quarry. Five-petal envelope is 25×7×25 with radius 12 and half-height 3. Exact surface geometry is cached immutable and derived from the same predicate as mining. A full-volume GameTest harvests exactly 1,675 cells after four exclusions: player-placed rock, denied claim, machine and bedrock. Outer-petal ore is harvested and an immediately exterior block is untouched. Three JUnit tests prove volume, symmetry, old-volume retention and exact six-face boundary. EN/ES summaries updated. No combat change, fluid/lava placement or new particle emissions.
+
+Initial CI 44177744653 completed gameplay and graphical scenes but failed the strict log scan due to Mojang authentication returning HTML instead of JSON. No log filter was relaxed. GitHub refused an explicit rerun; after adding the previous-quarry containment test, the next full run passed cleanly. Neither successful graphical smoke nor this evidence is manual visual approval or Windows/Ghouls certification.
+
+JAR `special-pickaxes-1.20.1-5.11.11.jar`: 590258 bytes; SHA-256 `5ef01cbb5e801deef17fce42c2f0dbf4d515564c21988757119a2c5a95dec615`. Authenticated personal artifact `14374521019` (7 days), full forge-validation artifact `14372844769`. No public release created; third-party artwork redistribution remains unapproved.
+
+### Historical progress notes
+
 ## 5.11.11 — validation pending
 
 Hellspec primary expanded from 353 to 1,679 candidate cells (five overlapping ellipsoidal petals, envelope 25×7×25, radius 12 and half-height 3). Mining remains scheduler-budgeted with existing natural-block, ore, claim, machine, bedrock and drop-pressure protections. Shared radial geometry and cached immutable six-face boundary use the same definition. No combat buff, fluids, lava placement, ambient VFX or new particle emissions. EN/ES summaries updated. Added three geometry/boundary JUnit tests (including retention of all 353 previous cells) and a full-volume Minecraft safety regression; updated the historical shape contract to the new intended bounds. CI 44177744653 passed 153 JUnit and all 398 GameTests, packaged server and every graphical scene. Strict client log validation failed on Mojang authentication service unavailability (HTML response parsed as JSON), not a mod exception. Kept the strict scanner unchanged; requested rerun was refused by GitHub. Added the previous-volume containment test and triggered fresh full CI. 5.11.10 remains the verified build until a completely clean run.
