@@ -1,3 +1,15 @@
+## 5.11.8 — complete CI verified
+
+Runtime commit `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`, [Forge run 44157295693](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693): SUCCESS. 147 JUnit (zero failures/errors/skips), all 395 required Minecraft GameTests, packaged server and graphical client smoke checks passed. Evidence retrieved to `/tmp/sp-ci5118-green` (temporary workspace location, not a published archive). No manual visual approval or Windows/Ghouls compatibility claim.
+
+Choir alternate streams a roof-clipped 9×7×48 vault (2,832 cells); Hellspec alternate streams an 11×11×48 chimney (5,808 cells). Constant plan memory and scheduler-budgeted execution. Regression coverage includes exact geometry, natural/placed blocks, denied cells, machines, bedrock, ore harvesting, unloaded chunks, drop-pressure cursor preservation/resume and callback tool swaps. EN/ES tooltips and manual descriptions match. No combat or ambient-VFX changes.
+
+The first full run (44155208932) passed the new excavation tests but failed the historical Worldloom root timing fixture. Isolated that fixture using fixed-size, separated, gravity-free targets and explicit velocities; no production snare changes. The following compile caught an unqualified test cleanup reference, corrected before the final green run. Neither failed run is release evidence.
+
+JAR `special-pickaxes-1.20.1-5.11.8.jar`: 585604 bytes; SHA-256 `299c30b1f31e5c6a1633f0fa76b7f6c20e85567aa24b5fd17727093bce4cb540`. Authenticated personal artifact `14363880574`, retained 7 days; full forge-validation artifact `14363601441`. No public release created; third-party artwork redistribution remains unapproved.
+
+### Historical progress notes
+
 ## 5.11.8 — validation pending
 
 Choir alternate now streams a 9×7×48 roof-clipped vault (2,832 cells); Hellspec streams an 11×11×48 chimney (5,808 cells). Constant plan memory; scheduler-budgeted execution and existing natural-block, claims, harvest, chunk and drop-backpressure checks. Three geometry unit tests and five Minecraft regression tests added, including cursor-preserving drop backpressure/resume and tool swaps inside claim callbacks. EN/ES descriptions updated. No combat-radius changes or new ambient effects. CI 44155208932 compiled successfully: 147 JUnit passed and the five new excavation GameTests passed. Full runtime validation failed in the historical Worldloom root timing test. Its fixture now uses a fixed-size slime, separated airborne targets and controlled velocity rather than random size, collision overlap and physics drift. No production snare logic changed. Full CI rerun pending; 5.11.7 remains the last verified build.

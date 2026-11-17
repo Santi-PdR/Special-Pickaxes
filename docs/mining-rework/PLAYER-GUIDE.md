@@ -1,8 +1,8 @@
-# Rediseño 5.11.8 — validación pendiente
+# Rediseño 5.11.8 — build de prueba verificada
 
-La última build completamente verificada es 5.11.7: CI `44146556631`,
-144 JUnit y 390 GameTests, cliente gráfico y servidor empaquetado.
-La 5.11.8 amplía las secundarias de Choir y Hellspec; su validación está pendiente.
+CI `44157295693` aprobada sobre `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`:
+147 JUnit y 395 GameTests, cliente gráfico y servidor empaquetado.
+La 5.11.8 amplía las secundarias de Choir y Hellspec con excavación por turnos.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni

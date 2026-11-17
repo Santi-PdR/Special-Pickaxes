@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.11.7
+# Special Pickaxes — 5.11.8
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -9,15 +9,21 @@
 - Worldloom: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
   y se detiene ante máquinas, fluidos y zonas protegidas. Secundaria: calzada de
   hasta 64 bloques, pagada exclusivamente desde la mano secundaria.
-- Icarus: cortes 11×7 / 15×9. Choir: 5×5×48. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631):
-  144 JUnit, 390 GameTests, cliente gráfico y servidor empaquetado.
+- Choir: primaria 5×5×48; secundaria abovedada 9×7×48, hasta 2.832 celdas.
+- Hellspec: secundaria de chimenea 11×11×48, hasta 5.808 celdas.
+  Ambas secundarias procesan el volumen por turnos, sin una lista de bloques al activar;
+  respetan permisos, bloques colocados, máquinas y presión de drops, sin cargar chunks.
+- Icarus: cortes 11×7 / 15×9. Seam: hasta 1024 bloques conectados.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693):
+  147 JUnit, 395 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631/artifacts/14357583794)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693/artifacts/14363880574)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `bb023afbe741a5e1058bfe046c6da693de4d8b5a`.
+Commit probado: `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`.
+JAR: `special-pickaxes-1.20.1-5.11.8.jar` — 585.604 bytes.
+SHA-256: `299c30b1f31e5c6a1633f0fa76b7f6c20e85567aa24b5fd17727093bce4cb540`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 
