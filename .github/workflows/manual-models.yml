@@ -1,0 +1,41 @@
+name: Pure Java manual models
+on:
+  push:
+    paths:
+      - '.github/workflows/manual-models.yml'
+      - 'tools/ManualModelsSmoke.java'
+      - 'tools/run_manual_models.py'
+      - 'src/main/java/io/github/santipdr/specialpickaxes/artifact/Manual*.java'
+  pull_request:
+    paths:
+      - '.github/workflows/manual-models.yml'
+      - 'tools/ManualModelsSmoke.java'
+      - 'tools/run_manual_models.py'
+      - 'src/main/java/io/github/santipdr/specialpickaxes/artifact/Manual*.java'
+permissions:
+  contents: read
+jobs:
+  manual-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile and execute production models without Forge or Maven
+        shell: bash
+        run: |
+          mkdir -p build/manual-models
+          set -o pipefail
+          python3 tools/run_manual_models.py 2>&1 | tee build/manual-models/console.log
+      - name: Retain model-only evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pure-java-manual-models
+          retention-days: 7
+          path: |
+            build/manual-models/report.json
+            build/manual-models/console.log

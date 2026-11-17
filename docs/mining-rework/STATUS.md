@@ -1,3 +1,17 @@
+## CI Java independiente para los modelos del manual (pendiente primera ejecución)
+
+Se añade workflow `Pure Java manual models`: JDK 17, javac --release 17 y un
+harness sin Gradle/Maven/Forge/JUnit. Compila las tres clases de PRODUCCIÓN
+ManualScreenLayout/ManualScrollModel/ManualWheelScroll y ejecuta acumulación,
+extremos, inversión, reset, 10000 entradas aleatorias, layouts pequeños/extremos,
+selector y 260 alturas de barra. No usa una traducción del algoritmo a Python.
+
+Genera evidencia con SHA de commit y hash de cada fuente solo tras completar
+las comprobaciones. Los fallos borran cualquier informe verde anterior.
+Tres tests Python comprueban ese contrato del ejecutor; no son las pruebas Java.
+Workflow separado, sin permisos de escritura, sin exportar binarios del mod.
+Su éxito NO equivaldrá a build Forge, renderizado, JUnit ni GameTests aprobados.
+
 ## Resultado CI del scroll preciso
 
 Run 43925814163, SHA `6c21d3caf75c2b8a988b2e864cda531497bbe7d7`: failure
