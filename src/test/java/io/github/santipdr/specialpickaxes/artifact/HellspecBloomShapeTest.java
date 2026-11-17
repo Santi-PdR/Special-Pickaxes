@@ -21,6 +21,16 @@ class HellspecBloomShapeTest {
         assertTrue(cells.contains(new BlockPos(0,3,0)));
         assertFalse(cells.contains(new BlockPos(12,1,0)));
     }
+    @Test void expandedBloomRetainsEveryCellOfThePreviousQuarry(){
+        int retained=0;
+        int[][] oldPetals={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
+        for(int x=-7;x<=7;x++)for(int y=-2;y<=2;y++)for(int z=-7;z<=7;z++){
+            boolean wasInside=false;
+            for(var petal:oldPetals)if((x-petal[0])*(x-petal[0])+(z-petal[1])*(z-petal[1])+2*y*y<=9){wasInside=true;break;}
+            if(wasInside){retained++;assertTrue(HellspecBloomShape.contains(x,y,z),"old cell retained: "+new BlockPos(x,y,z));}
+        }
+        assertEquals(353,retained);
+    }
     @Test void cachedBoundaryIsExactlyTheSixFaceSurface(){
         var boundary=HellspecBloomShape.boundary();
         assertSame(boundary,HellspecBloomShape.boundary());
