@@ -1,4 +1,10 @@
-# Rediseño 5.11.0 — pendiente de validar en cliente
+# Rediseño 5.11.6 — build de prueba verificada
+
+CI `43998074898` aprobada sobre `95fe6729e0483043d2e906d31b0001f20652ac4f`:
+144 JUnit, 388 GameTests, cliente gráfico y servidor empaquetado. El manual
+incluye scroll gradual de trackpad. Worldloom perfora roca natural en 7×7×48;
+Icarus usa 11×7 o 15×9; la primaria de Choir alcanza 5×5×48 y Seam hasta 1024.
+Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
 arte generado. Las partículas de equipamiento/Curios y bordes persistentes se

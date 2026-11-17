@@ -1,3 +1,27 @@
+## 5.11.6 — cadena completa en verde
+
+Commit probado: `95fe6729e0483043d2e906d31b0001f20652ac4f`.
+- Forge CI: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898 — success.
+- 144 JUnit: cero fallos, errores u omitidos; incluidos los cinco de ManualWheelScroll.
+- 388 GameTests requeridos aprobados: incluye Worldloom 2350/2352 celdas con mena
+  y roca colocada intactas, límites exactos y parada de sección ante máquinas.
+- Cliente gráfico y servidor empaquetado aprobados; 32 manuales renderizados.
+- CI independiente: https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916 — success.
+  Compila producción con Java 17 y exige más de 10.000 comprobaciones de modelos.
+- En este run Forge el wrapper usó un solo intento. Los bloqueos de dependencias
+  anteriores son históricos: no se deben presentar como el estado actual.
+
+JAR `special-pickaxes-1.20.1-5.11.6.jar`: 580190 bytes.
+SHA256: `f6396605365a18a8a990cb0a5586c4b9724787e95c9ab2790e9a304b199870b6`.
+Descarga autenticada temporal (7 días):
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898/artifacts/14291349249
+Evidencia de modelos puros:
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916/artifacts/14291260633
+
+No se publicó una release nueva. No certifica Windows/Ghouls, animaciones completas
+ni aprobación estética. El export Checks acotado no incluyó la captura del manual
+Worldloom: no se afirma inspección visual de esa escena en esta versión.
+
 ## CI Java independiente para los modelos del manual (pendiente primera ejecución)
 
 Se añade workflow `Pure Java manual models`: JDK 17, javac --release 17 y un

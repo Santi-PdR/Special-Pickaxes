@@ -1,17 +1,23 @@
-# Special Pickaxes — 5.11.0, reestructuración en validación
+# Special Pickaxes — 5.11.6
 
-**No instalar467esperando este rediseño: los enlaces inferiores son históricos.**
+**Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
--13sprites originales de Mythic Metals, exactos al commit fuente; sin arte generado
- ni filtros sobre los picos. Créditos/licencia de assets incluidos.
-- VFX custom breves solo al activar habilidades; sin auras pasivas ni partículas
- vanilla permanentes. Manual reducido a dos habilidades y controles reasignados.
-- Stasis: Fractura Temporal11×11×11; secundarias de excavación ampliadas y perfil
- de trabajo más rápido, siempre sujeto a permisos y presupuestos de servidor.
-- Uso personal: publicación automática de binarios desactivada. No se atribuye
- permiso general de redistribución de los sprites.
-- CI nueva pendiente. Las pruebas de467no validan5.11.0.
+- 13 sprites originales de Mythic Metals, sin retoques ni arte generado. Créditos
+  y licencia de assets incluidos; no se atribuye permiso general de redistribución.
+- VFX custom breves al activar habilidades, sin auras cosméticas permanentes.
+- Manual conciso por modo, controles reasignables y scroll preciso para trackpad.
+- Worldloom: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
+  y se detiene ante máquinas, fluidos y zonas protegidas.
+- Icarus: cortes 11×7 / 15×9. Choir: 5×5×48. Seam: hasta 1024 bloques conectados.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898):
+  144 JUnit, 388 GameTests, cliente gráfico y servidor empaquetado.
+- [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
+  compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898/artifacts/14291349249)
+  (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
+Commit probado: `95fe6729e0483043d2e906d31b0001f20652ac4f`.
+No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 
 ## Historial de entregas anteriores
