@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.11.6
+# Special Pickaxes — 5.11.7
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -7,16 +7,17 @@
 - VFX custom breves al activar habilidades, sin auras cosméticas permanentes.
 - Manual conciso por modo, controles reasignables y scroll preciso para trackpad.
 - Worldloom: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
-  y se detiene ante máquinas, fluidos y zonas protegidas.
+  y se detiene ante máquinas, fluidos y zonas protegidas. Secundaria: calzada de
+  hasta 64 bloques, pagada exclusivamente desde la mano secundaria.
 - Icarus: cortes 11×7 / 15×9. Choir: 5×5×48. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898):
-  144 JUnit, 388 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631):
+  144 JUnit, 390 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074898/artifacts/14291349249)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631/artifacts/14357583794)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `95fe6729e0483043d2e906d31b0001f20652ac4f`.
+Commit probado: `bb023afbe741a5e1058bfe046c6da693de4d8b5a`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

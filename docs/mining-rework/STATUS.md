@@ -1,3 +1,24 @@
+## 5.11.7 — calzada de 64 bloques validada
+
+Commit probado `bb023afbe741a5e1058bfe046c6da693de4d8b5a`.
+CI https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631 — success.
+144 JUnit sin fallos/errores/omitidos; 390 GameTests requeridos aprobados;
+cliente gráfico y servidor empaquetado aprobados. Local: 112 Python sin omitidos
+con Pillow, 25 recursos; secrets 322 sin firmas.
+
+Nuevos GameTests confirman 64 colocaciones por 64 bloques de offhand, reserva
+de inventario intacta y celda 65 intacta. Denegación en celda 40: se detiene
+con 39 colocaciones y 25 bloques restantes, sin saltar el claim.
+
+JAR `special-pickaxes-1.20.1-5.11.7.jar`: 580224 bytes.
+SHA256 `3131a2a7e15f22f5e671a5176703f20bf32484691e8f2a93fed545d2dc7c1dca`.
+Descarga autenticada temporal (7 días):
+https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44146556631/artifacts/14357583794
+No hubo release pública nueva. No certifica Windows/Ghouls ni todas las animaciones.
+El subconjunto Checks no retuvo manual-worldloom: no se afirma inspección visual
+nueva de esa escena. La CI de modelos puros anterior sigue como evidencia separada,
+no se atribuye un rerun nuevo a este commit que no cambia esos modelos.
+
 ## 5.11.7 — calzada Worldloom de una pila completa (CI pendiente)
 
 Secundaria ampliada de 32 a 64 bloques, constante BRIDGE_LENGTH. Conserva
