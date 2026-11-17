@@ -4209,25 +4209,31 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_35",timeoutTicks=120) public static void worldloomRootsHoldHostilesThenReleaseCleanly(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);
         var rival=player(h,ArtifactKind.WORLDLOOM,"SecondWorldloom");
-        var mob=EntityType.SLIME.create(h.getLevel());mob.setNoAi(true);mob.setPos(owner.getX()+2,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(mob);
-        var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setTarget(owner);
-        angryWolf.setPos(owner.getX()+3,owner.getY(),owner.getZ());h.getLevel().addFreshEntity(angryWolf);
+        // Pinning intentionally respects collisions. Keep this timing fixture away from
+        // other structures/entities, random slime sizes and gravity-driven movement.
+        var mob=EntityType.SLIME.create(h.getLevel());mob.setSize(1,true);mob.setNoAi(true);mob.setNoGravity(true);
+        mob.setPos(owner.getX()+2,owner.getY()+20,owner.getZ());h.getLevel().addFreshEntity(mob);
+        var angryWolf=EntityType.WOLF.create(h.getLevel());angryWolf.setNoAi(true);angryWolf.setNoGravity(true);angryWolf.setTarget(owner);
+        angryWolf.setPos(owner.getX()+3,owner.getY()+20,owner.getZ()+4);h.getLevel().addFreshEntity(angryWolf);
         var anchor=mob.position();
         h.assertTrue(WorldloomSnare.bind(owner,mob)&&WorldloomSnare.bind(owner,angryWolf),"explicit binding subsystem fixtures are registered independently of mining alternates");
         h.assertTrue(!WorldloomSnare.bind(owner,angryWolf),"Root Snare also captured an attacking non-Enemy mob in its bounded area scan");
         h.assertTrue(!WorldloomSnare.bind(rival,mob),"a second Worldloom cannot reset the first owner's four-second root windup");
         mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
         h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"roots mark the target without immediately freezing it");
+        mob.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         h.runAfterDelay(60,()->{
+            mob.setPos(anchor.add(1,0,0));mob.setDeltaMovement(.8,.2,0);
             WorldloomSnare.tick();
-            h.assertTrue(mob.getDeltaMovement().lengthSqr()>.001D,"the target can still move after three seconds of telegraph");
+            h.assertTrue(mob.position().distanceToSqr(anchor)>.5D&&mob.getDeltaMovement().lengthSqr()>.001D,"the target can still move after three seconds of telegraph");
+            mob.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             h.runAfterDelay(20,()->{
                 WorldloomSnare.tick();
                 var caughtPosition=mob.position();mob.setPos(caughtPosition.add(1,0,0));mob.setDeltaMovement(.8,.2,0);WorldloomSnare.tick();
                 h.assertTrue(mob.position().distanceToSqr(caughtPosition)<.001D&&mob.getDeltaMovement().lengthSqr()<.001D,"closing roots pin the hostile after four seconds for four seconds");
                 WorldloomSnare.forget(owner);mob.setDeltaMovement(.4,0,0);WorldloomSnare.tick();
                 h.assertTrue(Math.abs(mob.getDeltaMovement().x-.4D)<.001D,"cancel releases the target without leaving a movement lock");
-                finish(h,owner);
+                mob.discard();angryWolf.discard();RelicNetwork.forget(rival);finish(h,owner);
             });
         });
     }
