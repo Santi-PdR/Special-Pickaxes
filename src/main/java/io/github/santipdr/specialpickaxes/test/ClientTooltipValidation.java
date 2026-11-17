@@ -42,7 +42,7 @@ public final class ClientTooltipValidation {
                             &&lines.stream().noneMatch(line->line.getString().startsWith(bind.getTranslatedKeyMessage().getString())))
                         throw new IllegalStateException("Tooltip ignored rebound key: "+bind.getTranslatedKeyMessage().getString()+" in "+lines);
                     String how=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.how(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.SEAM_RIPPER,"connected").getString();
-                    if(!how.contains(" "+bind.getTranslatedKeyMessage().getString()+".")||how.contains("%1$s"))
+                    if(!how.startsWith(bind.getTranslatedKeyMessage().getString()+" · ")||how.contains("%1$s"))
                         throw new IllegalStateException("Instruction prose ignored rebound key: "+how);
                     alternateBind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_P));
                     String alternate=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.alternate(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.EVENTIDE).getString();

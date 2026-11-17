@@ -39,7 +39,7 @@ class InterfaceCopyTests(unittest.TestCase):
                 if not key.startswith('mining.how.') or key.split('.')[2] not in IDS:
                     continue
                 with self.subTest(locale=locale, key=key):
-                    self.assertIn('%1$s', text)
+                    self.assertTrue(text.startswith('%1$s · '), text)
                     self.assertLess(len(text), 240)
                     for retired in ('outline', 'contorno', 'visible border', 'borde visible', 'flash', 'destello'):
                         self.assertNotIn(retired, text.lower())
