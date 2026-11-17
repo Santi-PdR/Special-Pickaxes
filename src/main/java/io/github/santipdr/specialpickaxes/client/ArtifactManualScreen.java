@@ -51,30 +51,35 @@ public final class ArtifactManualScreen extends Screen {
         if(w<180||h<112){g.drawCenteredString(font,Component.translatable("screen.specialpickaxes.resize"),width/2,height/2,0xffd2dce5);super.render(g,mouseX,mouseY,partial);return;}
         ItemStack active=displayStack();
         ArtifactKind abilityKind=copiedKind(active);
+        int mode=ArtifactTooltips.abilityMode(active,kind);
+        String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
+        int accent=0xff000000|(abilityKind.color&0xffffff);
         g.fill(x-1,y-1,x+w+1,y+h+1,0xff090e15);
         g.fill(x,y,x+w,y+h,0xf2111925);
         g.fill(x,y,x+w,y+40,0xff182029);
-        g.fill(x,y,x+4,y+40,0xff7298a6);
-        g.fill(x+4,y+39,x+w,y+41,0xff7298a6);
-        g.drawCenteredString(font,title,width/2,y+4,0xffedf3f6);
+        g.fill(x,y,x+3,y+40,accent);
+        g.fill(x+3,y+39,x+w,y+40,0xff394b59);
+        g.drawString(font,title,x+PAD,y+6,0xffaebdca,false);
+        Component modeLabel=Component.translatable("mode.specialpickaxes."+modeKey);
+        int modeWidth=Math.max(0,w-2*PAD-font.width(title)-20);
+        String badge=fit(modeLabel,modeWidth);
+        if(!badge.isEmpty())g.drawString(font,badge,x+w-PAD-font.width(badge),y+6,0xffe2cd9d,false);
 
         ItemStack shownIcon=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?iconFor(abilityKind):headerIcon;
         g.renderItem(shownIcon,x+PAD,y+18);
         int nameX=x+PAD+24;
         Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
-                ?Component.translatable("screen.specialpickaxes.copy_mode_header",shownIcon.getHoverName())
-                :(selectingCopy()?Component.translatable("screen.specialpickaxes.copy_help",RelicKeys.name(RelicControl.Action.ACTIVATE),RelicKeys.name(RelicControl.Action.ALT_SKILL)):Component.translatable("screen.specialpickaxes.manual_hint"));
+                ?Component.translatable("screen.specialpickaxes.copy_mode_header")
+                :(selectingCopy()?Component.translatable("screen.specialpickaxes.copy_help"):Component.translatable("screen.specialpickaxes.manual_hint"));
         int hintX=x+w-PAD-font.width(headerHint);
         int nameMaxWidth=Math.max(0,(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w
                 ?hintX-8:x+w-PAD)-nameX);
-        String shownName=font.plainSubstrByWidth(shownIcon.getHoverName().getString(),nameMaxWidth);
+        String shownName=fit(shownIcon.getHoverName(),nameMaxWidth);
         g.drawString(font,shownName,nameX,y+22,0xfff1e5c9,false);
         if(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w)
             g.drawString(font,headerHint,hintX,y+22,0xffc0ccd8,false);
 
-        int mode=ArtifactTooltips.abilityMode(active,kind);
-        String modeKey=ArtifactInteraction.modeKey(abilityKind,mode);
         var content=layout.content();int contentX=content.x(),contentTop=content.y(),contentBottom=content.bottom(),contentWidth=content.width();
         boolean twoColumns=layout.twoColumns();
         ensureCards(contentWidth,twoColumns,active,abilityKind,mode,modeKey,contentTop,contentBottom);
@@ -92,6 +97,10 @@ public final class ArtifactManualScreen extends Screen {
             drawScrollBar(g,contentRight+2,contentTop,contentBottom,maxScroll);
         }
 
+        Component close=Component.translatable("screen.specialpickaxes.close",RelicKeys.MANUAL.getTranslatedKeyMessage());
+        String closeText=fit(close,Math.max(0,w-2*PAD));
+        int footerLeftWidth=Math.max(0,w-2*PAD-font.width(closeText)-12);
+        g.fill(x+PAD,layout.footerY()-7,x+w-PAD,layout.footerY()-6,0xff33414e);
         if(kind==ArtifactKind.WORLDBREAKER){
             if(layout.pickerVisible())drawCopyChoices(g,active,layout.picker(),mouseX,mouseY);
             String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
@@ -99,11 +108,11 @@ public final class ArtifactManualScreen extends Screen {
             if(!copied.isBlank()&&ArtifactInteraction.modeCount(abilityKind)>1)selection.append(" · ").append(Component.translatable("mode.specialpickaxes."+modeKey));
             Component state=copied.isBlank()?selection:Component.translatable("screen.specialpickaxes.copy_mode",selection);
             Component selected=Component.translatable("screen.specialpickaxes.selected",state);
-            int selectedWidth=Math.max(0,w-2*PAD-font.width(Component.translatable("screen.specialpickaxes.close"))-12);
-            g.drawString(font,font.plainSubstrByWidth(selected.getString(),selectedWidth),x+PAD,layout.footerY(),0xffedf3f6,false);
+            g.drawString(font,fit(selected,footerLeftWidth),x+PAD,layout.footerY(),0xffedf3f6,false);
+        }else if(maxScroll>0){
+            g.drawString(font,fit(Component.translatable("screen.specialpickaxes.navigation"),footerLeftWidth),x+PAD,layout.footerY(),0xffaebdca,false);
         }
-        Component close=Component.translatable("screen.specialpickaxes.close");
-        g.drawString(font,close,x+w-PAD-font.width(close),layout.footerY(),0xffaebdca,false);
+        g.drawString(font,closeText,x+w-PAD-font.width(closeText),layout.footerY(),0xffaebdca,false);
         super.render(g,mouseX,mouseY,partial);
     }
 
@@ -176,9 +185,11 @@ public final class ArtifactManualScreen extends Screen {
                 g.fill(x,cursor,x+2,cursor+18,card.section.color);
                 g.fill(x+3,cursor+1,x+cardWidth-1,cursor+18,0xff1b2630);
 
-                int headingWidth=Math.max(0,cardWidth-20);
-                String heading=font.plainSubstrByWidth(card.section.heading.getString(),headingWidth);
-                g.drawString(font,heading,x+10,cursor+5,card.section.color,false);
+                String number=switch(card.section.key){case "screen.specialpickaxes.main"->"01";case "screen.specialpickaxes.alternate"->"02";default->"03";};
+                g.fill(x+8,cursor+3,x+24,cursor+14,0xff101a24);
+                g.drawString(font,number,x+10,cursor+5,card.section.color,false);
+                String heading=fit(card.section.heading,Math.max(0,cardWidth-42));
+                g.drawString(font,heading,x+32,cursor+5,card.section.color,false);
                 int lineY=cursor+21;
                 for(var line:card.lines){g.drawString(font,line,x+10,lineY,0xffd2dce5,false);lineY+=LINE_HEIGHT;}
             }
@@ -308,6 +319,14 @@ public final class ArtifactManualScreen extends Screen {
     @Override public void removed(){
         if(Boolean.getBoolean("specialpickaxes.clientSmoke"))com.mojang.logging.LogUtils.getLogger().info("MANUAL_SCREEN_CLOSED");
         super.removed();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
+    }
+    /** Keep long translations and custom key names inside their allocated region. */
+    private String fit(Component text,int width){
+        if(width<=0)return "";
+        String value=text.getString();
+        if(font.width(value)<=width)return value;
+        int suffix=font.width("…");
+        return width<suffix?"":font.plainSubstrByWidth(value,width-suffix)+"…";
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
 }
