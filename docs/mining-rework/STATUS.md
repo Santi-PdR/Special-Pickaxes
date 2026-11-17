@@ -1,3 +1,7 @@
+## 5.11.8 — validation pending
+
+Choir alternate now streams a 9×7×48 roof-clipped vault (2,832 cells); Hellspec streams an 11×11×48 chimney (5,808 cells). Constant plan memory; scheduler-budgeted execution and existing natural-block, claims, harvest, chunk and drop-backpressure checks. Three geometry unit tests and three Minecraft regression tests added. EN/ES descriptions updated. No combat-radius changes or new ambient effects. Forge compilation and runtime validation pending; 5.11.7 remains the last verified build.
+
 ## 5.11.7 — calzada de 64 bloques validada
 
 Commit probado `bb023afbe741a5e1058bfe046c6da693de4d8b5a`.

@@ -141,6 +141,57 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
+    private static void expandedNaturalVolume(GameTestHelper h,ExcavationVolume.Shape shape){
+        var kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
+        var p=player(h,kind);var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,100,7));
+        p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-3.5);
+        for(int index=0;index<shape.volume;index++){
+            var at=ExcavationVolume.cell(origin,Direction.SOUTH,shape,index);
+            PlayerPlacedBlocks.get(level).unmark(at);level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());
+        }
+        var placed=ExcavationVolume.cell(origin,Direction.SOUTH,shape,1);
+        var denied=ExcavationVolume.cell(origin,Direction.SOUTH,shape,2);
+        var machine=ExcavationVolume.cell(origin,Direction.SOUTH,shape,3);
+        var bedrock=ExcavationVolume.cell(origin,Direction.SOUTH,shape,5);
+        var ore=ExcavationVolume.cell(origin,Direction.SOUTH,shape,6);
+        PlayerPlacedBlocks.get(level).mark(placed);level.setBlockAndUpdate(machine,Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=event->{
+            if(event.player==p&&event.target.equals(denied))event.setCanceled(true);
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+        try{
+            h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),kind,new NaturalExcavationProgram(origin,Direction.SOUTH,shape)),"streaming volume queues");
+            h.assertTrue(WorkQueue.remaining(p)==shape.volume&&level.getBlockState(origin).is(Blocks.GRANITE),"activation does not eagerly excavate");
+            WorkQueue.tick();
+            h.assertTrue(WorkQueue.completed(p)<=EnchantmentScaling.budget(p.getMainHandItem()),"first turn respects player budget");
+            for(int tick=0;tick<1000&&WorkQueue.busy(p);tick++){
+                for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                        new net.minecraft.world.phys.AABB(origin).inflate(60)))drop.discard();
+                if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+                WorkQueue.tick();
+            }
+            h.assertTrue(!WorkQueue.busy(p),"streamed volume finishes");
+            int removed=0;
+            for(int index=0;index<shape.volume;index++)if(level.getBlockState(ExcavationVolume.cell(origin,Direction.SOUTH,shape,index)).isAir())removed++;
+            h.assertTrue(removed==shape.volume-4,"exact excavation with four safety exclusions: "+removed);
+            h.assertTrue(level.getBlockState(placed).is(Blocks.GRANITE)&&level.getBlockState(denied).is(Blocks.GRANITE)
+                    &&level.getBlockState(machine).is(Blocks.CHEST)&&level.getBlockState(bedrock).is(Blocks.BEDROCK),"placed, claim, machine and bedrock survive");
+            h.assertTrue(level.getBlockState(ore).isAir(),"eligible ore is harvested with the rock");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);PlayerPlacedBlocks.get(level).unmark(placed);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_323") public static void choirVaultStreams2832CellsWithSafetyExclusions(GameTestHelper h){expandedNaturalVolume(h,ExcavationVolume.Shape.VAULT);}
+    @GameTest(template="empty",batch="rework_each_324") public static void hellspecChimneyStreams5808CellsWithSafetyExclusions(GameTestHelper h){expandedNaturalVolume(h,ExcavationVolume.Shape.CHIMNEY);}
+    @GameTest(template="empty",batch="rework_each_325") public static void naturalExcavationSkipsMissingChunksWithoutLoadingThem(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
+        h.assertTrue(!level.hasChunkAt(remote),"fixture is unloaded");
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CHOIR,new NaturalExcavationProgram(remote,Direction.SOUTH,ExcavationVolume.Shape.VAULT)),"unloaded scan queues");
+        for(int tick=0;tick<500&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(!WorkQueue.busy(p)&&!level.hasChunkAt(remote),"bounded volume does not force chunks");finish(h,p);
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

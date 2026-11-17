@@ -20,7 +20,14 @@ public final class MiningAlternates {
         var origin=aimed.get();
         if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
         if(kind==ArtifactKind.PALIMPSEST)return survey(player,tool,origin);
-        var steps=new ArrayList<WorkStep>();var forward=player.getDirection();var side=forward.getClockWise();
+        if(kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC){
+            var state=level.getBlockState(origin);
+            if(!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(level).contains(origin)
+                    ||!WorldSafety.harvestable(player,tool,origin))return false;
+            var shape=kind==ArtifactKind.CHOIR?ExcavationVolume.Shape.VAULT:ExcavationVolume.Shape.CHIMNEY;
+            return WorkQueue.startRegion(player,tool,kind,new NaturalExcavationProgram(origin,player.getDirection(),shape));
+        }
+        var steps=new ArrayList<WorkStep>();var forward=player.getDirection();
         if(kind==ArtifactKind.WORLDLOOM){
             if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
             var floor=player.blockPosition().below();
@@ -40,26 +47,11 @@ public final class MiningAlternates {
             return WorkQueue.startRegion(player,tool,kind,new RadialMiningProgram(origin,12,kind,ArtifactState.mode(player,kind),next));
         }else if(kind==ArtifactKind.INTERREGNUM){
             return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,true));
-        }else if(kind==ArtifactKind.CHOIR){
-            for(int depth=0;depth<24;depth++)for(int width=-3;width<=3;width++)for(int height=0;height<5;height++){
-                if(height==4&&Math.abs(width)>1)continue;
-                addMine(player,steps,origin.relative(forward,depth).relative(side,width).above(height),true);
-            }
-        }else if(kind==ArtifactKind.HELLSPEC){
-            for(int height=0;height<32;height++)for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)
-                addMine(player,steps,origin.offset(x,height,z),true);
         }else return false;
         if(steps.isEmpty()||!WorkQueue.start(player,tool,kind,steps))return false;
         ArtifactFeedback.preview(player,kind,steps);
         ArtifactFeedback.message(player,"mining_alternate_started",steps.size());
         return true;
-    }
-
-    private static void addMine(ServerPlayer player,ArrayList<WorkStep> steps,BlockPos at,boolean ores){
-        var level=player.serverLevel();
-        if(level.isOutsideBuildHeight(at)||!level.hasChunkAt(at)||PlayerPlacedBlocks.get(level).contains(at))return;
-        var state=level.getBlockState(at);
-        if(MiningDesigns.seamGeology(state)||(ores&&ArtifactOres.isOre(state)))steps.add(new WorkStep.Mine(at.immutable(),state,true));
     }
 
     private static boolean context(ServerPlayer player,ItemStack tool,net.minecraft.server.level.ServerLevel level,net.minecraft.world.phys.Vec3 origin){
