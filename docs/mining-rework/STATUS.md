@@ -1,3 +1,7 @@
+## 5.11.12 — validation pending
+
+Palimpsest survey now uses shared prewarmed distance-ordered offsets and stops after the complete distance group containing the 32nd eligible ore. Preserves exact world-coordinate `asLong` tie ordering, loaded/natural-ore filtering, immutable results and existing post-selection claim/context validation. Dense all-ore geometry requires 33 predicate inspections rather than 2,197; sparse/empty scans remain bounded by the same 13³ cube. No radius/result-cap changes, no new VFX, and no measured wall-clock claim. Added three unit tests (80 seeded oracle comparisons, signed-coordinate ties, empty scan, mutability) and a real-world dense/sparse oracle GameTest. Full CI pending; 5.11.11 remains the last verified build.
+
 ## 5.11.11 — complete CI verified
 
 Runtime commit `b8ea8da5e484be2cb04b4eef7c2a1c742fb91b7d`, [CI 44181772480](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480): SUCCESS. 154 JUnit with zero failures/errors/skips, all 398 required GameTests, packaged server and graphical client checks passed, including strict runtime-log validation. Local 116 Python tests (no skips), 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci51111-green` (temporary, not a durable publication).

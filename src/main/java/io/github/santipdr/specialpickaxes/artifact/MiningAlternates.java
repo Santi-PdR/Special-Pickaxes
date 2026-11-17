@@ -65,13 +65,8 @@ public final class MiningAlternates {
     /** Loaded, natural, nearest-first cells; no permission callbacks inside the collector. */
     public static java.util.List<BlockPos> surveyCandidates(ServerPlayer player,BlockPos origin){
         var level=player.serverLevel();
-        var best=new NearestCandidates<BlockPos>(32,java.util.Comparator.comparingDouble((BlockPos p)->p.distSqr(origin)).thenComparingLong(BlockPos::asLong));
-        for(var cursor:BlockPos.betweenClosed(origin.offset(-6,-6,-6),origin.offset(6,6,6))){
-            if(level.isOutsideBuildHeight(cursor)||!level.hasChunkAt(cursor)||PlayerPlacedBlocks.get(level).contains(cursor)
-                    ||!ArtifactOres.isOre(level.getBlockState(cursor)))continue;
-            best.offer(cursor.immutable());
-        }
-        return best.sorted();
+        return SurveyVolume.select(origin,cursor->!level.isOutsideBuildHeight(cursor)&&level.hasChunkAt(cursor)
+                &&!PlayerPlacedBlocks.get(level).contains(cursor)&&ArtifactOres.isOre(level.getBlockState(cursor)));
     }
 
     /** Information is emitted only after validating all claim callbacks and the captured miner. */
