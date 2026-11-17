@@ -1,3 +1,16 @@
+## 5.11.7 — calzada Worldloom de una pila completa (CI pendiente)
+
+Secundaria ampliada de 32 a 64 bloques, constante BRIDGE_LENGTH. Conserva
+pago exacto solo desde mano secundaria, rechazo de material con NBT,
+planificación sin saltar obstáculos y cancelación al fallar un paso.
+No carga chunks ni cambia permisos, materiales o efectos de combate.
+Textos bilingües de secundaria actualizados a 64.
+
+Dos GameTests nuevos: colocar exactamente 64 con una pila de offhand sin tocar
+reserva de inventario ni celda 65; denegar celda 40 y exigir solo 39 pagos,
+25 bloques restantes en mano y ninguna colocación a partir de la zona denegada.
+La versión verde anterior sigue 5.11.6 hasta completar esta nueva cadena CI.
+
 ## 5.11.6 — cadena completa en verde
 
 Commit probado: `95fe6729e0483043d2e906d31b0001f20652ac4f`.

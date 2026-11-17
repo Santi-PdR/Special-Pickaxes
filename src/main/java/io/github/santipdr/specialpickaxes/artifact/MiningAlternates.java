@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /** Block-only alternate techniques. Never queries, damages or controls living entities/projectiles. */
 public final class MiningAlternates {
+    public static final int BRIDGE_LENGTH=64;
     private MiningAlternates(){}
 
     public static boolean use(ServerPlayer player,ItemStack tool,ArtifactKind kind){
@@ -23,7 +24,7 @@ public final class MiningAlternates {
         if(kind==ArtifactKind.WORLDLOOM){
             if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
             var floor=player.blockPosition().below();
-            for(int depth=1;depth<=32;depth++){
+            for(int depth=1;depth<=BRIDGE_LENGTH;depth++){
                 var at=floor.relative(forward,depth);
                 if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir())break;
                 steps.add(new WorkStep.Place(at,block.getBlock().defaultBlockState(),true));

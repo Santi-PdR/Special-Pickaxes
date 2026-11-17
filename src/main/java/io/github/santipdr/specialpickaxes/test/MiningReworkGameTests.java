@@ -107,6 +107,40 @@ public final class MiningReworkGameTests {
         finish(h,p);
     }
 
+    private static BlockPos longBridgeFixture(GameTestHelper h,ServerPlayer p){
+        var base=h.absolutePos(new BlockPos(5,100,7));p.setPos(base.getX()+.5,base.getY(),base.getZ()+.5);p.setYRot(0);
+        var floor=p.blockPosition().below();
+        for(int depth=1;depth<=65;depth++)h.getLevel().setBlockAndUpdate(floor.south(depth),Blocks.AIR.defaultBlockState());
+        return floor;
+    }
+    @GameTest(template="empty",batch="rework_each_321") public static void worldloomBridgePaysExactlyOneFullOffhandStackFor64Blocks(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var floor=longBridgeFixture(h,p);var level=h.getLevel();
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,64));
+        var reserve=new ItemStack(Blocks.COBBLESTONE,64);p.getInventory().setItem(10,reserve);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"long bridge starts");
+        for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(!WorkQueue.busy(p)&&p.getOffhandItem().isEmpty()&&reserve.getCount()==64,"exactly the offhand stack is consumed");
+        for(int depth=1;depth<=64;depth++)h.assertTrue(level.getBlockState(floor.south(depth)).is(Blocks.COBBLESTONE),"paid bridge reaches cell "+depth);
+        h.assertTrue(level.getBlockState(floor.south(65)).isAir(),"never builds past the 64-block cap");finish(h,p);
+    }
+    @GameTest(template="empty",batch="rework_each_322") public static void worldloomLongBridgeStopsAtLateClaimWithoutPayingBeyondIt(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);var floor=longBridgeFixture(h,p);var level=h.getLevel();
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,64));var denied=floor.south(40);
+        java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=event->{
+            if(event.player==p&&event.target.equals(denied))event.setCanceled(true);
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+        try{
+            h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"late claim fixture queues");
+            for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+            h.assertTrue(!WorkQueue.busy(p)&&p.getOffhandItem().getCount()==25,"only 39 accepted blocks are paid");
+            h.assertTrue(level.getBlockState(floor.south(39)).is(Blocks.COBBLESTONE),"build reaches the claim boundary");
+            for(int depth=40;depth<=65;depth++)h.assertTrue(level.getBlockState(floor.south(depth)).isAir(),"claim cannot be skipped at cell "+depth);
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());
