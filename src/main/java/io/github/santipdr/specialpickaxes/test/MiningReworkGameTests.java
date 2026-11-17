@@ -239,6 +239,36 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="rework_each_328") public static void naturalExcavationClipsAtBuildCeilingWithoutLosingValidCells(GameTestHelper h){
+        for(var shape:ExcavationVolume.Shape.values()){
+            var kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
+            var p=player(h,kind);var level=h.getLevel();
+            var local=h.absolutePos(new BlockPos(5,0,7));var origin=new BlockPos(local.getX(),level.getMaxBuildHeight()-1,local.getZ());
+            p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-3.5);
+            int valid=0;
+            for(int index=0;index<shape.volume;index++){
+                var at=ExcavationVolume.cell(origin,Direction.SOUTH,shape,index);
+                if(level.isOutsideBuildHeight(at))continue;
+                valid++;PlayerPlacedBlocks.get(level).unmark(at);level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());
+            }
+            h.assertTrue(valid==(shape==ExcavationVolume.Shape.VAULT?432:121),"fixture has exactly one valid layer");
+            try{
+                h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),kind,new NaturalExcavationProgram(origin,Direction.SOUTH,shape)),"ceiling plan queues");
+                for(int tick=0;tick<500&&WorkQueue.busy(p);tick++){
+                    for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                            new net.minecraft.world.phys.AABB(origin).inflate(60)))drop.discard();
+                    WorkQueue.tick();
+                }
+                h.assertTrue(!WorkQueue.busy(p),"out-of-height cells cannot stall the job");
+                for(int index=0;index<shape.volume;index++){
+                    var at=ExcavationVolume.cell(origin,Direction.SOUTH,shape,index);
+                    if(!level.isOutsideBuildHeight(at))h.assertTrue(level.getBlockState(at).isAir(),"every valid ceiling cell is mined");
+                }
+            }finally{WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        }
+        h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

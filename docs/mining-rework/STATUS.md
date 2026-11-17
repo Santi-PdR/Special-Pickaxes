@@ -1,3 +1,7 @@
+## 5.11.9 — validation pending
+
+Restored the alternate-started feedback for the streaming Choir/Hellspec jobs, reporting the actual configured number of scheduled cells without building a preview list or scanning the world. Added a Minecraft ceiling-boundary regression for both shapes and a geometry translation test over every cell in all horizontal orientations. No extra particles, combat changes or permission relaxations. 5.11.8 remains the last fully verified build until the new CI completes.
+
 ## 5.11.8 — complete CI verified
 
 Runtime commit `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`, [Forge run 44157295693](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693): SUCCESS. 147 JUnit (zero failures/errors/skips), all 395 required Minecraft GameTests, packaged server and graphical client smoke checks passed. Evidence retrieved to `/tmp/sp-ci5118-green` (temporary workspace location, not a published archive). No manual visual approval or Windows/Ghouls compatibility claim.

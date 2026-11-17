@@ -28,6 +28,15 @@ class ExcavationVolumeTest {
         for(var cell:all)assertTrue(Math.abs(cell.getX())<=5&&Math.abs(cell.getZ())<=5&&cell.getY()>=0&&cell.getY()<48);
         assertEquals(5808,all.size());assertTrue(all.contains(new BlockPos(-5,47,5)));
     }
+    @Test void geometryTranslatesExactlyWithoutChangingTraversal(){
+        var origin=new BlockPos(-200,190,350);
+        for(var shape:ExcavationVolume.Shape.values())for(var direction:new Direction[]{Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST}){
+            for(int index=0;index<shape.volume;index++){
+                var relative=ExcavationVolume.cell(BlockPos.ZERO,direction,shape,index);
+                assertEquals(relative.offset(origin),ExcavationVolume.cell(origin,direction,shape,index));
+            }
+        }
+    }
     @Test void invalidIndicesAndVerticalDirectionsCannotEscapeThePlan(){
         for(var shape:ExcavationVolume.Shape.values()){
             assertThrows(IllegalArgumentException.class,()->ExcavationVolume.cell(BlockPos.ZERO,Direction.SOUTH,shape,-1));
