@@ -1,8 +1,8 @@
-# Rediseño 5.11.8 — build de prueba verificada
+# Rediseño 5.11.9 — build de prueba verificada
 
-CI `44157295693` aprobada sobre `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`:
-147 JUnit y 395 GameTests, cliente gráfico y servidor empaquetado.
-La 5.11.8 amplía las secundarias de Choir y Hellspec con excavación por turnos.
+CI `44162211767` aprobada sobre `462e6ba97649bc7938f775fb611b637874d9a90e`:
+148 JUnit y 396 GameTests, cliente gráfico y servidor empaquetado.
+La 5.11.9 restaura el aviso de inicio y verifica excavaciones en el techo del mundo.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni

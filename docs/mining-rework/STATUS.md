@@ -1,6 +1,8 @@
-## 5.11.9 — validation pending
+## 5.11.9 — complete CI verified
 
-Restored the alternate-started feedback for the streaming Choir/Hellspec jobs, reporting the actual configured number of scheduled cells without building a preview list or scanning the world. Added a Minecraft ceiling-boundary regression for both shapes and a geometry translation test over every cell in all horizontal orientations. No extra particles, combat changes or permission relaxations. 5.11.8 remains the last fully verified build until the new CI completes.
+Restored the alternate-started feedback for the streaming Choir/Hellspec jobs, reporting the actual configured number of scheduled cells without building a preview list or scanning the world. Added a Minecraft ceiling-boundary regression for both shapes and a geometry translation test over every cell in all horizontal orientations. No extra particles, combat changes or permission relaxations. Verified runtime commit `462e6ba97649bc7938f775fb611b637874d9a90e`: [CI 44162211767](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44162211767) SUCCESS; 148 JUnit with zero failures/errors/skips, all 396 required GameTests, packaged server and graphical client checks passed. Local 112 Python tests passed without skips, 25 resource checks and secret scan passed. Evidence retrieved to `/tmp/sp-ci5119-green` (temporary). No manual visual, Windows or Ghouls approval.
+
+JAR `special-pickaxes-1.20.1-5.11.9.jar`: 585686 bytes, SHA-256 `89873dc47136ce970fe108c9ea6b07aeed0506a2c472f3a78c36b12fc35ac01d`. Authenticated personal artifact `14365576665` (7 days), full forge-validation artifact `14363909299`. No public release.
 
 ## 5.11.8 — complete CI verified
 

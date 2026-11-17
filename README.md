@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.11.8
+# Special Pickaxes — 5.11.9
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -13,17 +13,19 @@
 - Hellspec: secundaria de chimenea 11×11×48, hasta 5.808 celdas.
   Ambas secundarias procesan el volumen por turnos, sin una lista de bloques al activar;
   respetan permisos, bloques colocados, máquinas y presión de drops, sin cargar chunks.
+- Choir/Hellspec muestran el número de celdas al iniciar; ambas excavaciones
+  completan las celdas válidas incluso al alcanzar el techo del mundo.
 - Icarus: cortes 11×7 / 15×9. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693):
-  147 JUnit, 395 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44162211767):
+  148 JUnit, 396 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44157295693/artifacts/14363880574)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44162211767/artifacts/14365576665)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `61101827ef922bfb53f1fe6f9b781e4e9c66b3f2`.
-JAR: `special-pickaxes-1.20.1-5.11.8.jar` — 585.604 bytes.
-SHA-256: `299c30b1f31e5c6a1633f0fa76b7f6c20e85567aa24b5fd17727093bce4cb540`.
+Commit probado: `462e6ba97649bc7938f775fb611b637874d9a90e`.
+JAR: `special-pickaxes-1.20.1-5.11.9.jar` — 585.686 bytes.
+SHA-256: `89873dc47136ce970fe108c9ea6b07aeed0506a2c472f3a78c36b12fc35ac01d`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 
