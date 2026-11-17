@@ -92,6 +92,7 @@ public final class SpecialPickaxes {
     }
     public SpecialPickaxes() {
         OrefallProgram.warmup();
+        RadialVolume.warmup();
         io.github.santipdr.specialpickaxes.network.RelicNetwork.register();
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);PARTICLES.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);

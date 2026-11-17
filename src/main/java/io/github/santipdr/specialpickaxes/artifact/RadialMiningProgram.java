@@ -5,58 +5,34 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Center-out, allocation-free scanner for bounded geology abilities. */
+/** Center-out execution over shared immutable geometry; no per-cast counting or shell search. */
 public final class RadialMiningProgram implements WorkProgram {
     private final BlockPos center;
     private final ArtifactKind kind;
-    private final int radius, mode, scanLimit;
+    private final int scanLimit;
     private final BlockState target;
-    private int shell=-1,x,y,z,scanned;
-    private BlockPos pending;
-    private boolean exhausted;
+    private final java.util.List<BlockPos> offsets;
+    private int scanned;
 
     public RadialMiningProgram(BlockPos center,int radius,ArtifactKind kind,int mode,BlockState target){
-        this.center=center.immutable();this.radius=Math.max(0,Math.min(12,radius));this.kind=kind;this.mode=mode;this.target=target;
-        this.scanLimit=Math.min(ArtifactConfig.JOB_LIMIT.get(),countCandidates());
+        this.center=center.immutable();this.kind=kind;this.target=target;
+        var shape=switch(kind){
+            case WORLDLOOM,CRUCIBLE -> RadialVolume.Shape.SPHERE;
+            case HELLSPEC -> RadialVolume.Shape.BLOOM;
+            case AXIOM -> RadialVolume.Shape.SHELL;
+            default -> RadialVolume.Shape.CUBE;
+        };
+        offsets=RadialVolume.offsets(shape,radius);
+        scanLimit=Math.min(ArtifactConfig.JOB_LIMIT.get(),offsets.size());
     }
 
     public BlockPos center(){return center;}
-
-    private boolean inside(int dx,int dy,int dz){
-        if(kind==ArtifactKind.WORLDLOOM||kind==ArtifactKind.CRUCIBLE)return dx*dx+dy*dy+dz*dz<=radius*radius;
-        if(kind==ArtifactKind.HELLSPEC){
-            return HellspecBloomShape.contains(dx,dy,dz);
-        }
-        if(kind==ArtifactKind.AXIOM){
-            int distance=dx*dx+dy*dy+dz*dz,inner=Math.max(0,radius-2);
-            return distance<=radius*radius&&distance>=inner*inner;
-        }
-        return true;
-    }
-
-    private int countCandidates(){
-        int count=0,limit=Math.max(1,ArtifactConfig.JOB_LIMIT.get());
-        for(int dx=-radius;dx<=radius;dx++)for(int dy=-radius;dy<=radius;dy++)for(int dz=-radius;dz<=radius;dz++)
-            if(Math.max(Math.max(Math.abs(dx),Math.abs(dy)),Math.abs(dz))<=radius&&inside(dx,dy,dz)&&++count>=limit)return limit;
-        return count;
-    }
-
-    private BlockPos peek(){
-        if(pending!=null||exhausted)return pending;
-        while(shell<=radius){
-            if(x>shell){shell++;if(shell>radius){exhausted=true;return null;}x=-shell;y=-shell;z=-shell;}
-            int dx=x,dy=y,dz=z;
-            if(++z>shell){z=-shell;if(++y>shell){y=-shell;x++;}}
-            if(Math.max(Math.max(Math.abs(dx),Math.abs(dy)),Math.abs(dz))!=shell||!inside(dx,dy,dz))continue;
-            pending=center.offset(dx,dy,dz).immutable();return pending;
-        }
-        exhausted=true;return null;
-    }
+    private BlockPos peek(){return done()?null:center.offset(offsets.get(scanned));}
 
     @Override public int remaining(){return Math.max(0,scanLimit-scanned);}
     @Override public boolean awaiting(){return false;}
     @Override public boolean executing(){return true;}
-    @Override public boolean done(){return scanned>=scanLimit||exhausted;}
+    @Override public boolean done(){return scanned>=scanLimit;}
     @Override public void confirm(){}
     @Override public boolean loaded(ServerPlayer p){return true;} // Unloaded positions are skipped without requesting chunks.
     @Override public boolean reportPartial(){return false;} // Empty, protected and non-geological cells are normal scan results.
@@ -71,8 +47,8 @@ public final class RadialMiningProgram implements WorkProgram {
 
     @Override public WorkStep next(ServerPlayer p){
         BlockPos pos=peek();
-        if(pos==null||scanned>=scanLimit){exhausted=true;return empty(center);}
-        pending=null;scanned++;
+        if(pos==null)return empty(center);
+        scanned++;
         if(kind==ArtifactKind.CRUCIBLE)return transmuteAt(pos,p);
         return mineAt(pos);
     }

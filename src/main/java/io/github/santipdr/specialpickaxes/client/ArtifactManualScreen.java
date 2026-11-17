@@ -59,7 +59,7 @@ public final class ArtifactManualScreen extends Screen {
         g.drawCenteredString(font,title,width/2,y+4,0xffedf3f6);
 
         ItemStack shownIcon=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
-                ?new ItemStack(SpecialPickaxes.PICKS.get(abilityKind).get()):headerIcon;
+                ?iconFor(abilityKind):headerIcon;
         g.renderItem(shownIcon,x+PAD,y+18);
         int nameX=x+PAD+24;
         Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
@@ -222,7 +222,7 @@ public final class ArtifactManualScreen extends Screen {
                 ArtifactKind source=choices.get(i);boolean selected=source.id.equals(copied)||(source==ArtifactKind.WORLDBREAKER&&copied.isBlank());
                 boolean hover=mouseX>=px&&mouseX<px+CHOICE_CELL&&mouseY>=y&&mouseY<bottom;
                 g.fill(px+1,y+1,px+CHOICE_CELL-2,bottom-1,selected?0xff806b3a:hover?0xff455d70:0xff202e3b);
-                ItemStack icon=choiceIcons.computeIfAbsent(source,k->new ItemStack(SpecialPickaxes.PICKS.get(k).get()));
+                ItemStack icon=iconFor(source);
                 g.renderItem(icon,px+(CHOICE_CELL-16)/2,y+2);
                 if(hover)hoveredChoice=source;
             }
@@ -232,7 +232,7 @@ public final class ArtifactManualScreen extends Screen {
                 int labelWidth=right-labelX;
                 if(labelWidth>=48){
                     ArtifactKind labelKind=hoveredChoice!=null?hoveredChoice:copyChoice(copied);
-                    ItemStack labelIcon=choiceIcons.computeIfAbsent(labelKind,k->new ItemStack(SpecialPickaxes.PICKS.get(k).get()));
+                    ItemStack labelIcon=iconFor(labelKind);
                     Component label=labelKind==ArtifactKind.WORLDBREAKER
                             ?Component.translatable("screen.specialpickaxes.copy_native"):labelIcon.getHoverName();
                     g.drawString(font,font.plainSubstrByWidth(label.getString(),labelWidth),labelX,y+6,
@@ -240,6 +240,12 @@ public final class ArtifactManualScreen extends Screen {
                 }
             }
         }
+    }
+
+    /** Display-only stacks are bounded by the thirteen playable kinds, never allocated per frame. */
+    private ItemStack iconFor(ArtifactKind source){
+        if(source==kind)return headerIcon;
+        return choiceIcons.computeIfAbsent(source,k->new ItemStack(SpecialPickaxes.PICKS.get(k).get()));
     }
 
     private Component allModes(ArtifactKind modeKind){

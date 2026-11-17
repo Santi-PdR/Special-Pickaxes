@@ -269,6 +269,27 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="rework_each_329") public static void radialSharedPlansKeepIndependentCursorsAndRespectConfiguredLimit(GameTestHelper h){
+        var p=player(h,ArtifactKind.CRUCIBLE);
+        var origin=h.absolutePos(new BlockPos(5,60,7));
+        for(var kind:new ArtifactKind[]{ArtifactKind.CRUCIBLE,ArtifactKind.WORLDLOOM,ArtifactKind.HELLSPEC,ArtifactKind.AXIOM}){
+            var shape=kind==ArtifactKind.HELLSPEC?RadialVolume.Shape.BLOOM:kind==ArtifactKind.AXIOM?RadialVolume.Shape.SHELL:RadialVolume.Shape.SPHERE;
+            var offsets=RadialVolume.offsets(shape,12);var mutable=origin.mutable();
+            var first=new RadialMiningProgram(mutable,12,kind,0,null);
+            var second=new RadialMiningProgram(origin,12,kind,0,null);mutable.set(0,0,0);
+            int limit=Math.min(offsets.size(),ArtifactConfig.JOB_LIMIT.get());
+            h.assertTrue(first.remaining()==limit&&second.remaining()==limit,"configured candidate count is exact");
+            for(int index=0;index<limit;index++){
+                h.assertTrue(!first.done(),"plan remains active through last candidate");
+                h.assertTrue(first.next(p).pos().equals(origin.offset(offsets.get(index))),"historical center-out traversal is preserved");
+                h.assertTrue(second.remaining()==limit,"another cast never shares mutable cursor state");
+            }
+            h.assertTrue(first.done()&&first.remaining()==0,"last candidate completes without a phantom scan step");
+            h.assertTrue(second.next(p).pos().equals(origin.offset(offsets.get(0))),"independent cast starts at first offset");
+        }
+        finish(h,p);
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());
