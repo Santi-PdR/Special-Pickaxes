@@ -728,7 +728,8 @@ public final class ArtifactFeedback {
             var offset=outline.get(i);var at=center.offset(offset);
             if(level.hasChunkAt(at))AbilityVfx.retired(level,p,offset.getY()==0?ember:heart,false,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
         }
-        int[][] cores={{0,0},{4,0},{-4,0},{0,4},{0,-4}};
+        int petal=HellspecBloomShape.PETAL_OFFSET;
+        int[][] cores={{0,0},{petal,0},{-petal,0},{0,petal},{0,-petal}};
         for(int[] offset:cores){
             var at=center.offset(offset[0],0,offset[1]);
             if(level.hasChunkAt(at)){

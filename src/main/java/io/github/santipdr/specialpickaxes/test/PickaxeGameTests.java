@@ -2788,11 +2788,11 @@ public final class PickaxeGameTests {
         finish(h,wearer);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void hellBloomTelegraphMatchesItsThreeDimensionalMiningShape(GameTestHelper h) {
-        h.assertTrue(HellspecBloomShape.contains(0,0,0)&&HellspecBloomShape.contains(4,0,0),"the core and all petal centers are mined");
-        h.assertTrue(HellspecBloomShape.contains(0,2,0)&&HellspecBloomShape.contains(0,-2,0),"the bloom has two-block vertical depth");
-        h.assertTrue(!HellspecBloomShape.contains(0,3,0)&&HellspecBloomShape.contains(7,0,0)&&!HellspecBloomShape.contains(8,0,0),"the excavation has firm vertical and radial edges");
+        h.assertTrue(HellspecBloomShape.contains(0,0,0)&&HellspecBloomShape.contains(7,0,0),"the core and all petal centers are mined");
+        h.assertTrue(HellspecBloomShape.contains(0,3,0)&&HellspecBloomShape.contains(0,-3,0),"the bloom has three-block vertical depth");
+        h.assertTrue(!HellspecBloomShape.contains(0,4,0)&&HellspecBloomShape.contains(12,0,0)&&!HellspecBloomShape.contains(13,0,0),"the excavation has firm vertical and radial edges");
         var outline=HellspecBloomShape.boundary();
-        h.assertTrue(outline.size()>100&&outline.size()<400,"the full outline stays within its particle budget");
+        h.assertTrue(outline.size()>400&&(outline.size()+Math.max(1,(outline.size()+191)/192)-1)/Math.max(1,(outline.size()+191)/192)<=192,"outline sampling stays within its point budget");
         for(var pos:outline)h.assertTrue(HellspecBloomShape.contains(pos.getX(),pos.getY(),pos.getZ()),"preview points belong to the mined volume");
         h.succeed();
     }

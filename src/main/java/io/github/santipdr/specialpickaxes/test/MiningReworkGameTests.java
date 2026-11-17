@@ -290,6 +290,36 @@ public final class MiningReworkGameTests {
         finish(h,p);
     }
 
+    @GameTest(template="empty",batch="rework_each_330") public static void hellspecExpandedBloomHarvests1679CellsWithSafetyExclusions(GameTestHelper h){
+        var p=player(h,ArtifactKind.HELLSPEC);var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,90,7));
+        p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-15.5);
+        var offsets=RadialVolume.offsets(RadialVolume.Shape.BLOOM,HellspecBloomShape.RADIUS);
+        h.assertTrue(offsets.size()==1679,"expanded primary contains exactly 1679 cells");
+        for(var offset:offsets){var at=origin.offset(offset);PlayerPlacedBlocks.get(level).unmark(at);level.setBlockAndUpdate(at,Blocks.GRANITE.defaultBlockState());}
+        var placed=origin.east(12);var denied=origin.west(12);var machine=origin.south(12);var ore=origin.north(12);var bedrock=origin.above(3);var outside=origin.east(13);
+        PlayerPlacedBlocks.get(level).mark(placed);level.setBlockAndUpdate(machine,Blocks.CHEST.defaultBlockState());
+        level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());level.setBlockAndUpdate(outside,Blocks.GRANITE.defaultBlockState());
+        java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=event->{if(event.player==p&&event.target.equals(denied))event.setCanceled(true);};
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,
+                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+        try{
+            h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.HELLSPEC,
+                    new RadialMiningProgram(origin,HellspecBloomShape.RADIUS,ArtifactKind.HELLSPEC,0,null)),"expanded bloom queues");
+            for(int tick=0;tick<500&&WorkQueue.busy(p);tick++){
+                for(var drop:level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(origin).inflate(20)))drop.discard();
+                if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
+                WorkQueue.tick();
+            }
+            h.assertTrue(!WorkQueue.busy(p),"expanded bloom completes within budgeted turns");
+            int removed=0;for(var offset:offsets)if(level.getBlockState(origin.offset(offset)).isAir())removed++;
+            h.assertTrue(removed==1675,"all 1679 cells except four safety exclusions are harvested: "+removed);
+            h.assertTrue(level.getBlockState(placed).is(Blocks.GRANITE)&&level.getBlockState(denied).is(Blocks.GRANITE)
+                    &&level.getBlockState(machine).is(Blocks.CHEST)&&level.getBlockState(bedrock).is(Blocks.BEDROCK),"placed, claims, machines and bedrock stay intact");
+            h.assertTrue(level.getBlockState(ore).isAir()&&level.getBlockState(outside).is(Blocks.GRANITE),"outer petal ore is harvested but the next cell is untouched");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);PlayerPlacedBlocks.get(level).unmark(placed);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

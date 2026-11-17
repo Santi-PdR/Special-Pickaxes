@@ -1,3 +1,7 @@
+## 5.11.11 — validation pending
+
+Hellspec primary expanded from 353 to 1,679 candidate cells (five overlapping ellipsoidal petals, envelope 25×7×25, radius 12 and half-height 3). Mining remains scheduler-budgeted with existing natural-block, ore, claim, machine, bedrock and drop-pressure protections. Shared radial geometry and cached immutable six-face boundary use the same definition. No combat buff, fluids, lava placement, ambient VFX or new particle emissions. EN/ES summaries updated. Added two exact geometry/boundary JUnit tests and a full-volume Minecraft safety regression; updated the historical shape contract to the new intended bounds. Full CI pending; 5.11.10 remains the verified build.
+
 ## 5.11.10 — complete CI verified
 
 Runtime commit `45d5cbbe02e4814c807d36458b0460ed4ded5eff`, [CI 44170280427](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427): SUCCESS. 151 JUnit with zero failures/errors/skips, all 397 required GameTests, packaged-server smoke and graphical-client smoke passed. Client log confirms 32 manual renders and 32 closes. Local 116 Python tests (no skips), 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci51110-green` (temporary, not a durable publication).

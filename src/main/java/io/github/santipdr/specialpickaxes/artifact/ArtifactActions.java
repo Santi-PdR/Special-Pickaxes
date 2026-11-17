@@ -175,7 +175,7 @@ public final class ArtifactActions {
             return started;
         }
         if(kind==ArtifactKind.HELLSPEC) {
-            var program=new RadialMiningProgram(center,7,kind,ArtifactState.mode(p,kind),null);
+            var program=new RadialMiningProgram(center,HellspecBloomShape.RADIUS,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);
             if(started){ArtifactFeedback.hellBloom(p,center);ArtifactFeedback.message(p,"infernal_bloom_started");}
             return started;
