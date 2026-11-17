@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.11.9
+# Special Pickaxes — 5.11.10
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -15,17 +15,20 @@
   respetan permisos, bloques colocados, máquinas y presión de drops, sin cargar chunks.
 - Choir/Hellspec muestran el número de celdas al iniciar; ambas excavaciones
   completan las celdas válidas incluso al alcanzar el techo del mundo.
+- Geometría radial precalculada y compartida: sin recuentos completos al activar,
+  con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
+  manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Icarus: cortes 11×7 / 15×9. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44162211767):
-  148 JUnit, 396 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427):
+  151 JUnit, 397 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44162211767/artifacts/14365576665)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427/artifacts/14369880511)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `462e6ba97649bc7938f775fb611b637874d9a90e`.
-JAR: `special-pickaxes-1.20.1-5.11.9.jar` — 585.686 bytes.
-SHA-256: `89873dc47136ce970fe108c9ea6b07aeed0506a2c472f3a78c36b12fc35ac01d`.
+Commit probado: `45d5cbbe02e4814c807d36458b0460ed4ded5eff`.
+JAR: `special-pickaxes-1.20.1-5.11.10.jar` — 590.073 bytes.
+SHA-256: `49b497246fab43a7caf87a4924d1209df2c7c566e0eef5ca05ae48d62634fccc`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

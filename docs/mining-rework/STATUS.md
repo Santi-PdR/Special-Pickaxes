@@ -1,3 +1,15 @@
+## 5.11.10 — complete CI verified
+
+Runtime commit `45d5cbbe02e4814c807d36458b0460ed4ded5eff`, [CI 44170280427](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44170280427): SUCCESS. 151 JUnit with zero failures/errors/skips, all 397 required GameTests, packaged-server smoke and graphical-client smoke passed. Client log confirms 32 manual renders and 32 closes. Local 116 Python tests (no skips), 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci51110-green` (temporary, not a durable publication).
+
+Radial abilities now use prewarmed immutable plans, eliminating per-cast volume counting and shell searching from scheduler peeks. All four shapes and radii 0–12 are compared with historical traversal; geometry, ordering, attempt caps and execution-time protections are preserved. Coordinate objects are shared across plans; cursors and centers remain per cast. Copied manual-header icons share the existing bounded display cache. No measured FPS/timing claim, no potency reduction, no new particles or combat changes.
+
+First CI 44167246767 passed JUnit/GameTests/server but failed graphical activation after a manual capture (no input edge logged). Client smoke now waits for real render and close acknowledgements before pressing activation; no retry or synthetic success. Four Python ordering tests enforce the handshake. The final CI passed every graphical scene; this is automated smoke coverage, not manual visual approval or Windows/Ghouls certification.
+
+JAR `special-pickaxes-1.20.1-5.11.10.jar`: 590073 bytes; SHA-256 `49b497246fab43a7caf87a4924d1209df2c7c566e0eef5ca05ae48d62634fccc`. Personal authenticated artifact `14369880511` (7 days), full validation artifact `14369501040`. No public release created; third-party artwork redistribution remains unapproved.
+
+### Historical progress notes
+
 ## 5.11.10 — validation pending
 
 Replaced per-activation radial candidate counting and repeated shell searching with shared immutable geometry prepared during mod setup. Every shape/radius preserves the original Chebyshev-shell / x / y / z traversal. Coordinates are shared between plans; each cast owns only its cursor and center. Configured attempt caps and execution-time permission, provenance and drop-pressure checks remain unchanged. Completion at the final candidate remains exact. Added exact-order/unit invariants for all four shapes and radii 0–12, plus a Minecraft independent-cursor/config-cap regression. Manual copied-header icons now reuse the same bounded display cache as the picker instead of allocating ItemStacks per render. No new VFX or power/geometry changes. CI 44167246767 passed 151 JUnit, all 397 GameTests and the packaged server. Client smoke failed waiting for an activation edge after the manual capture; no edge was logged. Replaced fixed-delay manual open/close sequencing with render and close acknowledgements, fail-closed with no retry, and four Python state-order tests. Full validation pending; 5.11.9 remains the last verified build.

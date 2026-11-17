@@ -1,8 +1,8 @@
-# Rediseño 5.11.9 — build de prueba verificada
+# Rediseño 5.11.10 — build de prueba verificada
 
-CI `44162211767` aprobada sobre `462e6ba97649bc7938f775fb611b637874d9a90e`:
-148 JUnit y 396 GameTests, cliente gráfico y servidor empaquetado.
-La 5.11.9 restaura el aviso de inicio y verifica excavaciones en el techo del mundo.
+CI `44170280427` aprobada sobre `45d5cbbe02e4814c807d36458b0460ed4ded5eff`:
+151 JUnit y 397 GameTests, cliente gráfico y servidor empaquetado.
+La 5.11.10 comparte geometría radial precalculada y reutiliza iconos del manual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
