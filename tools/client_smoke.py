@@ -18,6 +18,8 @@ execute as @a[scores={artifactAge=1}] run tp @s 0 65 14 180 -14
 execute as @a[tag=!artifact_gallery,scores={artifactAge=60..}] run function artifact_gallery:setup
 ''')
 from mining_catalog import IDS as ids, MODES
+from client_input_gate import ClientInputGate
+input_gate=ClientInputGate()
 # Keep the display gallery order from the asset catalog, but drive captures in
 # ArtifactKind enum order so the server and client agree on every acknowledgement index.
 scene_ids=['palimpsest','fault_choir','eventide','paradox_crucible','interregnum','worldloom','icarus','hollow_axiom','exodium','iridium','hellspec','worldbreaker','seam_ripper']
@@ -89,14 +91,22 @@ try:
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
    capture_screen(str(out/('ux-'+id+'.png')))
    capture_screen(str(out/('ux-shift-'+id+'.png')), 'shift')
-   # Open the actual guide with its registered key; capture every mode, including copies.
-   capture_screen(str(out/('manual-'+id+'.png')), 'manual')
+   # Wait for actual rendering and closure instead of racing the GUI with sleeps.
+   input_gate.begin(id)
+   press_screen('manual')
+   activation_pending=time.monotonic()
+  operation=input_gate.observe(line)
+  if operation=='capture_and_close':
+   capture_screen(str(out/('manual-'+input_gate.scene+'.png')))
    press_screen('close')
-   press_screen('confirm' if id=='paradox_crucible-regional' else 'activate')
+   activation_pending=time.monotonic()
+  elif operation in ('activate','confirm'):
+   press_screen(operation)
    activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
    id=line.strip().split('SCENE_ACTIVATED_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
+   input_gate.complete(id)
    activation_pending=None
    ux.add(id);i=scenes.index(id)
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
@@ -117,7 +127,7 @@ try:
    capture_screen(str(out/'supreme-complete.png'))
    success=True;break
   if activation_pending and time.monotonic()-activation_pending>45:
-   raise RuntimeError('Client input did not activate scene '+id+' within 45 seconds')
+   raise RuntimeError('Client scene '+str(input_gate.scene)+' stalled at '+str(input_gate.stage)+' within 45 seconds')
 finally:
  # PNG originals and JPEG review copies are encoded from the exact same Robot capture.
  import hashlib

@@ -306,6 +306,7 @@ public final class ArtifactManualScreen extends Screen {
         return super.mouseReleased(mouseX,mouseY,button);
     }
     @Override public void removed(){
+        if(Boolean.getBoolean("specialpickaxes.clientSmoke"))com.mojang.logging.LogUtils.getLogger().info("MANUAL_SCREEN_CLOSED");
         super.removed();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
     }
     private static int clamp(int value,int max){return Math.max(0,Math.min(value,max));}
