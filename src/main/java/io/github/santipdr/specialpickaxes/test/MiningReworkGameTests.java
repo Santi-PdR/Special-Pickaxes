@@ -192,6 +192,53 @@ public final class MiningReworkGameTests {
         h.assertTrue(!WorkQueue.busy(p)&&!level.hasChunkAt(remote),"bounded volume does not force chunks");finish(h,p);
     }
 
+    @GameTest(template="empty",batch="rework_each_326") public static void naturalExcavationBackpressurePreservesCursorAndResumes(GameTestHelper h){
+        for(var shape:ExcavationVolume.Shape.values()){
+            var kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
+            var p=player(h,kind);var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,70,7));
+            p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-3.5);
+            level.setBlockAndUpdate(origin,Blocks.GRANITE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(origin);
+            var drops=new java.util.ArrayList<net.minecraft.world.entity.item.ItemEntity>();
+            try{
+                for(int index=0;index<256;index++){
+                    var drop=new net.minecraft.world.entity.item.ItemEntity(level,origin.getX()+.5,origin.getY()+.5,origin.getZ()+.5,new ItemStack(Items.COBBLESTONE));
+                    drops.add(drop);level.addFreshEntity(drop);
+                }
+                h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),kind,new NaturalExcavationProgram(origin,Direction.SOUTH,shape)),"backpressured plan queues");
+                WorkQueue.tick();
+                h.assertTrue(WorkQueue.status(p).equals("paused")&&WorkQueue.remaining(p)==shape.volume,"drop pressure pauses without consuming first cell");
+                h.assertTrue(level.getBlockState(origin).is(Blocks.GRANITE),"drop pressure does not destroy target");
+                h.assertTrue(!WorkQueue.togglePause(p),"cannot resume while drops remain");
+                for(var drop:drops)drop.discard();
+                h.assertTrue(WorkQueue.togglePause(p),"can resume after clearing drops");WorkQueue.tick();
+                h.assertTrue(level.getBlockState(origin).isAir()&&WorkQueue.remaining(p)<shape.volume,"same target executes after resume");
+            }finally{for(var drop:drops)drop.discard();WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        }
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="rework_each_327") public static void naturalExcavationRejectsToolSwapDuringClaimCallback(GameTestHelper h){
+        for(var shape:ExcavationVolume.Shape.values()){
+            var kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
+            var p=player(h,kind);var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,75,7));
+            p.setPos(origin.getX()+.5,origin.getY(),origin.getZ()-3.5);
+            level.setBlockAndUpdate(origin,Blocks.GRANITE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(origin);
+            var next=ExcavationVolume.cell(origin,Direction.SOUTH,shape,1);
+            level.setBlockAndUpdate(next,Blocks.GRANITE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(next);
+            java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> swap=event->{
+                if(event.player==p&&event.target.equals(origin))p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.STICK));
+            };
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,
+                    io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,swap);
+            try{
+                h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),kind,new NaturalExcavationProgram(origin,Direction.SOUTH,shape)),"tool swap plan queues");
+                WorkQueue.tick();
+                h.assertTrue(!WorkQueue.busy(p),"callback invalidates actor and cancels stream");
+                h.assertTrue(level.getBlockState(origin).is(Blocks.GRANITE)&&level.getBlockState(next).is(Blocks.GRANITE),"neither target nor following cell is mined after tool swap");
+            }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(swap);WorkQueue.cancel(p);RelicNetwork.forget(p);}
+        }
+        h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

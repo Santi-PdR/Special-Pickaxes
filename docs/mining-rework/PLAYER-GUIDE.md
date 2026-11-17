@@ -1,9 +1,8 @@
-# Rediseño 5.11.6 — build de prueba verificada
+# Rediseño 5.11.8 — validación pendiente
 
-CI `43998074898` aprobada sobre `95fe6729e0483043d2e906d31b0001f20652ac4f`:
-144 JUnit, 388 GameTests, cliente gráfico y servidor empaquetado. El manual
-incluye scroll gradual de trackpad. Worldloom perfora roca natural en 7×7×48;
-Icarus usa 11×7 o 15×9; la primaria de Choir alcanza 5×5×48 y Seam hasta 1024.
+La última build completamente verificada es 5.11.7: CI `44146556631`,
+144 JUnit y 390 GameTests, cliente gráfico y servidor empaquetado.
+La 5.11.8 amplía las secundarias de Choir y Hellspec; su validación está pendiente.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
@@ -15,8 +14,9 @@ Corona de Stasis ya no extrae un solo bloque: Fractura Temporal abre un volumen
 de11×11×11, extrayendo roca y mineral con drops normales. La cola evita ejecutar
 1331mutaciones en un tick y conserva claims, bedrock y bloques construidos.
 Axiom vacía ese volumen conservando menas; Crucible transmuta una esfera de
-radio12; Choir abre una galería7×5×24; Hellspec una chimenea7×7×32; Worldloom
-construye un puente de32bloques pagados; Eventide atrae botín libre/propio en48
+radio12; Choir abre una galería abovedada de9×7×48 (2832celdas); Hellspec una chimenea
+de11×11×48 (5808celdas); ambas procesadas por turnos. Worldloom
+construye un puente de64bloques pagados; Eventide atrae botín libre/propio en48
 bloques; Worldbreaker tiene fractura nativa o secundaria copiada; Seam barre
 15×15; Exodium baja hasta64. Icarus/Iridium conservan sus mecánicas principales.
 
