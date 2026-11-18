@@ -12,7 +12,7 @@ KINDS='palimpsest choir eventide crucible interregnum worldloom icarus axiom wor
 class SignatureParticlesTest(unittest.TestCase):
     def test_every_relic_has_four_existing_distinct_frames(self):
         all_hashes=set()
-        for kind in KINDS:
+        for kind in KINDS+[k+'_alternate' for k in KINDS]:
             data=json.loads((ASSETS/'particles'/f'{kind}_signature.json').read_text())
             self.assertEqual(4,len(data['textures']))
             hashes=set()
@@ -33,7 +33,7 @@ class SignatureParticlesTest(unittest.TestCase):
         self.assertIn('setSpriteFromAge',source)
     def test_cast_uses_signature_registry_not_shared_fallback(self):
         source=(ROOT/'src/main/java/io/github/santipdr/specialpickaxes/artifact/AbilityVfx.java').read_text()
-        self.assertIn('SIGNATURE_PARTICLES.get(kind.name())',source)
+        self.assertIn('SIGNATURE_PARTICLES).get(kind.name())',source)
         self.assertNotIn('return switch(kind)',source)
 
 if __name__=='__main__':unittest.main()

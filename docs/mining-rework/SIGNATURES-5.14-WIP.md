@@ -31,3 +31,14 @@ También se separaron las siluetas de emisión antes compartidas: Flor Infernal/
 ## Validación
 
 La última release completa verificada sigue siendo 5.13.0. Esta versión requiere compilar, ejecutar sus tests Java y probar el cliente real antes de distribuirla. Los tests de recursos y Python locales no sustituyen esa evidencia. No se ha comprobado el aspecto en movimiento dentro del juego.
+
+## 5.14.1 — distinction primaire/secondaire
+
+- 13 séquences secondaires supplémentaires, quatre images par séquence (104 images au total, 26 signatures).
+- Symboles secondaires dédiés aux actions : chevrons ascendants d’Ícaro, entonnoir magnétique d’Ocaso, trois cristaux rappelés d’Iridio, grille découpée de Desgarraestratos, colonnes ardentes de Flor Infernal.
+- 13 trajectoires secondaires et 13 silhouettes de lancement secondaires distinctes de leurs primaires.
+- 13 timbres secondaires différents du son primaire, via les sons existants de Minecraft. Aucun fichier audio externe prétendu.
+- Budget partagé entre primaire et secondaire : alterner les deux ne contourne pas la déduplication du même tick.
+- Correction du test 5.14.0 : `ArtifactKind` initialise les sons et nécessite les registres Minecraft. Le test unitaire compare maintenant les enums purement géométriques ; GameTest vérifie le roster réel, l’unicité des 26 registres et les sons.
+
+Le run 44355060736 a compilé Java et créé le JAR, puis échoué au test unitaire de bootstrap. Il n’a donc PAS validé le runtime 5.14.0. 5.14.1 est encore en validation.

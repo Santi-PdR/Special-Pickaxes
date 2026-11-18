@@ -30,4 +30,18 @@ class AbilityBurstShapeTest {
         assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(AbilityBurstShape.Shape.ICARUS,-1));
         assertThrows(IllegalArgumentException.class,()->AbilityBurstShape.offset(AbilityBurstShape.Shape.ICARUS,16));
     }
+    @Test void secondarySilhouettesAreUniqueBoundedAndNotPrimaryReplays(){
+        var signatures=new HashSet<String>();
+        for(var kind:AbilityBurstShape.Shape.values()){
+            var points=new HashSet<Vec3>();var signature=new StringBuilder();boolean differs=false;
+            for(int i=0;i<AbilityBurstShape.COUNT;i++){
+                var point=AbilityBurstShape.alternateOffset(kind,i);
+                assertTrue(Double.isFinite(point.lengthSqr()));assertTrue(point.lengthSqr()<4);
+                assertTrue(points.add(point),kind.name());signature.append(point);
+                differs|=point.distanceToSqr(AbilityBurstShape.offset(kind,i))>1e-8;
+            }
+            assertTrue(differs,kind.name());assertTrue(signatures.add(signature.toString()),kind.name());
+        }
+    }
+
 }

@@ -1106,11 +1106,21 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_317") public static void everyAbilityParticleIsCustomAndBurstsAreDeduplicated(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);AbilityVfx.clear();
+        var registered=new java.util.HashSet<net.minecraft.resources.ResourceLocation>();
+        var styles=new java.util.HashSet<String>();
         for(var kind:ArtifactKind.playableValues()){
-            var key=net.minecraftforge.registries.ForgeRegistries.PARTICLE_TYPES.getKey(AbilityVfx.particle(kind));
-            h.assertTrue(key!=null&&key.getNamespace().equals(SpecialPickaxes.ID),"no vanilla particle fallback: "+kind);
+            styles.add(kind.name());
+            for(boolean alternate:new boolean[]{false,true}){
+                var key=net.minecraftforge.registries.ForgeRegistries.PARTICLE_TYPES.getKey(AbilityVfx.particle(kind,alternate));
+                h.assertTrue(key!=null&&key.getNamespace().equals(SpecialPickaxes.ID),"no vanilla particle fallback: "+kind);
+                h.assertTrue(registered.add(key),"each action has a unique registered sprite sequence: "+kind);
+            }
+            h.assertTrue(ArtifactFeedback.alternateSound(kind)!=kind.sound,"secondary has a distinct sound: "+kind);
         }
-        h.assertTrue(AbilityVfx.cast(p,ArtifactKind.INTERREGNUM)&&!AbilityVfx.cast(p,ArtifactKind.INTERREGNUM),"same-tick activation cannot multiply particle packets");
+        var visualStyles=new java.util.HashSet<String>();
+        for(var style:RelicParticleStyle.values())visualStyles.add(style.name());
+        h.assertTrue(styles.equals(visualStyles),"particle styles cover exactly the playable roster");
+        h.assertTrue(AbilityVfx.cast(p,ArtifactKind.INTERREGNUM)&&!AbilityVfx.cast(p,ArtifactKind.INTERREGNUM,true),"same-tick activation cannot multiply particle packets");
         h.assertTrue(!AbilityVfx.retired(h.getLevel(),p,net.minecraft.core.particles.ParticleTypes.FLAME,false,p.getX(),p.getY(),p.getZ(),100,0,0,0,0),"retired passive/vanilla cosmetic calls emit nothing");
         AbilityVfx.forget(p);finish(h,p);
     }

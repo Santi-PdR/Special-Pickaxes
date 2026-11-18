@@ -55,7 +55,7 @@ public final class ArtifactActions {
     }
     public static boolean useAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(!ACTIVATING.add(p.getUUID()))return false;
-        try{boolean success=activateAlternate(p,tool,kind);if(success)AbilityVfx.cast(p,ArtifactSkills.feedbackKind(tool,kind));return success;}finally{ACTIVATING.remove(p.getUUID());}
+        try{boolean success=activateAlternate(p,tool,kind);if(success)AbilityVfx.cast(p,ArtifactSkills.feedbackKind(tool,kind),true);return success;}finally{ACTIVATING.remove(p.getUUID());}
     }
     private static boolean activateAlternate(ServerPlayer p,ItemStack tool,ArtifactKind kind){
         if(!kind.playable()||p.getMainHandItem()!=tool||tool.isEmpty()

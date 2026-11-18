@@ -407,8 +407,29 @@ public final class ArtifactFeedback {
         sound(p,kind,"activate");
     }
     public static void sound(ServerPlayer p,ArtifactKind kind,String phase) {
-        nearbySound(p,kind.sound,phase.equals("alternate")?0.2F:0.25F,0.85F+kind.ordinal()*0.04F);
+        boolean alternate=phase.equals("alternate");
+        nearbySound(p,alternate?alternateSound(kind):kind.sound,alternate?.24F:.25F,
+                alternate?.72F+(kind.ordinal()%5)*.09F:.85F+kind.ordinal()*.04F);
         RelicEffects.emit(p,kind,phase,p.getEyePosition().add(p.getLookAngle().scale(2)));
+    }
+    /** Secondary actions are recognisable by timbre, not only by a small pitch change. */
+    public static SoundEvent alternateSound(ArtifactKind kind){
+        return switch(kind){
+            case PALIMPSEST -> net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE;
+            case CHOIR -> net.minecraft.sounds.SoundEvents.DEEPSLATE_BREAK;
+            case EVENTIDE -> net.minecraft.sounds.SoundEvents.ENDERMAN_TELEPORT;
+            case CRUCIBLE -> net.minecraft.sounds.SoundEvents.LAVA_EXTINGUISH;
+            case INTERREGNUM -> net.minecraft.sounds.SoundEvents.BEACON_DEACTIVATE;
+            case WORLDLOOM -> net.minecraft.sounds.SoundEvents.AZALEA_PLACE;
+            case ICARUS -> net.minecraft.sounds.SoundEvents.ENDER_DRAGON_FLAP;
+            case AXIOM -> net.minecraft.sounds.SoundEvents.RESPAWN_ANCHOR_DEPLETE;
+            case WORLDBREAKER -> net.minecraft.sounds.SoundEvents.ANVIL_LAND;
+            case EXODIUM -> net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_LAUNCH;
+            case IRIDIUM -> net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP;
+            case HELLSPEC -> net.minecraft.sounds.SoundEvents.BLAZE_SHOOT;
+            case SEAM_RIPPER -> net.minecraft.sounds.SoundEvents.GRINDSTONE_USE;
+            default -> kind.sound;
+        };
     }
     /** A private helix confirms which passive profile has entered the Curios slot. */
     public static void curiosAttunement(ServerPlayer player,ArtifactKind kind){

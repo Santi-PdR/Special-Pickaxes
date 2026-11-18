@@ -5,9 +5,9 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RelicParticleStyleTest {
-    @Test void stylesCoverExactlyThePlayableRoster(){
+    @Test void stylesCoverEveryBurstShapeWithoutBootstrappingRegistries(){
         var expected=new HashSet<String>();
-        for(var kind:ArtifactKind.values())if(kind.playable())expected.add(kind.name());
+        for(var kind:AbilityBurstShape.Shape.values())expected.add(kind.name());
         var actual=new HashSet<String>();
         for(var style:RelicParticleStyle.values())actual.add(style.name());
         assertEquals(expected,actual);
@@ -21,6 +21,9 @@ class RelicParticleStyleTest {
                     var offset=style.displacement(t,phase);
                     assertTrue(Double.isFinite(offset.lengthSqr()),style.name());
                     assertTrue(offset.lengthSqr()<2,style.name());
+                    var alternate=style.alternateDisplacement(t,phase);
+                    assertTrue(Double.isFinite(alternate.lengthSqr()),style.name());
+                    assertTrue(alternate.lengthSqr()<2,style.name());
                 }
             }
         }
@@ -33,4 +36,19 @@ class RelicParticleStyleTest {
             assertTrue(signatures.add(signature.toString()),style.name());
         }
     }
+    @Test void secondariesHaveDistinctMotionFromTheirPrimaryAndFromOneAnother(){
+        var signatures=new HashSet<String>();
+        for(var style:RelicParticleStyle.values()){
+            var signature=new StringBuilder();
+            boolean differs=false;
+            for(double t:new double[]{.2,.5,.8}){
+                var point=style.alternateDisplacement(t,.73);
+                signature.append(point);
+                differs|=point.distanceToSqr(style.displacement(t,.73))>1e-8;
+            }
+            assertTrue(differs,style.name());
+            assertTrue(signatures.add(signature.toString()),style.name());
+        }
+    }
+
 }

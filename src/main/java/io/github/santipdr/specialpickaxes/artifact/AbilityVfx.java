@@ -16,11 +16,17 @@ public final class AbilityVfx {
     private AbilityVfx(){}
 
     public static SimpleParticleType particle(ArtifactKind kind){
+        return particle(kind,false);
+    }
+    public static SimpleParticleType particle(ArtifactKind kind,boolean alternate){
         if(!kind.playable())throw new IllegalArgumentException("No cast signature for retired pickaxe");
-        return SpecialPickaxes.SIGNATURE_PARTICLES.get(kind.name()).get();
+        return (alternate?SpecialPickaxes.ALTERNATE_SIGNATURE_PARTICLES:SpecialPickaxes.SIGNATURE_PARTICLES).get(kind.name()).get();
     }
     /** Distinct custom cast silhouettes; at most one successful burst per player per tick. */
     public static boolean cast(ServerPlayer player,ArtifactKind kind){
+        return cast(player,kind,false);
+    }
+    public static boolean cast(ServerPlayer player,ArtifactKind kind,boolean alternate){
         if(!kind.playable()||!player.isAlive()||player.isRemoved()||player.isSpectator())return false;
         int tick=player.server.getTickCount();
         if(LAST_CAST.getOrDefault(player.getUUID(),tick-1)==tick||!BUDGET.tryReserve(tick,16))return false;
@@ -28,8 +34,8 @@ public final class AbilityVfx {
         var center=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(1.5)).add(0,.25,0);
         var shape=AbilityBurstShape.Shape.valueOf(kind.name());
         for(int i=0;i<AbilityBurstShape.COUNT;i++){
-            var point=center.add(AbilityBurstShape.orient(AbilityBurstShape.offset(shape,i),player.getLookAngle()));
-            player.serverLevel().sendParticles(player,particle(kind),false,point.x,
+            var point=center.add(AbilityBurstShape.orient((alternate?AbilityBurstShape.alternateOffset(shape,i):AbilityBurstShape.offset(shape,i)),player.getLookAngle()));
+            player.serverLevel().sendParticles(player,particle(kind,alternate),false,point.x,
                     point.y,point.z,1,0,.015,0,0);
         }
         return true;
