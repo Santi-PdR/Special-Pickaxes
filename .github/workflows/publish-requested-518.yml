@@ -1,0 +1,62 @@
+name: Publish requested 5.18 JAR download
+on:
+  push:
+    branches: [arena/cec54523-special-pickaxes]
+    paths: [.github/workflows/publish-requested-518.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish-exact-verified-jar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require the successful exact source run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/actions/runs/44416777028 > "$RUNNER_TEMP/source-run.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['RUNNER_TEMP']+'/source-run.json'))
+          assert d['head_sha']=='5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282'
+          assert d['status']=='completed' and d['conclusion']=='success'
+          PY
+      - uses: actions/download-artifact@v5
+        with:
+          name: special-pickaxes-5.18.0-personal
+          run-id: 44416777028
+          github-token: ${{ github.token }}
+          path: verified
+      - name: Validate exact JAR before publication
+        run: |
+          python3 - <<'PY'
+          import pathlib,hashlib,json
+          root=pathlib.Path('verified')
+          jars=list(root.rglob('*.jar'))
+          assert len(jars)==1
+          jar=jars[0]
+          assert jar.name=='special-pickaxes-1.20.1-5.18.0.jar'
+          assert jar.stat().st_size==804691
+          digest=hashlib.sha256(jar.read_bytes()).hexdigest()
+          assert digest=='c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c'
+          manifest=json.loads((root/'RELEASE.json').read_text())
+          assert manifest['commit']=='5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282'
+          assert str(manifest['run_id'])=='44416777028'
+          assert manifest['sha256']==digest and manifest['bytes']==804691
+          pathlib.Path('publish').mkdir()
+          import shutil
+          shutil.copy2(jar,'publish/'+jar.name)
+          shutil.copy2(root/'RELEASE.json','publish/RELEASE.json')
+          shutil.copy2(root/'SHA256SUMS','publish/SHA256SUMS')
+          PY
+      - name: Publish user-requested direct test download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create test-5.18.0-44416777028 publish/* \
+            --repo '${{ github.repository }}' \
+            --target 5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282 \
+            --prerelease --latest=false \
+            --title 'Special Pickaxes 5.18.0 - prueba CI' \
+            --notes 'Descarga directa solicitada expresamente por el propietario. Binario exacto de CI 44416777028: 178 JUnit, 420 GameTests, cliente y servidor aprobados. Minecraft 1.20.1, Forge 47.4.10, Java 17. No certifica todos los modpacks ni aprobación visual completa. Incluye arte externo: se mantienen créditos y avisos de sus titulares; esta publicación no concede licencia de redistribución de esos assets. SHA256 c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c'
