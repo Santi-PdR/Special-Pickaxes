@@ -1,3 +1,17 @@
+## 5.12.1 — localization and keyboard polish; validation pending
+
+Visual inspection of two real 5.12.0 manual screenshots found remaining raw English mode labels in Spanish (VEIN/CARVE). All active mode labels now use concise EN/ES display names, without changing NBT mode keys or order. Added Up/Down small-step keyboard scrolling, retaining wheel/trackpad, page, home/end and drag behavior. Two new presentation tests cover readable active-mode labels and arrow hints. Local 122 Python tests and 25 resource checks pass; full CI pending. Latest fully verified build is 5.12.0.
+
+## 5.12.0 — complete CI verified
+
+Runtime `ebea26e8a6425e0e794cfcd509a0b0646ec71912`, [CI 44197698594](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44197698594): SUCCESS. 157 JUnit, zero failures/errors/skips; 399 required GameTests; graphical client and packaged server checks passed, including strict logs. This also validates the 5.11.12 survey optimization. Evidence retrieved to `/tmp/sp-ci5120-green` (temporary).
+
+Inspected actual `manual-palimpsest-vein.jpg` and `manual-worldbreaker-carve.jpg` screenshots, 1280×720 / GUI 640×360: readable card hierarchy, copy selector and footer without overlap in those scenes. This is limited agent visual inspection, not user approval, not all modes/scales/locales, and not Windows/Ghouls compatibility certification.
+
+JAR `special-pickaxes-1.20.1-5.12.0.jar`: 590269 bytes, SHA-256 `a0b184f99bfa4f273f76a0f373139c3960a6ecee58fbf7d78931a55f644a5c7a`. Authenticated personal artifact `14379864415` (7 days), full validation artifact `14380154242`. No public release.
+
+### Historical progress notes
+
 ## 5.12.0 — interface and naming revision; validation pending
 
 User-requested presentation pass: shorter coherent names for the 13 playable picks in EN/ES, without registry/model/save ID changes or asset edits. Manual header now emphasizes the active mode and ability accent; numbered cards separate primary, secondary and controls. Width-bounded text uses ellipses, including the live-key footer and copy selection, avoiding overlap at compact scales. Added an overflow navigation hint. SHIFT instructions reuse concise mode-specific functional summaries and remove retired border/particle promises. Core dimensions, ore limits and payment descriptions remain explicit. Four localized presentation regression tests added. This includes the pending 5.11.12 survey optimization. First CI 44194792592 compiled and passed all 399 GameTests; graphical validation exposed a smoke assertion coupled to old prose punctuation (` key.`) rather than the new key-led label (`key · summary`). Updated that assertion to require the exact new label while retaining real key rebinding and placeholder checks. Prioritized two real manual captures in the bounded evidence export for visual inspection. Final CI 44197698594 on `ebea26e8a6425e0e794cfcd509a0b0646ec71912` started; status monitoring stopped when GitHub returned API rate-limit HTTP 403 (not an authentication request). Outcome currently unconfirmed. Local 120 Python tests, 25 resource checks and secret scan passed. Naming table and interface scope: `INTERFACE-5.12.md`. Full clean Forge/client CI pending; 5.11.11 remains the last fully verified build. No manual visual approval or Windows/Ghouls certification.

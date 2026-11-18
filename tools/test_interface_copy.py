@@ -58,3 +58,22 @@ class InterfaceCopyTests(unittest.TestCase):
                 for fact in facts:
                     self.assertIn(fact, text)
                 self.assertLess(len(text), 200)
+
+    def test_every_active_mode_has_readable_localized_labels(self):
+        from mining_catalog import MODES
+        modes = {mode for identity in IDS for mode in MODES[identity]}
+        for locale in ('en_us', 'es_es'):
+            texts = self.texts(locale)
+            for mode in modes:
+                value = texts['mode.specialpickaxes.' + mode]
+                self.assertTrue(3 <= len(value) <= 26, (locale, mode, value))
+                self.assertNotEqual(value, value.upper(), (locale, mode))
+                if locale == 'es_es':
+                    self.assertNotEqual(value.lower(), mode.replace('_', ' '), mode)
+
+    def test_manual_supports_small_keyboard_scroll_steps_and_shows_navigation(self):
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
+        for key in ('GLFW_KEY_UP', 'GLFW_KEY_DOWN', 'GLFW_KEY_PAGE_UP', 'GLFW_KEY_PAGE_DOWN'):
+            self.assertIn(key, source)
+        for locale in ('en_us', 'es_es'):
+            self.assertIn('↑↓', self.texts(locale)['screen.specialpickaxes.navigation'])

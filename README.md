@@ -1,36 +1,37 @@
-# Special Pickaxes — 5.11.11
+# Special Pickaxes — 5.12.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
 - 13 sprites originales de Mythic Metals, sin retoques ni arte generado. Créditos
   y licencia de assets incluidos; no se atribuye permiso general de redistribución.
 - VFX custom breves al activar habilidades, sin auras cosméticas permanentes.
-- Manual conciso por modo, controles reasignables y scroll preciso para trackpad.
-- Worldloom: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
+- Nombres EN/ES renovados, manual con tarjetas numeradas, modo activo y teclas
+  reales. Descripciones funcionales concisas. [Tabla de nombres y alcance](docs/mining-rework/INTERFACE-5.12.md).
+- Telar del Mundo: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
   y se detiene ante máquinas, fluidos y zonas protegidas. Secundaria: calzada de
   hasta 64 bloques, pagada exclusivamente desde la mano secundaria.
-- Choir: primaria 5×5×48; secundaria abovedada 9×7×48, hasta 2.832 celdas.
-- Hellspec: primaria de cinco pétalos de hasta 1.679 celdas, envolvente 25×7×25
+- Coro Sísmico: primaria 5×5×48; secundaria abovedada 9×7×48, hasta 2.832 celdas.
+- Flor Infernal: primaria de cinco pétalos de hasta 1.679 celdas, envolvente 25×7×25
   (antes 353; conserva íntegra la cantera anterior). Secundaria de chimenea
   11×11×48, hasta 5.808 celdas.
   Ambas secundarias procesan el volumen por turnos, sin una lista de bloques al activar;
   respetan permisos, bloques colocados, máquinas y presión de drops, sin cargar chunks.
-- Choir/Hellspec muestran el número de celdas al iniciar; ambas excavaciones
+- Coro Sísmico/Flor Infernal muestran el número de celdas al iniciar; ambas excavaciones
   completan las celdas válidas incluso al alcanzar el techo del mundo.
 - Geometría radial precalculada y compartida: sin recuentos completos al activar,
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
-- Icarus: cortes 11×7 / 15×9. Seam: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480):
-  154 JUnit, 398 GameTests, cliente gráfico y servidor empaquetado.
+- Ícaro: cortes 11×7 / 15×9. Desgarraestratos: hasta 1024 bloques conectados.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44197698594):
+  157 JUnit, 399 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44181772480/artifacts/14374521019)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44197698594/artifacts/14379864415)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `b8ea8da5e484be2cb04b4eef7c2a1c742fb91b7d`.
-JAR: `special-pickaxes-1.20.1-5.11.11.jar` — 590.258 bytes.
-SHA-256: `5ef01cbb5e801deef17fce42c2f0dbf4d515564c21988757119a2c5a95dec615`.
+Commit probado: `ebea26e8a6425e0e794cfcd509a0b0646ec71912`.
+JAR: `special-pickaxes-1.20.1-5.12.0.jar` — 590.269 bytes.
+SHA-256: `a0b184f99bfa4f273f76a0f373139c3960a6ecee58fbf7d78931a55f644a5c7a`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

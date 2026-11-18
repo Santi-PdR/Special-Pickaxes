@@ -36,6 +36,8 @@ public final class ArtifactManualScreen extends Screen {
     @Override public boolean keyPressed(int keyCode,int scanCode,int modifiers){
         var content=layout().content();int maxScroll=Math.max(0,contentHeight-content.height());
         int page=Math.max(24,content.height()-LINE_HEIGHT);
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN){contentWheel.reset();scroll=clamp(scroll+LINE_HEIGHT*2,maxScroll);return true;}
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_UP){contentWheel.reset();scroll=clamp(scroll-LINE_HEIGHT*2,maxScroll);return true;}
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN){contentWheel.reset();scroll=clamp(scroll+page,maxScroll);return true;}
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP){contentWheel.reset();scroll=clamp(scroll-page,maxScroll);return true;}
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME){contentWheel.reset();scroll=0;return true;}

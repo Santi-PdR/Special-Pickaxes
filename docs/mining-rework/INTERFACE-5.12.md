@@ -34,4 +34,6 @@ Resúmenes de función y controles, con dimensiones importantes y coste de mater
 
 ## Validación
 
-120 pruebas Python, 25 comprobaciones de recursos y escaneo de secretos correctos. La primera CI compiló y pasó 399 GameTests, pero su comprobación gráfica de reasignación esperaba la puntuación antigua. Corregida para comprobar el formato nuevo sin quitar la prueba de reasignación. La CI final es 44197698594 sobre `ebea26e8a6425e0e794cfcd509a0b0646ec71912`; no se confirmó su resultado porque GitHub devolvió un límite de cuota de API. No hay aprobación visual manual ni nueva build completamente verificada todavía.
+La 5.12.0 quedó verificada: CI 44197698594 sobre `ebea26e8a6425e0e794cfcd509a0b0646ec71912`, 157 JUnit sin fallos/errores/omitidos, 399 GameTests, cliente gráfico y servidor empaquetado correctos. Además, 120 pruebas Python y 25 comprobaciones de recursos. Se inspeccionaron las capturas reales `manual-palimpsest-vein.jpg` y `manual-worldbreaker-carve.jpg` a 1280×720 (GUI 640×360): tarjetas legibles y selector/pie sin solapamientos en esas escenas. No implica revisión visual de todos los modos, idiomas o escalas ni compatibilidad Windows/Ghouls.
+
+La 5.12.1 añade etiquetas de modo completamente localizadas y desplazamiento por flechas ↑↓; validación Forge/cliente pendiente. Las capturas de 5.12.0 aún muestran las etiquetas antiguas (VEIN/CARVE), lo que motivó esta corrección.
