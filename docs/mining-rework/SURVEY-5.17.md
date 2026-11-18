@@ -1,6 +1,6 @@
 # 5.17 — guía temporal de sondeo de Alba Eterna
 
-## Implementado, validación completa pendiente
+## Implementado y validado
 
 El sondeo conserva su búsqueda activada de hasta 32 menas naturales alrededor del bloque apuntado. Ahora publica una **guía de diez segundos al depósito más cercano al centro sondeado**: dirección cardinal, distancia al jugador y desnivel en el HUD. Al moverse el jugador cambia la lectura, no el depósito elegido. Una barra muestra la duración restante. Se cuenta como una nueva mejora funcional, no una mejora por campo del HUD.
 
@@ -27,4 +27,14 @@ Datos de presentación NBT del servidor mediante la sincronización de inventari
 - El smoke gráfico pulsa la secundaria real de Alba después de confirmar la pose, espera a que el cliente haya leído una guía válida, captura `survey-guide.png/.jpg` y sólo entonces pulsa la primaria real. No se simula activación ni éxito. La captura se incluye en la prioridad del export compacto de evidencia.
 - Local: 132 pruebas Python sin fallos, una omitida por falta de Java; 25 pruebas de recursos correctas. Son contratos locales, no sustituyen Forge/cliente real.
 
-Última build completamente verificada antes de esta tanda: 5.16.0. No se han integrado más texturas externas ni se afirma revisión visual de cada animación, todas las escalas, Windows/Ghouls o aprobación estética del usuario.
+## Validación final
+
+Runtime `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`, [CI 44390344841](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44390344841): SUCCESS. **175 JUnit**, cero fallos/errores/omisiones; **418 GameTests** obligatorios; cliente gráfico (32 escenas/64 tooltips), servidor empaquetado y logs estrictos aprobados. Local: 132 pruebas Python sin fallos, una omitida por falta de Java; 25 pruebas de recursos correctas.
+
+El log real confirma `CLIENT_INPUT_SERVER_RESULT_ALT_SKILL accepted=true` y `SURVEY_GUIDE_RENDERED_palimpsest-vein` antes de la captura y de la primaria. La activación/captura no se ha sustituido por una llamada directa de prueba.
+
+Captura real inspeccionada: `review/survey-guide-5.17.0-es.jpg`, 1280×720 (GUI 640×360), copia exacta de `build/client-smoke/survey-guide.jpg` del mismo run. Lectura visible: `Sondeo N · 6m · Y+3`, con tiempo restante; línea y barra caben sin cubrir la mira ni los dos cooldowns. Inspección de una escena en español, no todas las direcciones/escalas. Hash de la captura: `0b9ba34d688fc8d7586adfd2a5bec2e95aeedcb30448ec3ea7341c2863fd7b68`.
+
+JAR `special-pickaxes-1.20.1-5.17.0.jar`: **801313 bytes**, SHA256 `ff7567bce1be636232f037d5c5e4ca05fa64c07b94553f8548faa0e0550779fc`. Artefacto personal autenticado `14468589157`, evidencia completa `14468394369` (7 días), sin release pública. Evidencia temporal `/tmp/sp517green`.
+
+Esta es una nueva mejora funcional, adicional al inventario histórico de 47 hasta 5.16; no se cuentan los tres datos del HUD, pruebas o screenshots como mejoras separadas. No se han integrado más texturas externas ni se afirma revisión visual de cada animación, todas las escalas, Windows/Ghouls o aprobación estética del usuario.

@@ -1,7 +1,10 @@
-# Special Pickaxes — 5.16.0
+# Special Pickaxes — 5.17.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
+- Alba Eterna: sondeo con guía de depósito durante diez segundos (dirección,
+  distancia y desnivel). Repite la secundaria para cancelar. Sin detector pasivo.
+  [Cambio, captura real y validación 5.17](docs/mining-rework/SURVEY-5.17.md).
 - 11 sprites originales de Mythic Metals y dos de Malum, sin retoques ni arte generado. Créditos
   y licencia de assets incluidos; no se atribuye permiso general de redistribución.
 - 26 firmas de partículas custom: primaria y secundaria propias para cada pico,
@@ -39,16 +42,16 @@
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Ícaro: cortes 11×7 / 15×9. Desgarraestratos: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553):
-  171 JUnit, 410 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44390344841):
+  175 JUnit, 418 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553/artifacts/14465283390)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44390344841/artifacts/14468589157)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `b904be503ed9a19cc9e34039f57d949abed56928`.
-JAR: `special-pickaxes-1.20.1-5.16.0.jar` — 793.992 bytes.
-SHA-256: `623c2ca70156c84649fe2ef09b1e6763f21005195a7d662bd546c85c1a9c2caf`.
+Commit probado: `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`.
+JAR: `special-pickaxes-1.20.1-5.17.0.jar` — 801.313 bytes.
+SHA-256: `ff7567bce1be636232f037d5c5e4ca05fa64c07b94553f8548faa0e0550779fc`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

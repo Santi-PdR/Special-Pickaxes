@@ -1,10 +1,19 @@
-# Rediseño 5.16.0 — build de prueba verificada
+# Rediseño 5.17.0 — build de prueba verificada
 
-CI `44383199553` aprobada sobre `b904be503ed9a19cc9e34039f57d949abed56928`:
-171 JUnit y 410 GameTests, cliente gráfico y servidor empaquetado.
+CI `44390344841` aprobada sobre `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`:
+175 JUnit y 418 GameTests, cliente gráfico y servidor empaquetado.
 Selector de Rompemundos con flechas/Tab, Inicio/Fin, vista previa y Enter para copiar.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
+
+**Nuevo en 5.17:** el sondeo de Alba Eterna mantiene una guía al depósito
+más cercano al punto sondeado durante diez segundos. La línea dorada del HUD
+muestra rumbo cardinal, metros desde tu posición y desnivel Y (positivo=arriba).
+La barra fina indica su duración. Repite la secundaria para cancelar.
+No busca nuevas menas mientras caminas, no dibuja contornos a través de paredes y no
+excava automáticamente. Se retira al minar/cambiar la mena, perder permiso,
+salir de rango/dimensión o caducar; validar no renueva el plazo. Rompemundos
+puede usarla al copiar esa secundaria. Ver `SURVEY-5.17.md`.
 
 **Nuevo en 5.16:** la recuperación de Ocaso/Iridio mantiene la atracción hasta ocho
 segundos mientras conservas el mismo stack; sigue tu posición, respeta propiedad y

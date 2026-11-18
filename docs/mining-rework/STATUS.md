@@ -1,3 +1,13 @@
+## 5.17.0 — guía activada de sondeo, CI aprobada
+
+Runtime `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`, [CI 44390344841](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44390344841): SUCCESS. **175 JUnit**, cero fallos/errores/omisiones; **418 GameTests**; cliente gráfico 32 escenas/64 tooltips, servidor empaquetado y logs estrictos aprobados. Local: 132 Python sin fallos, una omisión sin Java; 25 recursos correctos.
+
+Alba Eterna y su copia de Rompemundos pueden guiar durante diez segundos al depósito sondeado: dirección/distancia/desnivel y barra temporal. Cancelación con la secundaria registrada; sin nueva búsqueda pasiva, no X-ray, no partículas ambientales ni autoridad de minería devuelta por el cliente. Fuente autorizada, dueño, caducidad, distancia/dimensión y cambios de claim/mena revalidados. Ocho GameTests y cuatro JUnit nuevos.
+
+Smoke gráfico pulsa la secundaria real, espera un readout válido del cliente y captura `survey-guide`, después activa la primaria real. Captura real 1280×720/GUI640×360 inspeccionada y guardada como `review/survey-guide-5.17.0-es.jpg`; todos los campos visibles y mira despejada. Sólo esa escena/idioma inspeccionada, no todas las escalas. Ver `SURVEY-5.17.md` para hash/procedencia y límites.
+
+JAR `special-pickaxes-1.20.1-5.17.0.jar`: **801313 bytes**, SHA256 `ff7567bce1be636232f037d5c5e4ca05fa64c07b94553f8548faa0e0550779fc`. Personal `14468589157`, evidencia `14468394369`, retención 7 días; sin release pública. Evidencia temporal `/tmp/sp517green`. Una mejora funcional adicional a las 47 del inventario histórico de 5.16, sin inflar campos/tests/capturas. Sin nuevos assets de picos ni certificación Windows/Ghouls.
+
 ## 5.16.0 — recuperación sostenida, arquitectura y HUD, CI aprobada
 
 Runtime `b904be503ed9a19cc9e34039f57d949abed56928`, [CI 44383199553](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553): SUCCESS. **171 JUnit**, cero fallos/errores/omisiones; **410 GameTests**; cliente gráfico 32 escenas/64 tooltips, servidor empaquetado y logs estrictos aprobados. Local: 131 pruebas Python sin fallos, una omitida por falta de Java; 25 pruebas de recursos correctas. Evidencia temporal `/tmp/sp516green`.
