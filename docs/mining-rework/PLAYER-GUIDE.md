@@ -1,12 +1,12 @@
-# Rediseño 5.14.1 — build de prueba verificada
+# Rediseño 5.15.0 — build de prueba verificada
 
-CI `44367188726` aprobada sobre `8722f0c4b59a419da6637cc1c444be06a83d52f0`:
-166 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
+CI `44375291707` aprobada sobre `a527ffbfd83931c57af9266e0865ef3eca3e60d1`:
+168 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
 Selector de Rompemundos con flechas/Tab, Inicio/Fin, vista previa y Enter para copiar.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
-Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
+Los 13 picos usan sprites originales de terceros (11 Mythic Metals y 2 Malum), sin retoques ni
 arte generado. Las partículas de equipamiento/Curios y bordes persistentes se
 retiran. Solo una activación válida muestra una ráfaga de partículas custom.
 Cada pico tiene ahora una firma primaria y otra secundaria: símbolo animado,
@@ -14,8 +14,12 @@ trayectoria y distribución diferentes. Las secundarias también usan un sonido
 Minecraft distinto de su primaria. No son sonidos externos originales.
 Se mantienen 16 partículas por activación y 256 globales por tick; alternar
 primaria/secundaria no evita ese límite. Las 26 firmas tienen cuatro imágenes
-cada una, pero esto no equivale a 104 mejoras de juego. No se han sustituido
-las texturas de los objetos ni revisado visualmente todas las animaciones.
+cada una, pero esto no equivale a 104 mejoras de juego. Se sustituyeron Alba Eterna y Axioma por originales de Malum; no se han revisado visualmente todas las animaciones.
+Las excavaciones activas muestran impactos custom en su frente y un remate al
+terminar sin cancelación. Alcance visual 48 bloques, ocho partículas cada diez
+ticks por trabajo activo y dieciséis al acabar, dentro del límite global de 256.
+Las pausas no mantienen un emisor ambiental. Las formas de los trece estilos
+están implementadas; sólo se usan cuando la habilidad ejecuta una cola de trabajo.
 El manual presenta tres bloques: principal, secundaria y controles actuales.
 
 Corona de Stasis ya no extrae un solo bloque: Fractura Temporal abre un volumen

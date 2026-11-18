@@ -1,16 +1,19 @@
-# Special Pickaxes — 5.14.1
+# Special Pickaxes — 5.15.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
-- 13 sprites originales de Mythic Metals, sin retoques ni arte generado. Créditos
+- 11 sprites originales de Mythic Metals y dos de Malum, sin retoques ni arte generado. Créditos
   y licencia de assets incluidos; no se atribuye permiso general de redistribución.
 - 26 firmas de partículas custom: primaria y secundaria propias para cada pico,
   con cuatro fotogramas, trayectoria y silueta de lanzamiento diferenciadas.
   Las secundarias tienen además un sonido distinto de la primaria.
   Sin auras cosméticas permanentes; presupuesto compartido de 16 partículas/cast
   y 256 globales/tick. [Alcance de esta tanda](docs/mining-rework/SIGNATURES-5.14-WIP.md).
-- Nuevas texturas externas todavía en investigación, no integradas. Esta tanda
-  no completa la petición de unas 50 mejoras notorias.
+- Alba Eterna y Axioma del Vacío estrenan originales de Malum. Nuevos impactos
+  custom en el frente de excavación y remates al terminar trabajos exitosos;
+  sin emisión al equiparse, en pausa o por cancelación.
+  [Cambios y evidencia 5.15](docs/mining-rework/EXCAVATION-5.15.md).
+  La petición de unas 50 mejoras notorias en todos los aspectos sigue incompleta.
 - Nombres EN/ES renovados, manual con tarjetas numeradas, modo activo y teclas
   reales. Modos localizados y navegación ↑↓/AvPág/RePág. Descripciones funcionales concisas. [Tabla de nombres y alcance](docs/mining-rework/INTERFACE-5.12.md).
 - Rompemundos: selector de copias por flechas/Tab, Inicio/Fin y confirmación con Enter,
@@ -30,16 +33,16 @@
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Ícaro: cortes 11×7 / 15×9. Desgarraestratos: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44367188726):
-  166 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707):
+  168 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44367188726/artifacts/14459196289)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707/artifacts/14462437214)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `8722f0c4b59a419da6637cc1c444be06a83d52f0`.
-JAR: `special-pickaxes-1.20.1-5.14.1.jar` — 778.556 bytes.
-SHA-256: `9912f571f45c6e412fad1f6f34474ed670a8d63f1968d00bc4a740f5567636bc`.
+Commit probado: `a527ffbfd83931c57af9266e0865ef3eca3e60d1`.
+JAR: `special-pickaxes-1.20.1-5.15.0.jar` — 782.740 bytes.
+SHA-256: `ce337b3b683d135c4860d8a8b18f8f27db0552b0781b9384cbc83068e1eda33e`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

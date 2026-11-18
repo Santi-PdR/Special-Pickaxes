@@ -1,3 +1,11 @@
+## 5.15.0 — impactos activos y dos originales Malum, CI aprobada
+
+Runtime `a527ffbfd83931c57af9266e0865ef3eca3e60d1`, [CI 44375291707](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707): SUCCESS. 168 JUnit, cero fallos/errores/omisiones; 400 GameTests; cliente gráfico y servidor empaquetado aprobados, logs estrictos. 130 pruebas Python locales sin fallos (una omitida sin Java), 25 pruebas de recursos correctas. Evidencia temporal `/tmp/sp515green`.
+
+Impactos custom en el frente de las colas activas y remates exitosos, con geometría por estilo, presupuesto compartido con casts. No partículas ambientales ni emisión durante pausas. Dos sprites originales Malum importados byte por byte para Alba Eterna/Axioma, SHA/commit/procedencia actualizados, sin inferir permisos de redistribución. Capturas reales de ambos en mano inspeccionadas y conservadas en `review/portrait-*-5.15.0.jpg`.
+
+JAR `special-pickaxes-1.20.1-5.15.0.jar`, 782740 bytes, SHA256 `ce337b3b683d135c4860d8a8b18f8f27db0552b0781b9384cbc83068e1eda33e`. Personal `14462437214`; evidencia completa `14462112977`, 7 días. No publicación pública. Ver `EXCAVATION-5.15.md`. No se afirma reforma de 50 completada, nueva mecánica de excavación ni revisión visual de todas las animaciones.
+
 ## 5.14.1 — firmas primarias/secundarias, validación completa aprobada
 
 Runtime `8722f0c4b59a419da6637cc1c444be06a83d52f0`, [CI 44367188726](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44367188726): SUCCESS. **166 JUnit**, cero fallos/errores/omisiones; **400 GameTests obligatorios**; cliente gráfico (32 escenas/64 tooltips) y servidor empaquetado aprobados, incluidos logs estrictos. Evidencia recuperada a `/tmp/sp5141green` (temporal). Local: 128 pruebas Python sin fallos, una omitida por falta de Java local; 25 pruebas de recursos correctas.
