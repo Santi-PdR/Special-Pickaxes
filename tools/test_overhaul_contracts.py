@@ -14,7 +14,7 @@ class OverhaulContracts(unittest.TestCase):
         self.assertEqual(len(records), 13)
         for record in records:
             with self.subTest(pick=record['artifact']):
-                self.assertEqual(record['external_repository'], 'Noaaan/MythicMetals')
+                self.assertIn(record['external_repository'], {'Noaaan/MythicMetals', 'SammySemicolon/Malum-Mod'})
                 self.assertRegex(record['external_commit'], r'^[0-9a-f]{40}$')
                 self.assertTrue(record['external_entry'].endswith('_pickaxe.png'))
                 data = (ASSETS / 'textures/item' / record['runtime_texture']).read_bytes()

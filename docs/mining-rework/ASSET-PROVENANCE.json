@@ -6,16 +6,16 @@
     "sha256": "19e4ad13e6576279a8f1b35d066572f72f9f0dfadc359c2e6efb7e3944627903",
     "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
     "runtime_texture": "palimpsest_external.png",
-    "runtime_sha256": "17e85506c4a5119d514b3bea5b07600e05c7a0792ac1ad339b519b3a4f4c3b74",
-    "external_repository": "Noaaan/MythicMetals",
-    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
-    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/hallowed_pickaxe.png",
-    "external_source_sha256": "17e85506c4a5119d514b3bea5b07600e05c7a0792ac1ad339b519b3a4f4c3b74",
+    "runtime_sha256": "43471d65e97ee9166fa2f0edaaa3c7881ff07040c3883fad62c57526327bb882",
+    "external_repository": "SammySemicolon/Malum-Mod",
+    "external_commit": "8e62bb70dd0c6a589f9cca1a16ab2c8ca1ffc9b7",
+    "external_entry": "src/main/resources/assets/malum/textures/item/spellweaving_pickaxe.png",
+    "external_source_sha256": "43471d65e97ee9166fa2f0edaaa3c7881ff07040c3883fad62c57526327bb882",
     "runtime_dimensions": [
       16,
       16
     ],
-    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
+    "asset_license": "No explicit asset license located in pinned tree; retained only for requested private/personal build. No public redistribution permission claimed."
   },
   {
     "artifact": "fault_choir",
@@ -132,16 +132,16 @@
     "sha256": "68415544cd16cbc80b04eebbcae993bfc3f75799f854cb05783e68ba556a840c",
     "adaptation": "Unmodified third-party sprite; no redrawing, recoloring, scaling or generative editing.",
     "runtime_texture": "hollow_axiom_external.png",
-    "runtime_sha256": "990d4cefcca27a3fea802f807248407e47b130c04841290511061331f3732946",
-    "external_repository": "Noaaan/MythicMetals",
-    "external_commit": "1cc825572b1e3a8697af197fa58da34636521ce4",
-    "external_entry": "src/main/resources/assets/mythicmetals/textures/item/adamantite_pickaxe.png",
-    "external_source_sha256": "990d4cefcca27a3fea802f807248407e47b130c04841290511061331f3732946",
+    "runtime_sha256": "3dec2132a846bd18817bc23d5b1be911dc2409b0c7da8a48d02c99c317f1844b",
+    "external_repository": "SammySemicolon/Malum-Mod",
+    "external_commit": "8e62bb70dd0c6a589f9cca1a16ab2c8ca1ffc9b7",
+    "external_entry": "src/main/resources/assets/malum/textures/item/soul_stained_steel_pickaxe.png",
+    "external_source_sha256": "3dec2132a846bd18817bc23d5b1be911dc2409b0c7da8a48d02c99c317f1844b",
     "runtime_dimensions": [
       16,
       16
     ],
-    "asset_license": "All rights reserved; retained for the requested personal-use build, not a grant of redistribution rights."
+    "asset_license": "No explicit asset license located in pinned tree; retained only for requested private/personal build. No public redistribution permission claimed."
   },
   {
     "artifact": "worldbreaker",

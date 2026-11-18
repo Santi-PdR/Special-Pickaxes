@@ -22,5 +22,21 @@
     "blob_sha": "a2850f68e0fdabdbd53624cdd36cc8d6da916964",
     "local_file": "artwork/candidates/minefantasy/pickDragon.png",
     "status": "candidate only; not integrated; asset permissions not yet established"
+  },
+  {
+    "repository": "stal111/Forbidden-Arcanus",
+    "ref": "aaa2002286570d821b1c89c5b888fce973ea7abe",
+    "path": "neoforge/src/main/resources/assets/forbidden_arcanus/textures/item/tool/draco_arcanus_pickaxe.png",
+    "blob_sha": "df205d5b1d20312aa6531b5e7a19b83f018abc38",
+    "local_file": "artwork/candidates/forbidden-arcanus/draco_arcanus_pickaxe.png",
+    "status": "candidate only; private-use research; no redistribution permission assumed"
+  },
+  {
+    "repository": "stal111/Forbidden-Arcanus",
+    "ref": "aaa2002286570d821b1c89c5b888fce973ea7abe",
+    "path": "neoforge/src/main/resources/assets/forbidden_arcanus/textures/item/tool/reinforced_deorum_pickaxe.png",
+    "blob_sha": "50c30b5ae59716a27ebab4135d8df9efb0809670",
+    "local_file": "artwork/candidates/forbidden-arcanus/reinforced_deorum_pickaxe.png",
+    "status": "candidate only; private-use research; no redistribution permission assumed"
   }
 ]

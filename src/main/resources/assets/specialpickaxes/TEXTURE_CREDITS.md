@@ -1,6 +1,6 @@
 # Runtime pickaxe artwork — third-party originals
 
-All thirteen runtime icons are **unmodified Mythic Metals pickaxe sprites**, not AI images or redraws by this project.
+Eleven runtime icons are **unmodified Mythic Metals pickaxe sprites**. Alba Eterna and Axioma del Vacío now use original Malum Spellweaving and Soul Stained Steel sprites respectively; see `MALUM_ASSET_NOTICE.md`. None of the item icons are AI images or redraws by this project.
 Source: https://github.com/Noaaan/MythicMetals/tree/1cc825572b1e3a8697af197fa58da34636521ce4
 
 Exact per-pick paths, source commit, original dimensions and SHA256 are recorded in

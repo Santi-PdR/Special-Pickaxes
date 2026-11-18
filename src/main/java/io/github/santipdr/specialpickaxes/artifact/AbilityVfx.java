@@ -5,6 +5,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +38,23 @@ public final class AbilityVfx {
             var point=center.add(AbilityBurstShape.orient((alternate?AbilityBurstShape.alternateOffset(shape,i):AbilityBurstShape.offset(shape,i)),player.getLookAngle()));
             player.serverLevel().sendParticles(player,particle(kind,alternate),false,point.x,
                     point.y,point.z,1,0,.015,0,0);
+        }
+        return true;
+    }
+    /** Invoked only by an executing queue after successful work, never by held/Curios tick effects. */
+    public static boolean excavation(ServerPlayer player,ArtifactKind kind,net.minecraft.core.BlockPos at,boolean complete){
+        if(!kind.playable()||!player.isAlive()||player.isRemoved()||player.isSpectator())return false;
+        var level=player.serverLevel();
+        if(!level.hasChunkAt(at)||player.distanceToSqr(Vec3.atCenterOf(at))>48*48)return false;
+        int tick=player.server.getTickCount(),count=complete?RelicWorkShape.FINISH_COUNT:RelicWorkShape.WORK_COUNT;
+        if(!BUDGET.tryReserve(tick,count))return false;
+        Vec3 center=Vec3.atCenterOf(at);
+        // Pull surface impacts slightly toward the caster so opaque adjacent faces do not swallow every glyph.
+        Vec3 toward=player.getEyePosition().subtract(center).normalize();center=center.add(toward.scale(.6));
+        var shape=AbilityBurstShape.Shape.valueOf(kind.name());
+        for(int i=0;i<count;i++){
+            var point=center.add(AbilityBurstShape.orient(RelicWorkShape.point(shape,i,complete),toward));
+            level.sendParticles(player,particle(kind,complete),false,point.x,point.y,point.z,1,0,0,0,0);
         }
         return true;
     }

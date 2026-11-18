@@ -26,6 +26,7 @@ public final class WorkQueue {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
         int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
+        BlockPos lastImpact;int impactTick=Integer.MIN_VALUE;
         final ArrayDeque<BlockPos> seamTrailPoints=new ArrayDeque<>(5);
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
@@ -147,7 +148,13 @@ public final class WorkQueue {
             // A native break/claim callback may cancel or replace this exact job.
             // Never requeue it, emit stale completion, or remove the replacement.
             if(JOBS.get(id)!=job)continue;
-            if(feedback!=null&&p.tickCount%10==0)RelicEffects.emit(p,job.kind,"work",net.minecraft.world.phys.Vec3.atCenterOf(feedback));
+            if(feedback!=null){
+                job.lastImpact=feedback.immutable();
+                int now=p.server.getTickCount();
+                if(job.succeeded>0&&(job.impactTick==Integer.MIN_VALUE||now-job.impactTick>=10)){
+                    job.impactTick=now;AbilityVfx.excavation(p,job.kind,feedback,false);
+                }
+            }
             if(feedback!=null && p.tickCount%4==0){
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
                 else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
@@ -162,6 +169,8 @@ public final class WorkQueue {
             if(job.region!=null)job.region.reportProgress(p);
             if(JOBS.get(id)!=job)continue;
             if(job.aborted||(job.region==null?job.steps.isEmpty():job.region.done())) {
+                if(!job.aborted&&job.succeeded>0&&job.lastImpact!=null)
+                    AbilityVfx.excavation(p,job.kind,job.lastImpact,true);
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
                 else if(job.region instanceof IcarianLiftProgram lift){
                     String result=lift.surfaced()?"icarian_lift_surface":lift.departed()?"icarian_lift_departed":lift.fluidBlocked()?"icarian_lift_fluid":lift.blocked()?"icarian_lift_barrier":"icarian_lift_limit";
