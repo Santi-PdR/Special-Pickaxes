@@ -614,13 +614,18 @@ public final class PickaxeGameTests {
         for(int y=1;y<=5;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y))==state,"no abandoned shaft block is cut");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_261") public static void icarianLiftStopsAfterDepartureBetweenBudgetedTurns(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
+        var wearer=player(h,ArtifactKind.ICARUS);
+        // Other test batches schedule world-wide work; isolate this shaft from their terrain.
+        wearer.setPos(wearer.getX(),h.getLevel().getMaxBuildHeight()-32,wearer.getZ());
+        var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
         for(int y=1;y<=5;y++){
             var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
         }
         var lift=new IcarianLiftProgram(base,20);int previous=ArtifactConfig.PER_PLAYER.get();
         try{ArtifactConfig.PER_PLAYER.set(1);WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);WorkQueue.tick();
             h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure");
+            h.assertTrue(EnchantmentScaling.budget(wearer.getMainHandItem())==1&&WorkQueue.completed(wearer)==1,"fixture executes exactly one budgeted step");
+            h.assertTrue(h.getLevel().getBlockState(base.above(2))==state,"second shaft block is intact before departure");
             var departure=wearer.position().add(0,0,2);wearer.setPos(departure);drain(wearer);
             h.assertTrue(lift.departed(),"lift records departure after the next budgeted turn");
             h.assertTrue(wearer.position().equals(departure),"later turns never pull the departed miner back");
