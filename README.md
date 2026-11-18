@@ -1,6 +1,9 @@
-# Special Pickaxes — 5.17.0
+# Special Pickaxes — 5.18.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
+
+**[Descargar 5.18.0 personal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44416777028/artifacts/14480089792)** · [Instalación y prueba rápida](docs/mining-rework/PLAY-5.18.md).
+Minecraft 1.20.1 / Forge 47.4.10 / Java 17. Kit completo `/specialpickaxes kit @s` (operador, 13 huecos), HUD adaptable y pausas con causa visible. CI: 178 JUnit, 420 GameTests, cliente y servidor aprobados. No se cuenta esta tanda de usabilidad como una reforma de 50 mecánicas nuevas.
 
 - Alba Eterna: sondeo con guía de depósito durante diez segundos (dirección,
   distancia y desnivel). Repite la secundaria para cancelar. Sin detector pasivo.

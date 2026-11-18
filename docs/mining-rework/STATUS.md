@@ -1,3 +1,9 @@
+## 5.18.0 — instalable personal, CI aprobada
+
+Fuente `5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282`, CI `44416777028`: SUCCESS. 178 JUnit sin fallos/errores/omisiones, 420 GameTests obligatorios, 32 escenas/64 tooltips, servidor empaquetado y logs aprobados. Kit de 13 picos con rechazo íntegro si falta espacio, HUD adaptable y causas de pausa localizadas, lectura de cooldown coherente con validación de servidor. [Instalación, descarga y límites](PLAY-5.18.md).
+
+JAR 804691 bytes, SHA256 `c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c`. Artefacto personal `14480089792`, evidencia `14480139804`, retención 7 días. Descarga CDN bloqueada aquí; no hay copia local ni publicación pública. Primer run falló en fixture preexistente de Ícaro; segundo pasó con diagnósticos más estrictos, sin relajar aserciones. Causa intermitente sin confirmar. No certificación Windows/modpacks ni 50 nuevas mecánicas.
+
 ## 5.17.0 — guía activada de sondeo, CI aprobada
 
 Runtime `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`, [CI 44390344841](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44390344841): SUCCESS. **175 JUnit**, cero fallos/errores/omisiones; **418 GameTests**; cliente gráfico 32 escenas/64 tooltips, servidor empaquetado y logs estrictos aprobados. Local: 132 Python sin fallos, una omisión sin Java; 25 recursos correctos.

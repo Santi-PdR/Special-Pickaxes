@@ -4,7 +4,7 @@ Minecraft Java **1.20.1**, **Forge 47.4.10**, **Java 17**. No es Fabric ni NeoFo
 
 ## Instalar y probar
 
-1. Descarga el artefacto autenticado `special-pickaxes-5.18.0-personal` de la ejecución CI de esta versión cuando termine en verde. Extrae el ZIP.
+1. Descarga el artefacto autenticado `special-pickaxes-5.18.0-personal` [de esta ejecución CI aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44416777028/artifacts/14480089792) (requiere iniciar sesión en GitHub; retención de 7 días). Extrae el ZIP.
 2. Cierra Minecraft. Haz copia de tu mundo. Quita únicamente versiones anteriores `special-pickaxes-*.jar` de `mods` y coloca `special-pickaxes-1.20.1-5.18.0.jar`. No copies el ZIP a `mods`.
 3. En SKLauncher, la carpeta indicada para esta instancia es `D:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods`.
 4. Abre primero un mundo de prueba en creativo con trucos. Ejecuta `/specialpickaxes kit @s` con **13 huecos libres** en el inventario principal. En servidor, requiere operador nivel 2; también puede usarse desde consola con el nombre del jugador. Si falta espacio, no entrega ni tira ningún pico.
@@ -22,4 +22,10 @@ Se mantienen IDs, datos previos y las 13 habilidades. No añade partículas ambi
 
 ## Verificación
 
-Pendiente CI de esta versión: no interpretar los resultados de 5.17 como validación de 5.18. Las pruebas de disposición verifican límites geométricos, no aprobación visual humana en todas las escalas. Windows/SKLauncher y compatibilidad con otros mods no se han ejecutado aquí.
+[CI 44416777028](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44416777028), fuente `5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282`: **SUCCESS**. 178 JUnit sin fallos/errores/omisiones; 420 GameTests obligatorios; cliente gráfico 32 escenas/64 tooltips; servidor con JAR empaquetado y validación estricta de logs aprobados. Local: 132 Python (una omisión sin Java), 25 recursos y escaneo de secretos correctos.
+
+JAR: **804691 bytes**, SHA256 `c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c`. Artefacto personal `14480089792`; evidencia `14480139804`. El CDN de descarga no es accesible desde este entorno, por lo que se entrega el enlace autenticado, no una supuesta copia local del JAR.
+
+El primer run `44415426565` falló en la prueba existente `icarianLiftStopsAfterDepartureBetweenBudgetedTurns`. Se añadieron precondiciones y diagnóstico sin relajar sus aserciones ni cambiar el ascensor. La ejecución completa siguiente pasó; la causa del fallo intermitente no está confirmada.
+
+ Las pruebas de disposición verifican límites geométricos, no aprobación visual humana en todas las escalas. Windows/SKLauncher y compatibilidad con otros mods no se han ejecutado aquí.
