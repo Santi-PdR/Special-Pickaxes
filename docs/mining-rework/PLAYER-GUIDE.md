@@ -1,8 +1,8 @@
-# Rediseño 5.12.0 — build de prueba verificada
+# Rediseño 5.12.1 — build de prueba verificada
 
-CI `44197698594` aprobada sobre `ebea26e8a6425e0e794cfcd509a0b0646ec71912`:
+CI `44208279107` aprobada sobre `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2`:
 157 JUnit y 399 GameTests, cliente gráfico y servidor empaquetado.
-Nuevos nombres EN/ES, manual numerado e instrucciones concisas por modo.
+Nombres y modos EN/ES renovados, manual numerado y navegación por flechas ↑↓.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 

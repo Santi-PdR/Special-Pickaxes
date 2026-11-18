@@ -1,3 +1,13 @@
+## 5.12.1 — complete CI verified
+
+Runtime `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2`, [CI 44208279107](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44208279107): SUCCESS. 157 JUnit, zero failures/errors/skips; all 399 required GameTests; graphical client and packaged server checks passed. Local 122 Python tests without skips, 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci5121-green` (temporary).
+
+All active mode labels now have readable EN/ES names; no NBT mode IDs/order changes. Manual adds small-step Up/Down scrolling, preserving other navigation. Inspected the final actual Worldbreaker rounded-tunnel manual screenshot at 1280×720 / GUI 640×360: localized mode label and readable cards, selector and footer. Unmodified reference image saved under `review/manual-5.12.1-es.jpg`, provenance/hash in `INTERFACE-5.12.md`. Limited scene inspection only, not blanket visual/user approval or Windows/Ghouls certification.
+
+JAR `special-pickaxes-1.20.1-5.12.1.jar`: 590273 bytes, SHA-256 `4265d89dc6206fd4742941eaee8992a250c3d6f117804bdc7018b084708ecc55`. Personal authenticated artifact `14384759934` (7 days), full forge-validation artifact `14385682682`. No public release.
+
+### Historical progress notes
+
 ## 5.12.1 — localization and keyboard polish; validation pending
 
 Visual inspection of two real 5.12.0 manual screenshots found remaining raw English mode labels in Spanish (VEIN/CARVE). All active mode labels now use concise EN/ES display names, without changing NBT mode keys or order. Added Up/Down small-step keyboard scrolling, retaining wheel/trackpad, page, home/end and drag behavior. Two new presentation tests cover readable active-mode labels and arrow hints. Local 122 Python tests and 25 resource checks pass; full CI pending. Latest fully verified build is 5.12.0.
