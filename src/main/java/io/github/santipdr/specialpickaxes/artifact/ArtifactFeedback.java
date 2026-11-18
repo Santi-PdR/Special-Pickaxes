@@ -422,7 +422,7 @@ public final class ArtifactFeedback {
             case INTERREGNUM -> net.minecraft.sounds.SoundEvents.BEACON_DEACTIVATE;
             case WORLDLOOM -> net.minecraft.sounds.SoundEvents.AZALEA_PLACE;
             case ICARUS -> net.minecraft.sounds.SoundEvents.ENDER_DRAGON_FLAP;
-            case AXIOM -> net.minecraft.sounds.SoundEvents.RESPAWN_ANCHOR_DEPLETE;
+            case AXIOM -> net.minecraft.sounds.SoundEvents.RESPAWN_ANCHOR_DEPLETE.value();
             case WORLDBREAKER -> net.minecraft.sounds.SoundEvents.ANVIL_LAND;
             case EXODIUM -> net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_LAUNCH;
             case IRIDIUM -> net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP;

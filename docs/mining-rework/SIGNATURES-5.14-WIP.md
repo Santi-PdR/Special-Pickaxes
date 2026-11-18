@@ -32,13 +32,15 @@ También se separaron las siluetas de emisión antes compartidas: Flor Infernal/
 
 La última release completa verificada sigue siendo 5.13.0. Esta versión requiere compilar, ejecutar sus tests Java y probar el cliente real antes de distribuirla. Los tests de recursos y Python locales no sustituyen esa evidencia. No se ha comprobado el aspecto en movimiento dentro del juego.
 
-## 5.14.1 — distinction primaire/secondaire
+## 5.14.1 — primaria y secundaria distinguibles
 
-- 13 séquences secondaires supplémentaires, quatre images par séquence (104 images au total, 26 signatures).
-- Symboles secondaires dédiés aux actions : chevrons ascendants d’Ícaro, entonnoir magnétique d’Ocaso, trois cristaux rappelés d’Iridio, grille découpée de Desgarraestratos, colonnes ardentes de Flor Infernal.
-- 13 trajectoires secondaires et 13 silhouettes de lancement secondaires distinctes de leurs primaires.
-- 13 timbres secondaires différents du son primaire, via les sons existants de Minecraft. Aucun fichier audio externe prétendu.
-- Budget partagé entre primaire et secondaire : alterner les deux ne contourne pas la déduplication du même tick.
-- Correction du test 5.14.0 : `ArtifactKind` initialise les sons et nécessite les registres Minecraft. Le test unitaire compare maintenant les enums purement géométriques ; GameTest vérifie le roster réel, l’unicité des 26 registres et les sons.
+- 13 secuencias secundarias adicionales, cuatro imágenes por secuencia: 104 imágenes en total, 26 firmas.
+- Símbolos secundarios que representan la acción: chevrones ascendentes de Ícaro, embudo magnético de Ocaso, cristales atraídos de Iridio, plano cortado de Desgarraestratos y columnas ardientes de Flor Infernal.
+- 13 trayectorias y 13 siluetas de lanzamiento secundarias diferentes de las primarias.
+- 13 timbres secundarios distintos del sonido primario, usando sonidos existentes de Minecraft. No son grabaciones originales ni archivos externos.
+- Presupuesto compartido: alternar primaria y secundaria no evita la deduplicación del mismo tick.
+- Corrección del test de 5.14.0: `ArtifactKind` inicializa sonidos y necesita los registros Minecraft. La prueba unitaria compara ahora los enums geométricos puros; GameTest comprueba la lista real, la exclusividad de los 26 registros y los sonidos.
 
-Le run 44355060736 a compilé Java et créé le JAR, puis échoué au test unitaire de bootstrap. Il n’a donc PAS validé le runtime 5.14.0. 5.14.1 est encore en validation.
+El run 44355060736 compiló Java y creó el JAR, pero falló en la prueba de bootstrap. Por tanto, NO validó el runtime de 5.14.0. El run 44366567461 detectó que RESPAWN_ANCHOR_DEPLETE es un Holder y requiere `.value()`; corregido antes de volver a validar.
+
+La validación completa de 5.14.1 sigue pendiente. No se han integrado texturas externas nuevas ni se ha completado la petición de unas 50 mejoras notorias.
