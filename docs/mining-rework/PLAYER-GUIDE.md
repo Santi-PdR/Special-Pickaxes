@@ -1,10 +1,24 @@
-# Rediseño 5.15.0 — build de prueba verificada
+# Rediseño 5.16.0 — build de prueba verificada
 
-CI `44375291707` aprobada sobre `a527ffbfd83931c57af9266e0865ef3eca3e60d1`:
-168 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
+CI `44383199553` aprobada sobre `b904be503ed9a19cc9e34039f57d949abed56928`:
+171 JUnit y 410 GameTests, cliente gráfico y servidor empaquetado.
 Selector de Rompemundos con flechas/Tab, Inicio/Fin, vista previa y Enter para copiar.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
+
+**Nuevo en 5.16:** la recuperación de Ocaso/Iridio mantiene la atracción hasta ocho
+segundos mientras conservas el mismo stack; sigue tu posición, respeta propiedad y
+claims en cada intervención, no atraviesa paredes ni fuerza la recogida.
+Cancelar o cambiar de herramienta termina el trabajo. Telar acepta escaleras
+vanilla en la mano secundaria para construir un ascenso; mira abajo más de 35°
+para descender. Con bloques completos sigue construyendo una calzada plana.
+Ambas opciones pagan una pieza por bloque sólo desde la mano secundaria.
+
+El HUD derecho muestra principal/secundaria listas o su enfriamiento, cola y
+pasos pendientes, botín en retorno o dominio activo. Datos del servidor con hasta
+medio segundo de retardo; no se muestran en menús, F1, espectadores ni GUI <240.
+Ver `GAMEPLAY-5.16.md` para límites y pruebas. Inventario acumulado de cambios en
+`IMPROVEMENTS-47-AUDIT.md`, sin contar tests, atajos ni fotogramas.
 
 Los 13 picos usan sprites originales de terceros (11 Mythic Metals y 2 Malum), sin retoques ni
 arte generado. Las partículas de equipamiento/Curios y bordes persistentes se

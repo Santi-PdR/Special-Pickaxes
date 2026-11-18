@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.15.0
+# Special Pickaxes — 5.16.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -13,7 +13,13 @@
   custom en el frente de excavación y remates al terminar trabajos exitosos;
   sin emisión al equiparse, en pausa o por cancelación.
   [Cambios y evidencia 5.15](docs/mining-rework/EXCAVATION-5.15.md).
-  La petición de unas 50 mejoras notorias en todos los aspectos sigue incompleta.
+- Ocaso/Iridio: recuperación sostenida hasta ocho segundos, con propiedad, claims
+  y colisiones normales. Telar: escaleras ascendentes/descendentes pagadas desde
+  la mano secundaria. HUD funcional con dos enfriamientos y estado de trabajo.
+  [Mecánicas y validación 5.16](docs/mining-rework/GAMEPLAY-5.16.md).
+- [Inventario acumulado de 47 cambios](docs/mining-rework/IMPROVEMENTS-47-AUDIT.md):
+  39 identidades audiovisuales por pico y ocho cambios de arte/sistemas.
+  No son 47 mecánicas nuevas ni una certificación estética de todas las animaciones.
 - Nombres EN/ES renovados, manual con tarjetas numeradas, modo activo y teclas
   reales. Modos localizados y navegación ↑↓/AvPág/RePág. Descripciones funcionales concisas. [Tabla de nombres y alcance](docs/mining-rework/INTERFACE-5.12.md).
 - Rompemundos: selector de copias por flechas/Tab, Inicio/Fin y confirmación con Enter,
@@ -33,16 +39,16 @@
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Ícaro: cortes 11×7 / 15×9. Desgarraestratos: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707):
-  168 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553):
+  171 JUnit, 410 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707/artifacts/14462437214)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553/artifacts/14465283390)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `a527ffbfd83931c57af9266e0865ef3eca3e60d1`.
-JAR: `special-pickaxes-1.20.1-5.15.0.jar` — 782.740 bytes.
-SHA-256: `ce337b3b683d135c4860d8a8b18f8f27db0552b0781b9384cbc83068e1eda33e`.
+Commit probado: `b904be503ed9a19cc9e34039f57d949abed56928`.
+JAR: `special-pickaxes-1.20.1-5.16.0.jar` — 793.992 bytes.
+SHA-256: `623c2ca70156c84649fe2ef09b1e6763f21005195a7d662bd546c85c1a9c2caf`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

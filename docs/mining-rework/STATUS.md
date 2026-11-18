@@ -1,3 +1,13 @@
+## 5.16.0 — recuperación sostenida, arquitectura y HUD, CI aprobada
+
+Runtime `b904be503ed9a19cc9e34039f57d949abed56928`, [CI 44383199553](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44383199553): SUCCESS. **171 JUnit**, cero fallos/errores/omisiones; **410 GameTests**; cliente gráfico 32 escenas/64 tooltips, servidor empaquetado y logs estrictos aprobados. Local: 131 pruebas Python sin fallos, una omitida por falta de Java; 25 pruebas de recursos correctas. Evidencia temporal `/tmp/sp516green`.
+
+Ocaso/Iridio mantienen ocho segundos una recuperación activa y acotada de sus objetivos seleccionados, sin teleport/robo/colisiones desactivadas, revalidando claims y contexto por intervención. Telar construye escaleras vanilla ascendentes/descendentes pagadas y con gálibo, sin ampliar los estados de transmutación de Crisol. HUD server-owned con dos cooldowns, progreso y actividad. Ver `GAMEPLAY-5.16.md` y el inventario acumulado `IMPROVEMENTS-47-AUDIT.md` (47 cambios, no 47 mecánicas; no incluye tests/atajos/fotogramas).
+
+Primer run 44380776387 pasó 171 JUnit/410 GameTests pero falló el smoke gráfico en la primera escena. Captura mostraba la mena fuera de mira. El fixture ahora restaura una vez su pose mediante handshake después de cerrar el manual; la activación sigue usando tecla real y paquete autorizado. Sin reintentos ni éxito sintético, sin cambiar el raycast del mod. Segundo run completamente verde.
+
+Dos capturas reales del HUD inspeccionadas/conservadas como `review/hud-{palimpsest,eventide}-5.16.0.jpg`, 640×360: textos/barras caben y mira despejada; no todos los estados/escalas. JAR `special-pickaxes-1.20.1-5.16.0.jar`: **793992 bytes**, SHA256 `623c2ca70156c84649fe2ef09b1e6763f21005195a7d662bd546c85c1a9c2caf`. Personal `14465283390`, evidencia `14465963235`, retención 7 días. Sin release pública ni certificación Windows/Ghouls.
+
 ## 5.15.0 — impactos activos y dos originales Malum, CI aprobada
 
 Runtime `a527ffbfd83931c57af9266e0865ef3eca3e60d1`, [CI 44375291707](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44375291707): SUCCESS. 168 JUnit, cero fallos/errores/omisiones; 400 GameTests; cliente gráfico y servidor empaquetado aprobados, logs estrictos. 130 pruebas Python locales sin fallos (una omitida sin Java), 25 pruebas de recursos correctas. Evidencia temporal `/tmp/sp515green`.
