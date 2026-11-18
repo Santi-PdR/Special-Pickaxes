@@ -6,7 +6,7 @@ modId="specialpickaxes"
 version="${mod_version}"
 displayName="Special Pickaxes"
 authors="Santi-PdR"
-description='''Thirteen tier-V mining pickaxes with custom abilities, safe scheduled excavation, modded geology support and original third-party pickaxe artwork, timed ore guidance and sustained loot recall.'''
+description='''Thirteen tier-V mining pickaxes with custom abilities, safe scheduled excavation, modded geology support and externally sourced pickaxe artwork, timed ore guidance and sustained loot recall.'''
 [[dependencies.specialpickaxes]]
 modId="forge"
 mandatory=true

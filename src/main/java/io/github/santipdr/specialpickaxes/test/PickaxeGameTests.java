@@ -1710,6 +1710,25 @@ public final class PickaxeGameTests {
         h.assertTrue(!level.hasChunkAt(remote)&&!SurveyGuide.publish(p,tool,remote,Blocks.DIAMOND_ORE.defaultBlockState())&&!level.hasChunkAt(remote),"publication never loads a missing chunk");finish(h,p);
     }
 
+    @GameTest(template="empty",batch="upgrade_518_01") public static void completeKitGrantsExactlyThirteenUniqueTools(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+        var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
+        int result=h.getLevel().getServer().getCommands().performPrefixedCommand(source,"specialpickaxes kit @s");
+        h.assertTrue(result==13,"kit reports all thirteen tools");
+        for(var kind:ArtifactKind.playableValues())h.assertTrue(p.getInventory().countItem(SpecialPickaxes.PICKS.get(kind).get())==1,"one tool of each identity");
+        h.assertTrue(!h.getLevel().getServer().getCommands().getDispatcher().getRoot().getChild("specialpickaxes").canUse(source.withPermission(0)),"kit remains operator only");
+        finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_518_02") public static void completeKitRejectsPartialInventoryWithoutMutatingIt(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
+        for(int i=0;i<24;i++)p.getInventory().items.set(i,new ItemStack(Blocks.STONE,64));
+        var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
+        int result=h.getLevel().getServer().getCommands().performPrefixedCommand(source,"specialpickaxes kit @s");
+        h.assertTrue(result==0,"twelve free slots cannot accept thirteen tools");
+        for(var kind:ArtifactKind.playableValues())h.assertTrue(p.getInventory().countItem(SpecialPickaxes.PICKS.get(kind).get())==0,"failure grants no partial kit");
+        h.assertTrue(p.getInventory().countItem(Blocks.STONE.asItem())==1536,"existing inventory is preserved");finish(h,p);
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }
