@@ -36,3 +36,9 @@ Geometría unitaria de 64 piezas para las cuatro direcciones y tres pendientes; 
 ## Estado
 
 Pendientes compilación, tests Java/GameTests, cliente gráfico, servidor empaquetado e inspección del nuevo HUD. La última versión completamente verificada al comenzar esta tanda es 5.15.0. No hay texturas nuevas en 5.16: se conservan los dos originales Malum y once Mythic Metals ya integrados. No se declara compatibilidad Windows/Ghouls ni aprobación estética del usuario.
+
+## Primera validación
+
+Run 44380776387: compilación Java y 171 JUnit sin fallos; 410 GameTests obligatorios aprobados. Falló el smoke gráfico: `palimpsest-vein` rechazó la activación y agotó su espera. La captura muestra la mena a la derecha, fuera de la mira, después del ciclo de inventario/manual de Robot. No se atribuye el fallo a la mecánica sin prueba adicional.
+
+El fixture de cliente ahora exige un handshake explícito después de cerrar el manual: solicita restaurar una vez la pose original, espera un mensaje confirmado por el cliente y sólo entonces pulsa la tecla real de activación. No invoca la habilidad, no simula éxito, no reintenta activaciones ni cambia el raycast de producción. Se añade captura `hud-<escena>` en esa pose. El gate falla si no llega el acuse o corresponde a otra escena. Pruebas Python del orden actualizadas (131 locales, una omisión por Java ausente). Validación completa pendiente.

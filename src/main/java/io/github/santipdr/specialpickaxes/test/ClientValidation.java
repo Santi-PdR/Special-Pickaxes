@@ -27,6 +27,20 @@ public final class ClientValidation {
             // slow screenshot helper can make activation and acknowledgement wait on each other.
             if(ticks>=240&&(ticks-240)/100<SCENES.size()&&(ticks-240)%100>=40){
                 var current=SCENES.get((ticks-240)/100);var state=p.getPersistentData();
+                String sceneId=current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode());
+                var aimRequest=java.nio.file.Path.of("client-aim-scene.txt");
+                if(!state.getBoolean("sceneAimed")&&java.nio.file.Files.exists(aimRequest)){
+                    try{
+                        if(java.nio.file.Files.readString(aimRequest).trim().equals(sceneId)){
+                            // Releasing the mouse after a real GUI can change camera yaw under Xvfb.
+                            // Restore fixture pose once; still require the real keyboard/network activation.
+                            p.connection.teleport(.5,65,14.5,180,current.kind()==ArtifactKind.PALIMPSEST?-25:-14);
+                            p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                            state.putBoolean("sceneAimed",true);java.nio.file.Files.deleteIfExists(aimRequest);
+                            p.sendSystemMessage(Component.literal("CLIENT_FIXTURE_AIMED_"+sceneId));
+                        }
+                    }catch(java.io.IOException error){throw new IllegalStateException("Cannot prepare client fixture aim",error);}
+                }
                 if(!state.getBoolean("sceneExecuted")&&ArtifactState.of(p,current.kind()).getLong("ready")>state.getLong("sceneReadyBefore")){
                     state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
                 }
@@ -110,7 +124,7 @@ public final class ClientValidation {
                     p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
                     if(k==ArtifactKind.CHOIR)p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 }
-                p.getPersistentData().putLong("sceneReadyBefore",ArtifactState.of(p,k).getLong("ready"));p.getPersistentData().putBoolean("sceneExecuted",false);
+                p.getPersistentData().putLong("sceneReadyBefore",ArtifactState.of(p,k).getLong("ready"));p.getPersistentData().putBoolean("sceneExecuted",false);p.getPersistentData().putBoolean("sceneAimed",false);
                 if(ArtifactInteraction.regional(k,scene.mode())){
                     ArtifactInteraction.use(p,p.getMainHandItem(),k,false);
                     RelicControl.corner(p,new BlockPos(-5,65,6));RelicControl.corner(p,new BlockPos(-3,67,8));

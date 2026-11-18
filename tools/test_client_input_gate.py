@@ -9,7 +9,9 @@ class ClientInputGateTests(unittest.TestCase):
         self.assertIsNone(gate.observe('MANUAL_SCREEN_CLOSED'))
         self.assertEqual(gate.observe('MANUAL_SCREEN_RENDERED 640x360'), 'capture_and_close')
         self.assertIsNone(gate.observe('MANUAL_SCREEN_RENDERED 640x360'))
-        self.assertEqual(gate.observe('MANUAL_SCREEN_CLOSED'), 'activate')
+        self.assertEqual(gate.observe('MANUAL_SCREEN_CLOSED'), 'prepare_activation')
+        self.assertIsNone(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_wrong-scene'))
+        self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_paradox_crucible-andesite'), 'activate')
         self.assertIsNone(gate.observe('MANUAL_SCREEN_CLOSED'))
         gate.complete('paradox_crucible-andesite')
         self.assertIsNone(gate.stage)
@@ -18,7 +20,8 @@ class ClientInputGateTests(unittest.TestCase):
         gate = ClientInputGate()
         gate.begin('paradox_crucible-regional')
         gate.observe('MANUAL_SCREEN_RENDERED 640x360')
-        self.assertEqual(gate.observe('MANUAL_SCREEN_CLOSED'), 'confirm')
+        self.assertEqual(gate.observe('MANUAL_SCREEN_CLOSED'), 'prepare_activation')
+        self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_paradox_crucible-regional'), 'confirm')
 
     def test_missing_close_never_authorizes_activation(self):
         gate = ClientInputGate()
@@ -38,6 +41,16 @@ class ClientInputGateTests(unittest.TestCase):
         gate.observe('MANUAL_SCREEN_CLOSED')
         with self.assertRaises(RuntimeError):
             gate.complete('wrong-scene')
+        gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_worldloom-tunnel')
         gate.complete('worldloom-tunnel')
         with self.assertRaises(RuntimeError):
             gate.complete('worldloom-tunnel')
+
+    def test_missing_aim_ack_cannot_authorize_or_complete_activation(self):
+        gate = ClientInputGate()
+        gate.begin('palimpsest-vein')
+        gate.observe('MANUAL_SCREEN_RENDERED 640x360')
+        self.assertEqual(gate.observe('MANUAL_SCREEN_CLOSED'), 'prepare_activation')
+        self.assertIsNone(gate.observe('CLIENT_FIXTURE_AIMED_palimpsest-vein'))
+        with self.assertRaises(RuntimeError):
+            gate.complete('palimpsest-vein')

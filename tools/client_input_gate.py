@@ -15,6 +15,9 @@ class ClientInputGate:
             self.stage = 'manual_close'
             return 'capture_and_close'
         if self.stage == 'manual_close' and 'MANUAL_SCREEN_CLOSED' in line:
+            self.stage = 'fixture_aim'
+            return 'prepare_activation'
+        if self.stage == 'fixture_aim' and '[CHAT]' in line and line.strip().endswith('CLIENT_FIXTURE_AIMED_' + self.scene):
             self.stage = 'activation'
             return 'confirm' if self.scene == 'paradox_crucible-regional' else 'activate'
         return None

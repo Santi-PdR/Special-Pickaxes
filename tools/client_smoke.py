@@ -4,6 +4,7 @@ import json,os,pathlib,queue,re,shutil,signal,subprocess,threading,time
 root=pathlib.Path.cwd();out=root/'build/client-smoke';out.mkdir(parents=True,exist_ok=True)
 ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
 gallery_flag=root/'run/gallery-captured.flag';gallery_flag.unlink(missing_ok=True)
+aim_request=root/'run/client-aim-scene.txt';aim_request.unlink(missing_ok=True)
 world=root/'run/saves/ArtifactSmoke'
 if world.exists():shutil.rmtree(world)
 shutil.copytree(root/'build/packaged-smoke/smoke-world',world)
@@ -100,7 +101,11 @@ try:
    capture_screen(str(out/('manual-'+input_gate.scene+'.png')))
    press_screen('close')
    activation_pending=time.monotonic()
+  elif operation=='prepare_activation':
+   pending=aim_request.with_suffix('.tmp');pending.write_text(input_gate.scene);pending.replace(aim_request)
+   activation_pending=time.monotonic()
   elif operation in ('activate','confirm'):
+   capture_screen(str(out/('hud-'+input_gate.scene+'.png')))
    press_screen(operation)
    activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
