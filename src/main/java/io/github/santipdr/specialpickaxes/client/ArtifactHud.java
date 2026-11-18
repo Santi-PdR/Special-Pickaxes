@@ -22,13 +22,14 @@ public final class ArtifactHud {
         if(mc.player==null||mc.level==null||mc.screen!=null||mc.options.hideGui||mc.player.isSpectator())return;
         var tool=mc.player.getMainHandItem();
         if(!(tool.getItem() instanceof ArtifactItem item)||!tool.hasTag()||!tool.getTag().contains("hudStatus"))return;
-        int screen=mc.getWindow().getGuiScaledWidth();if(screen<240)return;
         var tag=tool.getTag();var graphics=event.getGuiGraphics();
-        int width=Math.min(184,screen/2),x=screen-width-7,y=44;
         int primary=Math.max(0,Math.min(12000,tag.getInt("hudPrimary")));
         int alternate=Math.max(0,Math.min(48000,tag.getInt("hudAlternate")));
         var survey=io.github.santipdr.specialpickaxes.artifact.SurveyBearing.read(tag,mc.level.dimension().location().toString(),mc.level.getGameTime(),mc.player.position(),mc.player.getUUID());
-        int color=0xff000000|item.kind.color,height=survey.isPresent()?72:58;
+        var layout=RelicHudLayout.panel(mc.getWindow().getGuiScaledWidth(),mc.getWindow().getGuiScaledHeight(),survey.isPresent());
+        if(layout.isEmpty())return;
+        var panel=layout.get();int width=panel.width(),x=panel.x(),y=panel.y(),height=panel.height();
+        int color=0xff000000|item.kind.color;
         graphics.fill(x,y,x+width,y+height,0xc2101720);graphics.fill(x,y,x+2,y+height,color);
         var p=Component.translatable("hud.specialpickaxes.primary",primary==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((primary+19)/20)+"s"));
         var a=Component.translatable("hud.specialpickaxes.alternate",alternate==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((alternate+19)/20)+"s"));
@@ -39,7 +40,10 @@ public final class ArtifactHud {
         String status=tag.getString("hudStatus");
         if(!STATUSES.contains(status))status="idle";
         Component progress;
-        if(!status.equals("idle"))progress=Component.translatable("hud.specialpickaxes.work",Component.translatable("status.specialpickaxes."+status),Math.max(0,tag.getInt("hudCompleted")),Math.max(0,tag.getInt("artifactWork")));
+        String pauseReason=tag.getString("hudPauseReason");
+        if(status.equals("paused")&&(pauseReason.equals("manual")||pauseReason.equals("chunk")||pauseReason.equals("drops")))
+            progress=Component.translatable("hud.specialpickaxes.pause."+pauseReason,RelicKeys.name(io.github.santipdr.specialpickaxes.artifact.RelicControl.Action.ACTIVATE));
+        else if(!status.equals("idle"))progress=Component.translatable("hud.specialpickaxes.work",Component.translatable("status.specialpickaxes."+status),Math.max(0,tag.getInt("hudCompleted")),Math.max(0,tag.getInt("artifactWork")));
         else if(tag.getInt("hudRecall")>0)progress=Component.translatable("hud.specialpickaxes.recall",Math.min(256,tag.getInt("hudRecall")));
         else if(tag.getBoolean("hudDomain"))progress=Component.translatable("hud.specialpickaxes.domain");
         else progress=Component.translatable("hud.specialpickaxes.idle");
@@ -48,7 +52,7 @@ public final class ArtifactHud {
             var reading=survey.get();
             var direction=Component.translatable("hud.specialpickaxes.bearing."+reading.direction());
             String vertical=(reading.vertical()>0?"+":"")+reading.vertical();
-            var guidance=Component.translatable("hud.specialpickaxes.survey",direction,reading.distance(),vertical);
+            var guidance=Component.translatable(panel.compact()?"hud.specialpickaxes.survey_compact":"hud.specialpickaxes.survey",direction,reading.distance(),vertical);
             graphics.drawString(mc.font,mc.font.plainSubstrByWidth(guidance.getString(),width-12),x+6,y+59,0xffffd783,false);
             graphics.fill(x+6,y+56,x+6+(int)((width-12)*reading.remaining()/200D),y+57,0xffc3a65f);
         }

@@ -695,5 +695,11 @@
   "hud.specialpickaxes.bearing.5": "SO",
   "hud.specialpickaxes.bearing.6": "O",
   "hud.specialpickaxes.bearing.7": "NO",
-  "hud.specialpickaxes.bearing.8": "Aquí"
+  "hud.specialpickaxes.bearing.8": "Aquí",
+  "hud.specialpickaxes.survey_compact": "%s %sm Y%s",
+  "hud.specialpickaxes.pause.manual": "Pausa manual · %s",
+  "hud.specialpickaxes.pause.chunk": "Zona sin cargar · %s",
+  "hud.specialpickaxes.pause.drops": "Botín saturado · %s",
+  "message.specialpickaxes.kit_space": "Necesitas %s huecos libres para recibir el conjunto completo.",
+  "message.specialpickaxes.kit_granted": "Conjunto completo entregado a %s. Consulta los controles en Opciones → Controles → Special Pickaxes."
 }

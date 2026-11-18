@@ -695,5 +695,11 @@
   "hud.specialpickaxes.bearing.5": "SW",
   "hud.specialpickaxes.bearing.6": "W",
   "hud.specialpickaxes.bearing.7": "NW",
-  "hud.specialpickaxes.bearing.8": "Here"
+  "hud.specialpickaxes.bearing.8": "Here",
+  "hud.specialpickaxes.survey_compact": "%s %sm Y%s",
+  "hud.specialpickaxes.pause.manual": "Paused · %s",
+  "hud.specialpickaxes.pause.chunk": "Unloaded area · %s",
+  "hud.specialpickaxes.pause.drops": "Drop limit · %s",
+  "message.specialpickaxes.kit_space": "You need %s empty slots for the complete set.",
+  "message.specialpickaxes.kit_granted": "Complete set granted to %s. See Options → Controls → Special Pickaxes for bindings."
 }

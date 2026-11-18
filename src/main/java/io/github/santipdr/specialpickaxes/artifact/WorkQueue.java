@@ -26,7 +26,7 @@ public final class WorkQueue {
         final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
         int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
-        BlockPos lastImpact;int impactTick=Integer.MIN_VALUE;
+        BlockPos lastImpact;int impactTick=Integer.MIN_VALUE;String pauseReason="";
         final ArrayDeque<BlockPos> seamTrailPoints=new ArrayDeque<>(5);
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
             player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
@@ -50,6 +50,7 @@ public final class WorkQueue {
     public static boolean busy(ServerPlayer p) { return JOBS.containsKey(p.getUUID()); }
     public static int remaining(ServerPlayer p) { var job=JOBS.get(p.getUUID());return job==null?0:job.region==null?job.steps.size():job.region.remaining(); }
     public static String status(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?"idle":j.region!=null&&j.region.awaiting()?"ready":j.paused?"paused":j.region!=null&&!j.region.executing()?"preparing":"executing";}
+    public static String pauseReason(ServerPlayer p){var job=JOBS.get(p.getUUID());return job==null||!job.paused?"":job.pauseReason;}
     public static int completed(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.completed;}
     public static int succeeded(ServerPlayer p){var j=JOBS.get(p.getUUID());return j==null?0:j.succeeded;}
     public static boolean regionSnapshotBudgetAllows(ServerPlayer p,long snapshotBytes){
@@ -64,14 +65,14 @@ public final class WorkQueue {
         int cost=EnchantmentScaling.activationCost(j.tool,j.kind);if(!ArtifactActions.canSpendDurability(p,j.tool,cost))return false;
         j.tool.hurtAndBreak(cost,p,who->who.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND));if(j.region instanceof RegionWork r&&(j.kind==ArtifactKind.CHRONICLE&&r.mode==0))ArtifactState.of(p,j.kind).remove("memory");
         ArtifactState.of(p,j.kind).putLong("ready",ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get());p.getCooldowns().addCooldown(j.tool.getItem(),ArtifactConfig.COOLDOWN.get());
-        j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;
+        j.region.confirm();j.completed=0;j.succeeded=0;j.paused=false;j.pauseReason="";
     }else if(j.paused){
-        if(j.region!=null&&!j.region.loaded(p)){ArtifactFeedback.message(p,"chunk_pause");return false;}
-        if(dropBackpressured(j,p)){ArtifactFeedback.message(p,"drop_pause");return false;}
+        if(j.region!=null&&!j.region.loaded(p)){j.pauseReason="chunk";ArtifactFeedback.message(p,"chunk_pause");return false;}
+        if(dropBackpressured(j,p)){j.pauseReason="drops";ArtifactFeedback.message(p,"drop_pause");return false;}
         if(JOBS.get(p.getUUID())!=j)return false;
         if(!validActor(j,p)){cancel(p);return false;}
-        j.paused=false;
-    }else j.paused=true;return true;}
+        j.paused=false;j.pauseReason="";
+    }else {j.paused=true;j.pauseReason="manual";}return true;}
     public static boolean startRegion(ServerPlayer p,ItemStack tool,ArtifactKind kind,WorkProgram region){
         if(busy(p)||tool.isEmpty()||JOBS.size()>=ArtifactConfig.ACTIVE_JOBS.get())return false;
         var memories=region instanceof RegionWork snapshot&&snapshot.needsRestoration()?ArtifactState.memories(p,kind):List.<ArtifactState.Memory>of();
@@ -112,16 +113,16 @@ public final class WorkQueue {
             if(JOBS.get(id)!=job)continue;
             if(job.paused || job.region!=null&&job.region.awaiting()){ORDER.addLast(id);continue;}
             if(job.region!=null&&!job.region.loaded(p)){
-                if(JOBS.get(id)==job){job.paused=true;ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);}
+                if(JOBS.get(id)==job){job.paused=true;job.pauseReason="chunk";ArtifactFeedback.message(p,"chunk_pause");ORDER.addLast(id);}
                 continue;
             }
             if(JOBS.get(id)!=job)continue;
             int playerBudget=job.region==null?EnchantmentScaling.budget(job.tool):job.region.attemptsPerTick(job.tool);
             int turn=Math.min(budget,playerBudget);BlockPos feedback=null;net.minecraft.world.level.block.state.BlockState feedbackMaterial=null;
             while(turn-->0 && JOBS.get(id)==job&&!job.paused&&(job.region!=null?!job.region.done()&&!job.region.awaiting():!job.steps.isEmpty())) {
-                if(job.region!=null&&!job.region.loaded(p)){job.paused=true;break;}
+                if(job.region!=null&&!job.region.loaded(p)){job.paused=true;job.pauseReason="chunk";break;}
                 if(dropBackpressured(job,p)){
-                    job.paused=true;ArtifactFeedback.message(p,"drop_pause");break;
+                    job.paused=true;job.pauseReason="drops";ArtifactFeedback.message(p,"drop_pause");break;
                 }
                 if(JOBS.get(id)!=job||job.paused)break;
                 if(!validActor(job,p)){job.aborted=true;break;}

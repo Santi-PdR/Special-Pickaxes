@@ -273,6 +273,17 @@ public final class SpecialPickaxes {
     }
     private void commands(RegisterCommandsEvent e) {
         e.getDispatcher().register(Commands.literal("specialpickaxes").requires(source -> source.hasPermission(2))
+            .then(Commands.literal("kit").then(Commands.argument("player",EntityArgument.player()).executes(context -> {
+                var player=EntityArgument.getPlayer(context,"player");
+                // Require room for the whole set: never spill thirteen powerful tools onto the ground.
+                int empty=0;for(int slot=0;slot<player.getInventory().items.size();slot++)
+                    if(player.getInventory().items.get(slot).isEmpty())empty++;
+                if(empty<ArtifactKind.playableValues().length){context.getSource().sendFailure(Component.translatable("message.specialpickaxes.kit_space",ArtifactKind.playableValues().length));return 0;}
+                for(var kind:ArtifactKind.playableValues())player.getInventory().add(new ItemStack(PICKS.get(kind).get()));
+                player.inventoryMenu.broadcastChanges();
+                context.getSource().sendSuccess(() -> Component.translatable("message.specialpickaxes.kit_granted",player.getName()),true);
+                return ArtifactKind.playableValues().length;
+            })))
             .then(Commands.literal("grant").then(Commands.argument("player",EntityArgument.player())
             .then(Commands.argument("artifact",StringArgumentType.word())
                 .suggests((context,builder) -> SharedSuggestionProvider.suggest(Arrays.stream(ArtifactKind.playableValues()).map(k -> k.id),builder))
