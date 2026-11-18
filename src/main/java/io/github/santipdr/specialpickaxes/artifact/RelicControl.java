@@ -49,7 +49,7 @@ public final class RelicControl {
                 if(!copiedWorldbreaker&&ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
-                if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p))return cancel(p,k);
+                if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p)||(tool.hasTag()&&tool.getTag().contains(SurveyBearing.POSITION)))return cancel(p,k);
                 return ArtifactActions.useAlternate(p,tool,k);
             default:return false;
         }
@@ -59,9 +59,9 @@ public final class RelicControl {
         ArtifactFeedback.cue(p,"confirm");AbilityVfx.cast(p,ArtifactSkills.feedbackKind(p.getMainHandItem(),((ArtifactItem)p.getMainHandItem().getItem()).kind));return true;
     }
     private static boolean cancel(ServerPlayer p,ArtifactKind kind){
-        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p)||DropRecall.active(p);
+        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p)||DropRecall.active(p)||(p.getMainHandItem().hasTag()&&p.getMainHandItem().getTag().contains(SurveyBearing.POSITION));
         if(kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,kind,"a").isPresent();ArtifactState.clearAnchors(p,kind);ArtifactState.of(p,kind).remove("trail");}
-        WorkQueue.cancel(p);DomainFields.stop(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
+        WorkQueue.cancel(p);DomainFields.stop(p);DropRecall.stop(p);SurveyGuide.clear(p.getMainHandItem());CompanionActions.stop(p);ArtifactInteraction.clear(p);
         if(!active)return true;
         ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
     }

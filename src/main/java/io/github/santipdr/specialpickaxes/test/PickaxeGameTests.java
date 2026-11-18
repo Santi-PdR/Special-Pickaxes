@@ -1647,6 +1647,69 @@ public final class PickaxeGameTests {
         var tag=tool.getTag();h.assertTrue(tag.getInt("hudPrimary")==8&&tag.getInt("hudAlternate")==35&&tag.getString("hudStatus").equals("idle"),"dual cooldowns and actual queue status are copied from server state");finish(h,p);
     }
 
+    private static BlockPos guidedOre(GameTestHelper h){
+        var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);return at;
+    }
+    @GameTest(template="empty",batch="upgrade_517_01") public static void surveyAlternatePublishesATimedGuideWithoutMiningItsDeposit(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
+        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.PALIMPSEST),"real secondary publishes survey guidance");
+        var tag=tool.getTag();var reading=SurveyBearing.read(tag,h.getLevel().dimension().location().toString(),ArtifactState.now(p),p.position(),p.getUUID());
+        h.assertTrue(reading.isPresent()&&reading.get().target().equals(at)&&reading.get().remaining()==200,"nearest deposit has a ten-second owner-bound guide");
+        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.DIAMOND_ORE)&&!WorkQueue.busy(p),"guidance does not excavate or enqueue a passive detector");
+        SurveyGuide.clear(tool);finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_02") public static void guideRefreshDoesNotRenewItsExpiryAndCancelRemovesIt(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
+        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide starts");
+        long until=tool.getTag().getLong(SurveyBearing.UNTIL);SurveyGuide.refresh(p,tool);
+        h.assertTrue(tool.getTag().getLong(SurveyBearing.UNTIL)==until,"refresh never renews the active ability");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.PALIMPSEST,RelicControl.Action.ALT_SKILL)&&!tool.getTag().contains(SurveyBearing.POSITION),"cancel clears guidance even with no work queue");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_03") public static void guideRefreshDropsNewlyProtectedDeposits(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
+        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide initially permitted");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=e->{if(e.player==p&&e.target.equals(at))e.setCanceled(true);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+        try{SurveyGuide.refresh(p,tool);h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"claim changes revoke stored guidance");}
+        finally{MinecraftForge.EVENT_BUS.unregister(veto);SurveyGuide.clear(tool);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_04") public static void minedOrExpiredSurveyGuidesCannotBecomePermanentDetectors(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
+        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide starts");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+        SurveyGuide.refresh(p,tool);h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"mining the deposit clears it rather than searching for a new deposit");
+        h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at));
+        tool.getTag().putLong(SurveyBearing.UNTIL,ArtifactState.now(p));SurveyGuide.refresh(p,tool);
+        h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"elapsed guidance is not renewed");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_05") public static void surveyGuidanceDoesNotFollowAToolTradedToAnotherPlayer(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var other=player(h,ArtifactKind.PALIMPSEST,"SurveyRecipient");var at=guidedOre(h);var tool=p.getMainHandItem();
+        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide belongs to original miner");
+        p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);other.setItemInHand(InteractionHand.MAIN_HAND,tool);SurveyGuide.refresh(other,tool);
+        h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"another miner does not inherit active guidance");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_06") public static void worldbreakerCopiedSurveyUsesTheSameAuthoritativeGuide(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);var at=guidedOre(h);
+        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.WORLDBREAKER),"copied secondary executes its source survey");
+        h.assertTrue(tool.getTag().getLong(SurveyBearing.POSITION)==at.asLong()&&tool.getTag().getUUID(SurveyBearing.OWNER).equals(p.getUUID()),"copied guide retains owner and exact authorized target");
+        SurveyGuide.clear(tool);finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_07") public static void surveyGuidePublicationCannotReenterFromAClaimCallback(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var tool=p.getMainHandItem();var at=guidedOre(h);int[] attempts={0};boolean[] nested={true};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> reenter=e->{if(e.player==p&&e.target.equals(at)){attempts[0]++;nested[0]=SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,reenter);
+        try{h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at))&&attempts[0]==1&&!nested[0],"one permission transaction, no recursive ability publication");}
+        finally{MinecraftForge.EVENT_BUS.unregister(reenter);SurveyGuide.clear(tool);}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_517_08") public static void surveyGuideRejectsMovedCastersAndUnloadedTargets(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var tool=p.getMainHandItem();var at=guidedOre(h);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p)p.setPos(p.position().add(1,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at))&&!tool.getTag().contains(SurveyBearing.POSITION),"callback movement cannot publish stale guidance");}
+        finally{MinecraftForge.EVENT_BUS.unregister(move);}
+        var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
+        h.assertTrue(!level.hasChunkAt(remote)&&!SurveyGuide.publish(p,tool,remote,Blocks.DIAMOND_ORE.defaultBlockState())&&!level.hasChunkAt(remote),"publication never loads a missing chunk");finish(h,p);
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }

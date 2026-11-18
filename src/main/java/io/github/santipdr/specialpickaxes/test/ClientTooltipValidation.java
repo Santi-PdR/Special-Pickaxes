@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod;
 /** Real tooltip rendering in the CI gallery, not a fabricated image. Excluded from release. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ClientTooltipValidation {
-    private static boolean bindingsChecked;
+    private static boolean bindingsChecked,surveyCaptured;
     private static net.minecraft.client.gui.screens.Screen lastManual;
     @SubscribeEvent public static void manualRendered(net.minecraftforge.client.event.ScreenEvent.Render.Post event){
         if(!Boolean.getBoolean("specialpickaxes.clientSmoke")
@@ -27,6 +27,11 @@ public final class ClientTooltipValidation {
         var mc=Minecraft.getInstance();if(mc.player==null||mc.options.hideGui||mc.player.tickCount<250)return;
         mc.gui.getChat().clearMessages(false); // Diagnostic capture markers remain in logs, not over the demonstration.
         if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item){
+            var held=mc.player.getMainHandItem();
+            if(!surveyCaptured&&mc.level!=null&&mc.screen==null&&held.hasTag()
+                    &&io.github.santipdr.specialpickaxes.artifact.SurveyBearing.read(held.getTag(),mc.level.dimension().location().toString(),mc.level.getGameTime(),mc.player.position(),mc.player.getUUID()).isPresent()){
+                surveyCaptured=true;com.mojang.logging.LogUtils.getLogger().info("SURVEY_GUIDE_RENDERED_palimpsest-vein");
+            }
             if(!bindingsChecked&&!net.minecraft.client.gui.screens.Screen.hasShiftDown()){
                 var keys=io.github.santipdr.specialpickaxes.client.RelicKeys.KEYS;
                 var registered=java.util.Arrays.asList(mc.options.keyMappings);

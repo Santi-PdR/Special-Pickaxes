@@ -634,7 +634,7 @@
   "guide.main.iridium": "Extrae menas en un radio horizontal de 24 bloques y 12 en vertical, empezando por las cercanas. Conserva la roca circundante.",
   "guide.main.hellspec": "Abre una cantera de cinco pétalos de hasta 25×7×25. Extrae hasta 1679 bloques de roca natural y menas.",
   "guide.main.seam_ripper": "Extrae hasta 1024 bloques conectados de la misma roca natural; conserva menas y bloques colocados.",
-  "guide.alt.palimpsest": "Sondea hasta 32 menas cercanas y muestra las coordenadas del depósito más próximo.",
+  "guide.alt.palimpsest": "Sondea hasta 32 menas. El HUD guía al depósito más próximo durante 10 s con dirección, distancia y desnivel. Repite la secundaria para cancelar.",
   "guide.alt.fault_choir": "Abre una galería abovedada de 9 de ancho, 7 de alto y hasta 48 de largo.",
   "guide.alt.eventide": "Atrae hasta 256 objetos libres o propios en 48 bloques y mantiene la atracción hasta 8 s. Termina al cambiar de herramienta, cancelar o alejarte demasiado. No atraviesa paredes.",
   "guide.alt.paradox_crucible": "Transforma la roca natural en una esfera de radio 12 usando el material del modo actual.",
@@ -685,5 +685,15 @@
   "hud.specialpickaxes.work": "%s · %s / +%s",
   "hud.specialpickaxes.recall": "Atrayendo %s objetos",
   "hud.specialpickaxes.domain": "Dominio activo",
-  "hud.specialpickaxes.idle": "Sin excavación activa"
+  "hud.specialpickaxes.idle": "Sin excavación activa",
+  "hud.specialpickaxes.survey": "Sondeo %s · %sm · Y%s",
+  "hud.specialpickaxes.bearing.0": "N",
+  "hud.specialpickaxes.bearing.1": "NE",
+  "hud.specialpickaxes.bearing.2": "E",
+  "hud.specialpickaxes.bearing.3": "SE",
+  "hud.specialpickaxes.bearing.4": "S",
+  "hud.specialpickaxes.bearing.5": "SO",
+  "hud.specialpickaxes.bearing.6": "O",
+  "hud.specialpickaxes.bearing.7": "NO",
+  "hud.specialpickaxes.bearing.8": "Aquí"
 }

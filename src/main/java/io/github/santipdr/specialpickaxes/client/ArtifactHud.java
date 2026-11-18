@@ -27,8 +27,9 @@ public final class ArtifactHud {
         int width=Math.min(184,screen/2),x=screen-width-7,y=44;
         int primary=Math.max(0,Math.min(12000,tag.getInt("hudPrimary")));
         int alternate=Math.max(0,Math.min(48000,tag.getInt("hudAlternate")));
-        int color=0xff000000|item.kind.color;
-        graphics.fill(x,y,x+width,y+58,0xc2101720);graphics.fill(x,y,x+2,y+58,color);
+        var survey=io.github.santipdr.specialpickaxes.artifact.SurveyBearing.read(tag,mc.level.dimension().location().toString(),mc.level.getGameTime(),mc.player.position(),mc.player.getUUID());
+        int color=0xff000000|item.kind.color,height=survey.isPresent()?72:58;
+        graphics.fill(x,y,x+width,y+height,0xc2101720);graphics.fill(x,y,x+2,y+height,color);
         var p=Component.translatable("hud.specialpickaxes.primary",primary==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((primary+19)/20)+"s"));
         var a=Component.translatable("hud.specialpickaxes.alternate",alternate==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((alternate+19)/20)+"s"));
         graphics.drawString(mc.font,mc.font.plainSubstrByWidth(p.getString(),width-12),x+6,y+5,primary==0?0xffb4f2cd:0xffc3ccd9,false);
@@ -43,6 +44,14 @@ public final class ArtifactHud {
         else if(tag.getBoolean("hudDomain"))progress=Component.translatable("hud.specialpickaxes.domain");
         else progress=Component.translatable("hud.specialpickaxes.idle");
         graphics.drawString(mc.font,mc.font.plainSubstrByWidth(progress.getString(),width-12),x+6,y+44,0xffd5dde9,false);
+        if(survey.isPresent()){
+            var reading=survey.get();
+            var direction=Component.translatable("hud.specialpickaxes.bearing."+reading.direction());
+            String vertical=(reading.vertical()>0?"+":"")+reading.vertical();
+            var guidance=Component.translatable("hud.specialpickaxes.survey",direction,reading.distance(),vertical);
+            graphics.drawString(mc.font,mc.font.plainSubstrByWidth(guidance.getString(),width-12),x+6,y+59,0xffffd783,false);
+            graphics.fill(x+6,y+56,x+6+(int)((width-12)*reading.remaining()/200D),y+57,0xffc3a65f);
+        }
     }
     private static void bar(net.minecraft.client.gui.GuiGraphics graphics,int x,int y,int width,int remaining,int maximum,int color){
         graphics.fill(x,y,x+width,y+3,0xff33404c);

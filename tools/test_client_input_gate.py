@@ -54,3 +54,16 @@ class ClientInputGateTests(unittest.TestCase):
         self.assertIsNone(gate.observe('CLIENT_FIXTURE_AIMED_palimpsest-vein'))
         with self.assertRaises(RuntimeError):
             gate.complete('palimpsest-vein')
+
+    def test_survey_requires_a_real_rendered_readout_before_the_primary_key(self):
+        gate = ClientInputGate()
+        gate.begin('palimpsest-vein')
+        gate.observe('MANUAL_SCREEN_RENDERED 640x360')
+        gate.observe('MANUAL_SCREEN_CLOSED')
+        self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_palimpsest-vein'), 'survey')
+        self.assertIsNone(gate.observe('CLIENT_INPUT_SERVER_RESULT_ALT_SKILL accepted=true'))
+        with self.assertRaises(RuntimeError):
+            gate.complete('palimpsest-vein')
+        self.assertEqual(gate.observe('SURVEY_GUIDE_RENDERED_palimpsest-vein'), 'capture_survey_and_activate')
+        self.assertIsNone(gate.observe('SURVEY_GUIDE_RENDERED_palimpsest-vein'))
+        gate.complete('palimpsest-vein')

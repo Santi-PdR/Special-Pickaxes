@@ -82,6 +82,7 @@ public final class MiningAlternates {
             if(!context(player,tool,level,actorOrigin))return false;
             if(allowed&&level.hasChunkAt(at)&&level.getBlockState(at)==expected&&!PlayerPlacedBlocks.get(level).contains(at))accepted.put(at,expected);
         }
+        SurveyGuide.clear(tool);
         int found=0;BlockPos nearest=null;
         for(var hit:accepted.entrySet()){
             var at=hit.getKey();
@@ -91,7 +92,11 @@ public final class MiningAlternates {
                 AbilityVfx.retired(level,player,net.minecraft.core.particles.ParticleTypes.END_ROD,true,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
             found++;
         }
-        if(nearest!=null)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.specialpickaxes.survey_nearest",nearest.getX(),nearest.getY(),nearest.getZ()),false);
+        if(nearest!=null){
+            boolean guided=SurveyGuide.publish(player,tool,nearest,accepted.get(nearest));
+            if(!context(player,tool,level,actorOrigin)){SurveyGuide.clear(tool);return false;}
+            if(guided)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.specialpickaxes.survey_nearest",nearest.getX(),nearest.getY(),nearest.getZ()),false);
+        }
         ArtifactFeedback.message(player,"survey_found",found);return true;
     }
 }

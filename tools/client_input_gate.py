@@ -18,8 +18,14 @@ class ClientInputGate:
             self.stage = 'fixture_aim'
             return 'prepare_activation'
         if self.stage == 'fixture_aim' and '[CHAT]' in line and line.strip().endswith('CLIENT_FIXTURE_AIMED_' + self.scene):
+            if self.scene == 'palimpsest-vein':
+                self.stage = 'survey_render'
+                return 'survey'
             self.stage = 'activation'
             return 'confirm' if self.scene == 'paradox_crucible-regional' else 'activate'
+        if self.stage == 'survey_render' and line.strip().endswith('SURVEY_GUIDE_RENDERED_palimpsest-vein'):
+            self.stage = 'activation'
+            return 'capture_survey_and_activate'
         return None
 
     def complete(self, scene):

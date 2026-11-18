@@ -634,7 +634,7 @@
   "guide.main.iridium": "Extract ores in a 24-block horizontal radius and 12 blocks vertically, nearest first. Leaves the surrounding rock intact.",
   "guide.main.hellspec": "Open a five-petal quarry spanning up to 25×7×25. Harvest up to 1679 natural-rock and ore blocks.",
   "guide.main.seam_ripper": "Extract up to 1024 connected blocks of the same natural rock; preserves ores and player-placed blocks.",
-  "guide.alt.palimpsest": "Survey up to 32 nearby ores and report the closest deposit’s coordinates.",
+  "guide.alt.palimpsest": "Surveys up to 32 ores. The HUD guides you to the closest deposit for 10 s with direction, distance and height difference. Use the secondary again to cancel.",
   "guide.alt.fault_choir": "Open a vaulted gallery 9 blocks wide, 7 high and up to 48 long.",
   "guide.alt.eventide": "Attracts up to 256 free or owned drops within 48 blocks and sustains the pull for up to 8 s. Ends on tool change, cancellation or excessive movement. Does not bypass walls.",
   "guide.alt.paradox_crucible": "Transmute natural rock in a 12-block-radius sphere using the current mode’s material.",
@@ -685,5 +685,15 @@
   "hud.specialpickaxes.work": "%s · %s / +%s",
   "hud.specialpickaxes.recall": "Recalling %s drops",
   "hud.specialpickaxes.domain": "Domain active",
-  "hud.specialpickaxes.idle": "No active excavation"
+  "hud.specialpickaxes.idle": "No active excavation",
+  "hud.specialpickaxes.survey": "Survey %s · %sm · Y%s",
+  "hud.specialpickaxes.bearing.0": "N",
+  "hud.specialpickaxes.bearing.1": "NE",
+  "hud.specialpickaxes.bearing.2": "E",
+  "hud.specialpickaxes.bearing.3": "SE",
+  "hud.specialpickaxes.bearing.4": "S",
+  "hud.specialpickaxes.bearing.5": "SW",
+  "hud.specialpickaxes.bearing.6": "W",
+  "hud.specialpickaxes.bearing.7": "NW",
+  "hud.specialpickaxes.bearing.8": "Here"
 }
