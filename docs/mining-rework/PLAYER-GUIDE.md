@@ -1,7 +1,7 @@
-# Rediseño 5.13.0 — build de prueba verificada
+# Rediseño 5.14.1 — build de prueba verificada
 
-CI `44234259503` aprobada sobre `6aed2b07962f8511d86c4061a1b8e1181774c033`:
-161 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
+CI `44367188726` aprobada sobre `8722f0c4b59a419da6637cc1c444be06a83d52f0`:
+166 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
 Selector de Rompemundos con flechas/Tab, Inicio/Fin, vista previa y Enter para copiar.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
@@ -9,6 +9,13 @@ Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animacio
 Los13picos usan sprites originales de terceros (Mythic Metals), sin retoques ni
 arte generado. Las partículas de equipamiento/Curios y bordes persistentes se
 retiran. Solo una activación válida muestra una ráfaga de partículas custom.
+Cada pico tiene ahora una firma primaria y otra secundaria: símbolo animado,
+trayectoria y distribución diferentes. Las secundarias también usan un sonido
+Minecraft distinto de su primaria. No son sonidos externos originales.
+Se mantienen 16 partículas por activación y 256 globales por tick; alternar
+primaria/secundaria no evita ese límite. Las 26 firmas tienen cuatro imágenes
+cada una, pero esto no equivale a 104 mejoras de juego. No se han sustituido
+las texturas de los objetos ni revisado visualmente todas las animaciones.
 El manual presenta tres bloques: principal, secundaria y controles actuales.
 
 Corona de Stasis ya no extrae un solo bloque: Fractura Temporal abre un volumen

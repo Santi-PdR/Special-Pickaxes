@@ -1,3 +1,15 @@
+## 5.14.1 — firmas primarias/secundarias, validación completa aprobada
+
+Runtime `8722f0c4b59a419da6637cc1c444be06a83d52f0`, [CI 44367188726](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44367188726): SUCCESS. **166 JUnit**, cero fallos/errores/omisiones; **400 GameTests obligatorios**; cliente gráfico (32 escenas/64 tooltips) y servidor empaquetado aprobados, incluidos logs estrictos. Evidencia recuperada a `/tmp/sp5141green` (temporal). Local: 128 pruebas Python sin fallos, una omitida por falta de Java local; 25 pruebas de recursos correctas.
+
+26 firmas registradas exclusivamente custom: primaria/secundaria por pico, 104 imágenes de partículas de 32×32. Símbolos, trayectorias y siluetas secundarias diferentes; 13 sonidos secundarios distintos de la primaria. Límite compartido 16 por cast/256 globales por tick, una ráfaga por jugador/tick. GameTest comprueba registros únicos y cobertura de los 13 picos reales. No VFX ambientales, no iconos de pico dibujados, no nuevas texturas de objetos integradas. No presentar el número de fotogramas como mejoras independientes ni esta tanda como la reforma de 50 mejoras terminada.
+
+5.14.0 falló por cargar registros de sonido desde un test unitario puro. Comprobación real trasladada a GameTest; test geométrico sin bootstrap. Primer 5.14.1 detectó un Holder de sonido sin `.value()`, corregido. No se omitió ningún test Java ni se redujeron las 400 pruebas para obtener el verde.
+
+JAR `special-pickaxes-1.20.1-5.14.1.jar`: **778556 bytes**, SHA-256 `9912f571f45c6e412fad1f6f34474ed670a8d63f1968d00bc4a740f5567636bc`. Artefacto personal autenticado `14459196289`, evidencia completa `14459910206` (retención 7 días). Sin nueva release pública. El smoke gráfico no equivale a inspección de las 26 animaciones en movimiento, aprobación visual del usuario ni prueba Windows/Ghouls.
+
+### Historial
+
 ## 5.13.0 — first broad-review batch verified
 
 Runtime `6aed2b07962f8511d86c4061a1b8e1181774c033`, [CI 44234259503](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44234259503): SUCCESS. 161 JUnit, zero failures/errors/skips; all 400 required GameTests; graphical client and packaged server checks passed with strict log validation. Local 125 Python tests without skips, 25 resource checks and secret scan passed. Evidence retrieved to `/tmp/sp-ci5130-green` (temporary).

@@ -1,6 +1,6 @@
 # 5.14 — identidad visual, trabajo en curso
 
-Esta entrega NO completa la petición de unas 50 mejoras notorias. No es una release validada todavía.
+Esta entrega NO completa la petición de unas 50 mejoras notorias. 5.14.1 pasó la validación completa; no se ha aprobado visualmente cada animación.
 
 ## Implementado, pendiente de prueba gráfica de ejecución
 
@@ -30,7 +30,7 @@ También se separaron las siluetas de emisión antes compartidas: Flor Infernal/
 
 ## Validación
 
-La última release completa verificada sigue siendo 5.13.0. Esta versión requiere compilar, ejecutar sus tests Java y probar el cliente real antes de distribuirla. Los tests de recursos y Python locales no sustituyen esa evidencia. No se ha comprobado el aspecto en movimiento dentro del juego.
+5.14.1 pasó CI 44367188726: 166 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado. Los tests de recursos y Python locales no sustituyen esa evidencia. No se ha comprobado visualmente cada firma en movimiento dentro del juego.
 
 ## 5.14.1 — primaria y secundaria distinguibles
 
@@ -43,4 +43,4 @@ La última release completa verificada sigue siendo 5.13.0. Esta versión requie
 
 El run 44355060736 compiló Java y creó el JAR, pero falló en la prueba de bootstrap. Por tanto, NO validó el runtime de 5.14.0. El run 44366567461 detectó que RESPAWN_ANCHOR_DEPLETE es un Holder y requiere `.value()`; corregido antes de volver a validar.
 
-La validación completa de 5.14.1 sigue pendiente. No se han integrado texturas externas nuevas ni se ha completado la petición de unas 50 mejoras notorias.
+La validación completa de 5.14.1 pasó en el runtime `8722f0c4b59a419da6637cc1c444be06a83d52f0`. No se han integrado texturas externas nuevas ni se ha completado la petición de unas 50 mejoras notorias.
