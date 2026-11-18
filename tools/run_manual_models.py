@@ -11,6 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCES = [
+    'src/main/java/io/github/santipdr/specialpickaxes/artifact/ManualChoiceNavigation.java',
     'src/main/java/io/github/santipdr/specialpickaxes/artifact/ManualScreenLayout.java',
     'src/main/java/io/github/santipdr/specialpickaxes/artifact/ManualScrollModel.java',
     'src/main/java/io/github/santipdr/specialpickaxes/artifact/ManualWheelScroll.java',

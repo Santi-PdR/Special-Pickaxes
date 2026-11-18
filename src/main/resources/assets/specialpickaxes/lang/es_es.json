@@ -417,7 +417,7 @@
   "screen.specialpickaxes.manual": "GUÍA DE PICOS",
   "screen.specialpickaxes.manual_hint": "HABILIDADES Y CONTROLES",
   "screen.specialpickaxes.resize": "Aumenta la ventana para ver la guía",
-  "screen.specialpickaxes.copy_help": "Elige las habilidades que quieres copiar.",
+  "screen.specialpickaxes.copy_help": "← →: elegir · Enter: copiar · o haz clic",
   "screen.specialpickaxes.copy_mode_header": "Copia activa",
   "screen.specialpickaxes.selected": "%s",
   "screen.specialpickaxes.passive": "PASIVA",

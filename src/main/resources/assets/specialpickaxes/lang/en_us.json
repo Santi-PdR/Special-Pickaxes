@@ -417,7 +417,7 @@
   "screen.specialpickaxes.manual": "PICKAXE GUIDE",
   "screen.specialpickaxes.manual_hint": "ABILITIES & CONTROLS",
   "screen.specialpickaxes.resize": "Enlarge the window to view the guide",
-  "screen.specialpickaxes.copy_help": "Choose the abilities to copy.",
+  "screen.specialpickaxes.copy_help": "← →: browse · Enter: copy · or click",
   "screen.specialpickaxes.copy_mode_header": "Copied ability",
   "screen.specialpickaxes.selected": "%s",
   "screen.specialpickaxes.passive": "PASSIVE",

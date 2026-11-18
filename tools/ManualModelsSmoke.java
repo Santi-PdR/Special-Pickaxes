@@ -1,3 +1,4 @@
+import io.github.santipdr.specialpickaxes.artifact.ManualChoiceNavigation;
 import io.github.santipdr.specialpickaxes.artifact.ManualScreenLayout;
 import io.github.santipdr.specialpickaxes.artifact.ManualScrollModel;
 import io.github.santipdr.specialpickaxes.artifact.ManualWheelScroll;
@@ -78,8 +79,18 @@ public final class ManualModelsSmoke {
             }
         }
     }
+    private static void choiceNavigation(){
+        eq(-1,ManualChoiceNavigation.step(0,1,0),"empty picker");
+        eq(0,ManualChoiceNavigation.step(0,-1,13),"left edge does not wrap");
+        eq(12,ManualChoiceNavigation.step(12,1,13),"right edge does not wrap");
+        for(int viewport=24;viewport<=760;viewport++)for(int index=0;index<13;index++){
+            int scroll=ManualChoiceNavigation.reveal(212,index,13,24,viewport);
+            check(scroll>=0&&scroll<=Math.max(0,312-viewport),"picker scroll bounded");
+            check(index*24>=scroll&&(index+1)*24<=scroll+viewport,"focused choice visible");
+        }
+    }
     public static void main(String[] args){
-        wheel();layouts();scrollbars();
+        wheel();layouts();scrollbars();choiceNavigation();
         System.out.println("MANUAL_MODELS_OK checks="+checks+" scope=pure_java_only");
     }
 }

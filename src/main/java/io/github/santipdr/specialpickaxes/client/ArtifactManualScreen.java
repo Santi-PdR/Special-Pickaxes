@@ -17,7 +17,8 @@ public final class ArtifactManualScreen extends Screen {
     private final List<ArtifactKind> choices=Arrays.stream(ArtifactKind.playableValues()).toList();
     private final Map<ArtifactKind,ItemStack> choiceIcons=new EnumMap<>(ArtifactKind.class);
     private int scroll,choiceScroll,contentHeight,scrollbarGrabOffset;
-    private boolean draggingScrollbar;
+    private boolean draggingScrollbar,confirmingCopy;
+    private int choiceFocus=-1;
     private final ManualWheelScroll contentWheel=new ManualWheelScroll(),pickerWheel=new ManualWheelScroll();
     private final ManualLayoutRevision layoutRevision=new ManualLayoutRevision();
     private List<Card> leftCards=List.of(),rightCards=List.of();
@@ -27,14 +28,30 @@ public final class ArtifactManualScreen extends Screen {
     public ArtifactManualScreen(ArtifactKind kind){super(Component.translatable("screen.specialpickaxes.manual"));this.kind=kind;this.headerIcon=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());}
     @Override public boolean isPauseScreen(){return false;}
     @Override protected void init(){
-        super.init();layoutRevision.invalidate();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();
+        super.init();layoutRevision.invalidate();draggingScrollbar=false;confirmingCopy=false;choiceFocus=-1;contentWheel.reset();pickerWheel.reset();
     }
     private boolean selectingCopy(){return kind==ArtifactKind.WORLDBREAKER&&canChooseCopy();}
     private ManualScreenLayout.Layout layout(){return ManualScreenLayout.calculate(width,height,selectingCopy());}
 
     /** Page-sized keyboard navigation keeps the guide usable without precision mouse scrolling. */
     @Override public boolean keyPressed(int keyCode,int scanCode,int modifiers){
-        var content=layout().content();int maxScroll=Math.max(0,contentHeight-content.height());
+        var currentLayout=layout();
+        if(currentLayout.pickerVisible()&&canChooseCopy()){
+            if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT){
+                if(choiceFocus<0){
+                    var active=displayStack();String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
+                    choiceFocus=choices.indexOf(copyChoice(copied));
+                }
+                choiceFocus=ManualChoiceNavigation.step(choiceFocus,keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT?-1:1,choices.size());
+                pickerWheel.reset();choiceScroll=ManualChoiceNavigation.reveal(choiceScroll,choiceFocus,choices.size(),CHOICE_CELL,currentLayout.picker().width());
+                return true;
+            }
+            if(choiceFocus>=0&&(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)){
+                if(!confirmingCopy){confirmingCopy=true;RelicKeys.chooseCopy(choices.get(choiceFocus));}
+                return true;
+            }
+        }
+        var content=currentLayout.content();int maxScroll=Math.max(0,contentHeight-content.height());
         int page=Math.max(24,content.height()-LINE_HEIGHT);
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN){contentWheel.reset();scroll=clamp(scroll+LINE_HEIGHT*2,maxScroll);return true;}
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_UP){contentWheel.reset();scroll=clamp(scroll-LINE_HEIGHT*2,maxScroll);return true;}
@@ -43,6 +60,11 @@ public final class ArtifactManualScreen extends Screen {
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME){contentWheel.reset();scroll=0;return true;}
         if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_END){contentWheel.reset();scroll=maxScroll;return true;}
         return super.keyPressed(keyCode,scanCode,modifiers);
+    }
+
+    @Override public boolean keyReleased(int keyCode,int scanCode,int modifiers){
+        if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)confirmingCopy=false;
+        return super.keyReleased(keyCode,scanCode,modifiers);
     }
 
     @Override public void render(GuiGraphics g,int mouseX,int mouseY,float partial){
@@ -237,6 +259,10 @@ public final class ArtifactManualScreen extends Screen {
                 g.fill(px+1,y+1,px+CHOICE_CELL-2,bottom-1,selected?0xff806b3a:hover?0xff455d70:0xff202e3b);
                 ItemStack icon=iconFor(source);
                 g.renderItem(icon,px+(CHOICE_CELL-16)/2,y+2);
+                if(i==choiceFocus){
+                    g.fill(px+1,y,px+CHOICE_CELL-2,y+1,0xffedf3f6);
+                    g.fill(px+1,bottom-2,px+CHOICE_CELL-2,bottom-1,0xffedf3f6);
+                }
                 if(hover)hoveredChoice=source;
             }
             g.disableScissor();
@@ -244,7 +270,7 @@ public final class ArtifactManualScreen extends Screen {
                 int labelX=x+choices.size()*CHOICE_CELL+8;
                 int labelWidth=right-labelX;
                 if(labelWidth>=48){
-                    ArtifactKind labelKind=hoveredChoice!=null?hoveredChoice:copyChoice(copied);
+                    ArtifactKind labelKind=hoveredChoice!=null?hoveredChoice:choiceFocus>=0?choices.get(choiceFocus):copyChoice(copied);
                     ItemStack labelIcon=iconFor(labelKind);
                     Component label=labelKind==ArtifactKind.WORLDBREAKER
                             ?Component.translatable("screen.specialpickaxes.copy_native"):labelIcon.getHoverName();
@@ -306,7 +332,7 @@ public final class ArtifactManualScreen extends Screen {
         if(button==0&&kind==ArtifactKind.WORLDBREAKER&&canChooseCopy()&&layout.pickerVisible()
                 &&mouseX>=picker.x()&&mouseX<picker.right()&&mouseY>=picker.y()&&mouseY<picker.bottom()){
             int slot=ManualScreenLayout.choiceIndexAt((int)(mouseX-picker.x()),choiceScroll,CHOICE_CELL,choices.size());
-            if(slot>=0){RelicKeys.chooseCopy(choices.get(slot));return true;}
+            if(slot>=0){choiceFocus=-1;RelicKeys.chooseCopy(choices.get(slot));return true;}
         }
         return super.mouseClicked(mouseX,mouseY,button);
     }
@@ -320,7 +346,7 @@ public final class ArtifactManualScreen extends Screen {
     }
     @Override public void removed(){
         if(Boolean.getBoolean("specialpickaxes.clientSmoke"))com.mojang.logging.LogUtils.getLogger().info("MANUAL_SCREEN_CLOSED");
-        super.removed();draggingScrollbar=false;contentWheel.reset();pickerWheel.reset();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
+        super.removed();draggingScrollbar=false;confirmingCopy=false;choiceFocus=-1;contentWheel.reset();pickerWheel.reset();leftCards=List.of();rightCards=List.of();choiceIcons.clear();layoutRevision.invalidate();
     }
     /** Keep long translations and custom key names inside their allocated region. */
     private String fit(Component text,int width){

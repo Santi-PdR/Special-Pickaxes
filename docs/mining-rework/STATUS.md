@@ -1,3 +1,7 @@
+## 5.12.2 — keyboard copy picker; validation pending
+
+Worldbreaker manual copy picker now supports Left/Right focus and Enter/keypad Enter confirmation. Browsing does not send a copy intent. Focus is highlighted and revealed inside narrow scrolled strips. Enter repeats are suppressed until release, preventing held-key copy spam; mouse selection remains supported. EN/ES header explains the keyboard controls. Added four pure navigation JUnit tests and model-runner coverage over every viewport 24–760 and all thirteen choices. Full CI pending; 5.12.1 remains the latest verified build. No ability, registry, asset or VFX changes.
+
 ## 5.12.1 — complete CI verified
 
 Runtime `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2`, [CI 44208279107](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44208279107): SUCCESS. 157 JUnit, zero failures/errors/skips; all 399 required GameTests; graphical client and packaged server checks passed. Local 122 Python tests without skips, 25 resource checks and secret scan passed. Retrieved evidence: `/tmp/sp-ci5121-green` (temporary).
