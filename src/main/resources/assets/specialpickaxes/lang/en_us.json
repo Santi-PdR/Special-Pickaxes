@@ -417,7 +417,7 @@
   "screen.specialpickaxes.manual": "PICKAXE GUIDE",
   "screen.specialpickaxes.manual_hint": "ABILITIES & CONTROLS",
   "screen.specialpickaxes.resize": "Enlarge the window to view the guide",
-  "screen.specialpickaxes.copy_help": "← →: browse · Enter: copy · or click",
+  "screen.specialpickaxes.copy_help": "←→ / Tab: browse · Enter: copy",
   "screen.specialpickaxes.copy_mode_header": "Copied ability",
   "screen.specialpickaxes.selected": "%s",
   "screen.specialpickaxes.passive": "PASSIVE",
@@ -469,7 +469,7 @@
   "message.specialpickaxes.targets_pushed": "Pushed %s hostile targets away.",
   "message.specialpickaxes.ore_drops_glowing": "Marked %s Iridium ore drops.",
   "message.specialpickaxes.ore_drops_gathered": "Pulled %s Iridium ore drops toward you.",
-  "screen.specialpickaxes.copy_hand_only": "Hold Worldbreaker to choose copied techniques.",
+  "screen.specialpickaxes.copy_hand_only": "Hold Worldbreaker to choose a copy.",
   "screen.specialpickaxes.curios_passive": "In the Curios Pickaxe slot, this item grants only the passive effects listed above. Hold it to use R and X.",
   "tooltip.specialpickaxes.r": "%s · %s",
   "tooltip.specialpickaxes.x": "%s · %s",
@@ -676,5 +676,7 @@
   "guide.control.alternate": "Use alternate · cancel current work or selection",
   "guide.control.corners": "Left click two blocks to set corners; then confirm.",
   "guide.control.field": "Activate field · press again to deactivate",
-  "screen.specialpickaxes.navigation": "Scroll / ↑↓ / PgDn: read"
+  "screen.specialpickaxes.navigation": "Scroll / ↑↓ / PgDn: read",
+  "screen.specialpickaxes.copy_preview": "Preview: %s",
+  "guide.control.copy_picker": "←→ / Tab: browse · Home/End: first/last · Enter: copy · Backspace: leave picker."
 }

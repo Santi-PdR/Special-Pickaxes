@@ -417,7 +417,7 @@
   "screen.specialpickaxes.manual": "GUÍA DE PICOS",
   "screen.specialpickaxes.manual_hint": "HABILIDADES Y CONTROLES",
   "screen.specialpickaxes.resize": "Aumenta la ventana para ver la guía",
-  "screen.specialpickaxes.copy_help": "← →: elegir · Enter: copiar · o haz clic",
+  "screen.specialpickaxes.copy_help": "←→ / Tab: elegir · Enter: copiar",
   "screen.specialpickaxes.copy_mode_header": "Copia activa",
   "screen.specialpickaxes.selected": "%s",
   "screen.specialpickaxes.passive": "PASIVA",
@@ -469,7 +469,7 @@
   "message.specialpickaxes.targets_pushed": "Alejaste a %s objetivos hostiles.",
   "message.specialpickaxes.ore_drops_glowing": "Iluminaste %s drops de mena de Iridium.",
   "message.specialpickaxes.ore_drops_gathered": "Atraíste %s drops de mena de Iridium.",
-  "screen.specialpickaxes.copy_hand_only": "Sostén Rompemundos para elegir técnicas copiadas.",
+  "screen.specialpickaxes.copy_hand_only": "Sostén Rompemundos para elegir una copia.",
   "screen.specialpickaxes.curios_passive": "En el slot Pico de Curios, este objeto aplica solo las pasivas de arriba. Sosténlo para usar R y X.",
   "tooltip.specialpickaxes.r": "%s · %s",
   "tooltip.specialpickaxes.x": "%s · %s",
@@ -676,5 +676,7 @@
   "guide.control.alternate": "Usar alternativa · cancelar trabajo o selección actual",
   "guide.control.corners": "Clic izquierdo en dos bloques para marcar esquinas; después confirma.",
   "guide.control.field": "Activar campo · pulsa de nuevo para desactivar",
-  "screen.specialpickaxes.navigation": "Rueda / ↑↓ / AvPág: leer"
+  "screen.specialpickaxes.navigation": "Rueda / ↑↓ / AvPág: leer",
+  "screen.specialpickaxes.copy_preview": "Vista previa: %s",
+  "guide.control.copy_picker": "←→ / Tab: elegir · Inicio/Fin: extremos · Enter: copiar · Retroceso: salir del selector."
 }

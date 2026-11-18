@@ -16,17 +16,12 @@ public final class ArtifactInteraction {
     private ArtifactInteraction(){}
     public static boolean regional(ArtifactKind k){return k==ArtifactKind.CRUCIBLE;}
     public static boolean regional(ArtifactKind k,int mode){return k==ArtifactKind.CRUCIBLE||k==ArtifactKind.WORLDBREAKER&&mode==5;}
-    public static String[] modes(ArtifactKind k){return switch(k){
-        case PALIMPSEST->new String[]{"vein"};case CHOIR->new String[]{"forward"};
-        case EVENTIDE->new String[]{"gravity_in","gravity_out"};case CRUCIBLE->new String[]{"stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian","calcite","tuff","dripstone","gravel"};
-        case INTERREGNUM->new String[]{"domain","aura"};case WORLDLOOM->new String[]{"quarry"};
-        case ICARUS->new String[]{"forward","wide"};case AXIOM->new String[]{"hollow_pulse"};
-        case EXODIUM->new String[]{"starfall"};case IRIDIUM->new String[]{"orefall"};case HELLSPEC->new String[]{"hellforge"};
-        case SEAM_RIPPER->new String[]{"connected"};
-        case WORLDBREAKER->new String[]{"carve","fracture","cleave","core_drill","world_shatter","region_break"};
-        default->new String[]{"retired"};};}
-    public static int modeCount(ArtifactKind k){return modes(k).length;}
-    public static String modeKey(ArtifactKind k,int mode){return modes(k)[Math.floorMod(mode,modeCount(k))];}
+    /** Compatibility API returns a defensive copy; callers cannot edit the shared catalog. */
+    public static String[] modes(ArtifactKind k){return ArtifactModeCatalog.keys(k).toArray(String[]::new);}
+    public static int modeCount(ArtifactKind k){return ArtifactModeCatalog.keys(k).size();}
+    public static String modeKey(ArtifactKind k,int mode){
+        var keys=ArtifactModeCatalog.keys(k);return keys.get(Math.floorMod(mode,keys.size()));
+    }
     private static void resetDisplay(Selection selection){if(selection!=null&&!selection.tool.isEmpty())selection.tool.getOrCreateTag().putString("artifactStatus","idle");}
     public static void clear(ServerPlayer p){resetDisplay(SELECTED.remove(p.getUUID()));}
     public static void clear(){SELECTED.values().forEach(ArtifactInteraction::resetDisplay);SELECTED.clear();}

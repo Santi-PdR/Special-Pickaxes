@@ -77,3 +77,29 @@ class InterfaceCopyTests(unittest.TestCase):
             self.assertIn(key, source)
         for locale in ('en_us', 'es_es'):
             self.assertIn('↑↓', self.texts(locale)['screen.specialpickaxes.navigation'])
+
+    def test_browsing_copy_picker_never_sends_copy_intents(self):
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
+        browse = source.split('if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT', 1)[1].split('if(choiceFocus>=0&&(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER', 1)[0]
+        self.assertIn('GLFW_KEY_TAB', browse)
+        self.assertIn('hasShiftDown()', browse)
+        self.assertNotIn('chooseCopy', browse)
+        self.assertIn('if(!confirmingCopy)', source)
+
+    def test_copy_preview_and_help_are_localized_and_cache_tracks_picker_availability(self):
+        for locale in ('en_us', 'es_es'):
+            texts = self.texts(locale)
+            self.assertEqual(texts['screen.specialpickaxes.copy_preview'].count('%s'), 1)
+            self.assertIn('Tab', texts['guide.control.copy_picker'])
+            self.assertIn('Enter', texts['guide.control.copy_picker'])
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
+        self.assertIn('if(selectingCopy())controls.add', source)
+        self.assertIn('.append(selectingCopy())', source)
+        self.assertIn('String copied=selectedCopyId(active)', source)
+
+    def test_mode_hot_paths_do_not_allocate_mutable_arrays(self):
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/artifact/ArtifactInteraction.java').read_text()
+        hot = source.split('public static int modeCount', 1)[1].split('private static void resetDisplay', 1)[0]
+        self.assertNotIn('modes(k)', hot)
+        self.assertNotIn('new String', hot)
+        self.assertIn('Math.floorMod', hot)

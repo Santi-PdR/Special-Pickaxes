@@ -343,6 +343,25 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="rework_each_332") public static void modeCatalogPreservesSavedOrderAndDefendsSharedKeys(GameTestHelper h){
+        String[][] expected={
+            {"palimpsest","vein"},{"fault_choir","forward"},{"eventide","gravity_in,gravity_out"},
+            {"paradox_crucible","stone,deepslate,granite,diorite,andesite,dirt,basalt,obsidian,calcite,tuff,dripstone,gravel"},
+            {"interregnum","domain,aura"},{"worldloom","quarry"},{"icarus","forward,wide"},{"hollow_axiom","hollow_pulse"},
+            {"exodium","starfall"},{"iridium","orefall"},{"hellspec","hellforge"},{"seam_ripper","connected"},
+            {"worldbreaker","carve,fracture,cleave,core_drill,world_shatter,region_break"}
+        };
+        for(var record:expected){
+            var kind=ArtifactKind.byId(record[0]);var keys=record[1].split(",");
+            h.assertTrue(java.util.Arrays.equals(keys,ArtifactInteraction.modes(kind)),"saved mode order stays compatible: "+kind);
+            h.assertTrue(ArtifactInteraction.modeCount(kind)==keys.length,"constant-time mode count is exact");
+            var mutable=ArtifactInteraction.modes(kind);mutable[0]="corrupt";
+            for(int mode:new int[]{0,-1,1,Integer.MIN_VALUE,Integer.MAX_VALUE})
+                h.assertTrue(ArtifactInteraction.modeKey(kind,mode).equals(keys[Math.floorMod(mode,keys.length)]),"external mutation and corrupt mode integers cannot change catalog keys");
+        }
+        h.assertTrue(ArtifactInteraction.modeKey(ArtifactKind.MERIDIAN,0).equals("retired"),"retired modes stay retired");h.succeed();
+    }
+
     private static void barrier(GameTestHelper h,BlockState barrier){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=h.absolutePos(new BlockPos(5,4,7));
         h.getLevel().setBlockAndUpdate(at,barrier);h.getLevel().setBlockAndUpdate(at.south(),Blocks.STONE.defaultBlockState());

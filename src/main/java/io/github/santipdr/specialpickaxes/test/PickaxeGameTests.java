@@ -605,7 +605,9 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_260") public static void icarianLiftDoesNotRecaptureAMinerWhoLeftTheShaft(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
-        for(int y=1;y<=5;y++)h.getLevel().setBlockAndUpdate(base.above(y),state);
+        for(int y=1;y<=5;y++){
+            var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
+        }
         var lift=new IcarianLiftProgram(base,20);h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift),"lift starts");
         var departure=wearer.position().add(2,0,0);wearer.setPos(departure);drain(wearer);
         h.assertTrue(lift.departed()&&!WorkQueue.busy(wearer)&&wearer.position().equals(departure),"leaving the shaft ends work without teleporting the miner back");
@@ -613,12 +615,16 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_261") public static void icarianLiftStopsAfterDepartureBetweenBudgetedTurns(GameTestHelper h){
         var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
-        for(int y=1;y<=5;y++)h.getLevel().setBlockAndUpdate(base.above(y),state);
+        for(int y=1;y<=5;y++){
+            var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
+        }
         var lift=new IcarianLiftProgram(base,20);int previous=ArtifactConfig.PER_PLAYER.get();
         try{ArtifactConfig.PER_PLAYER.set(1);WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);WorkQueue.tick();
             h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure");
             var departure=wearer.position().add(0,0,2);wearer.setPos(departure);drain(wearer);
-            h.assertTrue(lift.departed()&&wearer.position().equals(departure)&&h.getLevel().getBlockState(base.above(2))==state,"a later turn does not resume excavation or movement from a stale shaft");
+            h.assertTrue(lift.departed(),"lift records departure after the next budgeted turn");
+            h.assertTrue(wearer.position().equals(departure),"later turns never pull the departed miner back");
+            h.assertTrue(h.getLevel().getBlockState(base.above(2))==state,"later turns preserve the next shaft block");
         }finally{ArtifactConfig.PER_PLAYER.set(previous);finish(h,wearer);}
     }
     @GameTest(template="empty",batch="rework_each_262") public static void icarianLiftPreservesExternalVerticalTeleport(GameTestHelper h){

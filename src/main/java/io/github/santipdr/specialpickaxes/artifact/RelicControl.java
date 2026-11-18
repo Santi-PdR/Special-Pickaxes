@@ -23,7 +23,7 @@ public final class RelicControl {
                 return confirm(p);
             case SELECT:
                 if(copiedWorldbreaker){
-                    try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));if(ArtifactInteraction.regional(copied,ArtifactState.mode(p,copied)))return ArtifactInteraction.use(p,tool,copied,false);}
+                    try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));if(ArtifactInteraction.regional(copied,ArtifactTooltips.abilityMode(tool,k)))return ArtifactInteraction.use(p,tool,copied,false);}
                     catch(IllegalArgumentException invalid){return false;}
                 }
                 if(!ArtifactInteraction.regional(k,ArtifactState.mode(p,k))||WorkQueue.busy(p))return false;

@@ -35,15 +35,17 @@ public final class ArtifactManualScreen extends Screen {
 
     /** Page-sized keyboard navigation keeps the guide usable without precision mouse scrolling. */
     @Override public boolean keyPressed(int keyCode,int scanCode,int modifiers){
+        draggingScrollbar=false;
         var currentLayout=layout();
         if(currentLayout.pickerVisible()&&canChooseCopy()){
-            if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT){
-                if(choiceFocus<0){
-                    var active=displayStack();String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
-                    choiceFocus=choices.indexOf(copyChoice(copied));
-                }
-                choiceFocus=ManualChoiceNavigation.step(choiceFocus,keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT?-1:1,choices.size());
-                pickerWheel.reset();choiceScroll=ManualChoiceNavigation.reveal(choiceScroll,choiceFocus,choices.size(),CHOICE_CELL,currentLayout.picker().width());
+            if(choiceFocus>=0&&keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE){choiceFocus=-1;return true;}
+            if(choiceFocus>=0&&(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_END)){
+                focusChoice(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_HOME?0:choices.size()-1,currentLayout.picker().width());return true;
+            }
+            if(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_TAB){
+                if(choiceFocus<0)choiceFocus=choices.indexOf(copyChoice(selectedCopyId(displayStack())));
+                int direction=keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_TAB&&hasShiftDown()?-1:1;
+                focusChoice(ManualChoiceNavigation.step(choiceFocus,direction,choices.size()),currentLayout.picker().width());
                 return true;
             }
             if(choiceFocus>=0&&(keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER||keyCode==org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)){
@@ -95,7 +97,7 @@ public final class ArtifactManualScreen extends Screen {
         int nameX=x+PAD+24;
         Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?Component.translatable("screen.specialpickaxes.copy_mode_header")
-                :(selectingCopy()?Component.translatable("screen.specialpickaxes.copy_help"):Component.translatable("screen.specialpickaxes.manual_hint"));
+                :(kind==ArtifactKind.WORLDBREAKER?Component.translatable(selectingCopy()?"screen.specialpickaxes.copy_help":"screen.specialpickaxes.copy_hand_only"):Component.translatable("screen.specialpickaxes.manual_hint"));
         int hintX=x+w-PAD-font.width(headerHint);
         int nameMaxWidth=Math.max(0,(w>=600&&font.width(shownIcon.getHoverName())+font.width(headerHint)+PAD*3+24<w
                 ?hintX-8:x+w-PAD)-nameX);
@@ -127,11 +129,14 @@ public final class ArtifactManualScreen extends Screen {
         g.fill(x+PAD,layout.footerY()-7,x+w-PAD,layout.footerY()-6,0xff33414e);
         if(kind==ArtifactKind.WORLDBREAKER){
             if(layout.pickerVisible())drawCopyChoices(g,active,layout.picker(),mouseX,mouseY);
-            String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
+            String copied=selectedCopyId(active);
             net.minecraft.network.chat.MutableComponent selection=copied.isBlank()?Component.translatable("screen.specialpickaxes.copy_native"):Component.translatable("item.specialpickaxes."+copied);
             if(!copied.isBlank()&&ArtifactInteraction.modeCount(abilityKind)>1)selection.append(" · ").append(Component.translatable("mode.specialpickaxes."+modeKey));
             Component state=copied.isBlank()?selection:Component.translatable("screen.specialpickaxes.copy_mode",selection);
-            Component selected=Component.translatable("screen.specialpickaxes.selected",state);
+            Component selected=choiceFocus>=0&&layout.pickerVisible()
+                    ?Component.translatable("screen.specialpickaxes.copy_preview",choiceFocus==choices.indexOf(ArtifactKind.WORLDBREAKER)
+                        ?Component.translatable("screen.specialpickaxes.copy_native"):iconFor(choices.get(choiceFocus)).getHoverName())
+                    :Component.translatable("screen.specialpickaxes.selected",state);
             g.drawString(font,fit(selected,footerLeftWidth),x+PAD,layout.footerY(),0xffedf3f6,false);
         }else if(maxScroll>0){
             g.drawString(font,fit(Component.translatable("screen.specialpickaxes.navigation"),footerLeftWidth),x+PAD,layout.footerY(),0xffaebdca,false);
@@ -155,6 +160,7 @@ public final class ArtifactManualScreen extends Screen {
             controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable(description)));
         }
         if(regional)controls.add(Component.translatable("guide.control.corners"));
+        if(selectingCopy())controls.add(Component.translatable("guide.control.copy_picker"));
         return List.of(
                 section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
                 section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
@@ -170,11 +176,13 @@ public final class ArtifactManualScreen extends Screen {
 
     private void ensureCards(int maxWidth,boolean twoColumns,ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey,int viewportTop,int viewportBottom){
         var tag=stack.getTag();
-        String fingerprint=kind+"|"+abilityKind+"|"+mode+"|"+modeKey+"|"
-                +(tag==null?"":tag.getInt("artifactActivationCost")+":"+tag.getInt("artifactCooldown")+":"+tag.getString("copiedSkill")+":"+tag.getInt("copiedMode"));
-        fingerprint+="|"+twoColumns+"|"+Minecraft.getInstance().getLanguageManager().getSelected()+"|"+RelicKeys.MANUAL.getTranslatedKeyMessage().getString();
-        for(var action:RelicControl.Action.values())fingerprint+="|"+RelicKeys.name(action).getString();
-        if(!layoutRevision.refresh(maxWidth,fingerprint,net.minecraft.locale.Language.getInstance()))return;
+        var fingerprint=new StringBuilder(192).append(kind).append('|').append(abilityKind).append('|').append(mode).append('|').append(modeKey);
+        if(tag!=null)fingerprint.append('|').append(tag.getInt("artifactActivationCost")).append(':').append(tag.getInt("artifactCooldown"))
+                .append(':').append(selectedCopyId(stack)).append(':').append(tag.getInt("copiedMode"));
+        fingerprint.append('|').append(selectingCopy()).append('|').append(twoColumns).append('|')
+                .append(Minecraft.getInstance().getLanguageManager().getSelected()).append('|').append(RelicKeys.MANUAL.getTranslatedKeyMessage().getString());
+        for(var action:RelicControl.Action.values())fingerprint.append('|').append(RelicKeys.name(action).getString());
+        if(!layoutRevision.refresh(maxWidth,fingerprint.toString(),net.minecraft.locale.Language.getInstance()))return;
         if(maxWidth<32){leftCards=List.of();rightCards=List.of();contentHeight=0;scroll=0;return;}
         List<Section> sections=sections(stack,abilityKind,mode,modeKey);
         var left=new ArrayList<Card>();var right=new ArrayList<Card>();int leftHeight=0,rightHeight=0;
@@ -249,19 +257,21 @@ public final class ArtifactManualScreen extends Screen {
         g.fill(x-2,y-1,right+2,y,0xff506476);
         if(picker.width()>0&&picker.height()>0){
             g.enableScissor(x,y,right,bottom);
-            String copied=active.hasTag()?active.getTag().getString("copiedSkill"):"";
+            String copied=selectedCopyId(active);
             ArtifactKind hoveredChoice=null;
             for(int i=0;i<choices.size();i++){
                 int px=x+i*CHOICE_CELL-choiceScroll;
                 if(px+CHOICE_CELL<=x||px>=right)continue;
                 ArtifactKind source=choices.get(i);boolean selected=source.id.equals(copied)||(source==ArtifactKind.WORLDBREAKER&&copied.isBlank());
-                boolean hover=mouseX>=px&&mouseX<px+CHOICE_CELL&&mouseY>=y&&mouseY<bottom;
+                boolean hover=mouseX>=px&&mouseX<px+CHOICE_CELL-2&&mouseY>=y&&mouseY<bottom;
                 g.fill(px+1,y+1,px+CHOICE_CELL-2,bottom-1,selected?0xff806b3a:hover?0xff455d70:0xff202e3b);
                 ItemStack icon=iconFor(source);
                 g.renderItem(icon,px+(CHOICE_CELL-16)/2,y+2);
                 if(i==choiceFocus){
                     g.fill(px+1,y,px+CHOICE_CELL-2,y+1,0xffedf3f6);
                     g.fill(px+1,bottom-2,px+CHOICE_CELL-2,bottom-1,0xffedf3f6);
+                    g.fill(px+1,y,px+2,bottom-1,0xffedf3f6);
+                    g.fill(px+CHOICE_CELL-3,y,px+CHOICE_CELL-2,bottom-1,0xffedf3f6);
                 }
                 if(hover)hoveredChoice=source;
             }
@@ -274,11 +284,21 @@ public final class ArtifactManualScreen extends Screen {
                     ItemStack labelIcon=iconFor(labelKind);
                     Component label=labelKind==ArtifactKind.WORLDBREAKER
                             ?Component.translatable("screen.specialpickaxes.copy_native"):labelIcon.getHoverName();
-                    g.drawString(font,font.plainSubstrByWidth(label.getString(),labelWidth),labelX,y+6,
+                    g.drawString(font,fit(label,labelWidth),labelX,y+6,
                             hoveredChoice!=null?0xffd9e5ef:0xffbac7d1,false);
                 }
             }
         }
+    }
+
+    private void focusChoice(int index,int viewport){
+        choiceFocus=index;pickerWheel.reset();
+        choiceScroll=ManualChoiceNavigation.reveal(choiceScroll,index,choices.size(),CHOICE_CELL,viewport);
+    }
+    private static String selectedCopyId(ItemStack stack){
+        if(!stack.hasTag())return "";
+        var selected=copyChoice(stack.getTag().getString("copiedSkill"));
+        return selected==ArtifactKind.WORLDBREAKER?"":selected.id;
     }
 
     /** Display-only stacks are bounded by the thirteen playable kinds, never allocated per frame. */
@@ -306,6 +326,7 @@ public final class ArtifactManualScreen extends Screen {
     private boolean canChooseCopy(){var player=Minecraft.getInstance().player;return player!=null&&player.getMainHandItem().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER;}
 
     @Override public boolean mouseScrolled(double mouseX,double mouseY,double delta){
+        draggingScrollbar=false;
         var layout=layout();var picker=layout.picker();
         if(layout.pickerVisible()&&mouseX>=picker.x()&&mouseX<picker.right()&&mouseY>=picker.y()&&mouseY<picker.bottom()){
             choiceScroll=pickerWheel.move(choiceScroll,Math.max(0,choices.size()*CHOICE_CELL-picker.width()),delta,CHOICE_CELL*2);return true;
