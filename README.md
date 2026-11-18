@@ -1,4 +1,4 @@
-# Special Pickaxes — 5.12.1
+# Special Pickaxes — 5.13.0
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 
@@ -7,6 +7,8 @@
 - VFX custom breves al activar habilidades, sin auras cosméticas permanentes.
 - Nombres EN/ES renovados, manual con tarjetas numeradas, modo activo y teclas
   reales. Modos localizados y navegación ↑↓/AvPág/RePág. Descripciones funcionales concisas. [Tabla de nombres y alcance](docs/mining-rework/INTERFACE-5.12.md).
+- Rompemundos: selector de copias por flechas/Tab, Inicio/Fin y confirmación con Enter,
+  vista previa y recuperación segura de IDs inválidos. [Primer lote de 20 cambios y 30 pendientes](docs/mining-rework/IMPROVEMENT-BATCH-5.13.md).
 - Telar del Mundo: túnel natural 7×7 de hasta 48 bloques; conserva menas y roca colocada
   y se detiene ante máquinas, fluidos y zonas protegidas. Secundaria: calzada de
   hasta 64 bloques, pagada exclusivamente desde la mano secundaria.
@@ -22,16 +24,16 @@
   con el mismo orden de extracción y presupuestos de trabajo. Iconos copiados del
   manual reutilizados, sin crear nuevos ItemStacks por fotograma.
 - Ícaro: cortes 11×7 / 15×9. Desgarraestratos: hasta 1024 bloques conectados.
-- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44208279107):
-  157 JUnit, 399 GameTests, cliente gráfico y servidor empaquetado.
+- [CI Forge aprobada](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44234259503):
+  161 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado.
 - [Modelos Java independientes aprobados](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/43998074916):
   compilación Java 17 y más de 10.000 comprobaciones sin Forge/Maven.
-- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44208279107/artifacts/14384759934)
+- [Descarga autenticada temporal](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44234259503/artifacts/14397750757)
   (7 días). Sin release pública nueva. Los enlaces inferiores son históricos.
 
-Commit probado: `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2`.
-JAR: `special-pickaxes-1.20.1-5.12.1.jar` — 590.273 bytes.
-SHA-256: `4265d89dc6206fd4742941eaee8992a250c3d6f117804bdc7018b084708ecc55`.
+Commit probado: `6aed2b07962f8511d86c4061a1b8e1181774c033`.
+JAR: `special-pickaxes-1.20.1-5.13.0.jar` — 593.475 bytes.
+SHA-256: `29e72e8582dcbb9a6b8da144a738a7f240644535c866122620a8511577a8aa22`.
 No prueba Windows/Ghouls ni todas las animaciones, idiomas o escalas visuales.
 Ver `docs/mining-rework/STATUS.md` y `PLAYER-GUIDE.md` para alcance y configuración.
 

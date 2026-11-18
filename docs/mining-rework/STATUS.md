@@ -1,3 +1,17 @@
+## 5.13.0 — first broad-review batch verified
+
+Runtime `6aed2b07962f8511d86c4061a1b8e1181774c033`, [CI 44234259503](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44234259503): SUCCESS. 161 JUnit, zero failures/errors/skips; all 400 required GameTests; graphical client and packaged server checks passed with strict log validation. Local 125 Python tests without skips, 25 resource checks and secret scan passed. Evidence retrieved to `/tmp/sp-ci5130-green` (temporary).
+
+Explicit scope: 20 applied changes and 30 pending proposals in `IMPROVEMENT-BATCH-5.13.md`, not 50 completed improvements. Includes pending 5.12.2 keyboard navigation. Immutable mode catalog preserves all saved keys/order and defensive-copy compatibility; a new real GameTest covers every playable kind and extreme mode values. Copy selector navigation/preview/cache/input coordination improved; no registry, asset, VFX or power changes.
+
+The Icarian departure test first failed only its second-block assertion, while departure and position checks passed. Its isolated elevated fixture now proves exactly one pre-departure step and an intact second block before departure; final checks are unchanged and full CI passed. No production lift behavior was modified.
+
+Inspected final Worldbreaker manual screenshot at 1280×720 / GUI 640×360: keyboard help fits without card overlap. Unmodified capture saved as `review/manual-5.13.0-es.jpg`, provenance in `INTERFACE-5.12.md`. Limited visual inspection, not all scales/locales or physical keyboard paths; no Windows/Ghouls certification.
+
+JAR `special-pickaxes-1.20.1-5.13.0.jar`: 593475 bytes, SHA-256 `29e72e8582dcbb9a6b8da144a738a7f240644535c866122620a8511577a8aa22`. Personal authenticated artifact `14397750757` (7 days), full forge-validation artifact `14397940289`. No public release.
+
+### Historical progress notes
+
 ## 5.13.0 — broad review first batch; validation pending
 
 User requested roughly 50 improvements and 20–30 necessary changes. `IMPROVEMENT-BATCH-5.13.md` records 50 explicit work points: 20 applied changes and 30 pending proposals; tests are not counted as extra features. First batch extends keyboard copy navigation, preview/invalid-NBT handling, input coordination, context-aware help/cache and allocation reduction through an immutable mode catalog. Saved mode IDs/order and registry/assets/VFX remain unchanged. Copied regional SELECT uses the stack's saved mode. The previous 5.12.2 independent Java model CI passed, but Forge run 44212796462 failed the historical Icarian departure regression; its fixture now explicitly clears natural-block provenance and splits assertions for diagnosis, without changing production lift logic. Local 125 Python tests and 25 resource checks passed. First full run 44233460425 compiled and passed the new catalog contract but the historical Icarian departure test still failed: split assertions localized it to the second shaft block, not departure or position. Elevated that fixture away from other test terrain and added pre-departure assertions for exact budget/step count and the untouched second block. No production lift change or weakened final assertion. Full CI pending; 5.12.1 remains the latest fully verified runtime.

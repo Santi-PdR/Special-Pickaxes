@@ -39,3 +39,9 @@ La 5.12.0 quedó verificada: CI 44197698594 sobre `ebea26e8a6425e0e794cfcd509a0b
 La 5.12.1 añade etiquetas de modo completamente localizadas y desplazamiento por flechas ↑↓. CI `44208279107` sobre `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2` completamente correcta: 157 JUnit sin fallos/errores/omitidos, 399 GameTests, cliente gráfico y servidor empaquetado. Localmente: 122 pruebas Python y 25 comprobaciones de recursos.
 
 Se revisó la captura real final de Rompemundos a 1280×720 (GUI 640×360): «Túnel redondeado» sustituye a CARVE; tarjetas, selector y pie legibles en esta escena. La imagen de referencia se conserva [aquí](review/manual-5.12.1-es.jpg), sin retoques ni generación. Origen: `build/client-smoke/manual-worldbreaker-carve.jpg` de la CI indicada; SHA-256 `defc542c6326d0b6527f13def0d7f3e70f95a5c7d1b71a004f837eebe0e91a4e`. La inspección no cubre todos los modos, idiomas, escalas ni Windows/Ghouls.
+
+## Primer lote 5.13.0
+
+Selector ampliado: Tab/Mayús+Tab, Inicio/Fin con foco, Retroceso para abandonarlo, borde de foco completo y vista previa en el pie. IDs inválidos/retirados/autorreferentes se presentan como habilidades nativas. La ayuda aparece también en la tarjeta de controles y el caché sigue la disponibilidad real del selector. Ratón y teclado dejan de competir con un arrastre anterior.
+
+CI `44234259503` correcta: 161 JUnit, 400 GameTests, cliente gráfico y servidor empaquetado. Se inspeccionó [la captura final real](review/manual-5.13.0-es.jpg) a 1280×720 / GUI 640×360: ayuda visible y tarjetas sin solapamiento. No prueba todas las escalas ni interacción física de todas las teclas. SHA-256 de la imagen: `2cd195d62cd2442c4d5b23a80c3fe88c6a426068c6f09e025788a9a220efa4e4`. Fuente `build/client-smoke/manual-worldbreaker-carve.jpg` del commit `6aed2b07962f8511d86c4061a1b8e1181774c033`, sin retoques.

@@ -1,6 +1,6 @@
 # Revisión amplia — 50 puntos de trabajo
 
-No son 50 mejoras terminadas. Este inventario separa los **20 cambios aplicados en el primer lote** de **30 propuestas pendientes**. «Aplicado» significa código escrito; la validación completa se registra en STATUS.md. Las propuestas requieren revisión antes de implementarse y no prometen interfaces ni funciones inexistentes.
+No son 50 mejoras terminadas. Este inventario separa los **20 cambios aplicados en el primer lote** de **30 propuestas pendientes**. Este primer lote quedó validado por CI `44234259503` sobre `6aed2b07962f8511d86c4061a1b8e1181774c033`: 161 JUnit sin fallos/errores/omitidos, 400 GameTests, cliente gráfico y servidor empaquetado. Localmente: 125 Python y 25 recursos. La validación automatizada no equivale a haber ejercitado físicamente todas las teclas en todas las escalas. Las propuestas requieren revisión antes de implementarse y no prometen interfaces ni funciones inexistentes.
 
 ## Primer lote: 20 cambios aplicados
 
@@ -23,7 +23,7 @@ No son 50 mejoras terminadas. Este inventario separa los **20 cambios aplicados 
 17. La huella de contenido se construye con StringBuilder, sin concatenaciones crecientes por acción.
 18. Catálogo de modos inmutable: consultas de cantidad/clave sin crear arrays y API histórica con copia defensiva.
 19. La selección regional copiada consulta el modo guardado en la herramienta, no el modo del otro pico en los datos del jugador.
-20. El fixture de salida del ascensor de Ícaro prepara su piedra como natural explícitamente y separa los tres fallos posibles en aserciones diagnósticas. No se relaja la protección de bloques colocados ni se afirma todavía que esa fuera la única causa del fallo anterior.
+20. El fixture de salida del ascensor de Ícaro prepara su piedra como natural explícitamente y separa los tres fallos posibles en aserciones diagnósticas. El fixture se elevó fuera del terreno compartido y ahora comprueba el presupuesto y la segunda celda antes de salir. Pasó la suite completa sin cambiar la lógica del ascensor ni debilitar sus aserciones finales.
 
 Pruebas añadidas: contrato de orden/compatibilidad de todos los modos, resistencia a mutación externa y modos enteros extremos; comprobaciones de navegación sin paquetes, ayuda localizada y caché de contexto. Las pruebas no se cuentan como mejoras independientes para completar artificialmente 50.
 

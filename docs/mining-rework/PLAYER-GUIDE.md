@@ -1,8 +1,8 @@
-# Rediseño 5.12.1 — build de prueba verificada
+# Rediseño 5.13.0 — build de prueba verificada
 
-CI `44208279107` aprobada sobre `92561baa0d0e1ff43fa89f9eded7b2ea33c1c7e2`:
-157 JUnit y 399 GameTests, cliente gráfico y servidor empaquetado.
-Nombres y modos EN/ES renovados, manual numerado y navegación por flechas ↑↓.
+CI `44234259503` aprobada sobre `6aed2b07962f8511d86c4061a1b8e1181774c033`:
+161 JUnit y 400 GameTests, cliente gráfico y servidor empaquetado.
+Selector de Rompemundos con flechas/Tab, Inicio/Fin, vista previa y Enter para copiar.
 Ver `INTERFACE-5.12.md` para los nombres y el alcance de la revisión visual.
 Sin garantía de compatibilidad Windows/Ghouls o revisión de todas las animaciones.
 
