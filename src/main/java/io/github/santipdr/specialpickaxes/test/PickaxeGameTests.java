@@ -622,8 +622,10 @@ public final class PickaxeGameTests {
             var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
         }
         var lift=new IcarianLiftProgram(base,20);int previous=ArtifactConfig.PER_PLAYER.get();
-        try{ArtifactConfig.PER_PLAYER.set(1);WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);WorkQueue.tick();
-            h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure");
+        try{ArtifactConfig.PER_PLAYER.set(1);
+            h.assertTrue(WorldSafety.allowed(wearer,ArtifactKind.ICARUS,base.above())&&WorldSafety.harvestable(wearer,wearer.getMainHandItem(),base.above()),"shaft fixture is authorized and harvestable before queue execution");
+            h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift),"shaft fixture enters the work queue");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure: block="+h.getLevel().getBlockState(base.above())+", status="+WorkQueue.status(wearer)+", completed="+WorkQueue.completed(wearer)+", reason="+WorkQueue.pauseReason(wearer)+", departed="+lift.departed()+", blocked="+lift.blocked());
             h.assertTrue(EnchantmentScaling.budget(wearer.getMainHandItem())==1&&WorkQueue.completed(wearer)==1,"fixture executes exactly one budgeted step");
             h.assertTrue(h.getLevel().getBlockState(base.above(2))==state,"second shaft block is intact before departure");
             var departure=wearer.position().add(0,0,2);wearer.setPos(departure);drain(wearer);
