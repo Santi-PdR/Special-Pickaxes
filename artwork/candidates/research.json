@@ -1,0 +1,26 @@
+[
+  {
+    "repository": "SammySemicolon/Malum-Mod",
+    "ref": "1.21.1",
+    "path": "src/main/resources/assets/malum/textures/item/spellweaving_pickaxe.png",
+    "blob_sha": "876d69cb2a889c3ec418650219d613a2440e9d35",
+    "local_file": "artwork/candidates/malum/spellweaving_pickaxe.png",
+    "status": "candidate only; not integrated; asset permissions not yet established"
+  },
+  {
+    "repository": "SammySemicolon/Malum-Mod",
+    "ref": "1.21.1",
+    "path": "src/main/resources/assets/malum/textures/item/soul_stained_steel_pickaxe.png",
+    "blob_sha": "24d3191e4363ccd9038f9882587a298d1eb4ecaf",
+    "local_file": "artwork/candidates/malum/soul_stained_steel_pickaxe.png",
+    "status": "candidate only; not integrated; asset permissions not yet established"
+  },
+  {
+    "repository": "TheAwesomeGem/MineFantasy",
+    "ref": "master",
+    "path": "src/main/resources/assets/minefantasy/textures/items/Tool/pickDragon.png",
+    "blob_sha": "a2850f68e0fdabdbd53624cdd36cc8d6da916964",
+    "local_file": "artwork/candidates/minefantasy/pickDragon.png",
+    "status": "candidate only; not integrated; asset permissions not yet established"
+  }
+]

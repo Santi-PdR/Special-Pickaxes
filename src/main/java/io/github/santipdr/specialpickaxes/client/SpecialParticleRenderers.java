@@ -12,6 +12,8 @@ public final class SpecialParticleRenderers {
     private SpecialParticleRenderers(){}
 
     @SubscribeEvent public static void register(RegisterParticleProvidersEvent event){
+        for(var style:io.github.santipdr.specialpickaxes.artifact.RelicParticleStyle.values())
+            event.registerSpriteSet(SpecialPickaxes.SIGNATURE_PARTICLES.get(style.name()).get(),sprites->new RelicSignatureParticle.Provider(sprites,style));
         event.registerSpriteSet(SpecialPickaxes.STASIS_SHARD.get(),StasisShardParticle.Provider::new);
         event.registerSpriteSet(SpecialPickaxes.ICARIAN_FEATHER.get(),IcarianFeatherParticle.Provider::new);
         event.registerSpriteSet(SpecialPickaxes.IRIDIUM_LODE_SHARD.get(),IridiumLodeShardParticle.Provider::new);

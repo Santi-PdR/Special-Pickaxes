@@ -16,15 +16,8 @@ public final class AbilityVfx {
     private AbilityVfx(){}
 
     public static SimpleParticleType particle(ArtifactKind kind){
-        return switch(kind){
-            case INTERREGNUM,CHOIR -> SpecialPickaxes.STASIS_SHARD.get();
-            case WORLDLOOM -> SpecialPickaxes.WORLDLOOM_ROOT_CLAMP.get();
-            case ICARUS -> SpecialPickaxes.ICARIAN_FEATHER.get();
-            case IRIDIUM,SEAM_RIPPER -> SpecialPickaxes.IRIDIUM_LODE_SHARD.get();
-            case HELLSPEC,CRUCIBLE -> SpecialPickaxes.HELLSPEC_BRAND_FLARE.get();
-            case PALIMPSEST -> SpecialPickaxes.DAWN_MENDING_BLOOM.get();
-            default -> SpecialPickaxes.EXODIUM_STARFALL.get();
-        };
+        if(!kind.playable())throw new IllegalArgumentException("No cast signature for retired pickaxe");
+        return SpecialPickaxes.SIGNATURE_PARTICLES.get(kind.name()).get();
     }
     /** Distinct custom cast silhouettes; at most one successful burst per player per tick. */
     public static boolean cast(ServerPlayer player,ArtifactKind kind){

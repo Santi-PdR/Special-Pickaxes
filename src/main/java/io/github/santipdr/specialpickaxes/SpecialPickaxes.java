@@ -47,6 +47,12 @@ public final class SpecialPickaxes {
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> WORLDLOOM_ROOT_CLAMP=PARTICLES.register("worldloom_root_clamp",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> EXODIUM_STARFALL=PARTICLES.register("exodium_starfall",()->new net.minecraft.core.particles.SimpleParticleType(false));
     public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> DAWN_MENDING_BLOOM=PARTICLES.register("dawn_mending_bloom",()->new net.minecraft.core.particles.SimpleParticleType(false));
+    public static final Map<String,RegistryObject<net.minecraft.core.particles.SimpleParticleType>> SIGNATURE_PARTICLES=createSignatureParticles();
+    private static Map<String,RegistryObject<net.minecraft.core.particles.SimpleParticleType>> createSignatureParticles(){
+        var particles=new LinkedHashMap<String,RegistryObject<net.minecraft.core.particles.SimpleParticleType>>();
+        for(var style:RelicParticleStyle.values())particles.put(style.name(),PARTICLES.register(style.name().toLowerCase(Locale.ROOT)+"_signature",()->new net.minecraft.core.particles.SimpleParticleType(false)));
+        return Collections.unmodifiableMap(particles);
+    }
     public static final RegistryObject<MobEffect> DOMINION=EFFECTS.register("dominion",DominionEffect::new);
     public static final RegistryObject<MobEffect> GRAVITIC_TETHER=EFFECTS.register("gravitic_tether",GraviticTetherEffect::new);
     public static final RegistryObject<MobEffect> HEARTWOOD_RENEWAL=EFFECTS.register("heartwood_renewal",HeartwoodRenewalEffect::new);

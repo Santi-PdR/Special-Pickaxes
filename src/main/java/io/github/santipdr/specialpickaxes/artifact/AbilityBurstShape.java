@@ -19,11 +19,14 @@ public final class AbilityBurstShape {
             case SEAM_RIPPER -> new Vec3((index%4-1.5)*.3,(index/4)*.25,0);
             case CHOIR -> new Vec3(Math.cos(angle)*.5,Math.sin(angle)*.5,.8*t);
             case EXODIUM -> new Vec3((index%2==0?-1:1)*.6*(1-t),1.2*(1-t),.65*t);
-            case HELLSPEC,CRUCIBLE -> new Vec3(Math.cos(angle)*radius,.9*t,Math.sin(angle)*radius);
+            case CRUCIBLE -> new Vec3(Math.cos(angle)*radius,.9*t,Math.sin(angle)*radius);
             case WORLDLOOM -> new Vec3((index%2==0?-1:1)*.3,.08,.1+.9*t);
             case AXIOM -> new Vec3(Math.cos(angle)*.7,Math.sin(angle)*.7,0);
             case PALIMPSEST -> new Vec3(Math.cos(angle)*radius,.25*Math.sin(2*angle),Math.sin(angle)*radius);
-            default -> new Vec3(Math.cos(angle)*radius,0,Math.sin(angle)*radius);
+            case HELLSPEC -> new Vec3(Math.cos(angle)*(.55+.2*Math.cos(angle*5)),.3*Math.sin(angle*5),Math.sin(angle)*(.55+.2*Math.cos(angle*5)));
+            case EVENTIDE -> new Vec3(Math.cos(angle)*(.85-.6*t),Math.sin(angle*2)*.15,Math.sin(angle)*(.85-.6*t));
+            case INTERREGNUM -> new Vec3((index%4-1.5)*.3,(index/4-1.5)*.3,.12*Math.sin(angle));
+            case WORLDBREAKER -> new Vec3((index%2==0?-1:1)*t*.8,.1+Math.abs(Math.sin(angle))*.3,t*.7);
         };
     }
 

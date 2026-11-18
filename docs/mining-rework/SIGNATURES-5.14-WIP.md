@@ -1,0 +1,33 @@
+# 5.14 — identidad visual, trabajo en curso
+
+Esta entrega NO completa la petición de unas 50 mejoras notorias. No es una release validada todavía.
+
+## Implementado, pendiente de prueba gráfica de ejecución
+
+Las activaciones ahora seleccionan trece partículas registradas, una por pico, en lugar de reutilizar siete sprites. Cada firma tiene cuatro imágenes propias de 32×32, transparencia, emisión, entrada/salida gradual, giro y trayectoria limitada. Son dibujos de **partículas**, no texturas de objetos: no se ha dibujado ni sustituido ningún icono de pico.
+
+| Pico | Símbolo | Movimiento |
+|---|---|---|
+| Alba Eterna | amanecer y estrella | expansión ascendente |
+| Coro Sísmico | tres ondas | vibración longitudinal |
+| Ocaso Gravitatorio | órbitas incompletas | espiral expansiva |
+| Crisol Alquímico | sello triangular doble | hélice ascendente |
+| Corona del Tiempo | reloj de arena | suspensión escalonada |
+| Telar del Mundo | rama con hojas | crecimiento vertical |
+| Ícaro | alas simétricas | apertura ascendente |
+| Axioma del Vacío | anillo fracturado y rombo | implosión |
+| Rompemundos | fractura central | onda balística |
+| Exodio Estelar | estrella y estela | caída meteórica |
+| Iridio Rompevetas | cristal facetado | ascenso orbital |
+| Flor Infernal | flor de cinco puntas | floración parabólica |
+| Desgarraestratos | tres cortes | deslizamiento lateral |
+
+También se separaron las siluetas de emisión antes compartidas: Flor Infernal/Crisol y Ocaso/Corona/Rompemundos. Se conservan 16 partículas por activación, 256 globales por tick, envío sólo al lanzador, ausencia de colisiones y ninguna emisión ambiental. Los antiguos registros siguen existiendo por compatibilidad.
+
+## Arte externo: investigación, no integración
+
+`artwork/candidates/research.json` conserva repositorio, ruta y SHA del blob de tres originales descargados de Malum y MineFantasy. Se inspeccionaron spellweaving_pickaxe y pickDragon. No se han aprobado como arte definitivo ni establecido permisos específicos de assets. Permanecen fuera de `src/main/resources`: no se empaquetan en el mod. No se presenta Mythic Metals como un descubrimiento nuevo ni se confunde licencia del código con la del arte.
+
+## Validación
+
+La última release completa verificada sigue siendo 5.13.0. Esta versión requiere compilar, ejecutar sus tests Java y probar el cliente real antes de distribuirla. Los tests de recursos y Python locales no sustituyen esa evidencia. No se ha comprobado el aspecto en movimiento dentro del juego.
