@@ -109,6 +109,12 @@ public final class ArtifactItem extends PickaxeItem {
             // Vanilla inventory synchronization carries the display data; client never authorizes work.
             var tag=tool.getOrCreateTag();tag.putInt("artifactActivationCost",EnchantmentScaling.activationCost(tool,kind));tag.remove("artifactCharge");tag.putInt("artifactCooldown",ArtifactConfig.COOLDOWN.get());
             tag.putInt("artifactMode",ArtifactState.mode(p,kind));tag.putInt("artifactWork",WorkQueue.remaining(p));
+            var abilityState=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
+            tag.putInt("hudPrimary",(int)Math.max(0,Math.min(12000,abilityState.getLong("ready")-now)));
+            tag.putInt("hudAlternate",(int)Math.max(0,Math.min(48000,abilityState.getLong("alternateReady")-now)));
+            tag.putInt("hudAlternateMax",Math.max(40,ArtifactConfig.COOLDOWN.get()*4));
+            tag.putString("hudStatus",WorkQueue.status(p));tag.putInt("hudCompleted",WorkQueue.completed(p));
+            tag.putInt("hudRecall",DropRecall.remaining(p));tag.putBoolean("hudDomain",DomainFields.active(p));
             tag.putInt("artifactMemory",ArtifactState.of(p,kind).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size());
             ArtifactInteraction.display(p,tool,kind);
         }

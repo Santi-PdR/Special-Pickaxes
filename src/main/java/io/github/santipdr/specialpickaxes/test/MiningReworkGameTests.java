@@ -30,7 +30,7 @@ public final class MiningReworkGameTests {
         var at=h.absolutePos(new BlockPos(5,3,3));p.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);p.setYRot(0);p.setXRot(0);
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());return p;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p){RelicNetwork.forget(p);WorkQueue.cancel(p);ArtifactInteraction.clear(p);h.succeed();}
+    private static void finish(GameTestHelper h,ServerPlayer p){DropRecall.stop(p);RelicNetwork.forget(p);WorkQueue.cancel(p);ArtifactInteraction.clear(p);h.succeed();}
     @GameTest(template="empty",batch="rework_each_318") public static void seamExpandedExtractionStopsAt1024AndPreservesProtectedCells(GameTestHelper h){
         var p=player(h,ArtifactKind.SEAM_RIPPER);var level=h.getLevel();
         var center=h.absolutePos(new BlockPos(5,60,7));

@@ -1559,6 +1559,94 @@ public final class PickaxeGameTests {
         h.succeed();
     }
 
+    private static ItemEntity homingDrop(GameTestHelper h,ServerPlayer p){
+        var drop=new ItemEntity(h.getLevel(),p.getX()+5,p.getY()+.45,p.getZ(),new ItemStack(Items.DIAMOND));
+        drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);return drop;
+    }
+    @GameTest(template="empty",batch="upgrade_516_01") public static void activeRecallKeepsSteeringAndTracksTheCaster(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=homingDrop(h,p);
+        try{
+            h.assertTrue(DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48),"active recall starts");
+            DropRecall.tick();h.assertTrue(drop.getDeltaMovement().x<0,"first steering approaches the caster");
+            drop.setDeltaMovement(Vec3.ZERO);p.setPos(p.position().add(0,0,2));DropRecall.tick();
+            h.assertTrue(drop.getDeltaMovement().x<0&&drop.getDeltaMovement().z>0,"later steering follows a moving caster, not a one-shot impulse");
+            h.assertTrue(!drop.noPhysics,"homing never disables item collision");
+        }finally{DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_02") public static void activeRecallStopsOnToolReplacement(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=homingDrop(h,p);
+        try{
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48);
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.EVENTIDE).get()));DropRecall.tick();
+            h.assertTrue(!DropRecall.active(p)&&drop.getDeltaMovement().equals(Vec3.ZERO),"same item type is not the same casting stack");
+        }finally{DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_03") public static void activeRecallRechecksClaimsBeforeEverySteer(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=homingDrop(h,p);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=e->{if(e.player==p)e.setCanceled(true);};
+        try{
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48);DropRecall.tick();drop.setDeltaMovement(Vec3.ZERO);
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
+            DropRecall.tick();h.assertTrue(!DropRecall.active(p)&&drop.getDeltaMovement().equals(Vec3.ZERO),"new claim veto ends steering without teleport or forced pickup");
+        }finally{MinecraftForge.EVENT_BUS.unregister(veto);DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_04") public static void activeRecallRejectsDropsReassignedToAnotherOwner(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=homingDrop(h,p);
+        try{
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48);
+            var saved=new net.minecraft.nbt.CompoundTag();drop.saveWithoutId(saved);saved.putUUID("Owner",UUID.randomUUID());drop.load(saved);drop.setDeltaMovement(Vec3.ZERO);
+            DropRecall.tick();h.assertTrue(!DropRecall.active(p)&&drop.getDeltaMovement().equals(Vec3.ZERO),"ownership is checked after casting too");
+        }finally{DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_05") public static void activeIridiumRecallKeepsItsOreProvenanceRule(GameTestHelper h){
+        var p=player(h,ArtifactKind.IRIDIUM);var drop=homingDrop(h,p);
+        try{
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,List.of(drop),48);DropRecall.tick();
+            h.assertTrue(!DropRecall.active(p)&&drop.getDeltaMovement().equals(Vec3.ZERO),"ordinary diamonds are not marked Iridium ore drops");
+            OreDropHighlight.mark(drop,p);DropRecall.start(p,p.getMainHandItem(),ArtifactKind.IRIDIUM,List.of(drop),48);DropRecall.tick();
+            h.assertTrue(DropRecall.active(p)&&drop.getDeltaMovement().x<0,"owned marked ore continues homing");
+        }finally{DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_06") public static void recallCancellationAndCallbackMovementAreSafe(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var drop=homingDrop(h,p);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> moved=e->{if(e.player==p)drop.setPos(drop.position().add(0,0,1));};
+        try{
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48);
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,moved);
+            DropRecall.tick();h.assertTrue(!DropRecall.active(p)&&drop.getDeltaMovement().equals(Vec3.ZERO),"permission at an obsolete position does not authorize steering");
+            DropRecall.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,List.of(drop),48);RelicControl.execute(p,ArtifactKind.EVENTIDE,RelicControl.Action.CANCEL);
+            h.assertTrue(!DropRecall.active(p),"semantic cancel clears active recall");
+        }finally{MinecraftForge.EVENT_BUS.unregister(moved);DropRecall.stop(p);drop.discard();}finish(h,p);
+    }
+    private static void worldloomStaircase(GameTestHelper h,boolean descend){
+        var p=player(h,ArtifactKind.WORLDLOOM);p.setPos(p.position().add(0,80,0));p.setXRot(descend?60:-30);p.setYRot(0);
+        var floor=p.blockPosition().below();int slope=descend?-1:1;
+        for(int depth=1;depth<=6;depth++)for(int y=0;y<=2;y++)h.getLevel().setBlockAndUpdate(BridgeDesign.cell(floor,Direction.SOUTH,depth,slope).above(y),Blocks.AIR.defaultBlockState());
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE_STAIRS,4));
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"stair material schedules architectural bridge");drain(p);
+        for(int depth=1;depth<=4;depth++){
+            var state=h.getLevel().getBlockState(BridgeDesign.cell(floor,Direction.SOUTH,depth,slope));
+            h.assertTrue(state.is(Blocks.COBBLESTONE_STAIRS)&&state.getValue(StairBlock.FACING)==(descend?Direction.NORTH:Direction.SOUTH),"correct paid stair direction at "+depth);
+        }
+        h.assertTrue(p.getOffhandItem().isEmpty()&&h.getLevel().getBlockState(BridgeDesign.cell(floor,Direction.SOUTH,5,slope)).isAir(),"exactly four stairs paid, no free tail");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_07") public static void worldloomBuildsPaidAscendingStaircases(GameTestHelper h){worldloomStaircase(h,false);}
+    @GameTest(template="empty",batch="upgrade_516_08") public static void worldloomBuildsPaidDescendingStaircases(GameTestHelper h){worldloomStaircase(h,true);}
+    @GameTest(template="empty",batch="upgrade_516_09") public static void staircaseClearanceStopsPlanningAtAContainer(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDLOOM);p.setPos(p.position().add(0,80,0));p.setXRot(-30);p.setYRot(0);var floor=p.blockPosition().below();
+        for(int d=1;d<=4;d++)for(int y=0;y<=2;y++)h.getLevel().setBlockAndUpdate(BridgeDesign.cell(floor,Direction.SOUTH,d,1).above(y),Blocks.AIR.defaultBlockState());
+        var obstacle=BridgeDesign.cell(floor,Direction.SOUTH,2,1).above();h.getLevel().setBlockAndUpdate(obstacle,Blocks.CHEST.defaultBlockState());
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE_STAIRS,8));
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"one safe step can be scheduled");drain(p);
+        h.assertTrue(p.getOffhandItem().getCount()==7&&h.getLevel().getBlockState(obstacle).is(Blocks.CHEST),"headroom obstacle is not overwritten or skipped");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_516_10") public static void hudTelemetryComesFromServerAbilityAndQueueState(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();p.tickCount=20;var state=ArtifactState.of(p,ArtifactKind.EVENTIDE);long now=ArtifactState.now(p);
+        state.putLong("ready",now+8);state.putLong("alternateReady",now+35);
+        ((ArtifactItem)tool.getItem()).inventoryTick(tool,h.getLevel(),p,0,true);
+        var tag=tool.getTag();h.assertTrue(tag.getInt("hudPrimary")==8&&tag.getInt("hudAlternate")==35&&tag.getString("hudStatus").equals("idle"),"dual cooldowns and actual queue status are copied from server state");finish(h,p);
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }
@@ -1573,7 +1661,7 @@ public final class PickaxeGameTests {
     private static BlockPos target(GameTestHelper h) {
         var pos=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());return pos;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
+    private static void finish(GameTestHelper h,ServerPlayer p) { DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty",batch="legacy_each_01") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
         h.assertTrue(SpecialPickaxes.PICKS.size()==13,"thirteen playable pickaxes");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();

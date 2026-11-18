@@ -139,7 +139,8 @@ public final class WorldSafety {
     }
     private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly) {
         var level=p.serverLevel();var origin=p.position();boolean creativeAtStart=p.isCreative();
-        if(!allowed(p,kind,pos) || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !inert(state) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
+        if(!allowed(p,kind,pos) || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !(inert(state)||offhandOnly&&kind==ArtifactKind.WORLDLOOM&&BridgeDesign.allowedStair(state))
+                || offhandOnly&&kind==ArtifactKind.WORLDLOOM&&BridgeDesign.stairMaterial(state)&&!BridgeDesign.clearance(level,pos) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             int first=offhandOnly?p.getInventory().getContainerSize()-1:0;

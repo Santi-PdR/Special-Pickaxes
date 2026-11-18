@@ -47,6 +47,7 @@ public final class ArtifactTechniques {
         var context=HeldUtilityContext.capture(player,tool);
         Vec3 center = player.getEyePosition();
         int moved = 0,visualized=0;
+        var recalledDrops=new java.util.ArrayList<ItemEntity>();
         var level=player.serverLevel();
         var drops=EntitySelection.nearest(level,ItemEntity.class,player.getBoundingBox().inflate(radius),
                 e->e.isAlive()&&DropOwnership.allows(player,e)
@@ -62,10 +63,10 @@ public final class ArtifactTechniques {
             if (delta.lengthSqr() < .25) continue;
             if(visualized<12){ArtifactFeedback.gravityTether(player,drop.position(),center);visualized++;}
             drop.setDeltaMovement(UtilityPullMotion.velocity(delta,Vec3.ZERO,0,.65,.65));
-            drop.hasImpulse = true;
+            drop.hasImpulse = true;recalledDrops.add(drop);
             if (++moved >= cap) break;
         }
-        if(moved>0)ArtifactFeedback.message(player, "drops_gathered", moved);
+        if(moved>0){DropRecall.start(player,tool,ArtifactKind.EVENTIDE,recalledDrops,radius);ArtifactFeedback.message(player, "drops_gathered", moved);}
         return moved>0;
     }
 
@@ -136,6 +137,7 @@ public final class ArtifactTechniques {
                 player.getBoundingBox().inflate(radius),
                 item->isIridiumRecallTarget(player,item,center,radius),center,cap,IRIDIUM_RECALL_INSPECTION_LIMIT);
         int recalled=0,visualized=0;
+        var recalledDrops=new java.util.ArrayList<ItemEntity>();
         for(var item:targets){
             if(recalled>=cap)break;
             var checkedPosition=item.position();var checkedStack=item.getItem();
@@ -150,9 +152,9 @@ public final class ArtifactTechniques {
                 item.hasImpulse=true;
             }
             if(visualized<24){ArtifactFeedback.burst(player,ArtifactKind.IRIDIUM,item.blockPosition(),4);visualized++;}
-            recalled++;
+            recalledDrops.add(item);recalled++;
         }
-        if(recalled>0)ArtifactFeedback.message(player,"ore_drops_recalled",recalled);
+        if(recalled>0){DropRecall.start(player,tool,ArtifactKind.IRIDIUM,recalledDrops,radius);ArtifactFeedback.message(player,"ore_drops_recalled",recalled);}
         return recalled>0;
     }
 

@@ -59,9 +59,9 @@ public final class RelicControl {
         ArtifactFeedback.cue(p,"confirm");AbilityVfx.cast(p,ArtifactSkills.feedbackKind(p.getMainHandItem(),((ArtifactItem)p.getMainHandItem().getItem()).kind));return true;
     }
     private static boolean cancel(ServerPlayer p,ArtifactKind kind){
-        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p);
+        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p)||DropRecall.active(p);
         if(kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,kind,"a").isPresent();ArtifactState.clearAnchors(p,kind);ArtifactState.of(p,kind).remove("trail");}
-        WorkQueue.cancel(p);DomainFields.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
+        WorkQueue.cancel(p);DomainFields.stop(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);
         if(!active)return true;
         ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
     }

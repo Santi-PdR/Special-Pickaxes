@@ -32,12 +32,16 @@ public final class MiningAlternates {
         }
         var steps=new ArrayList<WorkStep>();var forward=player.getDirection();
         if(kind==ArtifactKind.WORLDLOOM){
-            if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block)||!WorldSafety.inert(block.getBlock().defaultBlockState()))return false;
+            if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block))return false;
+            var material=block.getBlock().defaultBlockState();boolean stairs=BridgeDesign.stairMaterial(material);
+            if(!WorldSafety.inert(material)&&!stairs)return false;
+            int slope=BridgeDesign.slope(player.getXRot(),stairs);
+            if(stairs)material=material.setValue(net.minecraft.world.level.block.StairBlock.FACING,slope>0?forward:forward.getOpposite());
             var floor=player.blockPosition().below();
             for(int depth=1;depth<=BRIDGE_LENGTH;depth++){
-                var at=floor.relative(forward,depth);
-                if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir())break;
-                steps.add(new WorkStep.Place(at,block.getBlock().defaultBlockState(),true));
+                var at=BridgeDesign.cell(floor,forward,depth,slope);
+                if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir()||stairs&&!BridgeDesign.clearance(level,at))break;
+                steps.add(new WorkStep.Place(at,material,true));
             }
         }else if(kind==ArtifactKind.AXIOM){
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;

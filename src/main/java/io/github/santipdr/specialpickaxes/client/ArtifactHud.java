@@ -13,7 +13,42 @@ import net.minecraftforge.fml.common.Mod;
 /** Loaded exclusively on the physical client; all displayed values originate on the server. */
 @Mod.EventBusSubscriber(modid=SpecialPickaxes.ID,value=Dist.CLIENT)
 public final class ArtifactHud {
+    private static final java.util.Set<String> STATUSES=java.util.Set.of("idle","ready","paused","preparing","executing");
     private ArtifactHud() {}
+    /** Display-only server NBT. No client countdown or HUD state authorizes an ability. */
+    @SubscribeEvent public static void overlay(RenderGuiOverlayEvent.Post event){
+        if(event.getOverlay()!=VanillaGuiOverlay.HOTBAR.type())return;
+        var mc=Minecraft.getInstance();
+        if(mc.player==null||mc.level==null||mc.screen!=null||mc.options.hideGui||mc.player.isSpectator())return;
+        var tool=mc.player.getMainHandItem();
+        if(!(tool.getItem() instanceof ArtifactItem item)||!tool.hasTag()||!tool.getTag().contains("hudStatus"))return;
+        int screen=mc.getWindow().getGuiScaledWidth();if(screen<240)return;
+        var tag=tool.getTag();var graphics=event.getGuiGraphics();
+        int width=Math.min(184,screen/2),x=screen-width-7,y=44;
+        int primary=Math.max(0,Math.min(12000,tag.getInt("hudPrimary")));
+        int alternate=Math.max(0,Math.min(48000,tag.getInt("hudAlternate")));
+        int color=0xff000000|item.kind.color;
+        graphics.fill(x,y,x+width,y+58,0xc2101720);graphics.fill(x,y,x+2,y+58,color);
+        var p=Component.translatable("hud.specialpickaxes.primary",primary==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((primary+19)/20)+"s"));
+        var a=Component.translatable("hud.specialpickaxes.alternate",alternate==0?Component.translatable("hud.specialpickaxes.ready"):Component.literal(((alternate+19)/20)+"s"));
+        graphics.drawString(mc.font,mc.font.plainSubstrByWidth(p.getString(),width-12),x+6,y+5,primary==0?0xffb4f2cd:0xffc3ccd9,false);
+        bar(graphics,x+6,y+16,width-12,primary,Math.max(1,tag.getInt("artifactCooldown")),color);
+        graphics.drawString(mc.font,mc.font.plainSubstrByWidth(a.getString(),width-12),x+6,y+23,alternate==0?0xffb4f2cd:0xffc3ccd9,false);
+        bar(graphics,x+6,y+34,width-12,alternate,Math.max(40,tag.getInt("hudAlternateMax")),color);
+        String status=tag.getString("hudStatus");
+        if(!STATUSES.contains(status))status="idle";
+        Component progress;
+        if(!status.equals("idle"))progress=Component.translatable("hud.specialpickaxes.work",Component.translatable("status.specialpickaxes."+status),Math.max(0,tag.getInt("hudCompleted")),Math.max(0,tag.getInt("artifactWork")));
+        else if(tag.getInt("hudRecall")>0)progress=Component.translatable("hud.specialpickaxes.recall",Math.min(256,tag.getInt("hudRecall")));
+        else if(tag.getBoolean("hudDomain"))progress=Component.translatable("hud.specialpickaxes.domain");
+        else progress=Component.translatable("hud.specialpickaxes.idle");
+        graphics.drawString(mc.font,mc.font.plainSubstrByWidth(progress.getString(),width-12),x+6,y+44,0xffd5dde9,false);
+    }
+    private static void bar(net.minecraft.client.gui.GuiGraphics graphics,int x,int y,int width,int remaining,int maximum,int color){
+        graphics.fill(x,y,x+width,y+3,0xff33404c);
+        int filled=remaining<=0?width:(int)Math.round(width*(1-Math.min(1,remaining/(double)maximum)));
+        if(filled>0)graphics.fill(x,y,x+filled,y+3,remaining==0?0xff74d3a2:color);
+    }
     /** A full-screen guide owns the view; inventory/JEI tooltips behind it must not cover its cards. */
     @SubscribeEvent public static void manualTooltip(net.minecraftforge.client.event.RenderTooltipEvent.Pre e){
         if(Minecraft.getInstance().screen instanceof ArtifactManualScreen)e.setCanceled(true);
