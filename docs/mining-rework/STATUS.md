@@ -1,3 +1,7 @@
+## Reforma 6.0 — Stasis alpha.7 parcial, runtime validado
+
+Fuente `f837d8cda54b9e0a96fe1598a9e7760aae0ec513`, CI `44525770020` **SUCCESS**: 187 JUnit sin fallos/errores/omisiones, 465 GameTests, cliente 32 escenas/64 tooltips, controles y servidor empaquetado aprobados. Se restauró el envío vacío de bordes de Stasis y se añadieron pilares de tiempo en el mundo, sin HUD. Secundaria: reloj de arena de 4773 candidatos, hasta 25 bloques alto/ancho, cintura estrecha y cámaras polares; drops naturales, claims y procedencia conservados. 139 Python locales (una omisión), 25 recursos; 58 hashes congelados intactos. [Alcance y límites](STASIS-6.0.md). Falta inspección visual de acción, primaria completa y variante Curios de Stasis; siguen seis identidades globales incompletas y copia Curios de Worldbreaker. No release pública 6.0.
+
 ## Reforma 6.0 — Paradox alpha.6 validado, reforma global incompleta
 
 Runtime `20e2a1124560a1b1f21c024da83fcf496b2c1bb6`, CI `44515980736` **SUCCESS**: 182 JUnit sin fallos/errores/omisiones, 462 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado aprobados. Local 139 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Paradox: registro regional y detonación explícita con loot nativo, doce órdenes causales, retícula de 6101 candidatos y cuatro ecos Curios (hasta 108 celdas). Sin transmutación pública. [Alcance, captura de guía ES inspeccionada y límites](PARADOX-6.0.md). Quedan seis identidades y copia Curios global de Worldbreaker; sin release pública 6.0.
