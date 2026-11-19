@@ -14,11 +14,17 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 public final class WorldbreakerReworkGameTests {
     @GameTest(template="empty",batch="worldbreaker_619_01") public static void nativeCataclysmHarvestsABroadChamberAndPreservesItsExterior(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var level=h.getLevel();
+        // This large footprint exceeds target()'s small clear volume. Isolate the
+        // sparse fixture from previously generated tests/terrain and provenance.
+        for(int i=0;i<WorldbreakerCataclysm.VOLUME;i++){
+            var cell=WorldbreakerCataclysm.cell(at,i);level.setBlock(cell,Blocks.AIR.defaultBlockState(),2);PlayerPlacedBlocks.get(level).unmark(cell);
+        }
+        level.setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());
         var central=at.below(8);var satellite=at.offset(12,-6,4);var ore=at.west(12).below(4);var placed=at.north(12);var outside=at.offset(16,0,16);
         for(var cell:java.util.List.of(central,satellite,placed,outside)){level.setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(cell);}
         level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(ore);PlayerPlacedBlocks.get(level).mark(placed);
         try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public cataclysm starts");drain(p);
-            h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(central).isAir()&&level.getBlockState(satellite).isAir()&&level.getBlockState(ore).isAir(),"chamber harvest natural rock and ore");
+            h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(central).isAir()&&level.getBlockState(satellite).isAir()&&level.getBlockState(ore).isAir(),"chamber harvest natural rock and ore: target="+level.getBlockState(at)+" core="+level.getBlockState(central)+" lateral="+level.getBlockState(satellite)+" ore="+level.getBlockState(ore)+" remaining="+WorkQueue.remaining(p));
             h.assertTrue(level.getBlockState(placed).is(Blocks.STONE)&&level.getBlockState(outside).is(Blocks.STONE),"player builds and exterior remain intact");
         }finally{PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);}
     }

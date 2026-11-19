@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.23 Curios nativo e investigación de CI
+
+Curios sin copia: Fractura del Núcleo, 702 candidatos 9×9×9 menos núcleo 3×3×3, cada 8 s tras mena natural manual confirmada; conserva construcciones. Seleccionar copia o retirar slot revoca lease incluso en callback. Un JUnit y dos GameTests; local 141 Python (una omisión), 25 recursos, hashes congelados intactos. Forge/capturas pendientes. [Contrato y límites](WORLDBREAKER-6.0.md).
+
+Alpha.19 CI `44633175036` y alpha.20 `44633627986` SUCCESS. Alpha.21 `44634804567` y alpha.22 `44635858293` fallaron la misma aserción de cosecha Cataclismo. Se aísla toda su geometría en el fixture disperso (el helper limpiaba menos volumen que el programa), conserva aserciones y añade diagnóstico por posición. Causa de contaminación sospechada, no confirmada aún; límites y seguridad producción sin relajar. Siguen pendientes pasivas copiadas/controles equipados/copia Ícaro-Iridium-Strata y modos nativos 3..5. No release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.22 coronas y cisma implementados
 
 Modo Fractura ahora abre tres coronas concéntricas (radios 6..8 / 14..16 / 22..24, altura 13, 7228 candidatos); Corte abre dos planos verticales perpendiculares (radio 24, altura 25, 6925 candidatos). Conservan espacios entre cortes, construcciones y protecciones; drops naturales de roca/menas. Copias en mano y claves/índices de modos intactos. Dos JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos, 58 hashes intactos. [Detalles](WORLDBREAKER-6.0.md).

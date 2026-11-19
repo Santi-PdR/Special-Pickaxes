@@ -43,6 +43,11 @@ public final class MiningObservations {
     /** Mining-trigger copy only. Original stack, slot and selected source remain leased. */
     public static boolean captureCuriosWorldbreaker(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,
                                                     java.util.function.Supplier<ItemStack> current){
+        if(nativeWorldbreaker(curio)){
+            if(!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+            return capture(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,pos,state,false,new EquipmentLease<>(curio,
+                    ()->current.get()==curio&&nativeWorldbreaker(curio)?curio:ItemStack.EMPTY));
+        }
         var source=copiedMiningSource(curio);
         if(source==null||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
         boolean eligible=switch(source){
@@ -55,6 +60,10 @@ public final class MiningObservations {
                 &&ArtifactSkills.feedbackKind(p.getMainHandItem(),held.kind)==ArtifactKind.PALIMPSEST)return false;
         return capture(p,p.getMainHandItem(),source,pos,state,false,new EquipmentLease<>(curio,
                 ()->current.get()==curio&&copiedMiningSource(curio)==source?curio:ItemStack.EMPTY));
+    }
+    private static boolean nativeWorldbreaker(ItemStack stack){
+        return !stack.isEmpty()&&stack.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER
+                &&(!stack.hasTag()||!stack.getTag().contains("copiedSkill"));
     }
     public static ArtifactKind copiedMiningSource(ItemStack stack){
         if(stack.isEmpty()||!(stack.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER
@@ -154,6 +163,7 @@ public final class MiningObservations {
                 if(o.curioSource!=null&&o.kind==ArtifactKind.AXIOM&&valid(o))AxiomAftershock.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.EXODIUM&&valid(o))ExodiumFallingStar.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.HELLSPEC&&valid(o))HellspecCinderRing.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.WORLDBREAKER&&valid(o))WorldbreakerCoreFracture.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }

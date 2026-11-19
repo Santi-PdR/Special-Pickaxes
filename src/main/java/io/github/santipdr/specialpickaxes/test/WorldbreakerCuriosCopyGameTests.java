@@ -79,4 +79,24 @@ public final class WorldbreakerCuriosCopyGameTests {
         h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();h.assertTrue(WorkQueue.remaining(p)==156,"copied source queues its own geometry");drain(p);
         h.assertTrue(h.getLevel().getBlockState(below).isAir(),"copied roots harvest downward");finish(h,p);
     }
+    @GameTest(template="empty",batch="worldbreaker_curios_native_01") public static void uncopiedWorldbreakerHasItsOwnConfirmedOreFracture(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());var slot=new AtomicReference<ItemStack>(source);
+        var rock=at.offset(3,2,0);var ore=at.west(3);var core=at.above();var placed=at.east(3);
+        for(var cell:java.util.List.of(rock,core,placed)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
+        h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        try{h.assertTrue(MiningObservations.captureCuriosWorldbreaker(p,source,at,Blocks.DIAMOND_ORE.defaultBlockState(),slot::get),"native Curios observes manual ore");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
+            h.assertTrue(WorkQueue.remaining(p)==702,"native fracture has its own geometry");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(rock).isAir()&&h.getLevel().getBlockState(ore).isAir()&&h.getLevel().getBlockState(core).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.STONE),"native Curios harvests surrounding geology but preserves core/builds");
+            h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());MiningObservations.captureCuriosWorldbreaker(p,source,at,Blocks.DIAMOND_ORE.defaultBlockState(),slot::get);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();h.assertTrue(!WorkQueue.busy(p),"native eight-second cooldown cannot chain");
+        }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="worldbreaker_curios_native_02") public static void selectingACopyCancelsTheCurrentNativeFractureCell(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());var slot=new AtomicReference<ItemStack>(source);var rock=at.east(3);
+        h.getLevel().setBlockAndUpdate(rock,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(rock);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        h.assertTrue(MiningObservations.captureCuriosWorldbreaker(p,source,at,Blocks.DIAMOND_ORE.defaultBlockState(),slot::get),"native ore observation");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
+        Consumer<BlockEvent.BreakEvent> mutate=e->{if(e.getPlayer()==p&&e.getPos().equals(rock))source.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mutate);
+        try{drain(p);h.assertTrue(source.hasTag()&&source.getTag().contains("copiedSkill")&&h.getLevel().getBlockState(rock).is(Blocks.STONE),"selecting a copy revokes native current-cell lease");}
+        finally{MinecraftForge.EVENT_BUS.unregister(mutate);finish(h,p);}
+    }
 }

@@ -47,4 +47,9 @@ class WorldbreakerCataclysmTest {
         assertTrue(WorldbreakerWorldSplit.contains(24,12,0));assertFalse(WorldbreakerWorldSplit.contains(4,0,4));
         assertFalse(WorldbreakerWorldSplit.contains(24,0,2));assertFalse(WorldbreakerWorldSplit.contains(0,13,0));
     }
+    @Test void nativeCuriosFractureHas702ImmutableCellsAndKeepsTheCentralCube(){
+        var cells=WorldbreakerCoreFracture.cells(BlockPos.ZERO);assertEquals(702,cells.size());assertEquals(702,new HashSet<>(cells).size());
+        assertTrue(cells.contains(new BlockPos(4,4,4)));assertFalse(cells.contains(new BlockPos(1,1,1)));
+        assertFalse(cells.contains(new BlockPos(5,0,0)));assertThrows(UnsupportedOperationException.class,()->cells.clear());
+    }
 }

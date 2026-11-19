@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.22`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.23`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -21,6 +21,8 @@ CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/r
 Worldbreaker alpha.21 añade copia Curios de disparadores mineros para nueve orígenes, con condición/recarga originales y cancelación al cambiar copia o retirar el slot. No incluye aún copia de pasivas de estado/combate, controles equipados ni Ícaro/Iridium/Strata; copia global sigue incompleta. Forge pendiente.
 
 Worldbreaker alpha.22 sustituye Fractura por tres Coronas de Falla (7228 candidatos) y Corte por Cisma Mundial de dos planos verticales (6925). Primeros tres modos y secundaria nativa implementados; tres modos restantes y copia Curios global aún pendientes. Forge/capturas pendientes.
+
+Worldbreaker alpha.23 añade Fractura del Núcleo nativa en Curios (702 candidatos / 8 s tras mena manual, conserva núcleo). Seleccionar copia cancela trabajo nativo. También aísla la prueba de Cataclismo tras dos fallos de CI; corrección aún pendiente de confirmar. Forge/capturas y copia Curios global completa pendientes.
 
 ---
 
