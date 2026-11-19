@@ -45,6 +45,9 @@ public final class ClientValidation {
                     if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
                         if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");
                         // Stand outside the volume to show both its bounds and corner clocks.
+                        // The gallery floor is local, so supply a stable observation platform.
+                        for(int x=23;x<=25;x++)for(int z=37;z<=39;z++)
+                            p.serverLevel().setBlock(new BlockPos(x,64,z),net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE.defaultBlockState(),2);
                         p.connection.teleport(24.5,65,38.5,139,-8);
                     }
                     state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
