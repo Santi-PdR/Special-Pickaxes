@@ -32,7 +32,7 @@ public final class RelicControl {
             case MODE:
                 if(copiedWorldbreaker)return false;
                 if(ArtifactInteraction.modeCount(k)<2)return false;
-                WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
+                IcarianFlight.stop(p);WorkQueue.cancel(p);ArtifactInteraction.clear(p);DomainFields.stop(p);
                 ArtifactState.rotate(p,k);tool.getOrCreateTag().putInt("artifactMode",ArtifactState.mode(p,k));ArtifactInteraction.display(p,tool,k);ArtifactFeedback.message(p,"named_mode",net.minecraft.network.chat.Component.translatable("mode.specialpickaxes."+ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k))));ArtifactFeedback.cue(p,"select");return true;
             case ACTIVATE:
                 if(WorkQueue.busy(p)){
@@ -45,11 +45,11 @@ public final class RelicControl {
                     if(!WorkQueue.togglePause(p))return false;
                     p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
-                if(DomainFields.active(p)||CompanionActions.active(p))return cancel(p,k);
+                if(IcarianFlight.active(p)||DomainFields.active(p)||CompanionActions.active(p))return cancel(p,k);
                 if(!copiedWorldbreaker&&ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
-                if(WorkQueue.busy(p)||ArtifactInteraction.selecting(p)||(tool.hasTag()&&tool.getTag().contains(SurveyBearing.POSITION)))return cancel(p,k);
+                if(IcarianFlight.active(p)||WorkQueue.busy(p)||ArtifactInteraction.selecting(p)||(tool.hasTag()&&tool.getTag().contains(SurveyBearing.POSITION)))return cancel(p,k);
                 return ArtifactActions.useAlternate(p,tool,k);
             default:return false;
         }
@@ -59,9 +59,9 @@ public final class RelicControl {
         ArtifactFeedback.cue(p,"confirm");AbilityVfx.cast(p,ArtifactSkills.feedbackKind(p.getMainHandItem(),((ArtifactItem)p.getMainHandItem().getItem()).kind));return true;
     }
     private static boolean cancel(ServerPlayer p,ArtifactKind kind){
-        boolean active=WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p)||DropRecall.active(p)||(p.getMainHandItem().hasTag()&&p.getMainHandItem().getTag().contains(SurveyBearing.POSITION));
+        boolean active=IcarianFlight.active(p)||WorkQueue.busy(p)||DomainFields.active(p)||CompanionActions.active(p)||ArtifactInteraction.selecting(p)||DropRecall.active(p)||(p.getMainHandItem().hasTag()&&p.getMainHandItem().getTag().contains(SurveyBearing.POSITION));
         if(kind==ArtifactKind.MERIDIAN||kind==ArtifactKind.LODESTAR){active|=ArtifactState.anchor(p,kind,"a").isPresent();ArtifactState.clearAnchors(p,kind);ArtifactState.of(p,kind).remove("trail");}
-        WorkQueue.cancel(p);DomainFields.stop(p);DropRecall.stop(p);SurveyGuide.clear(p.getMainHandItem());CompanionActions.stop(p);ArtifactInteraction.clear(p);
+        IcarianFlight.stop(p);WorkQueue.cancel(p);DomainFields.stop(p);DropRecall.stop(p);SurveyGuide.clear(p.getMainHandItem());CompanionActions.stop(p);ArtifactInteraction.clear(p);
         if(!active)return true;
         ArtifactFeedback.cue(p,"cancel");ArtifactFeedback.message(p,"cancelled");return true;
     }

@@ -281,6 +281,8 @@ public final class ArtifactPassives {
             }
             case ICARUS -> {
                 if(!player.onGround()){
+                    grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_FEATHERFALL.get(),0,PASSIVE_LEASE_TICKS);
+                    if(!ownerContext.ownerValid())return;
                     grant(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.ICARIAN_MOMENTUM.get(),0,PASSIVE_LEASE_TICKS);
                 if(!ownerContext.ownerValid())return;
                     shareIcarianMomentum(player);

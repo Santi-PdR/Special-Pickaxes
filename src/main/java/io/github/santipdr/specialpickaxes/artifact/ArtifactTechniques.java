@@ -97,18 +97,6 @@ public final class ArtifactTechniques {
         if (level.hasChunkAt(pos)) AbilityVfx.retired(level,player, color, false, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5, 3, .08, .03, .08, 0);
     }
 
-    private static boolean icarianLift(ServerPlayer player,ItemStack tool) {
-        if(player.isPassenger()||player.isSleeping())return false;
-        BlockPos base=player.blockPosition();
-        int availableRise=player.serverLevel().getMaxBuildHeight()-base.getY()-2;
-        boolean started=WorkQueue.startRegion(player,tool,ArtifactKind.ICARUS,new IcarianLiftProgram(base,availableRise));
-        if(started){
-            ArtifactFeedback.message(player,"icarian_lift_started");
-            if(ArtifactFeedback.reserveMiningParticles(player,12))AbilityVfx.retired(player.serverLevel(),player,ParticleTypes.END_ROD,false,player.getX(),player.getY()+0.2,player.getZ(),12,.25,.2,.25,.04);
-        }
-        return started;
-    }
-
     private static boolean dash(ServerPlayer player, int distance) {
         Vec3 start = player.position(), direction = player.getLookAngle().normalize(), last = start;
         var box = player.getBoundingBox();
@@ -203,7 +191,7 @@ public final class ArtifactTechniques {
         return switch (kind) {
             case PALIMPSEST,CHOIR,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
             case EVENTIDE -> magnetDrops(player,tool,48,256);
-            case ICARUS -> icarianLift(player,tool);
+            case ICARUS -> IcarianFlight.start(player,tool);
             case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):
                     WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(aimed(player),kind,true));
             case EXODIUM -> starfallSink(player,tool);

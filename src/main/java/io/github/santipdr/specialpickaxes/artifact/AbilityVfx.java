@@ -58,6 +58,15 @@ public final class AbilityVfx {
         }
         return true;
     }
+    /** Two animated custom feather helices, only during the short active ascent. */
+    public static boolean ascent(ServerPlayer player,int age){
+        int tick=player.server.getTickCount();if(!BUDGET.tryReserve(tick,8))return false;
+        for(int side=-1;side<=1;side+=2)for(int feather=0;feather<4;feather++){
+            double angle=age*.24+feather*.65+(side<0?Math.PI:0),radius=.5+feather*.12;
+            var at=player.position().add(Math.cos(angle)*radius,.1-feather*.18,Math.sin(angle)*radius);
+            player.serverLevel().sendParticles(player,particle(ArtifactKind.ICARUS,true),false,at.x,at.y,at.z,1,0,.02,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

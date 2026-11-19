@@ -119,7 +119,14 @@ public final class ArtifactActions {
             }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
-        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.ICARUS||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
+        if(kind==ArtifactKind.ICARUS){
+            var aimed=target(p);if(aimed.isEmpty())return false;
+            var context=HeldUtilityContext.capture(p,tool);var at=aimed.get();
+            if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.serverLevel().hasChunkAt(at)
+                    ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
+            return WorkQueue.startRegion(p,tool,kind,new IcarianWingcut(at,p.getDirection(),ArtifactState.mode(p,kind)==1));
+        }
+        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
             return started;

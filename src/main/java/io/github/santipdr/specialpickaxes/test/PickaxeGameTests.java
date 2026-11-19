@@ -1777,6 +1777,47 @@ public final class PickaxeGameTests {
         h.assertTrue(p.getInventory().countItem(Blocks.STONE.asItem())==1536,"existing inventory is preserved");finish(h,p);
     }
 
+    private static ServerPlayer clearFlight(GameTestHelper h,ArtifactKind kind){
+        var p=player(h,kind);p.setPos(p.position().add(0,90,0));
+        for(int y=0;y<6;y++)h.getLevel().setBlockAndUpdate(p.blockPosition().above(y),Blocks.AIR.defaultBlockState());return p;
+    }
+    @GameTest(template="empty",batch="reform_602_01") public static void ascentStopsWhenToolChangesButKeepsGrace(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"flight starts");IcarianFlight.tick();
+        p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);IcarianFlight.tick();
+        h.assertTrue(!IcarianFlight.active(p)&&p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"tool loss ends thrust, not timed safety");finish(h,p);
+    }
+    @GameTest(template="empty",batch="reform_602_02") public static void ascentDoesNotOverwriteCallbackTeleport(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);var origin=p.position();
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> moved=e->{if(e.player==p)p.setPos(origin.add(2,0,0));};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,moved);
+        try{h.assertTrue(!IcarianFlight.start(p,p.getMainHandItem())&&!IcarianFlight.active(p),"callback displacement aborts start");
+            h.assertTrue(p.position().equals(origin.add(2,0,0))&&p.getDeltaMovement().equals(Vec3.ZERO),"external position remains with no stale impulse");
+        }finally{MinecraftForge.EVENT_BUS.unregister(moved);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="reform_602_03") public static void ascentStopsAtANewCeilingWithoutMining(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);var start=p.position();h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"clear path starts");
+        var roof=p.blockPosition().above(2);h.getLevel().setBlockAndUpdate(roof,Blocks.STONE.defaultBlockState());IcarianFlight.tick();
+        h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(start)&&h.getLevel().getBlockState(roof).is(Blocks.STONE),"new ceiling stops thrust without teleporting or breaking it");finish(h,p);
+    }
+    @GameTest(template="empty",batch="reform_602_04") public static void copiedIcarusUsesVelocityAscentAndCanCancelWithAlternate(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.WORLDBREAKER);p.getMainHandItem().getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER)&&IcarianFlight.active(p),"copy uses the actual Icarus implementation");
+        IcarianFlight.tick();var position=p.position();
+        h.assertTrue(p.getDeltaMovement().y>0&&RelicControl.execute(p,ArtifactKind.WORLDBREAKER,RelicControl.Action.ALT_SKILL),"alternate cancels copied thrust");
+        h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(position),"copy cancellation never relocates the caster");finish(h,p);
+    }
+    @GameTest(template="empty",batch="reform_602_05") public static void temporaryFeatherfallReducesFallDamageAfterThrustEnds(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"thrust starts");IcarianFlight.tick();IcarianFlight.stop(p);
+        var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,18F,1F);MinecraftForge.EVENT_BUS.post(fall);
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.2F)<.001F,"temporary featherfall reduces fall damage by 80 percent without editing armor");
+        p.removeEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get());var after=new net.minecraftforge.event.entity.living.LivingFallEvent(p,18F,1F);MinecraftForge.EVENT_BUS.post(after);
+        h.assertTrue(after.getDamageMultiplier()==1F,"no permanent fall immunity remains");finish(h,p);
+    }
+    @GameTest(template="empty",batch="reform_602_06") public static void curiosIcarusGrantsAirborneFeatherfallWithoutAThrustJob(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);p.setOnGround(false);ArtifactPassives.tick(p,ArtifactKind.ICARUS);
+        h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get())&&!IcarianFlight.active(p),"equipped passive has its own timed defensive behavior, not automatic thrust");finish(h,p);
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }
@@ -1791,7 +1832,7 @@ public final class PickaxeGameTests {
     private static BlockPos target(GameTestHelper h) {
         var pos=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());return pos;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p) { DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
+    private static void finish(GameTestHelper h,ServerPlayer p) { IcarianFlight.stop(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
     @GameTest(template="empty",batch="legacy_each_01") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
         h.assertTrue(SpecialPickaxes.PICKS.size()==13,"thirteen playable pickaxes");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
@@ -3858,24 +3899,21 @@ public final class PickaxeGameTests {
         h.assertTrue(h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(stone).isAir(),"scheduled quarry mines the stone sphere");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"quarry preserves ores");finish(h,p);
     }
-    @GameTest(template="empty",batch="legacy_each_12") public static void icarusBoreAndSolidStop(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ICARUS);var wall=h.absolutePos(new BlockPos(5,2,5));
-        for(int x=-1;x<=1;x++) for(int y=0;y<3;y++) h.getLevel().setBlockAndUpdate(wall.offset(x,y,0),Blocks.STONE.defaultBlockState());
-        var barrier=wall.offset(0,0,2);h.getLevel().setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(barrier.above(),Blocks.BEDROCK.defaultBlockState());
-        double old=p.getZ();h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.ICARUS,false),"kinetic bore activates");drain(p);
-        h.assertTrue(p.getZ()>old && p.getZ()<barrier.getZ(),"advanced through excavation but not bedrock");
-        h.assertTrue(h.getLevel().getBlockState(wall).isAir(),"bore excavated corridor");finish(h,p);
+    @GameTest(template="empty",batch="legacy_each_12") public static void icarianWingcutMinesWithoutRelocatingItsCaster(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);var at=target(h);var state=Blocks.STONE.defaultBlockState();
+        PlayerPlacedBlocks.get(h.getLevel()).unmark(at);p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
+        var origin=p.position();var barrier=at.south(2);h.getLevel().setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.ICARUS,false),"wingcut activates on natural rock");drain(p);
+        h.assertTrue(p.position().equals(origin),"primary performs no teleport or player movement");
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(barrier).is(Blocks.BEDROCK),"natural cut mines its target while preserving barriers");finish(h,p);
     }
-    @GameTest(template="empty",batch="legacy_each_12") public static void icarianLiftReachesSkyThroughItsOwnShaft(GameTestHelper h) {
-        var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
-        for(int y=1;y<=6;y++)for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)h.getLevel().setBlockAndUpdate(base.offset(x,y,z),Blocks.STONE.defaultBlockState());
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts without a target block");
-        h.assertTrue(WorkQueue.protectsFall(p),"fall damage is protected while the lift is running");drain(p);
-        h.assertTrue(p.blockPosition().getY()>=base.getY()+5,"the lift carries its owner up the shaft toward open sky");
-        for(int y=1;y<=6;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y)).isAir(),"the central shaft is cleared through the roof");
-        h.assertTrue(h.getLevel().getBlockState(base.above().east()).is(Blocks.STONE),"the lift never widens the shaft into the roof");
-        h.assertTrue(!WorkQueue.busy(p)&&!WorkQueue.protectsFall(p),"movement protection ends with the lift job");finish(h,p);
+    @GameTest(template="empty",batch="legacy_each_12") public static void icarianAscentUsesVelocityAndLeavesBlocksUntouched(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);p.setPos(p.position().add(0,80,0));var start=p.position();
+        for(int y=0;y<=4;y++)h.getLevel().setBlockAndUpdate(p.blockPosition().above(y),Blocks.AIR.defaultBlockState());
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"ascent starts in clear air without a mining target");IcarianFlight.tick();
+        h.assertTrue(IcarianFlight.active(p)&&p.getDeltaMovement().y>0&&p.position().equals(start),"only velocity changes; there is no direct position write");
+        h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get())&&p.getEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()).getDuration()==IcarianFlight.GRACE,"extra fall grace is granted independently of the motion job");
+        IcarianFlight.stop(p);h.assertTrue(!IcarianFlight.active(p)&&p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"cancelling thrust leaves the timed featherfall safety intact");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_12") public static void coreDrillFallProtectionContinuesUntilLanding(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",3);p.setOnGround(false);
@@ -3898,7 +3936,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.ICARUS);var base=p.blockPosition();
         for(int y=1;y<=2;y++)h.getLevel().setBlockAndUpdate(base.above(y),Blocks.STONE.defaultBlockState());
         var protectedBlock=base.above(3);h.getLevel().setBlockAndUpdate(protectedBlock,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(protectedBlock);
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a protected block");drain(p);
+        h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"ascent rejects a solid ceiling rather than excavating or teleporting through it");
         h.assertTrue(h.getLevel().getBlockState(protectedBlock).is(Blocks.STONE),"the lift stops without breaking a player-protected block");
         h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before pushing its owner through the barrier");
         h.assertTrue(!WorkQueue.busy(p),"barrier stop closes the lift cleanly");PlayerPlacedBlocks.get(h.getLevel()).unmark(protectedBlock);finish(h,p);
@@ -3908,7 +3946,7 @@ public final class PickaxeGameTests {
         h.getLevel().setBlockAndUpdate(base.above(),Blocks.STONE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(base.above(2),Blocks.STONE.defaultBlockState());
         var lava=base.above(3);h.getLevel().setBlockAndUpdate(lava,Blocks.LAVA.defaultBlockState());
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a lava barrier");drain(p);
+        h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"ascent rejects an obstructed path below lava");
         h.assertTrue(h.getLevel().getBlockState(lava).is(Blocks.LAVA),"the lift does not mine, drain or replace lava");
         h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before moving the player through lava");
         h.assertTrue(!WorkQueue.busy(p),"the lava stop ends the queue and movement protection");finish(h,p);
@@ -3919,7 +3957,7 @@ public final class PickaxeGameTests {
         h.getLevel().setBlockAndUpdate(base.above(2),Blocks.STONE.defaultBlockState());
         var foreignFluid=base.above(3);h.getLevel().setBlockAndUpdate(foreignFluid,TestFluids.BLOCK.defaultBlockState());
         h.assertTrue(TestFluids.BLOCK.defaultBlockState().getFluidState().getFluidType()==TestFluids.TYPE,"fixture is a registered non-vanilla Forge fluid");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"Icarian Lift starts below a foreign fluid");drain(p);
+        h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ALT_SKILL),"ascent rejects an obstructed path below modded fluid");
         h.assertTrue(h.getLevel().getBlockState(foreignFluid).is(TestFluids.BLOCK),"the lift leaves a modded fluid such as diesel untouched");
         h.assertTrue(p.blockPosition().getY()<=base.getY()+1,"the lift stops before moving through the foreign fluid");
         h.assertTrue(!WorkQueue.busy(p),"the foreign-fluid stop ends the queue cleanly");finish(h,p);
