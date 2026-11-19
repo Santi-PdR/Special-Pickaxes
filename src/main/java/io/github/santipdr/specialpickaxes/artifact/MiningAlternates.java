@@ -10,12 +10,12 @@ import java.util.ArrayList;
 
 /** Block-only alternate techniques. Never queries, damages or controls living entities/projectiles. */
 public final class MiningAlternates {
-    public static final int BRIDGE_LENGTH=64;
     private MiningAlternates(){}
 
     public static boolean use(ServerPlayer player,ItemStack tool,ArtifactKind kind){
+        if(kind==ArtifactKind.WORLDLOOM)return WorldloomHarvest.start(player,tool);
         var level=player.serverLevel();var actorOrigin=player.position();
-        var aimed=kind==ArtifactKind.WORLDLOOM?java.util.Optional.of(player.blockPosition().below()):ArtifactActions.target(player);
+        var aimed=ArtifactActions.target(player);
         if(aimed.isEmpty())return false;
         var origin=aimed.get();
         if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
@@ -29,22 +29,7 @@ public final class MiningAlternates {
             ArtifactFeedback.message(player,"mining_alternate_started",program.remaining());
             return true;
         }
-        var steps=new ArrayList<WorkStep>();var forward=player.getDirection();
-        if(kind==ArtifactKind.WORLDLOOM){
-            if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block))return false;
-            var material=block.getBlock().defaultBlockState();boolean stairs=BridgeDesign.stairMaterial(material);
-            if(!WorldSafety.inert(material)&&!stairs)return false;
-            int slope=BridgeDesign.slope(player.getXRot(),stairs);
-            if(stairs)material=material.setValue(net.minecraft.world.level.block.StairBlock.FACING,slope>0?forward:forward.getOpposite());
-            var floor=player.blockPosition().below();boolean wide=player.isShiftKeyDown();
-            for(int depth=1;depth<=BRIDGE_LENGTH;depth++){
-                var row=BridgeDesign.row(floor,forward,depth,slope,wide);boolean clear=true;
-                for(var at:row)if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir()
-                        ||(stairs||wide)&&!BridgeDesign.clearance(level,at)){clear=false;break;}
-                if(!clear)break;
-                for(var at:row)steps.add(wide?new WorkStep.BridgePlace(at,material):new WorkStep.Place(at,material,true));
-            }
-        }else if(kind==ArtifactKind.AXIOM){
+        if(kind==ArtifactKind.AXIOM){
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;
             return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,false));
         }else if(kind==ArtifactKind.CRUCIBLE){
@@ -52,10 +37,7 @@ public final class MiningAlternates {
         }else if(kind==ArtifactKind.INTERREGNUM){
             return WorkQueue.startRegion(player,tool,kind,new StasisHourglassProgram(origin));
         }else return false;
-        if(steps.isEmpty()||!WorkQueue.start(player,tool,kind,steps))return false;
-        ArtifactFeedback.preview(player,kind,steps);
-        ArtifactFeedback.message(player,"mining_alternate_started",steps.size());
-        return true;
+
     }
 
     private static boolean context(ServerPlayer player,ItemStack tool,net.minecraft.server.level.ServerLevel level,net.minecraft.world.phys.Vec3 origin){

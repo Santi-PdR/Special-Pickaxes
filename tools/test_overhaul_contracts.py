@@ -119,4 +119,5 @@ class OverhaulContracts(unittest.TestCase):
                 self.assertNotIn('contorno', texts[key].lower())
             self.assertIn('%1$s', texts['mining.how.worldloom.quarry'])
             self.assertIn('12', texts['guide.main.worldloom'])
-            self.assertIn('64', texts['tooltip.specialpickaxes.secondary.worldloom'])
+            self.assertIn('12', texts['tooltip.specialpickaxes.secondary.worldloom'])
+            self.assertNotIn('64', texts['tooltip.specialpickaxes.secondary.worldloom'])

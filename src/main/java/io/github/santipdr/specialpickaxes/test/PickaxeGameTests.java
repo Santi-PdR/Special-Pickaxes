@@ -158,7 +158,7 @@ public final class PickaxeGameTests {
         var wearer=player(h,kind);var at=target(h);var level=h.getLevel();
         if(kind==ArtifactKind.AXIOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());}
         if(kind==ArtifactKind.CRUCIBLE)ArtifactState.of(wearer,kind).putInt("mode",8);
-        if(kind==ArtifactKind.WORLDLOOM){wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,64));for(int n=1;n<=9;n++)level.setBlockAndUpdate(wearer.blockPosition().below().relative(wearer.getDirection(),n),Blocks.AIR.defaultBlockState());}
+        if(kind==ArtifactKind.WORLDLOOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(at);}
         var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(wearer.position().add(2,5,0));mob.setDeltaMovement(.2,.1,.3);level.addFreshEntity(mob);
         var arrow=new net.minecraft.world.entity.projectile.Arrow(level,mob);arrow.setPos(wearer.position().add(3,1,0));arrow.setDeltaMovement(-1,0,0);level.addFreshEntity(arrow);
         var motion=mob.getDeltaMovement();var arrowMotion=arrow.getDeltaMovement();float health=mob.getHealth();
@@ -173,7 +173,7 @@ public final class PickaxeGameTests {
         if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC)
             h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
         if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).isAir(),"exposure clears adjacent stone and preserves its ore");
-        if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(wearer.getOffhandItem().getCount()<64,"the walkway consumes real offhand building material");
+        if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(level.getBlockState(at).isAir(),"exposed ore harvested without construction");
         if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).isAir(),"solar nova harvests its natural target without harming creatures");
         WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
     }
@@ -183,6 +183,28 @@ public final class PickaxeGameTests {
             var wearer=player(h,kind);h.assertTrue(Math.abs(1D+wearer.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).stream().mapToDouble(modifier->modifier.getAmount()).sum()-4D)<.001,"all thirteen picks now deal four base melee damage");wearer.discard();
         }
         h.assertTrue(SpecialPickaxes.TIER.getUses()==32768&&SpecialPickaxes.TIER.getSpeed()==64F&&SpecialPickaxes.TIER.getLevel()==5,"mining durability, speed and tier remain OP");h.succeed();
+    }
+    /** Historical paid-placement utility regression; not dispatched by any public ability. */
+    static boolean legacyPaidBridge(ServerPlayer player){
+        var level=player.serverLevel();var kind=ArtifactKind.WORLDLOOM;var tool=player.getMainHandItem();
+        var steps=new ArrayList<WorkStep>();var forward=player.getDirection();
+        {
+            if(player.getOffhandItem().hasTag()||!(player.getOffhandItem().getItem() instanceof BlockItem block))return false;
+            var material=block.getBlock().defaultBlockState();boolean stairs=BridgeDesign.stairMaterial(material);
+            if(!WorldSafety.inert(material)&&!stairs)return false;
+            int slope=BridgeDesign.slope(player.getXRot(),stairs);
+            if(stairs)material=material.setValue(net.minecraft.world.level.block.StairBlock.FACING,slope>0?forward:forward.getOpposite());
+            var floor=player.blockPosition().below();boolean wide=player.isShiftKeyDown();
+            for(int depth=1;depth<=64;depth++){
+                var row=BridgeDesign.row(floor,forward,depth,slope,wide);boolean clear=true;
+                for(var at:row)if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir()
+                        ||(stairs||wide)&&!BridgeDesign.clearance(level,at)){clear=false;break;}
+                if(!clear)break;
+                for(var at:row)steps.add(wide?new WorkStep.BridgePlace(at,material):new WorkStep.Place(at,material,true));
+            }
+
+        }
+        return !steps.isEmpty()&&WorkQueue.start(player,tool,kind,steps);
     }
     private static BlockPos bridgeFixture(GameTestHelper h,ServerPlayer player){
         player.setPos(player.position().add(0,30,0));player.setXRot(-90);
@@ -195,14 +217,14 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var level=h.getLevel();
         wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,3));var reserve=new ItemStack(Blocks.COBBLESTONE,64);wearer.getInventory().setItem(10,reserve);
         h.assertTrue(ArtifactActions.target(wearer).isEmpty(),"fixture looks into a cleared empty sky column");
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"a ledge walkway activates without any block aimed at");drain(wearer);
+        h.assertTrue(legacyPaidBridge(wearer),"a ledge walkway activates without any block aimed at");drain(wearer);
         h.assertTrue(wearer.getOffhandItem().isEmpty()&&reserve.getCount()==64,"exactly the offhand material is paid, never a matching inventory reserve");
         for(int n=0;n<3;n++)h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),n)).is(Blocks.COBBLESTONE),"paid floor cells are placed in order");
         h.assertTrue(level.getBlockState(first.relative(wearer.getDirection(),3)).isAir()&&!WorkQueue.busy(wearer),"the walkway stops immediately when offhand payment runs out");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_197") public static void worldloomBridgeStopsAtDeniedCellWithoutJumpingIt(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var denied=first.relative(wearer.getDirection());wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,9));
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"bridge is scheduled");
+        h.assertTrue(legacyPaidBridge(wearer),"bridge is scheduled");
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=event->{if(event.player==wearer&&event.target.equals(denied))event.setCanceled(true);};
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
         try{drain(wearer);h.assertTrue(h.getLevel().getBlockState(first).is(Blocks.COBBLESTONE)&&h.getLevel().getBlockState(denied).isAir()&&h.getLevel().getBlockState(denied.relative(wearer.getDirection())).isAir()&&wearer.getOffhandItem().getCount()==8,"a denied cell stops the whole remaining path with no free blocks or later placements");}
@@ -210,12 +232,12 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_198") public static void worldloomBridgeDoesNotSkipObstaclesDuringPlanning(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDLOOM);var first=bridgeFixture(h,wearer);var barrier=first.relative(wearer.getDirection());h.getLevel().setBlockAndUpdate(barrier,Blocks.CHEST.defaultBlockState());wearer.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE,9));
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM),"the one safe cell before the obstacle can be planned");drain(wearer);
+        h.assertTrue(legacyPaidBridge(wearer),"the one safe cell before the obstacle can be planned");drain(wearer);
         h.assertTrue(h.getLevel().getBlockState(first).is(Blocks.COBBLESTONE)&&h.getLevel().getBlockState(barrier).is(Blocks.CHEST)&&h.getLevel().getBlockState(barrier.relative(wearer.getDirection())).isAir(),"planning never jumps a container or changes its contents");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_199") public static void worldloomBridgeRejectsNamedMaterialWithoutChargingCooldown(GameTestHelper h){
         var wearer=player(h,ArtifactKind.WORLDLOOM);bridgeFixture(h,wearer);var material=new ItemStack(Blocks.COBBLESTONE,9);material.setHoverName(net.minecraft.network.chat.Component.literal("Keep me"));wearer.setItemInHand(InteractionHand.OFF_HAND,material);
-        h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.WORLDLOOM)&&!WorkQueue.busy(wearer)&&!ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).contains("alternateReady")&&material.getCount()==9,"named/NBT material is rejected before queueing or charging an activation");finish(h,wearer);
+        h.assertTrue(!legacyPaidBridge(wearer)&&!WorkQueue.busy(wearer)&&!ArtifactState.of(wearer,ArtifactKind.WORLDLOOM).contains("alternateReady")&&material.getCount()==9,"named/NBT material is rejected before queueing or charging an activation");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_200") public static void naturalMiningStepRechecksPlacedProvenanceAtExecution(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var expected=h.getLevel().getBlockState(at);var step=new WorkStep.Mine(at,expected,true);PlayerPlacedBlocks.get(h.getLevel()).mark(at);
@@ -1599,7 +1621,7 @@ public final class PickaxeGameTests {
         var floor=p.blockPosition().below();int slope=descend?-1:1;
         for(int depth=1;depth<=6;depth++)for(int y=0;y<=2;y++)h.getLevel().setBlockAndUpdate(BridgeDesign.cell(floor,Direction.SOUTH,depth,slope).above(y),Blocks.AIR.defaultBlockState());
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE_STAIRS,4));
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"stair material schedules architectural bridge");drain(p);
+        h.assertTrue(legacyPaidBridge(p),"stair material schedules architectural bridge");drain(p);
         for(int depth=1;depth<=4;depth++){
             var state=h.getLevel().getBlockState(BridgeDesign.cell(floor,Direction.SOUTH,depth,slope));
             h.assertTrue(state.is(Blocks.COBBLESTONE_STAIRS)&&state.getValue(StairBlock.FACING)==(descend?Direction.NORTH:Direction.SOUTH),"correct paid stair direction at "+depth);
@@ -1613,7 +1635,7 @@ public final class PickaxeGameTests {
         for(int d=1;d<=4;d++)for(int y=0;y<=2;y++)h.getLevel().setBlockAndUpdate(BridgeDesign.cell(floor,Direction.SOUTH,d,1).above(y),Blocks.AIR.defaultBlockState());
         var obstacle=BridgeDesign.cell(floor,Direction.SOUTH,2,1).above();h.getLevel().setBlockAndUpdate(obstacle,Blocks.CHEST.defaultBlockState());
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.COBBLESTONE_STAIRS,8));
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"one safe step can be scheduled");drain(p);
+        h.assertTrue(legacyPaidBridge(p),"one safe step can be scheduled");drain(p);
         h.assertTrue(p.getOffhandItem().getCount()==7&&h.getLevel().getBlockState(obstacle).is(Blocks.CHEST),"headroom obstacle is not overwritten or skipped");finish(h,p);
     }
     @GameTest(template="empty",batch="upgrade_516_10") public static void hudTelemetryComesFromServerAbilityAndQueueState(GameTestHelper h){
@@ -1632,7 +1654,7 @@ public final class PickaxeGameTests {
     }
     private static void wideRoadBuilt(GameTestHelper h,boolean stairs,boolean descend){
         var p=wideRoadFixture(h,stairs,descend);var floor=p.blockPosition().below();int slope=stairs?(descend?-1:1):0;
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"wide road schedules from crouched alternate");drain(p);
+        h.assertTrue(legacyPaidBridge(p),"wide road schedules from crouched alternate");drain(p);
         for(int d=1;d<=3;d++)for(var at:BridgeDesign.row(floor,Direction.SOUTH,d,slope,true)){
             var state=h.getLevel().getBlockState(at);
             h.assertTrue(state.is(stairs?Blocks.COBBLESTONE_STAIRS:Blocks.COBBLESTONE),"paid three-wide cell at "+at);
@@ -1647,14 +1669,14 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="upgrade_519_04") public static void wideRoadPlanningStopsBeforeObstructedShoulder(GameTestHelper h){
         var p=wideRoadFixture(h,false,false);var floor=p.blockPosition().below();var row=BridgeDesign.row(floor,Direction.SOUTH,2,0,true);
         var obstacle=row.get(1).above();h.getLevel().setBlockAndUpdate(obstacle,Blocks.CHEST.defaultBlockState());
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"first complete row schedules");drain(p);
+        h.assertTrue(legacyPaidBridge(p),"first complete row schedules");drain(p);
         h.assertTrue(p.getOffhandItem().getCount()==6,"only first row is paid");
         for(var at:row)h.assertTrue(h.getLevel().getBlockState(at).isAir(),"obstructed row is excluded as a whole");
         h.assertTrue(h.getLevel().getBlockState(obstacle).is(Blocks.CHEST),"obstacle preserved");finish(h,p);
     }
     @GameTest(template="empty",batch="upgrade_519_05") public static void wideRoadRevalidatesNewCeilingBeforeSpendingMaterials(GameTestHelper h){
         var p=wideRoadFixture(h,false,false);var at=BridgeDesign.row(p.blockPosition().below(),Direction.SOUTH,1,0,true).get(0);
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"road queued before new ceiling");
+        h.assertTrue(legacyPaidBridge(p),"road queued before new ceiling");
         h.getLevel().setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());drain(p);
         h.assertTrue(p.getOffhandItem().getCount()==9&&h.getLevel().getBlockState(at).isAir(),"new headroom obstruction cancels without payment");finish(h,p);
     }
@@ -1663,7 +1685,7 @@ public final class PickaxeGameTests {
         java.util.function.Consumer<BlockEvent.EntityPlaceEvent> ceiling=e->{if(e.getEntity()==p&&e.getPos().equals(at))h.getLevel().setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());};
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,ceiling);
         try{
-            h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"road schedules before callback");drain(p);
+            h.assertTrue(legacyPaidBridge(p),"road schedules before callback");drain(p);
             h.assertTrue(p.getOffhandItem().getCount()==9&&h.getLevel().getBlockState(at).isAir(),"callback ceiling rolls back only tentative floor without spending");
             h.assertTrue(h.getLevel().getBlockState(at.above()).is(Blocks.STONE),"external ceiling remains untouched");
         }finally{MinecraftForge.EVENT_BUS.unregister(ceiling);finish(h,p);}

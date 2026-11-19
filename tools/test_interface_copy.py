@@ -50,7 +50,7 @@ class InterfaceCopyTests(unittest.TestCase):
             for identity, key, facts in (
                 ('hellspec', 'main', ('25×7×25', '1679')),
                 ('hellspec', 'alt', ('11×11', '48')),
-                ('worldloom', 'alt', ('64',)),
+                ('worldloom', 'alt', ('12', '25')),
                 ('palimpsest', 'main', ('2765',)),
                 ('palimpsest', 'alt', ('7153',)),
             ):
