@@ -51,6 +51,11 @@ public final class MiningObservations {
                 ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
         return capture(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,pos,state,false,new EquipmentLease<>(curio,current));
     }
+    public static boolean captureCuriosStasis(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
+        if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.INTERREGNUM
+                ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        return capture(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,pos,state,false,new EquipmentLease<>(curio,current));
+    }
     public static boolean captureCuriosParadox(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.CRUCIBLE
                 ||!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
@@ -97,6 +102,7 @@ public final class MiningObservations {
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CHOIR&&valid(o))ResonantFault.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.EVENTIDE&&valid(o))EventideRupture.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CRUCIBLE&&valid(o))ParadoxLattice.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.INTERREGNUM&&valid(o))StasisTimeSlice.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
