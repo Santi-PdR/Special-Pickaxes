@@ -2,7 +2,7 @@
 
 **Código actual: `6.0.0-alpha.1`, todavía no es la reforma completa ni una entrega final.**
 
-Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Las 11 habilidades nuevas y variantes Curios todavía están pendientes: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de esta base: [44429871556](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44429871556).
+Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Las 11 habilidades nuevas y variantes Curios todavía están pendientes: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de esta base: [44433168671](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44433168671).
 
 ---
 

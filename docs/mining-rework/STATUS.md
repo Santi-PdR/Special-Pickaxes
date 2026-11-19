@@ -1,6 +1,6 @@
 ## Reforma 6.0 — base alpha.1, incompleta
 
-Fuente `b2b8bead6368465087c3da15201817ecde40f7fb`. CI `44429871556` en curso al registrar este estado; no afirmar aún validación Java/cliente. Local: 137 Python (una omisión sin Java), 25 recursos correctos. Eliminación efectiva del renderer de HUD, tooltips idénticos con/sin SHIFT, errores breves, catálogo completo es_uy, tarjeta Curios actual en I y render real ampliado. Arte y clases dedicadas de Iridium/Strata congelados por SHA256. [Contrato y trabajo pendiente](REFORM-6.md).
+Fuente `5d0c8491d72f13de1fd6b702267f75b90d08af39`. CI `44433168671`: SUCCESS; 179 JUnit sin fallos/errores/omisiones, 426 GameTests, cliente 32 escenas/64 tooltips y servidor empaquetado aprobados. Local: 137 Python (una omisión sin Java), 25 recursos correctos. Eliminación efectiva del renderer de HUD, tooltips idénticos con/sin SHIFT, errores breves, catálogo completo es_uy, tarjeta Curios actual en I y render real ampliado. Arte y clases dedicadas de Iridium/Strata congelados por SHA256. Capturas finales ES de manual/SHIFT inspeccionadas en `review/*6.0.0-alpha.1-es.jpg`. [Contrato, historial de correcciones y trabajo pendiente](REFORM-6.md).
 
 No se reemplazaron todavía las 11 identidades ni sus variantes Curios. No se presenta la tabla de diseño como habilidades implementadas. No publicar alpha como reforma final. El enfoque de calzada 5.19 queda sustituido por la petición mayor del usuario; aunque su CI `44426271408` pasó, eso no valida 6.0 ni convierte su diseño en el objetivo nuevo.
 
