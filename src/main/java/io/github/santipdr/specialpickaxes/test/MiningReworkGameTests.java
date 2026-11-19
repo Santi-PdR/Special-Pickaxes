@@ -320,27 +320,10 @@ public final class MiningReworkGameTests {
         h.succeed();
     }
 
-    @GameTest(template="empty",batch="rework_each_331") public static void surveyEarlyExitMatchesExhaustiveWorldSearchIncludingPlacedOreAndTies(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var level=h.getLevel();
-        var origin=new BlockPos(-2,level.getMinBuildHeight()+120,-2);
-        var placed=PlayerPlacedBlocks.get(level);
-        try{
-            for(int density:new int[]{1,17}){
-                var expected=new java.util.ArrayList<BlockPos>();int index=0;
-                for(var offset:SurveyVolume.offsets()){
-                    var at=origin.offset(offset);placed.unmark(at);
-                    boolean ore=index++%density==0;
-                    level.setBlockAndUpdate(at,(ore?Blocks.DIAMOND_ORE:Blocks.STONE).defaultBlockState());
-                    if(ore&&!at.equals(origin))expected.add(at);
-                }
-                placed.mark(origin);
-                expected.sort(java.util.Comparator.comparingDouble((BlockPos pos)->pos.distSqr(origin)).thenComparingLong(BlockPos::asLong));
-                var actual=MiningAlternates.surveyCandidates(p,origin);
-                h.assertTrue(actual.equals(expected.subList(0,Math.min(32,expected.size()))),"optimized world survey matches full search at density "+density);
-                h.assertTrue(!actual.contains(origin)&&actual.stream().allMatch(at->level.getBlockState(at).is(Blocks.DIAMOND_ORE)),"survey neither includes placed ore nor mutates results");
-            }
-        }finally{placed.unmark(origin);RelicNetwork.forget(p);}
-        h.succeed();
+    @GameTest(template="empty",batch="rework_each_331") public static void solarNovaGeometryCannotLoadOrDiscoverRemoteOre(GameTestHelper h){
+        var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
+        var offsets=SolarRupture.offsets(SolarRupture.Form.NOVA);
+        h.assertTrue(!level.hasChunkAt(remote)&&offsets.size()==7153&&!level.hasChunkAt(remote),"geometry has no level/ore query dependency");h.succeed();
     }
 
     @GameTest(template="empty",batch="rework_each_332") public static void modeCatalogPreservesSavedOrderAndDefendsSharedKeys(GameTestHelper h){

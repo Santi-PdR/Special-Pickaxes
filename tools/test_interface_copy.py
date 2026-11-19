@@ -51,8 +51,8 @@ class InterfaceCopyTests(unittest.TestCase):
                 ('hellspec', 'main', ('25×7×25', '1679')),
                 ('hellspec', 'alt', ('11×11', '48')),
                 ('worldloom', 'alt', ('64',)),
-                ('palimpsest', 'main', ('1024',)),
-                ('palimpsest', 'alt', ('32',)),
+                ('palimpsest', 'main', ('2765',)),
+                ('palimpsest', 'alt', ('7153',)),
             ):
                 text = texts[f'guide.{key}.{identity}']
                 for fact in facts:

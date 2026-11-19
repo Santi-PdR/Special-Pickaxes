@@ -189,7 +189,8 @@ public final class ArtifactTechniques {
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
-            case PALIMPSEST,CHOIR,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
+            case CHOIR,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
+            case PALIMPSEST -> SolarRupture.start(player,tool,SolarRupture.Form.NOVA);
             case EVENTIDE -> magnetDrops(player,tool,48,256);
             case ICARUS -> IcarianFlight.start(player,tool);
             case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):

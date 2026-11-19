@@ -36,9 +36,9 @@ public final class WorldSafety {
     }
     public static void tagIridiumDrop(net.minecraft.world.entity.Entity entity,net.minecraft.server.level.ServerLevel level){
         var context=NATIVE_BREAK.get();
-        if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null
-                ||context.kind()!=ArtifactKind.IRIDIUM||context.player().serverLevel()!=level
-                ||!ArtifactOres.isOre(context.expected()))return;
+        if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null||context.player().serverLevel()!=level)return;
+        if(context.kind()==ArtifactKind.PALIMPSEST){drop.setGlowingTag(true);return;}
+        if(context.kind()!=ArtifactKind.IRIDIUM||!ArtifactOres.isOre(context.expected()))return;
         OreDropHighlight.mark(drop,context.player());
     }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!ArtifactOres.isOre(state)

@@ -101,7 +101,6 @@ public final class SpecialPickaxes {
     public SpecialPickaxes() {
         OrefallProgram.warmup();
         RadialVolume.warmup();
-        SurveyVolume.warmup();
         io.github.santipdr.specialpickaxes.network.RelicNetwork.register();
         var bus=FMLJavaModLoadingContext.get().getModEventBus();ITEMS.register(bus);TABS.register(bus);EFFECTS.register(bus);PARTICLES.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,ArtifactConfig.SPEC);
@@ -142,6 +141,11 @@ public final class SpecialPickaxes {
     private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
         StrataFocusEffect.observeBreak(p,e.getPos(),e.getState());
+        if(!WorkQueue.running()){
+            var dawn=CuriosCompat.findFresh(p);
+            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.PALIMPSEST)
+                MiningObservations.captureCuriosDawn(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
+        }
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.findFresh(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped,e.getPos(),e.getState());

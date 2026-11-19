@@ -167,7 +167,7 @@ public final class ArtifactPassives {
         if(PersistedCooldown.active(now,state.getLong("curiosPassiveReady"),160))return;
         state.putLong("curiosPassiveReady",now+160);
         switch(kind) {
-            case PALIMPSEST -> {event.setAmount(event.getAmount()*.9F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),0,80);}
+            case PALIMPSEST -> {event.setAmount(event.getAmount()*.35F);grantCombatEffect(player,io.github.santipdr.specialpickaxes.SpecialPickaxes.DAWN_RESERVE.get(),0,80);}
             case CHOIR -> {
                 event.setAmount(event.getAmount()*.85F);
                 grantCombatEffect(attacker,io.github.santipdr.specialpickaxes.SpecialPickaxes.FAULT_RESONANCE.get(),0,60);

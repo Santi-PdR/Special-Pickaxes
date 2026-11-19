@@ -67,6 +67,16 @@ public final class AbilityVfx {
             player.serverLevel().sendParticles(player,particle(ArtifactKind.ICARUS,true),false,at.x,at.y,at.z,1,0,.02,0,0);
         }return true;
     }
+    /** Expanding solar rim; only an executing sunburst calls this, never item/Curios idle ticks. */
+    public static boolean solarWave(ServerPlayer player,net.minecraft.core.BlockPos center,double radius,boolean nova){
+        if(!player.isAlive()||player.isRemoved()||player.distanceToSqr(Vec3.atCenterOf(center))>48*48)return false;
+        int tick=player.server.getTickCount();if(!BUDGET.tryReserve(tick,16))return false;
+        for(int i=0;i<16;i++){
+            double angle=Math.PI*2*i/16,r=Math.max(.6,radius);
+            var at=Vec3.atCenterOf(center).add(Math.cos(angle)*r,nova?Math.sin(angle*2)*r*.35:.2,Math.sin(angle)*r);
+            player.serverLevel().sendParticles(player,particle(ArtifactKind.PALIMPSEST,nova),false,at.x,at.y,at.z,1,0,.02,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

@@ -19,7 +19,6 @@ public final class MiningAlternates {
         if(aimed.isEmpty())return false;
         var origin=aimed.get();
         if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
-        if(kind==ArtifactKind.PALIMPSEST)return survey(player,tool,origin);
         if(kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC){
             var state=level.getBlockState(origin);
             if(!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(level).contains(origin)
@@ -68,37 +67,4 @@ public final class MiningAlternates {
                 &&player.position().equals(origin)&&player.getMainHandItem()==tool&&!tool.isEmpty();
     }
 
-    /** Loaded, natural, nearest-first cells; no permission callbacks inside the collector. */
-    public static java.util.List<BlockPos> surveyCandidates(ServerPlayer player,BlockPos origin){
-        var level=player.serverLevel();
-        return SurveyVolume.select(origin,cursor->!level.isOutsideBuildHeight(cursor)&&level.hasChunkAt(cursor)
-                &&!PlayerPlacedBlocks.get(level).contains(cursor)&&ArtifactOres.isOre(level.getBlockState(cursor)));
-    }
-
-    /** Information is emitted only after validating all claim callbacks and the captured miner. */
-    private static boolean survey(ServerPlayer player,ItemStack tool,BlockPos origin){
-        var level=player.serverLevel();var actorOrigin=player.position();var accepted=new java.util.LinkedHashMap<BlockPos,net.minecraft.world.level.block.state.BlockState>();
-        for(var at:surveyCandidates(player,origin)){
-            var expected=level.getBlockState(at);
-            boolean allowed=WorldSafety.allowed(player,ArtifactKind.PALIMPSEST,at);
-            if(!context(player,tool,level,actorOrigin))return false;
-            if(allowed&&level.hasChunkAt(at)&&level.getBlockState(at)==expected&&!PlayerPlacedBlocks.get(level).contains(at))accepted.put(at,expected);
-        }
-        SurveyGuide.clear(tool);
-        int found=0;BlockPos nearest=null;
-        for(var hit:accepted.entrySet()){
-            var at=hit.getKey();
-            if(!level.hasChunkAt(at)||level.getBlockState(at)!=hit.getValue()||PlayerPlacedBlocks.get(level).contains(at))continue;
-            if(nearest==null)nearest=at;
-            if(ArtifactFeedback.reserveAuraParticles(level.getServer().getTickCount(),1,1))
-                AbilityVfx.retired(level,player,net.minecraft.core.particles.ParticleTypes.END_ROD,true,at.getX()+.5,at.getY()+.5,at.getZ()+.5,1,0,0,0,0);
-            found++;
-        }
-        if(nearest!=null){
-            boolean guided=SurveyGuide.publish(player,tool,nearest,accepted.get(nearest));
-            if(!context(player,tool,level,actorOrigin)){SurveyGuide.clear(tool);return false;}
-            if(guided)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.specialpickaxes.survey_nearest",nearest.getX(),nearest.getY(),nearest.getZ()),false);
-        }
-        ArtifactFeedback.message(player,"survey_found",found);return true;
-    }
 }

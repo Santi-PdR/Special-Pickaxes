@@ -236,22 +236,21 @@ public final class PickaxeGameTests {
         try{h.assertTrue(!new WorkStep.Mine(at,expected,true).apply(wearer,wearer.getMainHandItem(),ArtifactKind.HELLSPEC)&&h.getLevel().getBlockState(at)==expected,"the native break context also protects provenance changed inside Forge's break event");}
         finally{MinecraftForge.EVENT_BUS.unregister(mark);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);}finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_203") public static void surveySelectsNearestThirtyTwoNaturalOreCells(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.PALIMPSEST);var center=target(h).above(20);var level=h.getLevel();
-        for(var at:BlockPos.betweenClosed(center.offset(-2,-2,-2),center.offset(2,2,2))){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(at);}
-        PlayerPlacedBlocks.get(level).mark(center);var result=MiningAlternates.surveyCandidates(wearer,center);
-        h.assertTrue(result.size()==32&&!result.contains(center)&&result.stream().allMatch(at->at.distSqr(center)<=4),"survey uses a bounded nearest-first natural-ore collector rather than scan-order priority");
-        for(int n=1;n<result.size();n++)h.assertTrue(result.get(n-1).distSqr(center)<=result.get(n).distSqr(center),"survey candidates remain ordered by proximity");PlayerPlacedBlocks.get(level).unmark(center);finish(h,wearer);
+    @GameTest(template="empty",batch="rework_each_203") public static void solarPlansAreFixedGeometryNotOreDiscovery(GameTestHelper h){
+        var center=target(h);var level=h.getLevel();var before=level.getBlockState(center);
+        var rays=SolarRupture.offsets(SolarRupture.Form.RAYS);var nova=SolarRupture.offsets(SolarRupture.Form.NOVA);
+        h.assertTrue(rays.contains(BlockPos.ZERO)&&nova.size()==7153&&level.getBlockState(center)==before,"planning depends only on geometry and never searches or changes ore");h.succeed();
     }
-    @GameTest(template="empty",batch="rework_each_204") public static void surveyNeverLoadsDistantMissingChunks(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.PALIMPSEST);var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
-        h.assertTrue(!level.hasChunkAt(remote)&&MiningAlternates.surveyCandidates(wearer,remote).isEmpty()&&!level.hasChunkAt(remote),"a bounded survey skips unloaded blocks instead of loading chunks");finish(h,wearer);
+    @GameTest(template="empty",batch="rework_each_204") public static void solarNovaSkipsMissingChunksWithoutLoadingThem(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
+        var program=new SolarRupture(remote,SolarRupture.Form.NOVA);
+        h.assertTrue(!level.hasChunkAt(remote)&&!program.next(p).apply(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST)&&!level.hasChunkAt(remote),"fixed solar work skips missing chunks without loading");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_205") public static void surveyRejectsCasterTeleportDuringPermission(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_205") public static void solarNovaRejectsCasterTeleportDuringPermission(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{if(event.player==wearer)wearer.setPos(wearer.position().add(1,0,0));};
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
-        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"a moved miner does not receive stale survey data or spend a cooldown");}
+        try{h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.PALIMPSEST)&&!ArtifactState.of(wearer,ArtifactKind.PALIMPSEST).contains("alternateReady"),"a moved caster cannot start solar work or spend a cooldown");}
         finally{MinecraftForge.EVENT_BUS.unregister(move);}finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_206") public static void paidPlacementRollsBackAfterListenerMovesMiner(GameTestHelper h){
@@ -690,7 +689,7 @@ public final class PickaxeGameTests {
         var source=h.getLevel().damageSources().mobAttack(attacker);
         var first=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);ArtifactPassives.onCuriosDamage(p,first,ArtifactKind.PALIMPSEST);
         var second=new net.minecraftforge.event.entity.living.LivingHurtEvent(p,source,10F);ArtifactPassives.onCuriosDamage(p,second,ArtifactKind.PALIMPSEST);
-        h.assertTrue(Math.abs(first.getAmount()-9F)<.001F&&second.getAmount()==10F&&state.getLong("curiosPassiveReady")==ArtifactState.now(p)+160,"corrupt deadline recovers once, never bypassing the real eight-second interval");finish(h,p);
+        h.assertTrue(Math.abs(first.getAmount()-3.5F)<.001F&&second.getAmount()==10F&&state.getLong("curiosPassiveReady")==ArtifactState.now(p)+160,"corrupt deadline recovers once, never bypassing the real eight-second interval");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_272") public static void corruptSharedHeartwoodDeadlineRecoversButStillThrottles(GameTestHelper h){
         var p=player(h,ArtifactKind.ICARUS);var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(attacker);
@@ -1675,67 +1674,64 @@ public final class PickaxeGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(ceiling);finish(h,p);}
     }
 
-    private static BlockPos guidedOre(GameTestHelper h){
-        var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);return at;
+    private static BlockPos solarTarget(GameTestHelper h,ServerPlayer p){
+        p.setPos(p.position().add(0,80,0));p.setYRot(0);p.setXRot(0);var at=p.blockPosition().above().south(4);
+        for(int n=1;n<4;n++)h.getLevel().setBlockAndUpdate(at.north(n),Blocks.AIR.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));return at;
     }
-    @GameTest(template="empty",batch="upgrade_517_01") public static void surveyAlternatePublishesATimedGuideWithoutMiningItsDeposit(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
-        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.PALIMPSEST),"real secondary publishes survey guidance");
-        var tag=tool.getTag();var reading=SurveyBearing.read(tag,h.getLevel().dimension().location().toString(),ArtifactState.now(p),p.position(),p.getUUID());
-        h.assertTrue(reading.isPresent()&&reading.get().target().equals(at)&&reading.get().remaining()==200,"nearest deposit has a ten-second owner-bound guide");
-        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.DIAMOND_ORE)&&!WorkQueue.busy(p),"guidance does not excavate or enqueue a passive detector");
-        SurveyGuide.clear(tool);finish(h,p);
+    @GameTest(template="empty",batch="reform_603_01") public static void dawnSecondaryExecutesNovaInsteadOfPublishingOreLocations(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var tool=p.getMainHandItem();
+        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.PALIMPSEST)&&WorkQueue.busy(p),"secondary starts destructive nova");
+        h.assertTrue(!tool.hasTag()||!tool.getTag().contains("surveyGuidePos"),"no ore guidance is published");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir(),"nova excavates natural target");finish(h,p);
     }
-    @GameTest(template="empty",batch="upgrade_517_02") public static void guideRefreshDoesNotRenewItsExpiryAndCancelRemovesIt(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
-        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide starts");
-        long until=tool.getTag().getLong(SurveyBearing.UNTIL);SurveyGuide.refresh(p,tool);
-        h.assertTrue(tool.getTag().getLong(SurveyBearing.UNTIL)==until,"refresh never renews the active ability");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.PALIMPSEST,RelicControl.Action.ALT_SKILL)&&!tool.getTag().contains(SurveyBearing.POSITION),"cancel clears guidance even with no work queue");finish(h,p);
+    @GameTest(template="empty",batch="reform_603_02") public static void dawnNovaCancelsThroughTheSemanticAlternateControl(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST),"nova starts");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.PALIMPSEST,RelicControl.Action.ALT_SKILL)&&!WorkQueue.busy(p),"second alternate cancels work");
+        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE),"cancelled queue does not change terrain");finish(h,p);
     }
-    @GameTest(template="empty",batch="upgrade_517_03") public static void guideRefreshDropsNewlyProtectedDeposits(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
-        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide initially permitted");
+    @GameTest(template="empty",batch="reform_603_03") public static void dawnNovaRevalidatesClaimsDuringExcavation(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST),"initial target permitted");
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> veto=e->{if(e.player==p&&e.target.equals(at))e.setCanceled(true);};
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,veto);
-        try{SurveyGuide.refresh(p,tool);h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"claim changes revoke stored guidance");}
-        finally{MinecraftForge.EVENT_BUS.unregister(veto);SurveyGuide.clear(tool);}finish(h,p);
+        try{drain(p);h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE),"claim changes protect cells after activation");}
+        finally{MinecraftForge.EVENT_BUS.unregister(veto);finish(h,p);}
     }
-    @GameTest(template="empty",batch="upgrade_517_04") public static void minedOrExpiredSurveyGuidesCannotBecomePermanentDetectors(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var at=guidedOre(h);var tool=p.getMainHandItem();
-        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide starts");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
-        SurveyGuide.refresh(p,tool);h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"mining the deposit clears it rather than searching for a new deposit");
-        h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at));
-        tool.getTag().putLong(SurveyBearing.UNTIL,ArtifactState.now(p));SurveyGuide.refresh(p,tool);
-        h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"elapsed guidance is not renewed");finish(h,p);
+    @GameTest(template="empty",batch="reform_603_04") public static void retiredSurveyDataIsRemovedWithoutTouchingCopyIdentity(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();var tag=tool.getOrCreateTag();
+        for(String key:List.of("surveyGuidePos","surveyGuideUntil","surveyGuideDimension","surveyGuideOre","surveyGuideOwner"))tag.putString(key,"legacy");
+        tag.putString("copiedSkill",ArtifactKind.PALIMPSEST.id);tag.putString("custom","keep");SolarRupture.clearLegacyGuide(tool);
+        h.assertTrue(!tag.contains("surveyGuidePos")&&!tag.contains("surveyGuideOre")&&tag.getString("copiedSkill").equals(ArtifactKind.PALIMPSEST.id)&&tag.getString("custom").equals("keep"),"migration only removes retired guidance fields");finish(h,p);
     }
-    @GameTest(template="empty",batch="upgrade_517_05") public static void surveyGuidanceDoesNotFollowAToolTradedToAnotherPlayer(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var other=player(h,ArtifactKind.PALIMPSEST,"SurveyRecipient");var at=guidedOre(h);var tool=p.getMainHandItem();
-        h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at)),"guide belongs to original miner");
-        p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);other.setItemInHand(InteractionHand.MAIN_HAND,tool);SurveyGuide.refresh(other,tool);
-        h.assertTrue(!tool.getTag().contains(SurveyBearing.POSITION),"another miner does not inherit active guidance");finish(h,p);
+    @GameTest(template="empty",batch="reform_603_05") public static void tradingDawnCannotTransferItsQueuedNova(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var tool=p.getMainHandItem();var other=player(h,ArtifactKind.PALIMPSEST,"NovaRecipient");
+        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.PALIMPSEST),"nova starts");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);other.setItemInHand(InteractionHand.MAIN_HAND,tool);WorkQueue.tick();
+        h.assertTrue(!WorkQueue.busy(p)&&!WorkQueue.busy(other)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"queue cannot follow a traded tool");finish(h,p);
     }
-    @GameTest(template="empty",batch="upgrade_517_06") public static void worldbreakerCopiedSurveyUsesTheSameAuthoritativeGuide(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);var at=guidedOre(h);
-        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.WORLDBREAKER),"copied secondary executes its source survey");
-        h.assertTrue(tool.getTag().getLong(SurveyBearing.POSITION)==at.asLong()&&tool.getTag().getUUID(SurveyBearing.OWNER).equals(p.getUUID()),"copied guide retains owner and exact authorized target");
-        SurveyGuide.clear(tool);finish(h,p);
+    @GameTest(template="empty",batch="reform_603_06") public static void worldbreakerCopiesSolarNovaAndKeepsGlowingLoot(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=solarTarget(h,p);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);
+        h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.WORLDBREAKER),"copy starts the source nova");drain(p);
+        var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(2),d->d.getItem().is(Items.DIAMOND));
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&!drops.isEmpty()&&drops.stream().allMatch(ItemEntity::isCurrentlyGlowing),"copied nova produces native glowing ore loot");finish(h,p);
     }
-    @GameTest(template="empty",batch="upgrade_517_07") public static void surveyGuidePublicationCannotReenterFromAClaimCallback(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var tool=p.getMainHandItem();var at=guidedOre(h);int[] attempts={0};boolean[] nested={true};
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> reenter=e->{if(e.player==p&&e.target.equals(at)){attempts[0]++;nested[0]=SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at));}};
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,reenter);
-        try{h.assertTrue(SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at))&&attempts[0]==1&&!nested[0],"one permission transaction, no recursive ability publication");}
-        finally{MinecraftForge.EVENT_BUS.unregister(reenter);SurveyGuide.clear(tool);}finish(h,p);
+    @GameTest(template="empty",batch="reform_603_07") public static void solarActivationCannotReenterFromAClaimCallback(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);solarTarget(h,p);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> nested=e->{if(e.player==p){calls[0]++;h.assertTrue(!SolarRupture.start(p,p.getMainHandItem(),SolarRupture.Form.NOVA),"recursive activation refused");}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,nested);
+        try{h.assertTrue(SolarRupture.start(p,p.getMainHandItem(),SolarRupture.Form.RAYS)&&calls[0]==1,"one guarded activation");}
+        finally{MinecraftForge.EVENT_BUS.unregister(nested);finish(h,p);}
     }
-    @GameTest(template="empty",batch="upgrade_517_08") public static void surveyGuideRejectsMovedCastersAndUnloadedTargets(GameTestHelper h){
-        var p=player(h,ArtifactKind.PALIMPSEST);var tool=p.getMainHandItem();var at=guidedOre(h);
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=e->{if(e.player==p)p.setPos(p.position().add(1,0,0));};
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
-        try{h.assertTrue(!SurveyGuide.publish(p,tool,at,h.getLevel().getBlockState(at))&&!tool.getTag().contains(SurveyBearing.POSITION),"callback movement cannot publish stale guidance");}
-        finally{MinecraftForge.EVENT_BUS.unregister(move);}
-        var remote=new BlockPos(1200000,80,1200000);var level=h.getLevel();
-        h.assertTrue(!level.hasChunkAt(remote)&&!SurveyGuide.publish(p,tool,remote,Blocks.DIAMOND_ORE.defaultBlockState())&&!level.hasChunkAt(remote),"publication never loads a missing chunk");finish(h,p);
+    @GameTest(template="empty",batch="reform_603_08") public static void solarNovaPreservesPlayerPlacedOreContainersAndFluids(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var placed=at.east();var chest=at.east(2);var fluid=at.east(3);
+        h.getLevel().setBlockAndUpdate(placed,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
+        h.getLevel().setBlockAndUpdate(chest,Blocks.CHEST.defaultBlockState());h.getLevel().setBlockAndUpdate(fluid,Blocks.LAVA.defaultBlockState());
+        try{h.assertTrue(SolarRupture.start(p,p.getMainHandItem(),SolarRupture.Form.NOVA),"nova starts on natural center");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST)&&h.getLevel().getBlockState(fluid).is(Blocks.LAVA),"nova preserves placed ore, inventories and fluids");
+        }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
 
     @GameTest(template="empty",batch="upgrade_518_01") public static void completeKitGrantsExactlyThirteenUniqueTools(GameTestHelper h){
@@ -1874,20 +1870,11 @@ public final class PickaxeGameTests {
         data.mark(preserved);PlayerPlacedBlocks.scheduleCleanup(h.getLevel(),preserved);PlayerPlacedBlocks.tickCleanup();
         h.assertTrue(data.contains(preserved),"unchanged/cancelled block keeps its protection");finish(h,player(h,ArtifactKind.PALIMPSEST));
     }
-    @GameTest(template="empty",batch="legacy_each_04") public static void palimpsestMinesOnlyItsConnectedOreVein(GameTestHelper h) {
-        var p=player(h,ArtifactKind.PALIMPSEST);var pos=target(h);
-        for(var at:List.of(pos,pos.east(),pos.above()))h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(pos.east(2),Blocks.DEEPSLATE_DIAMOND_ORE.defaultBlockState());
-        var adjacentGold=pos.east(3);h.getLevel().setBlockAndUpdate(adjacentGold,Blocks.GOLD_ORE.defaultBlockState());
-        var stone=pos.south();h.getLevel().setBlockAndUpdate(stone,Blocks.STONE.defaultBlockState());
-        var distant=pos.east(8);h.getLevel().setBlockAndUpdate(distant,Blocks.DIAMOND_ORE.defaultBlockState());
-        h.assertTrue(!ArtifactOres.veinFamilies(Blocks.DIAMOND_ORE.defaultBlockState()).stream().anyMatch(Blocks.GOLD_ORE.defaultBlockState()::is),"shared rate tags do not merge separate ore veins");
-        h.assertTrue(!java.util.Objects.equals(ArtifactOres.registryOreFamily(Blocks.DIAMOND_ORE),ArtifactOres.registryOreFamily(Blocks.GOLD_ORE)),"registry ore families stay distinct");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"vein echo activates");drain(p);
-        for(var at:List.of(pos,pos.east(),pos.above(),pos.east(2)))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"connected ore-family vein mined");
-        h.assertTrue(h.getLevel().getBlockState(stone).is(Blocks.STONE),"stone is not part of the vein");
-        h.assertTrue(h.getLevel().getBlockState(adjacentGold).is(Blocks.GOLD_ORE),"adjacent different ore family is preserved");
-        h.assertTrue(h.getLevel().getBlockState(distant).is(Blocks.DIAMOND_ORE),"disconnected ore is preserved");finish(h,p);
+    @GameTest(template="empty",batch="legacy_each_04") public static void dawnPrimaryBreaksRaysAcrossRockAndDisconnectedOre(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var ore=at.east(3);
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"solar rays activate on natural stone");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir(),"rays break rock and disconnected ore, not a connected-vein clone");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_05") public static void choirReplayMatchesState(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);
@@ -2209,7 +2196,7 @@ public final class PickaxeGameTests {
         var hit=new net.minecraftforge.event.entity.living.LivingHurtEvent(wearer,h.getLevel().damageSources().mobAttack(attacker),10F);
         ArtifactPassives.onCuriosDamage(wearer,hit,ArtifactKind.PALIMPSEST);
         var reserve=SpecialPickaxes.DAWN_RESERVE.get();
-        h.assertTrue(Math.abs(hit.getAmount()-9F)<.001F&&wearer.hasEffect(reserve),"Palimpsest still trims the hit and applies its named food reserve");
+        h.assertTrue(Math.abs(hit.getAmount()-3.5F)<.001F&&wearer.hasEffect(reserve),"Dawn's solar ward blocks 65 percent of one hostile hit and grants food reserve");
         h.assertTrue(wearer.getFoodData().getFoodLevel()==10&&wearer.getEffect(reserve).getDuration()==80,"food restoration is delayed into the four-second effect");
         h.assertTrue(reserve.isDurationEffectTick(80,0)&&!reserve.isDurationEffectTick(79,0),"the reserve pulses once per second");
         for(int i=0;i<4;i++)reserve.applyEffectTick(wearer,0);

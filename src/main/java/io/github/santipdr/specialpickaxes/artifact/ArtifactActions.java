@@ -138,12 +138,7 @@ public final class ArtifactActions {
             var program=new OrefallProgram(aimed.get());if(!WorkQueue.startRegion(p,tool,kind,program))return false;
             ArtifactFeedback.message(p,"ore_harvest_started");return true;
         }
-        if(kind==ArtifactKind.PALIMPSEST) {
-            var aimed=target(p);if(aimed.isEmpty())return false;
-            var origin=aimed.get();var initial=p.serverLevel().getBlockState(origin);
-            return ArtifactOres.isOre(initial)&&WorldSafety.allowed(p,kind,origin)&&WorldSafety.harvestable(p,tool,origin)
-                    &&WorkQueue.startRegion(p,tool,kind,new ConnectedVeinProgram(origin,initial,ArtifactConfig.PALIMPSEST_VEIN_LIMIT.get()));
-        }
+        if(kind==ArtifactKind.PALIMPSEST)return SolarRupture.start(p,tool,SolarRupture.Form.RAYS);
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
         if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;

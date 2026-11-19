@@ -116,7 +116,7 @@ public final class ArtifactItem extends PickaxeItem {
             tag.putString("hudStatus",WorkQueue.status(p));tag.putString("hudPauseReason",WorkQueue.pauseReason(p));tag.putInt("hudCompleted",WorkQueue.completed(p));
             tag.putInt("hudRecall",DropRecall.remaining(p));tag.putBoolean("hudDomain",DomainFields.active(p));
             tag.putInt("artifactMemory",ArtifactState.of(p,kind).getList("memory",net.minecraft.nbt.Tag.TAG_COMPOUND).size());
-            SurveyGuide.refresh(p,tool);
+            SolarRupture.clearLegacyGuide(tool);
             ArtifactInteraction.display(p,tool,kind);
         }
     }
