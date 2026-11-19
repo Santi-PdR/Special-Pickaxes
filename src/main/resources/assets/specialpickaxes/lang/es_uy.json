@@ -704,5 +704,6 @@
   "message.specialpickaxes.kit_granted": "Conjunto completo entregado a %s. Consulta los controles en Opciones → Controles → Special Pickaxes.",
   "effect.specialpickaxes.icarian_featherfall": "Pluma icaria",
   "mining.identity.palimpsest.solar_rupture": "RUPTURA SOLAR: fractura la tierra con ocho rayos.",
-  "mining.how.palimpsest.solar_rupture": "%1$s · Rayos solares: excava 8 brazos gruesos de 24 bloques y 5 de alto (2765 celdas candidatas). Apunta a roca natural; respeta bloques colocados, contenedores y fluidos."
+  "mining.how.palimpsest.solar_rupture": "%1$s · Rayos solares: excava 8 brazos gruesos de 24 bloques y 5 de alto (2765 celdas candidatas). Apunta a roca natural; respeta bloques colocados, contenedores y fluidos.",
+  "mode.specialpickaxes.solar_rupture": "Ruptura solar"
 }
