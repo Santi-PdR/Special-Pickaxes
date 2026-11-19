@@ -160,6 +160,16 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.HELLSPEC),false,at.x,at.y,at.z,1,.025,.08,.025,.015);
         }return true;
     }
+    /** Layered fragments mark native cataclysm work; strictly budgeted and local. */
+    public static boolean worldbreakerCataclysm(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||!p.serverLevel().hasChunkAt(center)||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),20))return false;
+        for(int i=0;i<20;i++){
+            double a=Math.PI*2*i/10,r=1+(i/10)*1.2;
+            var at=Vec3.atCenterOf(center).add(Math.cos(a)*r,(i%3)*.35,Math.sin(a)*r);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.WORLDBREAKER),false,at.x,at.y,at.z,1,.04,.04,.04,.01);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

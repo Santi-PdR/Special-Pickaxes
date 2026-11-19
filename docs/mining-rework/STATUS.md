@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.19 Cataclismo nativo parcial
+
+Primer modo nativo reemplaza túnel por cámara biselada 33×17×33, 14801 candidatos; límite por defecto 8192 bloques realmente minados. Otros cinco modos, secundaria y Curios/copia global sin reformar. Dos JUnit y dos GameTests; local 141 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Forge y captura pendientes. [Detalles](WORLDBREAKER-6.0.md). No release pública.
+
+Hellspec alpha.18 CI `44630552998`: 500 GameTests pasan, pero cliente falla por timeout de activación de `eventide-gravity_out` a 45 s. No es fallo de ACK de modo; no se relaja ni simula activación. Validación final de Hellspec sigue abierta.
+
 ## Reforma 6.0 — Hellspec alpha.18 implementado; Worldbreaker pendiente
 
 Secundaria Erupción Infernal: cono ascendente de 19 capas, radios 3..12, 3571 candidatos. Curios Anillo de Ceniza: 168 candidatos en tres capas/radios 3..5, cada 8 s tras minería natural manual confirmada, conserva menas y núcleo, lease de slot durante callbacks. Dos JUnit y cuatro GameTests nuevos; 141 Python locales (una omisión), 25 recursos. Forge alpha.18 y capturas dedicadas pendientes, no identidad visualmente aprobada. [Detalles](HELLSPEC-6.0.md).
