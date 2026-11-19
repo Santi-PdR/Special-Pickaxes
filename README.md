@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.24`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.25`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -25,6 +25,8 @@ Worldbreaker alpha.22 sustituye Fractura por tres Coronas de Falla (7228 candida
 Worldbreaker alpha.23 añade Fractura del Núcleo nativa en Curios (702 candidatos / 8 s tras mena manual, conserva núcleo). Seleccionar copia cancela trabajo nativo. También aísla la prueba de Cataclismo tras dos fallos de CI; corrección aún pendiente de confirmar. Forge/capturas y copia Curios global completa pendientes.
 
 Worldbreaker alpha.24 sustituye Core Drill por Descenso al Manto: cuatro terrazas radios 12/9/6/3, profundidad 24, 6485 candidatos. Conserva protección de caída y gracia hasta aterrizar. Forge/captura pendientes; modos 4/5 y copia Curios completa aún pendientes.
+
+Worldbreaker alpha.25 protege Rotura Regional y World Shatter frente a bloques colocados: región sólo mina geología natural y cuña se detiene ante construcciones/no geología. Mantiene ambas geometrías de utilidad; no son mecánicas nuevas. Alpha.23 CI `44637244361` verde (213 JUnit / 515 GameTests / cliente / servidor); alpha.24/25, copia Curios completa y capturas dedicadas aún pendientes.
 
 ---
 

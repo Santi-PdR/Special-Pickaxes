@@ -88,7 +88,7 @@ public final class RegionWork implements WorkProgram {
             // Indexed lookup assembled once at confirmation, never scan thousands of records per voxel.
             return new WorkStep.Place(pos,restoration.getOrDefault(pos,Blocks.AIR.defaultBlockState()));
         }
-        if(kind==ArtifactKind.CRUCIBLE)return eligible(p,old,pos)?new WorkStep.Mine(pos,old,true):skip(pos);
+        if(kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&mode==5)return eligible(p,old,pos)?new WorkStep.Mine(pos,old,true):skip(pos);
         if(kind==ArtifactKind.WORLDBREAKER&&mode==2)return new WorkStep.Rephase(pos,old,material);
         if(kind==ArtifactKind.WORLDBREAKER&&mode==1&&!carve(pos))return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer a,ItemStack t,ArtifactKind k){return false;}};
         return new WorkStep.Mine(pos,old);
@@ -130,7 +130,7 @@ public final class RegionWork implements WorkProgram {
         if(kind==ArtifactKind.CHRONICLE&&mode==1||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.WORLDBREAKER&&mode==4)return restoration.containsKey(pos)&&s.isAir();
         if(target!=null)return WorldSafety.inert(s)||WorldSafety.vacant(s);
         if(kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&(mode==0||carve(pos));
-        if(kind==ArtifactKind.WORLDBREAKER&&mode==5)return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&s.getDestroySpeed(p.serverLevel(),pos)>=0;
+        if(kind==ArtifactKind.WORLDBREAKER&&mode==5)return NaturalExcavationProgram.eligible(s)&&!PlayerPlacedBlocks.get(p.serverLevel()).contains(pos);
         if(kind==ArtifactKind.CRUCIBLE)
             return NaturalExcavationProgram.eligible(s)&&!PlayerPlacedBlocks.get(p.serverLevel()).contains(pos);
         return WorldSafety.inert(s);

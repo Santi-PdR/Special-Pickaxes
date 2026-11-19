@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.25 seguridad de región/cuña
+
+Region Break ahora analiza/mina sólo roca y menas naturales, omite procedencia de jugador y revalida durante callbacks con minería natural. World Shatter conserva la gran cuña, pero detiene ruta ante construcciones/no geología y usa minería natural. Son correcciones de seguridad con geometrías retenidas intencionadamente, no dos habilidades nuevas. Tres GameTests; 141 Python locales (una omisión), 25 recursos y 58 hashes intactos. Forge/capturas pendientes; copia Curios global/controles y revisión visual aún incompletas. [Detalles](WORLDBREAKER-6.0.md).
+
+Alpha.23 `b122931ea89ff713d94d313a79c8f35814362085`, CI `44637244361` SUCCESS: 213 JUnit sin fallos/errores/omisiones, 515 GameTests, cliente/input y servidor. Confirma fixture Cataclismo y Curios nativo/copia minera; no valida alpha.24/25. Alpha.24 CI `44637858136` aún en ejecución al comprobarla. Sin release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.24 Descenso al Manto
 
 Modo 3 reemplaza pozo estrecho por cuatro terrazas de radios 12/9/6/3 hasta profundidad 24, 6485 candidatos de roca/menas. Queue reconoce el nuevo programa para guardia de caída durante trabajo y gracia posterior hasta aterrizar. Un JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos y hashes congelados intactos. Forge/capturas pendientes; CI alpha.23 `44637244361` aún en ejecución al comprobarla. [Contrato](WORLDBREAKER-6.0.md). Modos 4/5 y copia Curios completa pendientes; no release pública.
