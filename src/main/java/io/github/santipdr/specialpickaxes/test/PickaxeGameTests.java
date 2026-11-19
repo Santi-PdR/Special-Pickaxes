@@ -603,41 +603,21 @@ public final class PickaxeGameTests {
                     &&binding.getContents() instanceof net.minecraft.network.chat.contents.KeybindContents,"instruction argument is a live keybind, not a literal letter");
         }h.succeed();
     }
-    @GameTest(template="empty",batch="rework_each_260") public static void icarianLiftDoesNotRecaptureAMinerWhoLeftTheShaft(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
-        for(int y=1;y<=5;y++){
-            var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
-        }
-        var lift=new IcarianLiftProgram(base,20);h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift),"lift starts");
-        var departure=wearer.position().add(2,0,0);wearer.setPos(departure);drain(wearer);
-        h.assertTrue(lift.departed()&&!WorkQueue.busy(wearer)&&wearer.position().equals(departure),"leaving the shaft ends work without teleporting the miner back");
-        for(int y=1;y<=5;y++)h.assertTrue(h.getLevel().getBlockState(base.above(y))==state,"no abandoned shaft block is cut");finish(h,wearer);
+    @GameTest(template="empty",batch="reform_602_11") public static void ascentCanBeCancelledByPrimaryWithoutStartingMining(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"ascent starts");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ACTIVATE)&&!IcarianFlight.active(p)&&!WorkQueue.busy(p),"primary cancels active ascent without starting another operation");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_261") public static void icarianLiftStopsAfterDepartureBetweenBudgetedTurns(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.ICARUS);
-        // Other test batches schedule world-wide work; isolate this shaft from their terrain.
-        wearer.setPos(wearer.getX(),h.getLevel().getMaxBuildHeight()-32,wearer.getZ());
-        var base=wearer.blockPosition();var state=Blocks.STONE.defaultBlockState();
-        for(int y=1;y<=5;y++){
-            var at=base.above(y);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.getLevel().setBlockAndUpdate(at,state);
-        }
-        var lift=new IcarianLiftProgram(base,20);int previous=ArtifactConfig.PER_PLAYER.get();
-        try{ArtifactConfig.PER_PLAYER.set(1);
-            h.assertTrue(WorldSafety.allowed(wearer,ArtifactKind.ICARUS,base.above())&&WorldSafety.harvestable(wearer,wearer.getMainHandItem(),base.above()),"shaft fixture is authorized and harvestable before queue execution");
-            h.assertTrue(WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift),"shaft fixture enters the work queue");WorkQueue.tick();
-            h.assertTrue(h.getLevel().getBlockState(base.above()).isAir()&&WorkQueue.busy(wearer),"one authorized cut completed before departure: block="+h.getLevel().getBlockState(base.above())+", status="+WorkQueue.status(wearer)+", completed="+WorkQueue.completed(wearer)+", reason="+WorkQueue.pauseReason(wearer)+", departed="+lift.departed()+", blocked="+lift.blocked());
-            h.assertTrue(EnchantmentScaling.budget(wearer.getMainHandItem())==1&&WorkQueue.completed(wearer)==1,"fixture executes exactly one budgeted step");
-            h.assertTrue(h.getLevel().getBlockState(base.above(2))==state,"second shaft block is intact before departure");
-            var departure=wearer.position().add(0,0,2);wearer.setPos(departure);drain(wearer);
-            h.assertTrue(lift.departed(),"lift records departure after the next budgeted turn");
-            h.assertTrue(wearer.position().equals(departure),"later turns never pull the departed miner back");
-            h.assertTrue(h.getLevel().getBlockState(base.above(2))==state,"later turns preserve the next shaft block");
-        }finally{ArtifactConfig.PER_PLAYER.set(previous);finish(h,wearer);}
+    @GameTest(template="empty",batch="reform_602_12") public static void duplicateAscentCannotRestartOrStackImpulse(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"first ascent starts");
+        h.assertTrue(!IcarianFlight.start(p,p.getMainHandItem()),"duplicate cannot renew deadline");IcarianFlight.tick();var first=p.getDeltaMovement();IcarianFlight.tick();
+        h.assertTrue(p.getDeltaMovement().equals(first),"repeated tick in one server time cannot stack acceleration");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_262") public static void icarianLiftPreservesExternalVerticalTeleport(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.ICARUS);var base=wearer.blockPosition();var lift=new IcarianLiftProgram(base,20);
-        WorkQueue.startRegion(wearer,wearer.getMainHandItem(),ArtifactKind.ICARUS,lift);var departure=wearer.position().add(0,7,0);wearer.setPos(departure);drain(wearer);
-        h.assertTrue(lift.departed()&&wearer.position().equals(departure)&&!WorkQueue.busy(wearer),"same-column external teleport is not undone by the old lift");finish(h,wearer);
+    @GameTest(template="empty",batch="reform_602_13") public static void ascentStopsAfterClaimRevocationWithoutApplyingVelocity(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"flight starts before claim changes");
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> denied=e->{if(e.player==p)e.setCanceled(true);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,denied);
+        try{IcarianFlight.tick();h.assertTrue(!IcarianFlight.active(p)&&p.getDeltaMovement().equals(Vec3.ZERO),"revoked claim ends the old motion job");}
+        finally{MinecraftForge.EVENT_BUS.unregister(denied);finish(h,p);}
     }
     @GameTest(template="empty",batch="rework_each_263") public static void loginIgnoresCorruptDeadlineButRestoresTheOtherValidCooldown(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE);var state=ArtifactState.of(wearer,ArtifactKind.EVENTIDE);long now=ArtifactState.now(wearer);var item=wearer.getMainHandItem().getItem();

@@ -10,7 +10,7 @@ import java.util.*;
 public final class DirectionalProgram implements WorkProgram {
     public enum Shape { CARVE, FRACTURE, CLEAVE, CORE_DRILL, WORLD_SHATTER, ICARUS, ICARUS_WIDE, EXODIUM_LANCE, EXODIUM_SINK, RESONANT_TUNNEL, WORLDLOOM_BORE }
     private final BlockPos origin;private final Direction direction;private final Shape shape;private final ArtifactKind kind;private final int length;
-    private int depth,index;private boolean digging,moving,finished;
+    private int depth,index;private boolean digging,finished;
     private List<BlockPos> slice;private BlockState[] expected;
     public DirectionalProgram(BlockPos origin,Direction direction,Shape shape){
         this(origin,direction,shape,switch(shape){case ICARUS,ICARUS_WIDE->ArtifactKind.ICARUS;case EXODIUM_LANCE->ArtifactKind.EXODIUM;default->ArtifactKind.WORLDBREAKER;});
@@ -23,7 +23,7 @@ public final class DirectionalProgram implements WorkProgram {
     public boolean isCoreDrill(){return shape==Shape.CORE_DRILL;}
     private void prepare(){
         slice=section(origin,direction,shape,depth);
-        expected=new BlockState[slice.size()];index=0;digging=false;moving=false;
+        expected=new BlockState[slice.size()];index=0;digging=false;
     }
     /** Exact live geometry, also used by previews and deterministic shape regressions. */
     public static List<BlockPos> section(BlockPos origin,Direction direction,Shape shape,int depth){
@@ -57,21 +57,20 @@ public final class DirectionalProgram implements WorkProgram {
         return (length-depth)*slice.size()*2;
     }
     public boolean awaiting(){return false;}public boolean executing(){return true;}public boolean done(){return finished;}public void confirm(){}
-    public boolean loaded(ServerPlayer p){return finished||p.serverLevel().hasChunkAt(moving?origin.relative(direction,depth):slice.get(index));}
+    public boolean loaded(ServerPlayer p){return finished||p.serverLevel().hasChunkAt(slice.get(index));}
     private void advance(){
         if(++index<slice.size())return;
         index=0;if(!digging){digging=true;return;}
-        if(shape==Shape.ICARUS||shape==Shape.ICARUS_WIDE){moving=true;return;}nextSlice();
+        nextSlice();
     }
     private void nextSlice(){if(++depth>=length){finished=true;return;}prepare();}
     public boolean backpressured(ServerPlayer p){
-        if(finished||moving||!digging||expected[index].isAir())return false;
+        if(finished||!digging||expected[index].isAir())return false;
         if(shape==Shape.WORLDLOOM_BORE&&(!MiningDesigns.matrix(expected[index])||ArtifactOres.isOre(expected[index])
                 ||PlayerPlacedBlocks.get(p.serverLevel()).contains(slice.get(index))))return false;
         return WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,slice.get(index),expected[index]);
     }
     public WorkStep next(ServerPlayer p){
-        if(moving){var destination=origin.relative(direction,depth).below();nextSlice();return new WorkStep.Move(destination);}
         final int i=index,sliceDepth=depth;var at=slice.get(i);boolean mine=digging;
         if(!mine)expected[i]=p.serverLevel().getBlockState(at);var old=expected[i];advance();
         return new WorkStep(){

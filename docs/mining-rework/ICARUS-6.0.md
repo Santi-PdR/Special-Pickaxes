@@ -18,6 +18,6 @@ La referencia del menú I y EN/ES/es_uy describen estos poderes. No se cambió n
 
 ## Pruebas
 
-Los tests antiguos del ascensor que verificaban teletransporte desde las teclas se sustituyeron por expectativas explícitas del rework. Las regresiones del programa antiguo, ya sin entrada en las habilidades de Ícaro, siguen compilando por compatibilidad interna; su existencia no significa que la habilidad nueva lo utilice.
+Los tests antiguos del ascensor que verificaban teletransporte desde las teclas se sustituyeron por expectativas explícitas del rework. Se retiraron por completo `IcarianLiftProgram`, su ancla `IcarianShaft` y las cinco pruebas unitarias de esa mecánica descartada. Sus tres regresiones de mundo fueron sustituidas por controles de cancelación, no acumulación y revocación de claims del impulso nuevo. También se eliminó el paso Move de las geometrías direccionales antiguas de Ícaro: no queda teletransporte de minería en ese motor.
 
 Pendiente comprobar resultados: JUnit de geometría/velocidad, GameTests de minería sin desplazamiento, impulso sin escritura de posición, techos/fluidos, retirada de herramienta, callback de teleport, copia/cancelación, Pluma temporal y variante pasiva. Smoke gráfico general comprueba principal; todavía no prueba un vuelo físico completo con un jugador humano ni el aspecto del ascenso en todos los FPS/modpacks.

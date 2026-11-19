@@ -158,7 +158,6 @@ public final class WorkQueue {
             }
             if(feedback!=null && p.tickCount%4==0){
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
-                else if(job.region instanceof IcarianLiftProgram)ArtifactFeedback.icarianAscent(p);
                 else if(job.kind==ArtifactKind.IRIDIUM)ArtifactFeedback.iridiumLodePulse(p,feedback);
                 else if(job.kind==ArtifactKind.AXIOM&&job.region instanceof RadialMiningProgram radial)ArtifactFeedback.axiomNullcutPulse(p,feedback,radial.center());
                 else if(job.kind==ArtifactKind.CRUCIBLE&&feedbackMaterial!=null)ArtifactFeedback.crucibleRephase(p,feedback,feedbackMaterial);
@@ -173,10 +172,7 @@ public final class WorkQueue {
                 if(!job.aborted&&job.succeeded>0&&job.lastImpact!=null)
                     AbilityVfx.excavation(p,job.kind,job.lastImpact,true);
                 if(job.aborted){ArtifactFeedback.message(p,"cancelled");ArtifactFeedback.cue(p,"cancel");}
-                else if(job.region instanceof IcarianLiftProgram lift){
-                    String result=lift.surfaced()?"icarian_lift_surface":lift.departed()?"icarian_lift_departed":lift.fluidBlocked()?"icarian_lift_fluid":lift.blocked()?"icarian_lift_barrier":"icarian_lift_limit";
-                    ArtifactFeedback.message(p,result);if(lift.surfaced())ArtifactFeedback.icarianSurface(p);ArtifactFeedback.cue(p,"complete");
-                }else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id,job);
+                else {boolean partial=job.region==null||job.region.reportPartial();String result=job.succeeded==0?(job.kind==ArtifactKind.CRUCIBLE?"crucible_no_change":"nothing_changed"):partial&&job.succeeded<job.completed?"partial":"complete";ArtifactFeedback.message(p,result);ArtifactFeedback.cue(p,"complete");}ArtifactInteraction.clear(p);JOBS.remove(id,job);
             } else ORDER.addLast(id);
         }
         if(visited==initial&&ORDER.size()>1)ORDER.addLast(ORDER.removeFirst());
