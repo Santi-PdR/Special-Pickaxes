@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.12`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.13`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -10,7 +10,7 @@ CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/r
 
 [Stasis alpha.9](docs/mining-rework/STASIS-6.0.md) implementado: dominio fijo 33×17×33, aura móvil personal, reloj en el mundo, secundaria reloj de arena de 4773 candidatos y corte Curios de 112. CI `44549253542` aprobada con 189 JUnit / 470 GameTests / cliente y servidor. Dominio activo ES inspeccionado; quedan cinco identidades y copia Curios global de Worldbreaker. No release 6.0 final.
 
-[Worldloom — validación final abierta](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios implementadas. Alpha.12: 195 JUnit / 479 GameTests / servidor pasan, pero CI completa sigue bloqueada por autenticación externa en logs del cliente y falta inspeccionar la captura de la cantera activa. No cuenta aún como identidad plenamente validada.
+[Worldloom alpha.12 validado](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios. CI `44609459397` SUCCESS: 195 JUnit / 479 GameTests / cliente y servidor con logs estrictos. Cantera activa y guía ES inspeccionadas. Quedan cuatro identidades y copia Curios global. Alpha.13 inicia la primaria de Axiom, todavía sin validar ni completar esa identidad.
 
 ---
 

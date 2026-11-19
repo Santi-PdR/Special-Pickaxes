@@ -130,6 +130,16 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.WORLDLOOM,true),false,at.x,at.y,at.z,1,0,0,0,0);
         }return true;
     }
+    public static boolean axiomImplosion(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),12))return false;
+        double phase=p.server.getTickCount()*.15;
+        for(int i=0;i<12;i++){
+            double a=phase+Math.PI*2*i/12,r=1.8-(i%3)*.4;
+            var at=Vec3.atCenterOf(center).add(Math.cos(a)*r,Math.sin(a*2)*.7,Math.sin(a)*r);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.AXIOM,true),false,at.x,at.y,at.z,1,0,0,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

@@ -42,7 +42,7 @@ Pendiente: reemplazo de las otras 7 identidades, nuevo sistema de activación Cu
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba, Coro, Ocaso, Paradox y Stasis, los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba, Coro, Ocaso, Paradox, Stasis y Worldloom, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 
@@ -66,3 +66,7 @@ Fuente `20e2a1124560a1b1f21c024da83fcf496b2c1bb6`, CI `44515980736` SUCCESS: 182
 ## Stasis alpha.9 validado
 
 Runtime `0227115609126603e9237ec2bb9d2eeee80429e6`, CI `44549253542`: SUCCESS, 189 JUnit / 470 GameTests / cliente y servidor. Dominio ampliado 33×17×33, bordes y reloj visibles, secundaria reloj de arena, corte Curios y copia en mano con modo correcto. Captura activa inspeccionada. [Alcance y límites](STASIS-6.0.md). Quedan cinco identidades y copia Curios global.
+
+## Worldloom alpha.12 validado
+
+Fuente `dde36814a8a0cef56166e509fd42e63d2e9ebe6c`, CI `44609459397`: SUCCESS, 195 JUnit / 479 GameTests / cliente y servidor. Cantera escalonada, cosecha expuesta sin construcción y raíces Curios con lease. Cantera real y guía ES inspeccionadas; límites en [WORLDLOOM-6.0.md](WORLDLOOM-6.0.md). Quedan Axiom, Exodium, Hellspec, Worldbreaker y copia Curios global.

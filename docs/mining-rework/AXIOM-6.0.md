@@ -1,0 +1,7 @@
+# Axiom alpha.13 — primary null chamber, implementation under validation
+
+Public primary replaces the radius-configured thin radial shell with an octahedral natural-rock implosion: Manhattan radius 18, 8446 unique candidates, traversed outer facets toward the center. Preserves all ore and a central 3×3×3 cube, including the aimed block. Can anchor on natural rock or ore. No tunnel, block construction, fluid removal or item magnet. Native rock loot, execution-time claims, provenance, chunk skipping, configured job cap and drop backpressure remain in force. Custom Axiom particle streams use existing assets, without changing item models/textures.
+
+Worldbreaker hand copy dispatches the same primary. Activation captures the exact held context and rejects reentrant or relocated callbacks. Two new geometry JUnit cases and three GameTests cover octahedral facets, core/ore/placed/exterior safety, ore-anchored hand copy and callback reentry. Existing RadialMiningProgram shell tests remain historical infrastructure regression coverage; public primary no longer dispatches that shell.
+
+Local 140 Python tests (one skipped without Java), 25 resource validations and diff check pass. No Java runtime locally; Forge CI pending. No Axiom action screenshot inspected. Secondary and Curios redesign remain pending: this primary milestone is not a completed identity. Global Worldbreaker Curios copying and the remaining identities are not claimed done.
