@@ -30,6 +30,18 @@ class EvidenceBundleTests(unittest.TestCase):
             extract_verified(data, directory)
             self.assertEqual((pathlib.Path(directory) / 'build/client.log').read_bytes(), contents['build/client.log'])
 
+    def test_current_quarry_review_outlives_larger_historical_priority_images(self):
+        contents = {'build/client.log': b'full log',
+                    'build/client-smoke/manual-worldloom-quarry.jpg': random.Random(9).randbytes(1200),
+                    'build/client-smoke/worldloom-quarry-active.jpg': random.Random(10).randbytes(1200),
+                    'build/client-smoke/gallery-clean.jpg': random.Random(11).randbytes(1400)}
+        data, manifest, report = make_bundle(contents, max_bytes=3800)
+        self.assertLessEqual(len(data), 3800)
+        names = {entry['path'] for entry in manifest}
+        self.assertIn('build/client-smoke/manual-worldloom-quarry.jpg', names)
+        self.assertIn('build/client-smoke/worldloom-quarry-active.jpg', names)
+        self.assertIn('build/client-smoke/gallery-clean.jpg', report['omitted_images'])
+
     def test_oversize_text_is_rejected_never_truncated(self):
         with self.assertRaises(ValueError):
             make_bundle({'build/client.log': random.Random(4).randbytes(5000)}, max_bytes=1000)

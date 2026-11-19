@@ -10,6 +10,9 @@ EXPORT_REPORT = 'build/evidence-export.json'
 from mining_catalog import IDS
 PRIORITY_IMAGES = {'icarus-ascent.jpg', 'survey-guide.jpg', 'manual-palimpsest-solar_rupture.jpg', 'manual-fault_choir-fault_fan.jpg', 'manual-eventide-gravity_in.jpg', 'manual-paradox_crucible-stone.jpg', 'manual-interregnum-domain.jpg', 'stasis-domain-active.jpg', 'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg', 'manual-worldbreaker-carve.jpg', 'ux-shift-fault_choir-fault_fan.jpg', 'ux-shift-worldbreaker-carve.jpg', 'gallery-clean.jpg', 'inventory.jpg', 'supreme-executing.jpg', 'supreme-complete.jpg'} | {'portrait-'+pick+'.jpg' for pick in IDS}
 
+# Current milestone's review must survive before historical priority screenshots.
+FOCUS_IMAGES = {'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg'}
+
 
 def make_bundle(contents, max_bytes=MAX_EXPORT_BYTES):
     files = dict(contents)
@@ -30,7 +33,9 @@ def make_bundle(contents, max_bytes=MAX_EXPORT_BYTES):
         images = [name for name in files if pathlib.PurePosixPath(name).suffix.lower() in ('.jpg', '.png')]
         if not images:
             raise ValueError('Non-image evidence exceeds export budget; no diagnostic text was truncated')
-        candidates = [name for name in images if pathlib.PurePosixPath(name).name not in PRIORITY_IMAGES] or images
+        candidates = ([name for name in images if pathlib.PurePosixPath(name).name not in PRIORITY_IMAGES]
+                      or [name for name in images if pathlib.PurePosixPath(name).name not in FOCUS_IMAGES]
+                      or images)
         remove = max(candidates, key=lambda name: (len(files[name]), name))
         omitted.append(remove)
         del files[remove]
