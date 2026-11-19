@@ -2158,7 +2158,7 @@ public final class PickaxeGameTests {
         h.assertTrue(wearer.isFallFlying()&&Math.abs(wearer.getDeltaMovement().y+1.2)<.001,
                 "Icarian Momentum preserves intentional Elytra dives instead of clamping their vertical speed");
         var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(wearer,16F,1F);MinecraftForge.EVENT_BUS.post(fall);
-        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.5F)<.001,"Icarian Momentum cuts fall damage in half while active");
+        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.1F)<.001,"airborne Curios combines featherfall and glide for 90 percent fall reduction");
         wearer.setOnGround(true);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
         h.assertTrue(!wearer.hasEffect(glide),"touchdown ends the airborne Curios passive promptly");
         wearer.setOnGround(false);ArtifactPassives.tick(wearer,ArtifactKind.ICARUS);
