@@ -114,6 +114,7 @@ try:
    input_gate.complete(id)
    activation_pending=None
    if id=='interregnum-domain':capture_screen(str(out/'stasis-domain-active.png'))
+   if id=='worldloom-quarry':capture_screen(str(out/'worldloom-quarry-active.png'))
    ux.add(id);i=scenes.index(id)
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
     press_screen('mode')

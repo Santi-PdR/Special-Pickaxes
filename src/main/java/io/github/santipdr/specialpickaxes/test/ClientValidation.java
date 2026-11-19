@@ -42,6 +42,19 @@ public final class ClientValidation {
                     }catch(java.io.IOException error){throw new IllegalStateException("Cannot prepare client fixture aim",error);}
                 }
                 if(!state.getBoolean("sceneExecuted")&&ArtifactState.of(p,current.kind()).getLong("ready")>state.getLong("sceneReadyBefore")){
+                    if(current.kind()==ArtifactKind.WORLDLOOM){
+                        if(!state.getBoolean("worldloomObserver")){
+                            for(int x=19;x<=21;x++)for(int z=31;z<=33;z++)p.serverLevel().setBlock(new BlockPos(x,81,z),net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE.defaultBlockState(),2);
+                            p.connection.teleport(20.5,82,32.5,138,35);state.putBoolean("worldloomObserver",true);
+                        }
+                        // Simulate collecting native drops; do not relax production backpressure.
+                        for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(64)))drop.discard();
+                        if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))WorkQueue.togglePause(p);
+                        if(WorkQueue.busy(p))continue;
+                        if(!p.serverLevel().getBlockState(new BlockPos(0,57,10)).isAir()
+                                ||!p.serverLevel().getBlockState(new BlockPos(5,62,10)).is(net.minecraft.world.level.block.Blocks.DIAMOND_ORE))
+                            throw new IllegalStateException("Worldloom action fixture did not expose ore through its terraces");
+                    }
                     if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
                         if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");
                         // Disposable action stage: the original gallery walls occlude a domain this large.
@@ -130,6 +143,16 @@ public final class ClientValidation {
                 for(int x=-5;x<=-3;x++)for(int y=65;y<=67;y++)for(int z=6;z<=8;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
                 var rock=new BlockPos(0,67,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 p.serverLevel().setBlockAndUpdate(rock.above(),net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState());
+                if(k==ArtifactKind.WORLDLOOM){
+                    // Disposable solid bank for an actual terraced-quarry action screenshot.
+                    for(int x=-13;x<=13;x++)for(int y=56;y<=67;y++)for(int z=-13;z<=13;z++)if(x*x+z*z<=169){
+                        var cell=new BlockPos(x,y,10+z);PlayerPlacedBlocks.get(p.serverLevel()).unmark(cell);
+                        p.serverLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                    }
+                    for(int x=-1;x<=1;x++)for(int y=65;y<=72;y++)for(int z=11;z<=16;z++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                    for(int x:new int[]{-5,5})p.serverLevel().setBlock(new BlockPos(x,62,10),net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState(),2);
+                    p.getPersistentData().putBoolean("worldloomObserver",false);
+                }
                 p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(k==ArtifactKind.CRUCIBLE?net.minecraft.world.item.Items.BASALT:net.minecraft.world.item.Items.STONE,64));
                 if(k==ArtifactKind.PALIMPSEST||k==ArtifactKind.CHOIR){
                     p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
