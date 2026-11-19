@@ -167,7 +167,7 @@ public final class ArtifactTechniques {
             case EVENTIDE -> EventideRupture.start(player,tool,EventideRupture.Form.HORIZON);
             case ICARUS -> IcarianFlight.start(player,tool);
             case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):
-                    WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(aimed(player),kind,true));
+                    WorldbreakerContinentalShear.start(player,tool);
             case EXODIUM -> ExodiumImpactBasin.start(player,tool);
             case IRIDIUM -> recallIridiumDrops(player,tool,IRIDIUM_RECALL_RADIUS,96);
             case SEAM_RIPPER -> seamFace(player,tool);

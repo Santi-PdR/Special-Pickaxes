@@ -1,3 +1,7 @@
+## Reforma 6.0 — Worldbreaker alpha.20 secundaria nativa parcial
+
+Cizalla Continental reemplaza el rift pequeño: tres discos horizontales radio 24 a alturas -6/0/+6, 5379 candidatos, conserva roca entre planos. Copias en mano siguen despachando la secundaria elegida; regresión Axiom verifica que no cae en la nativa. Un JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos y 58 hashes intactos. Forge alpha.20 y capturas pendientes; alpha.19 CI `44633175036` todavía en ejecución al preparar esta tanda. Otros cinco modos nativos y copia Curios global sin completar. [Contrato](WORLDBREAKER-6.0.md). No release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.19 Cataclismo nativo parcial
 
 Primer modo nativo reemplaza túnel por cámara biselada 33×17×33, 14801 candidatos; límite por defecto 8192 bloques realmente minados. Otros cinco modos, secundaria y Curios/copia global sin reformar. Dos JUnit y dos GameTests; local 141 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Forge y captura pendientes. [Detalles](WORLDBREAKER-6.0.md). No release pública.

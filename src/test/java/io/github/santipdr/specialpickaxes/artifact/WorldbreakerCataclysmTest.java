@@ -19,4 +19,13 @@ class WorldbreakerCataclysmTest {
         assertFalse(WorldbreakerCataclysm.contains(0,9,0));
         assertThrows(IllegalArgumentException.class,()->WorldbreakerCataclysm.cell(BlockPos.ZERO,WorldbreakerCataclysm.VOLUME));
     }
+    @Test void continentalShearHas5379UniqueCellsOnExactlyThreeDiscs(){
+        assertEquals(5379,WorldbreakerContinentalShear.VOLUME);var seen=new HashSet<BlockPos>();int previous=6;
+        for(int i=0;i<WorldbreakerContinentalShear.VOLUME;i++){
+            var p=WorldbreakerContinentalShear.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));assertTrue(p.getY()<=previous);previous=p.getY();
+            assertTrue(p.getY()==-6||p.getY()==0||p.getY()==6);assertTrue(p.getX()*p.getX()+p.getZ()*p.getZ()<=576);
+        }
+        assertTrue(WorldbreakerContinentalShear.contains(24,6,0));assertFalse(WorldbreakerContinentalShear.contains(24,1,0));
+        assertFalse(WorldbreakerContinentalShear.contains(24,0,1));
+    }
 }

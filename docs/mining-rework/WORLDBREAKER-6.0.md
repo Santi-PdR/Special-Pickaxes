@@ -11,3 +11,11 @@ This is deliberately a partial milestone: the other five native modes, native al
 ## Preceding Hellspec alpha.18 validation
 
 CI `44630552998`, source `8186708`: all 500 GameTests passed; client gallery failed at `eventide-gravity_out` activation after 45 seconds, not at the earlier mode acknowledgement. No synthetic activation or relaxed timeout was introduced to conceal it. Hellspec secondary/Curios are not yet approved end-to-end; the previous combined alpha.17 green CI remains historical evidence, not approval of alpha.18 or this code.
+
+## Alpha.20 — native Continental Shear alternate implemented
+
+Without a copied skill, X now starts Continental Shear instead of the 11-cubed legacy rift. Three horizontal discs of radius 24 at offsets -6, 0 and +6, 5379 unique candidates. Natural rock and ore yield native loot. Rock between the planes remains intact. Traverses upper-to-lower planes with the same safe queue, captured held context, start reentry guard, execution-time claim/provenance/chunk/tool checks, configured removal cap and drop backpressure. Uses bounded local Worldbreaker fragment-ring particles. No tunnel, explosion, block construction or entity damage.
+
+Copied alternates still use the source-specific echo dispatcher before the native alternate. A new regression verifies copied Axiom cuts its vertical cross, preserves its central core and does not fall back to native horizontal shear. Another GameTest covers native public alternate dispatch, the three strata, ore harvesting, intervening rock and player provenance. New JUnit case verifies exact 5379-cell geometry, uniqueness, ordering and boundaries. Local 141 Python (one skip without Java), 25 resources, frozen hashes and diff check pass; Forge alpha.20 and action-image inspection pending.
+
+This supersedes only the pending native-alternate item in alpha.19's scope list. Other five native modes and global Curios copying remain outstanding. No claim of complete Worldbreaker reform and no public release. Alpha.19 CI `44633175036` was still in progress when this milestone was prepared.
