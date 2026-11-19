@@ -155,8 +155,8 @@
   "controls.specialpickaxes.interregnum": "Aim and Use: stasis. Sneak-use: release. Mine inside to sustain it.",
   "example.specialpickaxes.interregnum": "Example: Mine while nearby hostiles remain in stasis.",
   "identity.specialpickaxes.worldloom": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
-  "controls.specialpickaxes.worldloom": "Primary: Canopy Bore. Alternate: Living Causeway.",
-  "example.specialpickaxes.worldloom": "Example: expose ore along a wide gallery, then bridge a gap using offhand blocks.",
+  "controls.specialpickaxes.worldloom": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
+  "example.specialpickaxes.worldloom": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
   "identity.specialpickaxes.icarus": "Unleash two rising fracture wings over 32 blocks. Excavates natural rock and ore without moving you. Wide mode expands the wingspan.",
   "controls.specialpickaxes.icarus": "Primary: wings. Mode: wingspan. Alternate: vertical thrust.",
   "example.specialpickaxes.icarus": "Excavate ahead, then use thrust in the open space.",
@@ -344,7 +344,7 @@
   "mode.specialpickaxes.aura": "Moving aura",
   "mining.identity.worldloom.quarry": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
   "mining.how.worldloom.quarry": "%1$s · Point at the top of natural rock. Excavates four terraces downward, leaving ore and player builds intact. No tunnel, roof excavation or material cost. 4164 candidates.",
-  "mode.specialpickaxes.quarry": "Quarry tunnel",
+  "mode.specialpickaxes.quarry": "Terraced quarry",
   "mining.identity.palimpsest.vein": "SOLAR RUPTURE: fracture the earth with eight rays.",
   "mining.how.palimpsest.vein": "%1$s · Solar rays: excavate 8 thick arms, 24 blocks long and 5 high (2765 candidate cells). Aim at natural rock; skips placed blocks, containers and fluids.",
   "mode.specialpickaxes.vein": "Vein extraction",
@@ -586,7 +586,7 @@
   "message.specialpickaxes.icarian_lift_limit": "Height limit reached.",
   "message.specialpickaxes.starfall_sink_started": "Starfall Sink marked its beveled 5×5 route down to 32 blocks; the drilling pulse follows the cut.",
   "message.specialpickaxes.seam_face_started": "Seam Sweep marked %s safe blocks in the target face.",
-  "message.specialpickaxes.worldloom_bore_started": "Canopy Bore queued a 7×7 tunnel up to 48 blocks long.",
+  "message.specialpickaxes.worldloom_bore_started": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
   "message.specialpickaxes.crucible_ward_started": "Crucible Ward active for 8 seconds. Hostile shots will be deflected around you.",
   "screen.specialpickaxes.copy_mode": "Copy · %s",
   "tooltip.specialpickaxes.copying": "Copying: %s",
@@ -709,5 +709,7 @@
   "mining.identity.fault_choir.fault_fan": "SEISMIC FAN: fracture a broad front, 32 blocks deep.",
   "mining.how.fault_choir.fault_fan": "%1$s · Seismic fan: 32 blocks forward, expanding to 49 wide and 5 high (5310 candidate cells). Aim at natural rock; preserves placed blocks, containers and fluids.",
   "mode.specialpickaxes.fault_fan": "Seismic fan",
-  "guide.main.worldloom.quarry": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls."
+  "guide.main.worldloom.quarry": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
+  "limits.specialpickaxes.worldloom": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls.",
+  "play4.worldloom": "TERRACED QUARRY: radius 12, depth 12; four steps expose ore without harvesting it. 4164 candidate cells. Point at natural rock and activate; repeat to pause/cancel with your configured controls."
 }

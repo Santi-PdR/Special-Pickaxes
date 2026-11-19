@@ -155,8 +155,8 @@
   "controls.specialpickaxes.interregnum": "Apunta y usa: estasis. Agachado + usar: libera. Minar dentro prolonga el dominio.",
   "example.specialpickaxes.interregnum": "Ejemplo: Mina mientras los hostiles cercanos quedan en estasis.",
   "identity.specialpickaxes.worldloom": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
-  "controls.specialpickaxes.worldloom": "Principal: Taladro del Dosel. Alternativa: Calzada viviente.",
-  "example.specialpickaxes.worldloom": "Ejemplo: expón menas en una galería ancha y salva una grieta con bloques de la mano secundaria.",
+  "controls.specialpickaxes.worldloom": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
+  "example.specialpickaxes.worldloom": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
   "identity.specialpickaxes.icarus": "Desata dos alas de fractura ascendente durante 32 bloques. Excava roca y menas naturales sin mover al jugador. El modo ancho amplía la envergadura.",
   "controls.specialpickaxes.icarus": "Principal: alas. Modo: envergadura. Secundaria: impulso vertical.",
   "example.specialpickaxes.icarus": "Excava el frente y usa el impulso en el espacio abierto.",
@@ -344,7 +344,7 @@
   "mode.specialpickaxes.aura": "Aura móvil",
   "mining.identity.worldloom.quarry": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
   "mining.how.worldloom.quarry": "%1$s · Apunta al techo de roca natural. Excava cuatro terrazas hacia abajo, sin extraer menas ni construcciones. Sin túneles, vaciar techos ni gasto de materiales. 4164 candidatos.",
-  "mode.specialpickaxes.quarry": "Túnel de cantera",
+  "mode.specialpickaxes.quarry": "Cantera escalonada",
   "mining.identity.palimpsest.vein": "RUPTURA SOLAR: fractura la tierra con ocho rayos.",
   "mining.how.palimpsest.vein": "%1$s · Rayos solares: excava 8 brazos gruesos de 24 bloques y 5 de alto (2765 celdas candidatas). Apunta a roca natural; respeta bloques colocados, contenedores y fluidos.",
   "mode.specialpickaxes.vein": "Extracción de vetas",
@@ -586,7 +586,7 @@
   "message.specialpickaxes.icarian_lift_limit": "Altura máxima.",
   "message.specialpickaxes.starfall_sink_started": "El Pozo Estelar marcó su ruta achaflanada 5×5 hasta 32 bloques; el pulso acompaña la perforación.",
   "message.specialpickaxes.seam_face_started": "Barrido de Falla marcó %s bloques seguros en la cara apuntada.",
-  "message.specialpickaxes.worldloom_bore_started": "El Taladro del Dosel encoló un túnel de 7×7 y hasta 48 bloques.",
+  "message.specialpickaxes.worldloom_bore_started": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
   "message.specialpickaxes.crucible_ward_started": "Égida del Crisol activa por 8 segundos. Desviará los proyectiles hostiles.",
   "screen.specialpickaxes.copy_mode": "Copia · %s",
   "tooltip.specialpickaxes.copying": "Copiando: %s",
@@ -709,5 +709,7 @@
   "mining.identity.fault_choir.fault_fan": "ABANICO SÍSMICO: fractura un frente amplio de 32 bloques.",
   "mining.how.fault_choir.fault_fan": "%1$s · Abanico sísmico: 32 bloques de alcance, hasta 49 de ancho y 5 de alto (5310 celdas candidatas). Apunta a roca natural; respeta bloques colocados, contenedores y fluidos.",
   "mode.specialpickaxes.fault_fan": "Abanico sísmico",
-  "guide.main.worldloom.quarry": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles."
+  "guide.main.worldloom.quarry": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
+  "limits.specialpickaxes.worldloom": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles.",
+  "play4.worldloom": "CANTERA ESCALONADA: radio 12 y profundidad 12; cuatro terrazas exponen menas sin extraerlas. 4164 candidatos. Apunta a roca natural y activa; pausa/cancela con tus controles."
 }
