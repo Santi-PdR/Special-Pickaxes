@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.21 copia minera Curios parcial
+
+Curios Worldbreaker reenvía minería manual confirmada a nueve rutas originales: Alba/Coro/Ocaso/Paradox/Stasis/Worldloom/Axiom/Exodium/Hellspec. Conserva condiciones, recargas y geometrías; lease exige stack, slot original y origen copiado inmutables durante callbacks. Siete GameTests nuevos, local 141 Python (una omisión), 25 recursos, 58 hashes congelados intactos. Forge/capturas pendientes. [Detalles y límites](WORLDBREAKER-6.0.md).
+
+NO es copia Curios global completa: faltan pasivas copiadas de estado/combate, controles equipados y copia Ícaro/Iridium/Strata. Esos dos picos conservados no se modifican. Otros cinco modos nativos Worldbreaker también pendientes; CI alpha.19/20 aún ejecutándose al preparar esta tanda. No release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.20 secundaria nativa parcial
 
 Cizalla Continental reemplaza el rift pequeño: tres discos horizontales radio 24 a alturas -6/0/+6, 5379 candidatos, conserva roca entre planos. Copias en mano siguen despachando la secundaria elegida; regresión Axiom verifica que no cae en la nativa. Un JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos y 58 hashes intactos. Forge alpha.20 y capturas pendientes; alpha.19 CI `44633175036` todavía en ejecución al preparar esta tanda. Otros cinco modos nativos y copia Curios global sin completar. [Contrato](WORLDBREAKER-6.0.md). No release pública.

@@ -143,6 +143,8 @@ public final class SpecialPickaxes {
         StrataFocusEffect.observeBreak(p,e.getPos(),e.getState());
         if(!WorkQueue.running()){
             var dawn=CuriosCompat.findFresh(p);
+            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER)
+                MiningObservations.captureCuriosWorldbreaker(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
             if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.PALIMPSEST)
                 MiningObservations.captureCuriosDawn(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
             if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.CHOIR)

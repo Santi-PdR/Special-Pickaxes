@@ -40,6 +40,33 @@ public final class MiningObservations {
                 applyHeldMiningEffects&&!queuedIridiumOre,curioSource));
         return true;
     }
+    /** Mining-trigger copy only. Original stack, slot and selected source remain leased. */
+    public static boolean captureCuriosWorldbreaker(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,
+                                                    java.util.function.Supplier<ItemStack> current){
+        var source=copiedMiningSource(curio);
+        if(source==null||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        boolean eligible=switch(source){
+            case CHOIR,CRUCIBLE,HELLSPEC -> NaturalExcavationProgram.eligible(state);
+            case PALIMPSEST -> true;
+            default -> ArtifactOres.isOre(state);
+        };
+        if(!eligible)return false;
+        if(source==ArtifactKind.PALIMPSEST&&p.getMainHandItem().getItem() instanceof ArtifactItem held
+                &&ArtifactSkills.feedbackKind(p.getMainHandItem(),held.kind)==ArtifactKind.PALIMPSEST)return false;
+        return capture(p,p.getMainHandItem(),source,pos,state,false,new EquipmentLease<>(curio,
+                ()->current.get()==curio&&copiedMiningSource(curio)==source?curio:ItemStack.EMPTY));
+    }
+    public static ArtifactKind copiedMiningSource(ItemStack stack){
+        if(stack.isEmpty()||!(stack.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.WORLDBREAKER
+                ||!stack.hasTag()||!stack.getTag().contains("copiedSkill"))return null;
+        try{
+            var source=ArtifactKind.byId(stack.getTag().getString("copiedSkill"));
+            return switch(source){
+                case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,EXODIUM,HELLSPEC -> source;
+                default -> null;
+            };
+        }catch(IllegalArgumentException invalid){return null;}
+    }
     /** Only manual natural mining can feed the equipped seismic streak. */
     public static boolean captureCuriosChoir(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.CHOIR
