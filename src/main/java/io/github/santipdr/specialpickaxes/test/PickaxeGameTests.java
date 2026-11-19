@@ -1676,6 +1676,11 @@ public final class PickaxeGameTests {
 
     private static BlockPos solarTarget(GameTestHelper h,ServerPlayer p){
         p.setPos(p.position().add(0,80,0));p.setYRot(0);p.setXRot(0);var at=p.blockPosition().above().south(4);
+        // High-altitude fixtures from other batches are outside template cleanup. Keep the
+        // inner burst isolated so old stone does not legitimately trip the 256-drop pause.
+        for(var cell:BlockPos.betweenClosed(at.offset(-5,-5,-5),at.offset(5,5,5))){
+            h.getLevel().setBlockAndUpdate(cell,Blocks.AIR.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);
+        }
         for(int n=1;n<4;n++)h.getLevel().setBlockAndUpdate(at.north(n),Blocks.AIR.defaultBlockState());
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));return at;

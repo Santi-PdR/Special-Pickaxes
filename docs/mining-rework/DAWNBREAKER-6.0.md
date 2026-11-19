@@ -25,3 +25,5 @@ Eliminados SurveyGuide, SurveyBearing y SurveyVolume, sus búsquedas y decodific
 ## Estado de comprobación
 
 Python: 138 pruebas, una omitida sin Java local; recursos: 25 correctas. Compilación, JUnit, GameTests y cliente/servidor de alpha.3 en CI pendientes. No presentar este documento como prueba de ejecución aprobada ni publicar esta alpha como reforma completa.
+
+Primera CI `44447488250`: compilación/JUnit aprobados, tres fallos GameTest. Dos expectativas no destructivas del sondeo retirado se sustituyeron por excavación de nova conservando las aserciones de criaturas/proyectiles/cooldown. Segunda CI `44448372209`: queda un fallo de fixture de rayos; diagnóstico: centro roto, 265 éxitos y pausa `drops` antes de alcanzar la mena. Roca residual de fixtures elevados fuera del volumen de limpieza de templates saturaba legítimamente el límite de 256 entidades. Se aísla el núcleo del fixture; **no se modifica ni relaja la contrapresión de drops**. Revalidación pendiente.
