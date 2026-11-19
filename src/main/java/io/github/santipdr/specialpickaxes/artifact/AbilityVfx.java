@@ -121,6 +121,15 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.INTERREGNUM,true),false,at.x,at.y,at.z,1,0,0,0,0);
         }return true;
     }
+    public static boolean worldloomStrands(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),12))return false;
+        for(int i=0;i<12;i++){
+            double offset=(i%6-2.5)*.6,phase=p.server.getTickCount()*.12;
+            var at=Vec3.atCenterOf(center).add(i<6?offset:Math.sin(phase+offset)*.2,.15+Math.cos(phase+offset)*.12,i<6?Math.sin(phase+offset)*.2:offset);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.WORLDLOOM,true),false,at.x,at.y,at.z,1,0,0,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

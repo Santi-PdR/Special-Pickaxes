@@ -167,11 +167,7 @@ public final class ArtifactActions {
             if(started){ArtifactFeedback.sphere(p,kind,center,r,Math.max(0,r-2),96);ArtifactFeedback.message(p,"nullcut_started");}
             return started;
         }
-        if(kind==ArtifactKind.WORLDLOOM){
-            boolean started=MiningDesigns.worldloomBore(p,tool,center);
-            if(started){var look=Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z);ArtifactFeedback.worldloomBore(p,center,look);ArtifactFeedback.message(p,"worldloom_bore_started");}
-            return started;
-        }
+        if(kind==ArtifactKind.WORLDLOOM)return WorldloomQuarry.start(p,tool);
         if(kind==ArtifactKind.HELLSPEC) {
             var program=new RadialMiningProgram(center,HellspecBloomShape.RADIUS,kind,ArtifactState.mode(p,kind),null);
             boolean started=WorkQueue.startRegion(p,tool,kind,program);

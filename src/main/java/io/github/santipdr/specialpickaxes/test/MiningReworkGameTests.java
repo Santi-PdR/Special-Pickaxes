@@ -446,7 +446,7 @@ public final class MiningReworkGameTests {
     }
     @GameTest(template="empty",batch="rework_each_14") public static void worldloomQuarryIsBoundedAndMiningOnly(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDLOOM);var center=h.absolutePos(new BlockPos(5,3,7));p.setPos(p.getX(),center.getY()-1,p.getZ());
-        var stone=center.east();var ore=center.above();var outside=center.east(9);
+        var stone=center.east();var ore=center.above();var outside=center.east(13);
         var placed=PlayerPlacedBlocks.get(h.getLevel());for(var at:java.util.List.of(center,stone,ore,outside))placed.unmark(at);
         h.getLevel().setBlockAndUpdate(center,Blocks.STONE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
