@@ -4,13 +4,10 @@ import re
 from pathlib import Path
 
 IDS=['palimpsest', 'fault_choir', 'eventide', 'paradox_crucible', 'interregnum', 'worldloom', 'icarus', 'hollow_axiom', 'worldbreaker', 'exodium', 'iridium', 'hellspec', 'seam_ripper']
-MODES={'palimpsest': {'vein': ('VEIN ECHO: harvest the connected ore vein.',
-                         'ECO DE VETA: extrae la veta conectada.',
-                         'Aim at an exposed ore and activate. It searches a 12-block radius and mines up to '
-                         '1024 connected blocks by default, respecting Fortune, protections and normal drops.',
-                         'Apunta a una mena expuesta y activa. Busca en un radio de 12 bloques y extrae '
-                         'hasta 1024 bloques conectados por defecto; respeta Fortuna, protecciones y drops '
-                         'normales.')},
+MODES={'palimpsest': {'solar_rupture': ('SOLAR RUPTURE: fracture the earth with eight rays.',
+                         'RUPTURA SOLAR: fractura la tierra con ocho rayos.',
+                         'Aim at natural rock: eight thick rays, 24 blocks long and 5 high, 2765 candidate cells. Native glowing loot; skips placed blocks, containers and fluids.',
+                         'Apunta a roca natural: ocho rayos gruesos de 24 bloques y 5 de alto, 2765 celdas candidatas. Botín nativo brillante; respeta bloques colocados, contenedores y fluidos.')},
  'fault_choir': {'forward': ('RESONANT TUNNEL: 2×2 bore, 20 blocks forward.',
                              'TÚNEL RESONANTE: perforación 2×2 de 20 bloques.',
                              'Aim forward and activate. The tunnel follows your view; it never flips behind '
