@@ -1,4 +1,4 @@
-# Coro / Faultsong — alpha.4, validación pendiente
+# Coro / Faultsong — alpha.4 validada
 
 Arte de los picos inalterado; Iridium y Strata conservan sus clases dedicadas.
 
@@ -21,8 +21,16 @@ Las geometrías históricas de galería se conservan como utilidades internas co
 
 ## Comprobación
 
-Pendiente de CI: compilación/JUnit, GameTests nuevos de mano/copia/Curios/callbacks, regresiones generales, cliente real y servidor empaquetado. Python y recursos locales comprobados antes del push. No publicar como reforma completa ni afirmar aprobación estética sin una captura de la acción inspeccionada.
+Runtime final `6915c714dade84828787567533fc24eddc7c1135`, CI `44457002693` **SUCCESS**: **176 JUnit**, cero fallos/errores/omisiones; **447 GameTests**; cliente **32 escenas / 64 tooltips**, controles reales y servidor empaquetado aprobados. Local: **139 Python** (una omisión por Java ausente), **25 recursos**, diff/secret scan correctos; los **58 hashes congelados** coinciden. Evidencia descargada en `/tmp/sp604verified`.
+
+Captura real ES 1280×720 inspeccionada: `review/faultsong-curios-6.0.0-alpha.4-es.jpg`. Incluye primaria, secundaria y la réplica Curios con disparador, tamaño y recarga, sin recorte del texto; controles por desplazamiento. Esta inspección no equivale a revisar todas las escalas/idiomas ni a aprobar estéticamente una captura de acción sísmica (no inspeccionada).
+
+JAR `special-pickaxes-1.20.1-6.0.0-alpha.4.jar`: **833548 bytes**, SHA256 `240fa402300e2ed5982a9d804ddd277e2771c8f4f10130e824206794ccb42df7`. No release 6.0 pública ni reforma global completa. Quedan ocho identidades y la copia global Curios de Worldbreaker.
+
+![Guía ES con variante Curios real](review/faultsong-curios-6.0.0-alpha.4-es.jpg)
 
 Primera CI `44454022416`: compilación y JUnit aprobados; cuatro fallos GameTest. Retirada del slot durante el callback de contrapresión reveló que el scheduler no revalidaba `done()` antes de `next()`; se corrige esa ventana sin desactivar el guard de equipo. Los otros casos ajustan fixtures: recogida simulada de drops durante ticks síncronos y evitar dos paquetes semánticos en el mismo tick (sin cambiar la contrapresión ni InputThrottle). Revalidación pendiente.
 
 CI `44454732849` (runtime `0873e29724d000226e0430d76caaa4c243535d6f`) SUCCESS: 176 JUnit sin fallos/errores/omisiones, 447 GameTests, cliente 32 escenas/64 tooltips y servidor empaquetado. Sin embargo, la captura real del manual inspeccionada mostró que la tarjeta Curios usaba sólo el resumen pasivo, omitiendo los detalles nuevos. Se conecta `curios.detail` para los trece picos y se corrige el texto genérico obsoleto; se actualiza la antigua prueba que prohibía esos detalles, contraria a la petición actual. La corrección gráfica aún requiere nueva CI. No reutilizar la captura con omisión como prueba de una guía completa.
+
+La CI final indicada arriba incluye la corrección de la guía para los trece picos. La tarjeta usa el tipo nativo para describir Curios: no atribuye a Worldbreaker una copia equipada aún no implementada. La guía sigue siendo desplazable y no se reintroducen el HUD ni la expansión SHIFT.

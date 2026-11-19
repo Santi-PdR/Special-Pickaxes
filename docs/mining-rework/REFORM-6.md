@@ -10,7 +10,9 @@ Primera base implementada: eliminación del renderer HUD; SHIFT no expande toolt
 
 [Alba reformada y validada](DAWNBREAKER-6.0.md): rayos de ocho brazos, nova de radio 12, Glowing de drops nativos y Curios, defensa solar del 65%. Sondeo y guía de mineral retirados.
 
-Pendiente: reemplazo de las otras 9 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **la transmutación y construcción antiguas todavía no se han retirado**.
+[Coro reformado y validado](FAULTSONG-6.0.md): abanico sísmico, cascada de cuatro fallas, réplica Curios de seis cicatrices, copia en mano y guard de slot durante callbacks. La guía muestra ahora el detalle equipado real de los trece picos.
+
+Pendiente: reemplazo de las otras 8 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **la transmutación y construcción antiguas todavía no se han retirado**.
 
 ## Invariantes obligatorios
 
@@ -22,12 +24,12 @@ Pendiente: reemplazo de las otras 9 identidades, nuevo sistema de activación Cu
 - Claims/protecciones, contenedores, chunks ausentes, presupuestos globales, drops y durabilidad siguen siendo límites de seguridad aunque el poder sea OP.
 - ES/EN completos, también `es_uy`. Evitar cadenas de error con listas de condiciones o ayuda larga en actionbar.
 
-## Dirección de las 11 identidades (Ícaro y Alba implementados)
+## Dirección de las 11 identidades (Ícaro, Alba y Coro implementados)
 
 | Identidad | Poderes en mano | Variante Curios |
 | --- | --- | --- |
 | Dawnbreaker / Alba — implementado | Ocho rayos de 24 bloques y nova de radio 12, Glowing de drops, ningún radar | Botín nuevo brillante, curación/velocidad y defensa solar del 65% cada 8 s; ver DAWNBREAKER-6.0.md |
-| Faultsong / Coro | Ruptura sísmica en abanico y fallas encadenadas, no un túnel rectangular | Réplica sísmica tras racha de minería |
+| Faultsong / Coro — implementado | Abanico de 32 de alcance hasta 49 de ancho y cascada de cuatro fallas verticales | Réplica sísmica de 99 celdas tras seis cicatrices naturales; recarga 8 s y lease de slot; ver FAULTSONG-6.0.md |
 | Eventide / Ocaso | Colapso crepuscular de grandes masas y segunda onda expansiva | Explosión crepuscular de represalia; imán no es su identidad |
 | Paradox / Crisol | Ruptura diferida y detonación de fracturas almacenadas, nunca transmutación | Eco diferido de bloques minados |
 | Stasis / Corona | Área de ruptura suspendida y liberación simultánea | Ventana temporal defensiva; dominio activo con contorno y caducidad visibles |
@@ -38,7 +40,7 @@ Pendiente: reemplazo de las otras 9 identidades, nuevo sistema de activación Cu
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro y Alba, los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba y Coro, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 
