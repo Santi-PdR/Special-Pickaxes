@@ -93,6 +93,9 @@ tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     doFirst {
         def properties = file("build/gametest-${project.version}/server.properties")
         properties.parentFile.mkdirs()
-        if (!properties.exists()) properties.text = 'spawn-protection=0\n'
+        // The disposable GameTest world must not spawn village AI that opens doors
+        // and recursively generates neighboring lava chunks during unrelated tests.
+        // Keep strict runtime-log checks; isolate the test world instead.
+        if (!properties.exists()) properties.text = 'spawn-protection=0\ngenerate-structures=false\nlevel-seed=0\n'
     }
 }
