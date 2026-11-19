@@ -8,12 +8,10 @@ MODES={'palimpsest': {'solar_rupture': ('SOLAR RUPTURE: fracture the earth with 
                          'RUPTURA SOLAR: fractura la tierra con ocho rayos.',
                          'Aim at natural rock: eight thick rays, 24 blocks long and 5 high, 2765 candidate cells. Native glowing loot; skips placed blocks, containers and fluids.',
                          'Apunta a roca natural: ocho rayos gruesos de 24 bloques y 5 de alto, 2765 celdas candidatas. Botín nativo brillante; respeta bloques colocados, contenedores y fluidos.')},
- 'fault_choir': {'forward': ('RESONANT TUNNEL: 2×2 bore, 20 blocks forward.',
-                             'TÚNEL RESONANTE: perforación 2×2 de 20 bloques.',
-                             'Aim forward and activate. The tunnel follows your view; it never flips behind '
-                             'you or replays distant blocks.',
-                             'Apunta al frente y activa. El túnel avanza hacia donde miras, sin girar 180° '
-                             'ni reproducir zonas lejanas.')},
+ 'fault_choir': {'fault_fan': ('SEISMIC FAN: fracture a broad front, 32 blocks deep.',
+                             'ABANICO SÍSMICO: fractura un frente amplio de 32 bloques.',
+                             'Aim at natural rock. A seismic fan expands over 32 blocks to 49 wide and 5 high: 5310 candidate cells, native drops, no placed blocks or containers.',
+                             'Apunta a roca natural. El abanico sísmico alcanza 32 bloques, hasta 49 de ancho y 5 de alto: 5310 celdas candidatas, drops nativos, sin bloques colocados ni contenedores.')},
  'eventide': {'gravity_in': ('GRAVITY WELL: pull hostile mobs and projectiles into the marked field.',
                              'POZO GRAVITATORIO: atrae hostiles y proyectiles al campo marcado.',
                              'Aim at a block and press R to anchor an 8-block field. Hostile mobs and '

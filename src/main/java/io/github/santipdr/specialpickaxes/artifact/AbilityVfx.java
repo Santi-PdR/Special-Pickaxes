@@ -77,6 +77,18 @@ public final class AbilityVfx {
             player.serverLevel().sendParticles(player,particle(ArtifactKind.PALIMPSEST,nova),false,at.x,at.y,at.z,1,0,.02,0,0);
         }return true;
     }
+    /** Seismic comb: authored fault particles on the advancing edge, never an idle aura. */
+    public static boolean faultWave(ServerPlayer player,net.minecraft.core.BlockPos origin,net.minecraft.core.Direction forward,net.minecraft.core.BlockPos front,boolean cascade){
+        if(!player.isAlive()||player.isRemoved()||player.distanceToSqr(Vec3.atCenterOf(front))>64*64)return false;
+        int tick=player.server.getTickCount();if(!BUDGET.tryReserve(tick,12))return false;
+        int depth=(front.getX()-origin.getX())*forward.getStepX()+(front.getZ()-origin.getZ())*forward.getStepZ();
+        var right=forward.getClockWise();double span=cascade?20:Math.min(24,2+depth);
+        for(int i=0;i<12;i++){
+            double side=(i/11D*2-1)*span;
+            var at=Vec3.atCenterOf(origin.relative(forward,depth)).add(right.getStepX()*side,cascade?(i%3-1)*10:.25,right.getStepZ()*side);
+            player.serverLevel().sendParticles(player,particle(ArtifactKind.CHOIR,cascade),false,at.x,at.y,at.z,1,0,.03,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

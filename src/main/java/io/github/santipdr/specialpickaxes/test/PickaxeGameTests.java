@@ -1381,7 +1381,7 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_151") public static void dawnNovaLeavesCreaturesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
     @GameTest(template="empty",batch="rework_each_152") public static void axiomExposureLeavesProjectilesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.AXIOM);}
-    @GameTest(template="empty",batch="rework_each_153") public static void choirArchIsMiningOnly(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.CHOIR);}
+    @GameTest(template="empty",batch="rework_each_153") public static void choirCascadeIsMiningOnly(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.CHOIR);}
     @GameTest(template="empty",batch="rework_each_154") public static void dawnNovaRecoversItsCooldown(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
     @GameTest(template="empty",batch="rework_each_155") public static void alternateRejectsDetachedToolsAndMismatchedKinds(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var tool=wearer.getMainHandItem();
@@ -1894,27 +1894,12 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"solar rays activate on natural stone");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir(),"rays break rock and disconnected ore: center="+h.getLevel().getBlockState(at)+" ore="+h.getLevel().getBlockState(ore)+" status="+WorkQueue.status(p)+" remaining="+WorkQueue.remaining(p)+" completed="+WorkQueue.completed(p)+" succeeded="+WorkQueue.succeeded(p)+" reason="+WorkQueue.pauseReason(p)+" range="+p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(ore)));finish(h,p);
     }
-    @GameTest(template="empty",batch="legacy_each_05") public static void choirReplayMatchesState(GameTestHelper h) {
-        var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);
-        for(int depth=0;depth<48;depth++)for(var pos:DirectionalProgram.section(origin,Direction.SOUTH,DirectionalProgram.Shape.RESONANT_TUNNEL,depth))h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());
-        var beyond=origin.relative(Direction.SOUTH,48);h.getLevel().setBlockAndUpdate(beyond,Blocks.STONE.defaultBlockState());
-        var outside=origin.offset(3,0,8);h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
-        var behind=p.blockPosition().relative(Direction.NORTH,2);h.getLevel().setBlockAndUpdate(behind,Blocks.STONE.defaultBlockState());
-        h.assertTrue(java.util.stream.IntStream.range(0,20).filter(ArtifactFeedback::resonantTunnelPulseDue).count()==10
-                &&!ArtifactFeedback.resonantTunnelPulseDue(20),"the private tunnel ripple is capped at ten samples for the 20-block route");
-        h.assertTrue(java.util.stream.IntStream.range(0,20).map(ArtifactFeedback::resonantTunnelParticleCount).sum()==42
-                &&ArtifactFeedback.resonantTunnelParticleCount(20)==0,"the four-point tunnel outline stays targeted and below 42 particles per full bore");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"forward resonance tunnel starts");
-        // Manual queue ticks do not merge or collect item entities; model collection.
-        for(int tick=0;tick<1000&&WorkQueue.busy(p);tick++){
-            for(var drop:h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(origin.relative(Direction.SOUTH,24)).inflate(30)))drop.discard();
-            if(WorkQueue.status(p).equals("paused"))WorkQueue.togglePause(p);
-            WorkQueue.tick();
-        }
-        h.assertTrue(!WorkQueue.busy(p),"the bounded route completes");
-        h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(origin.relative(Direction.SOUTH,47)).isAir(),"5x5 tunnel advances forty-eight blocks forward");
-        h.assertTrue(h.getLevel().getBlockState(beyond).is(Blocks.STONE)&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"stops at exact route and cross-section limits");
-        h.assertTrue(h.getLevel().getBlockState(behind).is(Blocks.STONE),"tunnel leaves blocks behind untouched");finish(h,p);
+    @GameTest(template="empty",batch="legacy_each_05") public static void choirFanExpandsInsteadOfReplayingATunnel(GameTestHelper h) {
+        var p=player(h,ArtifactKind.CHOIR);var origin=solarTarget(h,p);var edge=origin.south(8).east(8);var outside=origin.east(4);
+        h.getLevel().setBlockAndUpdate(edge,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(edge);
+        h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"seismic fan starts from aimed natural rock");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(edge).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"fan widens across terrain, preserves root limits, never replays distant memories");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void eventideMiningNotCombat(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);

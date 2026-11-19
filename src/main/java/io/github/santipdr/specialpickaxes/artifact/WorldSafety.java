@@ -26,6 +26,8 @@ public final class WorldSafety {
     private WorldSafety() {}
     private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind,boolean naturalOnly,net.minecraft.server.level.ServerLevel level,Vec3 origin){}
     private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
+    private static final ThreadLocal<java.util.function.BooleanSupplier> MINING_LEASE=new ThreadLocal<>();
+    private static boolean miningLeaseActive(){var guard=MINING_LEASE.get();return guard==null||guard.getAsBoolean();}
     public static boolean changedDuringBreakEvent(ServerPlayer p,BlockPos pos){
         var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
             &&(!sameActor(p,context.level(),context.origin(),context.tool(),pos)||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos)
@@ -55,7 +57,7 @@ public final class WorldSafety {
     /** No new callbacks: validate a transaction's actor after external Forge listeners return. */
     private static boolean sameActor(ServerPlayer p,net.minecraft.server.level.ServerLevel level,Vec3 origin,ItemStack tool,BlockPos pos){
         return p.serverLevel()==level&&p.position().equals(origin)&&p.getMainHandItem()==tool&&!tool.isEmpty()
-                &&allowedWithoutEvent(p,level,pos);
+                &&miningLeaseActive()&&allowedWithoutEvent(p,level,pos);
     }
     private static boolean allowedWithoutEvent(ServerPlayer p,net.minecraft.server.level.ServerLevel level,BlockPos pos){
         double range=ArtifactConfig.RANGE.get();
@@ -88,6 +90,13 @@ public final class WorldSafety {
     }
     static boolean mineNaturalQueued(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
         return mine(p,tool,kind,pos,expected,false,true);
+    }
+    /** Optional equipment transaction guard survives both ability and Forge break callbacks. */
+    static boolean mineNaturalLeased(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,java.util.function.BooleanSupplier guard){
+        var previous=MINING_LEASE.get();
+        MINING_LEASE.set(previous==null?guard:()->previous.getAsBoolean()&&guard.getAsBoolean());
+        try{return miningLeaseActive()&&mineNaturalQueued(p,tool,kind,pos,expected);}
+        finally{if(previous==null)MINING_LEASE.remove();else MINING_LEASE.set(previous);}
     }
     private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure){
         return mine(p,tool,kind,pos,expected,checkDropPressure,false);

@@ -6,7 +6,7 @@ import java.util.List;
 final class ArtifactModeCatalog {
     private ArtifactModeCatalog(){}
     private static final List<String> SOLAR=List.of("solar_rupture");
-    private static final List<String> FORWARD=List.of("forward");
+    private static final List<String> FAULT=List.of("fault_fan");
     private static final List<String> GRAVITY=List.of("gravity_in","gravity_out");
     private static final List<String> MATERIAL=List.of("stone","deepslate","granite","diorite","andesite","dirt","basalt","obsidian","calcite","tuff","dripstone","gravel");
     private static final List<String> STASIS=List.of("domain","aura");
@@ -20,7 +20,7 @@ final class ArtifactModeCatalog {
     private static final List<String> WORLD=List.of("carve","fracture","cleave","core_drill","world_shatter","region_break");
     private static final List<String> RETIRED=List.of("retired");
     static List<String> keys(ArtifactKind kind){return switch(kind){
-        case PALIMPSEST -> SOLAR; case CHOIR -> FORWARD; case EVENTIDE -> GRAVITY;
+        case PALIMPSEST -> SOLAR; case CHOIR -> FAULT; case EVENTIDE -> GRAVITY;
         case CRUCIBLE -> MATERIAL; case INTERREGNUM -> STASIS; case WORLDLOOM -> QUARRY;
         case ICARUS -> ICARIAN; case AXIOM -> HOLLOW; case EXODIUM -> STAR;
         case IRIDIUM -> ORE; case HELLSPEC -> HELL; case SEAM_RIPPER -> CONNECTED;

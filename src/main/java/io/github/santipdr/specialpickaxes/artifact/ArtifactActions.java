@@ -128,7 +128,7 @@ public final class ArtifactActions {
                     ?tool.getOrCreateTag().getInt("copiedMode"):ArtifactState.mode(p,kind);
             return WorkQueue.startRegion(p,tool,kind,new IcarianWingcut(at,p.getDirection(),wingMode==1));
         }
-        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
+        if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.EXODIUM) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
             return started;
@@ -139,6 +139,7 @@ public final class ArtifactActions {
             ArtifactFeedback.message(p,"ore_harvest_started");return true;
         }
         if(kind==ArtifactKind.PALIMPSEST)return SolarRupture.start(p,tool,SolarRupture.Form.RAYS);
+        if(kind==ArtifactKind.CHOIR)return ResonantFault.start(p,tool,ResonantFault.Form.FAN);
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
         if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;

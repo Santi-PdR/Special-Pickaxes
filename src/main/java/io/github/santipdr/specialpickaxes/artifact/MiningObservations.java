@@ -40,6 +40,12 @@ public final class MiningObservations {
                 applyHeldMiningEffects&&!queuedIridiumOre,curioSource));
         return true;
     }
+    /** Only manual natural mining can feed the equipped seismic streak. */
+    public static boolean captureCuriosChoir(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
+        if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.CHOIR
+                ||!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        return capture(p,p.getMainHandItem(),ArtifactKind.CHOIR,pos,state,false,new EquipmentLease<>(curio,current));
+    }
     /** Dawn in Curios lights only newly produced loot; it never searches for ore. */
     public static boolean captureCuriosDawn(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.PALIMPSEST)return false;
@@ -78,7 +84,8 @@ public final class MiningObservations {
                     if(o.dropsBeforeComplete)highlightNewOreDrops(p,o);
                 }
                 if(o.solarDrops&&o.dropsBeforeComplete&&valid(o))highlightNewSolarDrops(p,o);
-                if(o.applyHeldMiningEffects)ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.CHOIR&&valid(o))ResonantFault.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
     }
@@ -123,6 +130,6 @@ public final class MiningObservations {
             return inspected[0]>=DROP_QUERY_LIMIT?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT:net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });
     }
-    public static void forget(ServerPlayer p) { PENDING.removeIf(o -> o.player.getUUID().equals(p.getUUID())); }
-    public static void clear() { PENDING.clear(); }
+    public static void forget(ServerPlayer p) { ResonantFault.forget(p);PENDING.removeIf(o -> o.player.getUUID().equals(p.getUUID())); }
+    public static void clear() { PENDING.clear();ResonantFault.clear(); }
 }

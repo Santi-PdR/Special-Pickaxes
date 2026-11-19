@@ -260,13 +260,13 @@ class Resources(unittest.TestCase):
                     self.assertIn(f"mining.identity.{artifact}.{mode}", data)
                     self.assertIn(f"mining.how.{artifact}.{mode}", data)
 
-    def test_choir_manual_matches_live_tunnel(self):
+    def test_choir_manual_matches_seismic_fan(self):
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
-            self.assertIn("5×5", data["identity.specialpickaxes.fault_choir"])
-            self.assertIn("48", data["identity.specialpickaxes.fault_choir"])
-            self.assertIn("5×5", data["play4.fault_choir"])
-            self.assertIn("48", data["play4.fault_choir"])
+            self.assertIn("32", data["identity.specialpickaxes.fault_choir"])
+            self.assertIn("5310", data["guide.main.fault_choir"])
+            self.assertIn("49", data["play4.fault_choir"])
+            self.assertIn("4100", data["guide.alt.fault_choir"])
             self.assertNotIn("replay", data["identity.specialpickaxes.fault_choir"].lower())
             self.assertNotIn("repite", data["identity.specialpickaxes.fault_choir"].lower())
             combat_term = "Fault Resonance" if lang == "en_us" else "Resonancia de Falla"

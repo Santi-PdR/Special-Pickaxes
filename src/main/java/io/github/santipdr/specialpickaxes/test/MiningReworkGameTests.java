@@ -328,7 +328,7 @@ public final class MiningReworkGameTests {
 
     @GameTest(template="empty",batch="rework_each_332") public static void modeCatalogPreservesSavedOrderAndDefendsSharedKeys(GameTestHelper h){
         String[][] expected={
-            {"palimpsest","solar_rupture"},{"fault_choir","forward"},{"eventide","gravity_in,gravity_out"},
+            {"palimpsest","solar_rupture"},{"fault_choir","fault_fan"},{"eventide","gravity_in,gravity_out"},
             {"paradox_crucible","stone,deepslate,granite,diorite,andesite,dirt,basalt,obsidian,calcite,tuff,dripstone,gravel"},
             {"interregnum","domain,aura"},{"worldloom","quarry"},{"icarus","forward,wide"},{"hollow_axiom","hollow_pulse"},
             {"exodium","starfall"},{"iridium","orefall"},{"hellspec","hellforge"},{"seam_ripper","connected"},

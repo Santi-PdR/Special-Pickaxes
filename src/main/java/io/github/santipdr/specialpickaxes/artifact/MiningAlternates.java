@@ -19,11 +19,11 @@ public final class MiningAlternates {
         if(aimed.isEmpty())return false;
         var origin=aimed.get();
         if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
-        if(kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC){
+        if(kind==ArtifactKind.HELLSPEC){
             var state=level.getBlockState(origin);
             if(!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(level).contains(origin)
                     ||!WorldSafety.harvestable(player,tool,origin))return false;
-            var shape=kind==ArtifactKind.CHOIR?ExcavationVolume.Shape.VAULT:ExcavationVolume.Shape.CHIMNEY;
+            var shape=ExcavationVolume.Shape.CHIMNEY;
             var program=new NaturalExcavationProgram(origin,player.getDirection(),shape);
             if(!WorkQueue.startRegion(player,tool,kind,program))return false;
             ArtifactFeedback.message(player,"mining_alternate_started",program.remaining());
