@@ -1,3 +1,7 @@
+## Reforma 6.0 — Paradox alpha.6 validado, reforma global incompleta
+
+Runtime `20e2a1124560a1b1f21c024da83fcf496b2c1bb6`, CI `44515980736` **SUCCESS**: 182 JUnit sin fallos/errores/omisiones, 462 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado aprobados. Local 139 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Paradox: registro regional y detonación explícita con loot nativo, doce órdenes causales, retícula de 6101 candidatos y cuatro ecos Curios (hasta 108 celdas). Sin transmutación pública. [Alcance, captura de guía ES inspeccionada y límites](PARADOX-6.0.md). Quedan seis identidades y copia Curios global de Worldbreaker; sin release pública 6.0.
+
 ## Reforma 6.0 — Ocaso alpha.5 validado, reforma global incompleta
 
 Runtime `6d3439dfe3cc2a09e8e2e206018823bfcb72f992`, CI `44461111246` **SUCCESS**: 179 JUnit sin fallos/errores/omisiones, 454 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado. Local 139 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Ocaso reemplaza campo/imán por eclipse horizontal/creciente vertical de 7063 candidatos, horizonte anular de 5480 y réplica Curios de 312 tras una mena natural cada 8 s. Copia en mano con modo seleccionado. [Guía ES inspeccionada, límites y alcance](EVENTIDE-6.0.md). Quedan siete identidades y copia Curios global; no release 6.0 final.

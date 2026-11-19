@@ -42,7 +42,7 @@ Pendiente: reemplazo de las otras 7 identidades, nuevo sistema de activación Cu
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba, Coro y Ocaso, los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba, Coro, Ocaso y Paradox, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 
@@ -58,3 +58,7 @@ Capturas auténticas ES de la ejecución final, 1280×720, inspeccionadas: manua
 
 - `review/manual-curios-6.0.0-alpha.1-es.jpg`: SHA256 `5bb9cdd1d5195fff396bb85a07c80ad39b56e0f93eb0e604083739d713ee935f`.
 - `review/tooltip-shift-6.0.0-alpha.1-es.jpg`: SHA256 `4dd52370cae1c64179efea009bfd7b5539e2281f7d28ca7d4d838ad9e346cb60`.
+
+## Paradox alpha.6 validado
+
+Fuente `20e2a1124560a1b1f21c024da83fcf496b2c1bb6`, CI `44515980736` SUCCESS: 182 JUnit, 462 GameTests, cliente 32 escenas/64 tooltips y servidor empaquetado. Fractura regional, retícula causal, ecos Curios y copia en mano implementados sin transmutación pública. Seis identidades y copia Curios global siguen pendientes. [Evidencia y límites](PARADOX-6.0.md).

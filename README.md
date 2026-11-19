@@ -1,12 +1,12 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.5`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.6`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
-Identidades reformadas: [Ícaro](docs/mining-rework/ICARUS-6.0.md), [Alba](docs/mining-rework/DAWNBREAKER-6.0.md), [Coro](docs/mining-rework/FAULTSONG-6.0.md) y [Ocaso](docs/mining-rework/EVENTIDE-6.0.md). Ocaso ahora excava eclipses horizontales/verticales y anillos destructivos, con una réplica Curios al minar menas: ya no tiene un imán como poder principal.
+Identidades reformadas: [Ícaro](docs/mining-rework/ICARUS-6.0.md), [Alba](docs/mining-rework/DAWNBREAKER-6.0.md), [Coro](docs/mining-rework/FAULTSONG-6.0.md) [Ocaso](docs/mining-rework/EVENTIDE-6.0.md) y [Paradox](docs/mining-rework/PARADOX-6.0.md). Ocaso ahora excava eclipses horizontales/verticales y anillos destructivos, con una réplica Curios al minar menas: ya no tiene un imán como poder principal.
 
-CI alpha.5 [44461111246](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44461111246): **179 JUnit / 454 GameTests / 32 escenas y 64 tooltips / servidor empaquetado aprobados**. Quedan siete identidades y la copia Curios global de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md).
+CI alpha.6 [44515980736](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44515980736): **182 JUnit / 462 GameTests / 32 escenas y 64 tooltips / servidor empaquetado aprobados**. Quedan seis identidades y la copia Curios global de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md).
 
 ---
 
