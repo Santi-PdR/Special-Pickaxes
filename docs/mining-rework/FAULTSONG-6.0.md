@@ -22,3 +22,5 @@ Las geometrías históricas de galería se conservan como utilidades internas co
 ## Comprobación
 
 Pendiente de CI: compilación/JUnit, GameTests nuevos de mano/copia/Curios/callbacks, regresiones generales, cliente real y servidor empaquetado. Python y recursos locales comprobados antes del push. No publicar como reforma completa ni afirmar aprobación estética sin una captura de la acción inspeccionada.
+
+Primera CI `44454022416`: compilación y JUnit aprobados; cuatro fallos GameTest. Retirada del slot durante el callback de contrapresión reveló que el scheduler no revalidaba `done()` antes de `next()`; se corrige esa ventana sin desactivar el guard de equipo. Los otros casos ajustan fixtures: recogida simulada de drops durante ticks síncronos y evitar dos paquetes semánticos en el mismo tick (sin cambiar la contrapresión ni InputThrottle). Revalidación pendiente.

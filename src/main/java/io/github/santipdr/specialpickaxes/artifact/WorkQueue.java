@@ -126,6 +126,9 @@ public final class WorkQueue {
                 }
                 if(JOBS.get(id)!=job||job.paused)break;
                 if(!validActor(job,p)){job.aborted=true;break;}
+                // Backpressure permissions invoke external callbacks. A leased program may
+                // become done there (e.g. its Curios source was removed), before next().
+                if(job.region!=null&&job.region.done())break;
                 budget--;lastAttempts++;
                 WorkStep step=job.region==null?job.steps.removeFirst():job.region.next(p);
                 if(JOBS.get(id)!=job)break;

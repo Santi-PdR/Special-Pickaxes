@@ -42,7 +42,15 @@ public final class SeismicReworkGameTests {
         for(var drop:h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(12)))drop.discard();
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));return at;
     }
-    private static void drain(ServerPlayer p){for(int i=0;i<600&&WorkQueue.busy(p);i++)WorkQueue.tick();}
+    private static void drain(ServerPlayer p){
+        // Synchronous test ticks do not perform item collection/merging. Model collection,
+        // retaining the production drop cap and the ordinary paused-job resume path.
+        for(int i=0;i<1000&&WorkQueue.busy(p);i++){
+            for(var drop:p.serverLevel().getEntitiesOfClass(ItemEntity.class,p.getBoundingBox().inflate(64)))drop.discard();
+            if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))WorkQueue.togglePause(p);
+            WorkQueue.tick();
+        }
+    }
     private static void finish(GameTestHelper h,ServerPlayer p){WorkQueue.cancel(p);MiningObservations.forget(p);RelicNetwork.forget(p);h.succeed();}
     private static ItemStack source(){return new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CHOIR).get());}
     private static void scar(GameTestHelper h,ServerPlayer p,BlockPos at,ItemStack source,AtomicReference<ItemStack> slot){
@@ -61,7 +69,7 @@ public final class SeismicReworkGameTests {
         var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);var fault=at.south(6).above(10);var gap=at.south(5).above(10);
         h.getLevel().setBlockAndUpdate(fault,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(gap,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(fault);
         h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.CHOIR),"secondary starts cascade");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(fault).isAir()&&h.getLevel().getBlockState(gap).is(Blocks.STONE),"vertical sheets do not turn into a generic solid tunnel");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(fault).isAir()&&h.getLevel().getBlockState(gap).is(Blocks.STONE),"vertical sheets: center="+h.getLevel().getBlockState(at)+" fault="+h.getLevel().getBlockState(fault)+" gap="+h.getLevel().getBlockState(gap)+" status="+WorkQueue.status(p)+" remaining="+WorkQueue.remaining(p)+" reason="+WorkQueue.pauseReason(p));finish(h,p);
     }
     @GameTest(template="empty",batch="reform_604_03") public static void worldbreakerCopiesBothSeismicGeometries(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.CHOIR.id);
@@ -115,7 +123,7 @@ public final class SeismicReworkGameTests {
     }
     @GameTest(template="empty",batch="reform_604_10") public static void seismicAlternateCanCancelAndNeverLoadsRemoteChunks(GameTestHelper h){
         var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.CHOIR,RelicControl.Action.ALT_SKILL)&&WorkQueue.busy(p),"alternate starts");
+        h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.CHOIR)&&WorkQueue.busy(p),"alternate starts through server orchestration");
         h.assertTrue(RelicControl.execute(p,ArtifactKind.CHOIR,RelicControl.Action.ALT_SKILL)&&!WorkQueue.busy(p)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"second alternate cancels before execution");
         var remote=new BlockPos(1200000,100,1200000);var program=new ResonantFault(remote,Direction.SOUTH,ResonantFault.Form.FAN);
         h.assertTrue(!h.getLevel().hasChunkAt(remote)&&!program.next(p).apply(p,p.getMainHandItem(),ArtifactKind.CHOIR)&&!h.getLevel().hasChunkAt(remote),"missing chunks stay unloaded");finish(h,p);
