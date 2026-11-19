@@ -12,22 +12,14 @@ MODES={'palimpsest': {'solar_rupture': ('SOLAR RUPTURE: fracture the earth with 
                              'ABANICO SÍSMICO: fractura un frente amplio de 32 bloques.',
                              'Aim at natural rock. A seismic fan expands over 32 blocks to 49 wide and 5 high: 5310 candidate cells, native drops, no placed blocks or containers.',
                              'Apunta a roca natural. El abanico sísmico alcanza 32 bloques, hasta 49 de ancho y 5 de alto: 5310 celdas candidatas, drops nativos, sin bloques colocados ni contenedores.')},
- 'eventide': {'gravity_in': ('GRAVITY WELL: pull hostile mobs and projectiles into the marked field.',
-                             'POZO GRAVITATORIO: atrae hostiles y proyectiles al campo marcado.',
-                             'Aim at a block and press R to anchor an 8-block field. Hostile mobs and '
-                             'projectiles are pulled toward its center while you mine faster inside. C '
-                             'switches to outward gravity. The field never breaks extra blocks.',
-                             'Apunta a un bloque y pulsa R para anclar un campo de 8 bloques. Atrae enemigos '
-                             'y proyectiles hostiles al centro y te da más velocidad minera dentro. C cambia '
-                             'a gravedad hacia fuera. El campo no rompe bloques extra.'),
-              'gravity_out': ('GRAVITY SURGE: push hostile mobs and projectiles out of the marked field.',
-                              'IMPULSO GRAVITATORIO: repele hostiles y proyectiles del campo marcado.',
-                              'Aim at a block and press R to anchor an 8-block field. Hostile mobs and '
-                              'projectiles are pushed away from its center while you mine faster inside. C '
-                              'switches to inward gravity. The field never breaks extra blocks.',
-                              'Apunta a un bloque y pulsa R para anclar un campo de 8 bloques. Aleja '
-                              'enemigos y proyectiles hostiles del centro y te da más velocidad minera '
-                              'dentro. C cambia a gravedad hacia dentro. El campo no rompe bloques extra.')},
+ 'eventide': {'gravity_in': ('TWILIGHT ECLIPSE: collapse a horizontal disc of rock.',
+                             'ECLIPSE CREPUSCULAR: colapsa un disco horizontal de roca.',
+                             'Horizontal eclipse: radius 18, height 7, 7063 candidate cells. Excavates natural rock and ore with native drops; no gravity field.',
+                             'Eclipse horizontal: radio 18, altura 7, 7063 celdas candidatas. Excava roca y menas naturales con drops nativos; sin campo gravitatorio.'),
+              'gravity_out': ('VERTICAL CRESCENT: cut a towering twilight disc.',
+                              'CRECIENTE VERTICAL: corta un gran disco crepuscular.',
+                              'Vertical crescent: radius 18, thickness 7, 7063 candidate cells, oriented to your heading. No entity attraction or repulsion.',
+                              'Creciente vertical: radio 18, grosor 7, 7063 celdas candidatas, orientado a tu dirección. No atrae ni repele entidades.')},
  'paradox_crucible': {'stone': ('TRANSFORM: Stone',
                                 'TRANSFORMAR: Piedra',
                                 'Select two corners, wait for analysis and confirm. Only natural geology in '

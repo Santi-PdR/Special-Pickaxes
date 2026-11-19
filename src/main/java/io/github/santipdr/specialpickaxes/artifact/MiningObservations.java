@@ -46,6 +46,11 @@ public final class MiningObservations {
                 ||!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
         return capture(p,p.getMainHandItem(),ArtifactKind.CHOIR,pos,state,false,new EquipmentLease<>(curio,current));
     }
+    public static boolean captureCuriosEventide(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
+        if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.EVENTIDE
+                ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        return capture(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,pos,state,false,new EquipmentLease<>(curio,current));
+    }
     /** Dawn in Curios lights only newly produced loot; it never searches for ore. */
     public static boolean captureCuriosDawn(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.PALIMPSEST)return false;
@@ -85,6 +90,7 @@ public final class MiningObservations {
                 }
                 if(o.solarDrops&&o.dropsBeforeComplete&&valid(o))highlightNewSolarDrops(p,o);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CHOIR&&valid(o))ResonantFault.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.EVENTIDE&&valid(o))EventideRupture.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }

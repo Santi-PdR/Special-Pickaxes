@@ -89,6 +89,17 @@ public final class AbilityVfx {
             player.serverLevel().sendParticles(player,particle(ArtifactKind.CHOIR,cascade),false,at.x,at.y,at.z,1,0,.03,0,0);
         }return true;
     }
+    /** Twin twilight rims, horizontal or vertical, on the currently executing destructive horizon. */
+    public static boolean twilightHorizon(ServerPlayer p,net.minecraft.core.BlockPos center,net.minecraft.core.Direction forward,double radius,boolean vertical,boolean alternate){
+        if(!p.isAlive()||p.isRemoved()||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),16))return false;
+        var right=forward.getClockWise();double r=Math.max(1,radius);
+        for(int i=0;i<16;i++){
+            double a=Math.PI*2*i/16,x=Math.cos(a)*r,z=Math.sin(a)*r;
+            var at=Vec3.atCenterOf(center).add(vertical?right.getStepX()*x:x,vertical?z:(i%2==0?.25:-.25),vertical?right.getStepZ()*x:z);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.EVENTIDE,alternate),false,at.x,at.y,at.z,1,0,.015,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

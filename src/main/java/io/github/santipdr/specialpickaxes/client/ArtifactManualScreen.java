@@ -155,7 +155,7 @@ public final class ArtifactManualScreen extends Screen {
         for(var action:ArtifactTooltips.actions(stack,kind,mode)){
             String description=switch(action){
                 case ACTIVATE -> regional?"guide.control.region":
-                        abilityKind==ArtifactKind.EVENTIDE||abilityKind==ArtifactKind.INTERREGNUM
+                        abilityKind==ArtifactKind.INTERREGNUM
                                 ?"guide.control.field":"guide.control.activate";
                 case ALT_SKILL -> "guide.control.alternate";
                 default -> "key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT);

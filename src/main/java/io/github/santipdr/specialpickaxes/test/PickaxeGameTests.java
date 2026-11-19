@@ -367,10 +367,10 @@ public final class PickaxeGameTests {
             h.assertTrue(!ArtifactState.of(wearer,kind).contains("alternateReady")&&tool.getDamageValue()==0,"rejected utility does not spend durability/cooldown");}
         finally{MinecraftForge.EVENT_BUS.unregister(change);drop.discard();}finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_220") public static void eventidePullRejectsSmallCasterTeleport(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,0);}
-    @GameTest(template="empty",batch="rework_each_221") public static void eventidePullRejectsSameCellDropMovement(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,1);}
-    @GameTest(template="empty",batch="rework_each_222") public static void eventidePullRejectsDisarmedCaster(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,2);}
-    @GameTest(template="empty",batch="rework_each_223") public static void eventidePullRejectsReplacedItemStack(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.EVENTIDE,3);}
+    @GameTest(template="empty",batch="rework_each_220") public static void eventideHorizonRejectsSmallCasterTeleport(GameTestHelper h){EventideReworkGameTests.changedContext(h,0);}
+    @GameTest(template="empty",batch="rework_each_221") public static void eventideHorizonRejectsChangedProvenance(GameTestHelper h){EventideReworkGameTests.changedContext(h,1);}
+    @GameTest(template="empty",batch="rework_each_222") public static void eventideHorizonRejectsDisarmedCaster(GameTestHelper h){EventideReworkGameTests.changedContext(h,2);}
+    @GameTest(template="empty",batch="rework_each_223") public static void eventideHorizonRejectsSpectator(GameTestHelper h){EventideReworkGameTests.changedContext(h,3);}
     @GameTest(template="empty",batch="rework_each_224") public static void iridiumRecallRejectsSmallCasterTeleport(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,0);}
     @GameTest(template="empty",batch="rework_each_225") public static void iridiumRecallRejectsSameCellDropMovement(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,1);}
     @GameTest(template="empty",batch="rework_each_226") public static void iridiumRecallRejectsDisarmedCaster(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,2);}
@@ -1331,7 +1331,7 @@ public final class PickaxeGameTests {
         surge.applyEffectTick(wearer,2);h.assertTrue(wearer.getFoodData().getFoodLevel()==11,"a repeated effect tick cannot feed twice before the two-second cooldown");finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_160") public static void alternateEntryGuardCoversTheInitialPermissionCallback(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.EVENTIDE);var level=h.getLevel();
+        var wearer=player(h,ArtifactKind.EVENTIDE);solarTarget(h,wearer);var level=h.getLevel();
         var drop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
         ArtifactState.of(wearer,ArtifactKind.EVENTIDE).putLong("alternateReady",Long.MAX_VALUE);int[] calls={0};
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> recurse=event->{
@@ -1339,8 +1339,8 @@ public final class PickaxeGameTests {
                     "the outer entry point rejects recursion even before the initial caster permission finishes");}
         };
         MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,recurse);
-        try{h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE)&&calls[0]>=1&&drop.getDeltaMovement().x<-.5,
-                "the real control path recovers its invalid cooldown and performs one successful pull");}
+        try{h.assertTrue(ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE)&&calls[0]>=1&&drop.getDeltaMovement().equals(Vec3.ZERO)&&WorkQueue.busy(wearer),
+                "the real control path recovers its invalid cooldown and queues one destructive horizon, not a pull");}
         finally{MinecraftForge.EVENT_BUS.unregister(recurse);}
         h.assertTrue(!ArtifactActions.useAlternate(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE),"the committed ordinary cooldown remains effective");finish(h,wearer);
     }
@@ -1365,12 +1365,7 @@ public final class PickaxeGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(count);}
         finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_163") public static void guardedWorldbreakerStillExecutesItsCopiedAlternate(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.WORLDBREAKER);var tool=wearer.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.EVENTIDE.id);
-        var drop=new ItemEntity(h.getLevel(),wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);
-        h.assertTrue(ArtifactActions.useAlternate(wearer,tool,ArtifactKind.WORLDBREAKER)&&drop.getDeltaMovement().x<-.5,
-                "entry guards preserve Worldbreaker's copied Eventide alternate and full pull strength");finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_163") public static void worldbreakerCopiesDestructiveEventideHorizonNotAMagnet(GameTestHelper h){EventideReworkGameTests.copiedHorizon(h);}
     @GameTest(template="empty",batch="rework_each_164") public static void primaryRecoversItsImpossiblePersistedDeadline(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);var state=ArtifactState.of(wearer,ArtifactKind.INTERREGNUM);state.putLong("ready",Long.MAX_VALUE);
         // This regression concerns a deadline, not a ray hitting an unrelated neighbouring test structure.
@@ -1901,17 +1896,7 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"seismic fan starts from aimed natural rock");drain(p);
         h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(edge).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"fan widens across terrain, preserves root limits, never replays distant memories");finish(h,p);
     }
-    @GameTest(template="empty",batch="legacy_each_06") public static void eventideMiningNotCombat(GameTestHelper h) {
-        var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
-        h.getLevel().setBlockAndUpdate(center.above(),Blocks.DIAMOND_ORE.defaultBlockState());
-        var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+2,center.getY(),center.getZ());h.getLevel().addFreshEntity(mob);
-        mob.setDeltaMovement(Vec3.ZERO);float health=mob.getHealth();
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");DomainFields.tick();
-        h.assertTrue(mob.getDeltaMovement().equals(Vec3.ZERO),"mining does not become entity combat");
-        h.assertTrue(mob.getHealth()==health,"not a damage explosion");
-        h.assertTrue(DomainFields.contains(p,center)&&p.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED),"field grants its mining effect");
-        h.assertTrue(h.getLevel().getBlockState(center).is(Blocks.STONE)&&h.getLevel().getBlockState(center.above()).is(Blocks.DIAMOND_ORE),"activation does not perform a large quarry");finish(h,p);
-    }
+    @GameTest(template="empty",batch="legacy_each_06") public static void eventideExcavatesInsteadOfOnlyGrantingHaste(GameTestHelper h){EventideReworkGameTests.destructiveEclipse(h);}
     @GameTest(template="empty",batch="legacy_each_06") public static void eventideCuriosCounterUsesGraviticTether(GameTestHelper h) {
         var wearer=player(h,ArtifactKind.EVENTIDE);
         var attacker=EntityType.ZOMBIE.create(h.getLevel());attacker.setPos(wearer.getX()+2,wearer.getY(),wearer.getZ());h.getLevel().addFreshEntity(attacker);
@@ -2445,7 +2430,7 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_22") public static void eventideMiningChargeCollapsesIntoDropPull(GameTestHelper h) {
         var p=player(h,ArtifactKind.EVENTIDE);var center=target(h);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field activates");
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,center,8),"legacy internal gravity utility starts directly, not through the reworked skill");
         var drop=new ItemEntity(h.getLevel(),center.getX()+.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND,3));
         drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);var stone=Blocks.STONE.defaultBlockState();
         for(int i=0;i<23;i++)DomainFields.feed(p,p.getMainHandItem(),center,stone);
@@ -2456,13 +2441,7 @@ public final class PickaxeGameTests {
         h.assertTrue(drop.getDeltaMovement().lengthSqr()>.1,"the collapse keeps guiding drops during its three-second pulse");
         h.assertTrue(DomainFields.contains(p,center),"the collapse preserves the active mining field");finish(h,p);
     }
-    @GameTest(template="empty",batch="rework_each_61") public static void eventideAlternateTethersLooseDropsToItsOwner(GameTestHelper h){
-        var p=player(h,ArtifactKind.EVENTIDE,"EventideTether");var level=h.getLevel();
-        var drop=new ItemEntity(level,p.getX()+5D,p.getY()+.5D,p.getZ(),new ItemStack(Items.AMETHYST_SHARD));
-        drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"Eventide's alternate catches nearby loose drops");
-        h.assertTrue(drop.getDeltaMovement().x<-.5D,"the tether pulls its target toward the wearer");finish(h,p);
-    }
+    @GameTest(template="empty",batch="rework_each_61") public static void eventideAlternateHarvestsAHorizonNotLooseDrops(GameTestHelper h){EventideReworkGameTests.nativeHorizon(h);}
     @GameTest(template="empty",batch="rework_each_62") public static void eventideTetherUsesVisibleSpiralPath(GameTestHelper h){
         var from=new Vec3(0,0,0);var to=new Vec3(0,4,0);var middle=ArtifactFeedback.gravityTetherPoint(from,to,.5D);
         h.assertTrue(middle.distanceToSqr(from.lerp(to,.5D))>.02D&&middle.distanceToSqr(from.lerp(to,.5D))<.04D,
@@ -3407,39 +3386,7 @@ public final class PickaxeGameTests {
             if(level.getGameTime()%5==0)h.runAfterDelay(1,probe);else probe.run();
         });
     }
-    @GameTest(template="empty",batch="rework_each_130") public static void eventideAlternateCannotBypassClaimsOrPickupOwnership(GameTestHelper h){
-        var wearer=player(h,ArtifactKind.EVENTIDE);var level=h.getLevel();
-        var reserved=new ItemEntity(level,wearer.getX()+3,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
-        var protectedDrop=new ItemEntity(level,wearer.getX()+4,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
-        var changed=new ItemEntity(level,wearer.getX()+5,wearer.getY()+.5,wearer.getZ(),new ItemStack(Items.DIAMOND));
-        var saved=new net.minecraft.nbt.CompoundTag();reserved.saveWithoutId(saved);saved.putUUID("Owner",UUID.randomUUID());reserved.load(saved);
-        for(var drop:List.of(reserved,protectedDrop,changed)){drop.setDeltaMovement(Vec3.ZERO);level.addFreshEntity(drop);}
-        int[] foreignVetoes={0};
-        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> protect=event->{
-            if(event.player!=wearer)return;
-            if(event.target.equals(changed.blockPosition())){
-                var tag=new net.minecraft.nbt.CompoundTag();changed.saveWithoutId(tag);tag.putUUID("Owner",UUID.randomUUID());changed.load(tag);
-            }else{
-                // GameTest structures from earlier batches can leave unrelated loose drops nearby.
-                if(!event.target.equals(protectedDrop.blockPosition()))foreignVetoes[0]++;
-                event.setCanceled(true);
-            }
-        };
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,
-                io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,protect);
-        try{
-            h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE),
-                    "an alternate with only protected drops reports no target");
-            for(var drop:List.of(reserved,protectedDrop,changed))h.assertTrue(drop.getDeltaMovement().equals(Vec3.ZERO),
-                    "the alternate respects claims, vanilla pickup reservations and callback ownership changes");
-            h.assertTrue(!ArtifactState.of(wearer,ArtifactKind.EVENTIDE).contains("alternateReady"),
-                    "no-target protection does not spend the alternate cooldown");
-            com.mojang.logging.LogUtils.getLogger().info("EVENTIDE_FIXTURE_FOREIGN_DROP_VETOES_{}",foreignVetoes[0]);
-        }finally{MinecraftForge.EVENT_BUS.unregister(protect);}
-        h.assertTrue(ArtifactSkills.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE)
-                        &&protectedDrop.getDeltaMovement().x<-.5D,
-                "the now-permitted unreserved drop keeps the original strong pull");finish(h,wearer);
-    }
+    @GameTest(template="empty",batch="rework_each_130") public static void eventideHorizonRespectsClaimsAndNeverMovesReservedDrops(GameTestHelper h){EventideReworkGameTests.claimedHorizon(h);}
     @GameTest(template="empty",batch="rework_each_129") public static void domainCallbacksCanStopAFieldWithoutInvalidatingOtherFields(GameTestHelper h){
         var first=player(h,ArtifactKind.EVENTIDE,"FirstCallbackField");var second=player(h,ArtifactKind.EVENTIDE,"SecondCallbackField");
         var at=target(h);
@@ -3473,7 +3420,7 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="rework_each_128") public static void eventideCollapseRespectsClaimsAndPickupReservations(GameTestHelper h){
         var wearer=player(h,ArtifactKind.EVENTIDE);var center=target(h);var level=h.getLevel();
-        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE,false),"gravity field starts");
+        h.assertTrue(DomainFields.start(wearer,wearer.getMainHandItem(),ArtifactKind.EVENTIDE,center,8),"legacy internal gravity utility starts directly");
         var open=new ItemEntity(level,center.getX()+.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
         var reserved=new ItemEntity(level,center.getX()+1.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));
         var denied=new ItemEntity(level,center.getX()+2.5,center.getY()+.3,center.getZ()+.5,new ItemStack(Items.DIAMOND));

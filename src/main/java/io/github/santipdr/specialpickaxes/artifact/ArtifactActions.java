@@ -140,6 +140,10 @@ public final class ArtifactActions {
         }
         if(kind==ArtifactKind.PALIMPSEST)return SolarRupture.start(p,tool,SolarRupture.Form.RAYS);
         if(kind==ArtifactKind.CHOIR)return ResonantFault.start(p,tool,ResonantFault.Form.FAN);
+        if(kind==ArtifactKind.EVENTIDE){
+            int mode=tool.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER?tool.getOrCreateTag().getInt("copiedMode"):ArtifactState.mode(p,kind);
+            return EventideRupture.start(p,tool,mode==1?EventideRupture.Form.CRESCENT:EventideRupture.Form.ECLIPSE);
+        }
 
         var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
         if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
@@ -150,11 +154,6 @@ public final class ArtifactActions {
             if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
             ArtifactFeedback.domain(p,kind,center,fieldRadius,ArtifactState.mode(p,kind)==1?2:fieldRadius/2);
             return true;
-        }
-        if(kind==ArtifactKind.EVENTIDE) {
-            int fieldRadius=Math.min(r,8);
-            if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
-            ArtifactFeedback.ring(p,kind,center,fieldRadius);ArtifactFeedback.message(p,"gravity_marked");return true;
         }
         if(kind==ArtifactKind.AXIOM){
             var seed=p.serverLevel().getBlockState(center);
@@ -189,7 +188,7 @@ public final class ArtifactActions {
 
         List<WorkStep> steps=List.of();
         boolean started=WorkQueue.start(p,tool,kind,steps);
-        if(started) { if(kind==ArtifactKind.EVENTIDE&&!DomainFields.start(p,tool,kind,center,Math.min(r,8))){WorkQueue.cancel(p);return false;}if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
+        if(started) { if(kind!=ArtifactKind.AXIOM)ArtifactFeedback.preview(p,kind,steps);ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",steps.size()); }
         return started;
     }
     public static List<WorkStep> echo(ServerPlayer p,BlockPos center) {

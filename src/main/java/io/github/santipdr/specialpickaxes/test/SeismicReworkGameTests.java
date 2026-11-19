@@ -29,20 +29,20 @@ import java.util.function.Consumer;
 @GameTestHolder(SpecialPickaxes.ID)
 @net.minecraftforge.gametest.PrefixGameTestTemplate(false)
 public final class SeismicReworkGameTests {
-    private static ServerPlayer player(GameTestHelper h,ArtifactKind kind){
+    static ServerPlayer player(GameTestHelper h,ArtifactKind kind){
         var p=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"SeismicTester"));
         p.connection=new ServerGamePacketListenerImpl(h.getLevel().getServer(),new Connection(PacketFlow.SERVERBOUND),p);
         p.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);var base=h.absolutePos(new BlockPos(5,100,3));
         p.setPos(base.getX()+.5,base.getY(),base.getZ()+.5);p.setYRot(0);p.setXRot(0);
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(kind).get()));p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",UUID.randomUUID());return p;
     }
-    private static BlockPos target(GameTestHelper h,ServerPlayer p){
+    static BlockPos target(GameTestHelper h,ServerPlayer p){
         var at=p.blockPosition().above().south(4);
         for(var cell:BlockPos.betweenClosed(at.offset(-8,-4,-8),at.offset(8,4,8))){h.getLevel().setBlockAndUpdate(cell,Blocks.AIR.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         for(var drop:h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(12)))drop.discard();
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));return at;
     }
-    private static void drain(ServerPlayer p){
+    static void drain(ServerPlayer p){
         // Synchronous test ticks do not perform item collection/merging. Model collection,
         // retaining the production drop cap and the ordinary paused-job resume path.
         for(int i=0;i<1000&&WorkQueue.busy(p);i++){
@@ -51,7 +51,7 @@ public final class SeismicReworkGameTests {
             WorkQueue.tick();
         }
     }
-    private static void finish(GameTestHelper h,ServerPlayer p){WorkQueue.cancel(p);MiningObservations.forget(p);RelicNetwork.forget(p);h.succeed();}
+    static void finish(GameTestHelper h,ServerPlayer p){WorkQueue.cancel(p);MiningObservations.forget(p);RelicNetwork.forget(p);h.succeed();}
     private static ItemStack source(){return new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CHOIR).get());}
     private static void scar(GameTestHelper h,ServerPlayer p,BlockPos at,ItemStack source,AtomicReference<ItemStack> slot){
         var state=Blocks.STONE.defaultBlockState();h.getLevel().setBlockAndUpdate(at,state);

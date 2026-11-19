@@ -43,35 +43,6 @@ public final class ArtifactTechniques {
         return ArtifactActions.target(player).orElseGet(() -> player.blockPosition().relative(player.getDirection(), 6)).immutable();
     }
 
-    private static boolean magnetDrops(ServerPlayer player,ItemStack tool,int radius,int cap) {
-        var context=HeldUtilityContext.capture(player,tool);
-        Vec3 center = player.getEyePosition();
-        int moved = 0,visualized=0;
-        var recalledDrops=new java.util.ArrayList<ItemEntity>();
-        var level=player.serverLevel();
-        var drops=EntitySelection.nearest(level,ItemEntity.class,player.getBoundingBox().inflate(radius),
-                e->e.isAlive()&&DropOwnership.allows(player,e)
-                        &&e.position().distanceToSqr(center)<=(double)radius*radius,center,cap);
-        for (var drop : drops) {
-            var checkedPosition=drop.position();var checkedStack=drop.getItem();
-            boolean allowed=WorldSafety.allowed(player,ArtifactKind.EVENTIDE,drop.blockPosition());
-            if(!context.valid())break;
-            if(!allowed||!drop.isAlive()||drop.level()!=level||!drop.position().equals(checkedPosition)
-                    ||drop.getItem()!=checkedStack||drop.getItem().isEmpty()||!DropOwnership.allows(player,drop)
-                    ||drop.position().distanceToSqr(center)>(double)radius*radius)continue;
-            Vec3 delta = center.subtract(drop.position());
-            if (delta.lengthSqr() < .25) continue;
-            if(visualized<12){ArtifactFeedback.gravityTether(player,drop.position(),center);visualized++;}
-            drop.setDeltaMovement(UtilityPullMotion.velocity(delta,Vec3.ZERO,0,.65,.65));
-            drop.hasImpulse = true;recalledDrops.add(drop);
-            if (++moved >= cap) break;
-        }
-        if(moved>0){DropRecall.start(player,tool,ArtifactKind.EVENTIDE,recalledDrops,radius);ArtifactFeedback.message(player, "drops_gathered", moved);}
-        return moved>0;
-    }
-
-
-
     /** Query predicates stay side-effect free; permissions are checked immediately before each mutation. */
 
 
@@ -192,7 +163,7 @@ public final class ArtifactTechniques {
             case CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
             case CHOIR -> ResonantFault.start(player,tool,ResonantFault.Form.CASCADE);
             case PALIMPSEST -> SolarRupture.start(player,tool,SolarRupture.Form.NOVA);
-            case EVENTIDE -> magnetDrops(player,tool,48,256);
+            case EVENTIDE -> EventideRupture.start(player,tool,EventideRupture.Form.HORIZON);
             case ICARUS -> IcarianFlight.start(player,tool);
             case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):
                     WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(aimed(player),kind,true));

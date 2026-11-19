@@ -147,6 +147,8 @@ public final class SpecialPickaxes {
                 MiningObservations.captureCuriosDawn(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
             if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.CHOIR)
                 MiningObservations.captureCuriosChoir(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
+            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.EVENTIDE)
+                MiningObservations.captureCuriosEventide(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
         }
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.findFresh(p);
