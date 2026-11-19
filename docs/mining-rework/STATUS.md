@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.26 pasivas Curios copiadas
+
+Dispatch de estado/combate usa origen copiado en lugar de acumular Égida nativa. Lease síncrono de stack/slot/origen protege contextos de aura/reacción y limpia efectos propios tras revocación. Reconoce copias Heartwood/Null Veil para evitar doble reacción compartida. Resuelve doce orígenes no recursivos; picos nativos preservados y archivos congelados intactos. Cinco GameTests, 141 Python locales (una omisión), 25 recursos. Forge/revisión visual pendientes. [Límites](WORLDBREAKER-6.0.md).
+
+Copia Curios global sigue incompleta: controles equipados y disparadores restantes Ícaro/Iridium/Strata pendientes; no afirmar stress test dedicado de todos los efectos asíncronos. CI alpha.24/25 aún en ejecución al iniciar esta tanda. Sin release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.25 seguridad de región/cuña
 
 Region Break ahora analiza/mina sólo roca y menas naturales, omite procedencia de jugador y revalida durante callbacks con minería natural. World Shatter conserva la gran cuña, pero detiene ruta ante construcciones/no geología y usa minería natural. Son correcciones de seguridad con geometrías retenidas intencionadamente, no dos habilidades nuevas. Tres GameTests; 141 Python locales (una omisión), 25 recursos y 58 hashes intactos. Forge/capturas pendientes; copia Curios global/controles y revisión visual aún incompletas. [Detalles](WORLDBREAKER-6.0.md).

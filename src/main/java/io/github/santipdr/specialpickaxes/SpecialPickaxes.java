@@ -189,7 +189,7 @@ public final class SpecialPickaxes {
                 var entry=due.next();var player=entry.getValue();
                 if(player.isRemoved()){due.remove();curiosPassives.remove(entry.getKey());continue;}
                 var equipped=CuriosCompat.find(player);
-                ArtifactKind current=equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick?pick.kind:null;
+                ArtifactKind current=equipped!=null?WorldbreakerCuriosPassives.sourceKind(equipped.stack()):null;
                 boolean heldArtifact=player.getMainHandItem().getItem() instanceof ArtifactItem;
                 ArtifactPassives.syncNightVisionSource(player,heldArtifact||current!=null);
                 ArtifactKind previous=curiosPassives.put(player.getUUID(),current);
@@ -197,7 +197,11 @@ public final class SpecialPickaxes {
                     if(previous!=null)ArtifactPassives.onCuriosUnequip(player,previous);
                     if(current!=null)ArtifactFeedback.curiosAttunement(player,current);
                 }
-                if(current!=null)ArtifactPassives.tick(player,current);
+                if(current!=null){
+                    if(equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind==ArtifactKind.WORLDBREAKER)
+                        WorldbreakerCuriosPassives.tick(player,equipped.stack(),()->CuriosCompat.pickInSlotFresh(player,equipped.slot()));
+                    else ArtifactPassives.tick(player,current);
+                }
             }
         }
     }
@@ -271,8 +275,11 @@ public final class SpecialPickaxes {
             ArtifactPassives.onSharedHeartwoodGuard(p,e);
             ArtifactPassives.onSharedNullVeilGuard(p,e);
             var equipped=CuriosCompat.findFresh(p);
-            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind!=ArtifactKind.INTERREGNUM)
-                ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
+            if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick){
+                if(pick.kind==ArtifactKind.WORLDBREAKER)
+                    WorldbreakerCuriosPassives.hurt(p,equipped.stack(),()->CuriosCompat.pickInSlotFresh(p,equipped.slot()),e,sharedStarfallGuard);
+                else if(pick.kind!=ArtifactKind.INTERREGNUM)ArtifactPassives.onCuriosDamage(p,e,pick.kind,sharedStarfallGuard);
+            }
         }
     }
     private void heal(net.minecraftforge.event.entity.living.LivingHealEvent e){if(e.getEntity().hasEffect(NULL_MARK.get()))e.setCanceled(true);}

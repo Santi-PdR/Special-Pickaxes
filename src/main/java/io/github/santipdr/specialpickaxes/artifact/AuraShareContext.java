@@ -10,7 +10,7 @@ record AuraShareContext(ServerPlayer owner,ServerLevel level,Vec3 origin,double 
         return new AuraShareContext(owner,owner.serverLevel(),owner.position(),rangeSqr);
     }
     boolean ownerValid(){
-        return owner.isAlive()&&!owner.isRemoved()&&!owner.isSpectator()
+        return WorldbreakerCuriosPassives.valid(owner)&&owner.isAlive()&&!owner.isRemoved()&&!owner.isSpectator()
                 &&owner.serverLevel()==level&&owner.position().equals(origin);
     }
     boolean allows(ServerPlayer ally){

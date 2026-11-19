@@ -12,7 +12,7 @@ record PassiveReactionContext(ServerPlayer player,LivingEntity target,ServerLeve
         return new PassiveReactionContext(player,target,player.serverLevel(),player.position(),target.position());
     }
     boolean valid(){
-        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
+        return WorldbreakerCuriosPassives.valid(player)&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
                 &&target.isAlive()&&!target.isRemoved()&&target!=player
                 &&player.serverLevel()==level&&target.level()==level
                 &&player.position().equals(origin)&&target.position().equals(targetOrigin)

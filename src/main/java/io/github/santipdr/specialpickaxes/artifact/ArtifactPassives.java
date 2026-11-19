@@ -82,7 +82,7 @@ public final class ArtifactPassives {
         var renewal=io.github.santipdr.specialpickaxes.SpecialPickaxes.HEARTWOOD_RENEWAL.get();
         if(event.getAmount()<=0||!player.hasEffect(renewal))return false;
         var equipped=CuriosCompat.find(player);
-        if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind==ArtifactKind.WORLDLOOM)return false;
+        if(equipped!=null&&WorldbreakerCuriosPassives.sourceKind(equipped.stack())==ArtifactKind.WORLDLOOM)return false;
         var source=event.getSource();LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
         if(attacker==null){
             Entity direct=source.getDirectEntity();if(!JegProjectileCompat.isProjectile(direct))return false;
@@ -108,7 +108,7 @@ public final class ArtifactPassives {
         if(event.getAmount()<=0||!player.hasEffect(veil)
                 ||!player.getPersistentData().getBoolean(passiveLeaseKey(veil)))return false;
         var equipped=CuriosCompat.find(player);
-        if(equipped!=null&&equipped.stack().getItem() instanceof ArtifactItem pick&&pick.kind==ArtifactKind.AXIOM)return false;
+        if(equipped!=null&&WorldbreakerCuriosPassives.sourceKind(equipped.stack())==ArtifactKind.AXIOM)return false;
         if(player.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.AXIOM)return false;
         var source=event.getSource();LivingEntity attacker=source.getEntity() instanceof LivingEntity living?living:null;
         if(attacker==null){
@@ -128,7 +128,7 @@ public final class ArtifactPassives {
     }
 
     public static void onCuriosDamage(ServerPlayer player,net.minecraftforge.event.entity.living.LivingHurtEvent event,ArtifactKind kind,boolean sharedGuardApplied) {
-        if(event.getAmount()<=0)return;
+        if(event.getAmount()<=0||!WorldbreakerCuriosPassives.valid(player))return;
         // Interregnum's independent Stasis Ward handler also protects its Curios allies.
         if(kind==ArtifactKind.INTERREGNUM)return;
         var source=event.getSource();
@@ -163,6 +163,7 @@ public final class ArtifactPassives {
             case CHOIR,CRUCIBLE,ICARUS,AXIOM,EXODIUM -> true;
             default -> false;
         })return;
+        if(!WorldbreakerCuriosPassives.valid(player))return;
         var state=ArtifactState.of(player,kind);long now=ArtifactState.now(player);
         if(PersistedCooldown.active(now,state.getLong("curiosPassiveReady"),160))return;
         state.putLong("curiosPassiveReady",now+160);
