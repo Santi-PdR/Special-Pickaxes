@@ -59,6 +59,16 @@ class InterfaceCopyTests(unittest.TestCase):
                     self.assertIn(fact, text)
                 self.assertLess(len(text), 200)
 
+    def test_manual_renders_the_equipped_details_for_all_thirteen_in_three_languages(self):
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
+        self.assertIn('Component.translatable("curios.detail.specialpickaxes."+kind.id)', source)
+        for locale in ('en_us', 'es_es', 'es_uy'):
+            texts = self.texts(locale)
+            for identity in IDS:
+                self.assertTrue(texts['curios.detail.specialpickaxes.' + identity].strip())
+            self.assertIn('99', texts['curios.detail.specialpickaxes.fault_choir'])
+            self.assertIn('65', texts['curios.detail.specialpickaxes.palimpsest'])
+
     def test_every_active_mode_has_readable_localized_labels(self):
         from mining_catalog import MODES
         modes = {mode for identity in IDS for mode in MODES[identity]}

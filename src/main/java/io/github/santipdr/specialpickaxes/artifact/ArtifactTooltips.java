@@ -79,7 +79,7 @@ public final class ArtifactTooltips {
         section(lines,"manual4.tool_profile",Component.translatable("manual4.tool_profile_detail"));
         section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));
-        section(lines,"screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios_passive"));
+        section(lines,"screen.specialpickaxes.curios",Component.translatable("curios.detail.specialpickaxes."+k.id));
         if(ArtifactInteraction.modeCount(ability)>1){
             var allModes=Component.empty();String[] modes=ArtifactInteraction.modes(ability);
             for(int i=0;i<modes.length;i++){if(i>0)allModes.append(" · ");allModes.append(Component.translatable("mode.specialpickaxes."+modes[i]));}

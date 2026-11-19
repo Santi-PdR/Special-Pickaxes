@@ -47,7 +47,8 @@ class OverhaulContracts(unittest.TestCase):
         self.assertIn('RelicKeys.name(action)', sections)
         self.assertIn('passive.specialpickaxes.', sections)
         self.assertIn('screen.specialpickaxes.curios', sections)
-        for retired in ('manual4.limits', 'manual4.cost', 'manual4.tool_profile', 'curios.detail.', 'melee.specialpickaxes.'):
+        self.assertIn('curios.detail.specialpickaxes."+kind.id', sections)
+        for retired in ('manual4.limits', 'manual4.cost', 'manual4.tool_profile', 'melee.specialpickaxes.'):
             self.assertNotIn(retired, sections)
         for locale in ('en_us', 'es_es'):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
