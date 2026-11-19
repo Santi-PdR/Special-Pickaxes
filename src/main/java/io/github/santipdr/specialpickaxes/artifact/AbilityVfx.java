@@ -111,6 +111,16 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.CRUCIBLE,release),false,at.x,at.y,at.z,1,0,0,0,0);
         }return true;
     }
+    public static boolean stasisHourglass(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),12))return false;
+        double phase=p.server.getTickCount()*.12;
+        for(int i=0;i<12;i++){
+            double y=(i%6-2.5)*.5,r=.3+Math.abs(y),a=phase+(i<6?0:Math.PI);
+            var at=Vec3.atCenterOf(center).add(Math.cos(a)*r,y,Math.sin(a)*r);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.INTERREGNUM,true),false,at.x,at.y,at.z,1,0,0,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

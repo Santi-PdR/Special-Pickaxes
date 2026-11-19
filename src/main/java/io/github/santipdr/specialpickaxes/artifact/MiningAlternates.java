@@ -50,7 +50,7 @@ public final class MiningAlternates {
         }else if(kind==ArtifactKind.CRUCIBLE){
             return ParadoxLattice.start(player,tool);
         }else if(kind==ArtifactKind.INTERREGNUM){
-            return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,true));
+            return WorkQueue.startRegion(player,tool,kind,new StasisHourglassProgram(origin));
         }else return false;
         if(steps.isEmpty()||!WorkQueue.start(player,tool,kind,steps))return false;
         ArtifactFeedback.preview(player,kind,steps);

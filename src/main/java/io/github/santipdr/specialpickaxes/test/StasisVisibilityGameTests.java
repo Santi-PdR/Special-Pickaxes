@@ -10,6 +10,17 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class StasisVisibilityGameTests {
+    @GameTest(template="empty",batch="stasis_visibility_03") public static void hourglassSecondaryPreservesItsWaistGapAndPlacedPolarRock(GameTestHelper h){
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h,p);var level=h.getLevel();
+        var gap=at.east(4);var pole=at.east(7).above(8);var placed=at.west(7).above(8);
+        for(var cell:java.util.List.of(gap,pole,placed)){level.setBlockAndUpdate(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(cell);}
+        PlayerPlacedBlocks.get(level).mark(placed);
+        try{
+            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"public hourglass starts");drain(p);
+            h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(pole).isAir(),"waist and distant upper chamber excavated");
+            h.assertTrue(level.getBlockState(gap).is(net.minecraft.world.level.block.Blocks.STONE)&&level.getBlockState(placed).is(net.minecraft.world.level.block.Blocks.STONE),"narrow waist gap and player provenance preserved");
+        }finally{PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);}
+    }
     @GameTest(template="empty",batch="stasis_visibility_01") public static void boundaryReportsConfiguredRemainingLifetimeAndClearsOnStop(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);var tool=p.getMainHandItem();
         h.assertTrue(DomainFields.start(p,tool,ArtifactKind.INTERREGNUM,p.blockPosition(),8,321),"field starts");

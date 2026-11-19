@@ -1065,7 +1065,7 @@ public final class PickaxeGameTests {
         }finally{drop.discard();finish(h,p);}
     }
     @GameTest(template="empty",batch="rework_each_315") public static void temporalRiftHarvestsAVolumeInsteadOfOneBlock(GameTestHelper h){
-        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var far=at.east(4);var ore=at.above(3);var placed=at.west(3);var barrier=at.north(2);
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var far=at.east(7).above(8);var ore=at.above(3);var placed=at.west(3);var barrier=at.north(2);
         for(var pos:List.of(at,far,ore,placed,barrier))PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);
         h.getLevel().setBlockAndUpdate(far,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
@@ -1073,7 +1073,7 @@ public final class PickaxeGameTests {
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
         try{
             h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"rift activation has a real target");drain(p);
-            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(far).isAir()&&h.getLevel().getBlockState(ore).isAir(),"the rift harvests distant rock and ore throughout its11cubed volume");
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(far).isAir()&&h.getLevel().getBlockState(ore).isAir(),"hourglass harvests distant polar rock and core ore");
             h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.STONE)&&h.getLevel().getBlockState(barrier).is(Blocks.BEDROCK),"OP excavation preserves builds and bedrock");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
