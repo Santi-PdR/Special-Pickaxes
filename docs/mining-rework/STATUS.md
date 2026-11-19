@@ -1,3 +1,9 @@
+## Reforma 6.0 — Worldbreaker alpha.22 coronas y cisma implementados
+
+Modo Fractura ahora abre tres coronas concéntricas (radios 6..8 / 14..16 / 22..24, altura 13, 7228 candidatos); Corte abre dos planos verticales perpendiculares (radio 24, altura 25, 6925 candidatos). Conservan espacios entre cortes, construcciones y protecciones; drops naturales de roca/menas. Copias en mano y claves/índices de modos intactos. Dos JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos, 58 hashes intactos. [Detalles](WORLDBREAKER-6.0.md).
+
+Forge/capturas alpha.22 pendientes. CI alpha.19 `44633175036`, alpha.20 `44633627986` y alpha.21 `44634804567` seguían ejecutándose al comprobarlas. Tres modos nativos restantes y copia Curios global siguen pendientes; no reforma completa ni release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.21 copia minera Curios parcial
 
 Curios Worldbreaker reenvía minería manual confirmada a nueve rutas originales: Alba/Coro/Ocaso/Paradox/Stasis/Worldloom/Axiom/Exodium/Hellspec. Conserva condiciones, recargas y geometrías; lease exige stack, slot original y origen copiado inmutables durante callbacks. Siete GameTests nuevos, local 141 Python (una omisión), 25 recursos, 58 hashes congelados intactos. Forge/capturas pendientes. [Detalles y límites](WORLDBREAKER-6.0.md).

@@ -43,4 +43,21 @@ public final class WorldbreakerReworkGameTests {
         h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER),"copied cross starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(cross).isAir()&&h.getLevel().getBlockState(nativeOnly).is(Blocks.STONE)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"copied Axiom cross retains its core and geometry instead of native shear");finish(h,p);
     }
+    @GameTest(template="empty",batch="worldbreaker_622_crown") public static void fractureModeOpensThreeCrownsAndPreservesInterveningRock(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",1);
+        var inner=at.east(7);var middle=at.west(15);var outer=at.north(23);var gap=at.east(10);var placed=at.south(15);
+        for(var cell:java.util.List.of(inner,middle,gap,placed)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.getLevel().setBlockAndUpdate(outer,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(outer);PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
+        try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public fracture crown starts");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(inner).isAir()&&h.getLevel().getBlockState(middle).isAir()&&h.getLevel().getBlockState(outer).isAir(),"all three crowns harvest geology and ore");
+            h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&h.getLevel().getBlockState(gap).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.STONE),"center, gaps and builds survive");
+        }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="worldbreaker_622_split") public static void cleaveModeOpensTwoVerticalPlanesRatherThanAForwardTunnel(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",2);
+        var upper=at.offset(20,12,0);var lower=at.offset(0,-12,-20);var diagonal=at.offset(4,0,4);
+        for(var cell:java.util.List.of(upper,lower,diagonal)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public world split starts");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(lower).isAir()&&h.getLevel().getBlockState(diagonal).is(Blocks.STONE),"perpendicular vertical cuts leave diagonal rock intact");finish(h,p);
+    }
 }

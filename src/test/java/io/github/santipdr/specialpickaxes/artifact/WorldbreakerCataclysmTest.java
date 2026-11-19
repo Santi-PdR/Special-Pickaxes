@@ -28,4 +28,23 @@ class WorldbreakerCataclysmTest {
         assertTrue(WorldbreakerContinentalShear.contains(24,6,0));assertFalse(WorldbreakerContinentalShear.contains(24,1,0));
         assertFalse(WorldbreakerContinentalShear.contains(24,0,1));
     }
+    @Test void threeFaultCrownsHave7228UniqueCellsWithIntactCenterAndGaps(){
+        assertEquals(7228,WorldbreakerFaultCrown.VOLUME);var seen=new HashSet<BlockPos>();int previous=6;
+        for(int i=0;i<WorldbreakerFaultCrown.VOLUME;i++){
+            var p=WorldbreakerFaultCrown.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));assertTrue(p.getY()<=previous);previous=p.getY();
+            assertTrue(WorldbreakerFaultCrown.contains(p.getX(),p.getY(),p.getZ()));
+        }
+        assertFalse(WorldbreakerFaultCrown.contains(0,0,0));assertTrue(WorldbreakerFaultCrown.contains(7,0,0));
+        assertFalse(WorldbreakerFaultCrown.contains(10,0,0));assertTrue(WorldbreakerFaultCrown.contains(15,0,0));
+        assertFalse(WorldbreakerFaultCrown.contains(19,0,0));assertTrue(WorldbreakerFaultCrown.contains(23,0,0));
+    }
+    @Test void worldSplitHas6925UniqueCellsOnTwoBroadVerticalPlanes(){
+        assertEquals(6925,WorldbreakerWorldSplit.VOLUME);var seen=new HashSet<BlockPos>();int previous=12;
+        for(int i=0;i<WorldbreakerWorldSplit.VOLUME;i++){
+            var p=WorldbreakerWorldSplit.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));assertTrue(p.getY()<=previous);previous=p.getY();
+            assertTrue(WorldbreakerWorldSplit.contains(p.getX(),p.getY(),p.getZ()));
+        }
+        assertTrue(WorldbreakerWorldSplit.contains(24,12,0));assertFalse(WorldbreakerWorldSplit.contains(4,0,4));
+        assertFalse(WorldbreakerWorldSplit.contains(24,0,2));assertFalse(WorldbreakerWorldSplit.contains(0,13,0));
+    }
 }
