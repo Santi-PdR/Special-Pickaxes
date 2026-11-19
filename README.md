@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.17`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.18`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -14,7 +14,7 @@ CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/r
 
 [Exodium alpha.16](docs/mining-rework/EXODIUM-6.0.md): lluvia de cinco meteoros (3511 candidatos), cuenca secundaria (6789) y estrella fugaz Curios (201 / 8 s), sin lanza ni pozo estrecho. Implementado, validación Forge y capturas aún pendientes.
 
-[Hellspec alpha.17](docs/mining-rework/HELLSPEC-6.0.md) inicia su reforma con ocho grietas infernales (4049 candidatos). Primaria sin validar; secundaria y Curios pendientes. La prueba de cliente espera ahora el modo real antes de avanzar, con timeout y sin simular la tecla C.
+[Hellspec alpha.18](docs/mining-rework/HELLSPEC-6.0.md): ocho grietas infernales (4049), erupción secundaria ascendente (3571) y anillo Curios (168 / 8 s). Primaria alpha.17 validada en CI `44626533396` (205 JUnit / 496 GameTests / cliente / servidor); secundaria y Curios alpha.18 aún pendientes de Forge. Exodium alpha.16 CI `44624910270` también verde. Capturas de acción dedicadas pendientes; Worldbreaker nativo/copia Curios global sin reformar.
 
 ---
 

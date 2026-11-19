@@ -15,3 +15,7 @@ Secondary now dispatches Impact Basin instead of the legacy narrow sink: a singl
 Curios Falling Star: after a confirmed manual natural ore scar, opens a radius-5 / depth-4 bowl, 201 candidates, every 8 seconds. Natural rock and ore are harvested, unlike Axiom's ore-preserving octahedron. A live original-slot equipment lease is revalidated after callbacks before each mutation. Unconfirmed breaks, removed Curios sources and recursive queued breaks cannot trigger it. Existing Starfall Ward interception and projectile protections remain. Uses budgeted custom meteor descent VFX without changing item assets.
 
 Adds two JUnit geometry/immutability tests and four GameTests for secondary public dispatch and boundary preservation, Curios confirmation/cooldown, natural ore harvesting, provenance, source removal and same-cell callback revocation. Existing stale-actor secondary tests remain, now exercising the new basin dispatch. Local 140 Python tests (one skipped without Java), 25 resources and diff check pass. Forge alpha.16 and action captures remain pending: full ability implementation is not full validation. No public release.
+
+## Later runtime confirmation
+
+Combined source `09afad161605683eaf0d1f4ac697088401183d2e`, CI `44626533396` SUCCESS: 205 JUnit without failures/errors/skips, 496 GameTests, client/input and packaged server pass. Earlier end-to-end CI failure is superseded by this green run; dedicated action-image review remains outstanding. Does not validate subsequent alpha.18 changes or imply a public release.

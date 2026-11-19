@@ -13,6 +13,7 @@ public final class MiningAlternates {
     private MiningAlternates(){}
 
     public static boolean use(ServerPlayer player,ItemStack tool,ArtifactKind kind){
+        if(kind==ArtifactKind.HELLSPEC)return HellspecEruption.start(player,tool);
         if(kind==ArtifactKind.AXIOM)return AxiomNullCross.start(player,tool);
         if(kind==ArtifactKind.WORLDLOOM)return WorldloomHarvest.start(player,tool);
         var level=player.serverLevel();var actorOrigin=player.position();
@@ -20,16 +21,6 @@ public final class MiningAlternates {
         if(aimed.isEmpty())return false;
         var origin=aimed.get();
         if(!WorldSafety.allowed(player,kind,origin)||!context(player,tool,level,actorOrigin))return false;
-        if(kind==ArtifactKind.HELLSPEC){
-            var state=level.getBlockState(origin);
-            if(!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(level).contains(origin)
-                    ||!WorldSafety.harvestable(player,tool,origin))return false;
-            var shape=ExcavationVolume.Shape.CHIMNEY;
-            var program=new NaturalExcavationProgram(origin,player.getDirection(),shape);
-            if(!WorkQueue.startRegion(player,tool,kind,program))return false;
-            ArtifactFeedback.message(player,"mining_alternate_started",program.remaining());
-            return true;
-        }
         if(kind==ArtifactKind.CRUCIBLE){
             return ParadoxLattice.start(player,tool);
         }else if(kind==ArtifactKind.INTERREGNUM){

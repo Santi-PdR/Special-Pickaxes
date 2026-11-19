@@ -159,6 +159,8 @@ public final class SpecialPickaxes {
                 MiningObservations.captureCuriosAxiom(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
             if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.EXODIUM)
                 MiningObservations.captureCuriosExodium(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
+            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.HELLSPEC)
+                MiningObservations.captureCuriosHellspec(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
         }
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.findFresh(p);

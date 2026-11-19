@@ -1,3 +1,9 @@
+## Reforma 6.0 — Hellspec alpha.18 implementado; Worldbreaker pendiente
+
+Secundaria Erupción Infernal: cono ascendente de 19 capas, radios 3..12, 3571 candidatos. Curios Anillo de Ceniza: 168 candidatos en tres capas/radios 3..5, cada 8 s tras minería natural manual confirmada, conserva menas y núcleo, lease de slot durante callbacks. Dos JUnit y cuatro GameTests nuevos; 141 Python locales (una omisión), 25 recursos. Forge alpha.18 y capturas dedicadas pendientes, no identidad visualmente aprobada. [Detalles](HELLSPEC-6.0.md).
+
+CI alpha.17 `44626533396`, fuente `09afad161605683eaf0d1f4ac697088401183d2e`: SUCCESS, 205 JUnit sin fallos/errores/omisiones, 496 GameTests, cliente/input y servidor. Valida primaria Hellspec y corrección ACK, además de implementación Axiom/Exodium anterior; no sustituye revisión visual dedicada. Exodium alpha.16 CI `44624910270` SUCCESS. No siguen abiertas como fallos actuales las CI anteriores; se conservan abajo como historial. Worldbreaker nativo y copia Curios global todavía sin reformar. Sin release pública.
+
 ## Reforma 6.0 — Hellspec alpha.17 primaria y sincronización cliente
 
 Ocho grietas radiales, radio 18, altura 13, 4049 candidatos, roca y menas naturales con drops normales, VFX infernal personalizado sin modificar arte. Reemplaza primaria antigua y copia en mano. Dos JUnit y tres GameTests nuevos; local 141 Python (una omisión), 25 recursos. Secundaria/Curios Hellspec y Worldbreaker/copia global pendientes. [Contrato y límites](HELLSPEC-6.0.md).

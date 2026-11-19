@@ -15,3 +15,7 @@ Two additional JUnit geometry cases and four additional GameTests cover cross/co
 ## Alpha.14 runtime evidence
 
 Source `18994e99d1f3ce6edbb40c327d87486c48c678a8`, CI `44621956811`: 199 JUnit, no failures/errors/skips; all 486 GameTests pass, including the retained ore-anchored copy failure and the new secondary/Curios checks. Overall CI failed in client keyboard validation (`Real C key did not change mode: EVENTIDE expected 1`), not approved end-to-end. No action screenshot inspected. Does not supersede the pending full-validation status.
+
+## Later runtime confirmation
+
+Combined source `09afad161605683eaf0d1f4ac697088401183d2e`, CI `44626533396` SUCCESS: 205 JUnit without failures/errors/skips, 496 GameTests, client/input and packaged server pass. Earlier end-to-end CI failure is superseded by this green run; dedicated action-image review remains outstanding. Does not validate subsequent alpha.18 changes or imply a public release.

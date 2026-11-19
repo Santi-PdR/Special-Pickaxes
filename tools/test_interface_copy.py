@@ -49,7 +49,7 @@ class InterfaceCopyTests(unittest.TestCase):
             texts = self.texts(locale)
             for identity, key, facts in (
                 ('hellspec', 'main', ('18', '13', '4049')),
-                ('hellspec', 'alt', ('11×11', '48')),
+                ('hellspec', 'alt', ('19', '3', '12', '3571')),
                 ('worldloom', 'alt', ('12', '25')),
                 ('palimpsest', 'main', ('2765',)),
                 ('palimpsest', 'alt', ('7153',)),

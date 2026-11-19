@@ -33,4 +33,11 @@ public final class HellspecReworkGameTests {
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,callback);
         try{h.assertTrue(!HellspecInfernalRifts.start(p,p.getMainHandItem())&&calls[0]==1&&!WorkQueue.busy(p),"permission callback cannot redirect rift origin");}finally{MinecraftForge.EVENT_BUS.unregister(callback);finish(h,p);}
     }
+    @GameTest(template="empty",batch="hellspec_618_eruption") public static void secondaryWidensUpwardWithoutRemovingLowExterior(GameTestHelper h){
+        var p=player(h,ArtifactKind.HELLSPEC);var at=target(h,p);var flare=at.offset(11,18,0);var outside=at.east(11);var ore=at.above(10);
+        for(var cell:java.util.List.of(flare,outside)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.HELLSPEC),"public eruption starts");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(flare).isAir()&&h.getLevel().getBlockState(ore).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"eruption harvests rising flare and ore but preserves low exterior");finish(h,p);
+    }
 }

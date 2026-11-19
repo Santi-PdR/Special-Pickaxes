@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
-/** Curios falling star: ore-preserving octahedron around a confirmed manual ore scar. */
+/** Curios falling star: small impact bowl harvesting natural rock and ore after a confirmed ore scar. */
 public final class ExodiumFallingStar implements WorkProgram {
     private static final Set<UUID> STARTING=new HashSet<>();
     private final List<BlockPos> cells;
