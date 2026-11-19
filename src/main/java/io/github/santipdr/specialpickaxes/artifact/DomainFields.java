@@ -30,7 +30,8 @@ public final class DomainFields {
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final Map<UUID,Frozen> frozen=new HashMap<>();final Set<UUID> observed=new HashSet<>();long expires,collapsePullUntil,lastWardCueTick=-5;int gravityCharge;
         Field(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos center,int radius,int duration) {
-            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+duration;
+            owner=p;dimension=p.level().dimension();this.tool=tool;this.kind=kind;this.center=center;this.radius=radius;mode=kind==ArtifactKind.INTERREGNUM&&tool.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER
+                    ?Math.floorMod(tool.getOrCreateTag().getInt("copiedMode"),2):ArtifactState.mode(p,kind);expires=ArtifactState.now(p)+duration;
         }
     }
     private static final Map<UUID,Field> FIELDS=new HashMap<>();

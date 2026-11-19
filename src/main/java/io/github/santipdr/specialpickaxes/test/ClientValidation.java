@@ -42,6 +42,11 @@ public final class ClientValidation {
                     }catch(java.io.IOException error){throw new IllegalStateException("Cannot prepare client fixture aim",error);}
                 }
                 if(!state.getBoolean("sceneExecuted")&&ArtifactState.of(p,current.kind()).getLong("ready")>state.getLong("sceneReadyBefore")){
+                    if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
+                        if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");
+                        // Stand outside the volume to show both its bounds and corner clocks.
+                        p.connection.teleport(24.5,65,38.5,139,-8);
+                    }
                     state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
                 }
             }

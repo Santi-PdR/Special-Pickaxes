@@ -146,14 +146,16 @@ public final class ArtifactActions {
             return EventideRupture.start(p,tool,mode==1?EventideRupture.Form.CRESCENT:EventideRupture.Form.ECLIPSE);
         }
 
-        var target=kind==ArtifactKind.INTERREGNUM&&ArtifactState.mode(p,kind)==1?Optional.of(p.blockPosition()):target(p);
+        int stasisMode=kind==ArtifactKind.INTERREGNUM&&tool.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER
+                ?Math.floorMod(tool.getOrCreateTag().getInt("copiedMode"),2):ArtifactState.mode(p,kind);
+        var target=kind==ArtifactKind.INTERREGNUM&&stasisMode==1?Optional.of(p.blockPosition()):target(p);
         if(target.isEmpty() || !WorldSafety.allowed(p,kind,target.get())) return false;
         BlockPos center=target.get();
         int r=kind==ArtifactKind.WORLDLOOM?8:radius(p,kind);
         if(kind==ArtifactKind.INTERREGNUM) {
-            int fieldRadius=ArtifactState.mode(p,kind)==1?2:8;
+            int fieldRadius=stasisMode==1?2:16;
             if(!DomainFields.start(p,tool,kind,center,fieldRadius))return false;
-            ArtifactFeedback.domain(p,kind,center,fieldRadius,ArtifactState.mode(p,kind)==1?2:fieldRadius/2);
+            ArtifactFeedback.domain(p,kind,center,fieldRadius,stasisMode==1?2:fieldRadius/2);
             return true;
         }
         if(kind==ArtifactKind.AXIOM){
