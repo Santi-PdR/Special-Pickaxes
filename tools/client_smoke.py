@@ -117,6 +117,15 @@ try:
    if i+1<len(scenes) and scenes[i+1].rsplit('-',1)[0]==id.rsplit('-',1)[0]:
     press_screen('mode')
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
+  if '[CHAT]' in line and 'ICARUS_FLIGHT_READY' in line:
+   press_screen('third')
+   press_screen('alternate')
+  if '[CHAT]' in line and 'ICARUS_FLIGHT_OBSERVED' in line:
+   capture_screen(str(out/'icarus-ascent.png'))
+  if '[CHAT]' in line and 'ICARUS_FLIGHT_OK ' in line:
+   # Restore first person before the original control sequence toggles third person.
+   press_screen('third')
+   press_screen('third')
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
    capture_screen(str(out/'third-person.png'), 'third')
@@ -148,6 +157,7 @@ finally:
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
+if not any('ICARUS_FLIGHT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client ascent verification')
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
 if len(manual_frames)<len(scenes):raise SystemExit('Not every live manual scene rendered: '+str(len(manual_frames)))
 if any(not (out/('manual-'+scene+'.png')).exists() for scene in scenes):raise SystemExit('Missing real manual capture')

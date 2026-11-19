@@ -54,6 +54,9 @@ public final class ClientValidation {
             int index=(ticks-240)/100,phase=(ticks-240)%100;
             if(index>=SCENES.size()){
                 var data=p.getPersistentData();
+                if(!data.getBoolean("flightVerified")){
+                    verifyFlight(p);return;
+                }
                 if(!data.getBoolean("controlFixtureReady")){
                     if(!data.getBoolean("controlFixtureStarted")){
                         data.putBoolean("controlFixtureStarted",true);
@@ -136,6 +139,40 @@ public final class ClientValidation {
                 com.mojang.logging.LogUtils.getLogger().info("CLIENT_FIXTURE {} MODE={} EFFICIENCY={}",k.id,ArtifactInteraction.modeKey(k,ArtifactState.mode(p,k)),EnchantmentScaling.level(p.getMainHandItem(),net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY));
             }
         }
+    }
+    /** Real survival-client velocity trial after the gallery; only fixture setup teleports. */
+    private static void verifyFlight(net.minecraft.server.level.ServerPlayer p){
+        var data=p.getPersistentData();long now=ArtifactState.now(p);
+        if(!data.getBoolean("flightFixtureReady")){
+            WorkQueue.cancel(p);DomainFields.stop(p);IcarianFlight.stop(p);
+            for(int x=-2;x<=2;x++)for(int z=12;z<=16;z++){
+                p.serverLevel().setBlock(new BlockPos(x,99,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                for(int y=100;y<=130;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+            }
+            p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+            p.connection.teleport(.5,100,14.5,180,45);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.ICARUS).get()));
+            ArtifactState.of(p,ArtifactKind.ICARUS).remove("alternateReady");ArtifactState.of(p,ArtifactKind.ICARUS).remove("inputTick");
+            data.putBoolean("flightFixtureReady",true);data.putLong("flightFixtureAt",now);data.putDouble("flightLastY",100);
+            p.sendSystemMessage(Component.literal("ICARUS_FLIGHT_READY"));return;
+        }
+        if(now-data.getLong("flightFixtureAt")>240)throw new IllegalStateException("Real Icarus flight input or motion timed out");
+        if(!data.contains("flightStartedAt")){
+            if(!IcarianFlight.active(p))return;
+            data.putLong("flightStartedAt",now);
+        }
+        double y=p.getY(),step=Math.abs(y-data.getDouble("flightLastY"));data.putDouble("flightLastY",y);
+        data.putDouble("flightMaxStep",Math.max(step,data.getDouble("flightMaxStep")));
+        data.putDouble("flightRise",Math.max(y-100,data.getDouble("flightRise")));
+        if(!data.getBoolean("flightObserved")&&y>101&&IcarianFlight.active(p)){
+            data.putBoolean("flightObserved",true);p.sendSystemMessage(Component.literal("ICARUS_FLIGHT_OBSERVED"));
+        }
+        if(IcarianFlight.active(p))return;
+        if(!data.getBoolean("flightObserved")||data.getDouble("flightRise")<3||data.getDouble("flightMaxStep")>2.5
+                ||!p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()))
+            throw new IllegalStateException("Real ascent failed: rise="+data.getDouble("flightRise")+" step="+data.getDouble("flightMaxStep"));
+        p.sendSystemMessage(Component.literal("ICARUS_FLIGHT_OK rise="+data.getDouble("flightRise")+" maxStep="+data.getDouble("flightMaxStep")));
+        data.putBoolean("flightVerified",true);p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
     }
         private static void beginSupremeSetup(net.minecraft.server.level.ServerPlayer p){
         ArtifactConfig.PER_PLAYER.set(16);ArtifactConfig.GLOBAL.set(256);
