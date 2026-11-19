@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.8`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.9`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -8,7 +8,7 @@ Identidades reformadas: [Ícaro](docs/mining-rework/ICARUS-6.0.md), [Alba](docs/
 
 CI alpha.6 [44515980736](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44515980736): **182 JUnit / 462 GameTests / 32 escenas y 64 tooltips / servidor empaquetado aprobados**. Quedan seis identidades y la copia Curios global de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md).
 
-Avance parcial [Stasis alpha.7](docs/mining-rework/STASIS-6.0.md): bordes con reloj en el mundo y secundaria de reloj de arena (4773 candidatos). CI `44525770020` aprobada: 187 JUnit / 465 GameTests / cliente y servidor. No equivale a identidad completa: primaria sigue pendiente; sin captura de acción inspeccionada. Curios ya añade un corte horizontal de 112 candidatos tras mena manual confirmada cada 8 s: alpha.8, CI `44537195139` aprobada con 189 JUnit / 468 GameTests y guía ES inspeccionada.
+[Stasis alpha.9](docs/mining-rework/STASIS-6.0.md) implementado: dominio fijo 33×17×33, aura móvil personal, reloj en el mundo, secundaria reloj de arena de 4773 candidatos y corte Curios de 112. CI `44549253542` aprobada con 189 JUnit / 470 GameTests / cliente y servidor. Dominio activo ES inspeccionado; quedan cinco identidades y copia Curios global de Worldbreaker. No release 6.0 final.
 
 ---
 
