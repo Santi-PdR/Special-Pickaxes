@@ -37,11 +37,13 @@ public final class MiningAlternates {
             if(!WorldSafety.inert(material)&&!stairs)return false;
             int slope=BridgeDesign.slope(player.getXRot(),stairs);
             if(stairs)material=material.setValue(net.minecraft.world.level.block.StairBlock.FACING,slope>0?forward:forward.getOpposite());
-            var floor=player.blockPosition().below();
+            var floor=player.blockPosition().below();boolean wide=player.isShiftKeyDown();
             for(int depth=1;depth<=BRIDGE_LENGTH;depth++){
-                var at=BridgeDesign.cell(floor,forward,depth,slope);
-                if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir()||stairs&&!BridgeDesign.clearance(level,at))break;
-                steps.add(new WorkStep.Place(at,material,true));
+                var row=BridgeDesign.row(floor,forward,depth,slope,wide);boolean clear=true;
+                for(var at:row)if(!level.hasChunkAt(at)||level.isOutsideBuildHeight(at)||!level.getBlockState(at).isAir()
+                        ||(stairs||wide)&&!BridgeDesign.clearance(level,at)){clear=false;break;}
+                if(!clear)break;
+                for(var at:row)steps.add(wide?new WorkStep.BridgePlace(at,material):new WorkStep.Place(at,material,true));
             }
         }else if(kind==ArtifactKind.AXIOM){
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;

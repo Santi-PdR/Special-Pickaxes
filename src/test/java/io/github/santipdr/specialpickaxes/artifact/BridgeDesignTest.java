@@ -23,6 +23,18 @@ class BridgeDesignTest {
         assertEquals(1,BridgeDesign.slope(-45,true));assertEquals(1,BridgeDesign.slope(0,true));
         assertEquals(-1,BridgeDesign.slope(60,true));assertEquals(1,BridgeDesign.slope(Float.NaN,true));
     }
+    @Test void wideRowsHaveThreeDistinctCellsAndKeepAContinuousCenterline(){
+        for(var facing:new Direction[]{Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST})for(int slope=-1;slope<=1;slope++){
+            var seen=new HashSet<BlockPos>();
+            for(int depth=1;depth<=64;depth++){
+                var row=BridgeDesign.row(BlockPos.ZERO,facing,depth,slope,true);assertEquals(3,row.size());
+                assertEquals(BridgeDesign.cell(BlockPos.ZERO,facing,depth,slope),row.get(0));
+                for(var at:row){assertTrue(seen.add(at));assertEquals(slope*(depth-1),at.getY());}
+                assertEquals(java.util.List.of(row.get(0)),BridgeDesign.row(BlockPos.ZERO,facing,depth,slope,false));
+            }
+            assertEquals(192,seen.size());
+        }
+    }
     @Test void malformedPlansCannotBuildUnboundedOrVerticalColumns(){
         assertThrows(IllegalArgumentException.class,()->BridgeDesign.cell(BlockPos.ZERO,Direction.SOUTH,0,0));
         assertThrows(IllegalArgumentException.class,()->BridgeDesign.cell(BlockPos.ZERO,Direction.SOUTH,65,0));

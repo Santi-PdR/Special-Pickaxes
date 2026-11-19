@@ -639,7 +639,7 @@
   "guide.alt.eventide": "Attracts up to 256 free or owned drops within 48 blocks and sustains the pull for up to 8 s. Ends on tool change, cancellation or excessive movement. Does not bypass walls.",
   "guide.alt.paradox_crucible": "Transmute natural rock in a 12-block-radius sphere using the current mode’s material.",
   "guide.alt.interregnum": "Temporal Rift: excavate an 11×11×11 chamber, harvesting its natural rock and ore.",
-  "guide.alt.worldloom": "Builds up to 64 blocks paid from the offhand. Vanilla stairs create an ascending staircase; look down to descend. Full blocks retain the flat bridge.",
+  "guide.alt.worldloom": "Builds up to 64 rows paid from your offhand. Crouch for width 3. Vanilla stairs ascend; look down to descend. Without crouching, retains width 1.",
   "guide.alt.icarus": "Open a shaft and rise toward the surface.",
   "guide.alt.hollow_axiom": "Strip a broad area of rock around exposed ore.",
   "guide.alt.worldbreaker": "Use the copied technique, or unleash native World Shatter when no pick is copied.",

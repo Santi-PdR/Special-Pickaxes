@@ -23,6 +23,11 @@ public final class BridgeDesign {
         if(depth<1||depth>64||Math.abs(slope)>1||forward.getAxis().isVertical())throw new IllegalArgumentException("bridge cell");
         return floor.relative(forward,depth).offset(0,slope*(depth-1),0);
     }
+    /** A complete row is planned before enqueueing: an obstructed shoulder ends the road. */
+    public static java.util.List<BlockPos> row(BlockPos floor,Direction forward,int depth,int slope,boolean wide){
+        var center=cell(floor,forward,depth,slope);
+        return wide?java.util.List.of(center,center.relative(forward.getCounterClockWise()),center.relative(forward.getClockWise())):java.util.List.of(center);
+    }
     public static boolean clearance(net.minecraft.server.level.ServerLevel level,BlockPos at){
         return !level.isOutsideBuildHeight(at.above(2))&&level.hasChunkAt(at)&&level.hasChunkAt(at.above(2))
                 &&level.getBlockState(at.above()).isAir()&&level.getBlockState(at.above(2)).isAir();

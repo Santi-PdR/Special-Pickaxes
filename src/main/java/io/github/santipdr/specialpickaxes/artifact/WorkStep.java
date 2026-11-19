@@ -23,6 +23,11 @@ public interface WorkStep {
         }
         public boolean stopOnFailure(){return offhandOnly;}
     }
+    /** Wide roads need walkable headroom, rechecked inside the paid placement transaction. */
+    record BridgePlace(BlockPos pos,BlockState state) implements WorkStep {
+        public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k){return WorldSafety.placePaidBridge(p,t,k,pos,state);}
+        public boolean stopOnFailure(){return true;}
+    }
     record Rephase(BlockPos pos,BlockState expected,BlockState target) implements WorkStep {
         public boolean apply(ServerPlayer p,ItemStack t,ArtifactKind k) { return WorldSafety.transmute(p,t,k,pos,expected,target); }
     }

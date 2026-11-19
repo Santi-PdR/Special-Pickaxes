@@ -639,7 +639,7 @@
   "guide.alt.eventide": "Atrae hasta 256 objetos libres o propios en 48 bloques y mantiene la atracción hasta 8 s. Termina al cambiar de herramienta, cancelar o alejarte demasiado. No atraviesa paredes.",
   "guide.alt.paradox_crucible": "Transforma la roca natural en una esfera de radio 12 usando el material del modo actual.",
   "guide.alt.interregnum": "Fractura temporal: excava una cámara de 11×11×11 y recoge su roca natural y sus menas.",
-  "guide.alt.worldloom": "Construye hasta 64 bloques pagados desde la mano secundaria. Con escaleras vanilla crea una escalera ascendente; mira hacia abajo para descender. Con bloques completos conserva la calzada plana.",
+  "guide.alt.worldloom": "Construye hasta 64 filas pagadas desde la mano secundaria. Agáchate para ancho de 3. Con escaleras vanilla asciende; mira abajo para descender. Sin agacharte conserva ancho de 1.",
   "guide.alt.icarus": "Abre un pozo y asciende hacia la superficie.",
   "guide.alt.hollow_axiom": "Retira una amplia zona de roca alrededor del mineral expuesto.",
   "guide.alt.worldbreaker": "Usa la técnica copiada o desata Ruptura Mundial si no has copiado otro pico.",

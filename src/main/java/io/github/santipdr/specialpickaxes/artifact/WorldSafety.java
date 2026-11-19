@@ -137,10 +137,16 @@ public final class WorldSafety {
     public static boolean placePaidOffhand(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state){
         return placePaid(p,tool,kind,pos,state,true);
     }
-    private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly) {
+    public static boolean placePaidBridge(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state){
+        return kind==ArtifactKind.WORLDLOOM&&placePaid(p,tool,kind,pos,state,true,true);
+    }
+    private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly){
+        return placePaid(p,tool,kind,pos,state,offhandOnly,false);
+    }
+    private static boolean placePaid(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState state,boolean offhandOnly,boolean headroom) {
         var level=p.serverLevel();var origin=p.position();boolean creativeAtStart=p.isCreative();
         if(!allowed(p,kind,pos) || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || barrier(p,pos) || !(inert(state)||offhandOnly&&kind==ArtifactKind.WORLDLOOM&&BridgeDesign.allowedStair(state))
-                || offhandOnly&&kind==ArtifactKind.WORLDLOOM&&BridgeDesign.stairMaterial(state)&&!BridgeDesign.clearance(level,pos) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
+                || (headroom||offhandOnly&&kind==ArtifactKind.WORLDLOOM&&BridgeDesign.stairMaterial(state))&&!BridgeDesign.clearance(level,pos) || !emptyForPlacement(p,pos,state) || tool.isEmpty() || p.getMainHandItem()!=tool) return false;
         int paymentSlot=-1;
         if(!p.isCreative()) {
             int first=offhandOnly?p.getInventory().getContainerSize()-1:0;
@@ -155,7 +161,8 @@ public final class WorldSafety {
         boolean accepted=false;
         try {
             if(!level.setBlock(pos,state,2) || ForgeEventFactory.onBlockPlace(p,snapshot,Direction.UP)
-                    || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || !level.hasChunkAt(pos) || level.getBlockState(pos)!=state) return false;
+                    || p.isCreative()!=creativeAtStart || !sameActor(p,level,origin,tool,pos) || !level.hasChunkAt(pos) || level.getBlockState(pos)!=state
+                    || headroom&&!BridgeDesign.clearance(level,pos)) return false;
             if(!p.isCreative()) {
                 // A listener may replace/remove the payment stack. Never place for free after such a change.
                 if(p.getInventory().getItem(paymentSlot)!=payment || payment.isEmpty()

@@ -1649,6 +1649,52 @@ public final class PickaxeGameTests {
         var tag=tool.getTag();h.assertTrue(tag.getInt("hudPrimary")==8&&tag.getInt("hudAlternate")==35&&tag.getString("hudStatus").equals("idle"),"dual cooldowns and actual queue status are copied from server state");finish(h,p);
     }
 
+    private static ServerPlayer wideRoadFixture(GameTestHelper h,boolean stairs,boolean descend){
+        var p=player(h,ArtifactKind.WORLDLOOM);p.setPos(p.position().add(0,100,0));p.setYRot(0);p.setXRot(descend?60:-30);p.setShiftKeyDown(true);
+        var floor=p.blockPosition().below();
+        for(int d=1;d<=8;d++)for(var at:BridgeDesign.row(floor,Direction.SOUTH,d,stairs?(descend?-1:1):0,true))
+            for(int y=0;y<=2;y++)h.getLevel().setBlockAndUpdate(at.above(y),Blocks.AIR.defaultBlockState());
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(stairs?Blocks.COBBLESTONE_STAIRS:Blocks.COBBLESTONE,9));return p;
+    }
+    private static void wideRoadBuilt(GameTestHelper h,boolean stairs,boolean descend){
+        var p=wideRoadFixture(h,stairs,descend);var floor=p.blockPosition().below();int slope=stairs?(descend?-1:1):0;
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"wide road schedules from crouched alternate");drain(p);
+        for(int d=1;d<=3;d++)for(var at:BridgeDesign.row(floor,Direction.SOUTH,d,slope,true)){
+            var state=h.getLevel().getBlockState(at);
+            h.assertTrue(state.is(stairs?Blocks.COBBLESTONE_STAIRS:Blocks.COBBLESTONE),"paid three-wide cell at "+at);
+            if(stairs)h.assertTrue(state.getValue(StairBlock.FACING)==(descend?Direction.NORTH:Direction.SOUTH),"shoulders share correct stair facing");
+        }
+        for(var at:BridgeDesign.row(floor,Direction.SOUTH,4,slope,true))h.assertTrue(h.getLevel().getBlockState(at).isAir(),"no free tail after nine paid blocks");
+        h.assertTrue(p.getOffhandItem().isEmpty(),"nine placements consume nine materials");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_519_01") public static void crouchedWorldloomBuildsThreeWidePaidRoad(GameTestHelper h){wideRoadBuilt(h,false,false);}
+    @GameTest(template="empty",batch="upgrade_519_02") public static void crouchedWorldloomBuildsThreeWideAscendingStairs(GameTestHelper h){wideRoadBuilt(h,true,false);}
+    @GameTest(template="empty",batch="upgrade_519_03") public static void crouchedWorldloomBuildsThreeWideDescendingStairs(GameTestHelper h){wideRoadBuilt(h,true,true);}
+    @GameTest(template="empty",batch="upgrade_519_04") public static void wideRoadPlanningStopsBeforeObstructedShoulder(GameTestHelper h){
+        var p=wideRoadFixture(h,false,false);var floor=p.blockPosition().below();var row=BridgeDesign.row(floor,Direction.SOUTH,2,0,true);
+        var obstacle=row.get(1).above();h.getLevel().setBlockAndUpdate(obstacle,Blocks.CHEST.defaultBlockState());
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"first complete row schedules");drain(p);
+        h.assertTrue(p.getOffhandItem().getCount()==6,"only first row is paid");
+        for(var at:row)h.assertTrue(h.getLevel().getBlockState(at).isAir(),"obstructed row is excluded as a whole");
+        h.assertTrue(h.getLevel().getBlockState(obstacle).is(Blocks.CHEST),"obstacle preserved");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_519_05") public static void wideRoadRevalidatesNewCeilingBeforeSpendingMaterials(GameTestHelper h){
+        var p=wideRoadFixture(h,false,false);var at=BridgeDesign.row(p.blockPosition().below(),Direction.SOUTH,1,0,true).get(0);
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"road queued before new ceiling");
+        h.getLevel().setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());drain(p);
+        h.assertTrue(p.getOffhandItem().getCount()==9&&h.getLevel().getBlockState(at).isAir(),"new headroom obstruction cancels without payment");finish(h,p);
+    }
+    @GameTest(template="empty",batch="upgrade_519_06") public static void wideRoadRollsBackPlacementWhenCallbackInstallsCeiling(GameTestHelper h){
+        var p=wideRoadFixture(h,false,false);var at=BridgeDesign.row(p.blockPosition().below(),Direction.SOUTH,1,0,true).get(0);
+        java.util.function.Consumer<BlockEvent.EntityPlaceEvent> ceiling=e->{if(e.getEntity()==p&&e.getPos().equals(at))h.getLevel().setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.EntityPlaceEvent.class,ceiling);
+        try{
+            h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"road schedules before callback");drain(p);
+            h.assertTrue(p.getOffhandItem().getCount()==9&&h.getLevel().getBlockState(at).isAir(),"callback ceiling rolls back only tentative floor without spending");
+            h.assertTrue(h.getLevel().getBlockState(at.above()).is(Blocks.STONE),"external ceiling remains untouched");
+        }finally{MinecraftForge.EVENT_BUS.unregister(ceiling);finish(h,p);}
+    }
+
     private static BlockPos guidedOre(GameTestHelper h){
         var at=target(h);h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);return at;
     }
