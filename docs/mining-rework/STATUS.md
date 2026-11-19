@@ -1,3 +1,7 @@
+## Reforma 6.0 — Worldbreaker alpha.24 Descenso al Manto
+
+Modo 3 reemplaza pozo estrecho por cuatro terrazas de radios 12/9/6/3 hasta profundidad 24, 6485 candidatos de roca/menas. Queue reconoce el nuevo programa para guardia de caída durante trabajo y gracia posterior hasta aterrizar. Un JUnit y dos GameTests nuevos; local 141 Python (una omisión), 25 recursos y hashes congelados intactos. Forge/capturas pendientes; CI alpha.23 `44637244361` aún en ejecución al comprobarla. [Contrato](WORLDBREAKER-6.0.md). Modos 4/5 y copia Curios completa pendientes; no release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.23 Curios nativo e investigación de CI
 
 Curios sin copia: Fractura del Núcleo, 702 candidatos 9×9×9 menos núcleo 3×3×3, cada 8 s tras mena natural manual confirmada; conserva construcciones. Seleccionar copia o retirar slot revoca lease incluso en callback. Un JUnit y dos GameTests; local 141 Python (una omisión), 25 recursos, hashes congelados intactos. Forge/capturas pendientes. [Contrato y límites](WORLDBREAKER-6.0.md).

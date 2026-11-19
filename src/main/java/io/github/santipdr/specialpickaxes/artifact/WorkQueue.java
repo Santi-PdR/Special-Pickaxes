@@ -34,6 +34,9 @@ public final class WorkQueue {
         }
     }
     private WorkQueue() {}
+    private static boolean descentProgram(WorkProgram program){
+        return program instanceof WorldbreakerMantleDescent||program instanceof DirectionalProgram directional&&directional.isCoreDrill();
+    }
     public static boolean running() { return running; }
     public static boolean protectsFall(ServerPlayer p){
         var guard=CORE_DRILL_GUARDS.get(p.getUUID());
@@ -80,7 +83,7 @@ public final class WorkQueue {
         if(!regionSnapshotBudgetAllows(p,snapshotBytes))return false;
         if(region instanceof RegionWork snapshot){snapshot.allocateSnapshots();snapshot.loadMemories(memories);}
         var j=new Job(p,tool,kind,List.of(),snapshotBytes);j.region=region;if(!(region instanceof RegionWork))region.loadMemories(p);JOBS.put(p.getUUID(),j);ORDER.addLast(p.getUUID());
-        if(kind==ArtifactKind.WORLDBREAKER&&region instanceof DirectionalProgram directional&&directional.isCoreDrill())CORE_DRILL_GUARDS.put(p.getUUID(),new FallGuard(p,ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE));
+        if(kind==ArtifactKind.WORLDBREAKER&&descentProgram(region))CORE_DRILL_GUARDS.put(p.getUUID(),new FallGuard(p,ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE));
         return true;
     }
     public static int lastAttempts() { return lastAttempts; }
@@ -188,7 +191,7 @@ public final class WorkQueue {
             if(CORE_DRILL_GUARDS.get(entry.getKey())!=guard)continue;
             if(!p.isAlive()||p.isRemoved()||p.level().dimension()!=guard.dimension||ArtifactState.now(p)>guard.expires||p.onGround()) {CORE_DRILL_GUARDS.remove(entry.getKey(),guard);continue;}
             var job=JOBS.get(entry.getKey());
-            if(job!=null&&job.kind==ArtifactKind.WORLDBREAKER&&job.region instanceof DirectionalProgram directional&&directional.isCoreDrill())guard.expires=ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE;
+            if(job!=null&&job.kind==ArtifactKind.WORLDBREAKER&&descentProgram(job.region))guard.expires=ArtifactState.now(p)+CORE_DRILL_LANDING_GRACE;
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING,40,0,false,false,true));
             if(CORE_DRILL_GUARDS.get(entry.getKey())==guard&&job==null&&p.tickCount%10==0)RelicEffects.emit(p,ArtifactKind.WORLDBREAKER,"fall_guard",p.position());
         }

@@ -66,4 +66,19 @@ public final class WorldbreakerReworkGameTests {
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public world split starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(lower).isAir()&&h.getLevel().getBlockState(diagonal).is(Blocks.STONE),"perpendicular vertical cuts leave diagonal rock intact");finish(h,p);
     }
+    @GameTest(template="empty",batch="worldbreaker_624_descent") public static void descentModeCutsTerracesAndKeepsLandingGrace(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",3);p.setOnGround(false);
+        var upper=at.east(11);var middle=at.offset(8,-8,0);var bottom=at.offset(2,-24,0);var outside=at.offset(11,-8,0);
+        for(var cell:java.util.List.of(upper,middle,outside)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.getLevel().setBlockAndUpdate(bottom,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(bottom);
+        try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false)&&WorkQueue.protectsFall(p),"public descent starts with fall guard");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(middle).isAir()&&h.getLevel().getBlockState(bottom).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"terraces harvest ore while narrower deep boundary survives");
+            h.assertTrue(WorkQueue.protectsFall(p),"landing grace remains after excavation completion");p.setOnGround(true);WorkQueue.tick();h.assertTrue(!WorkQueue.protectsFall(p),"landing releases grace");
+        }finally{WorkQueue.forget(p);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="worldbreaker_624_reentry") public static void descentStartCannotBeRelocatedByPermissionCallbacks(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);int[] calls={0};Consumer<AbilityUseEvent> callback=e->{if(e.player==p){calls[0]++;h.assertTrue(!WorldbreakerMantleDescent.start(p,p.getMainHandItem()),"recursive descent rejected");p.setPos(p.position().add(1,0,0));}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,callback);
+        try{h.assertTrue(!WorldbreakerMantleDescent.start(p,p.getMainHandItem())&&calls[0]==1&&!WorkQueue.busy(p),"stale descent origin rejected");}finally{MinecraftForge.EVENT_BUS.unregister(callback);WorkQueue.forget(p);finish(h,p);}
+    }
 }

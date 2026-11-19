@@ -49,3 +49,11 @@ One JUnit tests immutable 702-cell geometry; two GameTests cover native public o
 ### Failed CI investigation
 
 Alpha.19 CI `44633175036` and alpha.20 `44633627986` SUCCESS. Alpha.21 `44634804567` and alpha.22 `44635858293` failed the same sparse native Cataclysm harvest assertion. The target helper only clears a 17×9×17 fixture while Cataclysm scans 33×17×33; added tests can change generated-world layout around this larger footprint. Alpha.23 explicitly clears/unmarks every Cataclysm candidate in that sparse fixture before reseeding the asserted probes. Production caps, safety, target geometry and assertions remain unchanged; detailed probe states/remaining work were added to future failure messages. This is a suspected fixture-isolation cause, not a verified runtime fix until CI reruns. The retained tests must still pass. Not evidence to approve alpha.21/22 wholesale.
+
+## Alpha.24 — Mantle Descent replaces native narrow Core Drill
+
+Native mode 3 (stable key `core_drill`) now excavates four descending terraces around aimed natural geology: radii 12/9/6/3, offsets 0..-24, 6485 unique candidates, top-down. Uses native rock/ore loot and the shared claim/provenance/chunk/tool/backpressure checks. Starts from the aimed quarry rim, not automatically below the player's feet. Not a 192-block narrow drilling tunnel.
+
+The queue explicitly recognizes Mantle Descent as a descent program for its existing fall guard, refreshes protection during work and preserves post-job landing grace. Existing DirectionalProgram Core Drill infrastructure and guard regressions remain supported. New JUnit checks volume, uniqueness, order and terrace boundaries; two GameTests exercise public mode dispatch, deep ore/boundary preservation, fall guard while working/after completion/until landing and callback reentry/relocation. Local 141 Python (one skip without Java), 25 resources, frozen hashes and diff check pass. Forge alpha.24/action captures pending. Alpha.23 `44637244361` still in progress when checked.
+
+Native modes 0..3 and alternate now implemented. World Shatter/Region Break (modes 4/5) and complete Curios copying still outstanding; no claim of completed reform or public release.

@@ -52,4 +52,14 @@ class WorldbreakerCataclysmTest {
         assertTrue(cells.contains(new BlockPos(4,4,4)));assertFalse(cells.contains(new BlockPos(1,1,1)));
         assertFalse(cells.contains(new BlockPos(5,0,0)));assertThrows(UnsupportedOperationException.class,()->cells.clear());
     }
+    @Test void mantleDescentHas6485CellsAcrossFourNarrowingTerraces(){
+        assertEquals(6485,WorldbreakerMantleDescent.VOLUME);var seen=new HashSet<BlockPos>();int previous=0;
+        for(int i=0;i<WorldbreakerMantleDescent.VOLUME;i++){
+            var p=WorldbreakerMantleDescent.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));assertTrue(p.getY()<=previous);previous=p.getY();
+            assertTrue(WorldbreakerMantleDescent.contains(p.getX(),p.getY(),p.getZ()));
+        }
+        assertTrue(WorldbreakerMantleDescent.contains(12,0,0));assertFalse(WorldbreakerMantleDescent.contains(12,-8,0));
+        assertTrue(WorldbreakerMantleDescent.contains(9,-8,0));assertTrue(WorldbreakerMantleDescent.contains(6,-16,0));
+        assertTrue(WorldbreakerMantleDescent.contains(3,-24,0));assertFalse(WorldbreakerMantleDescent.contains(4,-24,0));
+    }
 }

@@ -133,6 +133,7 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==0)return WorldbreakerCataclysm.start(p,tool);
         if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==1)return WorldbreakerFaultCrown.start(p,tool);
         if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==2)return WorldbreakerWorldSplit.start(p,tool);
+        if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==3)return WorldbreakerMantleDescent.start(p,tool);
         if(kind==ArtifactKind.WORLDBREAKER) {
             boolean started=MiningDesigns.drill(p,tool,kind);
             if(started&&(kind==ArtifactKind.ICARUS||ArtifactState.mode(p,kind)==3))p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,40,0,false,false,true));
