@@ -10,7 +10,7 @@ public final class AxiomNullChamber implements WorkProgram {
     public static final int VOLUME=OFFSETS.size();
     private final BlockPos center;
     private final ArtifactKind kind=ArtifactKind.AXIOM;
-    private int index,visualTick=Integer.MIN_VALUE;
+    private int index,mined,visualTick=Integer.MIN_VALUE;
     public AxiomNullChamber(BlockPos center){this.center=center.immutable();}
     public static boolean contains(int x,int y,int z){
         return Math.abs(x)+Math.abs(y)+Math.abs(z)<=18&&Math.max(Math.max(Math.abs(x),Math.abs(y)),Math.abs(z))>1;
@@ -45,8 +45,8 @@ public final class AxiomNullChamber implements WorkProgram {
             visualTick=now;AbilityVfx.axiomImplosion(p,cell(center,index-1));
         }
     }
-    public int remaining(){return limit()-index;}
-    public boolean awaiting(){return false;}public boolean executing(){return true;}public boolean done(){return index>=limit();}
+    public int remaining(){return done()?0:VOLUME-index;}
+    public boolean awaiting(){return false;}public boolean executing(){return true;}public boolean done(){return index>=VOLUME||mined>=limit();}
     public void confirm(){}public boolean loaded(ServerPlayer player){return true;}
     public boolean reportPartial(){return false;}
     public boolean backpressured(ServerPlayer player){
@@ -67,7 +67,8 @@ public final class AxiomNullChamber implements WorkProgram {
                 if(level.isOutsideBuildHeight(at)||!level.hasChunkAt(at)||PlayerPlacedBlocks.get(level).contains(at))return false;
                 var state=level.getBlockState(at);
                 if(!MiningDesigns.seamGeology(state)||ArtifactOres.isOre(state))return false;
-                return WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);
+                boolean result=WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);
+                if(result)mined++;return result;
             }
         };
     }

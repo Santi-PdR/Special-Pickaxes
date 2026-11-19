@@ -31,4 +31,11 @@ public final class AxiomReworkGameTests {
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,callback);
         try{h.assertTrue(!AxiomNullChamber.start(p,p.getMainHandItem())&&calls[0]==1&&!WorkQueue.busy(p),"permission callback cannot redirect origin");}finally{MinecraftForge.EVENT_BUS.unregister(callback);finish(h,p);}
     }
+    @GameTest(template="empty",batch="axiom_614_cross") public static void secondaryCutsThreePlanesButLeavesDiagonalRockAndOre(GameTestHelper h){
+        var p=player(h,ArtifactKind.AXIOM);var at=target(h,p);var plane=at.east(8);var diagonal=at.offset(3,3,3);var ore=at.above(4);
+        for(var cell:java.util.List.of(plane,diagonal)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.AXIOM),"public secondary null cross starts on rock");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(plane).isAir()&&h.getLevel().getBlockState(diagonal).is(Blocks.STONE)&&h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"cross planes excavate while diagonal, core and ore survive");finish(h,p);
+    }
 }

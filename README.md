@@ -1,16 +1,16 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.13`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.14`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
-Identidades reformadas: [Ícaro](docs/mining-rework/ICARUS-6.0.md), [Alba](docs/mining-rework/DAWNBREAKER-6.0.md), [Coro](docs/mining-rework/FAULTSONG-6.0.md), [Ocaso](docs/mining-rework/EVENTIDE-6.0.md) [Paradox](docs/mining-rework/PARADOX-6.0.md) y [Stasis](docs/mining-rework/STASIS-6.0.md). Ocaso ahora excava eclipses horizontales/verticales y anillos destructivos, con una réplica Curios al minar menas: ya no tiene un imán como poder principal.
+Identidades reformadas: [Ícaro](docs/mining-rework/ICARUS-6.0.md), [Alba](docs/mining-rework/DAWNBREAKER-6.0.md), [Coro](docs/mining-rework/FAULTSONG-6.0.md), [Ocaso](docs/mining-rework/EVENTIDE-6.0.md) [Paradox](docs/mining-rework/PARADOX-6.0.md) [Stasis](docs/mining-rework/STASIS-6.0.md) y [Worldloom](docs/mining-rework/WORLDLOOM-6.0.md). Ocaso ahora excava eclipses horizontales/verticales y anillos destructivos, con una réplica Curios al minar menas: ya no tiene un imán como poder principal.
 
-CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44549253542): **189 JUnit / 470 GameTests / 32 escenas y 64 tooltips / servidor empaquetado aprobados**. Quedan cinco identidades y la copia Curios global de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md).
+CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44549253542): **189 JUnit / 470 GameTests / 32 escenas y 64 tooltips / servidor empaquetado aprobados**. Quedan cuatro identidades y la copia Curios global de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md).
 
-[Stasis alpha.9](docs/mining-rework/STASIS-6.0.md) implementado: dominio fijo 33×17×33, aura móvil personal, reloj en el mundo, secundaria reloj de arena de 4773 candidatos y corte Curios de 112. CI `44549253542` aprobada con 189 JUnit / 470 GameTests / cliente y servidor. Dominio activo ES inspeccionado; quedan cinco identidades y copia Curios global de Worldbreaker. No release 6.0 final.
+[Stasis alpha.9](docs/mining-rework/STASIS-6.0.md) implementado: dominio fijo 33×17×33, aura móvil personal, reloj en el mundo, secundaria reloj de arena de 4773 candidatos y corte Curios de 112. CI `44549253542` aprobada con 189 JUnit / 470 GameTests / cliente y servidor. Dominio activo ES inspeccionado; este hito precede a la validación de Worldloom indicada debajo. No release 6.0 final.
 
-[Worldloom alpha.12 validado](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios. CI `44609459397` SUCCESS: 195 JUnit / 479 GameTests / cliente y servidor con logs estrictos. Cantera activa y guía ES inspeccionadas. Quedan cuatro identidades y copia Curios global. Alpha.13 inicia la primaria de Axiom, todavía sin validar ni completar esa identidad.
+[Worldloom alpha.12 validado](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios. CI `44609459397` SUCCESS: 195 JUnit / 479 GameTests / cliente y servidor con logs estrictos. Cantera activa y guía ES inspeccionadas. Quedan cuatro identidades y copia Curios global. [Axiom alpha.14](docs/mining-rework/AXIOM-6.0.md) implementa cámara nula, cruz secundaria y réplica Curios; validación Forge y visual aún pendientes.
 
 ---
 

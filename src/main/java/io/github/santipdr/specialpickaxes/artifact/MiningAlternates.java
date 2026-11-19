@@ -13,6 +13,7 @@ public final class MiningAlternates {
     private MiningAlternates(){}
 
     public static boolean use(ServerPlayer player,ItemStack tool,ArtifactKind kind){
+        if(kind==ArtifactKind.AXIOM)return AxiomNullCross.start(player,tool);
         if(kind==ArtifactKind.WORLDLOOM)return WorldloomHarvest.start(player,tool);
         var level=player.serverLevel();var actorOrigin=player.position();
         var aimed=ArtifactActions.target(player);
@@ -29,10 +30,7 @@ public final class MiningAlternates {
             ArtifactFeedback.message(player,"mining_alternate_started",program.remaining());
             return true;
         }
-        if(kind==ArtifactKind.AXIOM){
-            if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;
-            return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,false));
-        }else if(kind==ArtifactKind.CRUCIBLE){
+        if(kind==ArtifactKind.CRUCIBLE){
             return ParadoxLattice.start(player,tool);
         }else if(kind==ArtifactKind.INTERREGNUM){
             return WorkQueue.startRegion(player,tool,kind,new StasisHourglassProgram(origin));

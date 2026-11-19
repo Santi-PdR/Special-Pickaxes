@@ -1,3 +1,7 @@
+## Reforma 6.0 — Axiom alpha.14 implementado, validación pendiente
+
+Cámara octaédrica primaria de 8446 candidatos, secundaria de tres planos circulares radio 16 y réplica Curios radio 6 / 350 candidatos / 8 s, conservando menas y núcleo. CI alpha.13 `44617863959` falló una prueba de copia en mano: el tope de candidatos truncaba la geometría cerca del centro. Se mantiene la prueba y el límite 8192, ahora aplicado a bloques realmente minados. Nuevos tests de secundaria y lease Curios; 140 Python locales (una omisión), 25 recursos. Arte congelado. Forge alpha.14 y captura de acción pendientes; no contar Axiom como validado. [Detalles](AXIOM-6.0.md). Exodium, Hellspec y Worldbreaker/copia Curios global siguen pendientes. No release pública.
+
 ## Reforma 6.0 — Worldloom alpha.12 validado, reforma global incompleta
 
 Fuente `dde36814a8a0cef56166e509fd42e63d2e9ebe6c`, CI `44609459397` **SUCCESS**: 195 JUnit sin fallos/errores/omisiones, 479 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado aprobados, sin relajar logs. Primaria cantera escalonada 4164 candidatos, secundaria cosecha de menas expuestas y raíces Curios 156 candidatos cada 8 s. Capturas ES de cantera activa y guía inspeccionadas y guardadas. [Evidencia, fallos anteriores y límites](WORLDLOOM-6.0.md). Un rótulo corto heredado visto en la captura se corrige en locales de la siguiente tanda. Quedan cuatro identidades y copia Curios global de Worldbreaker; no release 6.0 pública. Siguiente Axiom, todavía no terminado.

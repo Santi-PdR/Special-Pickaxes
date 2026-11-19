@@ -16,4 +16,18 @@ class AxiomNullChamberTest {
         assertTrue(AxiomNullChamber.contains(18,0,0));assertTrue(AxiomNullChamber.contains(6,6,6));assertFalse(AxiomNullChamber.contains(7,6,6));
         assertThrows(IllegalArgumentException.class,()->AxiomNullChamber.cell(BlockPos.ZERO,8446));
     }
+    @Test void nullCrossHasOnlyThreeCircularPlanesAndNoCore(){
+        var seen=new HashSet<BlockPos>();
+        for(int i=0;i<AxiomNullCross.VOLUME;i++){
+            var p=AxiomNullCross.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));
+            assertTrue(p.getX()==0||p.getY()==0||p.getZ()==0);assertTrue(p.distSqr(BlockPos.ZERO)<=256);
+            assertTrue(Math.max(Math.max(Math.abs(p.getX()),Math.abs(p.getY())),Math.abs(p.getZ()))>1);
+        }
+        assertTrue(AxiomNullCross.contains(16,0,0));assertFalse(AxiomNullCross.contains(3,3,3));
+    }
+    @Test void aftershockIsImmutableAndPreservesTheCore(){
+        var cells=AxiomAftershock.cells(BlockPos.ZERO);assertEquals(350,cells.size());assertEquals(350,new HashSet<>(cells).size());
+        assertTrue(cells.contains(new BlockPos(6,0,0)));assertFalse(cells.contains(new BlockPos(1,1,1)));
+        assertThrows(UnsupportedOperationException.class,()->cells.clear());
+    }
 }
