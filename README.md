@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.14`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.15`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -11,6 +11,8 @@ CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/r
 [Stasis alpha.9](docs/mining-rework/STASIS-6.0.md) implementado: dominio fijo 33×17×33, aura móvil personal, reloj en el mundo, secundaria reloj de arena de 4773 candidatos y corte Curios de 112. CI `44549253542` aprobada con 189 JUnit / 470 GameTests / cliente y servidor. Dominio activo ES inspeccionado; este hito precede a la validación de Worldloom indicada debajo. No release 6.0 final.
 
 [Worldloom alpha.12 validado](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios. CI `44609459397` SUCCESS: 195 JUnit / 479 GameTests / cliente y servidor con logs estrictos. Cantera activa y guía ES inspeccionadas. Quedan cuatro identidades y copia Curios global. [Axiom alpha.14](docs/mining-rework/AXIOM-6.0.md) implementa cámara nula, cruz secundaria y réplica Curios; validación Forge y visual aún pendientes.
+
+[Exodium alpha.15](docs/mining-rework/EXODIUM-6.0.md) inicia su reforma con cinco cráteres de meteoros (3511 candidatos), sin lanza lineal. Primaria aún sin validar; secundaria y Curios pendientes.
 
 ---
 

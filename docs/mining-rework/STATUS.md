@@ -1,3 +1,7 @@
+## Reforma 6.0 — Exodium alpha.15 primaria implementada, identidad parcial
+
+Lluvia de cinco cráteres, 3511 candidatos, excavación de roca y menas naturales de arriba abajo. Reemplaza lanza lineal pública y su copia en mano. Partícula temática de descenso estelar con presupuesto. Dos JUnit y tres GameTests nuevos; 140 Python locales (una omisión), 25 recursos. Forge y captura de acción pendientes; secundaria y Curios sin reformar. [Detalles y límites](EXODIUM-6.0.md). Axiom alpha.14 sigue esperando validación de `18994e99d1f3ce6edbb40c327d87486c48c678a8`; el fallo previo `44621882371` era la expectativa heredada de vaciar el núcleo adyacente, actualizada al contrato nuevo sin retirar la prueba de protección. Hellspec y Worldbreaker/copia Curios global siguen pendientes. Sin release pública.
+
 ## Reforma 6.0 — Axiom alpha.14 implementado, validación pendiente
 
 Cámara octaédrica primaria de 8446 candidatos, secundaria de tres planos circulares radio 16 y réplica Curios radio 6 / 350 candidatos / 8 s, conservando menas y núcleo. CI alpha.13 `44617863959` falló una prueba de copia en mano: el tope de candidatos truncaba la geometría cerca del centro. Se mantiene la prueba y el límite 8192, ahora aplicado a bloques realmente minados. Nuevos tests de secundaria y lease Curios; 140 Python locales (una omisión), 25 recursos. Arte congelado. Forge alpha.14 y captura de acción pendientes; no contar Axiom como validado. [Detalles](AXIOM-6.0.md). Exodium, Hellspec y Worldbreaker/copia Curios global siguen pendientes. No release pública.

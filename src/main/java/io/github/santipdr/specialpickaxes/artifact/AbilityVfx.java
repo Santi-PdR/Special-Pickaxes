@@ -140,6 +140,16 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.AXIOM,true),false,at.x,at.y,at.z,1,0,0,0,0);
         }return true;
     }
+    /** Short slanted stellar descent, emitted only by executing meteor work. */
+    public static boolean meteorImpact(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||!p.serverLevel().hasChunkAt(center)||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),12))return false;
+        for(int i=0;i<12;i++){
+            double t=i/11.0;
+            var at=Vec3.atCenterOf(center).add((1-t)*2,(1-t)*5,(1-t)*.8);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.EXODIUM),false,at.x,at.y,at.z,1,.025,.025,.025,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

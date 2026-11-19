@@ -1,0 +1,9 @@
+# Exodium alpha.15 — meteor-shower primary implemented; identity partial
+
+Primary public dispatch replaces the generic forward lance with five top-down impact bowls, a union of integer paraboloids: central radius 10 / depth 10; four satellites at horizontal offsets (±12,0) and (0,±12), each radius 7 / depth 6. 3511 unique candidates, total horizontal extent 39×39. Every candidate column opens upward to the aimed block's elevation; terrain above that elevation is not scanned. Choose the aimed elevation as the crater rim, rather than claiming a surface-finding meteor simulation.
+
+Natural geology and ores produce ordinary tool loot. No real explosion, entity damage, fire, tunnel, block creation or item magnet. Player-placed blocks, claim permissions, unloaded chunks, build height, tool suitability, durability and drop pressure retain the shared execution-time safety rules. Successful blocks count against the configured job cap. Start captures the exact actor and held-tool context, with reentry guard and post-callback checks. Worldbreaker hand copy uses the same program. Budgeted custom signature particles trace a short stellar descent during execution; existing item art is unchanged.
+
+Two new JUnit cases cover exact volume, uniqueness, top-down traversal, open columns and paraboloid boundaries. Three GameTests cover public primary, central/satellite natural rock and ore removal, provenance and exterior preservation, Worldbreaker hand copy and callback reentry/relocation. Local 140 Python tests (one skip without Java), 25 resource validations and diff check pass. No local Java runtime; Forge CI pending. No Exodium action capture inspected.
+
+Secondary and Curios remain the previous implementation and are explicitly NOT claimed reformed. The legacy directional Exodium shapes remain infrastructure regression coverage but public primary no longer dispatches them. No release published; not a completed identity.
