@@ -100,6 +100,17 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.EVENTIDE,alternate),false,at.x,at.y,at.z,1,0,.015,0,0);
         }return true;
     }
+    /** Three crossed causal loops. Server-authored, bounded, and emitted only during work. */
+    public static boolean paradoxKnot(ServerPlayer p,net.minecraft.core.BlockPos center,boolean release){
+        if(!p.isAlive()||p.isRemoved()||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),12))return false;
+        double phase=p.server.getTickCount()*.17,r=release?1.8:.7;
+        for(int i=0;i<12;i++){
+            double a=phase+Math.PI*2*(i%4)/4,x=Math.cos(a)*r,y=Math.sin(a)*r;
+            var at=Vec3.atCenterOf(center).add(i<4?x:0,i<4?y:i<8?x:y,i<4?0:i<8?y:x);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.CRUCIBLE,release),false,at.x,at.y,at.z,1,0,0,0,0);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

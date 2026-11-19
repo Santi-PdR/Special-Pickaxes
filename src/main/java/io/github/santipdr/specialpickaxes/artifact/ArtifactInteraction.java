@@ -10,7 +10,7 @@ public final class ArtifactInteraction {
     private static final class Selection {
         final ItemStack tool;final ArtifactKind kind;final String dimension;final int mode;final long started;final long expires;
         final List<BlockPos> points=new ArrayList<>(2);boolean submitted;
-        Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;mode=ArtifactState.mode(p,k);dimension=ArtifactState.dimension(p);started=ArtifactState.now(p);expires=started+12000;}
+        Selection(ServerPlayer p,ItemStack t,ArtifactKind k){tool=t;kind=k;mode=selectedMode(p,t,k);dimension=ArtifactState.dimension(p);started=ArtifactState.now(p);expires=started+12000;}
     }
     private static final Map<UUID,Selection> SELECTED=new HashMap<>();
     private ArtifactInteraction(){}
@@ -25,7 +25,12 @@ public final class ArtifactInteraction {
     private static void resetDisplay(Selection selection){if(selection!=null&&!selection.tool.isEmpty())selection.tool.getOrCreateTag().putString("artifactStatus","idle");}
     public static void clear(ServerPlayer p){resetDisplay(SELECTED.remove(p.getUUID()));}
     public static void clear(){SELECTED.values().forEach(ArtifactInteraction::resetDisplay);SELECTED.clear();}
-    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&ArtifactState.mode(p,s.kind)==s.mode&&ArtifactState.dimension(p).equals(s.dimension)&&ArtifactState.now(p)>=s.started&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
+    private static int selectedMode(ServerPlayer p,ItemStack tool,ArtifactKind kind){
+        if(tool.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()
+                &&tool.getTag().getString("copiedSkill").equals(kind.id))return Math.floorMod(tool.getTag().getInt("copiedMode"),modeCount(kind));
+        return ArtifactState.mode(p,kind);
+    }
+    private static boolean valid(ServerPlayer p,Selection s){return p.isAlive()&&!p.isRemoved()&&p.getMainHandItem()==s.tool&&selectedMode(p,s.tool,s.kind)==s.mode&&ArtifactState.dimension(p).equals(s.dimension)&&ArtifactState.now(p)>=s.started&&(ArtifactState.now(p)<=s.expires||WorkQueue.busy(p));}
     private static Selection selection(ServerPlayer p){var s=SELECTED.get(p.getUUID());if(s!=null&&!valid(p,s)){clear(p);return null;}return s;}
     public static boolean selecting(ServerPlayer p){return selection(p)!=null;}
     public static int cornerCount(ServerPlayer p){var s=selection(p);return s==null?0:s.points.size();}
@@ -43,7 +48,7 @@ public final class ArtifactInteraction {
             var volume=new SelectionVolume(s.points.get(0),s.points.get(1));
             long snapshotBytes=RegionWork.snapshotMemoryBytesFor((int)volume.size(),net.minecraft.world.level.block.Block.BLOCK_STATE_REGISTRY.size(),false);
             if(!WorkQueue.regionSnapshotBudgetAllows(p,snapshotBytes))return;
-            var material=s.kind==ArtifactKind.CRUCIBLE?ArtifactActions.geologyMaterial(p,s.mode):net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
+            var material=net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
             var program=new RegionWork(volume,null,SelectionVolume.Transform.IDENTITY,s.kind,s.mode,material);
             if(WorkQueue.startRegion(p,s.tool,s.kind,program)){s.submitted=true;ArtifactFeedback.message(p,"selection_ready");}
         }catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"selection_invalid");}
@@ -65,7 +70,7 @@ public final class ArtifactInteraction {
         ArtifactKind shownKind=kind;int shownMode=ArtifactState.mode(p,kind);
         if(kind==ArtifactKind.WORLDBREAKER&&tag.contains("copiedSkill"))try{
             var copied=ArtifactKind.byId(tag.getString("copiedSkill"));
-            if(copied!=ArtifactKind.WORLDBREAKER){shownKind=copied;shownMode=ArtifactState.mode(p,copied);tag.putInt("copiedMode",shownMode);}
+            if(copied!=ArtifactKind.WORLDBREAKER){shownKind=copied;shownMode=selectedMode(p,tool,copied);tag.putInt("copiedMode",shownMode);}
         }catch(IllegalArgumentException invalid){tag.remove("copiedSkill");tag.remove("copiedMode");}
         tag.putString("artifactStatus",status);tag.putInt("artifactProgress",WorkQueue.completed(p));tag.putString("artifactModeName",modeKey(shownKind,shownMode));
         for(int i=0;i<4;i++)tag.remove("selection"+i);tag.remove("selectionDimension");tag.remove("artifactSource");tag.remove("artifactTarget");tag.remove("artifactTransform");

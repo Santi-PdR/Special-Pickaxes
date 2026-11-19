@@ -30,6 +30,14 @@ public final class RegionWork implements WorkProgram {
         registeredStates=Block.BLOCK_STATE_REGISTRY.size();
     }
     public long total(){return source.size();}
+    private BlockPos cell(long index){return kind==ArtifactKind.CRUCIBLE?ParadoxOrder.at(source,index,mode):source.at(index);}
+    private int visualTick=Integer.MIN_VALUE;
+    public void reportProgress(ServerPlayer p){
+        int now=p.server.getTickCount();
+        if(kind==ArtifactKind.CRUCIBLE&&cursor>0&&(visualTick==Integer.MIN_VALUE||now-visualTick>=8)){
+            visualTick=now;AbilityVfx.paradoxKnot(p,cell(cursor-1),executing);
+        }
+    }
     public long reservedMemoryBytes(java.util.List<ArtifactState.Memory> memories){
         long bytes=BlockIdSnapshot.memoryBytesFor((int)source.size(),registeredStates)*(target==null?1L:2L);
         if(needsRestoration())for(var memory:memories)if(source.contains(memory.pos()))bytes+=RESTORATION_ENTRY_BYTES;
@@ -48,22 +56,22 @@ public final class RegionWork implements WorkProgram {
     public boolean executing(){return executing;}
     public boolean done(){return executing && cursor==total();}
     public void confirm(){if(awaiting()){executing=true;cursor=0;}}
-    public boolean loaded(ServerPlayer p){if(cursor==total())return true;var pos=source.at(cursor);return p.serverLevel().hasChunkAt(pos)&&(target==null||p.serverLevel().hasChunkAt(transform.map(source,target,pos)));}
+    public boolean loaded(ServerPlayer p){if(cursor==total())return true;var pos=cell(cursor);return p.serverLevel().hasChunkAt(pos)&&(target==null||p.serverLevel().hasChunkAt(transform.map(source,target,pos)));}
     public boolean backpressured(ServerPlayer p){
-        if(!executing||target!=null||kind!=ArtifactKind.WORLDBREAKER||mode!=0&&mode!=1&&mode!=5||cursor>=total())return false;
-        var pos=source.at(cursor);var level=p.serverLevel();if(!level.hasChunkAt(pos))return false;
+        if(!executing||target!=null||cursor>=total()||!(kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1||mode==5)))return false;
+        var pos=cell(cursor);var level=p.serverLevel();if(!level.hasChunkAt(pos))return false;
         var state=level.getBlockState(pos);
         return eligible(p,state,pos)&&WorldSafety.backpressuredMine(p,p.getMainHandItem(),kind,pos,state);
     }
     public WorkStep next(ServerPlayer p){
-        int index=(int)cursor;BlockPos pos=source.at(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
+        int index=(int)cursor;BlockPos pos=cell(cursor++);var level=p.serverLevel();var old=level.getBlockState(pos);
         BlockPos other=target==null?null:transform.map(source,target,pos);
         BlockState second=other==null?null:level.getBlockState(other);
         if(!executing){expectedSource.set(index,Block.getId(old));if(second!=null)expectedTarget.set(index,Block.getId(second));}
         if(executing&&(Block.getId(old)!=expectedSource.get(index)||second!=null&&Block.getId(second)!=expectedTarget.get(index)))return skip(pos);
         if(!executing)return new WorkStep(){
             public BlockPos pos(){return pos;}
-            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&!WorldSafety.barrier(actor,pos)&&eligible(actor,old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1||mode==5))ok=WorldSafety.harvestable(actor,tool,pos);
+            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind k){boolean ok=WorldSafety.allowed(actor,k,pos)&&!WorldSafety.barrier(actor,pos)&&eligible(actor,old,pos)&&(other==null||WorldSafety.allowed(actor,k,other)&&(WorldSafety.inert(second)||WorldSafety.vacant(second)));if(ok&&(kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1||mode==5)))ok=WorldSafety.harvestable(actor,tool,pos);
                 if(ok&&other!=null)ok=kind==ArtifactKind.TESSELLATOR?WorldSafety.inert(old)&&WorldSafety.vacant(second):old!=second&&!(WorldSafety.vacant(old)&&WorldSafety.vacant(second));
                 if(ok)eligible++;else excluded++;return ok;}
         };
@@ -80,7 +88,8 @@ public final class RegionWork implements WorkProgram {
             // Indexed lookup assembled once at confirmation, never scan thousands of records per voxel.
             return new WorkStep.Place(pos,restoration.getOrDefault(pos,Blocks.AIR.defaultBlockState()));
         }
-        if(kind==ArtifactKind.CRUCIBLE||kind==ArtifactKind.WORLDBREAKER&&mode==2)return new WorkStep.Rephase(pos,old,material);
+        if(kind==ArtifactKind.CRUCIBLE)return eligible(p,old,pos)?new WorkStep.Mine(pos,old,true):skip(pos);
+        if(kind==ArtifactKind.WORLDBREAKER&&mode==2)return new WorkStep.Rephase(pos,old,material);
         if(kind==ArtifactKind.WORLDBREAKER&&mode==1&&!carve(pos))return new WorkStep(){public BlockPos pos(){return pos;}public boolean apply(ServerPlayer a,ItemStack t,ArtifactKind k){return false;}};
         return new WorkStep.Mine(pos,old);
     }
@@ -123,7 +132,7 @@ public final class RegionWork implements WorkProgram {
         if(kind==ArtifactKind.WORLDBREAKER&&(mode==0||mode==1))return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&(mode==0||carve(pos));
         if(kind==ArtifactKind.WORLDBREAKER&&mode==5)return ArtifactTools.effective(s)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&s.getDestroySpeed(p.serverLevel(),pos)>=0;
         if(kind==ArtifactKind.CRUCIBLE)
-            return WorldSafety.crucibleSource(p,pos,s)&&material!=null&&s.getBlock()!=material.getBlock();
+            return NaturalExcavationProgram.eligible(s)&&!PlayerPlacedBlocks.get(p.serverLevel()).contains(pos);
         return WorldSafety.inert(s);
     }
     /** Elliptical bore follows the selected Z axis; corners are preserved. */

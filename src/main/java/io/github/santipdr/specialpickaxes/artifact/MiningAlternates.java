@@ -48,11 +48,7 @@ public final class MiningAlternates {
             if(!ArtifactOres.isOre(level.getBlockState(origin)))return false;
             return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,false));
         }else if(kind==ArtifactKind.CRUCIBLE){
-            var state=level.getBlockState(origin);
-            var materials=new net.minecraft.world.level.block.Block[]{Blocks.STONE,Blocks.DEEPSLATE,Blocks.GRANITE,Blocks.DIORITE,Blocks.ANDESITE,Blocks.DIRT,Blocks.BASALT,Blocks.OBSIDIAN,Blocks.CALCITE,Blocks.TUFF,Blocks.DRIPSTONE_BLOCK,Blocks.GRAVEL};
-            var next=materials[Math.floorMod(ArtifactState.mode(player,kind),materials.length)].defaultBlockState();
-            if(!WorldSafety.inert(state)||PlayerPlacedBlocks.get(level).contains(origin))return false;
-            return WorkQueue.startRegion(player,tool,kind,new RadialMiningProgram(origin,12,kind,ArtifactState.mode(player,kind),next));
+            return ParadoxLattice.start(player,tool);
         }else if(kind==ArtifactKind.INTERREGNUM){
             return WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(origin,kind,true));
         }else return false;

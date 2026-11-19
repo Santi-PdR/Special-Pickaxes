@@ -20,78 +20,11 @@ MODES={'palimpsest': {'solar_rupture': ('SOLAR RUPTURE: fracture the earth with 
                               'CRECIENTE VERTICAL: corta un gran disco crepuscular.',
                               'Vertical crescent: radius 18, thickness 7, 7063 candidate cells, oriented to your heading. No entity attraction or repulsion.',
                               'Creciente vertical: radio 18, grosor 7, 7063 celdas candidatas, orientado a tu dirección. No atrae ni repele entidades.')},
- 'paradox_crucible': {'stone': ('TRANSFORM: Stone',
-                                'TRANSFORMAR: Piedra',
-                                'Select two corners, wait for analysis and confirm. Only natural geology in '
-                                'the region changes to Stone.',
-                                'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                'geología natural de la región a piedra.'),
-                      'deepslate': ('TRANSFORM: Deepslate',
-                                    'TRANSFORMAR: Pizarra profunda',
-                                    'Select two corners, wait for analysis and confirm. Only natural geology '
-                                    'in the region changes to Deepslate.',
-                                    'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                    'geología natural de la región a pizarra profunda.'),
-                      'granite': ('TRANSFORM: Granite',
-                                  'TRANSFORMAR: Granito',
-                                  'Select two corners, wait for analysis and confirm. Only natural geology '
-                                  'in the region changes to Granite.',
-                                  'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                  'geología natural de la región a granito.'),
-                      'diorite': ('TRANSFORM: Diorite',
-                                  'TRANSFORMAR: Diorita',
-                                  'Select two corners, wait for analysis and confirm. Only natural geology '
-                                  'in the region changes to Diorite.',
-                                  'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                  'geología natural de la región a diorita.'),
-                      'andesite': ('TRANSFORM: Andesite',
-                                   'TRANSFORMAR: Andesita',
-                                   'Select two corners, wait for analysis and confirm. Only natural geology '
-                                   'in the region changes to Andesite.',
-                                   'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                   'geología natural de la región a andesita.'),
-                      'dirt': ('TRANSFORM: Dirt',
-                               'TRANSFORMAR: Tierra',
-                               'Select two corners, wait for analysis and confirm. Only natural geology in '
-                               'the region changes to Dirt.',
-                               'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                               'geología natural de la región a tierra.'),
-                      'basalt': ('TRANSFORM: Basalt',
-                                 'TRANSFORMAR: Basalto',
-                                 'Select two corners, wait for analysis and confirm. Only natural geology in '
-                                 'the region changes to Basalt.',
-                                 'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                 'geología natural de la región a basalto.'),
-                      'obsidian': ('TRANSFORM: Obsidian',
-                                   'TRANSFORMAR: Obsidiana',
-                                   'Select two corners, wait for analysis and confirm. Only natural geology '
-                                   'in the region changes to Obsidian.',
-                                   'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                   'geología natural de la región a obsidiana.'),
-                      'calcite': ('TRANSMUTE: Calcite',
-                                  'TRANSFORMAR: Calcita',
-                                  'Select two corners, wait for the analysis, then confirm. Changes only '
-                                  'natural geology in the region to calcite.',
-                                  'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                  'geología natural de la región a calcita.'),
-                      'tuff': ('TRANSMUTE: Tuff',
-                               'TRANSFORMAR: Toba',
-                               'Select two corners, wait for the analysis, then confirm. Changes only '
-                               'natural geology in the region to tuff.',
-                               'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                               'geología natural de la región a toba.'),
-                      'dripstone': ('TRANSMUTE: Dripstone',
-                                    'TRANSFORMAR: Espeleotema',
-                                    'Select two corners, wait for the analysis, then confirm. Changes only '
-                                    'natural geology in the region to dripstone.',
-                                    'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                    'geología natural de la región a espeleotema.'),
-                      'gravel': ('TRANSMUTE: Gravel',
-                                 'TRANSFORMAR: Grava',
-                                 'Select two corners, wait for the analysis, then confirm. Changes only '
-                                 'natural geology in the region to gravel.',
-                                 'Selecciona dos esquinas, espera el análisis y confirma. Solo cambia la '
-                                 'geología natural de la región a grava.')},
+ 'paradox_crucible': {key: ('CAUSAL FRACTURE: record natural terrain, then detonate it.',
+                                'FRACTURA CAUSAL: registra terreno natural y detónalo después.',
+                                'Select two corners, analyze and confirm. Excavates exact recorded natural rock and ore with native drops. Mode selects release order, never output material.',
+                                'Selecciona dos esquinas, analiza y confirma. Excava roca y menas naturales registradas con drops nativos. El modo elige el orden de ruptura, nunca un material de salida.')
+                      for key in ['stone','deepslate','granite','diorite','andesite','dirt','basalt','obsidian','calcite','tuff','dripstone','gravel']},
  'interregnum': {'domain': ('DOMAIN: a marked 16×16×8 Stasis field that supports nearby teammates.',
                             'DOMINIO: campo Stasis marcado de 16×16×8 que ayuda a compañeros.',
                             'Aim at a location and activate. Its visible border marks the 16×16×8 field. '

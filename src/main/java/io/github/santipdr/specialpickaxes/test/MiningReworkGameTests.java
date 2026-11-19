@@ -470,7 +470,7 @@ public final class MiningReworkGameTests {
         for(int tick=0;tick<100&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready"),"analysis completes before applying changes");h.assertTrue(WorkQueue.togglePause(p),"explicitly confirm analyzed transformation");
         for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(h.getLevel().getBlockState(granite).is(Blocks.BASALT)&&h.getLevel().getBlockState(dirt).is(Blocks.BASALT),"natural stone and soil transform");
+        h.assertTrue(h.getLevel().getBlockState(granite).isAir()&&h.getLevel().getBlockState(dirt).isAir(),"natural stone and soil are excavated, not converted");
         h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.DIORITE),"marked player placement stays unchanged");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(chest).is(Blocks.CHEST),"ore and inventory stay unchanged");finish(h,p);
     }
@@ -487,7 +487,7 @@ public final class MiningReworkGameTests {
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick"); // GameTest advances work synchronously without advancing world time.
         h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"the normal confirm control resumes the conversion");
         for(int tick=0;tick<100&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.TUFF)&&h.getLevel().getBlockState(b).is(Blocks.TUFF),"calcite and obsidian both transmute to selected tuff");
+        h.assertTrue(h.getLevel().getBlockState(a).isAir()&&h.getLevel().getBlockState(b).isAir(),"calcite and obsidian are harvested with native drops, never converted to tuff");
         finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_16") public static void staleSameKindToolIntentIsRejected(GameTestHelper h){

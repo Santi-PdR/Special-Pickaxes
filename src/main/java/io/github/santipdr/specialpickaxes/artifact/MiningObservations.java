@@ -51,6 +51,11 @@ public final class MiningObservations {
                 ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
         return capture(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,pos,state,false,new EquipmentLease<>(curio,current));
     }
+    public static boolean captureCuriosParadox(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
+        if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.CRUCIBLE
+                ||!NaturalExcavationProgram.eligible(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        return capture(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,pos,state,false,new EquipmentLease<>(curio,current));
+    }
     /** Dawn in Curios lights only newly produced loot; it never searches for ore. */
     public static boolean captureCuriosDawn(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.PALIMPSEST)return false;
@@ -91,6 +96,7 @@ public final class MiningObservations {
                 if(o.solarDrops&&o.dropsBeforeComplete&&valid(o))highlightNewSolarDrops(p,o);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CHOIR&&valid(o))ResonantFault.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.EVENTIDE&&valid(o))EventideRupture.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.CRUCIBLE&&valid(o))ParadoxLattice.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }
@@ -136,6 +142,6 @@ public final class MiningObservations {
             return inspected[0]>=DROP_QUERY_LIMIT?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT:net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });
     }
-    public static void forget(ServerPlayer p) { ResonantFault.forget(p);PENDING.removeIf(o -> o.player.getUUID().equals(p.getUUID())); }
-    public static void clear() { PENDING.clear();ResonantFault.clear(); }
+    public static void forget(ServerPlayer p) { ResonantFault.forget(p);ParadoxLattice.forget(p);PENDING.removeIf(o -> o.player.getUUID().equals(p.getUUID())); }
+    public static void clear() { PENDING.clear();ResonantFault.clear();ParadoxLattice.clear(); }
 }

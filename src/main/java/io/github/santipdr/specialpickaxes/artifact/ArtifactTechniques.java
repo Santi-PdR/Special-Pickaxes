@@ -160,7 +160,8 @@ public final class ArtifactTechniques {
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         return switch (kind) {
-            case CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
+            case INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
+            case CRUCIBLE -> ParadoxLattice.start(player,tool);
             case CHOIR -> ResonantFault.start(player,tool,ResonantFault.Form.CASCADE);
             case PALIMPSEST -> SolarRupture.start(player,tool,SolarRupture.Form.NOVA);
             case EVENTIDE -> EventideRupture.start(player,tool,EventideRupture.Form.HORIZON);

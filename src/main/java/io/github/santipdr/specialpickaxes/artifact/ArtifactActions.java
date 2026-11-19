@@ -109,6 +109,7 @@ public final class ArtifactActions {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
         if(kind==ArtifactKind.SEAM_RIPPER)return DirectAbilities.activate(p,tool,kind);
+        if(kind==ArtifactKind.CRUCIBLE)return ArtifactInteraction.use(p,tool,kind,false);
         if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
             try{
                 var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));
@@ -167,15 +168,6 @@ public final class ArtifactActions {
         if(kind==ArtifactKind.WORLDLOOM){
             boolean started=MiningDesigns.worldloomBore(p,tool,center);
             if(started){var look=Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z);ArtifactFeedback.worldloomBore(p,center,look);ArtifactFeedback.message(p,"worldloom_bore_started");}
-            return started;
-        }
-        if(kind==ArtifactKind.CRUCIBLE){
-            var program=new RadialMiningProgram(center,r,kind,ArtifactState.mode(p,kind),
-                    kind==ArtifactKind.CRUCIBLE?geologyMaterial(p,ArtifactState.mode(p,kind)):null);
-            boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){
-                ArtifactFeedback.ring(p,kind,center,r);ArtifactFeedback.message(p,"queued",program.remaining());
-            }
             return started;
         }
         if(kind==ArtifactKind.HELLSPEC) {

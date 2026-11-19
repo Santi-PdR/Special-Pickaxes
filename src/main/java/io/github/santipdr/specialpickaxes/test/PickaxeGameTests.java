@@ -169,7 +169,7 @@ public final class PickaxeGameTests {
         if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE),"exposure preserves the ore core");
         h.assertTrue(!ArtifactSkills.use(wearer,wearer.getMainHandItem(),kind),"ordinary cooldown still blocks a replay");
         drain(wearer);
-        if(kind==ArtifactKind.CRUCIBLE)h.assertTrue(level.getBlockState(at).is(Blocks.CALCITE),"sample really rephases the aimed stone to the selected finish");
+        if(kind==ArtifactKind.CRUCIBLE)h.assertTrue(level.getBlockState(at).isAir(),"causal lattice harvests its natural target instead of producing a selected material");
         if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC)
             h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
         if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).isAir(),"exposure clears adjacent stone and preserves its ore");
@@ -3086,7 +3086,7 @@ public final class PickaxeGameTests {
                 &&MiningDesigns.matrix(Blocks.CUT_SANDSTONE.defaultBlockState())
                 &&MiningDesigns.matrix(Blocks.CLAY.defaultBlockState()),"shared mining designs recognize polished rock, sandstone and clay as geology");
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",8);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"calcite rephase activates");drain(p);
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RadialMiningProgram(center,12,ArtifactKind.CRUCIBLE,8,Blocks.CALCITE.defaultBlockState())),"calcite rephase activates");drain(p);
         for(var entry:convertible.entrySet())h.assertTrue(level.getBlockState(entry.getKey()).is(Blocks.CALCITE),entry.getValue()+" rephases to calcite");
         h.assertTrue(level.getBlockState(chest).is(Blocks.CHEST)&&level.getBlockState(ore).is(Blocks.DIAMOND_ORE),"containers and ores are preserved");
         h.assertTrue(level.getBlockState(placed).is(Blocks.CALCITE)&&level.getBlockState(bedrock).is(Blocks.BEDROCK)&&level.getBlockState(fluid).is(Blocks.WATER),"player-placed geology, bedrock and fluids are preserved");
@@ -3099,7 +3099,7 @@ public final class PickaxeGameTests {
         level.setBlockAndUpdate(pos,Blocks.CALCITE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(pos);
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
         h.assertTrue(MiningDesigns.crucibleGeology(level.getBlockState(pos)),"calcite is an eligible natural geology source");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible starts over calcite");drain(p);
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RadialMiningProgram(pos,12,ArtifactKind.CRUCIBLE,7,Blocks.OBSIDIAN.defaultBlockState())),"Crucible starts over calcite");drain(p);
         h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"calcite rephases to the selected obsidian output");
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"calcite rephase creates no drops");
         finish(h,p);
@@ -3112,7 +3112,7 @@ public final class PickaxeGameTests {
                 "common modded igneous and sedimentary rock names count as geology");
         level.setBlockAndUpdate(pos,gabbro);PlayerPlacedBlocks.get(level).unmark(pos);
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible can target third-party rock");drain(p);
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RadialMiningProgram(pos,12,ArtifactKind.CRUCIBLE,7,Blocks.OBSIDIAN.defaultBlockState())),"Crucible can target third-party rock");drain(p);
         h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"third-party rock rephases without drops into the selected output");
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"modded geology rephase creates no drops");
         finish(h,p);
@@ -3132,7 +3132,7 @@ public final class PickaxeGameTests {
                 "functional Terramity lamp and poker-chip dispenser are not geology");
         level.setBlockAndUpdate(pos,moonstone);PlayerPlacedBlocks.get(level).unmark(pos);
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"Crucible can target Terramity moonstone");drain(p);
+        h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,new RadialMiningProgram(pos,12,ArtifactKind.CRUCIBLE,7,Blocks.OBSIDIAN.defaultBlockState())),"Crucible can target Terramity moonstone");drain(p);
         h.assertTrue(level.getBlockState(pos).is(Blocks.OBSIDIAN),"Terramity moonstone rephases to the selected material");
         h.assertTrue(level.getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(1)).isEmpty(),"Terramity geology rephase creates no drops");
         finish(h,p);
@@ -4248,7 +4248,7 @@ public final class PickaxeGameTests {
         for(int tick=0;tick<10&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE)&&WorkQueue.status(p).equals("ready"),"analysis never mutates and requires confirmation");
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"R confirms analyzed operation");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.BASALT),"confirmed operation transforms");ArtifactInteraction.clear(p);
+        h.assertTrue(h.getLevel().getBlockState(a).isAir(),"confirmed causal fracture harvests instead of transmuting");ArtifactInteraction.clear(p);
         h.assertTrue(p.getMainHandItem().getDestroySpeed(Blocks.STONE.defaultBlockState())>1F,"normal mining speed returns after selection");finish(h,p);
     }
 
@@ -4409,7 +4409,7 @@ public final class PickaxeGameTests {
         RelicControl.corner(p,at);RelicControl.corner(p,at.east());for(int tick=0;tick<10&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready")&&h.getLevel().getBlockState(at).is(Blocks.STONE),"last corner analyzes without mutation");
         inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"R confirms analyzed region");for(int tick=0;tick<10&&WorkQueue.busy(p);tick++)WorkQueue.tick();
-        h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.OBSIDIAN),"confirmed region executes");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir(),"confirmed fracture excavates and ignores the offhand material");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_41") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);
