@@ -3054,9 +3054,16 @@ public final class PickaxeGameTests {
 
     @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"transmutation activates");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(pos).is(Blocks.OBSIDIAN),"curated rephase applied");
-        h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(0.8)).isEmpty(),"no extra drops from replacement");finish(h,p);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"causal selection arms");
+        h.assertTrue(ArtifactInteraction.left(p,pos,false)&&ArtifactInteraction.left(p,pos.east(),false),"record two corners");
+        ArtifactInteraction.analyzeComplete(p);
+        for(int tick=0;tick<20&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
+        h.assertTrue(WorkQueue.status(p).equals("ready")&&h.getLevel().getBlockState(pos).is(Blocks.STONE),"analysis preserves recorded terrain until confirmed");
+        h.assertTrue(WorkQueue.togglePause(p),"explicitly detonate recorded fracture");
+        for(int tick=0;tick<20&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(pos).isAir(),"fracture harvests instead of creating obsidian");
+        h.assertTrue(!h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(pos).inflate(2),e->e.getItem().is(Items.COBBLESTONE)).isEmpty(),"natural stone produces native cobblestone loot");
+        ArtifactInteraction.clear(p);finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_42") public static void crucibleRephasesCommonAndDeepGeologyButKeepsOresAndContainers(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var center=target(h);var level=h.getLevel();
