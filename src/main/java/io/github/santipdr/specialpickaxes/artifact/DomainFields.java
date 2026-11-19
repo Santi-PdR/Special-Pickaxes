@@ -166,6 +166,13 @@ public final class DomainFields {
         if(f.kind==ArtifactKind.INTERREGNUM)return Math.abs(pos.getX()-f.center.getX())<=f.radius&&Math.abs(pos.getZ()-f.center.getZ())<=f.radius&&Math.abs(pos.getY()-f.center.getY())<=Math.max(2,f.radius/2);
         return f.kind==ArtifactKind.EVENTIDE&&pos.distSqr(f.center)<=f.radius*f.radius;
     }
+    /** Visual telemetry only. No client request can extend the authoritative field. */
+    public static int remainingStasisTicks(ServerPlayer owner){
+        var field=FIELDS.get(owner.getUUID());
+        if(field==null||field.kind!=ArtifactKind.INTERREGNUM||owner.getMainHandItem()!=field.tool
+                ||field.tool.isEmpty()||owner.level().dimension()!=field.dimension)return 0;
+        return (int)Math.max(0,Math.min(Integer.MAX_VALUE,field.expires-ArtifactState.now(owner)));
+    }
     public static boolean frozen(Entity entity) {
         return entity!=null && FROZEN_ENTITIES.containsKey(entity.getUUID());
     }

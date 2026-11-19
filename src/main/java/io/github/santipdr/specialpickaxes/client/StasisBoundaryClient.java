@@ -25,7 +25,7 @@ import java.util.UUID;
 public final class StasisBoundaryClient {
     private static final net.minecraft.core.particles.DustParticleOptions BOUNDARY_GLOW=
             new net.minecraft.core.particles.DustParticleOptions(new Vector3f(.95F,.78F,.42F),.9F);
-    private record Boundary(ResourceLocation dimension,BlockPos center,int radius,int halfHeight,long lastSeen){}
+    private record Boundary(ResourceLocation dimension,BlockPos center,int radius,int halfHeight,long lastSeen,int remaining,int total){}
     private static final Map<UUID,Boundary> BOUNDARIES=new HashMap<>();
     private static long clientTicks;
 
@@ -35,7 +35,7 @@ public final class StasisBoundaryClient {
         if(!update.visible()){BOUNDARIES.remove(update.owner());return;}
         var dimension=ResourceLocation.tryParse(update.dimension());
         if(dimension==null||update.radius()<1||update.radius()>16||update.halfHeight()<1||update.halfHeight()>16)return;
-        BOUNDARIES.put(update.owner(),new Boundary(dimension,BlockPos.of(update.center()),update.radius(),update.halfHeight(),clientTicks));
+        BOUNDARIES.put(update.owner(),new Boundary(dimension,BlockPos.of(update.center()),update.radius(),update.halfHeight(),clientTicks,Math.max(0,update.remainingTicks()),Math.max(1,update.totalTicks())));
         if(BOUNDARIES.size()>32){var oldest=BOUNDARIES.entrySet().stream().min(java.util.Comparator.comparingLong(entry->entry.getValue().lastSeen())).orElse(null);if(oldest!=null)BOUNDARIES.remove(oldest.getKey());}
     }
 
@@ -59,6 +59,15 @@ public final class StasisBoundaryClient {
                 if(mc.player.distanceToSqr(center.getX()+.5D,center.getY()+.5D,center.getZ()+.5D)>(48D+radius)*(48D+radius))continue;
                 var box=new AABB(center.getX()-radius,center.getY()-height,center.getZ()-radius,
                         center.getX()+radius+1D,center.getY()+height+1D,center.getZ()+radius+1D);
+                // Four world-space hourglass rails shrink with server-owned remaining lifetime.
+                // This is part of the boundary, not an equipment HUD or screen overlay.
+                double fraction=io.github.santipdr.specialpickaxes.artifact.StasisLifetime.fraction(boundary.remaining(),boundary.total(),clientTicks-boundary.lastSeen());
+                float red=fraction<.2?.98F:.42F,green=fraction<.2?.55F:.85F;
+                for(int corner=0;corner<4;corner++){
+                    var top=StasisBoundaryGeometry.upperCorner(center,radius,height,corner);
+                    double base=center.getY()-height,fill=base+(2*height+1)*fraction;
+                    LevelRenderer.renderLineBox(pose,lines,new AABB(top.x-.09,base,top.z-.09,top.x+.09,fill,top.z+.09),red,green,1F,.95F);
+                }
                 // Cool cyan edges mark the actual buff volume; a small alpha wave keeps long edges legible.
                 double phase=(clientTicks+event.getPartialTick())*.15D;
                 float edgeAlpha=.72F+(float)(.06D*(.5D+.5D*Math.sin(phase*.35D)));

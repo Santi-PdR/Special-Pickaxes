@@ -9,7 +9,7 @@ import net.minecraftforge.network.*;
 
 /** One bounded intent packet; all authority stays on the server thread. */
 public final class RelicNetwork {
-    private static final String VERSION="10";
+    private static final String VERSION="11";
     public static final net.minecraftforge.network.simple.SimpleChannel CHANNEL=NetworkRegistry.newSimpleChannel(new ResourceLocation("specialpickaxes","controls"),()->VERSION,VERSION::equals,VERSION::equals);
     public record Intent(ArtifactKind kind,RelicControl.Action action,long sequence,java.util.UUID toolIdentity){}
     public record CopyChoice(ArtifactKind source,long sequence,java.util.UUID toolIdentity){}
@@ -59,8 +59,14 @@ public final class RelicNetwork {
     }
     private static void sendStasisBoundary(ServerPlayer owner,BlockPos center,int radius,int halfHeight,
                                            net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,boolean visible){
-        // Persistent field cosmetics deliberately retired: successful activation has one custom burst.
-
+        int remaining=visible?DomainFields.remainingStasisTicks(owner):0;
+        if(visible&&remaining<=0)return;
+        var message=new StasisBoundaryMessage(owner.getUUID(),dimension.location().toString(),center.asLong(),radius,halfHeight,
+                visible,remaining,Math.max(remaining,ArtifactConfig.FIELD_TIME.get()));
+        for(var viewer:owner.serverLevel().players()){
+            if(viewer==owner||viewer.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(center))<=(48D+radius)*(48D+radius))
+                CHANNEL.send(PacketDistributor.PLAYER.with(()->viewer),message);
+        }
     }
     public static void forget(net.minecraft.server.level.ServerPlayer p){SEEN.remove(p.getUUID());AbilityVfx.forget(p);}
     public static void clear(){SEEN.clear();AbilityVfx.clear();}

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class StasisBoundaryCodecTest {
     @Test void visibleBoundaryRoundTripsItsDimensionAndExactVolume(){
         var message=new StasisBoundaryMessage(UUID.fromString("b74a2277-b7bc-4d99-93e8-6e21dc1555b4"),
-                "minecraft:the_nether",new net.minecraft.core.BlockPos(-129,72,511).asLong(),8,4,true);
+                "minecraft:the_nether",new net.minecraft.core.BlockPos(-129,72,511).asLong(),8,4,true,321,1200);
         var buffer=new FriendlyByteBuf(Unpooled.buffer());
         StasisBoundaryCodec.encode(message,buffer);
         assertEquals(message,StasisBoundaryCodec.decode(buffer));

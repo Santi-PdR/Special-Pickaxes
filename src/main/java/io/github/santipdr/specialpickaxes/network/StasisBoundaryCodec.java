@@ -14,10 +14,12 @@ public final class StasisBoundaryCodec {
         buffer.writeVarInt(message.radius());
         buffer.writeVarInt(message.halfHeight());
         buffer.writeBoolean(message.visible());
+        buffer.writeVarInt(message.remainingTicks());
+        buffer.writeVarInt(message.totalTicks());
     }
 
     public static StasisBoundaryMessage decode(FriendlyByteBuf buffer){
         return new StasisBoundaryMessage(buffer.readUUID(),buffer.readUtf(MAX_DIMENSION_LENGTH),buffer.readLong(),
-                buffer.readVarInt(),buffer.readVarInt(),buffer.readBoolean());
+                buffer.readVarInt(),buffer.readVarInt(),buffer.readBoolean(),buffer.readVarInt(),buffer.readVarInt());
     }
 }
