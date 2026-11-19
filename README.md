@@ -1,4 +1,13 @@
-# Special Pickaxes — 5.18.0
+# Special Pickaxes — reforma 6.0 en desarrollo
+
+**Código actual: `6.0.0-alpha.1`, todavía no es la reforma completa ni una entrega final.**
+
+Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Las 11 habilidades nuevas y variantes Curios todavía están pendientes: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de esta base: [44429871556](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44429871556).
+
+---
+
+## Última entrega anterior: 5.18.0
+
 
 **Build verificada de prueba personal; no es una certificación de todos los modpacks.**
 

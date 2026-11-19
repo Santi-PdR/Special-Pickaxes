@@ -1,8 +1,14 @@
+## Reforma 6.0 — base alpha.1, incompleta
+
+Fuente `b2b8bead6368465087c3da15201817ecde40f7fb`. CI `44429871556` en curso al registrar este estado; no afirmar aún validación Java/cliente. Local: 137 Python (una omisión sin Java), 25 recursos correctos. Eliminación efectiva del renderer de HUD, tooltips idénticos con/sin SHIFT, errores breves, catálogo completo es_uy, tarjeta Curios actual en I y render real ampliado. Arte y clases dedicadas de Iridium/Strata congelados por SHA256. [Contrato y trabajo pendiente](REFORM-6.md).
+
+No se reemplazaron todavía las 11 identidades ni sus variantes Curios. No se presenta la tabla de diseño como habilidades implementadas. No publicar alpha como reforma final. El enfoque de calzada 5.19 queda sustituido por la petición mayor del usuario; aunque su CI `44426271408` pasó, eso no valida 6.0 ni convierte su diseño en el objetivo nuevo.
+
 ## 5.18.0 — instalable personal, CI aprobada
 
 Fuente `5c10ccb452afbeb667cd4c2e4ef8e4c65eed5282`, CI `44416777028`: SUCCESS. 178 JUnit sin fallos/errores/omisiones, 420 GameTests obligatorios, 32 escenas/64 tooltips, servidor empaquetado y logs aprobados. Kit de 13 picos con rechazo íntegro si falta espacio, HUD adaptable y causas de pausa localizadas, lectura de cooldown coherente con validación de servidor. [Instalación, descarga y límites](PLAY-5.18.md).
 
-JAR 804691 bytes, SHA256 `c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c`. Artefacto personal `14480089792`, evidencia `14480139804`, retención 7 días. Descarga CDN bloqueada aquí; no hay copia local ni publicación pública. Primer run falló en fixture preexistente de Ícaro; segundo pasó con diagnósticos más estrictos, sin relajar aserciones. Causa intermitente sin confirmar. No certificación Windows/modpacks ni 50 nuevas mecánicas.
+JAR 804691 bytes, SHA256 `c47921400e6865fcdfa86c96b958bd8e07b6d14bb78a5eec191570554e5ee54c`. Artefacto personal `14480089792`, evidencia `14480139804`, retención 7 días. Posteriormente se publicó el JAR exacto por solicitud expresa: release `test-5.18.0-44416777028`, workflow `44421388453` aprobado, tamaño y digest confirmados por API. Primer run falló en fixture preexistente de Ícaro; segundo pasó con diagnósticos más estrictos, sin relajar aserciones. Causa intermitente sin confirmar. No certificación Windows/modpacks ni 50 nuevas mecánicas.
 
 ## 5.17.0 — guía activada de sondeo, CI aprobada
 
