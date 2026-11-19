@@ -38,3 +38,5 @@ class MajorReformContracts(unittest.TestCase):
         source = (ROOT/'src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
         self.assertIn('"passive.specialpickaxes."+kind.id', source)
         self.assertIn('g.renderItem(shownIcon,0,0)', source)
+        self.assertIn('case "screen.specialpickaxes.curios"->"03"', source)
+        self.assertIn('default->"04"', source)

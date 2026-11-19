@@ -223,7 +223,7 @@ public final class ArtifactManualScreen extends Screen {
                 g.fill(x,cursor,x+2,cursor+18,card.section.color);
                 g.fill(x+3,cursor+1,x+cardWidth-1,cursor+18,0xff1b2630);
 
-                String number=switch(card.section.key){case "screen.specialpickaxes.main"->"01";case "screen.specialpickaxes.alternate"->"02";default->"03";};
+                String number=switch(card.section.key){case "screen.specialpickaxes.main"->"01";case "screen.specialpickaxes.alternate"->"02";case "screen.specialpickaxes.curios"->"03";default->"04";};
                 g.fill(x+8,cursor+3,x+24,cursor+14,0xff101a24);
                 g.drawString(font,number,x+10,cursor+5,card.section.color,false);
                 String heading=fit(card.section.heading,Math.max(0,cardWidth-42));
