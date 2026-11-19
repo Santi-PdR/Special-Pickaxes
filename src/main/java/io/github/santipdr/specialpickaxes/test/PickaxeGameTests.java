@@ -1818,6 +1818,16 @@ public final class PickaxeGameTests {
         h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get())&&!IcarianFlight.active(p),"equipped passive has its own timed defensive behavior, not automatic thrust");finish(h,p);
     }
 
+    @GameTest(template="empty",batch="reform_602_07",timeoutTicks=80) public static void ascentDeadlineEndsWithoutPermanentFlight(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"finite ascent starts");
+        h.runAfterDelay(IcarianFlight.DURATION+2,()->{IcarianFlight.tick();h.assertTrue(!IcarianFlight.active(p),"server deadline ends the job even if the actor does not move");finish(h,p);});
+    }
+    @GameTest(template="empty",batch="reform_602_08") public static void ascentDetectsExternalTeleportBetweenTicks(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"ascent starts");
+        var external=p.position().add(6,0,0);p.setPos(external);IcarianFlight.tick();
+        h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(external)&&p.getDeltaMovement().equals(Vec3.ZERO),"external teleport ends the old job without a stale impulse");finish(h,p);
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }

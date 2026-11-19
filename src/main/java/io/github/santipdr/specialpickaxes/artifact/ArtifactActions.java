@@ -124,7 +124,9 @@ public final class ArtifactActions {
             var context=HeldUtilityContext.capture(p,tool);var at=aimed.get();
             if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.serverLevel().hasChunkAt(at)
                     ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-            return WorkQueue.startRegion(p,tool,kind,new IcarianWingcut(at,p.getDirection(),ArtifactState.mode(p,kind)==1));
+            int wingMode=tool.getItem() instanceof ArtifactItem nativeTool&&nativeTool.kind==ArtifactKind.WORLDBREAKER
+                    ?tool.getOrCreateTag().getInt("copiedMode"):ArtifactState.mode(p,kind);
+            return WorkQueue.startRegion(p,tool,kind,new IcarianWingcut(at,p.getDirection(),wingMode==1));
         }
         if(kind==ArtifactKind.WORLDBREAKER||kind==ArtifactKind.EXODIUM||kind==ArtifactKind.CHOIR) {
             boolean started=MiningDesigns.drill(p,tool,kind);

@@ -40,3 +40,13 @@ class MajorReformContracts(unittest.TestCase):
         self.assertIn('g.renderItem(shownIcon,0,0)', source)
         self.assertIn('case "screen.specialpickaxes.curios"->"03"', source)
         self.assertIn('default->"04"', source)
+
+    def test_new_icarus_entrypoints_never_reference_legacy_lift_or_relocation(self):
+        base = ROOT/'src/main/java/io/github/santipdr/specialpickaxes/artifact'
+        for filename in ('IcarianFlight.java','IcarianWingcut.java'):
+            source=(base/filename).read_text()
+            for forbidden in ('.teleport(','.setPos(', 'WorldSafety.move(', 'new WorkStep.Move('):
+                self.assertNotIn(forbidden,source)
+        techniques=(base/'ArtifactTechniques.java').read_text()
+        self.assertIn('case ICARUS -> IcarianFlight.start(player,tool)',techniques)
+        self.assertNotIn('new IcarianLiftProgram',techniques)
