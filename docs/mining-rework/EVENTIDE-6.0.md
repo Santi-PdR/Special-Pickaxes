@@ -1,4 +1,4 @@
-# Ocaso / Eventide — alpha.5, validación pendiente
+# Ocaso / Eventide — alpha.5 validada
 
 Arte intacto, sin cambios en las clases dedicadas de Iridium/Strata.
 
@@ -21,4 +21,10 @@ El imán secundario se retira del dispatch y se elimina su método. Las utilidad
 
 ## Validación
 
-Pendiente de compilación/JUnit/GameTests/cliente/servidor en CI. Recursos y Python locales comprobados antes del push. No presentar como reforma global final ni afirmar aprobación estética de una acción no inspeccionada.
+Runtime `6d3439dfe3cc2a09e8e2e206018823bfcb72f992`, CI `44461111246` **SUCCESS**, primer run de alpha.5: **179 JUnit** sin fallos/errores/omisiones, **454 GameTests**, servidor empaquetado y cliente **32 escenas / 64 tooltips**, controles reales y regresiones generales aprobados. Local: **139 Python** (una omisión sin Java), **25 recursos**, secret scan y diff correctos; **58 hashes congelados intactos**. Evidencia descargada en `/tmp/sp605final`.
+
+Captura real de guía ES 1280×720 inspeccionada: `review/eventide-curios-6.0.0-alpha.5-es.jpg`. Muestra eclipse, anillo con núcleo conservado y réplica Curios con tamaño/recarga sin recortar texto; controles accesibles por desplazamiento. No se inspeccionó una captura de la acción destructiva ni todas las escalas e idiomas: no afirmar aprobación estética completa.
+
+JAR `special-pickaxes-1.20.1-6.0.0-alpha.5.jar`: **841023 bytes**, SHA256 `94e76062717068d3b1815de07f52d52d930e5c0aa849db8ea1dcbbdd59b98fc9`. No release 6.0 pública. Quedan siete identidades y copia global Curios de Worldbreaker; no presentar como reforma global final.
+
+![Guía ES de Ocaso y réplica Curios](review/eventide-curios-6.0.0-alpha.5-es.jpg)

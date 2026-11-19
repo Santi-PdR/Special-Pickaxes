@@ -12,7 +12,9 @@ Primera base implementada: eliminación del renderer HUD; SHIFT no expande toolt
 
 [Coro reformado y validado](FAULTSONG-6.0.md): abanico sísmico, cascada de cuatro fallas, réplica Curios de seis cicatrices, copia en mano y guard de slot durante callbacks. La guía muestra ahora el detalle equipado real de los trece picos.
 
-Pendiente: reemplazo de las otras 8 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **la transmutación y construcción antiguas todavía no se han retirado**.
+[Ocaso reformado y validado](EVENTIDE-6.0.md): eclipse horizontal/creciente vertical, horizonte anular y réplica Curios tras una mena, sin imán como poder principal. Copia en mano respeta el modo seleccionado.
+
+Pendiente: reemplazo de las otras 7 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **la transmutación y construcción antiguas todavía no se han retirado**.
 
 ## Invariantes obligatorios
 
@@ -24,13 +26,13 @@ Pendiente: reemplazo de las otras 8 identidades, nuevo sistema de activación Cu
 - Claims/protecciones, contenedores, chunks ausentes, presupuestos globales, drops y durabilidad siguen siendo límites de seguridad aunque el poder sea OP.
 - ES/EN completos, también `es_uy`. Evitar cadenas de error con listas de condiciones o ayuda larga en actionbar.
 
-## Dirección de las 11 identidades (Ícaro, Alba y Coro implementados)
+## Dirección de las 11 identidades (Ícaro, Alba, Coro y Ocaso implementados)
 
 | Identidad | Poderes en mano | Variante Curios |
 | --- | --- | --- |
 | Dawnbreaker / Alba — implementado | Ocho rayos de 24 bloques y nova de radio 12, Glowing de drops, ningún radar | Botín nuevo brillante, curación/velocidad y defensa solar del 65% cada 8 s; ver DAWNBREAKER-6.0.md |
 | Faultsong / Coro — implementado | Abanico de 32 de alcance hasta 49 de ancho y cascada de cuatro fallas verticales | Réplica sísmica de 99 celdas tras seis cicatrices naturales; recarga 8 s y lease de slot; ver FAULTSONG-6.0.md |
-| Eventide / Ocaso | Colapso crepuscular de grandes masas y segunda onda expansiva | Explosión crepuscular de represalia; imán no es su identidad |
+| Eventide / Ocaso — implementado | Eclipse horizontal/creciente vertical de radio 18, horizonte anular de radio 15–24 | Anillo de 312 celdas tras una mena natural, cada 8 s, con lease de slot; ver EVENTIDE-6.0.md |
 | Paradox / Crisol | Ruptura diferida y detonación de fracturas almacenadas, nunca transmutación | Eco diferido de bloques minados |
 | Stasis / Corona | Área de ruptura suspendida y liberación simultánea | Ventana temporal defensiva; dominio activo con contorno y caducidad visibles |
 | Worldloom / Telar | Desmontar estratos de un gesto y barrido de superficie, sin construcción de puentes | Réplica de barrido al completar una racha |
@@ -40,7 +42,7 @@ Pendiente: reemplazo de las otras 8 identidades, nuevo sistema de activación Cu
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba y Coro, los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, Alba, Coro y Ocaso, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 

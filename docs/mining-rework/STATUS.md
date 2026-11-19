@@ -1,3 +1,7 @@
+## Reforma 6.0 — Ocaso alpha.5 validado, reforma global incompleta
+
+Runtime `6d3439dfe3cc2a09e8e2e206018823bfcb72f992`, CI `44461111246` **SUCCESS**: 179 JUnit sin fallos/errores/omisiones, 454 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado. Local 139 Python (una omisión), 25 recursos; 58 hashes congelados intactos. Ocaso reemplaza campo/imán por eclipse horizontal/creciente vertical de 7063 candidatos, horizonte anular de 5480 y réplica Curios de 312 tras una mena natural cada 8 s. Copia en mano con modo seleccionado. [Guía ES inspeccionada, límites y alcance](EVENTIDE-6.0.md). Quedan siete identidades y copia Curios global; no release 6.0 final.
+
 ## Reforma 6.0 — Coro alpha.4 validado, reforma global incompleta
 
 Runtime `6915c714dade84828787567533fc24eddc7c1135`, CI `44457002693` **SUCCESS**: 176 JUnit sin fallos/errores/omisiones, 447 GameTests, cliente 32 escenas/64 tooltips, controles reales y servidor empaquetado aprobados. Local: 139 Python (una omisión sin Java), 25 recursos; 58 hashes congelados intactos. Coro: abanico de 5310 candidatos, cascada de cuatro fallas (4100), réplica Curios de 99 tras seis cicatrices naturales, lease revalidado durante callbacks y copia en mano. La inspección de la captura detectó y permitió corregir la omisión de detalles Curios en la guía de los trece picos. [Captura ES correcta, límites y fallos resueltos](FAULTSONG-6.0.md). Ocho identidades y copia Curios global aún pendientes; no presentar alpha.4 como reforma final.
