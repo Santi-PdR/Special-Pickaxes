@@ -119,9 +119,9 @@ try:
    pending=ack.with_suffix('.tmp');pending.write_text(str(i));pending.replace(ack)
   if '[CHAT]' in line and 'ICARUS_FLIGHT_READY' in line:
    press_screen('third')
-   press_screen('alternate')
-  if '[CHAT]' in line and 'ICARUS_FLIGHT_OBSERVED' in line:
-   capture_screen(str(out/'icarus-ascent.png'))
+   # One Robot invocation presses X and captures 620ms later, inside the 1.6s thrust.
+   # Compiling another helper after the observation marker captured the NEXT fixture.
+   capture_screen(str(out/'icarus-ascent.png'), 'alternate')
   if '[CHAT]' in line and 'ICARUS_FLIGHT_OK ' in line:
    # Restore first person before the original control sequence toggles third person.
    press_screen('third')
