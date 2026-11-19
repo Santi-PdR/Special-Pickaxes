@@ -104,15 +104,8 @@ try:
   elif operation=='prepare_activation':
    pending=aim_request.with_suffix('.tmp');pending.write_text(input_gate.scene);pending.replace(aim_request)
    activation_pending=time.monotonic()
-  elif operation=='survey':
-   press_screen('alternate')
-   activation_pending=time.monotonic()
-  elif operation=='capture_survey_and_activate':
-   capture_screen(str(out/'survey-guide.png'))
-   press_screen('activate')
-   activation_pending=time.monotonic()
   elif operation in ('activate','confirm'):
-   capture_screen(str(out/('hud-'+input_gate.scene+'.png')))
+   capture_screen(str(out/('world-view-'+input_gate.scene+'.png')))
    press_screen(operation)
    activation_pending=time.monotonic()
   if '[CHAT]' in line and 'SCENE_ACTIVATED_' in line:
@@ -155,7 +148,6 @@ finally:
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
-if not (out/'survey-guide.png').exists():raise SystemExit('Missing real secondary activation and survey HUD capture')
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
 if len(manual_frames)<len(scenes):raise SystemExit('Not every live manual scene rendered: '+str(len(manual_frames)))
 if any(not (out/('manual-'+scene+'.png')).exists() for scene in scenes):raise SystemExit('Missing real manual capture')

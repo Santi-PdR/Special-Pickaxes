@@ -55,15 +55,11 @@ class ClientInputGateTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             gate.complete('palimpsest-vein')
 
-    def test_survey_requires_a_real_rendered_readout_before_the_primary_key(self):
+    def test_dawn_scene_no_longer_waits_for_removed_hud(self):
         gate = ClientInputGate()
         gate.begin('palimpsest-vein')
         gate.observe('MANUAL_SCREEN_RENDERED 640x360')
         gate.observe('MANUAL_SCREEN_CLOSED')
-        self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_palimpsest-vein'), 'survey')
-        self.assertIsNone(gate.observe('CLIENT_INPUT_SERVER_RESULT_ALT_SKILL accepted=true'))
-        with self.assertRaises(RuntimeError):
-            gate.complete('palimpsest-vein')
-        self.assertEqual(gate.observe('SURVEY_GUIDE_RENDERED_palimpsest-vein'), 'capture_survey_and_activate')
+        self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_palimpsest-vein'), 'activate')
         self.assertIsNone(gate.observe('SURVEY_GUIDE_RENDERED_palimpsest-vein'))
         gate.complete('palimpsest-vein')

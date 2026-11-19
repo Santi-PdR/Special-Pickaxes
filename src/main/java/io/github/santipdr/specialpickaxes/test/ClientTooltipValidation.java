@@ -27,11 +27,6 @@ public final class ClientTooltipValidation {
         var mc=Minecraft.getInstance();if(mc.player==null||mc.options.hideGui||mc.player.tickCount<250)return;
         mc.gui.getChat().clearMessages(false); // Diagnostic capture markers remain in logs, not over the demonstration.
         if(mc.player.getMainHandItem().getItem() instanceof ArtifactItem item){
-            var held=mc.player.getMainHandItem();
-            if(!surveyCaptured&&mc.level!=null&&mc.screen==null&&held.hasTag()
-                    &&io.github.santipdr.specialpickaxes.artifact.SurveyBearing.read(held.getTag(),mc.level.dimension().location().toString(),mc.level.getGameTime(),mc.player.position(),mc.player.getUUID()).isPresent()){
-                surveyCaptured=true;com.mojang.logging.LogUtils.getLogger().info("SURVEY_GUIDE_RENDERED_palimpsest-vein");
-            }
             if(!bindingsChecked&&!net.minecraft.client.gui.screens.Screen.hasShiftDown()){
                 var keys=io.github.santipdr.specialpickaxes.client.RelicKeys.KEYS;
                 var registered=java.util.Arrays.asList(mc.options.keyMappings);
@@ -63,9 +58,9 @@ public final class ClientTooltipValidation {
             if(CHECKED.add(key)){
                 // Include Forge ItemTooltipEvent: checking only appendHoverText hid an event that erased SHIFT.
                 var lines=mc.player.getMainHandItem().getTooltipLines(mc.player,net.minecraft.world.item.TooltipFlag.Default.NORMAL);
-                if(shift?lines.size()<10:lines.size()!=3)throw new IllegalStateException("Final stack tooltip contract mismatch: "+key+" "+lines.size());
+                if(lines.size()!=3)throw new IllegalStateException("Final stack tooltip contract mismatch: "+key+" "+lines.size());
                 boolean details=lines.stream().anyMatch(line->line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text&&text.getKey().equals("manual4.what"));
-                if(details!=shift)throw new IllegalStateException("Forge tooltip event lost or leaked expanded details: "+key);
+                if(details)throw new IllegalStateException("Minimal tooltip leaked expanded details: "+key);
                 int wrappedLines=lines.stream().mapToInt(line->mc.font.split(line,320).size()).sum();
                 if(wrappedLines*mc.font.lineHeight+16>mc.getWindow().getGuiScaledHeight())
                     throw new IllegalStateException("Tooltip overflows the captured viewport: "+key+" wrappedLines="+wrappedLines);

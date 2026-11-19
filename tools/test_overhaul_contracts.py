@@ -39,13 +39,15 @@ class OverhaulContracts(unittest.TestCase):
         self.assertNotIn('.addParticle(', aura)
         self.assertNotIn('.addParticle(', boundary)
 
-    def test_manual_has_only_two_ability_summaries_and_live_controls(self):
+    def test_manual_has_two_ability_summaries_curios_and_live_controls(self):
         source = (ROOT / 'client/ArtifactManualScreen.java').read_text()
         sections = source.split('private List<Section> sections(', 1)[1].split('private void ensureCards', 1)[0]
         self.assertIn('guide.main.', sections)
         self.assertIn('guide.alt.', sections)
         self.assertIn('RelicKeys.name(action)', sections)
-        for retired in ('manual4.limits', 'manual4.cost', 'manual4.tool_profile', 'curios.detail.', 'melee.specialpickaxes.', 'passive.specialpickaxes.'):
+        self.assertIn('passive.specialpickaxes.', sections)
+        self.assertIn('screen.specialpickaxes.curios', sections)
+        for retired in ('manual4.limits', 'manual4.cost', 'manual4.tool_profile', 'curios.detail.', 'melee.specialpickaxes.'):
             self.assertNotIn(retired, sections)
         for locale in ('en_us', 'es_es'):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())

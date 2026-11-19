@@ -82,7 +82,7 @@ class Resources(unittest.TestCase):
     def test_activation_feedback_is_complete_in_both_languages(self):
         languages = {locale: json.loads((ROOT / f"assets/specialpickaxes/lang/{locale}.json").read_text())
                      for locale in ("en_us", "es_es")}
-        placeholders = {"alternate_no_target": 1, "alternate_cooldown": 1,
+        placeholders = {"alternate_no_target": 0, "alternate_cooldown": 1,
                         "primary_cooldown": 1, "insufficient_durability": 2}
         for locale, data in languages.items():
             for pick in IDS:

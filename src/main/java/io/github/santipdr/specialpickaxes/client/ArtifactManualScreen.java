@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
-/** Responsive ability reference: primary, alternate, and current controls only. */
+/** Scrollable ability reference, including equipped Curios behavior and live bindings. */
 public final class ArtifactManualScreen extends Screen {
     private static final int PAD=14, LINE_HEIGHT=10, CHOICE_CELL=24;
     private final ArtifactKind kind;
@@ -93,8 +93,11 @@ public final class ArtifactManualScreen extends Screen {
 
         ItemStack shownIcon=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?iconFor(abilityKind):headerIcon;
-        g.renderItem(shownIcon,x+PAD,y+18);
-        int nameX=x+PAD+24;
+        // Render the real item model, not a replacement texture or a hand-drawn icon.
+        g.pose().pushPose();
+        g.pose().translate(x+PAD,y+14,0);g.pose().scale(1.5F,1.5F,1);
+        g.renderItem(shownIcon,0,0);g.pose().popPose();
+        int nameX=x+PAD+32;
         Component headerHint=kind==ArtifactKind.WORLDBREAKER&&abilityKind!=kind
                 ?Component.translatable("screen.specialpickaxes.copy_mode_header")
                 :(kind==ArtifactKind.WORLDBREAKER?Component.translatable(selectingCopy()?"screen.specialpickaxes.copy_help":"screen.specialpickaxes.copy_hand_only"):Component.translatable("screen.specialpickaxes.manual_hint"));
@@ -164,6 +167,9 @@ public final class ArtifactManualScreen extends Screen {
         return List.of(
                 section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
                 section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
+                new Section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios"),
+                        List.of(Component.translatable("passive.specialpickaxes."+kind.id),
+                                Component.translatable("screen.specialpickaxes.curios_passive")),0xffb99aef),
                 new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffc6ced8));
     }
 

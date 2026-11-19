@@ -377,11 +377,11 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_226") public static void iridiumRecallRejectsDisarmedCaster(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,2);}
     @GameTest(template="empty",batch="rework_each_227") public static void iridiumRecallRejectsReplacedItemStack(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,3);}
     @GameTest(template="empty",batch="rework_each_228") public static void iridiumRecallRejectsSpectatorRevocation(GameTestHelper h){pullRejectsChangedContext(h,ArtifactKind.IRIDIUM,4);}
-    @GameTest(template="empty",batch="rework_each_229") public static void tooltipPresentationPreservesShiftDetailsForAllPicks(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_229") public static void tooltipPresentationStaysMinimalEvenWithShiftForAllPicks(GameTestHelper h){
         for(var kind:ArtifactKind.playableValues()){
             var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());var compact=new ArrayList<net.minecraft.network.chat.Component>();var expanded=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.presentation(stack,kind,compact,false);ArtifactTooltips.presentation(stack,kind,expanded,true);
-            h.assertTrue(compact.size()==2&&!tooltipHasKey(compact,"manual4.what")&&expanded.size()>9&&tooltipHasKey(expanded,"manual4.what"),"the final presentation distinguishes compact/SHIFT for "+kind.id);
+            h.assertTrue(compact.size()==2&&!tooltipHasKey(compact,"manual4.what")&&expanded.equals(compact),"SHIFT cannot expand the final tooltip for "+kind.id);
         }h.succeed();
     }
     @GameTest(template="empty",batch="rework_each_230") public static void explicitHigherForgeTierIsNotBypassedByOreInference(GameTestHelper h){
@@ -475,8 +475,8 @@ public final class PickaxeGameTests {
         for(var kind:ArtifactKind.playableValues()){
             var stack=new ItemStack(SpecialPickaxes.PICKS.get(kind).get());var lines=new ArrayList<net.minecraft.network.chat.Component>();
             ArtifactTooltips.presentation(stack,kind,lines,true);
-            h.assertTrue(lines.size()==12&&tooltipHasKey(lines,"manual4.what")&&tooltipHasKey(lines,"manual4.how")
-                    &&tooltipHasKey(lines,"manual4.cost")&&tooltipHasKey(lines,"tooltip.specialpickaxes.quick_controls"),"SHIFT keeps actionable instructions, costs and dynamic manual key: "+kind.id);
+            h.assertTrue(lines.size()==2&&!tooltipHasKey(lines,"manual4.what")&&!tooltipHasKey(lines,"manual4.how")
+                    &&!tooltipHasKey(lines,"manual4.cost"),"SHIFT retains only two compact ability labels: "+kind.id);
             h.assertTrue(!tooltipHasKey(lines,"manual4.tool_profile_detail")&&!tooltipHasKey(lines,"manual4.modes"),"long profile and mode lists belong to the scrollable manual");
         }h.succeed();
     }

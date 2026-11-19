@@ -23,7 +23,7 @@ public final class ArtifactSkills {
             return false;
         }
         if (!ArtifactTechniques.performHeldAlternate(player, tool, kind)) {
-            ArtifactFeedback.message(player,"alternate_no_target",net.minecraft.network.chat.Component.translatable("message.specialpickaxes.alternate_hint."+feedbackKind(tool,kind).id));
+            ArtifactFeedback.message(player,"alternate_no_target");
             return false;
         }
         data.putLong("alternateReady", now + interval);

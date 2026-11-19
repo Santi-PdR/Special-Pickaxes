@@ -56,7 +56,7 @@ public final class WorkQueue {
     public static boolean regionSnapshotBudgetAllows(ServerPlayer p,long snapshotBytes){
         long used=0;for(var job:JOBS.values())used+=job.reservedBytes;
         long limit=(long)ArtifactConfig.REGION_MEMORY_MIB.get()*1024*1024;
-        if(snapshotBytes>limit-used){ArtifactFeedback.message(p,"region_memory_limit",ArtifactConfig.REGION_MEMORY_MIB.get());return false;}
+        if(snapshotBytes>limit-used){ArtifactFeedback.message(p,"region_memory_limit");return false;}
         return true;
     }
     public static boolean togglePause(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j==null)return false;

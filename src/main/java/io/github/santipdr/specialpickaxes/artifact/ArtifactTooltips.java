@@ -12,18 +12,7 @@ public final class ArtifactTooltips {
     /** Shared final presentation, including the Forge tooltip event's reconstruction. */
     public static void presentation(ItemStack stack,ArtifactKind kind,List<Component> lines,boolean expanded){
         compact(stack,kind,lines);
-        if(expanded)quickReference(stack,kind,lines);
-    }
-    /** SHIFT is a readable quick reference, not the full scrollable manual squeezed off-screen. */
-    private static void quickReference(ItemStack stack,ArtifactKind kind,List<Component> lines){
-        var ability=abilityKind(stack,kind);String mode=ArtifactInteraction.modeKey(ability,abilityMode(stack,kind));
-        section(lines,"manual4.what",Component.translatable("mining.identity."+ability.id+"."+mode));
-        section(lines,"manual4.how",how(ability,mode));
-        section(lines,"screen.specialpickaxes.alternate",alternate(ability));
-        section(lines,"manual4.cost",costDetail(stack));
-        section(lines,"manual4.controls",Component.translatable("tooltip.specialpickaxes.quick_controls",
-                Component.keybind("key.specialpickaxes.activate"),Component.keybind("key.specialpickaxes.alt_skill"),
-                Component.keybind("key.specialpickaxes.manual")));
+        // SHIFT deliberately does not expand the tooltip. Full instructions live in the I menu.
     }
     /** Instruction prose uses the same live bindings as the compact controls and manual footer. */
     public static Component how(ArtifactKind ability,String mode){
