@@ -63,3 +63,16 @@ class ClientInputGateTests(unittest.TestCase):
         self.assertEqual(gate.observe('[CHAT] CLIENT_FIXTURE_AIMED_palimpsest-vein'), 'activate')
         self.assertIsNone(gate.observe('SURVEY_GUIDE_RENDERED_palimpsest-vein'))
         gate.complete('palimpsest-vein')
+
+    def test_scene_advance_waits_for_real_server_mode_with_bounded_failure(self):
+        from pathlib import Path
+        source = Path('src/main/java/io/github/santipdr/specialpickaxes/test/ClientValidation.java').read_text()
+        start = source.index('int next=(ticks-240)/100+1;')
+        end = source.index('modeAckWait=0;', start)
+        handshake = source[start:end]
+        self.assertIn('ArtifactState.mode(p,expected.kind())!=expected.mode()', handshake)
+        self.assertIn('++modeAckWait>100', handshake)
+        self.assertIn('throw new IllegalStateException', handshake)
+        self.assertIn('return;', handshake)
+        self.assertNotIn('putInt(', handshake)
+        self.assertNotIn('RelicControl.execute', handshake)

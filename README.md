@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.16`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.17`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -13,6 +13,8 @@ CI alpha.9 [44549253542](https://github.com/Santi-PdR/Special-Pickaxes/actions/r
 [Worldloom alpha.12 validado](docs/mining-rework/WORLDLOOM-6.0.md): cantera escalonada, cosecha de menas expuestas y raíces Curios. CI `44609459397` SUCCESS: 195 JUnit / 479 GameTests / cliente y servidor con logs estrictos. Cantera activa y guía ES inspeccionadas. Quedan cuatro identidades y copia Curios global. [Axiom alpha.14](docs/mining-rework/AXIOM-6.0.md) implementa cámara nula, cruz secundaria y réplica Curios; validación Forge y visual aún pendientes.
 
 [Exodium alpha.16](docs/mining-rework/EXODIUM-6.0.md): lluvia de cinco meteoros (3511 candidatos), cuenca secundaria (6789) y estrella fugaz Curios (201 / 8 s), sin lanza ni pozo estrecho. Implementado, validación Forge y capturas aún pendientes.
+
+[Hellspec alpha.17](docs/mining-rework/HELLSPEC-6.0.md) inicia su reforma con ocho grietas infernales (4049 candidatos). Primaria sin validar; secundaria y Curios pendientes. La prueba de cliente espera ahora el modo real antes de avanzar, con timeout y sin simular la tecla C.
 
 ---
 

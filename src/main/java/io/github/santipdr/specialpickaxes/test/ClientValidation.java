@@ -17,7 +17,7 @@ public final class ClientValidation {
     private record Scene(ArtifactKind kind,int mode){}
     private static final java.util.List<Scene> SCENES=new java.util.ArrayList<>();
     static {for(var k:ArtifactKind.playableValues())for(int m=0;m<ArtifactInteraction.modeCount(k);m++)SCENES.add(new Scene(k,m));}
-    private static int ticks;
+    private static int ticks,modeAckWait;
     @SubscribeEvent public static void tick(TickEvent.ServerTickEvent e){
         if(!Boolean.getBoolean("specialpickaxes.clientSmoke")||e.phase!=TickEvent.Phase.END)return;
         var server=ServerLifecycleHooks.getCurrentServer();if(server==null)return;
@@ -71,6 +71,17 @@ public final class ClientValidation {
             if(ticks>=240&&(ticks-240)/100<SCENES.size()&&(ticks-240)%100==99){
                 try{if(!java.nio.file.Files.readString(java.nio.file.Path.of("client-capture-ack.txt")).trim().equals(Integer.toString((ticks-240)/100)))return;}
                 catch(java.io.IOException missing){return;}
+                int next=(ticks-240)/100+1;
+                // The filesystem screenshot ACK may beat the C-key network packet.
+                // Observe real server state before advancing; never synthesize a mode.
+                if(next<SCENES.size()&&SCENES.get(next).mode()>0){
+                    var expected=SCENES.get(next);
+                    if(ArtifactState.mode(p,expected.kind())!=expected.mode()){
+                        if(++modeAckWait>100)throw new IllegalStateException("Real C key mode acknowledgement timed out: "+expected.kind()+" expected "+expected.mode());
+                        return;
+                    }
+                }
+                modeAckWait=0;
             }
             if(ticks==239+SCENES.size()*100){WorkQueue.cancel(p);DomainFields.stop(p);ArtifactInteraction.clear(p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");}
             ticks++;if(ticks<240)continue;

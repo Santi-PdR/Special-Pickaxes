@@ -1,3 +1,9 @@
+## Reforma 6.0 — Hellspec alpha.17 primaria y sincronización cliente
+
+Ocho grietas radiales, radio 18, altura 13, 4049 candidatos, roca y menas naturales con drops normales, VFX infernal personalizado sin modificar arte. Reemplaza primaria antigua y copia en mano. Dos JUnit y tres GameTests nuevos; local 141 Python (una omisión), 25 recursos. Secundaria/Curios Hellspec y Worldbreaker/copia global pendientes. [Contrato y límites](HELLSPEC-6.0.md).
+
+Fixture de cliente corregida para esperar el modo real después del ACK de captura, máximo 100 ticks; sin asignar modo ni reenviar teclas. Aborda una posible carrera entre filesystem y paquete C en el fallo de Ocaso. Confirmación runtime pendiente. CI alpha.15 `44623954610` y alpha.16 `44624910270` seguían ejecutándose al iniciar esta tanda; no afirmar resultados aún. Forge alpha.17 y capturas pendientes; no release pública.
+
 ## Reforma 6.0 — Exodium alpha.16 secundaria y Curios implementados, validación pendiente
 
 Secundaria Cuenca de Impacto radio/profundidad 16, 6789 candidatos; Curios Estrella Fugaz radio 5/profundidad 4, 201 candidatos cada 8 s tras mena manual confirmada, lease de slot original revalidado durante callbacks. Conserva protección estelar; no es lanza ni pozo estrecho. Dos JUnit y cuatro GameTests nuevos; local 140 Python (una omisión), 25 recursos; 58 hashes congelados intactos. [Detalles](EXODIUM-6.0.md). Forge alpha.16 y capturas pendientes; no contar identidad validada todavía. Hellspec y Worldbreaker/copia Curios global siguen pendientes.

@@ -150,6 +150,16 @@ public final class AbilityVfx {
             p.serverLevel().sendParticles(p,particle(ArtifactKind.EXODIUM),false,at.x,at.y,at.z,1,.025,.025,.025,0);
         }return true;
     }
+    /** Splintering infernal jets follow active mining; no ambient HUD or lava placement. */
+    public static boolean infernalRift(ServerPlayer p,net.minecraft.core.BlockPos center){
+        if(!p.isAlive()||p.isRemoved()||!p.serverLevel().hasChunkAt(center)||p.distanceToSqr(Vec3.atCenterOf(center))>64*64)return false;
+        if(!BUDGET.tryReserve(p.server.getTickCount(),16))return false;
+        for(int i=0;i<16;i++){
+            double a=Math.PI*2*i/8,r=.3+(i%4)*.35;
+            var at=Vec3.atCenterOf(center).add(Math.cos(a)*r,(i/8)*1.4,Math.sin(a)*r);
+            p.serverLevel().sendParticles(p,particle(ArtifactKind.HELLSPEC),false,at.x,at.y,at.z,1,.025,.08,.025,.015);
+        }return true;
+    }
     public static void forget(ServerPlayer player){LAST_CAST.remove(player.getUUID());}
     public static void clear(){LAST_CAST.clear();}
 

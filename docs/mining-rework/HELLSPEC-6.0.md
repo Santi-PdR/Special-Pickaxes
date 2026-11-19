@@ -1,0 +1,11 @@
+# Hellspec alpha.17 — infernal-rifts primary implemented, identity partial
+
+Public primary replaces the old five-petal bloom with eight broad radial fissures through natural strata. Radius 18, vertical offsets -8 through +4 (13 layers), 4049 unique candidates; cardinal and diagonal fissures narrow toward depth. Traversal is top-down. Harvests natural rock and ore with native tool loot. No lava placement, real explosions, entity damage, building, generic tunnel or magnet. Budgeted custom infernal jets follow active execution, reusing existing signature particle assets; item textures/models remain frozen.
+
+The hardened queue skips player-placed blocks and unloaded chunks, respects build height, tool/claims/durability/drop pressure, counts actual removals against configured cap, and validates captured actor/tool context after permission callbacks. Reentrant starts are blocked. Worldbreaker hand primary copying dispatches the same fissures. Legacy HellspecBloomShape geometry remains infrastructure regression coverage but no longer public primary.
+
+Two JUnit tests cover volume, uniqueness, top-down order, depth narrowing and rock between fissures. Three GameTests cover central/diagonal arms and ores, exterior/provenance preservation, hand copying and callback reentry/relocation. Local 141 Python tests (one skipped without Java), 25 resource checks and diff check pass. Forge validation and action screenshots pending. Secondary chimney and Curios remain previous implementation, explicitly not reformed in this milestone. Not a completed identity; no release published.
+
+## Client validation synchronization correction
+
+Previous Axiom CI 44621956811 passed 199 JUnit / 486 GameTests but failed when advancing from Eventide mode 0 to 1. The screenshot helper sends a real C key before writing filesystem ACK; the ACK and network packet travel independently. Dev-only fixture now waits for the actual server mode before advancing, up to 100 server ticks. It does not change mode, resend the key, remove assertions or alter production controls. A missing/rejected key still fails with a bounded timeout. This addresses the possible ACK race; runtime confirmation remains pending and it is not claimed as the proven cause of every lost input.

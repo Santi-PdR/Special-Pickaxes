@@ -161,12 +161,7 @@ public final class ArtifactActions {
         }
         if(kind==ArtifactKind.AXIOM)return AxiomNullChamber.start(p,tool);
         if(kind==ArtifactKind.WORLDLOOM)return WorldloomQuarry.start(p,tool);
-        if(kind==ArtifactKind.HELLSPEC) {
-            var program=new RadialMiningProgram(center,HellspecBloomShape.RADIUS,kind,ArtifactState.mode(p,kind),null);
-            boolean started=WorkQueue.startRegion(p,tool,kind,program);
-            if(started){ArtifactFeedback.hellBloom(p,center);ArtifactFeedback.message(p,"infernal_bloom_started");}
-            return started;
-        }
+        if(kind==ArtifactKind.HELLSPEC)return HellspecInfernalRifts.start(p,tool);
 
 
         List<WorkStep> steps=List.of();
