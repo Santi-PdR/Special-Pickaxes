@@ -15,3 +15,14 @@ Added three geometry JUnit cases and a public activation GameTest verifying pola
 
 
 Validated build metadata: `special-pickaxes-1.20.1-6.0.0-alpha.7.jar`, 859583 bytes, SHA256 `221660d373550959d0636be7d32228477310acb9e30dcd5bc48f9c1b6dbf95a6`. No public release. The automated client gallery is not an inspected screenshot of an active Stasis domain; action visual review remains open. All 58 frozen hashes verified unchanged before runtime validation.
+
+
+## Curios temporal cut — alpha.8 validated
+
+Runtime `f1b60336cad1079b2ee650d05d70581d85403484`, CI `44537195139` SUCCESS: 189 JUnit without failures/errors/skips, 468 required GameTests, client 32 scenes / 64 tooltips, real keyboard input and packaged server passed. Local 139 Python (one skipped without Java), 25 resource tests; 58 frozen hashes unchanged.
+
+Confirmed manual natural ore scars trigger a horizontal radius-6 cut excluding the original scar: 112 candidates, exactly one block high. Eight-second persisted cooldown, no ore scan, no queued-mining recursion. The original Curios slot stack and exact held tool are required through confirmation and work execution; revoking the slot inside a Forge break callback protects the current cell too. Existing Absorption/Stasis Ward sharing remains. Per-cell claims, provenance, unloaded chunks and drop backpressure use the normal leased natural mining path. Does not grant global Worldbreaker Curios copying.
+
+Added two geometry JUnit tests and three GameTests: confirmed horizontal excavation/placed-block safety/cooldown; unconfirmed break and slot removal; callback revocation. Authentic ES guide inspected at 1280×720 and saved in `review/stasis-curios-6.0.0-alpha.8-es.jpg`: the new cut description is visible; lower general controls continue below the scroll viewport. Not an action screenshot or all-scales/languages approval.
+
+Build: `special-pickaxes-1.20.1-6.0.0-alpha.8.jar`, 865394 bytes, SHA256 `9b06c2c8611f6176fce0f085561f7a4f33f1f527d96f87f234117be9a423122a`. No public alpha.8 release. Remaining Stasis scope: full primary rework and active-domain/action visual inspection. The earlier statements about Curios being pending describe alpha.7, superseded by this section; the overall rework is still incomplete.
