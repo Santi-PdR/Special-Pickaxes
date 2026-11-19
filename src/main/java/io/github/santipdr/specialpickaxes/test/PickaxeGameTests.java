@@ -1828,6 +1828,22 @@ public final class PickaxeGameTests {
         h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(external)&&p.getDeltaMovement().equals(Vec3.ZERO),"external teleport ends the old job without a stale impulse");finish(h,p);
     }
 
+    @GameTest(template="empty",batch="reform_602_09") public static void ascentCannotReenterItsStartFromAClaimCallback(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);int[] nested={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> reenter=e->{if(e.player==p){nested[0]++;h.assertTrue(!IcarianFlight.start(p,p.getMainHandItem()),"recursive start is rejected before another callback");}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,reenter);
+        try{h.assertTrue(IcarianFlight.start(p,p.getMainHandItem())&&nested[0]==1,"outer start succeeds exactly once");}
+        finally{MinecraftForge.EVENT_BUS.unregister(reenter);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="reform_602_10") public static void ascentRechecksCeilingInstalledByStartCallback(GameTestHelper h){
+        var p=clearFlight(h,ArtifactKind.ICARUS);var roof=p.blockPosition().above(2);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> obstruct=e->{if(e.player==p)h.getLevel().setBlockAndUpdate(roof,Blocks.CHEST.defaultBlockState());};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,obstruct);
+        try{h.assertTrue(!IcarianFlight.start(p,p.getMainHandItem())&&!IcarianFlight.active(p),"callback-installed ceiling invalidates start");
+            h.assertTrue(h.getLevel().getBlockState(roof).is(Blocks.CHEST),"external container is not overwritten");}
+        finally{MinecraftForge.EVENT_BUS.unregister(obstruct);finish(h,p);}
+    }
+
     private static ServerPlayer player(GameTestHelper h,ArtifactKind kind) {
         return player(h,kind,"ArtifactTest");
     }

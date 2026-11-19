@@ -15,6 +15,7 @@ public final class IcarianFlight {
     public static final double MAX_RISE=14;
     private static final Map<UUID,Flight> JOBS=new HashMap<>();
     private static boolean ticking;
+    private static final Set<UUID> STARTING=new HashSet<>();
     private static final class Flight {
         final ServerPlayer player;final ServerLevel level;final ItemStack tool;final Vec3 origin;final long start;
         Vec3 previous;long lastTick=Long.MIN_VALUE;
@@ -36,6 +37,10 @@ public final class IcarianFlight {
         return true;
     }
     public static boolean start(ServerPlayer p,ItemStack tool){
+        if(!STARTING.add(p.getUUID()))return false;
+        try{return startOnce(p,tool);}finally{STARTING.remove(p.getUUID());}
+    }
+    private static boolean startOnce(ServerPlayer p,ItemStack tool){
         if(!caster(p,tool)||active(p)||JOBS.size()>=MAX_JOBS||!clear(p,.8))return false;
         var context=HeldUtilityContext.capture(p,tool);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above());
