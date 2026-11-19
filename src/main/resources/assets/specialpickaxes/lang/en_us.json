@@ -702,5 +702,7 @@
   "hud.specialpickaxes.pause.drops": "Drop limit · %s",
   "message.specialpickaxes.kit_space": "You need %s empty slots for the complete set.",
   "message.specialpickaxes.kit_granted": "Complete set granted to %s. See Options → Controls → Special Pickaxes for bindings.",
-  "effect.specialpickaxes.icarian_featherfall": "Icarian Featherfall"
+  "effect.specialpickaxes.icarian_featherfall": "Icarian Featherfall",
+  "mining.identity.palimpsest.solar_rupture": "SOLAR RUPTURE: fracture the earth with eight rays.",
+  "mining.how.palimpsest.solar_rupture": "%1$s · Solar rays: excavate 8 thick arms, 24 blocks long and 5 high (2765 candidate cells). Aim at natural rock; skips placed blocks, containers and fluids."
 }

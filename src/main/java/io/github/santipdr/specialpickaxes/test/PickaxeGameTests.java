@@ -1734,6 +1734,18 @@ public final class PickaxeGameTests {
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
 
+    @GameTest(template="empty",batch="reform_603_09") public static void dawnCuriosLightsOnlyNewLootAndRequiresTheOriginalSlotSource(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var at=target(h);var level=h.getLevel();var state=Blocks.STONE.defaultBlockState();
+        var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
+        var existing=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.DIRT));level.addFreshEntity(existing);
+        h.assertTrue(MiningObservations.captureCuriosDawn(p,source,at,state,slot::get),"Dawn observation uses live equipped source");
+        level.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());var fresh=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.COBBLESTONE));level.addFreshEntity(fresh);MiningObservations.flush();
+        h.assertTrue(fresh.isCurrentlyGlowing()&&!existing.isCurrentlyGlowing(),"only fresh ordinary rock loot glows; no ore search or old-drop magnet");
+        level.setBlockAndUpdate(at,state);h.assertTrue(MiningObservations.captureCuriosDawn(p,source,at,state,slot::get),"second break observed");
+        level.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());var revoked=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.FLINT));level.addFreshEntity(revoked);
+        slot.set(source.copy());MiningObservations.flush();h.assertTrue(!revoked.isCurrentlyGlowing(),"equal-looking replacement is not the original slot lease");finish(h,p);
+    }
+
     @GameTest(template="empty",batch="upgrade_518_01") public static void completeKitGrantsExactlyThirteenUniqueTools(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
@@ -4384,7 +4396,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();var ore=target(h);
         h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);
         h.assertTrue(ArtifactActions.primary(p,tool,ArtifactKind.WORLDBREAKER),"copied Palimpsest mining skill starts");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(ore).isAir(),"Worldbreaker executes the selected pick's connected-ore harvest");
+        h.assertTrue(h.getLevel().getBlockState(ore).isAir(),"Worldbreaker executes the selected pick's solar rays");
         h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(ore).inflate(1)).stream().anyMatch(e->e.getItem().is(Items.DIAMOND)),"copied ability preserves the source pick's native ore drops");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_36") public static void compactAndExpandedTooltipContracts(GameTestHelper h){

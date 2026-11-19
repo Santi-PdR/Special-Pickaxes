@@ -1,3 +1,7 @@
+## Reforma 6.0 — Alba alpha.3 implementada, CI pendiente
+
+[Diseño implementado, límites y comprobaciones](DAWNBREAKER-6.0.md). Rayos de ocho brazos y nova de radio 12 sustituyen veta y sondeo; radar retirado, Glowing de drops conservado y añadido a variante Curios con lease del slot. Defensa Curios del 65% cada ocho segundos. Arte intacto. Python 138 (una omisión) y recursos 25 correctos; no afirmar validación runtime hasta resultado CI. La reforma global y copia Curios Worldbreaker siguen incompletas.
+
 ## Reforma 6.0 — Ícaro alpha.2 validado, reforma global incompleta
 
 Runtime `98f5c06c900461b16cca18d1a177c3d178adf231`, CI `44442689638` SUCCESS: **177 JUnit** sin fallos/errores/omisiones, **436 GameTests**, cliente 32 escenas/64 tooltips, servidor empaquetado y vuelo real de supervivencia por tecla X aprobados. Local: 138 Python (una omisión sin Java), 25 recursos correctos. Ícaro: alas naturales de 32 bloques / 37–49 de envergadura sin desplazamiento, impulso de 32 ticks por velocidad, Pluma temporal 120 ticks, variante aérea Curios, copia en mano y hélices custom activas. Ascensor/anclas TP retirados completamente; se sustituyeron sus pruebas, no se cambiaron Iridium ni Strata. [Detalle, límites, fallos corregidos y captura real](ICARUS-6.0.md).
