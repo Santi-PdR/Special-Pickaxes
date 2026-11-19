@@ -1,6 +1,6 @@
-## Reforma 6.0 — Alba alpha.3 implementada, CI pendiente
+## Reforma 6.0 — Alba alpha.3 validada, reforma global incompleta
 
-[Diseño implementado, límites y comprobaciones](DAWNBREAKER-6.0.md). Rayos de ocho brazos y nova de radio 12 sustituyen veta y sondeo; radar retirado, Glowing de drops conservado y añadido a variante Curios con lease del slot. Defensa Curios del 65% cada ocho segundos. Arte intacto. Python 138 (una omisión) y recursos 25 correctos; no afirmar validación runtime hasta resultado CI. La reforma global y copia Curios Worldbreaker siguen incompletas.
+Runtime `d48cc5364253a6daee0a74678a92fe9a326c7996`, CI `44450388632` **SUCCESS**: 173 JUnit sin fallos/errores/omisiones, 437 GameTests, cliente 32 escenas/64 tooltips y servidor empaquetado aprobados. Python 138 (una omisión sin Java), recursos 25 correctos; 58 hashes congelados intactos. Rayos de ocho brazos y nova de radio 12 sustituyen veta y sondeo; radar retirado, Glowing conservado y añadido a variante Curios con lease del slot. Defensa Curios del 65% cada ocho segundos. [Límites, fallos corregidos y alcance](DAWNBREAKER-6.0.md). No se inspeccionó una nueva captura de acción solar; la comprobación gráfica automatizada no equivale a una revisión estética completa. Quedan nueve identidades y la copia Curios global de Worldbreaker.
 
 ## Reforma 6.0 — Ícaro alpha.2 validado, reforma global incompleta
 

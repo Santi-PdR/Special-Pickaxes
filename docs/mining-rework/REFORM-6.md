@@ -8,7 +8,9 @@ Primera base implementada: eliminación del renderer HUD; SHIFT no expande toolt
 
 [Ícaro reformado y validado](ICARUS-6.0.md): alas de fractura, ascenso por velocidad sin TP, Pluma temporal, variante aérea Curios y copia en mano. No quedan el ascensor ni sus anclas de TP.
 
-Pendiente: reemplazo de las otras 10 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **no afirmar que ya se eliminaron el sondeo, la transmutación o la construcción del motor**.
+[Alba reformada y validada](DAWNBREAKER-6.0.md): rayos de ocho brazos, nova de radio 12, Glowing de drops nativos y Curios, defensa solar del 65%. Sondeo y guía de mineral retirados.
+
+Pendiente: reemplazo de las otras 9 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **la transmutación y construcción antiguas todavía no se han retirado**.
 
 ## Invariantes obligatorios
 
@@ -20,11 +22,11 @@ Pendiente: reemplazo de las otras 10 identidades, nuevo sistema de activación C
 - Claims/protecciones, contenedores, chunks ausentes, presupuestos globales, drops y durabilidad siguen siendo límites de seguridad aunque el poder sea OP.
 - ES/EN completos, también `es_uy`. Evitar cadenas de error con listas de condiciones o ayuda larga en actionbar.
 
-## Dirección de las 11 identidades (sólo Ícaro implementado por ahora)
+## Dirección de las 11 identidades (Ícaro y Alba implementados)
 
 | Identidad | Poderes en mano | Variante Curios |
 | --- | --- | --- |
-| Dawnbreaker / Alba | Fractura solar de menas y onda de amanecer; conservar Glowing en drops, ningún radar | Réplica solar acotada al minar y curación por racha |
+| Dawnbreaker / Alba — implementado | Ocho rayos de 24 bloques y nova de radio 12, Glowing de drops, ningún radar | Botín nuevo brillante, curación/velocidad y defensa solar del 65% cada 8 s; ver DAWNBREAKER-6.0.md |
 | Faultsong / Coro | Ruptura sísmica en abanico y fallas encadenadas, no un túnel rectangular | Réplica sísmica tras racha de minería |
 | Eventide / Ocaso | Colapso crepuscular de grandes masas y segunda onda expansiva | Explosión crepuscular de represalia; imán no es su identidad |
 | Paradox / Crisol | Ruptura diferida y detonación de fracturas almacenadas, nunca transmutación | Eco diferido de bloques minados |
@@ -36,7 +38,7 @@ Pendiente: reemplazo de las otras 10 identidades, nuevo sistema de activación C
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro y Alba, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 

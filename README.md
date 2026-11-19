@@ -1,8 +1,8 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.2`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.3`, todavía no es la reforma completa ni una entrega final.**
 
-Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Ícaro ya tiene alas de fractura y ascenso físico sin TP, Pluma temporal y variante aérea Curios: [validación y captura real](docs/mining-rework/ICARUS-6.0.md). Quedan las otras diez identidades y la copia Curios de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de Ícaro: [44442689638](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44442689638), 177 JUnit / 436 GameTests / vuelo real de supervivencia aprobado.
+Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Ícaro ya tiene alas de fractura y ascenso físico sin TP, Pluma temporal y variante aérea Curios: [validación y captura real](docs/mining-rework/ICARUS-6.0.md). Alba ya usa rayos de ruptura y nova solar sin radar, con Glowing de drops y variante Curios: [detalle y límites](docs/mining-rework/DAWNBREAKER-6.0.md). CI alpha.3 [44450388632](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44450388632): 173 JUnit / 437 GameTests / cliente 32 escenas y 64 tooltips / servidor empaquetado aprobados. Quedan otras nueve identidades y la copia Curios de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de Ícaro: [44442689638](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44442689638), 177 JUnit / 436 GameTests / vuelo real de supervivencia aprobado.
 
 ---
 
