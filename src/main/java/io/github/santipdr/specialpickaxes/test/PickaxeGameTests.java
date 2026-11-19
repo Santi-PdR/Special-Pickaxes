@@ -156,7 +156,7 @@ public final class PickaxeGameTests {
     }
     private static void miningOnlyAlternate(GameTestHelper h,ArtifactKind kind){
         var wearer=player(h,kind);var at=target(h);var level=h.getLevel();
-        if(kind==ArtifactKind.AXIOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());}
+        if(kind==ArtifactKind.AXIOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());level.setBlockAndUpdate(at.above(),Blocks.STONE.defaultBlockState());level.setBlockAndUpdate(at.above(4),Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(at);PlayerPlacedBlocks.get(level).unmark(at.above(4));}
         if(kind==ArtifactKind.CRUCIBLE)ArtifactState.of(wearer,kind).putInt("mode",8);
         if(kind==ArtifactKind.WORLDLOOM){level.setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(at);}
         var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setPos(wearer.position().add(2,5,0));mob.setDeltaMovement(.2,.1,.3);level.addFreshEntity(mob);
@@ -172,7 +172,7 @@ public final class PickaxeGameTests {
         if(kind==ArtifactKind.CRUCIBLE)h.assertTrue(level.getBlockState(at).isAir(),"causal lattice harvests its natural target instead of producing a selected material");
         if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC)
             h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
-        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).isAir(),"exposure clears adjacent stone and preserves its ore");
+        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).is(Blocks.STONE)&&level.getBlockState(at.above(4)).isAir(),"null cross preserves its ore and adjacent core while clearing the vertical plane");
         if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(level.getBlockState(at).isAir(),"exposed ore harvested without construction");
         if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).isAir(),"solar nova harvests its natural target without harming creatures");
         WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
