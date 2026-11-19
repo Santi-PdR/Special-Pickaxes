@@ -6,7 +6,9 @@
 
 Primera base implementada: eliminación del renderer HUD; SHIFT no expande tooltips; fallos/cancelaciones breves; catálogo completo `es_uy` junto a `es_es` y `en_us`; manual con tarjeta explícita de comportamiento Curios y render del modelo real aumentado. La tarjeta describe los pasivos actuales, no promete todavía las nuevas variantes. La copia de habilidades de mano no se presenta como copia de pasivos si no existe en runtime.
 
-Pendiente: reemplazo de las 11 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **no afirmar que ya se eliminaron el sondeo, la transmutación o la construcción del motor**.
+[Ícaro reformado y validado](ICARUS-6.0.md): alas de fractura, ascenso por velocidad sin TP, Pluma temporal, variante aérea Curios y copia en mano. No quedan el ascensor ni sus anclas de TP.
+
+Pendiente: reemplazo de las otras 10 identidades, nuevo sistema de activación Curios/copia, rediseño visual completo del manual, nuevos VFX por habilidad, pruebas de esas mecánicas y publicación final con shell directo. Las otras habilidades de 5.x siguen presentes en esta base salvo los cambios de interfaz; **no afirmar que ya se eliminaron el sondeo, la transmutación o la construcción del motor**.
 
 ## Invariantes obligatorios
 
@@ -18,7 +20,7 @@ Pendiente: reemplazo de las 11 identidades, nuevo sistema de activación Curios/
 - Claims/protecciones, contenedores, chunks ausentes, presupuestos globales, drops y durabilidad siguen siendo límites de seguridad aunque el poder sea OP.
 - ES/EN completos, también `es_uy`. Evitar cadenas de error con listas de condiciones o ayuda larga en actionbar.
 
-## Dirección propuesta para las 11 nuevas identidades (NO implementada aún)
+## Dirección de las 11 identidades (sólo Ícaro implementado por ahora)
 
 | Identidad | Poderes en mano | Variante Curios |
 | --- | --- | --- |
@@ -28,13 +30,13 @@ Pendiente: reemplazo de las 11 identidades, nuevo sistema de activación Curios/
 | Paradox / Crisol | Ruptura diferida y detonación de fracturas almacenadas, nunca transmutación | Eco diferido de bloques minados |
 | Stasis / Corona | Área de ruptura suspendida y liberación simultánea | Ventana temporal defensiva; dominio activo con contorno y caducidad visibles |
 | Worldloom / Telar | Desmontar estratos de un gesto y barrido de superficie, sin construcción de puentes | Réplica de barrido al completar una racha |
-| Icarus | Corte ascendente sin mover por TP; secundaria de empuje vertical progresivo | Aceleración aérea/control de caída con duración extra al terminar el impulso |
+| Icarus — implementado | Alas de fractura sin mover al jugador; impulso vertical progresivo y Pluma de 6 s | Pluma aérea añadida al planeo sin impulso automático; ver ICARUS-6.0.md |
 | Void / Axioma | Implosión de roca y corte de vacío penetrante y destructivo | Fractura de vacío desde el bloque minado |
 | Exodium | Lluvia estelar dirigida y cráteres encadenados | Réplicas estelares sobre minería |
 | Hellspec | Erupción infernal y frente de ruptura volcánica | Contraerupción al recibir daño y pulso minero térmico |
 | Worldbreaker | Cataclismo propio y segunda ruptura suprema, además de copiar | Variante suprema propia más imitación real de la variante Curios seleccionada |
 
-Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Los nombres de esta tabla son dirección de diseño, no contenido terminado.
+Los valores finales y las geometrías deben definirse con pruebas y presupuesto, no copiar la misma esfera cambiando el color. Salvo Ícaro, los nombres de esta tabla son dirección de diseño, no contenido terminado.
 
 ## Validación requerida antes de entrega final
 

@@ -1,8 +1,8 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.1`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.2`, todavía no es la reforma completa ni una entrega final.**
 
-Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Las 11 habilidades nuevas y variantes Curios todavía están pendientes: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de esta base: [44433168671](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44433168671).
+Eliminación del HUD y de expansión SHIFT, mensajes breves, traducción `es_uy` y primera tarjeta Curios en el manual. Modelos/texturas congelados; clases dedicadas de Iridium/Strata preservadas. Ícaro ya tiene alas de fractura y ascenso físico sin TP, Pluma temporal y variante aérea Curios: [validación y captura real](docs/mining-rework/ICARUS-6.0.md). Quedan las otras diez identidades y la copia Curios de Worldbreaker: [estado y contrato](docs/mining-rework/REFORM-6.md). CI de Ícaro: [44442689638](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44442689638), 177 JUnit / 436 GameTests / vuelo real de supervivencia aprobado.
 
 ---
 

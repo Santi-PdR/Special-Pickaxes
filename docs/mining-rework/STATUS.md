@@ -1,3 +1,9 @@
+## Reforma 6.0 — Ícaro alpha.2 validado, reforma global incompleta
+
+Runtime `98f5c06c900461b16cca18d1a177c3d178adf231`, CI `44442689638` SUCCESS: **177 JUnit** sin fallos/errores/omisiones, **436 GameTests**, cliente 32 escenas/64 tooltips, servidor empaquetado y vuelo real de supervivencia por tecla X aprobados. Local: 138 Python (una omisión sin Java), 25 recursos correctos. Ícaro: alas naturales de 32 bloques / 37–49 de envergadura sin desplazamiento, impulso de 32 ticks por velocidad, Pluma temporal 120 ticks, variante aérea Curios, copia en mano y hélices custom activas. Ascensor/anclas TP retirados completamente; se sustituyeron sus pruebas, no se cambiaron Iridium ni Strata. [Detalle, límites, fallos corregidos y captura real](ICARUS-6.0.md).
+
+Vuelo observado: subida 14,21545 bloques, máximo paso entre muestras servidor 1,30760; no confundir muestreo de paquetes con velocidad impuesta por tick. Captura ES inspeccionada: `review/icarus-ascent-6.0.0-alpha.2-es.jpg`. Modelos/texturas de picos intactos según hashes. JAR alpha 824530 bytes, SHA256 `941f79ecb3cdde57c816d872740533fc82cfa25b8951a355c0066bae3fb1bbe0`. No release final: quedan otras diez identidades y variantes/copia Curios global. La base de interfaz se conserva.
+
 ## Reforma 6.0 — base alpha.1, incompleta
 
 Fuente `5d0c8491d72f13de1fd6b702267f75b90d08af39`. CI `44433168671`: SUCCESS; 179 JUnit sin fallos/errores/omisiones, 426 GameTests, cliente 32 escenas/64 tooltips y servidor empaquetado aprobados. Local: 137 Python (una omisión sin Java), 25 recursos correctos. Eliminación efectiva del renderer de HUD, tooltips idénticos con/sin SHIFT, errores breves, catálogo completo es_uy, tarjeta Curios actual en I y render real ampliado. Arte y clases dedicadas de Iridium/Strata congelados por SHA256. Capturas finales ES de manual/SHIFT inspeccionadas en `review/*6.0.0-alpha.1-es.jpg`. [Contrato, historial de correcciones y trabajo pendiente](REFORM-6.md).
