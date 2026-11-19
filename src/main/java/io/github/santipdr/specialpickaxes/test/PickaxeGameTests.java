@@ -174,7 +174,7 @@ public final class PickaxeGameTests {
             h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
         if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).isAir(),"exposure clears adjacent stone and preserves its ore");
         if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(wearer.getOffhandItem().getCount()<64,"the walkway consumes real offhand building material");
-        if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).is(Blocks.STONE),"survey is non-destructive");
+        if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).isAir(),"solar nova harvests its natural target without harming creatures");
         WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
     }
     @GameTest(template="empty",batch="rework_each_194") public static void hellspecChimneyIsNotAMagmaAttack(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.HELLSPEC);}
@@ -1379,10 +1379,10 @@ public final class PickaxeGameTests {
                 "the actual primary control path recovers a malformed future deadline");
         h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);
     }
-    @GameTest(template="empty",batch="rework_each_151") public static void palimpsestSurveyLeavesCreaturesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
+    @GameTest(template="empty",batch="rework_each_151") public static void dawnNovaLeavesCreaturesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
     @GameTest(template="empty",batch="rework_each_152") public static void axiomExposureLeavesProjectilesUntouched(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.AXIOM);}
     @GameTest(template="empty",batch="rework_each_153") public static void choirArchIsMiningOnly(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.CHOIR);}
-    @GameTest(template="empty",batch="rework_each_154") public static void palimpsestSurveyRecoversItsCooldown(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
+    @GameTest(template="empty",batch="rework_each_154") public static void dawnNovaRecoversItsCooldown(GameTestHelper h){miningOnlyAlternate(h,ArtifactKind.PALIMPSEST);}
     @GameTest(template="empty",batch="rework_each_155") public static void alternateRejectsDetachedToolsAndMismatchedKinds(GameTestHelper h){
         var wearer=player(h,ArtifactKind.PALIMPSEST);var tool=wearer.getMainHandItem();
         h.assertTrue(!ArtifactSkills.use(wearer,tool.copy(),ArtifactKind.PALIMPSEST),"a detached copy cannot activate the held skill");
@@ -1886,7 +1886,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var ore=at.east(3);
         h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);
         h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"solar rays activate on natural stone");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir(),"rays break rock and disconnected ore, not a connected-vein clone");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir(),"rays break rock and disconnected ore: center="+h.getLevel().getBlockState(at)+" ore="+h.getLevel().getBlockState(ore)+" status="+WorkQueue.status(p)+" remaining="+WorkQueue.remaining(p)+" completed="+WorkQueue.completed(p)+" succeeded="+WorkQueue.succeeded(p)+" reason="+WorkQueue.pauseReason(p)+" range="+p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(ore)));finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_05") public static void choirReplayMatchesState(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);p.setYRot(0);var origin=p.blockPosition().above().relative(Direction.SOUTH);
