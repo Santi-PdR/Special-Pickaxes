@@ -61,6 +61,11 @@ public final class MiningObservations {
                 ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
         return capture(p,p.getMainHandItem(),ArtifactKind.AXIOM,pos,state,false,new EquipmentLease<>(curio,current));
     }
+    public static boolean captureCuriosExodium(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
+        if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.EXODIUM
+                ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
+        return capture(p,p.getMainHandItem(),ArtifactKind.EXODIUM,pos,state,false,new EquipmentLease<>(curio,current));
+    }
     public static boolean captureCuriosStasis(ServerPlayer p,ItemStack curio,BlockPos pos,BlockState state,java.util.function.Supplier<ItemStack> current){
         if(curio.isEmpty()||!(curio.getItem() instanceof ArtifactItem item)||item.kind!=ArtifactKind.INTERREGNUM
                 ||!ArtifactOres.isOre(state)||PlayerPlacedBlocks.get(p.serverLevel()).contains(pos))return false;
@@ -115,6 +120,7 @@ public final class MiningObservations {
                 if(o.curioSource!=null&&o.kind==ArtifactKind.INTERREGNUM&&valid(o))StasisTimeSlice.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.WORLDLOOM&&valid(o))WorldloomRoots.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.AXIOM&&valid(o))AxiomAftershock.observed(p,o.tool,o.pos,o.curioSource);
+                if(o.curioSource!=null&&o.kind==ArtifactKind.EXODIUM&&valid(o))ExodiumFallingStar.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.applyHeldMiningEffects&&valid(o))ArtifactActions.mined(p,o.tool,o.kind,o.pos,o.state);
             }
         }

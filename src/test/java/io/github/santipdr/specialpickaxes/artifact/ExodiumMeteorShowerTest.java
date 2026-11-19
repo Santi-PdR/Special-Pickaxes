@@ -18,4 +18,19 @@ class ExodiumMeteorShowerTest {
         assertFalse(ExodiumMeteorShower.contains(12,0,12));assertFalse(ExodiumMeteorShower.contains(0,1,0));
         assertThrows(IllegalArgumentException.class,()->ExodiumMeteorShower.cell(BlockPos.ZERO,-1));
     }
+    @Test void impactBasinIsBroadTopDownAndContains6789UniqueCells(){
+        assertEquals(6789,ExodiumImpactBasin.VOLUME);var seen=new HashSet<BlockPos>();int previous=0;
+        for(int i=0;i<ExodiumImpactBasin.VOLUME;i++){
+            var p=ExodiumImpactBasin.cell(BlockPos.ZERO,i);assertTrue(seen.add(p));assertTrue(p.getY()<=previous);previous=p.getY();
+            assertTrue(ExodiumImpactBasin.contains(p.getX(),p.getY(),p.getZ()));
+            for(int y=p.getY();y<=0;y++)assertTrue(ExodiumImpactBasin.contains(p.getX(),y,p.getZ()));
+        }
+        assertTrue(ExodiumImpactBasin.contains(0,-16,0));assertFalse(ExodiumImpactBasin.contains(16,-1,0));
+    }
+    @Test void curiosFallingStarHas201ImmutableCellsInASmallBowl(){
+        var cells=ExodiumFallingStar.cells(BlockPos.ZERO);assertEquals(201,cells.size());assertEquals(201,new HashSet<>(cells).size());
+        assertTrue(cells.contains(new BlockPos(0,-4,0)));assertTrue(cells.contains(new BlockPos(5,0,0)));
+        assertFalse(cells.contains(new BlockPos(5,-1,0)));assertFalse(cells.contains(new BlockPos(0,1,0)));
+        assertThrows(UnsupportedOperationException.class,()->cells.clear());
+    }
 }

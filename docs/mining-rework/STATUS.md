@@ -1,3 +1,9 @@
+## Reforma 6.0 — Exodium alpha.16 secundaria y Curios implementados, validación pendiente
+
+Secundaria Cuenca de Impacto radio/profundidad 16, 6789 candidatos; Curios Estrella Fugaz radio 5/profundidad 4, 201 candidatos cada 8 s tras mena manual confirmada, lease de slot original revalidado durante callbacks. Conserva protección estelar; no es lanza ni pozo estrecho. Dos JUnit y cuatro GameTests nuevos; local 140 Python (una omisión), 25 recursos; 58 hashes congelados intactos. [Detalles](EXODIUM-6.0.md). Forge alpha.16 y capturas pendientes; no contar identidad validada todavía. Hellspec y Worldbreaker/copia Curios global siguen pendientes.
+
+Axiom alpha.14 fuente `18994e99d1f3ce6edbb40c327d87486c48c678a8`, CI `44621956811`: 199 JUnit sin fallos/errores/omisiones y 486 GameTests pasan. CI completa falló en cliente: `Real C key did not change mode: EVENTIDE expected 1`. No se relaja ni elimina esa prueba; Axiom no está validado extremo a extremo ni tiene captura de acción inspeccionada. Exodium alpha.15 `44623954610` aún en ejecución al iniciar esta tanda. Sin release pública.
+
 ## Reforma 6.0 — Exodium alpha.15 primaria implementada, identidad parcial
 
 Lluvia de cinco cráteres, 3511 candidatos, excavación de roca y menas naturales de arriba abajo. Reemplaza lanza lineal pública y su copia en mano. Partícula temática de descenso estelar con presupuesto. Dos JUnit y tres GameTests nuevos; 140 Python locales (una omisión), 25 recursos. Forge y captura de acción pendientes; secundaria y Curios sin reformar. [Detalles y límites](EXODIUM-6.0.md). Axiom alpha.14 sigue esperando validación de `18994e99d1f3ce6edbb40c327d87486c48c678a8`; el fallo previo `44621882371` era la expectativa heredada de vaciar el núcleo adyacente, actualizada al contrato nuevo sin retirar la prueba de protección. Hellspec y Worldbreaker/copia Curios global siguen pendientes. Sin release pública.

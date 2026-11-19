@@ -168,27 +168,13 @@ public final class ArtifactTechniques {
             case ICARUS -> IcarianFlight.start(player,tool);
             case WORLDBREAKER -> tool.hasTag()&&tool.getTag().contains("copiedSkill")?echo(player,tool,2):
                     WorkQueue.startRegion(player,tool,kind,new TemporalRiftProgram(aimed(player),kind,true));
-            case EXODIUM -> starfallSink(player,tool);
+            case EXODIUM -> ExodiumImpactBasin.start(player,tool);
             case IRIDIUM -> recallIridiumDrops(player,tool,IRIDIUM_RECALL_RADIUS,96);
             case SEAM_RIPPER -> seamFace(player,tool);
             default -> false;
         };
     }
 
-    private static boolean starfallSink(ServerPlayer player,ItemStack tool){
-        var aimed=ArtifactActions.target(player);if(aimed.isEmpty())return false;
-        var context=HeldUtilityContext.capture(player,tool);
-        BlockPos center=aimed.get();var level=player.serverLevel();var state=level.getBlockState(center);
-        if(!WorldSafety.allowed(player,ArtifactKind.EXODIUM,center)||!context.valid()
-                ||!level.hasChunkAt(center)||level.getBlockState(center)!=state
-                ||PlayerPlacedBlocks.get(level).contains(center)
-                ||!MiningDesigns.matrix(state)&&!ArtifactOres.isOre(state)
-                ||!WorldSafety.harvestable(player,tool,center))return false;
-        var program=new DirectionalProgram(center,Direction.DOWN,DirectionalProgram.Shape.EXODIUM_SINK,ArtifactKind.EXODIUM);
-        if(!WorkQueue.startRegion(player,tool,ArtifactKind.EXODIUM,program))return false;
-        ArtifactFeedback.starfallSink(player,center);
-        ArtifactFeedback.message(player,"starfall_sink_started");
-        return true;
-    }
+
 
 }

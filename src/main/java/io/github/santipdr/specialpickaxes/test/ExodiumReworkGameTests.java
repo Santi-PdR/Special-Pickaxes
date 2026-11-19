@@ -33,4 +33,10 @@ public final class ExodiumReworkGameTests {
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,callback);
         try{h.assertTrue(!ExodiumMeteorShower.start(p,p.getMainHandItem())&&calls[0]==1&&!WorkQueue.busy(p),"permission callback cannot redirect meteor origin");}finally{MinecraftForge.EVENT_BUS.unregister(callback);finish(h,p);}
     }
+    @GameTest(template="empty",batch="exodium_616_basin") public static void secondaryOpensABroadDeepBasinAndPreservesItsExterior(GameTestHelper h){
+        var p=player(h,ArtifactKind.EXODIUM);var at=target(h,p);var deep=at.below(16);var wide=at.east(12).below(3);var outside=at.east(16).below();
+        for(var cell:java.util.List.of(deep,wide,outside)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.EXODIUM),"public impact basin starts");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(deep).isAir()&&h.getLevel().getBlockState(wide).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"wide paraboloid opens deeply without becoming a shaft or removing exterior");finish(h,p);
+    }
 }
