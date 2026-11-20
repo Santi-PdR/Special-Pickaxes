@@ -84,4 +84,28 @@ public final class ConnectedExcavationGameTests {
         WorkQueue.cancel(p);ArtifactInteraction.display(p,tool,ArtifactKind.CRUCIBLE);
         h.assertTrue(tool.getDestroySpeed(Blocks.STONE.defaultBlockState())>=72,"finished alternate keeps full manual speed");finish(h,p);
     }
+    @GameTest(template="empty",batch="front_07") public static void liveFrontContinuesThroughDenseLootWithoutHighlightingOrdinaryDrops(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var level=h.getLevel();
+        var drops=new java.util.ArrayList<ItemEntity>();
+        for(int x=0;x<=4;x++)level.setBlockAndUpdate(at.east(x),Blocks.TERRACOTTA.defaultBlockState());
+        try{
+            for(int i=0;i<256;i++){
+                var drop=new ItemEntity(level,at.getX()+.5,at.getY()+.5,at.getZ()+.5,new ItemStack(Items.COBBLESTONE));
+                drops.add(drop);level.addFreshEntity(drop);
+            }
+            h.assertTrue(WorldSafety.dropPressure(p,at),"fixture actually reaches the dense loot threshold");
+            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live alternate starts despite dense loot");
+            for(int i=0;i<64;i++)WorkQueue.tick();
+            h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(at.east(4)).isAir(),"connected bank excavates while all existing loot remains");
+            h.assertTrue(!WorkQueue.pauseReason(p).equals("drops")&&drops.stream().allMatch(ItemEntity::isAlive),"no loot pause or deletion");
+            var nativeDrops=level.getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(8));
+            h.assertTrue(nativeDrops.stream().anyMatch(d->d.getItem().is(Items.TERRACOTTA)),"native terracotta loot is produced");
+            h.assertTrue(nativeDrops.stream().noneMatch(ItemEntity::isCurrentlyGlowing),"neither fresh ordinary drops nor existing loot are highlighted");
+        }finally{
+            WorkQueue.cancel(p);MiningObservations.forget(p);
+            for(var drop:level.getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(8)))drop.discard();
+        }
+        finish(h,p);
+    }
+
 }

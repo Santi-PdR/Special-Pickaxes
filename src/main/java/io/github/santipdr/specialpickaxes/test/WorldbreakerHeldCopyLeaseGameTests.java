@@ -27,7 +27,7 @@ public final class WorldbreakerHeldCopyLeaseGameTests {
     @GameTest(template="empty",batch="worldbreaker_held_lease_03") public static void sourceMutationDuringActivationPermissionCannotStartOldAbility(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.EXODIUM.id);
         Consumer<AbilityUseEvent> mutate=e->{if(e.player==p)tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);};MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,mutate);
-        try{h.assertTrue(!ExodiumMeteorShower.start(p,tool)&&!WorkQueue.busy(p),"claim callback cannot retag the source and start stale work");}
+        try{h.assertTrue(!ArtifactActions.primary(p,tool,ArtifactKind.WORLDBREAKER)&&!WorkQueue.busy(p),"claim callback cannot retag the source and start stale work");}
         finally{MinecraftForge.EVENT_BUS.unregister(mutate);finish(h,p);}
     }
 }
