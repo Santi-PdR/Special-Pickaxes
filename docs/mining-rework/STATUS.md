@@ -1,3 +1,11 @@
+## Revisión frontal — alpha.42, cierre gráfico pendiente
+
+Alpha.41 `2e47125f534be52c593688f09e120e4ba40389c7`, CI `44804429368`: GameTests y servidor empaquetado/logs superados; cliente gráfico todavía en ejecución al registrar esta nota. Incluye la corrección de seguimiento de arena y grava reales; se amplió la fase de asentamiento a 120 ticks bajo el deadline absoluto original de 240 ticks. No se amplían timeouts del smoke ni se omiten pruebas fallidas.
+
+Detectado en el código fuente de Curios 1.20.x que su inventario usa G. Alpha.42 `a884f7267a9ef254bbd156b61fec7bfd5fadd94b`, CI `44807152424`, mueve la activa equipada a H y hace que todos los resúmenes Curios interpolen la tecla real reasignada. Curios conserva G para su inventario. Prueba Robot actualizada a H; validación física aún pendiente. Local: 157 Python (una omisión), 25 recursos, hashes de arte/mecánicas congeladas intactos.
+
+El alcance solicitado ya está implementado en código (minería frontal conectada, asentamiento de bloques, compatibilidad ampliada, brillo sólo en menas del extractor, continuidad con loot denso, ascenso excavador, velocidad de Paradox y resúmenes positivos). No equivale a validación final: falta confirmar el cliente de la fuente exacta y revisar las capturas actuales. No publicar ni pedir al usuario que pruebe de nuevo antes de cerrar esto.
+
 ## Revisión frontal — alpha.39 en validación, no aprobada
 
 R/X mineros de las fuentes reformadas y sus copias usan ConnectedExcavation: objetivo a un máximo de seis bloques, expansión sólo tras rotura real a vecinos conectados, mitad frontal y alcance limitado, sin saltos por aire a islas remotas. Stasis conserva su dominio primario; Paradox conserva selección primaria, pero su secundaria es demolición frontal inmediata. Ícaro conserva ascenso con apertura de techo; Iridium/Strata nativos intactos.
