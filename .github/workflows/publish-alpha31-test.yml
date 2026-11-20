@@ -34,7 +34,7 @@ jobs:
           assert m['commit']=='031b70ac9fb770c940add8493e4f480793600656'
           assert str(m['run_id'])=='44783621237'
           assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.31.jar'
-          jar=root/m['file']
+          jar=root/'libs'/m['file']
           assert jar.stat().st_size==m['bytes']==991442
           assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='a52e8e8a89a6258aa7ad92ab3975ee7526df5feeed69765a49863a07c8f429a7'
           with zipfile.ZipFile(jar) as z:
@@ -48,4 +48,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create test-6.0.0-alpha.31-44783621237 release/special-pickaxes-1.20.1-6.0.0-alpha.31.jar release/RELEASE.json release/SHA256SUMS --target 031b70ac9fb770c940add8493e4f480793600656 --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.31 - prueba solicitada' --notes 'Prueba manual solicitada expresamente. Contiene las 13 activas equipadas y sus copias Worldbreaker. CI 44783621237 SUCCESS: 539 GameTests, cliente grafico y servidor. No es una version final ni aprobacion visual. G con slot Curios real aun pendiente de validacion dedicada. Requiere Minecraft 1.20.1, Forge 47.4.10 y Java 17; Curios opcional para las variantes equipadas. SHA256 a52e8e8a89a6258aa7ad92ab3975ee7526df5feeed69765a49863a07c8f429a7; 991442 bytes.'
+          gh release create test-6.0.0-alpha.31-44783621237 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.31.jar release/RELEASE.json release/SHA256SUMS --target 031b70ac9fb770c940add8493e4f480793600656 --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.31 - prueba solicitada' --notes 'Prueba manual solicitada expresamente. Contiene las 13 activas equipadas y sus copias Worldbreaker. CI 44783621237 SUCCESS: 539 GameTests, cliente grafico y servidor. No es una version final ni aprobacion visual. G con slot Curios real aun pendiente de validacion dedicada. Requiere Minecraft 1.20.1, Forge 47.4.10 y Java 17; Curios opcional para las variantes equipadas. SHA256 a52e8e8a89a6258aa7ad92ab3975ee7526df5feeed69765a49863a07c8f429a7; 991442 bytes.'
