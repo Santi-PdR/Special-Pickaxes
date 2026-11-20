@@ -32,7 +32,7 @@ public final class StasisVisibilityGameTests {
         for(var cell:java.util.List.of(gap,pole,placed)){level.setBlockAndUpdate(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(cell);}
         PlayerPlacedBlocks.get(level).mark(placed);
         try{
-            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"public hourglass starts");drain(p);
+            h.assertTrue(MiningAlternates.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"public hourglass starts");drain(p);
             h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(pole).isAir(),"waist and distant upper chamber excavated");
             h.assertTrue(level.getBlockState(gap).is(net.minecraft.world.level.block.Blocks.STONE)&&level.getBlockState(placed).is(net.minecraft.world.level.block.Blocks.STONE),"narrow waist gap and player provenance preserved");
         }finally{PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);}
