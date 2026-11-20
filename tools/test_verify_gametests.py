@@ -20,6 +20,16 @@ class GameTestLogValidation(unittest.TestCase):
         self.assertIn('python3 tools/verify_gametests.py build/verification-gametest.log', workflow)
         self.assertIn('python3 tools/validate_runtime_logs.py run/logs/gametest.log build/verification-gametest.log', workflow)
 
+    def test_validation_config_writes_are_isolated_without_shipping_the_fixture(self):
+        source = pathlib.Path('src/main/java/io/github/santipdr/specialpickaxes/test/ValidationConfigIsolation.java').read_text()
+        self.assertIn('Boolean.getBoolean("specialpickaxes.testConfig")', source)
+        self.assertIn('Boolean.getBoolean("specialpickaxes.clientSmoke")', source)
+        self.assertIn('CommentedConfig.inMemory()', source)
+        self.assertLess(source.index('ArtifactConfig.SPEC.correct(config)'), source.index('ArtifactConfig.SPEC.setConfig(config)'))
+        gradle = pathlib.Path('build.gradle').read_text()
+        self.assertIn("property 'specialpickaxes.testConfig', 'true'", gradle)
+        self.assertIn("exclude 'io/github/santipdr/specialpickaxes/test/**'", gradle)
+
     def test_launch_without_summary_is_not_success(self):
         with self.assertRaises(ValueError):
             validate_log('BUILD SUCCESSFUL\nStarting GameTest server', 153)

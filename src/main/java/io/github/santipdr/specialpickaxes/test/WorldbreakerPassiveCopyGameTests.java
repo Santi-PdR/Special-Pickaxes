@@ -51,4 +51,16 @@ public final class WorldbreakerPassiveCopyGameTests {
         try{WorldbreakerCuriosPassives.hurt(p,stack,()->stack,event,false);h.assertTrue(event.getAmount()==8F&&enemy.isOnFire()&&!p.hasEffect(net.minecraft.world.effect.MobEffects.ABSORPTION),"infernal source reaction replaces native absorption reaction");}
         finally{enemy.discard();finish(h,p);}
     }
+    @GameTest(template="empty",batch="worldbreaker_passive_06") public static void copiedIcarusKeepsAirborneMomentumAndFeatherfall(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var stack=copy(ArtifactKind.ICARUS);p.setOnGround(false);
+        WorldbreakerCuriosPassives.tick(p,stack,()->stack);
+        h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get())&&p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get())&&!p.hasEffect(SpecialPickaxes.WORLDBREAKER_AEGIS.get()),"Icarus airborne passive copied without native aegis or teleport");
+        ArtifactPassives.onCuriosUnequip(p,ArtifactKind.ICARUS);h.assertTrue(!p.hasEffect(SpecialPickaxes.ICARIAN_MOMENTUM.get()),"owned airborne momentum cleaned up");finish(h,p);
+    }
+    @GameTest(template="empty",batch="worldbreaker_passive_07") public static void copiedStrataUsesOriginalFocusWithoutNewMiningGeometry(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var stack=copy(ArtifactKind.SEAM_RIPPER);
+        WorldbreakerCuriosPassives.tick(p,stack,()->stack);
+        h.assertTrue(p.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&p.getEffect(SpecialPickaxes.STRATA_FOCUS.get()).getAmplifier()==1&&!WorkQueue.busy(p)&&!p.hasEffect(SpecialPickaxes.WORLDBREAKER_AEGIS.get()),"original Strata Focus II copied without inventing a queued mining trigger");
+        finish(h,p);
+    }
 }

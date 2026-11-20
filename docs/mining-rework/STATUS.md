@@ -1,3 +1,9 @@
+## Reforma 6.0 — alpha.29 aislamiento de configuración y paridad pasiva
+
+Alpha.28 CI `44649509385`: 530 GameTests pasan, pero logs estrictos detectan ConfigLoadingException/tabla TOML [work] duplicada en FileWatcher durante cambios de límites por tests. No era el supuesto fallo de resumen nocturno. Fixture sólo de pruebas liga configuración corregida en memoria al iniciar servidor GameTest/clienteSmoke, excluida del JAR; producción/validador sin excepciones ni cambios de límites. Un Python de regresión y dos GameTests de paridad Ícaro/Strata; local 143 Python (una omisión), 25 recursos, hashes congelados intactos. [Detalles](WORLDBREAKER-6.0.md).
+
+Forge alpha.29/revisión visual pendientes; controles equipados y lifecycle completo de copias todavía abiertos. No se inventan disparadores mineros para fuentes cuya variante Curios original es pasiva. Sin release pública ni reforma completa.
+
 ## Reforma 6.0 — alpha.28 seguridad de copias en mano
 
 Lease de copiedSkill/copiedMode para contextos de utilidad, jobs y rotura nativa: cambiar copia/modo en el mismo stack invalida trabajo anterior, incluso el bloque actual durante callback. No invalida desgaste/encantamientos/status ni modifica picos nativos no Worldbreaker. Tres GameTests; local 142 Python (una omisión), 25 recursos, 58 hashes intactos. Forge alpha.28 pendiente; controles equipados/paridad restante y revisión visual siguen abiertos. [Detalles](WORLDBREAKER-6.0.md).

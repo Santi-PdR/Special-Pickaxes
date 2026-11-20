@@ -93,3 +93,13 @@ A same-stack NBT change is now treated as a copied-skill source change. Held uti
 Three GameTests cover source changes before queued mining, copiedMode changes inside the current block callback, and copiedSkill changes inside activation permission callbacks. Uses shared safety infrastructure rather than inventing another excavation. Local 142 Python (one skip without Java), 25 resources, frozen hashes and diff check pass. Forge alpha.28 pending; equipped active controls and outstanding Curios parity/visual review remain incomplete.
 
 Alpha.27 source `fa1cea44db69e3b06e1c94ca7d135576099f346c`, CI `44645297618` SUCCESS: all 527 GameTests, client/input and packaged-server validation passed. This supersedes the earlier failed post-GameTest validation and validates the copied-Iridium milestone; does not validate alpha.28. No public release.
+
+## Alpha.29 — configuration-race correction and copied passive parity checks
+
+Alpha.28 CI `44649509385` completed all 530 GameTests, but strict logs correctly rejected a real `ConfigLoadingException` / duplicate TOML `[work]` table from NightConfig's file-watcher thread while tests were changing work budgets. This is not the earlier suspected midnight-summary issue. The previous full-transcript validation exposed it rather than suppressing it.
+
+A test-package-only ServerStarted fixture now binds default-corrected in-memory configuration when `specialpickaxes.testConfig` (GameTests) or `specialpickaxes.clientSmoke` is enabled. The real config loader still runs at startup; deliberate test `.set` overrides no longer autosave a watched server TOML file. Fixture package stays excluded from the shipped JAR. Production config storage, reload behavior, limits and strict error scanner are unchanged. This isolates validation state; does not claim a general NightConfig upstream fix. Python regression requires the guard, correct-before-bind ordering, property and JAR exclusion. Forge rerun pending.
+
+Two GameTests now explicitly cover copied Icarus airborne Momentum/Featherfall and copied Strata Focus II without inventing a new mining geometry. These are parity checks for existing source passives, not new abilities. Frozen native Iridium/Strata files remain unchanged. Equipped active controls and full lifecycle/visual review remain outstanding; no complete-global-copy claim.
+
+Local 143 Python (one skip without Java), 25 resources, diff check and frozen hashes pass; alpha.29 Forge pending. No public release.
