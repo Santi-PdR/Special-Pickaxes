@@ -46,13 +46,16 @@ fml.write_text(config)
 (out/'alsoft.conf').write_text('[general]\nrt-prio=0\ndrivers=null\n')
 env=dict(os.environ,DISPLAY=':99',LIBGL_ALWAYS_SOFTWARE='1',ALSOFT_DRIVERS='null',ALSOFT_CONF=str(out/'alsoft.conf'),NO_AT_BRIDGE='1')
 xlog=open(out/'xvfb.log','w');xvfb=subprocess.Popen(['Xvfb',':99','-screen','0','1280x720x24','-ac'],stdout=xlog,stderr=subprocess.STDOUT)
+# Compile once: source-launching Java for every capture wastes the fixed client deadline.
+helper=out/'robot-classes';helper.mkdir(exist_ok=True)
+subprocess.run(['javac','-d',str(helper),str(root/'tools/CaptureScreen.java')],check=True,timeout=30)
 proc=None;lines=queue.Queue();captured=[];ready=None;success=False;gallery_done=False;ux=set();activation_pending=None
 def capture_screen(path,action=None):
- args=['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),str(path)]
+ args=['java','-Djava.awt.headless=false','-cp',str(helper),'CaptureScreen',str(path)]
  if action:args.append(action)
  subprocess.run(args,env=env,check=True,timeout=20)
 def press_screen(action):
- subprocess.run(['java','-Djava.awt.headless=false',str(root/'tools/CaptureScreen.java'),'--press',action],env=env,check=True,timeout=20)
+ subprocess.run(['java','-Djava.awt.headless=false','-cp',str(helper),'CaptureScreen','--press',action],env=env,check=True,timeout=20)
 try:
  for _ in range(100):
   if pathlib.Path('/tmp/.X11-unix/X99').exists():break
@@ -186,6 +189,6 @@ assert "control_active" in text and "control_cancelled" in text
 print("KEYBOARD_TO_SERVER_ACTIVATE_CANCEL_OK")
 
 assert "supreme_executing" in text and "supreme_complete" in text
-print("SUPREME_REAL_WEDGE_AND_BARRIER_VERIFIED")
+print("SUPREME_CONNECTED_FRONT_AND_BARRIER_VERIFIED")
 
 assert "key_bindings_registered_and_rebound_ok" in text

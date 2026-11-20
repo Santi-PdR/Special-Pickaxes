@@ -120,15 +120,15 @@ public final class ClientValidation {
                     data.putBoolean("supremeDone",true);// Higher CI throughput is configured before the long World Shatter work queue starts.
                     var center=BlockPos.of(data.getLong("supremeCenter"));
                     var centerState=p.serverLevel().getBlockState(new BlockPos(100,82,100));
-                    var wedgeState=p.serverLevel().getBlockState(new BlockPos(112,82,140));
-                    var outsideState=p.serverLevel().getBlockState(new BlockPos(112,82,100));
+                    var connectedState=p.serverLevel().getBlockState(new BlockPos(104,82,104));
+                    var outsideState=p.serverLevel().getBlockState(new BlockPos(112,82,149));
                     var bedrockState=p.serverLevel().getBlockState(new BlockPos(100,82,150));
                     var barrierState=p.serverLevel().getBlockState(new BlockPos(100,82,151));
-                    String geometry="center="+center+" states="+centerState+","+wedgeState+","+outsideState+","+bedrockState+","+barrierState;
-                    if(!centerState.isAir()||!wedgeState.isAir()||!outsideState.is(net.minecraft.world.level.block.Blocks.STONE)
+                    String geometry="center="+center+" states="+centerState+","+connectedState+","+outsideState+","+bedrockState+","+barrierState;
+                    if(!centerState.isAir()||!connectedState.isAir()||!outsideState.is(net.minecraft.world.level.block.Blocks.STONE)
                         ||!bedrockState.is(net.minecraft.world.level.block.Blocks.BEDROCK)||!barrierState.is(net.minecraft.world.level.block.Blocks.STONE)){
                         p.sendSystemMessage(Component.literal("SUPREME_GEOMETRY_FAILED "+geometry));
-                        throw new IllegalStateException("Supreme wedge geometry or barrier failed: "+geometry);
+                        throw new IllegalStateException("Supreme connected front or barrier failed: "+geometry);
                     }
                     int removed=0;for(int x=76;x<=124;x++)for(int z=100;z<150;z++)for(int y=75;y<=95;y++)if(p.serverLevel().getBlockState(new BlockPos(x,y,z)).isAir())removed++;
                     if(removed<=4096)throw new IllegalStateException("Supreme excavation truncated: "+removed);
@@ -230,6 +230,7 @@ public final class ClientValidation {
         p.connection.teleport(100.5,81,96.5,0,0);
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get()));
         p.getMainHandItem().enchant(net.minecraft.world.item.enchantment.Enchantments.BLOCK_EFFICIENCY,1000);
+        p.getMainHandItem().getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());
         ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",4);
         ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("ready");
         p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.fallDistance=0;

@@ -43,3 +43,16 @@ class ConnectedExcavationTests(unittest.TestCase):
                     self.assertLessEqual(len(value),160,(kind,language,ability))
                     for phrase in ('no radar','sin radar','no imán','no atrae','cannot','no teleport','no ore','celdas candidatas','candidate cells'):
                         self.assertNotIn(phrase,value.lower())
+
+    def test_graphical_front_probe_and_fixed_deadline_capture_helper(self):
+        fixture=(BASE/'test/ClientValidation.java').read_text()
+        self.assertIn('new BlockPos(104,82,104)',fixture)
+        self.assertIn('new BlockPos(112,82,149)',fixture)
+        self.assertIn('removed<=4096',fixture)
+        self.assertNotIn('wedgeState',fixture)
+        smoke=pathlib.Path('tools/client_smoke.py').read_text()
+        self.assertIn("['javac','-d',str(helper)",smoke)
+        self.assertIn("'-cp',str(helper),'CaptureScreen'",smoke)
+        self.assertIn('deadline=time.monotonic()+1100',smoke)
+        hud=(BASE/'client/ArtifactHud.java').read_text()
+        self.assertIn('@SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST) public static void levels',hud)
