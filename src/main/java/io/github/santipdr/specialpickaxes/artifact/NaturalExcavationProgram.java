@@ -21,7 +21,8 @@ public final class NaturalExcavationProgram implements WorkProgram {
         kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
         limit=Math.min(shape.volume,ArtifactConfig.JOB_LIMIT.get());
     }
-    public static boolean eligible(BlockState state){return MiningDesigns.seamGeology(state)||ArtifactOres.isOre(state);}
+    public static boolean eligible(BlockState state){return !state.isAir()&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()
+            &&state.getBlock().defaultDestroyTime()>=0;}
     private BlockPos at(int cell){return ExcavationVolume.cell(origin,forward,shape,cell);}
     public int remaining(){return Math.max(0,limit-index);}
     public boolean awaiting(){return false;}

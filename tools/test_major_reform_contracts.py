@@ -36,7 +36,7 @@ class MajorReformContracts(unittest.TestCase):
 
     def test_manual_has_explicit_curios_content_and_real_item_render(self):
         source = (ROOT/'src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
-        self.assertIn('"passive.specialpickaxes."+kind.id', source)
+        self.assertIn('"curios.detail.specialpickaxes."+kind.id', source)
         self.assertIn('g.renderItem(shownIcon,0,0)', source)
         self.assertIn('case "screen.specialpickaxes.curios"->"03"', source)
         self.assertIn('default->"04"', source)

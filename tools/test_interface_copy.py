@@ -66,8 +66,10 @@ class InterfaceCopyTests(unittest.TestCase):
             texts = self.texts(locale)
             for identity in IDS:
                 self.assertTrue(texts['curios.detail.specialpickaxes.' + identity].strip())
-            self.assertIn('99', texts['curios.detail.specialpickaxes.fault_choir'])
-            self.assertIn('65', texts['curios.detail.specialpickaxes.palimpsest'])
+            for identity in IDS:
+                detail = texts['curios.detail.specialpickaxes.' + identity]
+                self.assertLessEqual(len(detail), 200, (locale, identity))
+                self.assertIn('G:', detail)
 
     def test_every_active_mode_has_readable_localized_labels(self):
         from mining_catalog import MODES

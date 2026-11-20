@@ -39,7 +39,6 @@ public final class WorldSafety {
     public static void tagIridiumDrop(net.minecraft.world.entity.Entity entity,net.minecraft.server.level.ServerLevel level){
         var context=NATIVE_BREAK.get();
         if(!(entity instanceof net.minecraft.world.entity.item.ItemEntity drop)||context==null||context.player().serverLevel()!=level)return;
-        if(context.kind()==ArtifactKind.PALIMPSEST){drop.setGlowingTag(true);return;}
         if(context.kind()!=ArtifactKind.IRIDIUM||!ArtifactOres.isOre(context.expected()))return;
         OreDropHighlight.mark(drop,context.player());
     }
@@ -79,7 +78,7 @@ public final class WorldSafety {
         var level=p.serverLevel();var s=level.getBlockState(pos);
         return !tool.isEmpty() && p.getMainHandItem()==tool && !s.isAir() && !s.hasBlockEntity()
             && s.getFluidState().isEmpty() && s.getDestroySpeed(level,pos)>=0
-            && ArtifactTools.effective(s) && tool.isCorrectToolForDrops(s);
+            && tool.isCorrectToolForDrops(s);
     }
     public static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected) {
         return mine(p,tool,kind,pos,expected,true);
@@ -106,7 +105,7 @@ public final class WorldSafety {
         if(!allowed(p,kind,pos) || !skill.valid() || !sameActor(p,level,origin,tool,pos) || level.getBlockState(pos)!=expected || !harvestable(p,tool,pos)
                 ||naturalOnly&&PlayerPlacedBlocks.get(level).contains(pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
-        if(checkDropPressure&&dropPressure(p,pos))return false;
+        // Item density never blocks mining; scheduler work budgets remain bounded.
         // Keep the exact break context through item spawning so Iridium can tag only these drops.
         var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly,level,origin,skill));
         boolean mined;
@@ -124,9 +123,7 @@ public final class WorldSafety {
     }
     /** Avoid entity queries and false pauses unless this exact block is still a permitted mining target. */
     static boolean backpressuredMine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected){
-        var level=p.serverLevel();
-        return level.hasChunkAt(pos)&&level.getBlockState(pos)==expected&&harvestable(p,tool,pos)
-                &&allowed(p,kind,pos)&&dropPressure(p,pos);
+        return false; // Loot density is not a mining permission or a pause condition.
     }
     private static boolean breakPermission(ServerPlayer p,BlockPos pos) {
         return ForgeHooks.onBlockBreakEvent(p.serverLevel(),p.gameMode.getGameModeForPlayer(),p,pos)>=0;

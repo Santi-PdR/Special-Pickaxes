@@ -30,7 +30,7 @@ public final class MiningObservations {
         if(!p.isAlive()||p.isRemoved()||p.isSpectator()||tool.isEmpty()||p.getMainHandItem()!=tool
                 ||curioSource!=null&&(!curioSource.active()||curioSource.expected().isEmpty()))return false;
         boolean trackOreDrops=kind==ArtifactKind.IRIDIUM&&ArtifactOres.isOre(state);
-        boolean solarDrops=kind==ArtifactKind.PALIMPSEST||curioSource==null&&ArtifactSkills.feedbackKind(tool,kind)==ArtifactKind.PALIMPSEST;
+        boolean solarDrops=false; // Only the ore extractor highlights ore drops.
         // Queued Iridium breaks never chain held-mining effects.
         boolean queuedIridiumOre=WorkQueue.running()&&trackOreDrops;
         if((WorkQueue.running()&&!queuedIridiumOre) || PENDING.size()>=1024) return false;
@@ -155,7 +155,6 @@ public final class MiningObservations {
                     if(!valid(o)||p.serverLevel()!=level||!p.position().equals(origin))continue;
                     if(o.dropsBeforeComplete)highlightNewOreDrops(p,o);
                 }
-                if(o.solarDrops&&o.dropsBeforeComplete&&valid(o))highlightNewSolarDrops(p,o);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CHOIR&&valid(o))ResonantFault.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.EVENTIDE&&valid(o))EventideRupture.observed(p,o.tool,o.pos,o.curioSource);
                 if(o.curioSource!=null&&o.kind==ArtifactKind.CRUCIBLE&&valid(o))ParadoxLattice.observed(p,o.tool,o.pos,o.curioSource);
@@ -199,15 +198,6 @@ public final class MiningObservations {
             }
             return inspected[0]>=DROP_QUERY_LIMIT?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT
                     :net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
-        });
-    }
-    private static void highlightNewSolarDrops(ServerPlayer p,Observation o){
-        int[] inspected={0};
-        p.serverLevel().getEntities().get(net.minecraft.world.level.entity.EntityTypeTest.forClass(ItemEntity.class),new AABB(o.pos).inflate(2),drop->{
-            if(++inspected[0]>DROP_QUERY_LIMIT)return net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT;
-            var before=o.dropsBefore.get(drop.getUUID());var stack=drop.getItem();
-            if(drop.isAlive()&&(before==null||stack.getCount()>before.getCount()||!ItemStack.isSameItemSameTags(before,stack)))drop.setGlowingTag(true);
-            return inspected[0]>=DROP_QUERY_LIMIT?net.minecraft.util.AbortableIterationConsumer.Continuation.ABORT:net.minecraft.util.AbortableIterationConsumer.Continuation.CONTINUE;
         });
     }
     public static void forget(ServerPlayer p) { ResonantFault.forget(p);ParadoxLattice.forget(p);PENDING.removeIf(o -> o.player.getUUID().equals(p.getUUID())); }

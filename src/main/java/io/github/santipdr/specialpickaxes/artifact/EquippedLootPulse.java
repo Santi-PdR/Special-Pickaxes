@@ -6,9 +6,17 @@ import net.minecraft.world.item.ItemStack;
 final class EquippedLootPulse {
     private EquippedLootPulse(){}
     static boolean activate(ServerPlayer p,ItemStack held,ArtifactKind kind,EquipmentLease<ItemStack> source){
+        if(kind==ArtifactKind.PALIMPSEST){
+            var guard=HeldUtilityContext.capture(p,held);
+            if(!source.active()||!guard.valid())return false;
+            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DIG_SPEED,160,3,false,false,true));
+            if(!source.active()||!guard.valid())return false;
+            p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION,100,1,false,false,true));
+            return source.active()&&guard.valid();
+        }
         var context=HeldUtilityContext.capture(p,held);var center=p.getEyePosition();int changed=0;
         var drops=EntitySelection.nearest(p.serverLevel(),ItemEntity.class,p.getBoundingBox().inflate(12),
-                drop->drop.isAlive()&&(kind==ArtifactKind.PALIMPSEST||ArtifactTechniques.isIridiumRecallTarget(p,drop,center,12)),center,32,256);
+                drop->drop.isAlive()&&ArtifactTechniques.isIridiumRecallTarget(p,drop,center,12),center,32,256);
         for(var drop:drops){
             var pos=drop.position();var stack=drop.getItem();boolean allowed=WorldSafety.allowed(p,kind,drop.blockPosition());
             if(!context.valid()||!source.active()||source.expected().isEmpty())break;

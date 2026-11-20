@@ -41,10 +41,10 @@ public final class CuriosActiveGameTests {
         h.assertTrue(CuriosMiningActive.activate(p,source,slot::get)&&IcarianFlight.active(p),"equipped ascent starts");IcarianFlight.tick();
         h.assertTrue(p.position().equals(position)&&p.getDeltaMovement().y>0,"flight uses velocity, never teleport");slot.set(ItemStack.EMPTY);IcarianFlight.tick();h.assertTrue(!IcarianFlight.active(p),"removal stops further impulses");IcarianFlight.stop(p);finish(h,p);
     }
-    @GameTest(template="empty",batch="curios_active_loot") public static void dawnLightsLootWhileIridiumOnlyPullsOwnedOreLoot(GameTestHelper h){
+    @GameTest(template="empty",batch="curios_active_loot") public static void dawnBoostsMiningWhileOnlyIridiumHighlightsOreLoot(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);var at=target(h,p);var dawn=p.getMainHandItem();p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         var drop=new net.minecraft.world.entity.item.ItemEntity(h.getLevel(),at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);var motion=drop.getDeltaMovement();
-        h.assertTrue(CuriosMiningActive.activate(p,dawn,()->dawn)&&drop.isCurrentlyGlowing()&&drop.getDeltaMovement().equals(motion),"Dawn lights drops without a magnet or mineral radar");
+        h.assertTrue(CuriosMiningActive.activate(p,dawn,()->dawn)&&!drop.isCurrentlyGlowing()&&p.hasEffect(net.minecraft.world.effect.MobEffects.DIG_SPEED)&&drop.getDeltaMovement().equals(motion),"Dawn boosts the miner and leaves ordinary drops unchanged");
         var iridium=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());
         h.assertTrue(!CuriosMiningActive.activate(p,iridium,()->iridium)&&iridium.getDamageValue()==0,"Iridium never recalls unowned loot");OreDropHighlight.mark(drop,p);
         h.assertTrue(CuriosMiningActive.activate(p,iridium,()->iridium)&&!drop.getDeltaMovement().equals(motion),"owned ore loot receives bounded recall impulse");drop.discard();finish(h,p);
@@ -52,5 +52,19 @@ public final class CuriosActiveGameTests {
     @GameTest(template="empty",batch="curios_active_copy_remaining") public static void worldbreakerCopyCanActivatePreviouslyUnsupportedSource(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
         h.assertTrue(CuriosMiningActive.activate(p,source,()->source)&&WorkQueue.remaining(p)==27,"Paradox copy activates small echoes, not transmutation or native fracture");drain(p);finish(h,p);
+    }
+    @GameTest(template="empty",batch="feedback_terrain") public static void reworkedMiningAcceptsSandstoneTerracottaSandAndModdedStyleMaterials(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=target(h,p);var level=h.getLevel();
+        var blocks=java.util.List.of(Blocks.SANDSTONE,Blocks.RED_SANDSTONE,Blocks.TERRACOTTA,Blocks.RED_TERRACOTTA,Blocks.SAND,Blocks.GRAVEL,Blocks.GLASS);
+        for(int i=0;i<blocks.size();i++){
+            var cell=at.east(i);level.setBlock(cell.below(),Blocks.BEDROCK.defaultBlockState(),2);
+            level.setBlock(cell,blocks.get(i).defaultBlockState(),2);PlayerPlacedBlocks.get(level).unmark(cell);
+            h.assertTrue(NaturalExcavationProgram.eligible(level.getBlockState(cell)),"breakable material accepted: "+blocks.get(i));
+        }
+        h.assertTrue(!NaturalExcavationProgram.eligible(Blocks.WATER.defaultBlockState())&&!NaturalExcavationProgram.eligible(Blocks.LAVA.defaultBlockState())
+                &&!NaturalExcavationProgram.eligible(Blocks.BEDROCK.defaultBlockState()),"fluids and unbreakable blocks remain outside excavation");
+        h.assertTrue(SolarRupture.start(p,p.getMainHandItem(),SolarRupture.Form.NOVA),"excavation starts on sandstone");drain(p);
+        for(int i=0;i<blocks.size();i++)h.assertTrue(level.getBlockState(at.east(i)).isAir(),"material actually harvested: "+blocks.get(i));
+        finish(h,p);
     }
 }

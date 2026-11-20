@@ -1734,12 +1734,12 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.PALIMPSEST),"nova starts");p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);other.setItemInHand(InteractionHand.MAIN_HAND,tool);WorkQueue.tick();
         h.assertTrue(!WorkQueue.busy(p)&&!WorkQueue.busy(other)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"queue cannot follow a traded tool");finish(h,p);
     }
-    @GameTest(template="empty",batch="reform_603_06") public static void worldbreakerCopiesSolarNovaAndKeepsGlowingLoot(GameTestHelper h){
+    @GameTest(template="empty",batch="reform_603_06") public static void worldbreakerCopiesSolarNovaWithoutHighlightingLoot(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=solarTarget(h,p);var tool=p.getMainHandItem();tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.PALIMPSEST.id);
         h.getLevel().setBlockAndUpdate(at,Blocks.DIAMOND_ORE.defaultBlockState());
         h.assertTrue(ArtifactSkills.use(p,tool,ArtifactKind.WORLDBREAKER),"copy starts the source nova");drain(p);
         var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(2),d->d.getItem().is(Items.DIAMOND));
-        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&!drops.isEmpty()&&drops.stream().allMatch(ItemEntity::isCurrentlyGlowing),"copied nova produces native glowing ore loot");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&!drops.isEmpty()&&drops.stream().noneMatch(ItemEntity::isCurrentlyGlowing),"copied nova leaves native ore loot unhighlighted");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_603_07") public static void solarActivationCannotReenterFromAClaimCallback(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);solarTarget(h,p);int[] calls={0};
@@ -1757,13 +1757,13 @@ public final class PickaxeGameTests {
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
 
-    @GameTest(template="empty",batch="reform_603_09") public static void dawnCuriosLightsOnlyNewLootAndRequiresTheOriginalSlotSource(GameTestHelper h){
+    @GameTest(template="empty",batch="reform_603_09") public static void dawnCuriosLeavesOrdinaryLootUnhighlighted(GameTestHelper h){
         var p=player(h,ArtifactKind.CHOIR);var at=target(h);var level=h.getLevel();var state=Blocks.STONE.defaultBlockState();
         var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.PALIMPSEST).get());var slot=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);
         var existing=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.DIRT));level.addFreshEntity(existing);
         h.assertTrue(MiningObservations.captureCuriosDawn(p,source,at,state,slot::get),"Dawn observation uses live equipped source");
         level.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());var fresh=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.COBBLESTONE));level.addFreshEntity(fresh);MiningObservations.flush();
-        h.assertTrue(fresh.isCurrentlyGlowing()&&!existing.isCurrentlyGlowing(),"only fresh ordinary rock loot glows; no ore search or old-drop magnet");
+        h.assertTrue(!fresh.isCurrentlyGlowing()&&!existing.isCurrentlyGlowing(),"ordinary loot stays unhighlighted, both fresh and existing");
         level.setBlockAndUpdate(at,state);h.assertTrue(MiningObservations.captureCuriosDawn(p,source,at,state,slot::get),"second break observed");
         level.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());var revoked=new ItemEntity(level,at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.FLINT));level.addFreshEntity(revoked);
         slot.set(source.copy());MiningObservations.flush();h.assertTrue(!revoked.isCurrentlyGlowing(),"equal-looking replacement is not the original slot lease");finish(h,p);
@@ -1805,10 +1805,10 @@ public final class PickaxeGameTests {
             h.assertTrue(p.position().equals(origin.add(2,0,0))&&p.getDeltaMovement().equals(Vec3.ZERO),"external position remains with no stale impulse");
         }finally{MinecraftForge.EVENT_BUS.unregister(moved);finish(h,p);}
     }
-    @GameTest(template="empty",batch="reform_602_03") public static void ascentStopsAtANewCeilingWithoutMining(GameTestHelper h){
+    @GameTest(template="empty",batch="reform_602_03") public static void ascentMinesANewCeilingBeforeApplyingUpwardVelocity(GameTestHelper h){
         var p=clearFlight(h,ArtifactKind.ICARUS);var start=p.position();h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"clear path starts");
         var roof=p.blockPosition().above(2);h.getLevel().setBlockAndUpdate(roof,Blocks.STONE.defaultBlockState());IcarianFlight.tick();
-        h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(start)&&h.getLevel().getBlockState(roof).is(Blocks.STONE),"new ceiling stops thrust without teleporting or breaking it");finish(h,p);
+        h.assertTrue(IcarianFlight.active(p)&&p.position().equals(start)&&p.getDeltaMovement().y>0&&h.getLevel().getBlockState(roof).isAir(),"ascent clears ceiling before upward velocity");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_602_04") public static void copiedIcarusUsesVelocityAscentAndCanCancelWithAlternate(GameTestHelper h){
         var p=clearFlight(h,ArtifactKind.WORLDBREAKER);p.getMainHandItem().getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);

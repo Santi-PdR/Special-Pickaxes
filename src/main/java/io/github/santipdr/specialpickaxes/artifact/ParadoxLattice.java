@@ -33,8 +33,11 @@ public final class ParadoxLattice implements WorkProgram {
             var aimed=ArtifactActions.target(p);if(aimed.isEmpty())return false;var at=aimed.get();var level=p.serverLevel();var context=HeldUtilityContext.capture(p,tool);
             if(!level.hasChunkAt(at)||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at))return false;
             boolean allowed=WorldSafety.allowed(p,ArtifactKind.CRUCIBLE,at);
-            return allowed&&context.valid()&&level.hasChunkAt(at)&&NaturalExcavationProgram.eligible(level.getBlockState(at))
-                    &&!PlayerPlacedBlocks.get(level).contains(at)&&WorkQueue.startRegion(p,tool,ArtifactKind.CRUCIBLE,new ParadoxLattice(at));
+            if(!allowed||!context.valid()||!level.hasChunkAt(at)||!NaturalExcavationProgram.eligible(level.getBlockState(at))
+                    ||PlayerPlacedBlocks.get(level).contains(at))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.CRUCIBLE,new ParadoxLattice(at)))return false;
+            ArtifactInteraction.clear(p); // Alternate mining must end corner-selection's zero-speed lock.
+            return true;
         }finally{STARTING.remove(p.getUUID());}
     }
     public static boolean observed(ServerPlayer p,ItemStack tool,BlockPos scar,EquipmentLease<ItemStack> source){

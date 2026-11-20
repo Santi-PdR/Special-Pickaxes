@@ -1,3 +1,11 @@
+## Alpha.35 — correcciones tras rechazo de la prueba
+
+El usuario rechaza anillos/túneles ornamentales y no volverá a probar hasta rehacerlos. [Dirección vigente, implementación y pendientes](FEEDBACK-OP-REVISION.md). Sin aprobación ni nueva publicación de esta tanda.
+
+Retirado glow de Alba y sus copias; sólo extractor conserva marcado de menas. Eliminado bloqueo de minería por densidad de drops. Ampliada elegibilidad compartida a bloques rompibles como areniscas, terracotas, arena y grava. Ascenso Ícaro abre techo con minería validada antes del impulso. Secundaria Paradox limpia selección sólo tras aceptar el job, corrigiendo una ruta de velocidad cero. Curios resumido en los tres idiomas. Tests previos de brillo/pausa/techo actualizados al nuevo comportamiento; nueva regresión real de siete materiales. Local: 152 Python (una omisión), 25 recursos y archivos congelados intactos; Java/Forge pendiente.
+
+Aún faltan: rediseño frontal de habilidades rechazadas, bloques que caen en celdas ya visitadas, filtros particulares restantes, resúmenes principal/secundaria y validación gráfica. No representar esta corrección parcial como reforma lista.
+
 ## Alpha.34 — remapeo del cliente Curios en desarrollo
 
 Alpha.33 CI `44789030366` y `44790381506` alcanzan el cliente, pero Curios falla antes de entrar al mundo: su AccessorEntity conserva `f_19803_` SRG frente a nombres oficiales del entorno ForgeGradle. No es un resultado aprobado ni prueba de un fallo en el JAR de producción. Se habilita remapeo de refmap y dependencia createSrgToMcp sólo para `-PclientSmoke`; no se deshabilitan mixins ni se simula G. Pendiente CI para confirmar arranque/slot/teclado y capturas.

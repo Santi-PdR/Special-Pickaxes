@@ -192,7 +192,7 @@ public final class MiningReworkGameTests {
         h.assertTrue(!WorkQueue.busy(p)&&!level.hasChunkAt(remote),"bounded volume does not force chunks");finish(h,p);
     }
 
-    @GameTest(template="empty",batch="rework_each_326") public static void naturalExcavationBackpressurePreservesCursorAndResumes(GameTestHelper h){
+    @GameTest(template="empty",batch="rework_each_326") public static void naturalExcavationContinuesThroughDenseLoot(GameTestHelper h){
         for(var shape:ExcavationVolume.Shape.values()){
             var kind=shape==ExcavationVolume.Shape.VAULT?ArtifactKind.CHOIR:ArtifactKind.HELLSPEC;
             var p=player(h,kind);var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,70,7));
@@ -206,12 +206,8 @@ public final class MiningReworkGameTests {
                 }
                 h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),kind,new NaturalExcavationProgram(origin,Direction.SOUTH,shape)),"backpressured plan queues");
                 WorkQueue.tick();
-                h.assertTrue(WorkQueue.status(p).equals("paused")&&WorkQueue.remaining(p)==shape.volume,"drop pressure pauses without consuming first cell");
-                h.assertTrue(level.getBlockState(origin).is(Blocks.GRANITE),"drop pressure does not destroy target");
-                h.assertTrue(!WorkQueue.togglePause(p),"cannot resume while drops remain");
-                for(var drop:drops)drop.discard();
-                h.assertTrue(WorkQueue.togglePause(p),"can resume after clearing drops");WorkQueue.tick();
-                h.assertTrue(level.getBlockState(origin).isAir()&&WorkQueue.remaining(p)<shape.volume,"same target executes after resume");
+                h.assertTrue(!WorkQueue.pauseReason(p).equals("drops"),"dense loot never pauses mining");
+                h.assertTrue(level.getBlockState(origin).isAir()&&WorkQueue.remaining(p)<shape.volume,"target mines while all drops remain");
             }finally{for(var drop:drops)drop.discard();WorkQueue.cancel(p);RelicNetwork.forget(p);}
         }
         h.succeed();

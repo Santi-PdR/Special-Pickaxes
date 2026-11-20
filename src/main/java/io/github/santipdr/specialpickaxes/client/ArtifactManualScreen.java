@@ -169,9 +169,7 @@ public final class ArtifactManualScreen extends Screen {
                 section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
                 section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
                 new Section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios"),
-                        List.of(Component.translatable("passive.specialpickaxes."+kind.id),
-                                Component.translatable("curios.detail.specialpickaxes."+kind.id),
-                                Component.translatable("screen.specialpickaxes.curios_passive")),0xffb99aef),
+                        List.of(Component.translatable("curios.detail.specialpickaxes."+kind.id)),0xffb99aef),
                 new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffc6ced8));
     }
 

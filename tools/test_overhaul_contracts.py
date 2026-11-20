@@ -45,7 +45,7 @@ class OverhaulContracts(unittest.TestCase):
         self.assertIn('guide.main.', sections)
         self.assertIn('guide.alt.', sections)
         self.assertIn('RelicKeys.name(action)', sections)
-        self.assertIn('passive.specialpickaxes.', sections)
+        self.assertNotIn('passive.specialpickaxes.', sections)
         self.assertIn('screen.specialpickaxes.curios', sections)
         self.assertIn('curios.detail.specialpickaxes."+kind.id', sections)
         for retired in ('manual4.limits', 'manual4.cost', 'manual4.tool_profile', 'melee.specialpickaxes.'):
