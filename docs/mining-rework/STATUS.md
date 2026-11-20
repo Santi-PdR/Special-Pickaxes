@@ -1,3 +1,13 @@
+## Alpha.45 — ejecución exacta completa en verde, descarga solicitada
+
+Fuente `1134994a08bb1b4aa96a35ce10da01d1b2bed962`, CI `44811466825` SUCCESS. Predecesora funcional alpha.44 / `44809755725` también SUCCESS. Última ejecución: 214 JUnit, 546 GameTests, servidor empaquetado/logs, cliente real 32 escenas y 64 tooltips, activación/cancelación, ascenso Ícaro y H con slot Curios real. Worldbreaker removió 6977 bloques en la escena final, respetando los probes fuera de alcance y bedrock. Local 158 Python (una omisión), 25 recursos.
+
+La regresión de gravedad retiene los drops sobre un piso completo: antes rodaban fuera del pedestal de un bloque y caían fuera del volumen observado. Se conservaron las aserciones de loot nativo de arena y grava/pedernal y ambas fases reales de FallingBlockEntity. Alpha.43 y .44 superaron esa fase; no se modificaron loot tables ni la producción para satisfacer el fixture.
+
+Cliente: reconstrucción del tooltip al final del evento evita la línea añadida después por Curios; se mantiene el contrato de tres líneas. Capturador Robot precompilado una sola vez sin ampliar deadline. Escena final valida el frente conectado actual, no la cuña histórica. Capturas alpha.45 revisadas directamente: `manual-worldloom-quarry.jpg` (resúmenes legibles, Excavación frontal, H) y `supreme-complete.jpg` (excavación real). No equivale a revisar todas las capturas ni todos los modpacks/escalas GUI. No se cambia la aprobación visual histórica global.
+
+JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.45.jar`, 998212 bytes; SHA256 `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`. Se prepara publicación directa explícitamente solicitada mediante workflow fijado a fuente/run/hash/tamaño, sin recompilar ni alterar el binario. Resultado de publicación aún pendiente al registrar esta nota.
+
 ## Revisión frontal — alpha.42, cierre gráfico pendiente
 
 Alpha.41 `2e47125f534be52c593688f09e120e4ba40389c7`, CI `44804429368`: GameTests y servidor empaquetado/logs superados; cliente gráfico todavía en ejecución al registrar esta nota. Incluye la corrección de seguimiento de arena y grava reales; se amplió la fase de asentamiento a 120 ticks bajo el deadline absoluto original de 240 ticks. No se amplían timeouts del smoke ni se omiten pruebas fallidas.

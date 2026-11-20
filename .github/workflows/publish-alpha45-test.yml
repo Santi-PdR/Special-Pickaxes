@@ -1,0 +1,51 @@
+name: Publish validated alpha45 manual test
+on:
+  push:
+    branches: ['arena/cec54523-special-pickaxes']
+    paths: ['.github/workflows/publish-alpha45-test.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download and verify successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 44811466825 --json conclusion,headSha,event,workflowName > source-run.json
+          python3 - <<'PY'
+          import json
+          run=json.load(open('source-run.json'))
+          assert run['conclusion']=='success'
+          assert run['headSha']=='1134994a08bb1b4aa96a35ce10da01d1b2bed962'
+          assert run['event']=='push' and run['workflowName']=='Forge verification'
+          PY
+          gh run download 44811466825 -n special-pickaxes-6.0.0-alpha.45-personal -D release
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('release')
+          m=json.loads((root/'RELEASE.json').read_text())
+          assert m['commit']=='1134994a08bb1b4aa96a35ce10da01d1b2bed962'
+          assert str(m['run_id'])=='44811466825'
+          assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.45.jar'
+          jar=root/'libs'/m['file']
+          assert jar.stat().st_size==m['bytes']==998212
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34'
+          with zipfile.ZipFile(jar) as z:
+              assert z.testzip() is None
+              assert not any('/test/' in name for name in z.namelist())
+          PY
+      - name: Publish explicitly requested test JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create test-6.0.0-alpha.45-44811466825 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.45.jar release/RELEASE.json release/SHA256SUMS --target 1134994a08bb1b4aa96a35ce10da01d1b2bed962 --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.45 - prueba solicitada' --notes 'Actualizacion solicitada de mineria frontal conectada: comienza cerca del jugador y sigue terreno conectado; asentamiento de arena y grava; Paradox secundaria inmediata y velocidad normal; ascenso excavador de Icarus; brillo solo en drops de menas del extractor; guia y Curios resumidos; activa equipada H (G queda para inventario Curios). Modelos/texturas y habilidades originales Iridium/Strata preservados. Fuente exacta 1134994a08bb1b4aa96a35ce10da01d1b2bed962; CI 44811466825 SUCCESS: 214 JUnit, 546 GameTests, servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activacion/cancelacion). Requiere Minecraft 1.20.1, Forge 47.4.10, Java 17; Curios opcional para variantes equipadas. Prerelease: no certifica todos los modpacks ni una aprobacion visual universal. Arte externo conserva sus creditos y avisos; no se concede una licencia adicional de redistribucion. SHA256 e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34; 998212 bytes.'
