@@ -54,6 +54,13 @@ public final class ClientValidation {
                         if(WorkQueue.busy(p))continue;
                         if(!p.serverLevel().getBlockState(new BlockPos(0,67,10)).isAir())
                             throw new IllegalStateException("Worldloom failed to clear the close frontal bank");
+                        var loot=p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                                new net.minecraft.world.phys.AABB(new BlockPos(0,62,10)).inflate(48));
+                        int items=loot.stream().mapToInt(drop->drop.getItem().getCount()).sum();
+                        if(items<256||loot.stream().anyMatch(net.minecraft.world.entity.item.ItemEntity::isCurrentlyGlowing))
+                            throw new IllegalStateException("Worldloom survival loot missing or unexpectedly glowing: "+items);
+                        p.sendSystemMessage(Component.literal("WORLDLOOM_NATIVE_LOOT_OK items="+items+" entities="+loot.size()));
+                        p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
                     }
                     if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
                         if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");
@@ -156,7 +163,8 @@ public final class ClientValidation {
                 var rock=new BlockPos(0,67,10);p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 p.serverLevel().setBlockAndUpdate(rock.above(),net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState());
                 if(k==ArtifactKind.WORLDLOOM){
-                    // Disposable solid bank for an actual terraced-quarry action screenshot.
+                    // Disposable bank: use survival so native loot stays in the world throughout the real job.
+                    p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
                     for(int x=-13;x<=13;x++)for(int y=56;y<=67;y++)for(int z=-13;z<=13;z++)if(x*x+z*z<=169){
                         var cell=new BlockPos(x,y,10+z);PlayerPlacedBlocks.get(p.serverLevel()).unmark(cell);
                         p.serverLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
