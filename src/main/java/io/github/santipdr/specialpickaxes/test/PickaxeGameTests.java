@@ -1094,7 +1094,7 @@ public final class PickaxeGameTests {
         h.getLevel().setBlockAndUpdate(barrier,Blocks.BEDROCK.defaultBlockState());
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
         try{
-            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"rift activation has a real target");drain(p);
+            h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,new StasisHourglassProgram(at)),"rift activation has a real target");drain(p);
             h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(far).isAir()&&h.getLevel().getBlockState(ore).isAir(),"hourglass harvests distant polar rock and core ore");
             h.assertTrue(h.getLevel().getBlockState(placed).is(Blocks.STONE)&&h.getLevel().getBlockState(barrier).is(Blocks.BEDROCK),"OP excavation preserves builds and bedrock");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}

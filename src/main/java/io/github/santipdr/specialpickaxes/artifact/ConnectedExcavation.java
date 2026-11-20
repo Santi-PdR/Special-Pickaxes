@@ -83,7 +83,7 @@ public final class ConnectedExcavation implements WorkProgram {
     public int attemptsPerTick(ItemStack tool){return Math.max(256,EnchantmentScaling.budget(tool));}
     public WorkStep next(ServerPlayer p){
         now=ArtifactState.now(p);
-        if(frontier.isEmpty()&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(hardDeadline,now+60);
+        if(frontier.isEmpty()&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(hardDeadline,now+120);
         boolean revisit=frontier.isEmpty();
         var at=revisit?cleared.removeFirst():frontier.remove();
         if(revisit)cleared.addLast(at);
@@ -105,7 +105,7 @@ public final class ConnectedExcavation implements WorkProgram {
                 if(mined){
                     broken++;
                     if(!revisit)cleared.addLast(at);
-                    else settleUntil=Math.min(hardDeadline,now+60);
+                    else settleUntil=Math.min(hardDeadline,now+120);
                     // Bound both queued positions and visited-state memory, not just successful breaks.
                     if(seen.size()<cap*4)for(var direction:Direction.values()){
                         var next=at.relative(direction);if(within(next)&&seen.size()<cap*4&&seen.add(next))frontier.add(next);

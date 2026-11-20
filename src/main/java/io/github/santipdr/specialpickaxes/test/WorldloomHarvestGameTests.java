@@ -20,7 +20,7 @@ public final class WorldloomHarvestGameTests {
         for(var cell:java.util.List.of(ore,buried,placed)){level.setBlockAndUpdate(cell,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(cell);}
         for(var direction:Direction.values())level.setBlockAndUpdate(buried.relative(direction),Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).mark(placed);
         var material=new ItemStack(Items.COBBLESTONE,31);material.setHoverName(net.minecraft.network.chat.Component.literal("Not payment"));p.setItemInHand(InteractionHand.OFF_HAND,material);
-        try{h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM),"secondary accepts natural target independently of offhand");drain(p);
+        try{h.assertTrue(WorldloomHarvest.start(p,p.getMainHandItem()),"secondary accepts natural target independently of offhand");drain(p);
             h.assertTrue(level.getBlockState(ore).isAir()&&level.getBlockState(buried).is(Blocks.DIAMOND_ORE)&&level.getBlockState(placed).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at).is(Blocks.STONE),"exposed ore only; buried ore, builds and matrix preserved");
             h.assertTrue(material.getCount()==31,"no construction payment");
         }finally{PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);}

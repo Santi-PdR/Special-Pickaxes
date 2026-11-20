@@ -18,7 +18,7 @@ class ConnectedExcavationTests(unittest.TestCase):
         source=(BASE/'artifact/ConnectedExcavation.java').read_text()
         self.assertIn('cleared.addLast(at)',source)
         self.assertIn('if(state.isAir()&&!revisit)',source)
-        self.assertIn('settleUntil=Math.min(hardDeadline,now+60)',source)
+        self.assertIn('settleUntil=Math.min(hardDeadline,now+120)',source)
         self.assertIn('ConnectedExcavation.this::active',source)
         self.assertIn('PlayerPlacedBlocks.get',source)
         self.assertIn('now>=hardDeadline',source)

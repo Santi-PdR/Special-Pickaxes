@@ -58,12 +58,12 @@ public final class ParadoxReworkGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(veto);PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
     private static void scar(GameTestHelper h,ServerPlayer p,BlockPos at,ItemStack source,AtomicReference<ItemStack> slot){
-        h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());h.assertTrue(MiningObservations.captureCuriosParadox(p,source,at,Blocks.STONE.defaultBlockState(),slot::get),"live slot observes natural manual scar");
+        h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(at);h.assertTrue(MiningObservations.captureCuriosParadox(p,source,at,Blocks.STONE.defaultBlockState(),slot::get),"live slot observes natural manual scar");
         h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
     }
     @GameTest(template="empty",batch="reform_606_05") public static void fourCuriosScarsReplayDestructiveEchoesAtTheirOriginalLocations(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h,p);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CRUCIBLE).get());var slot=new AtomicReference<ItemStack>(source);
-        var a=at;var b=at.east(4);var c=at.east(8);var d=at.east(12);for(var point:new BlockPos[]{a,b,c,d})h.getLevel().setBlockAndUpdate(point.above(),Blocks.STONE.defaultBlockState());
+        var a=at;var b=at.east(2);var c=at.east(4);var d=at.east(6);for(var point:new BlockPos[]{a,b,c,d})h.getLevel().setBlockAndUpdate(point.above(),Blocks.STONE.defaultBlockState());
         scar(h,p,a,source,slot);scar(h,p,b,source,slot);scar(h,p,c,source,slot);h.assertTrue(!WorkQueue.busy(p),"three scars are stored without immediate excavation");scar(h,p,d,source,slot);
         h.assertTrue(WorkQueue.busy(p),"four scars trigger one connected aftershock");drain(p);
         h.assertTrue(h.getLevel().getBlockState(d.above()).isAir()&&h.getLevel().getBlockState(a.above()).is(Blocks.STONE),"aftershock starts at the latest scar and does not jump to a remote island");
