@@ -61,7 +61,7 @@ class InterfaceCopyTests(unittest.TestCase):
 
     def test_manual_renders_the_equipped_details_for_all_thirteen_in_three_languages(self):
         source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()
-        self.assertIn('Component.translatable("curios.detail.specialpickaxes."+kind.id)', source)
+        self.assertIn('Component.translatable("curios.detail.specialpickaxes."+kind.id,RelicKeys.name(RelicControl.Action.CURIO_ACTIVATE))', source)
         for locale in ('en_us', 'es_es', 'es_uy'):
             texts = self.texts(locale)
             for identity in IDS:
@@ -69,7 +69,7 @@ class InterfaceCopyTests(unittest.TestCase):
             for identity in IDS:
                 detail = texts['curios.detail.specialpickaxes.' + identity]
                 self.assertLessEqual(len(detail), 200, (locale, identity))
-                self.assertIn('G:', detail)
+                self.assertIn('%s:', detail)
 
     def test_every_active_mode_has_readable_localized_labels(self):
         from mining_catalog import MODES

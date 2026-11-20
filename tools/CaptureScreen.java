@@ -10,7 +10,7 @@ class CaptureScreen {
         return switch (action) {
             case "confirm" -> java.awt.event.KeyEvent.VK_ENTER;
             case "mode" -> java.awt.event.KeyEvent.VK_C;
-            case "curio" -> java.awt.event.KeyEvent.VK_G;
+            case "curio" -> java.awt.event.KeyEvent.VK_H;
             case "manual" -> java.awt.event.KeyEvent.VK_I;
             case "close" -> java.awt.event.KeyEvent.VK_ESCAPE;
             case "inventory" -> java.awt.event.KeyEvent.VK_E;

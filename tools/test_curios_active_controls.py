@@ -12,7 +12,7 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertLess(branch.index('equals(intent.toolIdentity())'),branch.index('CuriosMiningActive.activate'))
     def test_client_sends_equipped_identity_and_never_swaps_hand(self):
         source = (ROOT/'client/RelicKeys.java').read_text()
-        self.assertIn('GLFW.GLFW_KEY_G',source)
+        self.assertIn('GLFW.GLFW_KEY_H',source)
         self.assertIn('equipped.stack().getTag().getUUID("controlIdentity")', source)
         active = (ROOT/'artifact/CuriosMiningActive.java').read_text()
         self.assertNotIn('setItemInHand',active)
@@ -27,7 +27,7 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertNotIn('CuriosMiningActive.activate', fixture)
         smoke = pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("press_screen('curio')", smoke)
-        self.assertIn("Missing real Curios slot and physical G verification", smoke)
+        self.assertIn("Missing real Curios slot and physical equipped-key verification", smoke)
 
     def test_tooltip_fixture_is_not_a_gameplay_hud(self):
         fixture = (ROOT/'test/ClientTooltipValidation.java').read_text()
@@ -44,3 +44,12 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertIn("file('build/createSrgToMcp/output.srg').absolutePath", client)
         self.assertIn("dependsOn 'createSrgToMcp'", gradle)
         self.assertNotIn('disableRefMap', gradle)
+
+    def test_equipped_default_avoids_curios_inventory_and_manual_uses_rebound_key(self):
+        source = (ROOT/'client/RelicKeys.java').read_text()
+        self.assertIn('GLFW.GLFW_KEY_X,GLFW.GLFW_KEY_H', source)
+        self.assertNotIn('GLFW.GLFW_KEY_X,GLFW.GLFW_KEY_G', source)
+        manual = (ROOT/'client/ArtifactManualScreen.java').read_text()
+        self.assertIn('Component.translatable("curios.detail.specialpickaxes."+kind.id,RelicKeys.name(RelicControl.Action.CURIO_ACTIVATE))', manual)
+        helper = pathlib.Path('tools/CaptureScreen.java').read_text()
+        self.assertIn('case "curio" -> java.awt.event.KeyEvent.VK_H', helper)

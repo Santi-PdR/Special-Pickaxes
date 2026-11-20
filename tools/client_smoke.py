@@ -167,7 +167,7 @@ finally:
   try:proc.wait(timeout=20)
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
-if not any('CURIO_KEY_OK' in s for s in captured):raise SystemExit('Missing real Curios slot and physical G verification')
+if not any('CURIO_KEY_OK' in s for s in captured):raise SystemExit('Missing real Curios slot and physical equipped-key verification')
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
 if not any('ICARUS_FLIGHT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client ascent verification')
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]

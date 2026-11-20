@@ -16,7 +16,7 @@ public final class RelicKeys {
     private static final PressLatch MANUAL_DOWN=new PressLatch();
     private static Object connection;private static long sequence;
     public static final KeyMapping MANUAL=new KeyMapping("key.specialpickaxes.manual",net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_I,"key.categories.specialpickaxes");
-    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X,GLFW.GLFW_KEY_G};
+    private static final int[] DEFAULTS={GLFW.GLFW_KEY_R,GLFW.GLFW_KEY_C,GLFW.GLFW_KEY_B,GLFW.GLFW_KEY_ENTER,GLFW.GLFW_KEY_V,GLFW.GLFW_KEY_K,GLFW.GLFW_KEY_X,GLFW.GLFW_KEY_H};
     public static final KeyMapping[] KEYS=new KeyMapping[RelicControl.Action.values().length];
     static {for(var a:RelicControl.Action.values())KEYS[a.ordinal()]=new KeyMapping("key.specialpickaxes."+a.name().toLowerCase(java.util.Locale.ROOT),net.minecraftforge.client.settings.KeyConflictContext.IN_GAME,com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,DEFAULTS[a.ordinal()],"key.categories.specialpickaxes");}
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){
