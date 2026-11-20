@@ -2,6 +2,7 @@
 """Real Forge client + integrated-server gallery under Xvfb. Uses only a disposable copy of the smoke world."""
 import json,os,pathlib,queue,re,shutil,signal,subprocess,threading,time
 root=pathlib.Path.cwd();out=root/'build/client-smoke';out.mkdir(parents=True,exist_ok=True)
+tooltip_flag=root/'run/client-tooltip-visible.flag';tooltip_flag.unlink(missing_ok=True)
 ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
 gallery_flag=root/'run/gallery-captured.flag';gallery_flag.unlink(missing_ok=True)
 aim_request=root/'run/client-aim-scene.txt';aim_request.unlink(missing_ok=True)
@@ -90,8 +91,10 @@ try:
   if '[CHAT]' in line and 'ARTIFACT_UX_READY_' in line:
    id=line.strip().split('ARTIFACT_UX_READY_',1)[1]
    if id not in scenes:raise RuntimeError('Unexpected client artifact')
+   tooltip_flag.write_text('tooltip capture only')
    capture_screen(str(out/('ux-'+id+'.png')))
    capture_screen(str(out/('ux-shift-'+id+'.png')), 'shift')
+   tooltip_flag.unlink(missing_ok=True)
    # Wait for actual rendering and closure instead of racing the GUI with sleeps.
    input_gate.begin(id)
    press_screen('manual')
@@ -113,6 +116,7 @@ try:
    if id not in scenes:raise RuntimeError('Unexpected scene activation')
    input_gate.complete(id)
    activation_pending=None
+   capture_screen(str(out/('action-'+id+'.png')))
    if id=='interregnum-domain':capture_screen(str(out/'stasis-domain-active.png'))
    if id=='worldloom-quarry':capture_screen(str(out/'worldloom-quarry-active.png'))
    ux.add(id);i=scenes.index(id)

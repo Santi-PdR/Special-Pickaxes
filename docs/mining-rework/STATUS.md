@@ -1,3 +1,11 @@
+## Cierre de validación 6.0 — alpha.32 y capturas pendientes
+
+Alpha.31 `031b70ac9fb770c940add8493e4f480793600656`, CI `44783621237` SUCCESS: 539 GameTests requeridos, cliente gráfico y servidor empaquetado pasan. Evidencia descargada y verificada por SHA256. Esto confirma la tanda de trece activas, no constituye aprobación visual final.
+
+Alpha.32 `e7c19ba89de1ce32a44e40bccaf6ef615e3601c7`, CI `44787337101` falló al descargar bibliotecas del instalador Forge (ForgeAutoRenamingTool/srgutils), antes de arrancar cliente; GameTests pasaron. No se ha validado G físico. Esta versión añade Curios real sólo a clientSmoke y G físico, con comprobaciones de coste/origen/herramienta/núcleo preservado. Guía actualizada en los tres idiomas.
+
+La revisión detectó que el fixture CI dibujaba el tooltip de tres líneas durante las capturas de acción, pareciendo un HUD. No existe ese overlay en producción. Ahora el fixture sólo lo dibuja durante las capturas explícitas de tooltip. Se capturan todas las escenas activadas y se priorizan las siete acciones pendientes, Worldbreaker y G en el export limitado; sin imágenes sintéticas ni relajar validadores. Nueva CI y revisión de esas capturas aún pendientes. Sin release pública 6.0 ni aprobación anticipada.
+
 ## Reforma 6.0 — alpha.31 activas G de las trece fuentes implementadas
 
 Ocho restantes: Alba ilumina drops (sin radar/imán), Coro REPLICA, Ocaso AFTERGLOW, Paradox eco 27 celdas (sin transmutar), Stasis lámina horizontal, Ícaro ascenso por velocidad con lease, Iridium pulso limitado de drops de mena propios, Strata cara equipada 7×7 separada de su habilidad nativa 15×15. Worldbreaker resuelve todas por copia. Coste 8/recarga 8 s; slot/origen revocables, sin swaps de mano ni teleport. Cuatro GameTests nuevos; local 145 Python (una omisión), 25 recursos y 58 hashes intactos. [Diferencias y límites](WORLDBREAKER-6.0.md).

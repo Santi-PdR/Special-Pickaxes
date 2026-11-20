@@ -19,3 +19,19 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertIn('!lease.active()',active)
         self.assertIn('curiosActiveReady',active)
         self.assertIn('canSpendDurability(p,source,8)',active)
+
+    def test_real_equipped_client_fixture_requires_keyboard_and_real_inventory(self):
+        fixture = (ROOT/'test/EquippedClientValidation.java').read_text()
+        self.assertIn('getCuriosInventory', fixture)
+        self.assertIn('setStackInSlot', fixture)
+        self.assertNotIn('CuriosMiningActive.activate', fixture)
+        smoke = pathlib.Path('tools/client_smoke.py').read_text()
+        self.assertIn("press_screen('curio')", smoke)
+        self.assertIn("Missing real Curios slot and physical G verification", smoke)
+
+    def test_tooltip_fixture_is_not_a_gameplay_hud(self):
+        fixture = (ROOT/'test/ClientTooltipValidation.java').read_text()
+        self.assertIn('Files.exists(java.nio.file.Path.of("client-tooltip-visible.flag"))', fixture)
+        smoke = pathlib.Path('tools/client_smoke.py').read_text()
+        self.assertIn("tooltip_flag.unlink(missing_ok=True)", smoke)
+        self.assertIn("'action-'+id+'.png'", smoke)

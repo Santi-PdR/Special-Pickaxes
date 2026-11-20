@@ -11,7 +11,13 @@ from mining_catalog import IDS
 PRIORITY_IMAGES = {'icarus-ascent.jpg', 'survey-guide.jpg', 'manual-palimpsest-solar_rupture.jpg', 'manual-fault_choir-fault_fan.jpg', 'manual-eventide-gravity_in.jpg', 'manual-paradox_crucible-stone.jpg', 'manual-interregnum-domain.jpg', 'stasis-domain-active.jpg', 'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg', 'manual-worldbreaker-carve.jpg', 'ux-shift-fault_choir-fault_fan.jpg', 'ux-shift-worldbreaker-carve.jpg', 'gallery-clean.jpg', 'inventory.jpg', 'supreme-executing.jpg', 'supreme-complete.jpg'} | {'portrait-'+pick+'.jpg' for pick in IDS}
 
 # Current milestone's review must survive before historical priority screenshots.
-FOCUS_IMAGES = {'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg'}
+ACTION_REVIEW_IMAGES = {'action-'+scene+'.jpg' for scene in (
+    'palimpsest-solar_rupture', 'fault_choir-fault_fan', 'eventide-gravity_in',
+    'paradox_crucible-stone', 'hollow_axiom-hollow_pulse', 'exodium-starfall',
+    'hellspec-hellforge')} | {'supreme-executing.jpg', 'supreme-complete.jpg',
+                           'curios-key-before.jpg', 'curios-key-after.jpg'}
+PRIORITY_IMAGES |= ACTION_REVIEW_IMAGES
+FOCUS_IMAGES = {'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg'} | ACTION_REVIEW_IMAGES
 
 
 def make_bundle(contents, max_bytes=MAX_EXPORT_BYTES):

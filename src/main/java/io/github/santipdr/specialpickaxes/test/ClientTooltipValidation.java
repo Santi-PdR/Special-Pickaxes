@@ -68,7 +68,10 @@ public final class ClientTooltipValidation {
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_STACK_EVENT_VALIDATED {} lines={}",key,lines.size());
                 com.mojang.logging.LogUtils.getLogger().info("TOOLTIP_VALIDATED {} lines={}",key,lines.size());
             }
-            e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);
+            // Only explicit tooltip frames may draw the test tooltip over gameplay.
+            // Action captures must show the same HUD-free view as the shipped mod.
+            if(java.nio.file.Files.exists(java.nio.file.Path.of("client-tooltip-visible.flag")))
+                e.getGuiGraphics().renderTooltip(mc.font,mc.player.getMainHandItem(),8,18);
         }
     }
 }
