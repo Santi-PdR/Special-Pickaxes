@@ -6,7 +6,7 @@ La regresión de gravedad retiene los drops sobre un piso completo: antes rodaba
 
 Cliente: reconstrucción del tooltip al final del evento evita la línea añadida después por Curios; se mantiene el contrato de tres líneas. Capturador Robot precompilado una sola vez sin ampliar deadline. Escena final valida el frente conectado actual, no la cuña histórica. Capturas alpha.45 revisadas directamente: `manual-worldloom-quarry.jpg` (resúmenes legibles, Excavación frontal, H) y `supreme-complete.jpg` (excavación real). No equivale a revisar todas las capturas ni todos los modpacks/escalas GUI. No se cambia la aprobación visual histórica global.
 
-JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.45.jar`, 998212 bytes; SHA256 `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`. Se prepara publicación directa explícitamente solicitada mediante workflow fijado a fuente/run/hash/tamaño, sin recompilar ni alterar el binario. Resultado de publicación aún pendiente al registrar esta nota.
+JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.45.jar`, 998212 bytes; SHA256 `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`. Se prepara publicación directa explícitamente solicitada mediante workflow fijado a fuente/run/hash/tamaño, sin recompilar ni alterar el binario. Publicación confirmada SUCCESS por workflow `44814703908`: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825 . El commit de publicación sólo añade workflow/documentación; el JAR corresponde exactamente a la fuente validada indicada.
 
 ## Revisión frontal — alpha.42, cierre gráfico pendiente
 
