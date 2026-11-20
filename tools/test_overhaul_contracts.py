@@ -42,8 +42,8 @@ class OverhaulContracts(unittest.TestCase):
     def test_manual_has_two_ability_summaries_curios_and_live_controls(self):
         source = (ROOT / 'client/ArtifactManualScreen.java').read_text()
         sections = source.split('private List<Section> sections(', 1)[1].split('private void ensureCards', 1)[0]
-        self.assertIn('guide.main.', sections)
-        self.assertIn('guide.alt.', sections)
+        self.assertIn('guide.brief.main.', sections)
+        self.assertIn('guide.brief.alt.', sections)
         self.assertIn('RelicKeys.name(action)', sections)
         self.assertNotIn('passive.specialpickaxes.', sections)
         self.assertIn('screen.specialpickaxes.curios', sections)

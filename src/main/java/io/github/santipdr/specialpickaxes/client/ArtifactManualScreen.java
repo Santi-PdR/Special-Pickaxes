@@ -167,7 +167,7 @@ public final class ArtifactManualScreen extends Screen {
         if(selectingCopy())controls.add(Component.translatable("guide.control.copy_picker"));
         return List.of(
                 section("screen.specialpickaxes.main",primaryDescription(abilityKind,modeKey),0xffa9d9ec),
-                section("screen.specialpickaxes.alternate",Component.translatable("guide.alt."+abilityKind.id),0xffdfc58e),
+                section("screen.specialpickaxes.alternate",Component.translatable("guide.brief.alt."+abilityKind.id),0xffdfc58e),
                 new Section("screen.specialpickaxes.curios",Component.translatable("screen.specialpickaxes.curios"),
                         List.of(Component.translatable("curios.detail.specialpickaxes."+kind.id)),0xffb99aef),
                 new Section("manual4.controls",Component.translatable("manual4.controls"),controls,0xffc6ced8));
@@ -175,8 +175,8 @@ public final class ArtifactManualScreen extends Screen {
 
     /** Mode-aware descriptions also follow Worldbreaker's copied mode, not its native mode. */
     private Component primaryDescription(ArtifactKind abilityKind,String modeKey){
-        String specific="guide.main."+abilityKind.id+"."+modeKey;
-        String key=net.minecraft.locale.Language.getInstance().has(specific)?specific:"guide.main."+abilityKind.id;
+        String specific="guide.brief.main."+abilityKind.id+"."+modeKey;
+        String key=net.minecraft.locale.Language.getInstance().has(specific)?specific:"guide.brief.main."+abilityKind.id;
         return Component.translatable(key);
     }
 

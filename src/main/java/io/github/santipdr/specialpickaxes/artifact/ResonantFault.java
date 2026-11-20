@@ -68,7 +68,7 @@ public final class ResonantFault implements WorkProgram {
             var context=HeldUtilityContext.capture(p,tool);var heading=p.getDirection();
             boolean allowed=WorldSafety.allowed(p,ArtifactKind.CHOIR,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.CHOIR,new ResonantFault(scar,heading,Form.REPLICA,source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.CHOIR,new ConnectedExcavation(p,scar,ArtifactKind.CHOIR,false,source)))return false;
             state.putLong("curiosFaultReady",time+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }

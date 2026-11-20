@@ -51,9 +51,8 @@ public final class ClientValidation {
                         for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(64)))drop.discard();
                         if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))WorkQueue.togglePause(p);
                         if(WorkQueue.busy(p))continue;
-                        if(!p.serverLevel().getBlockState(new BlockPos(0,57,10)).isAir()
-                                ||!p.serverLevel().getBlockState(new BlockPos(5,62,10)).is(net.minecraft.world.level.block.Blocks.DIAMOND_ORE))
-                            throw new IllegalStateException("Worldloom action fixture did not expose ore through its terraces");
+                        if(!p.serverLevel().getBlockState(new BlockPos(0,67,10)).isAir())
+                            throw new IllegalStateException("Worldloom failed to clear the close frontal bank");
                     }
                     if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
                         if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");

@@ -17,15 +17,18 @@ public final class ConnectedExcavation implements WorkProgram {
     private final ArtifactKind kind;
     private final EquipmentLease<ItemStack> source;
     private final int reach,cap;
-    private final ArrayDeque<BlockPos> frontier=new ArrayDeque<>(),cleared=new ArrayDeque<>();
+    private final Queue<BlockPos> frontier;
+    private final ArrayDeque<BlockPos> cleared=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
-    private int broken,checks;
+    private int broken;
+    private long lastVisual=Long.MIN_VALUE;
     private long now,settleUntil=Long.MIN_VALUE,hardDeadline;
     private boolean revoked;
 
     public ConnectedExcavation(ServerPlayer p,BlockPos seed,ArtifactKind kind,boolean alternate,EquipmentLease<ItemStack> source){
         this.seed=seed.immutable();this.kind=kind;this.source=source;origin=p.getEyePosition();look=p.getLookAngle().normalize();
         reach=reach(kind,alternate,source!=null);cap=Math.min(ArtifactConfig.JOB_LIMIT.get(),source!=null?2048:alternate?16384:12288);
+        frontier=new PriorityQueue<>(Comparator.comparingDouble(this::priority).thenComparingLong(BlockPos::asLong));
         now=ArtifactState.now(p);hardDeadline=now+240;frontier.add(this.seed);seen.add(this.seed);
     }
     public static boolean handles(ArtifactKind kind){
@@ -44,13 +47,28 @@ public final class ConnectedExcavation implements WorkProgram {
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean alternate){
         if(!STARTING.add(p.getUUID()))return false;
         try{
-            if(!p.isAlive()||p.isSpectator()||!p.mayBuild()||p.getMainHandItem()!=tool||tool.isEmpty()||WorkQueue.busy(p))return false;
+            if(!p.isAlive()||p.isSpectator()||!p.mayBuild()||p.getMainHandItem()!=tool||tool.isEmpty()||WorkQueue.busy(p)
+                    ||!(tool.getItem() instanceof ArtifactItem item)||ArtifactSkills.feedbackKind(tool,item.kind)!=kind)return false;
             var context=HeldUtilityContext.capture(p,tool);var target=closeTarget(p);if(target.isEmpty())return false;var at=target.get();
             if(!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-            if(!WorldSafety.allowed(p,kind,at)||!context.valid())return false;
+            if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.serverLevel().hasChunkAt(at)
+                    ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
             if(!WorkQueue.startRegion(p,tool,kind,new ConnectedExcavation(p,at,kind,alternate,null)))return false;
             ArtifactInteraction.clear(p);tool.getOrCreateTag().putString("artifactStatus","idle");return true;
         }finally{STARTING.remove(p.getUUID());}
+    }
+    private double priority(BlockPos at){
+        var delta=Vec3.atCenterOf(at).subtract(Vec3.atCenterOf(seed));
+        double depth=Math.max(0,delta.dot(look)),distance=delta.lengthSqr();
+        // Only traversal order changes: the result follows connected terrain, not carved geometry.
+        return switch(kind){
+            case CHOIR -> depth*depth*4+distance*.1; // broad advancing seismic front
+            case EXODIUM -> distance*.15-delta.y*12; // top-down stellar demolition
+            case WORLDLOOM -> distance*.15+delta.y*12; // clear a bank from its base
+            case AXIOM -> distance-depth*depth*.8; // deep connected void rupture
+            case HELLSPEC -> distance*.5-Math.abs(delta.y)*3; // vertical infernal demolition
+            default -> distance;
+        };
     }
     private boolean active(){return !revoked&&(source==null||source.active()&&!source.expected().isEmpty());}
     private boolean within(BlockPos at){
@@ -67,16 +85,16 @@ public final class ConnectedExcavation implements WorkProgram {
         now=ArtifactState.now(p);
         if(frontier.isEmpty()&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(hardDeadline,now+60);
         boolean revisit=frontier.isEmpty();
-        var at=revisit?cleared.removeFirst():frontier.removeFirst();
+        var at=revisit?cleared.removeFirst():frontier.remove();
         if(revisit)cleared.addLast(at);
-        checks++;
         return new WorkStep(){
             public BlockPos pos(){return at;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind ignored){
                 if(!active()||!within(at)||!actor.serverLevel().hasChunkAt(at)||actor.serverLevel().isOutsideBuildHeight(at))return false;
                 var state=actor.serverLevel().getBlockState(at);
-                if(state.isAir()&&at.equals(seed)&&!revisit){
-                    for(var direction:Direction.values()){
+                if(state.isAir()&&!revisit){
+                    cleared.addLast(at);
+                    if(at.equals(seed))for(var direction:Direction.values()){
                         var next=at.relative(direction);if(within(next)&&seen.add(next))frontier.addLast(next);
                     }
                     return false;
@@ -99,6 +117,6 @@ public final class ConnectedExcavation implements WorkProgram {
     }
     public void reportProgress(ServerPlayer p){
         now=ArtifactState.now(p);
-        if(now%5==0&&broken>0)AbilityVfx.excavation(p,kind,seed,false);
+        if(now%5==0&&broken>0&&lastVisual!=now){lastVisual=now;AbilityVfx.excavation(p,kind,seed,false);}
     }
 }
