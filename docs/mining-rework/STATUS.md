@@ -1,3 +1,9 @@
+## Alpha.34 — remapeo del cliente Curios en desarrollo
+
+Alpha.33 CI `44789030366` y `44790381506` alcanzan el cliente, pero Curios falla antes de entrar al mundo: su AccessorEntity conserva `f_19803_` SRG frente a nombres oficiales del entorno ForgeGradle. No es un resultado aprobado ni prueba de un fallo en el JAR de producción. Se habilita remapeo de refmap y dependencia createSrgToMcp sólo para `-PclientSmoke`; no se deshabilitan mixins ni se simula G. Pendiente CI para confirmar arranque/slot/teclado y capturas.
+
+Publicada para prueba manual alpha.31 desde el artefacto original verificado de CI `44783621237`: tag `test-6.0.0-alpha.31-44783621237`, JAR 991442 bytes, SHA256 `a52e8e8a89a6258aa7ad92ab3975ee7526df5feeed69765a49863a07c8f429a7`. Publicación `44790381545` SUCCESS por solicitud expresa. No equivale a revisión final ni aprobación de G físico. Texturas y habilidades nativas Iridium/Strata sin cambios.
+
 ## Cierre de validación 6.0 — alpha.32 y capturas pendientes
 
 Alpha.31 `031b70ac9fb770c940add8493e4f480793600656`, CI `44783621237` SUCCESS: 539 GameTests requeridos, cliente gráfico y servidor empaquetado pasan. Evidencia descargada y verificada por SHA256. Esto confirma la tanda de trece activas, no constituye aprobación visual final.

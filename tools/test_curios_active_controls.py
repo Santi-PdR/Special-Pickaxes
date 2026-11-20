@@ -35,3 +35,12 @@ class CuriosActiveControls(unittest.TestCase):
         smoke = pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("tooltip_flag.unlink(missing_ok=True)", smoke)
         self.assertIn("'action-'+id+'.png'", smoke)
+
+    def test_curios_mixins_remap_only_in_development_smoke_client(self):
+        gradle = pathlib.Path('build.gradle').read_text()
+        client = gradle[gradle.index('        client {'):gradle.index('        server {')]
+        self.assertIn("if (project.hasProperty('clientSmoke'))", client)
+        self.assertIn("property 'mixin.env.remapRefMap', 'true'", client)
+        self.assertIn("file('build/createSrgToMcp/output.srg').absolutePath", client)
+        self.assertIn("dependsOn 'createSrgToMcp'", gradle)
+        self.assertNotIn('disableRefMap', gradle)
