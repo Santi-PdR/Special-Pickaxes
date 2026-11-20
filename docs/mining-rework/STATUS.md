@@ -1,3 +1,9 @@
+## Seguimiento posterior a la publicación — regresiones por rutas live
+
+Commit `095a898feab733199b12862069e186439c2bd2e4`, CI `44816553795` en ejecución. Sólo cambia tests excluidos del JAR: nueva regresión Eventide alterna con 256 entidades de loot (verifica umbral real, frente de terracota, drops nativos, ausencia de pausa/borrado/brillo), y regresión de retag durante permiso de Worldbreaker trasladada de `ExodiumMeteorShower.start` a `ArtifactActions.primary`. No se añade una nueva mecánica ni se cambia el binario alpha.45 publicado.
+
+Local: 158 Python (una omisión), 25 recursos, diff check OK. La fase completa de GameTests de este seguimiento ya terminó correctamente; a la hora de esta nota continúa el servidor empaquetado y resta el cliente. No se afirma todavía SUCCESS de la ejecución completa.
+
 ## Alpha.45 — ejecución exacta completa en verde, descarga solicitada
 
 Fuente `1134994a08bb1b4aa96a35ce10da01d1b2bed962`, CI `44811466825` SUCCESS. Predecesora funcional alpha.44 / `44809755725` también SUCCESS. Última ejecución: 214 JUnit, 546 GameTests, servidor empaquetado/logs, cliente real 32 escenas y 64 tooltips, activación/cancelación, ascenso Ícaro y H con slot Curios real. Worldbreaker removió 6977 bloques en la escena final, respetando los probes fuera de alcance y bedrock. Local 158 Python (una omisión), 25 recursos.
