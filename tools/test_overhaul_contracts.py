@@ -104,9 +104,11 @@ class OverhaulContracts(unittest.TestCase):
                 if 'seam_ripper' in key:
                     self.assertNotIn('256', value, key)
                     self.assertNotIn('512', value, key)
-                    self.assertNotIn('7×7', value, key)
+                    if key != 'curios.detail.specialpickaxes.seam_ripper':
+                        self.assertNotIn('7×7', value, key)
             self.assertIn('1024', texts['guide.main.seam_ripper'])
             self.assertIn('15×15', texts['guide.alt.seam_ripper'])
+            self.assertIn('7×7', texts['curios.detail.specialpickaxes.seam_ripper'])
 
     def test_worldloom_primary_documents_terraces_instead_of_the_retired_bore(self):
         for locale in ('en_us', 'es_es', 'es_uy'):

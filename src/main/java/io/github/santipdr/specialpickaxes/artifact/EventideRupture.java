@@ -14,7 +14,7 @@ public final class EventideRupture implements WorkProgram {
     private final Form form;private final EquipmentLease<ItemStack> source;private final int limit;
     private int index,lastVisualIndex,lastVisualTick=Integer.MIN_VALUE;
     public EventideRupture(BlockPos center,Direction forward,Form form){this(center,forward,form,null);}
-    private EventideRupture(BlockPos center,Direction forward,Form form,EquipmentLease<ItemStack> source){
+    EventideRupture(BlockPos center,Direction forward,Form form,EquipmentLease<ItemStack> source){
         this.center=center.immutable();this.forward=forward;this.form=form;this.source=source;
         cells=geometry(center,forward,form);limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());
     }

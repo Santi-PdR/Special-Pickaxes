@@ -1,3 +1,9 @@
+## Reforma 6.0 — alpha.31 activas G de las trece fuentes implementadas
+
+Ocho restantes: Alba ilumina drops (sin radar/imán), Coro REPLICA, Ocaso AFTERGLOW, Paradox eco 27 celdas (sin transmutar), Stasis lámina horizontal, Ícaro ascenso por velocidad con lease, Iridium pulso limitado de drops de mena propios, Strata cara equipada 7×7 separada de su habilidad nativa 15×15. Worldbreaker resuelve todas por copia. Coste 8/recarga 8 s; slot/origen revocables, sin swaps de mano ni teleport. Cuatro GameTests nuevos; local 145 Python (una omisión), 25 recursos y 58 hashes intactos. [Diferencias y límites](WORLDBREAKER-6.0.md).
+
+Alpha.30 CI `44779978500` SUCCESS. Forge alpha.31, G físico y revisión de capturas pendientes; todas las rutas implementadas no equivale a reforma aprobada. Sin release pública.
+
 ## Reforma 6.0 — alpha.30 primeros controles activos equipados
 
 Tecla G reasignable, paquete con secuencia/item/identidad del slot Curios fresco, sin intercambio de mano. Activas mineras pequeñas de Worldbreaker/Axiom/Worldloom/Exodium/Hellspec y sus copias: coste 8 en pico equipado, recarga 8 s por origen, herramienta en mano realiza minería; lease de slot/origen durante callbacks. Fuentes aún no soportadas rechazan sin coste ni fallback. Tres GameTests y dos Python de controles; local 145 Python (una omisión), 25 recursos, hashes congelados intactos. Forge/G físico/revisión visual pendientes. [Contrato](WORLDBREAKER-6.0.md).

@@ -11,15 +11,21 @@ public final class CuriosMiningActive {
     public static boolean activate(ServerPlayer p,ItemStack source,Supplier<ItemStack> current){
         if(!STARTING.add(p.getUUID()))return false;
         try{
-            if(!p.isAlive()||p.isRemoved()||p.isSpectator()||!p.mayBuild()||source.isEmpty()||current.get()!=source||WorkQueue.busy(p))return false;
+            if(!p.isAlive()||p.isRemoved()||p.isSpectator()||!p.mayBuild()||source.isEmpty()||current.get()!=source||WorkQueue.busy(p)||IcarianFlight.active(p))return false;
             var kind=WorldbreakerCuriosPassives.sourceKind(source);
-            if(kind==null||!switch(kind){case WORLDBREAKER,AXIOM,WORLDLOOM,EXODIUM,HELLSPEC->true;default->false;}){
+            if(kind==null||!kind.playable()){
                 ArtifactFeedback.message(p,"curios_active_unavailable");return false;
             }
             var held=p.getMainHandItem();if(held.isEmpty())return false;
             var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
             if(PersistedCooldown.active(now,state.getLong("curiosActiveReady"),160)){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(state.getLong("curiosActiveReady")-now+19)/20));return false;}
             var lease=new EquipmentLease<>(source,()->current.get()==source&&WorldbreakerCuriosPassives.sourceKind(source)==kind?source:ItemStack.EMPTY);
+            if(!ArtifactActions.canSpendDurability(p,source,8))return false;
+            if(kind==ArtifactKind.ICARUS||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.IRIDIUM){
+                boolean started=kind==ArtifactKind.ICARUS?IcarianFlight.startEquipped(p,held,lease):EquippedLootPulse.activate(p,held,kind,lease);
+                if(!started)return false;
+                state.putLong("curiosActiveReady",now+160);source.hurtAndBreak(8,p,who->{});AbilityVfx.cast(p,kind,true);return true;
+            }
             var context=HeldUtilityContext.capture(p,held);var target=ArtifactActions.target(p);if(target.isEmpty())return false;var at=target.get();var level=p.serverLevel();
             if(!level.hasChunkAt(at)||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at))return false;
             if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!lease.active()||!level.hasChunkAt(at)
@@ -30,6 +36,11 @@ public final class CuriosMiningActive {
                 case WORLDLOOM -> new WorldloomRoots(at,lease);
                 case EXODIUM -> new ExodiumFallingStar(at,lease);
                 case HELLSPEC -> new HellspecCinderRing(at,lease);
+                case CHOIR -> new ResonantFault(at,p.getDirection(),ResonantFault.Form.REPLICA,lease);
+                case EVENTIDE -> new EventideRupture(at,p.getDirection(),EventideRupture.Form.AFTERGLOW,lease);
+                case CRUCIBLE -> new ParadoxLattice(ParadoxLattice.echoes(List.of(at)),lease);
+                case INTERREGNUM -> new StasisTimeSlice(at,lease);
+                case SEAM_RIPPER -> new EquippedSeamSlice(at,net.minecraft.core.Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z),lease);
                 default -> throw new IllegalStateException("unsupported Curios mining source");
             };
             if(!WorkQueue.startRegion(p,held,kind,program))return false;

@@ -16,7 +16,7 @@ public final class ResonantFault implements WorkProgram {
     private final Form form;private final EquipmentLease<ItemStack> source;private final int limit;
     private int index,lastVisualIndex,lastVisualTick=Integer.MIN_VALUE;
     public ResonantFault(BlockPos center,Direction forward,Form form){this(center,forward,form,null);}
-    private ResonantFault(BlockPos center,Direction forward,Form form,EquipmentLease<ItemStack> source){
+    ResonantFault(BlockPos center,Direction forward,Form form,EquipmentLease<ItemStack> source){
         this.center=center.immutable();this.forward=forward;this.form=form;this.source=source;
         cells=geometry(center,forward,form);limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());
     }

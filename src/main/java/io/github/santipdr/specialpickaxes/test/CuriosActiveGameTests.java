@@ -28,6 +28,29 @@ public final class CuriosActiveGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(mutate);finish(h,p);}
     }
     @GameTest(template="empty",batch="curios_active_03") public static void removedOrUnsupportedEquippedSourceCannotStartOrCharge(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();h.assertTrue(!CuriosMiningActive.activate(p,source,()->ItemStack.EMPTY)&&!WorkQueue.busy(p)&&source.getDamageValue()==0,"removed source rejected");source.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&!WorkQueue.busy(p)&&source.getDamageValue()==0,"unsupported equipped control never falls back to native");finish(h,p);
+        var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();h.assertTrue(!CuriosMiningActive.activate(p,source,()->ItemStack.EMPTY)&&!WorkQueue.busy(p)&&source.getDamageValue()==0,"removed source rejected");source.getOrCreateTag().putString("copiedSkill","invalid");h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&!WorkQueue.busy(p)&&source.getDamageValue()==0,"unsupported equipped control never falls back to native");finish(h,p);
+    }
+    @GameTest(template="empty",batch="curios_active_remaining_mining") public static void remainingEquippedMiningSourcesStartTheirOwnPrograms(GameTestHelper h){
+        for(var kind:java.util.List.of(ArtifactKind.CHOIR,ArtifactKind.EVENTIDE,ArtifactKind.CRUCIBLE,ArtifactKind.INTERREGNUM,ArtifactKind.SEAM_RIPPER)){
+            var p=player(h,kind);target(h,p);var source=p.getMainHandItem();p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source)&&source.getDamageValue()==8&&WorkQueue.busy(p),"equipped source starts and charges once: "+kind);drain(p);WorkQueue.cancel(p);MiningObservations.forget(p);
+        }h.succeed();
+    }
+    @GameTest(template="empty",batch="curios_active_icarus") public static void equippedIcarusUsesVelocityAndStopsWhenSlotIsRemoved(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);target(h,p);var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var position=p.position();
+        h.assertTrue(CuriosMiningActive.activate(p,source,slot::get)&&IcarianFlight.active(p),"equipped ascent starts");IcarianFlight.tick();
+        h.assertTrue(p.position().equals(position)&&p.getDeltaMovement().y>0,"flight uses velocity, never teleport");slot.set(ItemStack.EMPTY);IcarianFlight.tick();h.assertTrue(!IcarianFlight.active(p),"removal stops further impulses");IcarianFlight.stop(p);finish(h,p);
+    }
+    @GameTest(template="empty",batch="curios_active_loot") public static void dawnLightsLootWhileIridiumOnlyPullsOwnedOreLoot(GameTestHelper h){
+        var p=player(h,ArtifactKind.PALIMPSEST);var at=target(h,p);var dawn=p.getMainHandItem();p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        var drop=new net.minecraft.world.entity.item.ItemEntity(h.getLevel(),at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);var motion=drop.getDeltaMovement();
+        h.assertTrue(CuriosMiningActive.activate(p,dawn,()->dawn)&&drop.isCurrentlyGlowing()&&drop.getDeltaMovement().equals(motion),"Dawn lights drops without a magnet or mineral radar");
+        var iridium=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.IRIDIUM).get());
+        h.assertTrue(!CuriosMiningActive.activate(p,iridium,()->iridium)&&iridium.getDamageValue()==0,"Iridium never recalls unowned loot");OreDropHighlight.mark(drop,p);
+        h.assertTrue(CuriosMiningActive.activate(p,iridium,()->iridium)&&!drop.getDeltaMovement().equals(motion),"owned ore loot receives bounded recall impulse");drop.discard();finish(h,p);
+    }
+    @GameTest(template="empty",batch="curios_active_copy_remaining") public static void worldbreakerCopyCanActivatePreviouslyUnsupportedSource(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        h.assertTrue(CuriosMiningActive.activate(p,source,()->source)&&WorkQueue.remaining(p)==27,"Paradox copy activates small echoes, not transmutation or native fracture");drain(p);finish(h,p);
     }
 }

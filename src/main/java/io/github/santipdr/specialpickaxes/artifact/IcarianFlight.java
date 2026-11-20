@@ -17,10 +17,10 @@ public final class IcarianFlight {
     private static boolean ticking;
     private static final Set<UUID> STARTING=new HashSet<>();
     private static final class Flight {
-        final ServerPlayer player;final ServerLevel level;final ItemStack tool;final Vec3 origin;final long start;
+        final ServerPlayer player;final ServerLevel level;final ItemStack tool;final EquipmentLease<ItemStack> source;final Vec3 origin;final long start;
         Vec3 previous;long lastTick=Long.MIN_VALUE;
-        Flight(ServerPlayer p,ItemStack tool){player=p;level=p.serverLevel();this.tool=tool;origin=p.position();previous=origin;start=ArtifactState.now(p);}
-        boolean valid(){return JOBS.get(player.getUUID())==this&&caster(player,tool)&&player.serverLevel()==level
+        Flight(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){this.source=source;player=p;level=p.serverLevel();this.tool=tool;origin=p.position();previous=origin;start=ArtifactState.now(p);}
+        boolean valid(){return JOBS.get(player.getUUID())==this&&caster(player,tool,source)&&player.serverLevel()==level
                 &&player.position().distanceToSqr(previous)<=16&&player.position().distanceToSqr(origin)<=32*32
                 &&player.getY()-origin.y<MAX_RISE&&ArtifactState.now(player)>=start&&ArtifactState.now(player)-start<DURATION;}
     }
@@ -30,6 +30,15 @@ public final class IcarianFlight {
                 &&p.getMainHandItem()==tool&&!tool.isEmpty()&&tool.getItem() instanceof ArtifactItem item
                 &&ArtifactSkills.feedbackKind(tool,item.kind)==ArtifactKind.ICARUS;
     }
+    private static boolean caster(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){
+        return source==null?caster(p,tool):source.active()&&!source.expected().isEmpty()&&WorldbreakerCuriosPassives.sourceKind(source.expected())==ArtifactKind.ICARUS
+                &&p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&p.mayBuild()&&!p.isPassenger()&&!p.isSleeping()&&!p.isFallFlying()
+                &&p.getMainHandItem()==tool&&!tool.isEmpty();
+    }
+    public static boolean startEquipped(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){
+        if(!STARTING.add(p.getUUID()))return false;
+        try{return startOnce(p,tool,source);}finally{STARTING.remove(p.getUUID());}
+    }
     public static double speed(int age){return Math.min(.70,.16+Math.max(0,age)*.035);}
     private static boolean clear(ServerPlayer p,double rise){
         // Sweep in short increments: checking only the destination could skip a thin obstruction.
@@ -38,14 +47,14 @@ public final class IcarianFlight {
     }
     public static boolean start(ServerPlayer p,ItemStack tool){
         if(!STARTING.add(p.getUUID()))return false;
-        try{return startOnce(p,tool);}finally{STARTING.remove(p.getUUID());}
+        try{return startOnce(p,tool,null);}finally{STARTING.remove(p.getUUID());}
     }
-    private static boolean startOnce(ServerPlayer p,ItemStack tool){
-        if(!caster(p,tool)||active(p)||JOBS.size()>=MAX_JOBS||!clear(p,.8))return false;
+    private static boolean startOnce(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){
+        if(!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS||!clear(p,.8))return false;
         var context=HeldUtilityContext.capture(p,tool);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above());
-        if(!allowed||!context.valid()||!caster(p,tool)||!clear(p,.8)||active(p)||JOBS.size()>=MAX_JOBS)return false;
-        JOBS.put(p.getUUID(),new Flight(p,tool));return true;
+        if(!allowed||!context.valid()||!caster(p,tool,source)||!clear(p,.8)||active(p)||JOBS.size()>=MAX_JOBS)return false;
+        JOBS.put(p.getUUID(),new Flight(p,tool,source));return true;
     }
     public static boolean active(ServerPlayer p){return JOBS.containsKey(p.getUUID());}
     public static void stop(ServerPlayer p){JOBS.remove(p.getUUID());}

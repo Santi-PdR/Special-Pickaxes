@@ -12,7 +12,7 @@ public final class ParadoxLattice implements WorkProgram {
     private final List<BlockPos> cells;private final EquipmentLease<ItemStack> source;private final int limit;
     private int index,visualTick=Integer.MIN_VALUE;
     public ParadoxLattice(BlockPos center){this(lattice(center),null);}
-    private ParadoxLattice(List<BlockPos> cells,EquipmentLease<ItemStack> source){this.cells=cells;this.source=source;limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());}
+    ParadoxLattice(List<BlockPos> cells,EquipmentLease<ItemStack> source){this.cells=cells;this.source=source;limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());}
     public static List<BlockPos> lattice(BlockPos center){
         var offsets=new ArrayList<BlockPos>();offsets.add(BlockPos.ZERO);
         for(int x=-13;x<=13;x++)for(int y=-13;y<=13;y++)for(int z=-13;z<=13;z++)
