@@ -1,3 +1,17 @@
+## Revisión frontal — alpha.39 en validación, no aprobada
+
+R/X mineros de las fuentes reformadas y sus copias usan ConnectedExcavation: objetivo a un máximo de seis bloques, expansión sólo tras rotura real a vecinos conectados, mitad frontal y alcance limitado, sin saltos por aire a islas remotas. Stasis conserva su dominio primario; Paradox conserva selección primaria, pero su secundaria es demolición frontal inmediata. Ícaro conserva ascenso con apertura de techo; Iridium/Strata nativos intactos.
+
+Perfiles de recorrido: Coro frente ancho por capas, Exodium de arriba abajo, Worldloom desde la base, Axiom penetración profunda, Hellspec masas verticales. Worldbreaker tiene el mayor alcance y respeta la fuente copiada. G minero y disparadores equipados comparten el motor con lease de slot/origen; los programas geométricos antiguos ya no son las rutas R/X vivas.
+
+La fase de asentamiento vuelve a inspeccionar celdas vaciadas bajo el mismo lease; presupuesto global por tick, tamaño de frontera/visitados y duración absoluta limitados. Se añadieron seis GameTests nuevos, incluida caída real de arena y grava sobre una celda previamente vaciada y revocación del slot durante asentamiento. Guía visible principal/secundaria/Curios resumida, positiva, completa en en_us/es_es/es_uy.
+
+Validación todavía abierta. Alpha.35 mostró seis fallos (nueva compatibilidad glass/tier, preflight Ícaro y expectativa regional antigua). Alpha.36 compiló pero los tests mostraron expectativas de formas ya rechazadas y jobs de asentamiento que sus helpers síncronos nunca finalizaban al no avanzar tiempo. Alpha.37 detectó dos llamadas Queue.addLast al cambiar el orden de la frontera; corregidas en .38. No se ha relajado el escaneo de errores ni el gate de GameTests.
+
+Los tests de geometrías históricas conservan sus aserciones exactas llamando explícitamente a esos algoritmos antiguos; no se presentan como validación de las rutas nuevas. ConnectedExcavationGameTests prueba las rutas actuales y sus permisos. Los fixtures síncronos avanzan/restauran sólo el reloj para los programas de asentamiento; la prueba de caída real es asíncrona y no usa ese helper. Fuente, coste, loot y callbacks no se simulan.
+
+Curios dev: ForgeGradle registra runClient después del script y genera TSRG por defecto. .38 corrige registro tardío y solicita SRG explícito para su refmap. Sigue pendiente confirmar el cliente G real. No hay otra publicación ni petición de prueba al usuario hasta terminar validación.
+
 ## Alpha.35 — correcciones tras rechazo de la prueba
 
 El usuario rechaza anillos/túneles ornamentales y no volverá a probar hasta rehacerlos. [Dirección vigente, implementación y pendientes](FEEDBACK-OP-REVISION.md). Sin aprobación ni nueva publicación de esta tanda.

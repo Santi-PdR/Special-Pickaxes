@@ -172,7 +172,7 @@ public final class PickaxeGameTests {
         if(kind==ArtifactKind.CRUCIBLE)h.assertTrue(level.getBlockState(at).isAir(),"causal lattice harvests its natural target instead of producing a selected material");
         if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CHOIR||kind==ArtifactKind.HELLSPEC)
             h.assertTrue(level.getBlockState(at).isAir(),"queued alternate really harvests the aimed geology");
-        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).is(Blocks.DIAMOND_ORE)&&level.getBlockState(at.above()).is(Blocks.STONE)&&level.getBlockState(at.above(4)).isAir(),"null cross preserves its ore and adjacent core while clearing the vertical plane");
+        if(kind==ArtifactKind.AXIOM)h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(at.above()).isAir()&&level.getBlockState(at.above(4)).is(Blocks.STONE),"connected Void excavation harvests its front but does not jump the air gap to a remote block");
         if(kind==ArtifactKind.WORLDLOOM)h.assertTrue(level.getBlockState(at).isAir(),"exposed ore harvested without construction");
         if(kind==ArtifactKind.PALIMPSEST)h.assertTrue(level.getBlockState(at).isAir(),"solar nova harvests its natural target without harming creatures");
         WorkQueue.cancel(wearer);mob.discard();arrow.discard();finish(h,wearer);
@@ -1870,7 +1870,7 @@ public final class PickaxeGameTests {
         var pos=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());return pos;
     }
     private static void finish(GameTestHelper h,ServerPlayer p) { IcarianFlight.stop(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
-    private static void drain(ServerPlayer p) { for(int i=0;i<400 && WorkQueue.busy(p);i++) WorkQueue.tick(); }
+    private static void drain(ServerPlayer p) { SynchronousWorkDrain.drain(p,400); }
     @GameTest(template="empty",batch="legacy_each_01") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
         h.assertTrue(SpecialPickaxes.PICKS.size()==13,"thirteen playable pickaxes");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
         var source=h.getLevel().getServer().createCommandSourceStack().withEntity(p).withPermission(2);
@@ -1908,14 +1908,14 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="legacy_each_04") public static void dawnPrimaryBreaksRaysAcrossRockAndDisconnectedOre(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);var at=solarTarget(h,p);var ore=at.east(3);
         h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.PALIMPSEST,false),"solar rays activate on natural stone");drain(p);
+        h.assertTrue(SolarRupture.start(p,p.getMainHandItem(),SolarRupture.Form.RAYS),"solar rays activate on natural stone");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir(),"rays break rock and disconnected ore: center="+h.getLevel().getBlockState(at)+" ore="+h.getLevel().getBlockState(ore)+" status="+WorkQueue.status(p)+" remaining="+WorkQueue.remaining(p)+" completed="+WorkQueue.completed(p)+" succeeded="+WorkQueue.succeeded(p)+" reason="+WorkQueue.pauseReason(p)+" range="+p.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(ore)));finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_05") public static void choirFanExpandsInsteadOfReplayingATunnel(GameTestHelper h) {
         var p=player(h,ArtifactKind.CHOIR);var origin=solarTarget(h,p);var edge=origin.south(8).east(8);var outside=origin.east(4);
         h.getLevel().setBlockAndUpdate(edge,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(edge);
         h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"seismic fan starts from aimed natural rock");drain(p);
+        h.assertTrue(ResonantFault.start(p,p.getMainHandItem(),ResonantFault.Form.FAN),"seismic fan starts from aimed natural rock");drain(p);
         h.assertTrue(h.getLevel().getBlockState(origin).isAir()&&h.getLevel().getBlockState(edge).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"fan widens across terrain, preserves root limits, never replays distant memories");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_06") public static void eventideExcavatesInsteadOfOnlyGrantingHaste(GameTestHelper h){EventideReworkGameTests.destructiveEclipse(h);}
@@ -3867,7 +3867,7 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="legacy_each_11") public static void worldloomBoundedQuarryPreservesOres(GameTestHelper h) {
         var p=player(h,ArtifactKind.WORLDLOOM);var center=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(center);p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(center));var stone=center.east();var ore=center.above();
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry activation");drain(p);
+        h.assertTrue(WorldloomQuarry.start(p,p.getMainHandItem()),"quarry activation");drain(p);
         h.assertTrue(h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(stone).isAir(),"scheduled quarry mines the stone sphere");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE),"quarry preserves ores");finish(h,p);
     }
@@ -3945,7 +3945,7 @@ public final class PickaxeGameTests {
         var rayTarget=ArtifactActions.target(p);h.assertTrue(rayTarget.filter(center::equals).isPresent(),"Axiom fixture aims at its own explicit center: "+rayTarget);
         var seed=h.getLevel().getBlockState(center);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.AXIOM,center),harvestable=WorldSafety.harvestable(p,p.getMainHandItem(),center);
-        boolean activated=ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.AXIOM,false);
+        boolean activated=AxiomNullChamber.start(p,p.getMainHandItem());
         h.assertTrue(activated,"axiom activation (ray="+rayTarget+", center="+center+", allowed="+allowed+", matrix="+MiningDesigns.matrix(seed)+", ore="+ArtifactOres.isOre(seed)+", placed="+PlayerPlacedBlocks.get(p.serverLevel()).contains(center)+", harvestable="+harvestable+")");
         // Manual scheduler ticks do not tick item entities: model loot collection here, rather
         // than bypassing the production drop-pressure pause or filling it with unmerged drops.

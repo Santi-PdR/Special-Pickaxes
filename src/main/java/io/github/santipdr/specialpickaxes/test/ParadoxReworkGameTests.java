@@ -54,7 +54,7 @@ public final class ParadoxReworkGameTests {
         for(var cell:new BlockPos[]{included,gap,denied}){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         h.getLevel().setBlockAndUpdate(placed,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
         Consumer<AbilityUseEvent> veto=e->{if(e.player==p&&e.target.equals(denied))e.setCanceled(true);};MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,veto);
-        try{h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE),"lattice starts");drain(p);h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(included).isAir()&&h.getLevel().getBlockState(gap).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(denied).is(Blocks.STONE),"causal geometry, provenance and claims all hold");}
+        try{h.assertTrue(ParadoxLattice.start(p,p.getMainHandItem()),"lattice starts");drain(p);h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(included).isAir()&&h.getLevel().getBlockState(gap).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(denied).is(Blocks.STONE),"causal geometry, provenance and claims all hold");}
         finally{MinecraftForge.EVENT_BUS.unregister(veto);PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
     private static void scar(GameTestHelper h,ServerPlayer p,BlockPos at,ItemStack source,AtomicReference<ItemStack> slot){
@@ -65,8 +65,8 @@ public final class ParadoxReworkGameTests {
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h,p);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CRUCIBLE).get());var slot=new AtomicReference<ItemStack>(source);
         var a=at;var b=at.east(4);var c=at.east(8);var d=at.east(12);for(var point:new BlockPos[]{a,b,c,d})h.getLevel().setBlockAndUpdate(point.above(),Blocks.STONE.defaultBlockState());
         scar(h,p,a,source,slot);scar(h,p,b,source,slot);scar(h,p,c,source,slot);h.assertTrue(!WorkQueue.busy(p),"three scars are stored without immediate excavation");scar(h,p,d,source,slot);
-        h.assertTrue(WorkQueue.remaining(p)==108,"four disjoint echoes are bounded to 108 candidates");drain(p);
-        for(var point:new BlockPos[]{a,b,c,d})h.assertTrue(h.getLevel().getBlockState(point.above()).isAir(),"echo returns to each original scar, not just the most recent one");
+        h.assertTrue(WorkQueue.busy(p),"four scars trigger one connected aftershock");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(d.above()).isAir()&&h.getLevel().getBlockState(a.above()).is(Blocks.STONE),"aftershock starts at the latest scar and does not jump to a remote island");
         for(int i=0;i<4;i++)scar(h,p,a,source,slot);h.assertTrue(!WorkQueue.busy(p),"eight-second cooldown prevents endless echo chaining");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_606_06") public static void removingCuriosInsideForgeCallbackStopsTheSameEchoCell(GameTestHelper h){
@@ -83,7 +83,7 @@ public final class ParadoxReworkGameTests {
         finally{MinecraftForge.EVENT_BUS.unregister(callback);finish(h,p);}
     }
     @GameTest(template="empty",batch="reform_606_08") public static void latticeCancelsThroughAlternateAndSkipsUnloadedChunks(GameTestHelper h){
-        var p=player(h,ArtifactKind.CRUCIBLE);target(h,p);h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE),"lattice starts");h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ALT_SKILL)&&!WorkQueue.busy(p),"alternate cancels work");
+        var p=player(h,ArtifactKind.CRUCIBLE);target(h,p);h.assertTrue(ParadoxLattice.start(p,p.getMainHandItem()),"lattice starts");h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ALT_SKILL)&&!WorkQueue.busy(p),"alternate cancels work");
         var remote=new BlockPos(1200000,100,1200000);var plan=new ParadoxLattice(remote);h.assertTrue(!h.getLevel().hasChunkAt(remote)&&!plan.next(p).apply(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE)&&!h.getLevel().hasChunkAt(remote),"no chunk loading");finish(h,p);
     }
 }

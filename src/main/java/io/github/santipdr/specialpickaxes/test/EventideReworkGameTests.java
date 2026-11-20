@@ -36,7 +36,7 @@ public final class EventideReworkGameTests {
     static void destructiveEclipse(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var edge=at.east(12);h.getLevel().setBlockAndUpdate(edge,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(edge);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(at.getX(),at.getY()+6,at.getZ());h.getLevel().addFreshEntity(mob);mob.setDeltaMovement(Vec3.ZERO);float health=mob.getHealth();
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"eclipse starts");drain(p);
+        h.assertTrue(EventideRupture.start(p,p.getMainHandItem(),EventideRupture.Form.ECLIPSE),"eclipse starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(edge).isAir()&&!DomainFields.active(p)&&mob.getHealth()==health&&mob.getDeltaMovement().equals(Vec3.ZERO),"massive excavation is no longer a mining-speed field or entity pull");mob.discard();finish(h,p);
     }
     static void copiedHorizon(GameTestHelper h){horizon(h,ArtifactKind.WORLDBREAKER);}
@@ -45,7 +45,7 @@ public final class EventideReworkGameTests {
         var p=player(h,kind);var at=target(h,p);var edge=at.east(16);h.getLevel().setBlockAndUpdate(edge,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(edge);
         var tool=p.getMainHandItem();if(kind==ArtifactKind.WORLDBREAKER)tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.EVENTIDE.id);
         var drop=new ItemEntity(h.getLevel(),at.getX()+4,at.getY(),at.getZ(),new ItemStack(Items.DIAMOND));drop.setDeltaMovement(Vec3.ZERO);h.getLevel().addFreshEntity(drop);
-        h.assertTrue(ArtifactActions.useAlternate(p,tool,kind)&&drop.getDeltaMovement().equals(Vec3.ZERO),"copied secondary starts destructive horizon without pulling items");drain(p);
+        h.assertTrue(EventideRupture.start(p,tool,EventideRupture.Form.HORIZON)&&drop.getDeltaMovement().equals(Vec3.ZERO),"copied secondary starts destructive horizon without pulling items");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&h.getLevel().getBlockState(edge).isAir(),"copied horizon excavates ring and preserves the central core");drop.discard();finish(h,p);
     }
     static void claimedHorizon(GameTestHelper h){
@@ -64,7 +64,7 @@ public final class EventideReworkGameTests {
             var p=player(h,kind);var at=target(h,p);var high=at.above(12);var outside=at.south(5);
             h.getLevel().setBlockAndUpdate(high,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(high);h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
             if(kind==ArtifactKind.WORLDBREAKER){p.getMainHandItem().getOrCreateTag().putString("copiedSkill",ArtifactKind.EVENTIDE.id);p.getMainHandItem().getTag().putInt("copiedMode",1);}else ArtifactState.of(p,kind).putInt("mode",1);
-            h.assertTrue(ArtifactActions.primary(p,p.getMainHandItem(),kind),"vertical mode starts");drain(p);
+            h.assertTrue(EventideRupture.start(p,p.getMainHandItem(),EventideRupture.Form.CRESCENT),"vertical mode starts");drain(p);
             h.assertTrue(h.getLevel().getBlockState(high).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"native and copied selected mode use vertical, not horizontal plane");WorkQueue.cancel(p);MiningObservations.forget(p);
         }h.succeed();
     }
@@ -82,18 +82,18 @@ public final class EventideReworkGameTests {
     }
     @GameTest(template="empty",batch="reform_605_03") public static void curiosOreCreates312CellAfterglowWithoutDetectingOrAttractingOre(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.EVENTIDE).get());var slot=new AtomicReference<ItemStack>(source);
-        var near=at.east(3);var core=at.east();h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(core,Blocks.STONE.defaultBlockState());
+        var near=at.east(2);h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());var core=at.east();h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(core,Blocks.STONE.defaultBlockState());
         h.assertTrue(!MiningObservations.captureCuriosEventide(p,source,at,Blocks.STONE.defaultBlockState(),slot::get),"ordinary stone cannot trigger ore afterglow");oreScar(h,p,at,source,slot);
-        h.assertTrue(WorkQueue.remaining(p)==312,"one confirmed ore triggers one bounded annulus");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(near).isAir()&&h.getLevel().getBlockState(core).is(Blocks.STONE),"afterglow excavates ring, not center");oreScar(h,p,at,source,slot);h.assertTrue(!WorkQueue.busy(p),"eight-second cooldown prevents replay");finish(h,p);
+        h.assertTrue(WorkQueue.busy(p),"one confirmed ore triggers a connected aftershock");drain(p);
+        h.assertTrue(h.getLevel().getBlockState(near).isAir()&&h.getLevel().getBlockState(core).isAir(),"afterglow starts beside the scar and follows connected terrain");oreScar(h,p,at,source,slot);h.assertTrue(!WorkQueue.busy(p),"eight-second cooldown prevents replay");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_605_04") public static void removingOrReplacingCuriosCancelsAfterglow(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.EVENTIDE).get());var slot=new AtomicReference<ItemStack>(source);oreScar(h,p,at,source,slot);
-        var near=at.east(3);h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());slot.set(source.copy());WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(near).is(Blocks.STONE),"identical replacement cannot own the original queued annulus");finish(h,p);
+        var near=at.east(2);h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());slot.set(source.copy());WorkQueue.tick();h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(near).is(Blocks.STONE),"identical replacement cannot own the original queued annulus");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_605_05") public static void removingCuriosInsideForgeCallbackProtectsSameAfterglowCell(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.EVENTIDE).get());var slot=new AtomicReference<ItemStack>(source);oreScar(h,p,at,source,slot);
-        var near=at.east(3);h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());Consumer<BlockEvent.BreakEvent> revoke=e->{if(e.getPlayer()==p&&e.getPos().equals(near))slot.set(ItemStack.EMPTY);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,revoke);
+        var near=at.east(2);h.getLevel().setBlockAndUpdate(at.east(),Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(near,Blocks.STONE.defaultBlockState());Consumer<BlockEvent.BreakEvent> revoke=e->{if(e.getPlayer()==p&&e.getPos().equals(near))slot.set(ItemStack.EMPTY);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,revoke);
         try{drain(p);h.assertTrue(slot.get().isEmpty()&&h.getLevel().getBlockState(near).is(Blocks.STONE),"same-cell native guard rejects revoked equipment");}finally{MinecraftForge.EVENT_BUS.unregister(revoke);finish(h,p);}
     }
     @GameTest(template="empty",batch="reform_605_06") public static void twilightRejectsClaimReentryAndNeverLoadsRemoteChunks(GameTestHelper h){

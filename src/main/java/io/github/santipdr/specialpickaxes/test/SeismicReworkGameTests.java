@@ -43,13 +43,7 @@ public final class SeismicReworkGameTests {
         h.getLevel().setBlockAndUpdate(at,Blocks.STONE.defaultBlockState());p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));return at;
     }
     static void drain(ServerPlayer p){
-        // Synchronous test ticks do not perform item collection/merging. Model collection,
-        // retaining the production drop cap and the ordinary paused-job resume path.
-        for(int i=0;i<1000&&WorkQueue.busy(p);i++){
-            for(var drop:p.serverLevel().getEntitiesOfClass(ItemEntity.class,p.getBoundingBox().inflate(64)))drop.discard();
-            if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))WorkQueue.togglePause(p);
-            WorkQueue.tick();
-        }
+        SynchronousWorkDrain.drain(p,1000);
     }
     static void finish(GameTestHelper h,ServerPlayer p){WorkQueue.cancel(p);MiningObservations.forget(p);RelicNetwork.forget(p);h.succeed();}
     private static ItemStack source(){return new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CHOIR).get());}
@@ -62,13 +56,13 @@ public final class SeismicReworkGameTests {
         var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);var lateral=at.south(10).east(10);var outside=at.east(4);
         h.getLevel().setBlockAndUpdate(lateral,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(lateral);
         h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CHOIR,false),"real primary starts fan");drain(p);
+        h.assertTrue(ResonantFault.start(p,p.getMainHandItem(),ResonantFault.Form.FAN),"real primary starts fan");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(lateral).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"wide fan reaches lateral ore but respects narrow root");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_604_02") public static void cascadeCutsSeparateTallFaultsAndLeavesTheirGaps(GameTestHelper h){
         var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);var fault=at.south(6).above(10);var gap=at.south(5).above(10);
         h.getLevel().setBlockAndUpdate(fault,Blocks.STONE.defaultBlockState());h.getLevel().setBlockAndUpdate(gap,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(fault);
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.CHOIR),"secondary starts cascade");drain(p);
+        h.assertTrue(ResonantFault.start(p,p.getMainHandItem(),ResonantFault.Form.CASCADE),"secondary starts cascade");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(fault).isAir()&&h.getLevel().getBlockState(gap).is(Blocks.STONE),"vertical sheets: center="+h.getLevel().getBlockState(at)+" fault="+h.getLevel().getBlockState(fault)+" gap="+h.getLevel().getBlockState(gap)+" status="+WorkQueue.status(p)+" remaining="+WorkQueue.remaining(p)+" reason="+WorkQueue.pauseReason(p));finish(h,p);
     }
     @GameTest(template="empty",batch="reform_604_03") public static void worldbreakerCopiesBothSeismicGeometries(GameTestHelper h){
@@ -89,9 +83,9 @@ public final class SeismicReworkGameTests {
     }
     @GameTest(template="empty",batch="reform_604_05") public static void sixConfirmedCuriosBreaksCreateOneBoundedReplica(GameTestHelper h){
         var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
-        var source=source();var slot=new AtomicReference<ItemStack>(source);var adjacent=at.east(3);h.getLevel().setBlockAndUpdate(adjacent,Blocks.STONE.defaultBlockState());
+        var source=source();var slot=new AtomicReference<ItemStack>(source);var adjacent=at.east();h.getLevel().setBlockAndUpdate(adjacent,Blocks.STONE.defaultBlockState());
         for(int i=0;i<5;i++)scar(h,p,at,source,slot);h.assertTrue(!WorkQueue.busy(p),"five manual scars do not proc");scar(h,p,at,source,slot);
-        h.assertTrue(WorkQueue.busy(p)&&WorkQueue.remaining(p)==99,"sixth scar schedules exactly one 99-cell cross");drain(p);
+        h.assertTrue(WorkQueue.busy(p),"sixth scar schedules one connected aftershock");drain(p);
         h.assertTrue(h.getLevel().getBlockState(adjacent).isAir(),"replica actually harvests surrounding natural rock with the held tool");
         for(int i=0;i<6;i++)scar(h,p,at,source,slot);h.assertTrue(!WorkQueue.busy(p),"eight-second cooldown prevents immediate replay");finish(h,p);
     }

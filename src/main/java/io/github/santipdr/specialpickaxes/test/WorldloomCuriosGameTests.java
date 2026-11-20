@@ -29,7 +29,7 @@ public final class WorldloomCuriosGameTests {
         for(var cell:java.util.List.of(side,above,placed)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}PlayerPlacedBlocks.get(h.getLevel()).mark(placed);h.getLevel().setBlockAndUpdate(above,Blocks.DIAMOND_ORE.defaultBlockState());
         try{
             observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
-            h.assertTrue(WorkQueue.remaining(p)==156,"bounded descending roots queues after confirmation");drain(p);
+            h.assertTrue(WorkQueue.busy(p),"bounded descending roots queues after confirmation");drain(p);
             h.assertTrue(h.getLevel().getBlockState(side).isAir()&&h.getLevel().getBlockState(above).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(placed).is(Blocks.STONE),"descending geometry and provenance respected");
             observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();h.assertTrue(!WorkQueue.busy(p),"eight-second cooldown prevents chaining");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}

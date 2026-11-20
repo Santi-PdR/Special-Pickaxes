@@ -447,7 +447,7 @@ public final class MiningReworkGameTests {
         h.getLevel().setBlockAndUpdate(center,Blocks.STONE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(stone,Blocks.GRANITE.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());h.getLevel().setBlockAndUpdate(outside,Blocks.STONE.defaultBlockState());
         p.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,net.minecraft.world.phys.Vec3.atCenterOf(center));
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDLOOM,false),"quarry starts");
+        h.assertTrue(WorldloomQuarry.start(p,p.getMainHandItem()),"quarry starts");
         for(int tick=0;tick<1200&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(stone).isAir(),"quarry mines nearby stone");
         h.assertTrue(h.getLevel().getBlockState(ore).is(Blocks.DIAMOND_ORE)&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"preserves ore and cells outside radius");finish(h,p);

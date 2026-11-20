@@ -23,7 +23,7 @@ public final class WorldbreakerReworkGameTests {
         var central=at.below(8);var satellite=at.offset(12,-6,4);var ore=at.west(12).below(4);var placed=at.north(12);var outside=at.offset(16,0,16);
         for(var cell:java.util.List.of(central,satellite,placed,outside)){level.setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(cell);}
         level.setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(level).unmark(ore);PlayerPlacedBlocks.get(level).mark(placed);
-        try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public cataclysm starts");drain(p);
+        try{h.assertTrue(WorldbreakerCataclysm.start(p,p.getMainHandItem()),"public cataclysm starts");drain(p);
             h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(central).isAir()&&level.getBlockState(satellite).isAir()&&level.getBlockState(ore).isAir(),"chamber harvest natural rock and ore: target="+level.getBlockState(at)+" core="+level.getBlockState(central)+" lateral="+level.getBlockState(satellite)+" ore="+level.getBlockState(ore)+" remaining="+WorkQueue.remaining(p));
             h.assertTrue(level.getBlockState(placed).is(Blocks.STONE)&&level.getBlockState(outside).is(Blocks.STONE),"player builds and exterior remain intact");
         }finally{PlayerPlacedBlocks.get(level).unmark(placed);finish(h,p);}
@@ -37,7 +37,7 @@ public final class WorldbreakerReworkGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var upper=at.offset(20,6,0);var lower=at.offset(-20,-6,0);var between=at.offset(5,1,0);var placed=at.east(8);
         for(var cell:java.util.List.of(upper,between,placed)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         h.getLevel().setBlockAndUpdate(lower,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(lower);PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
-        try{h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER),"public native shear starts");drain(p);
+        try{h.assertTrue(WorldbreakerContinentalShear.start(p,p.getMainHandItem()),"public native shear starts");drain(p);
             h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(lower).isAir(),"all three broad planes harvest natural rock and ore");
             h.assertTrue(h.getLevel().getBlockState(between).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.STONE),"intervening strata and builds preserved");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
@@ -46,7 +46,7 @@ public final class WorldbreakerReworkGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var cross=at.above(10);var nativeOnly=at.offset(20,6,0);
         for(var cell:java.util.List.of(cross,nativeOnly)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         p.getMainHandItem().getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);
-        h.assertTrue(ArtifactSkills.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER),"copied cross starts");drain(p);
+        h.assertTrue(AxiomNullCross.start(p,p.getMainHandItem()),"copied cross starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(cross).isAir()&&h.getLevel().getBlockState(nativeOnly).is(Blocks.STONE)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"copied Axiom cross retains its core and geometry instead of native shear");finish(h,p);
     }
     @GameTest(template="empty",batch="worldbreaker_622_crown") public static void fractureModeOpensThreeCrownsAndPreservesInterveningRock(GameTestHelper h){
@@ -54,7 +54,7 @@ public final class WorldbreakerReworkGameTests {
         var inner=at.east(7);var middle=at.west(15);var outer=at.north(23);var gap=at.east(10);var placed=at.south(15);
         for(var cell:java.util.List.of(inner,middle,gap,placed)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         h.getLevel().setBlockAndUpdate(outer,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(outer);PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
-        try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public fracture crown starts");drain(p);
+        try{h.assertTrue(WorldbreakerFaultCrown.start(p,p.getMainHandItem()),"public fracture crown starts");drain(p);
             h.assertTrue(h.getLevel().getBlockState(inner).isAir()&&h.getLevel().getBlockState(middle).isAir()&&h.getLevel().getBlockState(outer).isAir(),"all three crowns harvest geology and ore");
             h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE)&&h.getLevel().getBlockState(gap).is(Blocks.STONE)&&h.getLevel().getBlockState(placed).is(Blocks.STONE),"center, gaps and builds survive");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
@@ -63,7 +63,7 @@ public final class WorldbreakerReworkGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);ArtifactState.of(p,ArtifactKind.WORLDBREAKER).putInt("mode",2);
         var upper=at.offset(20,12,0);var lower=at.offset(0,-12,-20);var diagonal=at.offset(4,0,4);
         for(var cell:java.util.List.of(upper,lower,diagonal)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false),"public world split starts");drain(p);
+        h.assertTrue(WorldbreakerWorldSplit.start(p,p.getMainHandItem()),"public world split starts");drain(p);
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(lower).isAir()&&h.getLevel().getBlockState(diagonal).is(Blocks.STONE),"perpendicular vertical cuts leave diagonal rock intact");finish(h,p);
     }
     @GameTest(template="empty",batch="worldbreaker_624_descent") public static void descentModeCutsTerracesAndKeepsLandingGrace(GameTestHelper h){
@@ -71,7 +71,7 @@ public final class WorldbreakerReworkGameTests {
         var upper=at.east(11);var middle=at.offset(8,-8,0);var bottom=at.offset(2,-24,0);var outside=at.offset(11,-8,0);
         for(var cell:java.util.List.of(upper,middle,outside)){h.getLevel().setBlockAndUpdate(cell,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
         h.getLevel().setBlockAndUpdate(bottom,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(bottom);
-        try{h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,false)&&WorkQueue.protectsFall(p),"public descent starts with fall guard");drain(p);
+        try{h.assertTrue(WorldbreakerMantleDescent.start(p,p.getMainHandItem())&&WorkQueue.protectsFall(p),"public descent starts with fall guard");drain(p);
             h.assertTrue(h.getLevel().getBlockState(upper).isAir()&&h.getLevel().getBlockState(middle).isAir()&&h.getLevel().getBlockState(bottom).isAir()&&h.getLevel().getBlockState(outside).is(Blocks.STONE),"terraces harvest ore while narrower deep boundary survives");
             h.assertTrue(WorkQueue.protectsFall(p),"landing grace remains after excavation completion");p.setOnGround(true);WorkQueue.tick();h.assertTrue(!WorkQueue.protectsFall(p),"landing releases grace");
         }finally{WorkQueue.forget(p);finish(h,p);}
