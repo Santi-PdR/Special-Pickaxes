@@ -50,8 +50,10 @@ jobs:
           gametest_log=$(find build -path 'build/gametest-*/logs/latest.log' -type f -print -quit)
           test -n "$gametest_log"
           cp "$gametest_log" run/logs/gametest.log
-          python3 tools/validate_runtime_logs.py run/logs/gametest.log
-          python3 tools/verify_gametests.py run/logs/gametest.log
+          # latest.log may rotate at midnight; the tee transcript spans the entire run.
+          # Scan both logs strictly, but require completion in the unrotated transcript.
+          python3 tools/validate_runtime_logs.py run/logs/gametest.log build/verification-gametest.log
+          python3 tools/verify_gametests.py build/verification-gametest.log
       - run: |
           set -o pipefail
           python3 tools/dedicated_smoke.py 2>&1 | tee build/verification-packaged.log

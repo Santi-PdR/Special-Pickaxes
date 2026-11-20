@@ -62,10 +62,10 @@ public final class WorldbreakerCuriosCopyGameTests {
     }
     @GameTest(template="empty",batch="worldbreaker_curios_copy_06") public static void onlySupportedNonRecursiveMiningSourcesAreResolved(GameTestHelper h){
         var source=source();
-        for(var kind:java.util.List.of(ArtifactKind.PALIMPSEST,ArtifactKind.CHOIR,ArtifactKind.EVENTIDE,ArtifactKind.CRUCIBLE,ArtifactKind.INTERREGNUM,ArtifactKind.WORLDLOOM,ArtifactKind.AXIOM,ArtifactKind.EXODIUM,ArtifactKind.HELLSPEC)){
+        for(var kind:java.util.List.of(ArtifactKind.PALIMPSEST,ArtifactKind.CHOIR,ArtifactKind.EVENTIDE,ArtifactKind.CRUCIBLE,ArtifactKind.INTERREGNUM,ArtifactKind.WORLDLOOM,ArtifactKind.AXIOM,ArtifactKind.EXODIUM,ArtifactKind.HELLSPEC,ArtifactKind.IRIDIUM)){
             source.getOrCreateTag().putString("copiedSkill",kind.id);h.assertTrue(MiningObservations.copiedMiningSource(source)==kind,"explicit mining source resolves: "+kind);
         }
-        for(var id:java.util.List.of(ArtifactKind.WORLDBREAKER.id,ArtifactKind.ICARUS.id,ArtifactKind.IRIDIUM.id,ArtifactKind.SEAM_RIPPER.id,"invalid")){
+        for(var id:java.util.List.of(ArtifactKind.WORLDBREAKER.id,ArtifactKind.ICARUS.id,ArtifactKind.SEAM_RIPPER.id,"invalid")){
             source.getOrCreateTag().putString("copiedSkill",id);h.assertTrue(MiningObservations.copiedMiningSource(source)==null,"unsupported/self/invalid source rejected");
         }
         h.succeed();
@@ -98,5 +98,16 @@ public final class WorldbreakerCuriosCopyGameTests {
         Consumer<BlockEvent.BreakEvent> mutate=e->{if(e.getPlayer()==p&&e.getPos().equals(rock))source.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mutate);
         try{drain(p);h.assertTrue(source.hasTag()&&source.getTag().contains("copiedSkill")&&h.getLevel().getBlockState(rock).is(Blocks.STONE),"selecting a copy revokes native current-cell lease");}
         finally{MinecraftForge.EVENT_BUS.unregister(mutate);finish(h,p);}
+    }
+    @GameTest(template="empty",batch="worldbreaker_curios_iridium_01") public static void copiedIridiumConfirmsOreSurgeAndNewLootOwnership(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);var source=source();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.IRIDIUM.id);var slot=new AtomicReference<ItemStack>(source);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(at,ore);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        h.assertTrue(MiningObservations.captureCuriosWorldbreaker(p,source,at,ore,slot::get),"copied Iridium observes ore");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+        var drop=new net.minecraft.world.entity.item.ItemEntity(h.getLevel(),at.getX()+.5,at.getY()+.25,at.getZ()+.5,new ItemStack(Items.DIAMOND));h.getLevel().addFreshEntity(drop);MiningObservations.flush();
+        h.assertTrue(p.hasEffect(SpecialPickaxes.LODE_SURGE.get())&&drop.getPersistentData().getBoolean("specialpickaxesIridiumOreDrop")&&drop.getPersistentData().getUUID("specialpickaxesIridiumOwner").equals(p.getUUID()),"original Iridium surge and owned loot semantics copied");drop.discard();finish(h,p);
+    }
+    @GameTest(template="empty",batch="worldbreaker_curios_iridium_02") public static void copiedIridiumRejectsRevokedSourceBeforeOreConfirmation(GameTestHelper h){
+        var p=player(h,ArtifactKind.CHOIR);var at=target(h,p);var source=source();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.IRIDIUM.id);var slot=new AtomicReference<ItemStack>(source);var ore=Blocks.DIAMOND_ORE.defaultBlockState();h.getLevel().setBlockAndUpdate(at,ore);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);
+        h.assertTrue(MiningObservations.captureCuriosWorldbreaker(p,source,at,ore,slot::get),"copied ore observation admitted");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());source.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);MiningObservations.flush();
+        h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get()),"changed source cannot claim old ore surge");finish(h,p);
     }
 }

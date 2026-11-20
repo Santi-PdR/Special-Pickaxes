@@ -10,6 +10,16 @@ class GameTestLogValidation(unittest.TestCase):
     def test_complete_clean_run(self):
         self.assertEqual(validate_log('=== 153 GAME TESTS COMPLETE ===\nAll 153 required tests passed', 153), 153)
 
+    def test_midnight_rotation_requires_full_transcript_not_shutdown_only_latest(self):
+        before = '[23:59:55] === 525 GAME TESTS COMPLETE ===\nAll 525 required tests passed\n'
+        after = '[00:00:10] Saving chunks\nBUILD SUCCESSFUL'
+        with self.assertRaises(ValueError):
+            validate_log(after, 525)
+        self.assertEqual(validate_log(before + after, 525), 525)
+        workflow = pathlib.Path('.github/workflows/verify.yml').read_text()
+        self.assertIn('python3 tools/verify_gametests.py build/verification-gametest.log', workflow)
+        self.assertIn('python3 tools/validate_runtime_logs.py run/logs/gametest.log build/verification-gametest.log', workflow)
+
     def test_launch_without_summary_is_not_success(self):
         with self.assertRaises(ValueError):
             validate_log('BUILD SUCCESSFUL\nStarting GameTest server', 153)

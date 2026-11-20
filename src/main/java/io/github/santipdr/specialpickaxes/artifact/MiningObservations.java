@@ -56,6 +56,7 @@ public final class MiningObservations {
             default -> ArtifactOres.isOre(state);
         };
         if(!eligible)return false;
+        if(source==ArtifactKind.IRIDIUM&&p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return false;
         if(source==ArtifactKind.PALIMPSEST&&p.getMainHandItem().getItem() instanceof ArtifactItem held
                 &&ArtifactSkills.feedbackKind(p.getMainHandItem(),held.kind)==ArtifactKind.PALIMPSEST)return false;
         return capture(p,p.getMainHandItem(),source,pos,state,false,new EquipmentLease<>(curio,
@@ -71,7 +72,7 @@ public final class MiningObservations {
         try{
             var source=ArtifactKind.byId(stack.getTag().getString("copiedSkill"));
             return switch(source){
-                case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,EXODIUM,HELLSPEC -> source;
+                case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,AXIOM,EXODIUM,HELLSPEC,IRIDIUM -> source;
                 default -> null;
             };
         }catch(IllegalArgumentException invalid){return null;}

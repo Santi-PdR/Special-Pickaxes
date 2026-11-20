@@ -1,3 +1,9 @@
+## Reforma 6.0 — alpha.27 copia minera Iridium y robustez de CI
+
+Worldbreaker Curios copia disparador minero Iridium con racha/propiedad de drops originales y lease de slot/origen; rechaza fuente cambiada y duplicación con Iridium nativo en mano. Dos GameTests; no modifica habilidades nativas/ficheros congelados. Local 142 Python (una omisión), 25 recursos, 58 hashes intactos. Forge/revisión visual pendientes. [Detalles](WORLDBREAKER-6.0.md).
+
+Alpha.26 CI `44641371608`: compilación, 214 JUnit sin fallos/errores/omisiones y 525 GameTests pasan; fallo posterior en paso de verificación de registros, antes de cliente/servidor empaquetado. Transcripción estricta limpia. Ejecución cruzó medianoche; posible latest.log rotado. Workflow exige ahora resumen exacto en tee completo y escanea ambos registros sin relajar errores; regresión para rotación añadida. Causa exacta remota no confirmada (CDN logs EOF), corrección pendiente de CI. Controles equipados/paridad restante de copia y revisión visual siguen pendientes; no reforma final ni release pública.
+
 ## Reforma 6.0 — Worldbreaker alpha.26 pasivas Curios copiadas
 
 Dispatch de estado/combate usa origen copiado en lugar de acumular Égida nativa. Lease síncrono de stack/slot/origen protege contextos de aura/reacción y limpia efectos propios tras revocación. Reconoce copias Heartwood/Null Veil para evitar doble reacción compartida. Resuelve doce orígenes no recursivos; picos nativos preservados y archivos congelados intactos. Cinco GameTests, 141 Python locales (una omisión), 25 recursos. Forge/revisión visual pendientes. [Límites](WORLDBREAKER-6.0.md).
