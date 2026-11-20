@@ -1,3 +1,47 @@
+# Guía actual — 6.0.0-alpha.45
+
+[Descargar JAR](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.45-44811466825/special-pickaxes-1.20.1-6.0.0-alpha.45.jar) · [Release](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825) · [Validación y límites comprobados](STATUS.md)
+
+## Instalación
+
+Cierra Minecraft. Usa Minecraft 1.20.1 / Forge 47.4.10 / Java 17. Instala sólo un JAR de Special Pickaxes en `mods`, reemplazando su versión anterior. Curios habilita el slot `pickaxe` y las variantes equipadas.
+
+JAR: **998212 bytes**, SHA256 `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`.
+
+## Controles predeterminados
+
+| Tecla | Acción |
+|---|---|
+| R | Principal; durante un trabajo, pausa/reanuda. |
+| X | Secundaria; cancela el trabajo o selección en curso. |
+| H | Activa del pico equipado en Curios, conservando la herramienta en mano. |
+| I | Abre la guía del pico en mano, o del equipado si no llevas un pico en mano. |
+| G | Inventario de Curios, reservado por ese mod. |
+
+Todos los controles del mod son reasignables. La guía muestra las teclas configuradas. Las selecciones regionales y la elección de copia de Worldbreaker se explican en esa misma guía.
+
+## Uso de la minería frontal
+
+Apunta a un bloque cercano (hasta seis bloques) y activa el pico. La excavación sigue el terreno conectado desde ese frente. Las variantes reformadas conservan su prioridad temática: Coro abre un frente ancho, Worldloom desmonta desde la base, Exodium prioriza arriba y Axiom profundiza en la masa. La secundaria amplía la demolición donde corresponde.
+
+La habilidad vuelve a visitar las celdas despejadas mientras permanece activa para minar bloques que caigan después. El loot abundante no pausa el trabajo. Sólo el extractor de menas resalta sus drops de mena.
+
+- **Paradox:** principal por selección de dos esquinas y confirmación; secundaria de demolición causal inmediata. Conserva la velocidad manual tras usarla.
+- **Ícaro:** secundaria de ascenso con apertura de techo y protección de caída.
+- **Worldbreaker:** devastación frontal propia o habilidades de la copia elegida en la guía. Con Curios, H activa la variante equipada correspondiente.
+- **Iridium y Strata:** habilidades originales conservadas; consulta I para sus controles y variantes equipadas.
+
+La interfaz dentro del juego es la referencia breve para cada pico. Modelos y texturas se mantienen intactos.
+
+## Validación
+
+JAR publicado: CI `44811466825` SUCCESS, 214 JUnit / 546 GameTests / servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activación/cancelación). Seguimiento sólo de tests: CI `44816553795` SUCCESS con 547 GameTests. No exige reinstalar el JAR.
+
+Es una prerelease: no equivale a probar todos los modpacks, plugins de claims o escalas de interfaz ni a certificar Windows.
+
+<details>
+<summary>Guías históricas — habilidades, controles y entregas anteriores</summary>
+
 # Rediseño 5.17.0 — build de prueba verificada
 
 CI `44390344841` aprobada sobre `fc1fff5481e7fff576fb87c1d46fa035b7999dcc`:
@@ -220,3 +264,5 @@ El ascensor de Icarus se detiene si sales de su eje o un mod te teletransporta
 fuera del avance esperado: no continúa cortando ni te arrastra a tu posición
 anterior. Las partículas de sintonía Curios pueden omitirse por presupuesto sin
 impedir las pasivas. Al reconectar sólo se sincronizan recargas con plazos válidos.
+
+</details>

@@ -1,3 +1,34 @@
+# Special Pickaxes — 6.0.0-alpha.45
+
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.45-44811466825/special-pickaxes-1.20.1-6.0.0-alpha.45.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+
+Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
+
+## Qué hace la revisión actual
+
+- Minería frontal: empieza en un bloque cercano y avanza por terreno conectado. La secundaria amplía la demolición de los picos reformados.
+- Admite bloques rompibles apropiados, incluida arenisca y terracota, y vuelve a excavar arena/grava que se asienten durante el trabajo. Conserva permisos, procedencia de construcciones, inventarios, líquidos e irrompibles.
+- El loot acumulado no pausa la minería. Sólo los drops de menas del extractor reciben resaltado.
+- Paradox conserva la selección regional en su principal; su secundaria ejecuta demolición causal inmediata. Ícaro asciende abriendo paso por el techo.
+- Worldbreaker usa devastación propia o las habilidades del origen elegido en la guía; sus variantes equipadas conservan la identidad del origen.
+- **R** principal, **X** secundaria/cancelar, **H** activa equipada y **I** guía. **G** queda para el inventario de Curios. Las teclas son reasignables.
+- Guía breve en `en_us`, `es_es` y `es_uy`, sin HUD de equipamiento ni expansión de SHIFT. Modelos/texturas y habilidades originales Iridium/Strata preservados.
+
+## Evidencia y descarga
+
+El JAR publicado proviene de `1134994a08bb1b4aa96a35ce10da01d1b2bed962`, [CI 44811466825](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44811466825): **214 JUnit, 546 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+
+El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
+
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.45.jar`
+- Tamaño: **998212 bytes**
+- SHA256: `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`
+
+Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
+
+<details>
+<summary>Historial anterior a alpha.45 — no es la guía de funcionamiento actual</summary>
+
 # Special Pickaxes — reforma 6.0 en desarrollo
 
 **Código actual: `6.0.0-alpha.31`, todavía no es la reforma completa ni una entrega final.**
@@ -569,3 +600,5 @@ La versión 5.10.125 evita inferir geología a partir de sufijos fusionados como
 [Descarga de prueba5.10.439](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-5.10.439-43562331609).
 No es aprobación estable ni instalación en Windows. Detalles/hashes en
 `docs/mining-rework/STATUS.md`.
+
+</details>

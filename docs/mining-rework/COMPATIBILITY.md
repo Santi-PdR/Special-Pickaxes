@@ -1,3 +1,17 @@
+# Compatibilidad vigente — alpha.45
+
+- Minecraft **1.20.1**, Forge **47.4.10**, Java **17**.
+- Curios opcional: slot `pickaxe`, efectos pasivos y activa **H**, distinta de **G** (inventario de Curios). La guía muestra la tecla reasignada.
+- CI del JAR exacto `44811466825`: **214 JUnit, 546 GameTests**, servidor empaquetado/logs y cliente gráfico completos. El cliente verifica un slot Curios real con H, coste de la fuente y minería conectada, manteniendo otra herramienta en mano.
+- CI posterior sólo de pruebas `44816553795`: **214 JUnit, 547 GameTests**, servidor/cliente completos. Verifica loot denso por la ruta actual y cambio de copia durante permisos.
+- Los tests cubren permisos/callbacks, bloques colocados, contenedores, fluidos, irrompibles, cancelación por cambio de equipo y asentamiento real de arena/grava. Esto no certifica todos los proveedores de claims ni todos los bloques de otros mods.
+- Sin certificación de Windows, Ghouls completo, todos los modpacks o todas las escalas de GUI. Las capturas revisadas y sus límites se registran en [STATUS.md](STATUS.md).
+
+[Descarga vigente](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825) · [Guía actual](PLAYER-GUIDE.md)
+
+<details>
+<summary>Historial de compatibilidad — resultados y limitaciones de versiones anteriores</summary>
+
 ## Entrega verificada 5.10.467
 
 - Runtime: `fe56becab9ce5d368116d031d3f7bca6b9a2dcf7`.
@@ -140,3 +154,5 @@ por listeners durante la transacción, sin gastar su material capturado. El
 descubrimiento de Seam Ripper también revalida procedencia tras el claim. Las
 instrucciones del manual y SHIFT usan las teclas configuradas; no se afirma
 compatibilidad visual completa con interfaces de terceros.
+
+</details>
