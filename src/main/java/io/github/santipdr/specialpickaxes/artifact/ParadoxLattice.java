@@ -54,7 +54,7 @@ public final class ParadoxLattice implements WorkProgram {
             if(WorkQueue.busy(p)||PersistedCooldown.active(time,state.getLong("curiosParadoxReady"),160))return false;
             var context=HeldUtilityContext.capture(p,tool);boolean allowed=WorldSafety.allowed(p,ArtifactKind.CRUCIBLE,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.CRUCIBLE,new ParadoxLattice(echoes(scars),source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.CRUCIBLE,new ConnectedExcavation(p,scar,ArtifactKind.CRUCIBLE,false,source)))return false;
             state.putLong("curiosParadoxReady",time+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }

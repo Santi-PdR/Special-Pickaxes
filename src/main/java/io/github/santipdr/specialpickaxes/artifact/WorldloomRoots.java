@@ -35,7 +35,7 @@ public final class WorldloomRoots implements WorkProgram {
             if(PersistedCooldown.active(now,state.getLong("curiosRootsReady"),160))return false;
             var context=HeldUtilityContext.capture(p,tool);boolean allowed=WorldSafety.allowed(p,ArtifactKind.WORLDLOOM,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.WORLDLOOM,new WorldloomRoots(scar,source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.WORLDLOOM,new ConnectedExcavation(p,scar,ArtifactKind.WORLDLOOM,false,source)))return false;
             state.putLong("curiosRootsReady",now+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }

@@ -27,9 +27,9 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public float getDestroySpeed(ItemStack stack,BlockState state) {
         if(ArtifactInteraction.regional(kind,ArtifactTooltips.mode(stack))&&stack.hasTag()){
             String status=stack.getTag().getString("artifactStatus");
-            if(status.equals("selecting")||status.equals("preparing")||status.equals("ready")||status.equals("paused")||status.equals("executing"))return 1F;
+            if(status.equals("selecting")||status.equals("preparing")||status.equals("ready"))return 1F;
         }
-        if(!ArtifactTools.effective(state))return super.getDestroySpeed(stack,state);
+        if(!ArtifactTools.effective(state)&&!(kind!=ArtifactKind.IRIDIUM&&kind!=ArtifactKind.SEAM_RIPPER&&NaturalExcavationProgram.eligible(state)))return super.getDestroySpeed(stack,state);
         boolean ore=ArtifactOres.isOre(state),stone=MiningDesigns.matrix(state);
         return switch(kind){
             case PALIMPSEST->ore?192F:72F;case CHOIR->stone?96F:72F;case EVENTIDE->96F;
@@ -42,7 +42,7 @@ public final class ArtifactItem extends PickaxeItem {
     }
     // Tier V still supports foreign ores without vanilla tool tags, but must honor explicit higher Forge tiers.
     @Override public boolean isCorrectToolForDrops(BlockState state) {
-        return ArtifactTools.effective(state)&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state);
+        return (ArtifactTools.effective(state)||kind!=ArtifactKind.IRIDIUM&&kind!=ArtifactKind.SEAM_RIPPER&&NaturalExcavationProgram.eligible(state))&&net.minecraftforge.common.TierSortingRegistry.isCorrectTierForDrops(SpecialPickaxes.TIER,state);
     }
     @Override public boolean isCorrectToolForDrops(ItemStack stack,BlockState state){return isCorrectToolForDrops(state);}
     @Override public boolean hurtEnemy(ItemStack stack,LivingEntity target,LivingEntity attacker) {

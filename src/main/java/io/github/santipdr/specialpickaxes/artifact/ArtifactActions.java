@@ -120,6 +120,7 @@ public final class ArtifactActions {
             }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
+        if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.ICARUS){
             var aimed=target(p);if(aimed.isEmpty())return false;
             var context=HeldUtilityContext.capture(p,tool);var at=aimed.get();

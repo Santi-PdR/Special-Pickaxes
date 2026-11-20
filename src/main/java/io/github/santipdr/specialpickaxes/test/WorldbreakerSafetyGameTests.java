@@ -13,13 +13,13 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class WorldbreakerSafetyGameTests {
-    @GameTest(template="empty",batch="worldbreaker_625_region") public static void regionBreakPreservesPlayerStoneAndNonGeology(GameTestHelper h){
+    @GameTest(template="empty",batch="worldbreaker_625_region") public static void regionBreakAcceptsBreakableMaterialsAndPreservesPlayerStone(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var placed=at.east();var wood=at.east(2);var ore=at.east(3);
         h.getLevel().setBlockAndUpdate(placed,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).mark(placed);
         h.getLevel().setBlockAndUpdate(wood,Blocks.OAK_PLANKS.defaultBlockState());h.getLevel().setBlockAndUpdate(ore,Blocks.DIAMOND_ORE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(ore);
         var region=new RegionWork(new SelectionVolume(at,ore),null,SelectionVolume.Transform.IDENTITY,ArtifactKind.WORLDBREAKER,5,Blocks.STONE.defaultBlockState());
         try{h.assertTrue(WorkQueue.startRegion(p,p.getMainHandItem(),ArtifactKind.WORLDBREAKER,region),"region analysis starts");WorkQueue.tick();h.assertTrue(region.awaiting(),"explicit confirmation still required");region.confirm();drain(p);
-            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir()&&h.getLevel().getBlockState(placed).is(Blocks.STONE)&&h.getLevel().getBlockState(wood).is(Blocks.OAK_PLANKS),"region only harvests natural geology and ore");
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(ore).isAir()&&h.getLevel().getBlockState(placed).is(Blocks.STONE)&&h.getLevel().getBlockState(wood).isAir(),"region harvests breakable materials and ore while preserving placed blocks");
         }finally{PlayerPlacedBlocks.get(h.getLevel()).unmark(placed);finish(h,p);}
     }
     @GameTest(template="empty",batch="worldbreaker_625_callback") public static void regionBreakRechecksProvenanceInsideCurrentBreakCallback(GameTestHelper h){

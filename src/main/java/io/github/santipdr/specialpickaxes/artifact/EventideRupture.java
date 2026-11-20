@@ -56,7 +56,7 @@ public final class EventideRupture implements WorkProgram {
             if(PersistedCooldown.active(now,state.getLong("curiosAfterglowReady"),160))return false;
             var context=HeldUtilityContext.capture(p,tool);var heading=p.getDirection();boolean allowed=WorldSafety.allowed(p,ArtifactKind.EVENTIDE,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.EVENTIDE,new EventideRupture(scar,heading,Form.AFTERGLOW,source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.EVENTIDE,new ConnectedExcavation(p,scar,ArtifactKind.EVENTIDE,false,source)))return false;
             state.putLong("curiosAfterglowReady",now+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }

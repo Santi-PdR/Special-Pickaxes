@@ -33,7 +33,7 @@ public final class HellspecCinderRing implements WorkProgram {
             if(PersistedCooldown.active(now,state.getLong("curiosCinderReady"),160))return false;
             var context=HeldUtilityContext.capture(p,tool);boolean allowed=WorldSafety.allowed(p,ArtifactKind.HELLSPEC,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.HELLSPEC,new HellspecCinderRing(scar,source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.HELLSPEC,new ConnectedExcavation(p,scar,ArtifactKind.HELLSPEC,false,source)))return false;
             state.putLong("curiosCinderReady",now+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }

@@ -45,6 +45,13 @@ public final class IcarianFlight {
         for(double dy=.1;dy<=rise+.1;dy+=.1)if(!WorldSafety.freeBody(p,p.position().add(0,Math.min(dy,rise),0)))return false;
         return true;
     }
+    private static boolean safeStart(ServerPlayer p){
+        var box=p.getBoundingBox().expandTowards(0,1.5,0).deflate(.001);
+        for(var at:BlockPos.betweenClosed(BlockPos.containing(box.minX,box.minY,box.minZ),BlockPos.containing(box.maxX,box.maxY,box.maxZ))){
+            if(!p.serverLevel().hasChunkAt(at)||WorldSafety.barrier(p,at)||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
+        }
+        return true;
+    }
     private static boolean headroom(ServerPlayer p,double rise,Flight job){
         var box=p.getBoundingBox().expandTowards(0,rise+.25,0).deflate(.001);
         for(var cursor:BlockPos.betweenClosed(BlockPos.containing(box.minX,box.minY,box.minZ),BlockPos.containing(box.maxX,box.maxY,box.maxZ))){
@@ -61,10 +68,10 @@ public final class IcarianFlight {
         try{return startOnce(p,tool,null);}finally{STARTING.remove(p.getUUID());}
     }
     private static boolean startOnce(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){
-        if(!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS)return false;
+        if(!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS||!safeStart(p))return false;
         var context=HeldUtilityContext.capture(p,tool);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above());
-        if(!allowed||!context.valid()||!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS)return false;
+        if(!allowed||!context.valid()||!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS||!safeStart(p))return false;
         JOBS.put(p.getUUID(),new Flight(p,tool,source));return true;
     }
     public static boolean active(ServerPlayer p){return JOBS.containsKey(p.getUUID());}

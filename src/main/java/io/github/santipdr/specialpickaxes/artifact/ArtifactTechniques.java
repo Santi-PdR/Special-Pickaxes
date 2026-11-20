@@ -159,6 +159,8 @@ public final class ArtifactTechniques {
 
 
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
+        if(kind==ArtifactKind.CRUCIBLE||ConnectedExcavation.handles(kind)&&kind!=ArtifactKind.ICARUS)
+            return ConnectedExcavation.start(player,tool,kind,true);
         return switch (kind) {
             case INTERREGNUM,WORLDLOOM,AXIOM,HELLSPEC -> MiningAlternates.use(player,tool,kind);
             case CRUCIBLE -> ParadoxLattice.start(player,tool);

@@ -34,7 +34,7 @@ public final class AxiomAftershock implements WorkProgram {
             if(PersistedCooldown.active(now,state.getLong("curiosNullReady"),160))return false;
             var context=HeldUtilityContext.capture(p,tool);boolean allowed=WorldSafety.allowed(p,ArtifactKind.AXIOM,scar);
             if(!allowed||!context.valid()||!source.active()||source.expected().isEmpty()||!p.serverLevel().hasChunkAt(scar)||!p.serverLevel().getBlockState(scar).isAir())return false;
-            if(!WorkQueue.startRegion(p,tool,ArtifactKind.AXIOM,new AxiomAftershock(scar,source)))return false;
+            if(!WorkQueue.startRegion(p,tool,ArtifactKind.AXIOM,new ConnectedExcavation(p,scar,ArtifactKind.AXIOM,false,source)))return false;
             state.putLong("curiosNullReady",now+160);return true;
         }finally{STARTING.remove(p.getUUID());}
     }
