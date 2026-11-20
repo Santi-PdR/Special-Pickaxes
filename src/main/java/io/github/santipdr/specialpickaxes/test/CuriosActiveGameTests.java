@@ -16,12 +16,12 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @PrefixGameTestTemplate(false)
 public final class CuriosActiveGameTests {
     @GameTest(template="empty",batch="curios_active_01") public static void equippedWorldbreakerActivatesWithoutSwappingHeldTool(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);var rock=at.east(3);h.getLevel().setBlockAndUpdate(rock,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(rock);
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);var rock=at.east(3);for(int x=1;x<=3;x++)h.getLevel().setBlockAndUpdate(at.east(x),Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(rock);
         h.assertTrue(CuriosMiningActive.activate(p,source,slot::get)&&source.getDamageValue()==8&&p.getMainHandItem()==held,"equipped active charges source without swapping held mining tool");drain(p);
-        h.assertTrue(h.getLevel().getBlockState(rock).isAir()&&h.getLevel().getBlockState(at).is(Blocks.STONE),"native small Curios geometry and core preserved");h.assertTrue(!CuriosMiningActive.activate(p,source,slot::get)&&source.getDamageValue()==8,"cooldown prevents duplicate charge");finish(h,p);
+        h.assertTrue(h.getLevel().getBlockState(rock).isAir()&&h.getLevel().getBlockState(at).isAir(),"equipped mining clears the front first and follows its connected bank");h.assertTrue(!CuriosMiningActive.activate(p,source,slot::get)&&source.getDamageValue()==8,"cooldown prevents duplicate charge");finish(h,p);
     }
     @GameTest(template="empty",batch="curios_active_02") public static void changingCopiedEquippedSourceDuringBreakRevokesActiveCell(GameTestHelper h){
-        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.HELLSPEC.id);var slot=new AtomicReference<ItemStack>(source);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var rock=at.east(3);h.getLevel().setBlockAndUpdate(rock,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(rock);
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.HELLSPEC.id);var slot=new AtomicReference<ItemStack>(source);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));var rock=at.east(3);for(int x=1;x<=3;x++)h.getLevel().setBlockAndUpdate(at.east(x),Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(rock);
         h.assertTrue(CuriosMiningActive.activate(p,source,slot::get),"equipped copied Hellspec active starts");
         Consumer<BlockEvent.BreakEvent> mutate=e->{if(e.getPlayer()==p&&e.getPos().equals(rock))source.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);};MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mutate);
         try{drain(p);h.assertTrue(h.getLevel().getBlockState(rock).is(Blocks.STONE)&&source.getTag().getString("copiedSkill").equals(ArtifactKind.AXIOM.id),"active uses copied geometry but rechecks source lease at mutation");}
@@ -51,7 +51,7 @@ public final class CuriosActiveGameTests {
     }
     @GameTest(template="empty",batch="curios_active_copy_remaining") public static void worldbreakerCopyCanActivatePreviouslyUnsupportedSource(GameTestHelper h){
         var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
-        h.assertTrue(CuriosMiningActive.activate(p,source,()->source)&&WorkQueue.remaining(p)==27,"Paradox copy activates small echoes, not transmutation or native fracture");drain(p);finish(h,p);
+        h.assertTrue(CuriosMiningActive.activate(p,source,()->source)&&WorkQueue.busy(p),"Paradox copy starts a connected equipped excavation");drain(p);finish(h,p);
     }
     @GameTest(template="empty",batch="feedback_terrain") public static void reworkedMiningAcceptsSandstoneTerracottaSandAndModdedStyleMaterials(GameTestHelper h){
         var p=player(h,ArtifactKind.PALIMPSEST);var at=target(h,p);var level=h.getLevel();

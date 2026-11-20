@@ -95,7 +95,7 @@ public final class ConnectedExcavation implements WorkProgram {
                 if(state.isAir()&&!revisit){
                     cleared.addLast(at);
                     if(at.equals(seed))for(var direction:Direction.values()){
-                        var next=at.relative(direction);if(within(next)&&seen.add(next))frontier.addLast(next);
+                        var next=at.relative(direction);if(within(next)&&seen.add(next))frontier.add(next);
                     }
                     return false;
                 }
@@ -108,7 +108,7 @@ public final class ConnectedExcavation implements WorkProgram {
                     else settleUntil=Math.min(hardDeadline,now+60);
                     // Bound both queued positions and visited-state memory, not just successful breaks.
                     if(seen.size()<cap*4)for(var direction:Direction.values()){
-                        var next=at.relative(direction);if(within(next)&&seen.size()<cap*4&&seen.add(next))frontier.addLast(next);
+                        var next=at.relative(direction);if(within(next)&&seen.size()<cap*4&&seen.add(next))frontier.add(next);
                     }
                 }
                 return mined;

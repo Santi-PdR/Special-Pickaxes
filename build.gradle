@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '6.0.54'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '6.0.0-alpha.37'
+version = '6.0.0-alpha.38'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -110,5 +110,10 @@ tasks.matching { it.name == 'runGameTestServer' }.configureEach {
 }
 // Generate the mapping before Mixin reads the external Curios refmap.
 if (project.hasProperty('clientSmoke')) {
-    tasks.named('runClient').configure { dependsOn 'createSrgToMcp' }
+    tasks.named('createSrgToMcp').configure {
+        setFormat('SRG')
+        getOutput().set(layout.buildDirectory.file('createSrgToMcp/output.srg'))
+    }
+    // ForgeGradle registers runClient after evaluating this script.
+    tasks.matching { it.name == 'runClient' }.configureEach { dependsOn 'createSrgToMcp' }
 }
