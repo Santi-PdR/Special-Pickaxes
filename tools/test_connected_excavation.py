@@ -58,3 +58,13 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('deadline=time.monotonic()+1100',smoke)
         hud=(BASE/'client/ArtifactHud.java').read_text()
         self.assertIn('@SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST) public static void levels',hud)
+
+    def test_graphical_worldloom_never_collects_loot_or_resumes_for_the_player(self):
+        source=(BASE/'test/ClientValidation.java').read_text()
+        begin=source.index('if(current.kind()==ArtifactKind.WORLDLOOM)')
+        end=source.index('if(current.kind()==ArtifactKind.INTERREGNUM',begin)
+        observer=source[begin:end]
+        self.assertNotIn('drop.discard()',observer)
+        self.assertNotIn('WorkQueue.togglePause',observer)
+        self.assertIn('throw new IllegalStateException("Worldloom paused for loot in the real client")',observer)
+        self.assertIn('if(WorkQueue.busy(p))continue;',observer)

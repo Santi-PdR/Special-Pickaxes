@@ -47,9 +47,10 @@ public final class ClientValidation {
                             for(int x=19;x<=21;x++)for(int z=31;z<=33;z++)p.serverLevel().setBlock(new BlockPos(x,81,z),net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE.defaultBlockState(),2);
                             p.connection.teleport(20.5,82,32.5,138,35);state.putBoolean("worldloomObserver",true);
                         }
-                        // Simulate collecting native drops; do not relax production backpressure.
-                        for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(64)))drop.discard();
-                        if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))WorkQueue.togglePause(p);
+                        // Leave native loot in the world: the client must finish without
+                        // simulated collection or automatically resuming a loot pause.
+                        if(WorkQueue.status(p).equals("paused")&&WorkQueue.pauseReason(p).equals("drops"))
+                            throw new IllegalStateException("Worldloom paused for loot in the real client");
                         if(WorkQueue.busy(p))continue;
                         if(!p.serverLevel().getBlockState(new BlockPos(0,67,10)).isAir())
                             throw new IllegalStateException("Worldloom failed to clear the close frontal bank");
