@@ -19,9 +19,9 @@ final class SynchronousWorkDrain {
         long time=player.serverLevel().getGameTime();boolean timed=connected(player);
         try{
             for(int i=0;i<turns&&WorkQueue.busy(player);i++){
-                if(timed)player.serverLevel().setGameTime(time+i+1);
+                if(timed)player.serverLevel().getServer().getWorldData().overworldData().setGameTime(time+i+1);
                 WorkQueue.tick();
             }
-        }finally{if(timed)player.serverLevel().setGameTime(time);}
+        }finally{if(timed)player.serverLevel().getServer().getWorldData().overworldData().setGameTime(time);}
     }
 }

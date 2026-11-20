@@ -41,7 +41,7 @@ public final class ConnectedExcavationGameTests {
     }
     @GameTest(template="empty",batch="front_03",timeoutTicks=160) public static void activeExcavationBreaksSandAndGravelFallingIntoPreviouslyClearedCells(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);h.getLevel().setBlock(at.below(),Blocks.BEDROCK.defaultBlockState(),2);
-        h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");WorkQueue.tick();
+        h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");for(int i=0;i<12;i++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains watched during settling");
         h.runAtTickTime(5,()->{h.getLevel().setBlock(at.above(5),Blocks.SAND.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.SAND.defaultBlockState());});
         h.runAtTickTime(30,()->{h.getLevel().setBlock(at.above(5),Blocks.GRAVEL.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.GRAVEL.defaultBlockState());});
@@ -56,7 +56,7 @@ public final class ConnectedExcavationGameTests {
     @GameTest(template="empty",batch="front_04") public static void equippedSourceRemovalCancelsSettlingAndProtectsNewBlocks(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
-        h.assertTrue(CuriosMiningActive.activate(p,source,slot::get),"equipped connected excavation starts");WorkQueue.tick();
+        h.assertTrue(CuriosMiningActive.activate(p,source,slot::get),"equipped connected excavation starts");for(int i=0;i<12;i++)WorkQueue.tick();
         slot.set(ItemStack.EMPTY);h.getLevel().setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);WorkQueue.tick();
         h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(at).is(Blocks.GRAVEL),"revoked settling job cannot harvest a newly arrived block");finish(h,p);
     }
