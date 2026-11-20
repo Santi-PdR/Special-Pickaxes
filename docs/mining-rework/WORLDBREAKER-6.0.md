@@ -103,3 +103,13 @@ A test-package-only ServerStarted fixture now binds default-corrected in-memory 
 Two GameTests now explicitly cover copied Icarus airborne Momentum/Featherfall and copied Strata Focus II without inventing a new mining geometry. These are parity checks for existing source passives, not new abilities. Frozen native Iridium/Strata files remain unchanged. Equipped active controls and full lifecycle/visual review remain outstanding; no complete-global-copy claim.
 
 Local 143 Python (one skip without Java), 25 resources, diff check and frozen hashes pass; alpha.29 Forge pending. No public release.
+
+## Alpha.30 — first equipped active controls (five sources), Forge pending
+
+New rebindable G action activates the equipped Curios pick independently of the held R/X commands. Server resolves a fresh Curios slot and validates packet sequence, actual item kind and controlIdentity; it never trusts a client slot/target or swaps stacks into the hand. Equipped identity is assigned server-side during passive scans. Protocol increments to 12; client and server must match.
+
+Implemented source-specific small mining actives: native Worldbreaker Core Fracture, Axiom Aftershock, Worldloom Roots, Exodium Falling Star and Hellspec Cinder Ring. Worldbreaker copies of those sources dispatch the corresponding equipped variant, not the hand skill. Aim at natural geology with a harvesting tool held; preserve each small program's geometry/ore policy/core/provenance/claim/chunk/backpressure protections. Cooldown 8 s per source and 8 durability from equipped pick, retaining one durability point; held tool performs ordinary mining and associated costs. Original-slot/source lease stays live through execution. Source removal/change cancels active work. Unsupported sources explicitly reject without fallback/charge.
+
+Three GameTests cover native public active dispatch/cost/cooldown/core and unchanged held tool, copied equipped Hellspec with same-cell source revocation, and removed/unsupported rejection. Two Python controls tests cover key mapping, live-slot/packet identity checks and no hand swapping. Local 145 Python (one skip without Java), 25 resources and diff check pass. Frozen hashes unchanged. Forge alpha.30 and graphical G-key verification pending; this is NOT all equipped controls completed (other eight sources remain).
+
+Alpha.29 CI `44746077743` passed its GameTest phase but failed before entering the client artifact gallery within its deadline. Not end-to-end approved. Config isolation must still be evaluated in subsequent green CI; no relaxed logs/timeouts or synthetic input. No public release or completed reform claim.

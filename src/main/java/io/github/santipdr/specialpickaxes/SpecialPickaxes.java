@@ -189,6 +189,7 @@ public final class SpecialPickaxes {
                 var entry=due.next();var player=entry.getValue();
                 if(player.isRemoved()){due.remove();curiosPassives.remove(entry.getKey());continue;}
                 var equipped=CuriosCompat.find(player);
+                if(equipped!=null&&!equipped.stack().getOrCreateTag().hasUUID("controlIdentity"))equipped.stack().getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());
                 ArtifactKind current=equipped!=null?WorldbreakerCuriosPassives.sourceKind(equipped.stack()):null;
                 boolean heldArtifact=player.getMainHandItem().getItem() instanceof ArtifactItem;
                 ArtifactPassives.syncNightVisionSource(player,heldArtifact||current!=null);

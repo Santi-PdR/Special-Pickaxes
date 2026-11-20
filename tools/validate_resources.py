@@ -286,7 +286,7 @@ class Resources(unittest.TestCase):
         self.assertIn("event.register(RelicKeys.MANUAL);", source)
         registered = {"key.specialpickaxes." + action.lower() for action in actions - excluded}
         registered.add("key.specialpickaxes.manual")
-        self.assertEqual(registered, {"key.specialpickaxes.activate", "key.specialpickaxes.mode", "key.specialpickaxes.alt_skill", "key.specialpickaxes.manual"})
+        self.assertEqual(registered, {"key.specialpickaxes.activate", "key.specialpickaxes.mode", "key.specialpickaxes.alt_skill", "key.specialpickaxes.manual", "key.specialpickaxes.curio_activate"})
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
             self.assertTrue(registered <= data.keys())

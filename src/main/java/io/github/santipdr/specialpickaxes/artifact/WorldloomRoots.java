@@ -11,7 +11,7 @@ public final class WorldloomRoots implements WorkProgram {
     private final EquipmentLease<ItemStack> source;
     private final int limit;
     private int index,visualTick=Integer.MIN_VALUE;
-    private WorldloomRoots(BlockPos scar,EquipmentLease<ItemStack> source){
+    WorldloomRoots(BlockPos scar,EquipmentLease<ItemStack> source){
         cells=cells(scar);this.source=source;limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());
     }
     public static List<BlockPos> cells(BlockPos scar){

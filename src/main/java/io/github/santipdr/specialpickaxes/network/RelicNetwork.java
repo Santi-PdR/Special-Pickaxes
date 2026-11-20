@@ -9,7 +9,7 @@ import net.minecraftforge.network.*;
 
 /** One bounded intent packet; all authority stays on the server thread. */
 public final class RelicNetwork {
-    private static final String VERSION="11";
+    private static final String VERSION="12";
     public static final net.minecraftforge.network.simple.SimpleChannel CHANNEL=NetworkRegistry.newSimpleChannel(new ResourceLocation("specialpickaxes","controls"),()->VERSION,VERSION::equals,VERSION::equals);
     public record Intent(ArtifactKind kind,RelicControl.Action action,long sequence,java.util.UUID toolIdentity){}
     public record CopyChoice(ArtifactKind source,long sequence,java.util.UUID toolIdentity){}
@@ -21,6 +21,13 @@ public final class RelicNetwork {
             return false;
         }
         SEEN.put(p.getUUID(),intent.sequence());
+        if(intent.action()==RelicControl.Action.CURIO_ACTIVATE){
+            var equipped=CuriosCompat.findFresh(p);if(equipped==null)return false;
+            var stack=equipped.stack();
+            if(!(stack.getItem() instanceof ArtifactItem item)||item.kind!=intent.kind()
+                    ||!stack.hasTag()||!stack.getTag().hasUUID("controlIdentity")||!stack.getTag().getUUID("controlIdentity").equals(intent.toolIdentity()))return false;
+            return CuriosMiningActive.activate(p,stack,()->CuriosCompat.pickInSlotFresh(p,equipped.slot()));
+        }
         var tool=p.getMainHandItem();
         boolean identity=tool.hasTag()&&tool.getTag().hasUUID("controlIdentity")&&tool.getTag().getUUID("controlIdentity").equals(intent.toolIdentity());
         if(!identity){

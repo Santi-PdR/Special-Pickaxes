@@ -11,7 +11,7 @@ public final class ExodiumFallingStar implements WorkProgram {
     private final EquipmentLease<ItemStack> source;
     private final int limit;
     private int index,visualTick=Integer.MIN_VALUE;
-    private ExodiumFallingStar(BlockPos scar,EquipmentLease<ItemStack> source){
+    ExodiumFallingStar(BlockPos scar,EquipmentLease<ItemStack> source){
         cells=cells(scar);this.source=source;limit=Math.min(cells.size(),ArtifactConfig.JOB_LIMIT.get());
     }
     public static List<BlockPos> cells(BlockPos scar){

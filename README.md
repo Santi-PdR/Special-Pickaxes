@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.29`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.30`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -35,6 +35,8 @@ Worldbreaker alpha.27 copia también racha/propiedad de drops de Iridium en Curi
 Alpha.27 CI `44645297618` verde (527 GameTests / cliente / input / servidor). Alpha.28 protege copias en mano frente a cambios de origen/modo NBT en el mismo stack, incluso durante callbacks. Forge nuevo pendiente; controles equipados y revisión visual aún incompletos.
 
 Alpha.29 aísla los cambios de configuración de GameTests/cliente de validación en memoria: evita que las pruebas escriban sobre un TOML vigilado en caliente. Alpha.28 pasó 530 GameTests pero CI rechazó un error real NightConfig; no validación completa. Añadidas comprobaciones de pasivas copiadas Ícaro/Strata. Forge nuevo pendiente.
+
+Alpha.30 añade tecla equipada G (reasignable) para variantes mineras Curios de Worldbreaker/Axiom/Worldloom/Exodium/Hellspec, incluidas copias, con validación servidor de slot/identidad, coste 8 y recarga 8 s. Otras fuentes aún no soportadas. Forge/tecla real G pendientes; alpha.29 falló al entrar en galería cliente, no aprobación completa.
 
 ---
 

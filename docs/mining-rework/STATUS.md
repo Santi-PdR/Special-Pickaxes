@@ -1,3 +1,9 @@
+## Reforma 6.0 — alpha.30 primeros controles activos equipados
+
+Tecla G reasignable, paquete con secuencia/item/identidad del slot Curios fresco, sin intercambio de mano. Activas mineras pequeñas de Worldbreaker/Axiom/Worldloom/Exodium/Hellspec y sus copias: coste 8 en pico equipado, recarga 8 s por origen, herramienta en mano realiza minería; lease de slot/origen durante callbacks. Fuentes aún no soportadas rechazan sin coste ni fallback. Tres GameTests y dos Python de controles; local 145 Python (una omisión), 25 recursos, hashes congelados intactos. Forge/G físico/revisión visual pendientes. [Contrato](WORLDBREAKER-6.0.md).
+
+Alpha.29 CI `44746077743` pasó fase GameTests pero cliente no entró en galería dentro del plazo. Sin aprobación extremo a extremo. Faltan controles equipados de otras ocho fuentes y cierre de revisión visual; sin release pública ni reforma completa.
+
 ## Reforma 6.0 — alpha.29 aislamiento de configuración y paridad pasiva
 
 Alpha.28 CI `44649509385`: 530 GameTests pasan, pero logs estrictos detectan ConfigLoadingException/tabla TOML [work] duplicada en FileWatcher durante cambios de límites por tests. No era el supuesto fallo de resumen nocturno. Fixture sólo de pruebas liga configuración corregida en memoria al iniciar servidor GameTest/clienteSmoke, excluida del JAR; producción/validador sin excepciones ni cambios de límites. Un Python de regresión y dos GameTests de paridad Ícaro/Strata; local 143 Python (una omisión), 25 recursos, hashes congelados intactos. [Detalles](WORLDBREAKER-6.0.md).

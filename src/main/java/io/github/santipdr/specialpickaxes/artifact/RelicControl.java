@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** Semantic intents shared by keyboard input, packets and tests. No client coordinates are trusted. */
 public final class RelicControl {
-    public enum Action { ACTIVATE, MODE, SELECT, CONFIRM, CANCEL, PAUSE, ALT_SKILL }
+    public enum Action { ACTIVATE, MODE, SELECT, CONFIRM, CANCEL, PAUSE, ALT_SKILL, CURIO_ACTIVATE }
     private RelicControl(){}
     public static boolean execute(ServerPlayer p,ArtifactKind expected,Action action){
         if(!expected.playable()||p.isRemoved()||!p.isAlive()||p.isSpectator()||!(p.getMainHandItem().getItem() instanceof ArtifactItem item)||item.kind!=expected)return false;
