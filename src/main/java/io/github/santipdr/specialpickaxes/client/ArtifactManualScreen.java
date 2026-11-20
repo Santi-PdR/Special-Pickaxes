@@ -86,7 +86,7 @@ public final class ArtifactManualScreen extends Screen {
         g.fill(x,y,x+3,y+40,accent);
         g.fill(x+3,y+39,x+w,y+40,0xff394b59);
         g.drawString(font,title,x+PAD,y+6,0xffaebdca,false);
-        Component modeLabel=Component.translatable("mode.specialpickaxes."+modeKey);
+        Component modeLabel=ConnectedExcavation.handles(abilityKind)?Component.translatable("guide.front"):Component.translatable("mode.specialpickaxes."+modeKey);
         int modeWidth=Math.max(0,w-2*PAD-font.width(title)-20);
         String badge=fit(modeLabel,modeWidth);
         if(!badge.isEmpty())g.drawString(font,badge,x+w-PAD-font.width(badge),y+6,0xffe2cd9d,false);

@@ -50,6 +50,8 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('new BlockPos(112,82,149)',fixture)
         self.assertIn('removed<=4096',fixture)
         self.assertNotIn('wedgeState',fixture)
+        manual=(BASE/'client/ArtifactManualScreen.java').read_text()
+        self.assertIn('ConnectedExcavation.handles(abilityKind)?Component.translatable("guide.front")',manual)
         smoke=pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("['javac','-d',str(helper)",smoke)
         self.assertIn("'-cp',str(helper),'CaptureScreen'",smoke)
