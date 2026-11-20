@@ -6,12 +6,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 /** A synchronous held utility transaction must not follow a caster moved or disarmed by a claim callback. */
-record HeldUtilityContext(ServerPlayer player,ServerLevel level,Vec3 origin,ItemStack tool) {
+record HeldUtilityContext(ServerPlayer player,ServerLevel level,Vec3 origin,ItemStack tool,HeldSkillLease skill) {
     static HeldUtilityContext capture(ServerPlayer player,ItemStack tool){
-        return new HeldUtilityContext(player,player.serverLevel(),player.position(),tool);
+        return new HeldUtilityContext(player,player.serverLevel(),player.position(),tool,HeldSkillLease.capture(tool));
     }
     boolean valid(){
-        return player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
+        return skill.valid()&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
                 &&player.serverLevel()==level&&player.position().equals(origin)
                 &&player.getMainHandItem()==tool&&!tool.isEmpty();
     }

@@ -24,13 +24,13 @@ public final class WorldSafety {
         Blocks.CALCITE,Blocks.BASALT,Blocks.SMOOTH_BASALT,Blocks.OBSIDIAN,Blocks.END_STONE,Blocks.NETHERRACK,
         Blocks.DIRT,Blocks.COARSE_DIRT,Blocks.GRASS_BLOCK,Blocks.PODZOL,Blocks.ROOTED_DIRT,Blocks.GRAVEL,Blocks.DRIPSTONE_BLOCK,Blocks.POINTED_DRIPSTONE);
     private WorldSafety() {}
-    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind,boolean naturalOnly,net.minecraft.server.level.ServerLevel level,Vec3 origin){}
+    private record NativeBreak(ServerPlayer player,ItemStack tool,BlockPos pos,BlockState expected,ArtifactKind kind,boolean naturalOnly,net.minecraft.server.level.ServerLevel level,Vec3 origin,HeldSkillLease skill){}
     private static final ThreadLocal<NativeBreak> NATIVE_BREAK=new ThreadLocal<>();
     private static final ThreadLocal<java.util.function.BooleanSupplier> MINING_LEASE=new ThreadLocal<>();
     private static boolean miningLeaseActive(){var guard=MINING_LEASE.get();return guard==null||guard.getAsBoolean();}
     public static boolean changedDuringBreakEvent(ServerPlayer p,BlockPos pos){
         var context=NATIVE_BREAK.get();return context!=null&&context.player()==p&&context.pos().equals(pos)
-            &&(!sameActor(p,context.level(),context.origin(),context.tool(),pos)||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos)
+            &&(!context.skill().valid()||!sameActor(p,context.level(),context.origin(),context.tool(),pos)||p.serverLevel().getBlockState(pos)!=context.expected()||barrier(p,pos)
                     ||context.naturalOnly()&&PlayerPlacedBlocks.get(p.serverLevel()).contains(pos));
     }
     static boolean capturesIridiumDrops(){
@@ -102,13 +102,13 @@ public final class WorldSafety {
         return mine(p,tool,kind,pos,expected,checkDropPressure,false);
     }
     private static boolean mine(ServerPlayer p,ItemStack tool,ArtifactKind kind,BlockPos pos,BlockState expected,boolean checkDropPressure,boolean naturalOnly) {
-        var level=p.serverLevel();var origin=p.position();
-        if(!allowed(p,kind,pos) || !sameActor(p,level,origin,tool,pos) || level.getBlockState(pos)!=expected || !harvestable(p,tool,pos)
+        var level=p.serverLevel();var origin=p.position();var skill=HeldSkillLease.capture(tool);
+        if(!allowed(p,kind,pos) || !skill.valid() || !sameActor(p,level,origin,tool,pos) || level.getBlockState(pos)!=expected || !harvestable(p,tool,pos)
                 ||naturalOnly&&PlayerPlacedBlocks.get(level).contains(pos)) return false;
         // Backpressure: do not destroy another block into a dense pile of uncollected drops.
         if(checkDropPressure&&dropPressure(p,pos))return false;
         // Keep the exact break context through item spawning so Iridium can tag only these drops.
-        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly,level,origin));
+        var previous=NATIVE_BREAK.get();NATIVE_BREAK.set(new NativeBreak(p,tool,pos.immutable(),expected,kind,naturalOnly,level,origin,skill));
         boolean mined;
         try{mined=p.gameMode.destroyBlock(pos);}finally{if(previous==null)NATIVE_BREAK.remove();else NATIVE_BREAK.set(previous);}
         return mined;

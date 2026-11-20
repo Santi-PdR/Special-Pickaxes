@@ -1,3 +1,9 @@
+## Reforma 6.0 — alpha.28 seguridad de copias en mano
+
+Lease de copiedSkill/copiedMode para contextos de utilidad, jobs y rotura nativa: cambiar copia/modo en el mismo stack invalida trabajo anterior, incluso el bloque actual durante callback. No invalida desgaste/encantamientos/status ni modifica picos nativos no Worldbreaker. Tres GameTests; local 142 Python (una omisión), 25 recursos, 58 hashes intactos. Forge alpha.28 pendiente; controles equipados/paridad restante y revisión visual siguen abiertos. [Detalles](WORLDBREAKER-6.0.md).
+
+Alpha.27 fuente `fa1cea44db69e3b06e1c94ca7d135576099f346c`, CI `44645297618` SUCCESS, 527 GameTests, cliente/input y servidor pasan. Sustituye el fallo previo de verificación post-GameTest; no aprueba cambios alpha.28. Sin release pública.
+
 ## Reforma 6.0 — alpha.27 copia minera Iridium y robustez de CI
 
 Worldbreaker Curios copia disparador minero Iridium con racha/propiedad de drops originales y lease de slot/origen; rechaza fuente cambiada y duplicación con Iridium nativo en mano. Dos GameTests; no modifica habilidades nativas/ficheros congelados. Local 142 Python (una omisión), 25 recursos, 58 hashes intactos. Forge/revisión visual pendientes. [Detalles](WORLDBREAKER-6.0.md).

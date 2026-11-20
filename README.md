@@ -1,6 +1,6 @@
 # Special Pickaxes — reforma 6.0 en desarrollo
 
-**Código actual: `6.0.0-alpha.27`, todavía no es la reforma completa ni una entrega final.**
+**Código actual: `6.0.0-alpha.28`, todavía no es la reforma completa ni una entrega final.**
 
 Arte congelado; habilidades de Iridium y Strata preservadas. Sin HUD de equipamiento ni expansión SHIFT; guía I con detalles Curios de los trece picos y traducciones `en_us`, `es_es`, `es_uy`.
 
@@ -31,6 +31,8 @@ Worldbreaker alpha.25 protege Rotura Regional y World Shatter frente a bloques c
 Worldbreaker alpha.26 añade pasivas Curios de estado/combate del origen copiado, sustituyendo Égida nativa, con lease de slot/origen y limpieza de efectos propios. Forge pendiente; controles equipados y disparadores mineros restantes aún sin completar.
 
 Worldbreaker alpha.27 copia también racha/propiedad de drops de Iridium en Curios sin cambiar su habilidad nativa. CI verifica resumen GameTests en transcripción completa, manteniendo escaneo estricto de ambos logs ante rotación nocturna. Forge nuevo pendiente; controles equipados/paridad restante y revisión visual siguen abiertos.
+
+Alpha.27 CI `44645297618` verde (527 GameTests / cliente / input / servidor). Alpha.28 protege copias en mano frente a cambios de origen/modo NBT en el mismo stack, incluso durante callbacks. Forge nuevo pendiente; controles equipados y revisión visual aún incompletos.
 
 ---
 

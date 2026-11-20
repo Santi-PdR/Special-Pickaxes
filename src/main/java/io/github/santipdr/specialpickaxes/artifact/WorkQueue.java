@@ -23,13 +23,13 @@ public final class WorkQueue {
         FallGuard(ServerPlayer player,long expires){this.player=player;this.dimension=player.level().dimension();this.expires=expires;}
     }
     private static final class Job {
-        final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;
+        final ServerPlayer player; final ItemStack tool; final ArtifactKind kind;final HeldSkillLease skill;
         final ResourceKey<Level> dimension; final long deadline; final ArrayDeque<WorkStep> steps;final long reservedBytes;
         int accepted,completed,succeeded; boolean paused,aborted; WorkProgram region;
         BlockPos lastImpact;int impactTick=Integer.MIN_VALUE;String pauseReason="";
         final ArrayDeque<BlockPos> seamTrailPoints=new ArrayDeque<>(5);
         Job(ServerPlayer p,ItemStack t,ArtifactKind k,List<WorkStep> work,long snapshotBytes) {
-            player=p;tool=t;kind=k;dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
+            player=p;tool=t;kind=k;skill=HeldSkillLease.capture(t);dimension=p.level().dimension();deadline=ArtifactState.now(p)+ArtifactConfig.JOB_TTL.get();
             steps=new ArrayDeque<>(work);accepted=work.size();this.reservedBytes=snapshotBytes;
         }
     }
@@ -46,7 +46,7 @@ public final class WorkQueue {
     /** Remove player-bound descent state on logout, death replacement, or dimension travel. */
     public static void forget(ServerPlayer p){CORE_DRILL_GUARDS.remove(p.getUUID());}
     private static boolean validActor(Job job,ServerPlayer player){
-        return job.player==player&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
+        return job.skill.valid()&&job.player==player&&player.isAlive()&&!player.isRemoved()&&!player.isSpectator()&&player.mayBuild()
                 &&player.getMainHandItem()==job.tool&&!job.tool.isEmpty()&&player.level().dimension()==job.dimension;
     }
     public static void discardStale(ServerPlayer p){var j=JOBS.get(p.getUUID());if(j!=null&&!validActor(j,p))cancel(p);}
