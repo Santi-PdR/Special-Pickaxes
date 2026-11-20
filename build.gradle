@@ -3,7 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '6.0.54'
 }
 group = 'io.github.santipdr.specialpickaxes'
-version = '6.0.0-alpha.31'
+version = '6.0.0-alpha.32'
 base { archivesName = 'special-pickaxes-1.20.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 minecraft {
@@ -32,6 +32,9 @@ minecraft {
     }
 }
 repositories {
+    if (project.hasProperty('clientSmoke')) {
+        maven { url = 'https://maven.theillusivec4.top/'; content { includeGroup 'top.theillusivec4.curios' } }
+    }
     // Forge/Minecraft coordinates do not belong to Central. A 429 there must not
     // prevent Gradle reaching ForgeGradle's generated Minecraft repository.
     maven {
@@ -46,6 +49,7 @@ repositories {
 }
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.4.10'
+    if (project.hasProperty('clientSmoke')) runtimeOnly fg.deobf('top.theillusivec4.curios:curios-forge:5.14.1+1.20.1')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

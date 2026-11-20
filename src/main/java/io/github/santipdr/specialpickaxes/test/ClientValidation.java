@@ -91,6 +91,7 @@ public final class ClientValidation {
                 if(!data.getBoolean("flightVerified")){
                     verifyFlight(p);return;
                 }
+                if(!EquippedClientValidation.tick(p))return;
                 if(!data.getBoolean("controlFixtureReady")){
                     if(!data.getBoolean("controlFixtureStarted")){
                         data.putBoolean("controlFixtureStarted",true);

@@ -128,6 +128,11 @@ try:
    # Restore first person before the original control sequence toggles third person.
    press_screen('third')
    press_screen('third')
+  if '[CHAT]' in line and 'CURIO_KEY_READY' in line:
+   capture_screen(str(out/'curios-key-before.png'))
+   press_screen('curio')
+  if '[CHAT]' in line and 'CURIO_KEY_OK' in line:
+   capture_screen(str(out/'curios-key-after.png'))
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
    capture_screen(str(out/'third-person.png'), 'third')
@@ -158,6 +163,7 @@ finally:
   try:proc.wait(timeout=20)
   except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
+if not any('CURIO_KEY_OK' in s for s in captured):raise SystemExit('Missing real Curios slot and physical G verification')
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
 if not any('ICARUS_FLIGHT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client ascent verification')
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
