@@ -40,14 +40,18 @@ public final class ConnectedExcavationGameTests {
         h.assertTrue(!ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true)&&!WorkQueue.busy(p),"no twenty-block remote activation");finish(h,p);
     }
     @GameTest(template="empty",batch="front_03",timeoutTicks=200) public static void activeExcavationBreaksSandAndGravelFallingIntoPreviouslyClearedCells(GameTestHelper h){
-        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);h.getLevel().setBlock(at.below(),Blocks.BEDROCK.defaultBlockState(),2);
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
+        // Native drops have random horizontal motion: retain them instead of letting them
+        // roll off a one-block pedestal and fall outside the observation volume.
+        for(var floor:BlockPos.betweenClosed(at.offset(-6,-1,-6),at.offset(6,-1,6)))
+            h.getLevel().setBlock(floor,Blocks.BEDROCK.defaultBlockState(),2);
         h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");for(int i=0;i<64;i++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains watched during settling");
         h.runAtTickTime(5,()->{h.getLevel().setBlock(at.above(5),Blocks.SAND.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.SAND.defaultBlockState());});
         h.runAtTickTime(30,()->{h.getLevel().setBlock(at.above(5),Blocks.GRAVEL.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.GRAVEL.defaultBlockState());});
         h.runAtTickTime(110,()->{
             h.assertTrue(h.getLevel().getBlockState(at).isAir(),"landed sand and gravel have both been excavated");
-            var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(3));
+            var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(7));
             h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Items.SAND)),"falling sand generated native harvested loot");
             h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Items.GRAVEL)||d.getItem().is(Items.FLINT)),"falling gravel generated native harvested loot; busy="+WorkQueue.busy(p)+" blocks="+h.getLevel().getBlockState(at)+" falling="+h.getLevel().getEntitiesOfClass(FallingBlockEntity.class,new AABB(at).inflate(8)).size()+" drops="+drops.stream().map(d->d.getItem().toString()).toList());
             finish(h,p);
