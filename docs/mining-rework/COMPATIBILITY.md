@@ -1,13 +1,13 @@
-# Compatibilidad vigente — alpha.46
+# Compatibilidad vigente — alpha.47
 
 - Minecraft **1.20.1**, Forge **47.4.10**, Java **17**.
 - Curios opcional: slot `pickaxe`, efectos pasivos y activa **H**, distinta de **G** (inventario de Curios). La guía muestra la tecla reasignada.
-- CI del JAR exacto `44850183303`: **214 JUnit, 548 GameTests**, servidor empaquetado/logs y cliente gráfico completos. El cliente verifica un slot Curios real con H, coste de la fuente y minería conectada, manteniendo otra herramienta en mano.
+- CI del JAR exacto `44859312447`: **214 JUnit, 549 GameTests**, servidor empaquetado/logs y cliente gráfico completos. El cliente verifica un slot Curios real con H, coste de la fuente y minería conectada, manteniendo otra herramienta en mano.
 - CI posterior sólo de pruebas `44816553795`: **214 JUnit, 547 GameTests**, servidor/cliente completos. Verifica loot denso por la ruta actual y cambio de copia durante permisos.
 - Los tests cubren permisos/callbacks, bloques colocados, contenedores, fluidos, irrompibles, cancelación por cambio de equipo y asentamiento real de arena/grava. Esto no certifica todos los proveedores de claims ni todos los bloques de otros mods.
 - Sin certificación de Windows, Ghouls completo, todos los modpacks o todas las escalas de GUI. Las capturas revisadas y sus límites se registran en [STATUS.md](STATUS.md).
 
-[Descarga vigente](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.46-44850183303) · [Guía actual](PLAYER-GUIDE.md)
+[Descarga vigente](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.47-44859312447) · [Guía actual](PLAYER-GUIDE.md)
 
 <details>
 <summary>Historial de compatibilidad — resultados y limitaciones de versiones anteriores</summary>

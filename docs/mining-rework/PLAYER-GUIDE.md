@@ -1,12 +1,12 @@
-# Guía actual — 6.0.0-alpha.46
+# Guía actual — 6.0.0-alpha.47
 
-[Descargar JAR](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.46-44850183303/special-pickaxes-1.20.1-6.0.0-alpha.46.jar) · [Release](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.46-44850183303) · [Validación y límites comprobados](STATUS.md)
+[Descargar JAR](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.47-44859312447/special-pickaxes-1.20.1-6.0.0-alpha.47.jar) · [Release](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.47-44859312447) · [Validación y límites comprobados](STATUS.md)
 
 ## Instalación
 
 Cierra Minecraft. Usa Minecraft 1.20.1 / Forge 47.4.10 / Java 17. Instala sólo un JAR de Special Pickaxes en `mods`, reemplazando su versión anterior. Curios habilita el slot `pickaxe` y las variantes equipadas.
 
-JAR: **998287 bytes**, SHA256 `dcb7fb9ce402a5bb60263aaaef3afe84d6cf012b2279cd896972e2782b088cc5`.
+JAR: **998380 bytes**, SHA256 `18010bf278f970eb2458bc55c41dcad2b5fe8eb1b2c40048a84751e9464735dc`.
 
 ## Controles predeterminados
 
@@ -24,7 +24,7 @@ Todos los controles del mod son reasignables. La guía muestra las teclas config
 
 Apunta a un bloque cercano (hasta seis bloques) y activa el pico. La excavación sigue el terreno conectado desde ese frente. Las variantes reformadas conservan su prioridad temática: Coro abre un frente ancho, Worldloom desmonta desde la base, Exodium prioriza arriba y Axiom profundiza en la masa. La secundaria amplía la demolición donde corresponde.
 
-La habilidad vuelve a visitar las celdas despejadas mientras permanece activa para minar bloques que caigan después. El loot abundante no pausa el trabajo. Sólo el extractor de menas resalta sus drops de mena.
+La habilidad intercala revisiones de las celdas despejadas mientras avanza y mantiene una ventana final acotada para minar bloques que caigan después. El loot abundante no pausa el trabajo. Sólo el extractor de menas resalta sus drops de mena.
 
 - **Paradox:** principal por selección de dos esquinas y confirmación; secundaria de demolición causal inmediata. Conserva la velocidad manual tras usarla.
 - **Ícaro:** secundaria de ascenso con apertura de techo y protección de caída.
@@ -35,7 +35,7 @@ La interfaz dentro del juego es la referencia breve para cada pico. Modelos y te
 
 ## Validación
 
-JAR publicado: CI `44850183303` SUCCESS, 214 JUnit / 548 GameTests / servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activación/cancelación). Seguimiento sólo de tests: CI `44816553795` SUCCESS con 547 GameTests. No exige reinstalar el JAR.
+JAR publicado: CI `44859312447` SUCCESS, 214 JUnit / 549 GameTests / servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activación/cancelación). Seguimiento sólo de tests: CI `44816553795` SUCCESS con 547 GameTests. No exige reinstalar el JAR.
 
 Es una prerelease: no equivale a probar todos los modpacks, plugins de claims o escalas de interfaz ni a certificar Windows.
 
