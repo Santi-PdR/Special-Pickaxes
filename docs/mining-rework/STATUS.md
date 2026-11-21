@@ -1,3 +1,9 @@
+## Alpha.46 — seguimiento de caída tras agotar el frente, pendiente de Forge
+
+Cambio funcional respecto a alpha.45: agotar el presupuesto de terreno ya no termina inmediatamente el programa. Detiene la expansión y conserva la vigilancia de celdas ya despejadas. Las llegadas tienen un presupuesto separado acotado a `min(cap,1024)`, bajo el mismo deadline absoluto de 240 ticks, las mismas comprobaciones de permisos/procedencia/equipo y los mismos presupuestos del scheduler. Una celda revisitada no expande el frente a terreno nuevo.
+
+Nueva regresión live con tope 32: mina exactamente 32 de 60 bloques, comprueba que siga activa, cosecha grava llegada al origen, deja 28 bloques intactos, protege una llegada marcada como colocada y termina en plazo. La implementación anterior falla al exigir que el frente saturado siga vigilado. Local: 162 Python (una omisión), 25 recursos, diff check OK. Forge y cliente todavía pendientes. No sustituir ni publicar por encima de alpha.45 hasta validación completa.
+
 ## Ícaro: dos techos excavados en cliente supervivencia — SUCCESS
 
 Fuente `d4d4335`, CI `44844430058` **SUCCESS**: 214 JUnit, 547 GameTests, servidor/logs y cliente real completos (32 escenas, 64 tooltips, Curios H, activación/cancelación, Worldbreaker y loot Worldloom sin recogida simulada).

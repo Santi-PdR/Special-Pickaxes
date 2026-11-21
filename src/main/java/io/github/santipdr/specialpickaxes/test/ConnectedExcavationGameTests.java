@@ -108,4 +108,33 @@ public final class ConnectedExcavationGameTests {
         finish(h,p);
     }
 
+    @GameTest(template="empty",batch="front_08") public static void saturatedFrontStillHarvestsArrivalsWithoutExpandingOrIgnoringProvenance(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var level=h.getLevel();
+        var terrain=new java.util.ArrayList<BlockPos>();
+        for(int x=0;x<5;x++)for(int y=0;y<3;y++)for(int z=0;z<4;z++){
+            var cell=at.offset(x,y,z);terrain.add(cell);PlayerPlacedBlocks.get(level).unmark(cell);
+            level.setBlock(cell,Blocks.STONE.defaultBlockState(),2);
+        }
+        int previous=ArtifactConfig.JOB_LIMIT.get();
+        try{
+            ArtifactConfig.JOB_LIMIT.set(32);
+            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live front starts with a finite terrain budget");
+        }finally{ArtifactConfig.JOB_LIMIT.set(previous);}
+        try{
+            for(int i=0;i<64;i++)WorkQueue.tick();
+            h.assertTrue(terrain.stream().filter(cell->level.getBlockState(cell).isAir()).count()==32,"terrain budget is enforced exactly");
+            h.assertTrue(WorkQueue.busy(p)&&level.getBlockState(at).isAir(),"saturated front still watches its cleared origin");
+            level.setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);
+            for(int i=0;i<64;i++)WorkQueue.tick();
+            h.assertTrue(level.getBlockState(at).isAir(),"arrival in a cleared cell is harvested after terrain budget exhaustion");
+            h.assertTrue(terrain.stream().filter(cell->level.getBlockState(cell).is(Blocks.STONE)).count()==28,"settling never resumes untouched terrain expansion");
+            level.setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);PlayerPlacedBlocks.get(level).mark(at);
+            for(int i=0;i<64;i++)WorkQueue.tick();
+            h.assertTrue(level.getBlockState(at).is(Blocks.GRAVEL),"settling still protects newly placed blocks");
+            PlayerPlacedBlocks.get(level).unmark(at);drain(p);
+            h.assertTrue(!WorkQueue.busy(p),"settling remains finite after the front saturates");
+        }finally{PlayerPlacedBlocks.get(level).unmark(at);WorkQueue.cancel(p);MiningObservations.forget(p);}
+        finish(h,p);
+    }
+
 }

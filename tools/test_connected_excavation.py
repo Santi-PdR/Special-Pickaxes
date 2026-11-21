@@ -92,3 +92,12 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('getDouble("flightRise")<8',flight)
         smoke=pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("if not any('ICARUS_CEILINGS_OK' in s for s in captured):raise SystemExit",smoke)
+
+    def test_terrain_cap_transitions_to_bounded_settling_instead_of_finishing(self):
+        source=(BASE/'artifact/ConnectedExcavation.java').read_text()
+        done=source[source.index('public boolean done()'):source.index('public int attemptsPerTick')]
+        self.assertNotIn('broken>=cap',done)
+        self.assertIn('settled>=Math.min(cap,1024)',done)
+        self.assertIn('if(broken>=cap){',source)
+        self.assertIn('frontier.clear();settleUntil=Math.min(hardDeadline,now+120)',source)
+        self.assertIn('broken++;cleared.addLast(at)',source)

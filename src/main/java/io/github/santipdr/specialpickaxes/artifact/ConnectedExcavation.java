@@ -20,7 +20,7 @@ public final class ConnectedExcavation implements WorkProgram {
     private final Queue<BlockPos> frontier;
     private final ArrayDeque<BlockPos> cleared=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
-    private int broken;
+    private int broken,settled;
     private long lastVisual=Long.MIN_VALUE;
     private long now,settleUntil=Long.MIN_VALUE,hardDeadline;
     private boolean revoked;
@@ -79,7 +79,7 @@ public final class ConnectedExcavation implements WorkProgram {
     public boolean awaiting(){return false;}public boolean executing(){return true;}public void confirm(){}
     public boolean loaded(ServerPlayer p){return true;}
     public boolean reportPartial(){return false;}
-    public boolean done(){return !active()||now>=hardDeadline||broken>=cap||frontier.isEmpty()&&(cleared.isEmpty()||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
+    public boolean done(){return !active()||now>=hardDeadline||settled>=Math.min(cap,1024)||frontier.isEmpty()&&(cleared.isEmpty()||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
     public int attemptsPerTick(ItemStack tool){return Math.max(256,EnchantmentScaling.budget(tool));}
     public WorkStep next(ServerPlayer p){
         now=ArtifactState.now(p);
@@ -103,12 +103,18 @@ public final class ConnectedExcavation implements WorkProgram {
                 boolean mined=WorldSafety.mineNaturalLeased(actor,tool,kind,at,state,ConnectedExcavation.this::active);
                 if(!active()){revoked=true;return mined;}
                 if(mined){
-                    broken++;
-                    if(!revisit)cleared.addLast(at);
-                    else settleUntil=Math.min(hardDeadline,now+120);
-                    // Bound both queued positions and visited-state memory, not just successful breaks.
-                    if(seen.size()<cap*4)for(var direction:Direction.values()){
-                        var next=at.relative(direction);if(within(next)&&seen.size()<cap*4&&seen.add(next))frontier.add(next);
+                    if(revisit){
+                        settled++;
+                        settleUntil=Math.min(hardDeadline,now+120);
+                    }else{
+                        broken++;cleared.addLast(at);
+                        if(broken>=cap){
+                            // Exhausting the terrain budget ends expansion, not observation of
+                            // cleared cells. Arrivals have their own small, finite break budget.
+                            frontier.clear();settleUntil=Math.min(hardDeadline,now+120);
+                        }else if(seen.size()<cap*4)for(var direction:Direction.values()){
+                            var next=at.relative(direction);if(within(next)&&seen.size()<cap*4&&seen.add(next))frontier.add(next);
+                        }
                     }
                 }
                 return mined;
