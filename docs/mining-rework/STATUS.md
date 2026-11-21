@@ -4,7 +4,7 @@ Cambio funcional respecto a alpha.45: agotar el presupuesto de terreno ya no ter
 
 Nueva regresión live con tope 32: mina exactamente 32 de 60 bloques, comprueba que siga activa, cosecha grava llegada al origen, deja 28 bloques intactos, protege una llegada marcada como colocada y termina en plazo. La implementación anterior falla al exigir que el frente saturado siga vigilado. Local: 162 Python (una omisión), 25 recursos, diff check OK. Fuente `d93e92218cfeabfc424cd4f3d3cc8a1ba96184cf`, CI `44850183303` SUCCESS: 214 JUnit, 548 GameTests, servidor/logs y cliente real completos (32 escenas, 64 tooltips). Continúan pasando los techos de Ícaro y el loot nativo sin recoger de Worldloom (4671 unidades / 567 entidades en esta ejecución).
 
-JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.46.jar`, 998287 bytes, SHA256 `dcb7fb9ce402a5bb60263aaaef3afe84d6cf012b2279cd896972e2782b088cc5`. Se prepara publicación directa mediante workflow fijado a fuente/run/tamaño/hash; pendiente confirmar publicación. Alpha.45 permanece disponible como entrega anterior.
+JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.46.jar`, 998287 bytes, SHA256 `dcb7fb9ce402a5bb60263aaaef3afe84d6cf012b2279cd896972e2782b088cc5`. Publicación directa confirmada SUCCESS por workflow `44852761448`, fijado a fuente/run/tamaño/hash: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.46-44850183303 . No se recompiló el JAR para publicarlo. Alpha.45 permanece disponible como entrega anterior.
 
 ## Ícaro: dos techos excavados en cliente supervivencia — SUCCESS
 
