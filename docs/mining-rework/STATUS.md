@@ -4,7 +4,7 @@ La minería conectada reserva una de cada dieciséis inspecciones para volver a 
 
 Nueva regresión live con presupuesto global de una inspección: abre el origen, introduce grava y exige que se recoja en dieciséis turnos, mientras la masa conectada sigue pendiente; verifica que ningún turno exceda una inspección. La implementación anterior no revisita el origen mientras queda ese frente. Local: 163 Python (una omisión), 25 recursos, diff check limpio. Fuente `2ff45d89154fd1534107ec3e99a14f94ac2d9d77`, CI `44859312447` SUCCESS: 214 JUnit, 549 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Ícaro y Worldloom sin recogida simulada: 8274 unidades / 1237 entidades). El reloj de asentamiento final no comienza por una llegada mientras queda frente.
 
-JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.47.jar`, 998380 bytes, SHA256 `18010bf278f970eb2458bc55c41dcad2b5fe8eb1b2c40048a84751e9464735dc`. Workflow de publicación fijado a fuente/run/hash/tamaño preparado; falta confirmar publicación. Alpha.46 permanece disponible como entrega anterior.
+JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.47.jar`, 998380 bytes, SHA256 `18010bf278f970eb2458bc55c41dcad2b5fe8eb1b2c40048a84751e9464735dc`. Publicación confirmada SUCCESS por workflow `44860962470`, fijado a fuente/run/hash/tamaño, sin recompilar: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.47-44859312447 . Alpha.46 permanece disponible como entrega anterior.
 
 ## Alpha.46 — seguimiento de caída tras agotar el frente, SUCCESS
 
