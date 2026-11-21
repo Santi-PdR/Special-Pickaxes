@@ -1,8 +1,10 @@
-## Alpha.48 — menos revisiones repetidas durante seguimiento pequeño, pendiente de Forge
+## Alpha.48 — menos revisiones repetidas durante seguimiento pequeño, SUCCESS
 
 Un programa de minería conectada cuyo frente ya terminó limita su turno a una pasada por sus celdas vigiladas si son menos que el presupuesto normal. Los frentes activos y los conjuntos grandes mantienen su presupuesto anterior. No se reduce la frecuencia efectiva de una celda pequeña (ya se revisa cada turno), no se amplía el presupuesto global, y se libera presupuesto sobrante para otros jugadores.
 
-Nueva regresión con dos jugadores y presupuesto global 16: el primero conserva una vigilancia pequeña, el segundo inicia un frente conectado, y se exige que el segundo mine en ese mismo tick sin cancelar la vigilancia ni superar 16 intentos globales. La versión anterior consume los 16 en la vigilancia del primero. Local: 164 Python (una omisión), 25 recursos, diff limpio. No es un benchmark de TPS/FPS ni prueba de un servidor concurrido. Forge/cliente pendientes; publicada vigente alpha.47.
+Nueva regresión con dos jugadores y presupuesto global 16: el primero conserva una vigilancia pequeña, el segundo inicia un frente conectado, y se exige que el segundo mine en ese mismo tick sin cancelar la vigilancia ni superar 16 intentos globales. La versión anterior consume los 16 en la vigilancia del primero. Local: 164 Python (una omisión), 25 recursos, diff limpio. No es un benchmark de TPS/FPS ni prueba de un servidor concurrido. Fuente `d37b9dbba6ed86d504949c7477d19e6a588e041c`, CI `44861236206` SUCCESS: 214 JUnit, 550 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, Ícaro con dos techos y Worldloom sin recoger loot: 8338 unidades / 1052 entidades).
+
+JAR exacto `special-pickaxes-1.20.1-6.0.0-alpha.48.jar`, 998417 bytes, SHA256 `06933512653590a490a215dfa8d45f969ed7ce8ae53dd48fb6cd71b3765a50a3`. Publicación fijada a fuente/run/hash/tamaño preparada; pendiente confirmar release. Alpha.47 permanece disponible como entrega anterior.
 
 ## Alpha.47 — revisión de llegadas durante el frente activo, SUCCESS
 

@@ -1,10 +1,10 @@
-# Special Pickaxes — 6.0.0-alpha.47
+# Special Pickaxes — 6.0.0-alpha.48
 
-**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.47-44859312447/special-pickaxes-1.20.1-6.0.0-alpha.47.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.47-44859312447) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.48-44861236206/special-pickaxes-1.20.1-6.0.0-alpha.48.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.48-44861236206) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
 
 Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
 
-**Nuevo en alpha.47:** revisita celdas despejadas mientras el frente sigue avanzando, dentro del mismo presupuesto por tick. Conserva el seguimiento acotado después de agotar el frente.
+**Nuevo en alpha.48:** reduce revisiones repetidas en vigilancias pequeñas y libera presupuesto para minería de otros jugadores. Conserva el ritmo de los frentes activos, las revisiones intercaladas y el asentamiento final acotado.
 
 ## Qué hace la revisión actual
 
@@ -18,13 +18,13 @@ Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habil
 
 ## Evidencia y descarga
 
-El JAR publicado proviene de `2ff45d89154fd1534107ec3e99a14f94ac2d9d77`, [CI 44859312447](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44859312447): **214 JUnit, 549 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+El JAR publicado proviene de `d37b9dbba6ed86d504949c7477d19e6a588e041c`, [CI 44861236206](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44861236206): **214 JUnit, 550 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
 
 El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
 
-- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.47.jar`
-- Tamaño: **998380 bytes**
-- SHA256: `18010bf278f970eb2458bc55c41dcad2b5fe8eb1b2c40048a84751e9464735dc`
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.48.jar`
+- Tamaño: **998417 bytes**
+- SHA256: `06933512653590a490a215dfa8d45f969ed7ce8ae53dd48fb6cd71b3765a50a3`
 
 Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
 

@@ -1,0 +1,51 @@
+name: Publish validated alpha48 manual test
+on:
+  push:
+    branches: ['arena/cec54523-special-pickaxes']
+    paths: ['.github/workflows/publish-alpha48-test.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download and verify successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 44861236206 --json conclusion,headSha,event,workflowName > source-run.json
+          python3 - <<'PY'
+          import json
+          run=json.load(open('source-run.json'))
+          assert run['conclusion']=='success'
+          assert run['headSha']=='d37b9dbba6ed86d504949c7477d19e6a588e041c'
+          assert run['event']=='push' and run['workflowName']=='Forge verification'
+          PY
+          gh run download 44861236206 -n special-pickaxes-6.0.0-alpha.48-personal -D release
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('release')
+          m=json.loads((root/'RELEASE.json').read_text())
+          assert m['commit']=='d37b9dbba6ed86d504949c7477d19e6a588e041c'
+          assert str(m['run_id'])=='44861236206'
+          assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.48.jar'
+          jar=root/'libs'/m['file']
+          assert jar.stat().st_size==m['bytes']==998417
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='06933512653590a490a215dfa8d45f969ed7ce8ae53dd48fb6cd71b3765a50a3'
+          with zipfile.ZipFile(jar) as z:
+              assert z.testzip() is None
+              assert not any('/test/' in name for name in z.namelist())
+          PY
+      - name: Publish explicitly requested test JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create test-6.0.0-alpha.48-44861236206 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.48.jar release/RELEASE.json release/SHA256SUMS --target d37b9dbba6ed86d504949c7477d19e6a588e041c --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.48 - prueba solicitada' --notes 'Mejora alpha.48: evita repetir revisiones de celdas vacias en vigilancias pequenas y deja presupuesto en el mismo tick para mineria de otros jugadores; sin reducir presupuesto de frentes activos o conjuntos grandes. Conserva la mejora anterior: una de cada 16 inspecciones atiende celdas despejadas mientras avanza el frente, compartiendo el presupuesto existente; la ventana final de asentamiento empieza al agotar el frente, no antes. Conserva la correccion anterior: agotar el presupuesto de terreno conserva un seguimiento finito de bloques que lleguen a celdas despejadas; no expande terreno nuevo y respeta permisos, construcciones y equipo. Actualizacion solicitada de mineria frontal conectada: comienza cerca del jugador y sigue terreno conectado; asentamiento de arena y grava; Paradox secundaria inmediata y velocidad normal; ascenso excavador de Icarus; brillo solo en drops de menas del extractor; guia y Curios resumidos; activa equipada H (G queda para inventario Curios). Modelos/texturas y habilidades originales Iridium/Strata preservados. Fuente exacta d37b9dbba6ed86d504949c7477d19e6a588e041c; CI 44861236206 SUCCESS: 214 JUnit, 550 GameTests, servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activacion/cancelacion). Requiere Minecraft 1.20.1, Forge 47.4.10, Java 17; Curios opcional para variantes equipadas. Prerelease: no certifica todos los modpacks ni una aprobacion visual universal. Arte externo conserva sus creditos y avisos; no se concede una licencia adicional de redistribucion. SHA256 06933512653590a490a215dfa8d45f969ed7ce8ae53dd48fb6cd71b3765a50a3; 998417 bytes.'
