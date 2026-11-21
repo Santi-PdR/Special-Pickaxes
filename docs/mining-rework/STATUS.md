@@ -1,3 +1,9 @@
+## Alpha.52 — lease del modo copiado en activa equipada, pendiente CI
+
+La activa de Curios conserva HeldSkillLease del origen equipado además de su identidad de pila/slot y habilidad efectiva. Cambiar copiedMode de Worldbreaker invalida el trabajo anterior de minería o ascenso, incluso si copiedSkill no cambia. El mismo guard impide iniciar/cobrar un trabajo si un callback de permisos cambia ese modo. No afecta variantes nativas ni habilidades originales Iridium/Strata; arte intacto.
+
+Tres regresiones: mutación durante permiso sin trabajo/coste/cooldown; mutación tras encolar conserva bloque y cancela; mutación durante ascenso cancela sin sobrescribir física ni quitar gracia de caída. Local: 167 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.51 sigue siendo la descarga validada.
+
 ## Alpha.51 — lease persistente del ascenso copiado, SUCCESS
 
 Ícaro conserva HeldSkillLease durante todo el vuelo, igual que los trabajos de minería. Cambiar copiedMode en la misma pila Worldbreaker invalida el ascenso original antes de consultar techo o emitir otro impulso; antes sólo se verificaba que el origen siguiera siendo Ícaro. El cambio no elimina el efecto finito de protección de caída ni sobrescribe movimiento/posición al cancelar. Ícaro nativo y habilidades originales Iridium/Strata, modelos y texturas sin cambios.

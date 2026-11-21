@@ -67,4 +67,43 @@ public final class CuriosActiveGameTests {
         for(int i=0;i<blocks.size();i++)h.assertTrue(level.getBlockState(at.east(i)).isAir(),"material actually harvested: "+blocks.get(i));
         finish(h,p);
     }
+    @GameTest(template="empty",batch="curios_active_mode_start") public static void copiedEquippedModeChangeDuringPermissionCannotStartOrCharge(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();
+        source.getOrCreateTag().putString("copiedSkill",ArtifactKind.HELLSPEC.id);source.getOrCreateTag().putInt("copiedMode",0);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> mutate=e->{if(e.player==p)source.getOrCreateTag().putInt("copiedMode",1);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,mutate);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source),"mode changed by claim callback rejects stale activation");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&h.getLevel().getBlockState(at).is(Blocks.STONE),"no job, charge or break after stale permission");
+            h.assertTrue(ArtifactState.of(p,ArtifactKind.HELLSPEC).getLong("curiosActiveReady")==0,"rejected activation never starts cooldown");
+            finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(mutate);WorkQueue.cancel(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_active_mode_mining") public static void copiedEquippedModeChangeCancelsQueuedMiningOnSameStack(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=p.getMainHandItem();
+        source.getOrCreateTag().putString("copiedSkill",ArtifactKind.HELLSPEC.id);source.getOrCreateTag().putInt("copiedMode",0);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        try{
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"equipped mining starts");
+            source.getOrCreateTag().putInt("copiedMode",1);WorkQueue.tick();
+            h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(at).is(Blocks.STONE),"mode change revokes queued mining before its first break");
+            h.assertTrue(source.getDamageValue()==8,"successful original activation charges only once");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_active_mode_flight") public static void copiedEquippedModeChangeCancelsAscentWithoutRemovingGrace(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var source=p.getMainHandItem();
+        source.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);source.getOrCreateTag().putInt("copiedMode",0);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        try{
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"equipped copied ascent starts");IcarianFlight.tick();
+            h.assertTrue(p.getDeltaMovement().y>0&&p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"initial thrust grants finite grace");
+            var motion=p.getDeltaMovement();var position=p.position();source.getOrCreateTag().putInt("copiedMode",1);IcarianFlight.tick();
+            h.assertTrue(!IcarianFlight.active(p)&&p.getDeltaMovement().equals(motion)&&p.position().equals(position),"source mode change stops old ascent without overwriting physics");
+            h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"mode change preserves fall grace");finish(h,p);
+        }finally{IcarianFlight.stop(p);}
+    }
+
 }

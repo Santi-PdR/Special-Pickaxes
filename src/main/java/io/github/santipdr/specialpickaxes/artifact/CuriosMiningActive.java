@@ -19,7 +19,8 @@ public final class CuriosMiningActive {
             var held=p.getMainHandItem();if(held.isEmpty())return false;
             var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
             if(PersistedCooldown.active(now,state.getLong("curiosActiveReady"),160)){ArtifactFeedback.message(p,"alternate_cooldown",Math.max(1,(state.getLong("curiosActiveReady")-now+19)/20));return false;}
-            var lease=new EquipmentLease<>(source,()->current.get()==source&&WorldbreakerCuriosPassives.sourceKind(source)==kind?source:ItemStack.EMPTY);
+            var skill=HeldSkillLease.capture(source);
+            var lease=new EquipmentLease<>(source,()->current.get()==source&&skill.valid()&&WorldbreakerCuriosPassives.sourceKind(source)==kind?source:ItemStack.EMPTY);
             if(!ArtifactActions.canSpendDurability(p,source,8))return false;
             if(kind==ArtifactKind.ICARUS||kind==ArtifactKind.PALIMPSEST||kind==ArtifactKind.IRIDIUM){
                 boolean started=kind==ArtifactKind.ICARUS?IcarianFlight.startEquipped(p,held,lease):EquippedLootPulse.activate(p,held,kind,lease);

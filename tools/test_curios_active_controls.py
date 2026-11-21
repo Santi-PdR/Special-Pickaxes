@@ -53,3 +53,9 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertIn('Component.translatable("curios.detail.specialpickaxes."+kind.id,RelicKeys.name(RelicControl.Action.CURIO_ACTIVATE))', manual)
         helper = pathlib.Path('tools/CaptureScreen.java').read_text()
         self.assertIn('case "curio" -> java.awt.event.KeyEvent.VK_H', helper)
+
+    def test_equipped_active_lease_tracks_same_stack_copied_mode(self):
+        source=(ROOT/'artifact/CuriosMiningActive.java').read_text()
+        self.assertIn('var skill=HeldSkillLease.capture(source)',source)
+        self.assertIn('current.get()==source&&skill.valid()&&WorldbreakerCuriosPassives.sourceKind(source)==kind',source)
+        self.assertLess(source.index('HeldSkillLease.capture(source)'),source.index('WorldSafety.allowed(p,kind,at)'))
