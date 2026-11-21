@@ -1,3 +1,13 @@
+## Cliente supervivencia sin recogida simulada — cierre SUCCESS
+
+Fuente `a2def62`, CI `44841557428` **SUCCESS**: 214 JUnit, 547 GameTests, servidor empaquetado/logs y cliente real (32 escenas / 64 tooltips / Ícaro / Curios H / activación-cancelación / Worldbreaker).
+
+El escenario de Worldloom ahora usa supervivencia, deja todo el loot en el mundo y falla si hay pausa por drops; se retiraron la recogida simulada y la reanudación automática. Exige al menos 256 unidades de loot nativo, sin brillo, antes de aceptar la escena. Evidencia final: `WORLDLOOM_NATIVE_LOOT_OK items=8316 entities=4265`, conservadas al terminar. No equivale a un benchmark de rendimiento ni a probar sesiones de larga duración.
+
+La ejecución anterior `44839638540` terminó la escena (`items=6558 entities=511`) pero falló el verificador de tooltips porque latest.log rotó a medianoche. Se corrigió para escanear conjuntamente el log del cliente y la transcripción completa de consola, manteniendo tanto marcadores anteriores como errores. No se ampliaron deadlines ni se omitieron comprobaciones. La evidencia anterior recuperada contiene los 64 marcadores y cero incidencias del escáner; la repetición final completa confirma SUCCESS.
+
+Local: 160 Python (una omisión), 25 recursos. Cambios sólo en el paquete de pruebas excluido del JAR y en sus herramientas: la alpha.45 publicada y su SHA256 permanecen intactos; no requiere reinstalar.
+
 ## Seguimiento posterior a la publicación — regresiones por rutas live
 
 Commit `095a898feab733199b12862069e186439c2bd2e4`, CI `44816553795` **SUCCESS**. Sólo cambia tests excluidos del JAR: nueva regresión Eventide alterna con 256 entidades de loot (verifica umbral real, frente de terracota, drops nativos, ausencia de pausa/borrado/brillo), y regresión de retag durante permiso de Worldbreaker trasladada de `ExodiumMeteorShower.start` a `ArtifactActions.primary`. No se añade una nueva mecánica ni se cambia el binario alpha.45 publicado.
