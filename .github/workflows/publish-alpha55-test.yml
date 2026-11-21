@@ -1,0 +1,51 @@
+name: Publish validated alpha55 manual test
+on:
+  push:
+    branches: ['arena/cec54523-special-pickaxes']
+    paths: ['.github/workflows/publish-alpha55-test.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download and verify successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 44953214803 --json conclusion,headSha,event,workflowName > source-run.json
+          python3 - <<'PY'
+          import json
+          run=json.load(open('source-run.json'))
+          assert run['conclusion']=='success'
+          assert run['headSha']=='51795cc6c26068687ccc52336ef68a9c6520d066'
+          assert run['event']=='push' and run['workflowName']=='Forge verification'
+          PY
+          gh run download 44953214803 -n special-pickaxes-6.0.0-alpha.55-personal -D release
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('release')
+          m=json.loads((root/'RELEASE.json').read_text())
+          assert m['commit']=='51795cc6c26068687ccc52336ef68a9c6520d066'
+          assert str(m['run_id'])=='44953214803'
+          assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.55.jar'
+          jar=root/'libs'/m['file']
+          assert jar.stat().st_size==m['bytes']==1001763
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='be5b4884ec069473aa2cc218966b60eb6b7b3c028efba831943f01b092c49f32'
+          with zipfile.ZipFile(jar) as z:
+              assert z.testzip() is None
+              assert not any('/test/' in name for name in z.namelist())
+          PY
+      - name: Publish explicitly requested test JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create test-6.0.0-alpha.55-44953214803 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.55.jar release/RELEASE.json release/SHA256SUMS --target 51795cc6c26068687ccc52336ef68a9c6520d066 --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.55 - prueba solicitada' --notes 'Mejora alpha.55: despacho pasivo sincrono de Worldbreaker equipado ligado al modo original; cambiarlo durante callbacks invalida reaccion obsoleta y limpia efecto propio, sin gastar cooldown ni modificar dano por esa reaccion. Conserva alpha.54: rachas de Coro y Paradox no reutilizan registros cuyo lease ha sido revocado; el cambio de modo copiado reinicia la acumulacion sin cambiar umbrales ni cooldown. Conserva alpha.53: observacion pasiva de Worldbreaker equipado ligada al modo original; cambiarlo antes de confirmar descarta trabajo antiguo sin gastar cooldown, y cambiarlo durante BreakEvent revoca la celda actual. Conserva alpha.52: activa equipada de Worldbreaker ligada al modo copiado original; cambiarlo revoca mineria o ascenso anterior y un cambio durante permisos impide iniciar/cobrar trabajo obsoleto. Conserva alpha.51: ascenso copiado de Worldbreaker ligado al modo original durante todo el vuelo; cambiar modo cancela trabajo anterior sin retirar gracia de caida ni sobrescribir fisica. Prueba de arena/grava aislada de agua y grava del worldgen, sin relajar resultados. Conserva alpha.50: rechaza inspecciones de mineria conectada fuera del deadline absoluto o de la ventana final de asentamiento, comprobando el reloj antes de mutar bloques. Conserva alpha.49: prioridad del frente sin vectores temporales, con resultados y desempates identicos verificados; no es benchmark TPS/FPS. Conserva alpha.48: evita repetir revisiones de celdas vacias en vigilancias pequenas y deja presupuesto en el mismo tick para mineria de otros jugadores; sin reducir presupuesto de frentes activos o conjuntos grandes. Conserva la mejora anterior: una de cada 16 inspecciones atiende celdas despejadas mientras avanza el frente, compartiendo el presupuesto existente; la ventana final de asentamiento empieza al agotar el frente, no antes. Conserva la correccion anterior: agotar el presupuesto de terreno conserva un seguimiento finito de bloques que lleguen a celdas despejadas; no expande terreno nuevo y respeta permisos, construcciones y equipo. Actualizacion solicitada de mineria frontal conectada: comienza cerca del jugador y sigue terreno conectado; asentamiento de arena y grava; Paradox secundaria inmediata y velocidad normal; ascenso excavador de Icarus; brillo solo en drops de menas del extractor; guia y Curios resumidos; activa equipada H (G queda para inventario Curios). Modelos/texturas y habilidades originales Iridium/Strata preservados. Fuente exacta 51795cc6c26068687ccc52336ef68a9c6520d066; CI 44953214803 SUCCESS: 216 JUnit, 563 GameTests, servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activacion/cancelacion). Requiere Minecraft 1.20.1, Forge 47.4.10, Java 17; Curios opcional para variantes equipadas. Prerelease: no certifica todos los modpacks ni una aprobacion visual universal. Arte externo conserva sus creditos y avisos; no se concede una licencia adicional de redistribucion. SHA256 be5b4884ec069473aa2cc218966b60eb6b7b3c028efba831943f01b092c49f32; 1001763 bytes.'
