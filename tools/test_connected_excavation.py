@@ -129,3 +129,10 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('FallingBlockEntity.fall(h.getLevel(),at.above(5),falling)',source)
         self.assertIn('harvested.stream().noneMatch(ItemEntity::isCurrentlyGlowing)',source)
         self.assertIn('Items.DIAMOND_PICKAXE:Items.DIAMOND_SHOVEL',source)
+
+    def test_settling_fluid_arrival_fixtures_preserve_live_sources(self):
+        source=(BASE/'test/ConnectedExcavationGameTests.java').read_text()
+        self.assertIn('settlingPreservesWaterArrivingAfterExcavation',source)
+        self.assertIn('settlingPreservesLavaArrivingAfterExcavation',source)
+        self.assertIn('h.getLevel().getFluidState(at).isSource()',source)
+        self.assertIn('fluid barrier does not cancel the finite observation job',source)

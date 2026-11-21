@@ -263,4 +263,24 @@ public final class ConnectedExcavationGameTests {
     @GameTest(template="empty",batch="front_falling_powder_equipped",timeoutTicks=150) public static void equippedExcavationWithShovelHarvestsRealFallingConcretePowder(GameTestHelper h){verifyOtherFallingArrival(h,true,false);}
     @GameTest(template="empty",batch="front_falling_anvil_equipped",timeoutTicks=150) public static void equippedExcavationWithPickHarvestsRealFallingAnvil(GameTestHelper h){verifyOtherFallingArrival(h,true,true);}
 
+    private static void verifySettlingPreservesNewFluid(GameTestHelper h,boolean lava){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);sealedFallingFixture(h,at);
+        h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"connected front starts");
+        for(int i=0;i<64;i++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains under observation");
+        var fluid=lava?Blocks.LAVA:Blocks.WATER;
+        h.getLevel().setBlockAndUpdate(at,fluid.defaultBlockState());
+        h.runAfterDelay(40,()->{
+            try{
+                h.assertTrue(h.getLevel().getBlockState(at).is(fluid)&&h.getLevel().getFluidState(at).isSource(),"settling never harvests or replaces newly arrived fluid source");
+                h.assertTrue(WorkQueue.busy(p),"fluid barrier does not cancel the finite observation job");
+                h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(7)).stream()
+                        .noneMatch(d->d.getItem().is(lava?Items.LAVA_BUCKET:Items.WATER_BUCKET)),"ordinary mining does not synthesize fluid loot");
+                finish(h,p);
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        });
+    }
+    @GameTest(template="empty",batch="front_arrival_water",timeoutTicks=100) public static void settlingPreservesWaterArrivingAfterExcavation(GameTestHelper h){verifySettlingPreservesNewFluid(h,false);}
+    @GameTest(template="empty",batch="front_arrival_lava",timeoutTicks=100) public static void settlingPreservesLavaArrivingAfterExcavation(GameTestHelper h){verifySettlingPreservesNewFluid(h,true);}
+
 }
