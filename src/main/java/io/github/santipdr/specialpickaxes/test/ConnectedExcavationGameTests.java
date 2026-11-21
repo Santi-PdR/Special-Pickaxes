@@ -41,10 +41,15 @@ public final class ConnectedExcavationGameTests {
     }
     @GameTest(template="empty",batch="front_03",timeoutTicks=200) public static void activeExcavationBreaksSandAndGravelFallingIntoPreviouslyClearedCells(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
-        // Native drops have random horizontal motion: retain them instead of letting them
-        // roll off a one-block pedestal and fall outside the observation volume.
-        for(var floor:BlockPos.betweenClosed(at.offset(-6,-1,-6),at.offset(6,-1,6)))
-            h.getLevel().setBlock(floor,Blocks.BEDROCK.defaultBlockState(),2);
+        // This high fixture can still intersect worldgen water/gravel depending on the
+        // batch's world position. Seal outside fluids and falling terrain out; do not
+        // change the ability's fluid barriers, landing physics or settling deadline.
+        for(int x=-8;x<=8;x++)for(int y=-1;y<=8;y++)for(int z=-8;z<=8;z++){
+            var cell=at.offset(x,y,z);boolean shell=Math.abs(x)==8||Math.abs(z)==8||y==-1||y==8;
+            h.getLevel().setBlock(cell,shell?Blocks.BEDROCK.defaultBlockState():Blocks.AIR.defaultBlockState(),2);
+            PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);
+        }
+        h.getLevel().setBlock(at,Blocks.STONE.defaultBlockState(),2);
         h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");for(int i=0;i<64;i++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains watched during settling");
         long started=ArtifactState.now(p);var trace=new StringBuilder();
@@ -52,7 +57,7 @@ public final class ConnectedExcavationGameTests {
                 .append(" age=").append(ArtifactState.now(p)-started).append(" busy=").append(WorkQueue.busy(p))
                 .append(" block=").append(h.getLevel().getBlockState(at))
                 .append(" falling=").append(h.getLevel().getEntitiesOfClass(FallingBlockEntity.class,new AABB(at).inflate(8)).stream()
-                        .map(e->e.getBlockState()+"@"+e.position()).toList()));
+                        .limit(8).map(e->e.getBlockState()+"@"+e.position()).toList()));
         h.runAtTickTime(5,()->{h.getLevel().setBlock(at.above(5),Blocks.SAND.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.SAND.defaultBlockState());});
         h.runAtTickTime(30,()->{h.getLevel().setBlock(at.above(5),Blocks.GRAVEL.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.GRAVEL.defaultBlockState());});
         h.runAtTickTime(110,()->{
