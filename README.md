@@ -1,10 +1,10 @@
-# Special Pickaxes — 6.0.0-alpha.50
+# Special Pickaxes — 6.0.0-alpha.51
 
-**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.50-44876262545/special-pickaxes-1.20.1-6.0.0-alpha.50.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.50-44876262545) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.51-44919875327/special-pickaxes-1.20.1-6.0.0-alpha.51.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.51-44919875327) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
 
 Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
 
-**Nuevo en alpha.50:** una inspección retrasada ya no puede romper fuera del plazo de excavación o de la ventana final de asentamiento. Conserva la prioridad optimizada, el reparto de presupuesto y el seguimiento de bloques que caen.
+**Nuevo en alpha.51:** Worldbreaker copiando Ícaro detiene el ascenso anterior si cambia el modo en la misma pila; conserva la gracia finita de caída y la física existente. Mantiene los límites temporales, la minería frontal y el seguimiento de bloques que caen.
 
 ## Qué hace la revisión actual
 
@@ -18,13 +18,13 @@ Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habil
 
 ## Evidencia y descarga
 
-El JAR publicado proviene de `845ad6ebc11369b720a2568949c8bbc099e382b1`, [CI 44876262545](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44876262545): **216 JUnit, 552 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+El JAR publicado proviene de `15031fdb613003ab35ab87702db5c0075f18f018`, [CI 44919875327](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44919875327): **216 JUnit, 554 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
 
 El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
 
-- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.50.jar`
-- Tamaño: **1001371 bytes**
-- SHA256: `ea5eb602a9da22a5b4539c38ff6b107cc42a0a1ea2ed98d4de6bb94660f9e1a6`
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.51.jar`
+- Tamaño: **1001459 bytes**
+- SHA256: `389a5ddf12a52ad21d6049eee48239e6f8b76eb585ff27d1a9de598a8634de56`
 
 Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
 
