@@ -30,4 +30,37 @@ public final class WorldbreakerHeldCopyLeaseGameTests {
         try{h.assertTrue(!ArtifactActions.primary(p,tool,ArtifactKind.WORLDBREAKER)&&!WorkQueue.busy(p),"claim callback cannot retag the source and start stale work");}
         finally{MinecraftForge.EVENT_BUS.unregister(mutate);finish(h,p);}
     }
+    @GameTest(template="empty",batch="worldbreaker_held_lease_04") public static void copiedAscentModeChangeBeforeFirstTickCannotMineOrThrust(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();
+        for(int y=0;y<5;y++)h.getLevel().setBlockAndUpdate(p.blockPosition().above(y),Blocks.AIR.defaultBlockState());
+        tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);
+        tool.getOrCreateTag().putInt("copiedMode",0);
+        try{
+            h.assertTrue(IcarianFlight.start(p,tool),"copied ascent starts with original mode");
+            var roof=p.blockPosition().above(2);h.getLevel().setBlockAndUpdate(roof,Blocks.STONE.defaultBlockState());
+            tool.getOrCreateTag().putInt("copiedMode",1);IcarianFlight.tick();
+            h.assertTrue(!IcarianFlight.active(p),"same-stack mode change invalidates original ascent");
+            h.assertTrue(h.getLevel().getBlockState(roof).is(Blocks.STONE)&&p.getDeltaMovement().y==0,"stale ascent neither mines roof nor applies thrust");
+            finish(h,p);
+        }finally{IcarianFlight.stop(p);}
+    }
+
+    @GameTest(template="empty",batch="worldbreaker_held_lease_05") public static void copiedAscentModeChangeAfterThrustPreservesFallGrace(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var tool=p.getMainHandItem();
+        for(int y=0;y<5;y++)h.getLevel().setBlockAndUpdate(p.blockPosition().above(y),Blocks.AIR.defaultBlockState());
+        tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);
+        tool.getOrCreateTag().putInt("copiedMode",0);
+        try{
+            h.assertTrue(IcarianFlight.start(p,tool),"copied ascent starts");IcarianFlight.tick();
+            h.assertTrue(p.getDeltaMovement().y>0&&p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"original impulse grants fall grace");
+            // Cancellation must not overwrite existing physics, even within the same server tick.
+            var motion=p.getDeltaMovement();var position=p.position();
+            tool.getOrCreateTag().putInt("copiedMode",1);IcarianFlight.tick();
+            h.assertTrue(!IcarianFlight.active(p),"changed mode ends old job before duplicate-tick shortcut");
+            h.assertTrue(p.getDeltaMovement().equals(motion)&&p.position().equals(position),"cancellation does not teleport or overwrite motion");
+            h.assertTrue(p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()),"finite safety grace survives cancellation");
+            finish(h,p);
+        }finally{IcarianFlight.stop(p);}
+    }
+
 }

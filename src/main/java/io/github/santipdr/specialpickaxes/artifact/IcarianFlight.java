@@ -17,10 +17,10 @@ public final class IcarianFlight {
     private static boolean ticking;
     private static final Set<UUID> STARTING=new HashSet<>();
     private static final class Flight {
-        final ServerPlayer player;final ServerLevel level;final ItemStack tool;final EquipmentLease<ItemStack> source;final Vec3 origin;final long start;
+        final ServerPlayer player;final ServerLevel level;final ItemStack tool;final EquipmentLease<ItemStack> source;final Vec3 origin;final long start;final HeldSkillLease skill;
         Vec3 previous;long lastTick=Long.MIN_VALUE;
-        Flight(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){this.source=source;player=p;level=p.serverLevel();this.tool=tool;origin=p.position();previous=origin;start=ArtifactState.now(p);}
-        boolean valid(){return JOBS.get(player.getUUID())==this&&caster(player,tool,source)&&player.serverLevel()==level
+        Flight(ServerPlayer p,ItemStack tool,EquipmentLease<ItemStack> source){this.source=source;player=p;level=p.serverLevel();this.tool=tool;skill=HeldSkillLease.capture(tool);origin=p.position();previous=origin;start=ArtifactState.now(p);}
+        boolean valid(){return JOBS.get(player.getUUID())==this&&skill.valid()&&caster(player,tool,source)&&player.serverLevel()==level
                 &&player.position().distanceToSqr(previous)<=16&&player.position().distanceToSqr(origin)<=32*32
                 &&player.getY()-origin.y<MAX_RISE&&ArtifactState.now(player)>=start&&ArtifactState.now(player)-start<DURATION;}
     }

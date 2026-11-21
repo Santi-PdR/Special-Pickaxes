@@ -1,3 +1,9 @@
+## Alpha.51 — lease persistente del ascenso copiado, pendiente CI
+
+Ícaro conserva HeldSkillLease durante todo el vuelo, igual que los trabajos de minería. Cambiar copiedMode en la misma pila Worldbreaker invalida el ascenso original antes de consultar techo o emitir otro impulso; antes sólo se verificaba que el origen siguiera siendo Ícaro. El cambio no elimina el efecto finito de protección de caída ni sobrescribe movimiento/posición al cancelar. Native Ícaro y habilidades originales Iridium/Strata, modelos y texturas sin cambios.
+
+Dos regresiones: cambio antes del primer tick con techo natural intacto y sin impulso; cambio después de un impulso, incluso en el mismo tick, cancela conservando física y gracia de caída. Local: 166 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.50 sigue siendo la descarga validada.
+
 ## Alpha.50 — rechazar roturas fuera de plazo, SUCCESS
 
 La aplicación de cada inspección conectada actualiza la hora y verifica el deadline absoluto, y en revisitas también la ventana final, antes de consultar/minar terreno. El scheduler podía consultar done() con el reloj del turno anterior y permitir una rotura tardía antes de actualizarlo. No amplía ventanas ni reduce presupuestos. Regresiones directas: primera inspección retenida hasta tick 241, y revisita al origen retenida hasta después de su ventana final. La aplicación antigua permite ambas roturas.

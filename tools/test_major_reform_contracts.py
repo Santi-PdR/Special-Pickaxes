@@ -50,3 +50,11 @@ class MajorReformContracts(unittest.TestCase):
         techniques=(base/'ArtifactTechniques.java').read_text()
         self.assertIn('case ICARUS -> IcarianFlight.start(player,tool)',techniques)
         self.assertNotIn('new IcarianLiftProgram',techniques)
+
+    def test_icarus_persists_same_stack_copy_lease_for_the_whole_flight(self):
+        source=(ROOT/'src/main/java/io/github/santipdr/specialpickaxes/artifact/IcarianFlight.java').read_text()
+        self.assertIn('final HeldSkillLease skill',source)
+        self.assertIn('skill=HeldSkillLease.capture(tool)',source)
+        self.assertIn('skill.valid()&&caster',source)
+        advance=source[source.index('private static void advance(Flight job)'):]
+        self.assertLess(advance.index('if(!job.valid())'),advance.index('if(job.lastTick==now)'))
