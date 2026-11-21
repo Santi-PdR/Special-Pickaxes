@@ -202,6 +202,12 @@ public final class ClientValidation {
                 p.serverLevel().setBlock(new BlockPos(x,99,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
                 for(int y=100;y<=130;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
             }
+            // Two natural ceilings: verify the real survival client opens its own path,
+            // rather than demonstrating flight through an already empty shaft.
+            for(int roofY:new int[]{104,108})for(int x=-1;x<=1;x++)for(int z=13;z<=15;z++){
+                var roof=new BlockPos(x,roofY,z);PlayerPlacedBlocks.get(p.serverLevel()).unmark(roof);
+                p.serverLevel().setBlock(roof,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+            }
             p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
             p.connection.teleport(.5,100,14.5,180,45);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.ICARUS).get()));
@@ -224,6 +230,16 @@ public final class ClientValidation {
         if(!data.getBoolean("flightObserved")||data.getDouble("flightRise")<3||data.getDouble("flightMaxStep")>2.5
                 ||!p.hasEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get()))
             throw new IllegalStateException("Real ascent failed: rise="+data.getDouble("flightRise")+" step="+data.getDouble("flightMaxStep"));
+        for(int roofY:new int[]{104,108}){
+            if(!p.serverLevel().getBlockState(new BlockPos(0,roofY,14)).isAir()
+                    ||!p.serverLevel().getBlockState(new BlockPos(1,roofY,14)).is(net.minecraft.world.level.block.Blocks.STONE))
+                throw new IllegalStateException("Real ascent failed to excavate only its body path through ceiling "+roofY);
+        }
+        var roofLoot=p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                new net.minecraft.world.phys.AABB(new BlockPos(0,106,14)).inflate(16));
+        if(data.getDouble("flightRise")<8||roofLoot.stream().noneMatch(drop->drop.getItem().is(net.minecraft.world.item.Items.COBBLESTONE)))
+            throw new IllegalStateException("Real ascent did not cross both ceilings with native stone loot");
+        p.sendSystemMessage(Component.literal("ICARUS_CEILINGS_OK"));
         p.sendSystemMessage(Component.literal("ICARUS_FLIGHT_OK rise="+data.getDouble("flightRise")+" maxStep="+data.getDouble("flightMaxStep")));
         data.putBoolean("flightVerified",true);p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
     }

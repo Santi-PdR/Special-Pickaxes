@@ -173,6 +173,7 @@ finally:
 if not any('CURIO_KEY_OK' in s for s in captured):raise SystemExit('Missing real Curios slot and physical equipped-key verification')
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
 if not any('ICARUS_FLIGHT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client ascent verification')
+if not any('ICARUS_CEILINGS_OK' in s for s in captured):raise SystemExit('Missing real survival-client ceiling excavation verification')
 if not any('WORLDLOOM_NATIVE_LOOT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client uncollected loot verification')
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
 if len(manual_frames)<len(scenes):raise SystemExit('Not every live manual scene rendered: '+str(len(manual_frames)))

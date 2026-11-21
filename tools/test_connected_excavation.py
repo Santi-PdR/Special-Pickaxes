@@ -81,3 +81,14 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn("*[str(log) for log in runtime_logs]",source)
         self.assertIn("join(log.read_text(errors='replace') for log in runtime_logs).lower()",source)
         self.assertNotIn("text=(out/'client.log').read_text().lower()",source)
+
+    def test_real_survival_ascent_requires_excavation_through_two_ceilings(self):
+        source=(BASE/'test/ClientValidation.java').read_text()
+        flight=source[source.index('private static void verifyFlight('):source.index('private static void beginSupremeSetup(')]
+        self.assertEqual(flight.count('for(int roofY:new int[]{104,108})'),2)
+        self.assertIn('new BlockPos(0,roofY,14)).isAir()',flight)
+        self.assertIn('new BlockPos(1,roofY,14)',flight)
+        self.assertIn('Items.COBBLESTONE',flight)
+        self.assertIn('getDouble("flightRise")<8',flight)
+        smoke=pathlib.Path('tools/client_smoke.py').read_text()
+        self.assertIn("if not any('ICARUS_CEILINGS_OK' in s for s in captured):raise SystemExit",smoke)
