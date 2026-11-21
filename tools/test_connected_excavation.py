@@ -121,3 +121,11 @@ class ConnectedExcavationTests(unittest.TestCase):
         apply=source[source.index('public boolean apply(ServerPlayer actor'):]
         self.assertLess(apply.index('now=ArtifactState.now(actor)'),apply.index('WorldSafety.mineNaturalLeased'))
         self.assertIn('if(now>=hardDeadline||revisit&&settleUntil!=Long.MIN_VALUE&&now>=settleUntil)return false;',apply)
+
+    def test_other_falling_material_fixtures_use_real_physics_and_observe_native_loot(self):
+        source=(BASE/'test/ConnectedExcavationGameTests.java').read_text()
+        self.assertIn('Blocks.RED_CONCRETE_POWDER.defaultBlockState()',source)
+        self.assertIn('Blocks.ANVIL.defaultBlockState()',source)
+        self.assertIn('FallingBlockEntity.fall(h.getLevel(),at.above(5),falling)',source)
+        self.assertIn('harvested.stream().noneMatch(ItemEntity::isCurrentlyGlowing)',source)
+        self.assertIn('Items.DIAMOND_PICKAXE:Items.DIAMOND_SHOVEL',source)

@@ -1,3 +1,7 @@
+## Seguimiento de compatibilidad tras alpha.55 — caída de polvo/yunques, pendiente CI
+
+Cuatro GameTests adicionales comprueban caída real de polvo de hormigón y yunques durante vigilancia de celdas despejadas: rutas sostenida y equipada (pala/pico adecuados). Exigen celda vacía después, drops nativos sin glowing y ninguna entidad todavía en vuelo. Reutilizan el escenario sellado frente a agua exterior. No cambia código de producción, versión ni JAR publicado: cobertura adicional, no habilidad nueva. Local: 171 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.55 sigue siendo la descarga publicada validada.
+
 ## Alpha.55 — modo original durante despacho pasivo síncrono, SUCCESS
 
 El Scope de pasivas equipadas conserva HeldSkillLease, además de slot/pila y habilidad. Cambiar copiedMode durante callback de permisos o de aplicación de efecto invalida el despacho anterior; limpia el efecto propio invalidado y evita represalia/reducción de daño/cooldown obsoletos. No cambia las habilidades nativas ni el arte.

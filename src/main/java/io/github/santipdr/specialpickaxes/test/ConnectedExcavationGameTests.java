@@ -41,15 +41,7 @@ public final class ConnectedExcavationGameTests {
     }
     @GameTest(template="empty",batch="front_03",timeoutTicks=200) public static void activeExcavationBreaksSandAndGravelFallingIntoPreviouslyClearedCells(GameTestHelper h){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
-        // This high fixture can still intersect worldgen water/gravel depending on the
-        // batch's world position. Seal outside fluids and falling terrain out; do not
-        // change the ability's fluid barriers, landing physics or settling deadline.
-        for(int x=-8;x<=8;x++)for(int y=-1;y<=8;y++)for(int z=-8;z<=8;z++){
-            var cell=at.offset(x,y,z);boolean shell=Math.abs(x)==8||Math.abs(z)==8||y==-1||y==8;
-            h.getLevel().setBlock(cell,shell?Blocks.BEDROCK.defaultBlockState():Blocks.AIR.defaultBlockState(),2);
-            PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);
-        }
-        h.getLevel().setBlock(at,Blocks.STONE.defaultBlockState(),2);
+        sealedFallingFixture(h,at);
         h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");for(int i=0;i<64;i++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains watched during settling");
         long started=ArtifactState.now(p);var trace=new StringBuilder();
@@ -224,5 +216,46 @@ public final class ConnectedExcavationGameTests {
             }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
         });
     }
+
+    private static void sealedFallingFixture(GameTestHelper h,BlockPos at){
+        // This high fixture can still intersect worldgen water/gravel depending on the
+        // batch's world position. Seal outside fluids and falling terrain out; do not
+        // change the ability's fluid barriers, landing physics or settling deadline.
+        for(int x=-8;x<=8;x++)for(int y=-1;y<=8;y++)for(int z=-8;z<=8;z++){
+            var cell=at.offset(x,y,z);boolean shell=Math.abs(x)==8||Math.abs(z)==8||y==-1||y==8;
+            h.getLevel().setBlock(cell,shell?Blocks.BEDROCK.defaultBlockState():Blocks.AIR.defaultBlockState(),2);
+            PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);
+        }
+        h.getLevel().setBlock(at,Blocks.STONE.defaultBlockState(),2);
+    }
+    private static void verifyOtherFallingArrival(GameTestHelper h,boolean equipped,boolean anvil){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);sealedFallingFixture(h,at);
+        var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);
+        if(equipped)p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(anvil?Items.DIAMOND_PICKAXE:Items.DIAMOND_SHOVEL));
+        boolean started=equipped?CuriosMiningActive.activate(p,source,slot::get):ConnectedExcavation.start(p,source,ArtifactKind.EVENTIDE,true);
+        h.assertTrue(started,"falling arrival observation starts in requested held/equipped route");
+        for(int i=0;i<64;i++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"origin is cleared and watched before the arrival exists");
+        var falling=anvil?Blocks.ANVIL.defaultBlockState():Blocks.RED_CONCRETE_POWDER.defaultBlockState();
+        h.runAtTickTime(5,()->{
+            h.getLevel().setBlock(at.above(5),falling,2);
+            FallingBlockEntity.fall(h.getLevel(),at.above(5),falling);
+        });
+        h.runAtTickTime(80,()->{
+            try{
+                h.assertTrue(h.getLevel().getBlockState(at).isAir(),"arrived falling material was harvested");
+                var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(7));
+                var harvested=drops.stream().filter(d->anvil?(d.getItem().is(Items.ANVIL)||d.getItem().is(Items.CHIPPED_ANVIL)||d.getItem().is(Items.DAMAGED_ANVIL)):d.getItem().is(Items.RED_CONCRETE_POWDER)).toList();
+                h.assertTrue(!harvested.isEmpty(),"native harvested drops exist for the falling material");
+                h.assertTrue(harvested.stream().noneMatch(ItemEntity::isCurrentlyGlowing),"ordinary falling-block drops never receive extractor highlighting");
+                h.assertTrue(h.getLevel().getEntitiesOfClass(FallingBlockEntity.class,new AABB(at).inflate(7)).isEmpty(),"assertion observes completed fall, not a still airborne block");
+                finish(h,p);
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        });
+    }
+    @GameTest(template="empty",batch="front_falling_powder_held",timeoutTicks=150) public static void heldExcavationHarvestsRealFallingConcretePowder(GameTestHelper h){verifyOtherFallingArrival(h,false,false);}
+    @GameTest(template="empty",batch="front_falling_anvil_held",timeoutTicks=150) public static void heldExcavationHarvestsRealFallingAnvil(GameTestHelper h){verifyOtherFallingArrival(h,false,true);}
+    @GameTest(template="empty",batch="front_falling_powder_equipped",timeoutTicks=150) public static void equippedExcavationWithShovelHarvestsRealFallingConcretePowder(GameTestHelper h){verifyOtherFallingArrival(h,true,false);}
+    @GameTest(template="empty",batch="front_falling_anvil_equipped",timeoutTicks=150) public static void equippedExcavationWithPickHarvestsRealFallingAnvil(GameTestHelper h){verifyOtherFallingArrival(h,true,true);}
 
 }
