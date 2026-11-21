@@ -1,8 +1,8 @@
-## Alpha.53 — lease del modo copiado en observación pasiva, pendiente CI
+## Alpha.53 — lease del modo copiado en observación pasiva, SUCCESS
 
 La observación de minería manual de Worldbreaker equipado conserva HeldSkillLease además del slot/pila y habilidad. Un cambio de copiedMode antes de confirmar el hueco invalida la observación, y uno durante BreakEvent revoca la celda actual y el resto del trabajo pasivo. La activa equipada sigue separada. Sin modificar arte ni habilidades originales Iridium/Strata.
 
-Dos regresiones: cambio antes de flush sin trabajo y nueva observación válida sin cooldown consumido; cambio durante callback conserva bloque y cancela. Local: 168 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.52 sigue siendo la descarga validada.
+Dos regresiones: cambio antes de flush sin trabajo y nueva observación válida sin cooldown consumido; cambio durante callback conserva bloque y cancela. Local: 168 Python (una omisión), 25 recursos y diff check PASS. Fuente `940762e6c3a985bbb07741cdf35aacbcd6a106ab`, CI `44929650776` SUCCESS: 216 JUnit, 559 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Ícaro, Worldloom sin recoger loot: 8274 unidades / 932 entidades). JAR 1001601 bytes, SHA256 `798f6999c93ca13b2db9bc503bf23ffc7bfcf972aca755e6d9c919d56550d40f`. Publicación exacta pendiente, sin recompilar.
 
 ## Alpha.52 — lease del modo copiado en activa equipada, SUCCESS
 
