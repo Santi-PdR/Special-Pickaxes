@@ -139,4 +139,28 @@ public final class WorldbreakerCuriosCopyGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(mutate);WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    private static void confirmedCopyScar(GameTestHelper h,ServerPlayer p,ItemStack source,AtomicReference<ItemStack> slot,BlockPos at){
+        observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
+    }
+    private static void verifyStreakRestartsAfterModeChange(GameTestHelper h,ArtifactKind kind,int threshold){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=source();var slot=new AtomicReference<ItemStack>(source);
+        source.getOrCreateTag().putString("copiedSkill",kind.id);source.getOrCreateTag().putInt("copiedMode",0);
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        try{
+            for(int i=0;i<threshold-1;i++)confirmedCopyScar(h,p,source,slot,at.offset(i,0,0));
+            h.assertTrue(!WorkQueue.busy(p),"old mode holds an incomplete streak");
+            source.getOrCreateTag().putInt("copiedMode",1);
+            confirmedCopyScar(h,p,source,slot,at.offset(0,0,2));
+            h.assertTrue(!WorkQueue.busy(p),"new mode's first scar must not complete old mode's streak");
+            for(int i=1;i<threshold;i++)confirmedCopyScar(h,p,source,slot,at.offset(i,0,2));
+            h.assertTrue(WorkQueue.busy(p),"full fresh streak still triggers in the unchanged new mode");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+    @GameTest(template="empty",batch="worldbreaker_curios_streak_mode_01") public static void copiedChoirModeChangeRestartsSixScarStreak(GameTestHelper h){
+        verifyStreakRestartsAfterModeChange(h,ArtifactKind.CHOIR,6);
+    }
+    @GameTest(template="empty",batch="worldbreaker_curios_streak_mode_02") public static void copiedParadoxModeChangeRestartsFourScarMemory(GameTestHelper h){
+        verifyStreakRestartsAfterModeChange(h,ArtifactKind.CRUCIBLE,4);
+    }
+
 }

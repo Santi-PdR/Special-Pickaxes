@@ -64,3 +64,8 @@ class CuriosActiveControls(unittest.TestCase):
         source=(ROOT/'artifact/MiningObservations.java').read_text()
         self.assertIn('var skill=HeldSkillLease.capture(curio)',source)
         self.assertIn('current.get()==curio&&skill.valid()&&copiedMiningSource(curio)==source',source)
+
+    def test_passive_streaks_never_reuse_revoked_equipment_records(self):
+        for name in ('ResonantFault','ParadoxLattice'):
+            source=(ROOT/'artifact'/f'{name}.java').read_text()
+            self.assertIn('old!=null&&old.source.active()&&old.source.expected()==source.expected()',source)

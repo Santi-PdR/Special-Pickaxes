@@ -47,7 +47,7 @@ public final class ParadoxLattice implements WorkProgram {
             int now=p.server.getTickCount();MEMORIES.entrySet().removeIf(e->now-e.getValue().at>100||now-e.getValue().at<0);
             var old=MEMORIES.get(p.getUUID());if(old==null&&MEMORIES.size()>=256)return false;
             var scars=new ArrayList<BlockPos>();
-            if(old!=null&&old.source.expected()==source.expected()&&old.dimension==p.level().dimension())scars.addAll(old.scars);
+            if(old!=null&&old.source.active()&&old.source.expected()==source.expected()&&old.dimension==p.level().dimension())scars.addAll(old.scars);
             scars.add(scar.immutable());
             if(scars.size()<4){MEMORIES.put(p.getUUID(),new Memory(source,p.level().dimension(),now,List.copyOf(scars)));return false;}
             MEMORIES.remove(p.getUUID());var state=ArtifactState.of(p,ArtifactKind.CRUCIBLE);long time=ArtifactState.now(p);

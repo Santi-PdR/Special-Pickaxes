@@ -61,7 +61,7 @@ public final class ResonantFault implements WorkProgram {
             int now=p.server.getTickCount();var old=STREAKS.get(p.getUUID());
             STREAKS.entrySet().removeIf(e->now-e.getValue().at>100||now-e.getValue().at<0);
             if(old==null&&STREAKS.size()>=256)return false;
-            int count=old!=null&&old.source.expected()==source.expected()&&old.dimension==p.level().dimension()&&now-old.at>=0&&now-old.at<=100?old.count+1:1;
+            int count=old!=null&&old.source.active()&&old.source.expected()==source.expected()&&old.dimension==p.level().dimension()&&now-old.at>=0&&now-old.at<=100?old.count+1:1;
             if(count<6){STREAKS.put(p.getUUID(),new Streak(source,p.level().dimension(),now,count));return false;}
             STREAKS.remove(p.getUUID());var state=ArtifactState.of(p,ArtifactKind.CHOIR);long time=ArtifactState.now(p);
             if(WorkQueue.busy(p)||PersistedCooldown.active(time,state.getLong("curiosFaultReady"),160))return false;

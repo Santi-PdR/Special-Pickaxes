@@ -1,3 +1,9 @@
+## Alpha.54 — rachas pasivas no mezclan modos copiados, pendiente CI
+
+Coro y Paradox sólo reutilizan una racha/memoria anterior si su lease de equipo sigue activo. Antes se comparaba la identidad de pila y dimensión: cambiar copiedMode en Worldbreaker conservando la pila permitía sumar roturas antiguas a la nueva racha. Se mantiene el umbral original de seis/cuatro, cooldown y trabajo conectado. Arte y habilidades originales Iridium/Strata intactos.
+
+Dos regresiones: seis roturas para Coro y cuatro para Paradox, con cambio de modo a una rotura del umbral. La primera del modo nuevo no dispara; una racha íntegra nueva sí. Local: 169 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.53 sigue siendo la descarga validada.
+
 ## Alpha.53 — lease del modo copiado en observación pasiva, SUCCESS
 
 La observación de minería manual de Worldbreaker equipado conserva HeldSkillLease además del slot/pila y habilidad. Un cambio de copiedMode antes de confirmar el hueco invalida la observación, y uno durante BreakEvent revoca la celda actual y el resto del trabajo pasivo. La activa equipada sigue separada. Sin modificar arte ni habilidades originales Iridium/Strata.
