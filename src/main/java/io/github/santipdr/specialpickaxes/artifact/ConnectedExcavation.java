@@ -15,6 +15,7 @@ public final class ConnectedExcavation implements WorkProgram {
     private final BlockPos seed;
     private final Vec3 origin,look;
     private final ArtifactKind kind;
+    private final ExcavationOrder.Style order;
     private final EquipmentLease<ItemStack> source;
     private final int reach,cap;
     private final Queue<BlockPos> frontier;
@@ -28,6 +29,14 @@ public final class ConnectedExcavation implements WorkProgram {
     public ConnectedExcavation(ServerPlayer p,BlockPos seed,ArtifactKind kind,boolean alternate,EquipmentLease<ItemStack> source){
         this.seed=seed.immutable();this.kind=kind;this.source=source;origin=p.getEyePosition();look=p.getLookAngle().normalize();
         reach=reach(kind,alternate,source!=null);cap=Math.min(ArtifactConfig.JOB_LIMIT.get(),source!=null?2048:alternate?16384:12288);
+        order=switch(kind){
+            case CHOIR -> ExcavationOrder.Style.SEISMIC;
+            case EXODIUM -> ExcavationOrder.Style.TOP_DOWN;
+            case WORLDLOOM -> ExcavationOrder.Style.BASE_UP;
+            case AXIOM -> ExcavationOrder.Style.DEEP;
+            case HELLSPEC -> ExcavationOrder.Style.VERTICAL;
+            default -> ExcavationOrder.Style.NEAREST;
+        };
         frontier=new PriorityQueue<>(Comparator.comparingDouble(this::priority).thenComparingLong(BlockPos::asLong));
         now=ArtifactState.now(p);hardDeadline=now+240;frontier.add(this.seed);seen.add(this.seed);
     }
@@ -58,18 +67,11 @@ public final class ConnectedExcavation implements WorkProgram {
         }finally{STARTING.remove(p.getUUID());}
     }
     private double priority(BlockPos at){
-        var delta=Vec3.atCenterOf(at).subtract(Vec3.atCenterOf(seed));
-        double depth=Math.max(0,delta.dot(look)),distance=delta.lengthSqr();
-        // Only traversal order changes: the result follows connected terrain, not carved geometry.
-        return switch(kind){
-            case CHOIR -> depth*depth*4+distance*.1; // broad advancing seismic front
-            case EXODIUM -> distance*.15-delta.y*12; // top-down stellar demolition
-            case WORLDLOOM -> distance*.15+delta.y*12; // clear a bank from its base
-            case AXIOM -> distance-depth*depth*.8; // deep connected void rupture
-            case HELLSPEC -> distance*.5-Math.abs(delta.y)*3; // vertical infernal demolition
-            default -> distance;
-        };
+        // Cast before subtraction so even opposite world limits cannot overflow an int.
+        return ExcavationOrder.score(order,(double)at.getX()-seed.getX(),(double)at.getY()-seed.getY(),
+                (double)at.getZ()-seed.getZ(),look.x,look.y,look.z);
     }
+
     private boolean active(){return !revoked&&(source==null||source.active()&&!source.expected().isEmpty());}
     private boolean within(BlockPos at){
         var delta=Vec3.atCenterOf(at).subtract(origin);

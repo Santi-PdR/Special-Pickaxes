@@ -1,3 +1,9 @@
+## Alpha.49 — prioridad de excavación sin vectores temporales, pendiente CI
+
+El comparador del frente calcula distancias y proyección con escalares, sin construir tres Vec3 por evaluación. Selecciona el estilo una vez al crear el trabajo y conserva el desempate por BlockPos.asLong. No cambia presupuestos, alcance, protección ni habilidades. Dos regresiones JUnit comparan bits del resultado con las fórmulas vectoriales anteriores (18 000 casos incluidos límites del mundo) y el orden completo de extracción de seis colas de 4913 posiciones. Es optimización interna, no una habilidad nueva ni un benchmark de TPS/FPS.
+
+Local: 164 Python (una omisión) y diff check PASS. JUnit/Forge/cliente pendientes de CI; alpha.48 sigue siendo la descarga validada.
+
 ## Alpha.48 — menos revisiones repetidas durante seguimiento pequeño, SUCCESS
 
 Un programa de minería conectada cuyo frente ya terminó limita su turno a una pasada por sus celdas vigiladas si son menos que el presupuesto normal. Los frentes activos y los conjuntos grandes mantienen su presupuesto anterior. No se reduce la frecuencia efectiva de una celda pequeña (ya se revisa cada turno), no se amplía el presupuesto global, y se libera presupuesto sobrante para otros jugadores.
