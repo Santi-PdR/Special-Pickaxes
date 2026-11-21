@@ -1,3 +1,9 @@
+## Alpha.50 — rechazar roturas fuera de plazo, pendiente CI
+
+La aplicación de cada inspección conectada actualiza la hora y verifica el deadline absoluto, y en revisitas también la ventana final, antes de consultar/minar terreno. El scheduler podía consultar done() con el reloj del turno anterior y permitir una rotura tardía antes de actualizarlo. No amplía ventanas ni reduce presupuestos. Regresiones directas: primera inspección retenida hasta tick 241, y revisita al origen retenida hasta después de su ventana final. La aplicación antigua permite ambas roturas.
+
+Local: 165 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.49 sigue siendo la descarga validada. Sin cambios de modelos/texturas ni habilidades originales Iridium/Strata.
+
 ## Alpha.49 — prioridad de excavación sin vectores temporales, SUCCESS
 
 El comparador del frente calcula distancias y proyección con escalares, sin construir tres Vec3 por evaluación. Selecciona el estilo una vez al crear el trabajo y conserva el desempate por BlockPos.asLong. No cambia presupuestos, alcance, protección ni habilidades. Dos regresiones JUnit comparan bits del resultado con las fórmulas vectoriales anteriores (18 000 casos incluidos límites del mundo) y el orden completo de extracción de seis colas de 4913 posiciones. Es optimización interna, no una habilidad nueva ni un benchmark de TPS/FPS.

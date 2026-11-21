@@ -115,3 +115,9 @@ class ConnectedExcavationTests(unittest.TestCase):
         source=(BASE/'artifact/ConnectedExcavation.java').read_text()
         self.assertIn('int budget=Math.max(256,EnchantmentScaling.budget(tool))',source)
         self.assertIn('frontier.isEmpty()?Math.min(budget,Math.max(1,cleared.size())):budget',source)
+
+    def test_expiration_is_checked_with_fresh_time_before_native_mutation(self):
+        source=(BASE/'artifact/ConnectedExcavation.java').read_text()
+        apply=source[source.index('public boolean apply(ServerPlayer actor'):]
+        self.assertLess(apply.index('now=ArtifactState.now(actor)'),apply.index('WorldSafety.mineNaturalLeased'))
+        self.assertIn('if(now>=hardDeadline||revisit&&settleUntil!=Long.MIN_VALUE&&now>=settleUntil)return false;',apply)

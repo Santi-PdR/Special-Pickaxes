@@ -101,6 +101,10 @@ public final class ConnectedExcavation implements WorkProgram {
         return new WorkStep(){
             public BlockPos pos(){return at;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind ignored){
+                // done() can have seen the previous scheduler turn's time. A delayed
+                // inspection must refresh the clock before any native block mutation.
+                now=ArtifactState.now(actor);
+                if(now>=hardDeadline||revisit&&settleUntil!=Long.MIN_VALUE&&now>=settleUntil)return false;
                 if(!active()||!within(at)||!actor.serverLevel().hasChunkAt(at)||actor.serverLevel().isOutsideBuildHeight(at))return false;
                 var state=actor.serverLevel().getBlockState(at);
                 if(state.isAir()&&!revisit){

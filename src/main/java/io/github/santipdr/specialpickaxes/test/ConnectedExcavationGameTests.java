@@ -181,4 +181,37 @@ public final class ConnectedExcavationGameTests {
         finish(h,idle);
     }
 
+    @GameTest(template="empty",batch="front_11",timeoutTicks=280) public static void delayedFirstInspectionCannotMineAfterHardDeadline(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
+        // Direct program: deliberately withhold all scheduler/progress calls until expiry.
+        var program=new ConnectedExcavation(p,at,ArtifactKind.EVENTIDE,true,null);
+        h.runAfterDelay(241,()->{
+            try{
+                boolean mined=program.next(p).apply(p,p.getMainHandItem(),ArtifactKind.EVENTIDE);
+                h.assertTrue(!mined&&h.getLevel().getBlockState(at).is(Blocks.STONE),"stale done clock cannot authorize one late terrain break");
+                h.assertTrue(program.done(),"expired program is finished after refreshing time");
+                finish(h,p);
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        });
+    }
+
+    @GameTest(template="empty",batch="front_12",timeoutTicks=180) public static void delayedSettlingInspectionCannotHarvestAfterItsWindow(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
+        var program=new ConnectedExcavation(p,at,ArtifactKind.EVENTIDE,true,null);
+        // Seed and six neighbors, then hold a revisit across the final deadline.
+        for(int i=0;i<7;i++)program.next(p).apply(p,p.getMainHandItem(),ArtifactKind.EVENTIDE);
+        var delayed=program.next(p);
+        h.assertTrue(delayed.pos().equals(at),"delayed inspection targets the mined seed");
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&!program.done(),"seed was cleared and observation is live");
+        h.runAfterDelay(121,()->{
+            try{
+                h.getLevel().setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);
+                boolean mined=delayed.apply(p,p.getMainHandItem(),ArtifactKind.EVENTIDE);
+                h.assertTrue(!mined&&h.getLevel().getBlockState(at).is(Blocks.GRAVEL),"expired observation cannot harvest a late arrival");
+                h.assertTrue(program.done(),"final window expiry finishes program");
+                finish(h,p);
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        });
+    }
+
 }
