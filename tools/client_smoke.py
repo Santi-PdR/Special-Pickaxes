@@ -177,8 +177,11 @@ if not any('WORLDLOOM_NATIVE_LOOT_OK ' in s for s in captured):raise SystemExit(
 manual_frames=[s for s in captured if 'MANUAL_SCREEN_RENDERED ' in s]
 if len(manual_frames)<len(scenes):raise SystemExit('Not every live manual scene rendered: '+str(len(manual_frames)))
 if any(not (out/('manual-'+scene+'.png')).exists() for scene in scenes):raise SystemExit('Missing real manual capture')
-subprocess.run(['python3','tools/validate_runtime_logs.py',str(out/'client.log')],check=True)
-text=(out/'client.log').read_text().lower()
+# latest.log rotates at midnight. Keep all positive markers AND errors from the
+# complete captured process stream instead of accepting only the post-rotation tail.
+runtime_logs=[out/'client.log',out/'console.log']
+subprocess.run(['python3','tools/validate_runtime_logs.py',*[str(log) for log in runtime_logs]],check=True)
+text='\n'.join(log.read_text(errors='replace') for log in runtime_logs).lower()
 for issue in ['missing texture','unable to load model','unable to bake','using missing texture']:
  if issue in text:raise SystemExit('Client resource error: '+issue)
 for id in scenes:

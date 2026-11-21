@@ -74,3 +74,10 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL)',setup)
         smoke=pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("if not any('WORLDLOOM_NATIVE_LOOT_OK ' in s for s in captured):raise SystemExit",smoke)
+
+    def test_graphical_validation_keeps_pre_midnight_markers_and_errors(self):
+        source=pathlib.Path('tools/client_smoke.py').read_text()
+        self.assertIn("runtime_logs=[out/'client.log',out/'console.log']",source)
+        self.assertIn("*[str(log) for log in runtime_logs]",source)
+        self.assertIn("join(log.read_text(errors='replace') for log in runtime_logs).lower()",source)
+        self.assertNotIn("text=(out/'client.log').read_text().lower()",source)
