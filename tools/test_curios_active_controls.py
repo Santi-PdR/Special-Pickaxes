@@ -59,3 +59,8 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertIn('var skill=HeldSkillLease.capture(source)',source)
         self.assertIn('current.get()==source&&skill.valid()&&WorldbreakerCuriosPassives.sourceKind(source)==kind',source)
         self.assertLess(source.index('HeldSkillLease.capture(source)'),source.index('WorldSafety.allowed(p,kind,at)'))
+
+    def test_passive_copy_observation_keeps_original_mode_through_confirmation(self):
+        source=(ROOT/'artifact/MiningObservations.java').read_text()
+        self.assertIn('var skill=HeldSkillLease.capture(curio)',source)
+        self.assertIn('current.get()==curio&&skill.valid()&&copiedMiningSource(curio)==source',source)

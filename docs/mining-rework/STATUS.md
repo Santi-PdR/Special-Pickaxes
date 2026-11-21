@@ -1,3 +1,9 @@
+## Alpha.53 — lease del modo copiado en observación pasiva, pendiente CI
+
+La observación de minería manual de Worldbreaker equipado conserva HeldSkillLease además del slot/pila y habilidad. Un cambio de copiedMode antes de confirmar el hueco invalida la observación, y uno durante BreakEvent revoca la celda actual y el resto del trabajo pasivo. La activa equipada sigue separada. Sin modificar arte ni habilidades originales Iridium/Strata.
+
+Dos regresiones: cambio antes de flush sin trabajo y nueva observación válida sin cooldown consumido; cambio durante callback conserva bloque y cancela. Local: 168 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.52 sigue siendo la descarga validada.
+
 ## Alpha.52 — lease del modo copiado en activa equipada, SUCCESS
 
 La activa de Curios conserva HeldSkillLease del origen equipado además de su identidad de pila/slot y habilidad efectiva. Cambiar copiedMode de Worldbreaker invalida el trabajo anterior de minería o ascenso, incluso si copiedSkill no cambia. El mismo guard impide iniciar/cobrar un trabajo si un callback de permisos cambia ese modo. No afecta variantes nativas ni habilidades originales Iridium/Strata; arte intacto.

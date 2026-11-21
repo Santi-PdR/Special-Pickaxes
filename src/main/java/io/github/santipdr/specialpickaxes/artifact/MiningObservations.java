@@ -59,8 +59,9 @@ public final class MiningObservations {
         if(source==ArtifactKind.IRIDIUM&&p.getMainHandItem().getItem() instanceof ArtifactItem held&&held.kind==ArtifactKind.IRIDIUM)return false;
         if(source==ArtifactKind.PALIMPSEST&&p.getMainHandItem().getItem() instanceof ArtifactItem held
                 &&ArtifactSkills.feedbackKind(p.getMainHandItem(),held.kind)==ArtifactKind.PALIMPSEST)return false;
+        var skill=HeldSkillLease.capture(curio);
         return capture(p,p.getMainHandItem(),source,pos,state,false,new EquipmentLease<>(curio,
-                ()->current.get()==curio&&copiedMiningSource(curio)==source?curio:ItemStack.EMPTY));
+                ()->current.get()==curio&&skill.valid()&&copiedMiningSource(curio)==source?curio:ItemStack.EMPTY));
     }
     private static boolean nativeWorldbreaker(ItemStack stack){
         return !stack.isEmpty()&&stack.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER

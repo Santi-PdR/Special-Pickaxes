@@ -110,4 +110,33 @@ public final class WorldbreakerCuriosCopyGameTests {
         h.assertTrue(MiningObservations.captureCuriosWorldbreaker(p,source,at,ore,slot::get),"copied ore observation admitted");h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());source.getOrCreateTag().putString("copiedSkill",ArtifactKind.AXIOM.id);MiningObservations.flush();
         h.assertTrue(!p.hasEffect(SpecialPickaxes.LODE_SURGE.get()),"changed source cannot claim old ore surge");finish(h,p);
     }
+    @GameTest(template="empty",batch="worldbreaker_curios_mode_01") public static void copiedModeChangeBeforeConfirmationInvalidatesPassiveObservation(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=source();var slot=new AtomicReference<ItemStack>(source);
+        var side=at.east();h.getLevel().setBlockAndUpdate(side,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(side);
+        source.getOrCreateTag().putInt("copiedMode",0);
+        try{
+            observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+            source.getOrCreateTag().putInt("copiedMode",1);MiningObservations.flush();
+            h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(side).is(Blocks.STONE),"pending scar cannot start passive work after a same-stack mode change");
+            // A rejected old observation must not consume the new mode's passive cooldown.
+            observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
+            h.assertTrue(WorkQueue.busy(p),"fresh observation in the new mode still starts");drain(p);
+            h.assertTrue(h.getLevel().getBlockState(side).isAir(),"unchanged new source mines its connected neighbor");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="worldbreaker_curios_mode_02") public static void copiedModeChangeInPassiveBreakCallbackPreservesCurrentBlock(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var at=target(h,p);var source=source();var slot=new AtomicReference<ItemStack>(source);var side=at.east();
+        source.getOrCreateTag().putInt("copiedMode",0);
+        h.getLevel().setBlockAndUpdate(side,Blocks.STONE.defaultBlockState());PlayerPlacedBlocks.get(h.getLevel()).unmark(side);
+        observe(h,p,at,source,slot);h.getLevel().setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());MiningObservations.flush();
+        h.assertTrue(WorkQueue.busy(p),"confirmed passive work starts before callback mode change");
+        int[] calls={0};Consumer<BlockEvent.BreakEvent> mutate=e->{if(e.getPlayer()==p&&e.getPos().equals(side)){calls[0]++;source.getOrCreateTag().putInt("copiedMode",1);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST,false,BlockEvent.BreakEvent.class,mutate);
+        try{
+            drain(p);
+            h.assertTrue(calls[0]==1&&!WorkQueue.busy(p)&&h.getLevel().getBlockState(side).is(Blocks.STONE),"callback mode change revokes current block as well as remaining passive work");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(mutate);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
