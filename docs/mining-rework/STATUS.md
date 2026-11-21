@@ -2,7 +2,7 @@
 
 El comparador del frente calcula distancias y proyección con escalares, sin construir tres Vec3 por evaluación. Selecciona el estilo una vez al crear el trabajo y conserva el desempate por BlockPos.asLong. No cambia presupuestos, alcance, protección ni habilidades. Dos regresiones JUnit comparan bits del resultado con las fórmulas vectoriales anteriores (18 000 casos incluidos límites del mundo) y el orden completo de extracción de seis colas de 4913 posiciones. Es optimización interna, no una habilidad nueva ni un benchmark de TPS/FPS.
 
-Local: 164 Python (una omisión), 25 recursos y diff check PASS. Fuente `ec6776973c6552ea911a3a76f1aaa5819c5c9eee`, CI `44863578241` SUCCESS: 216 JUnit, 550 GameTests; servidor/logs y cliente real (32 escenas, 64 tooltips, Ícaro con dos techos, Worldloom sin recoger loot: 3992 unidades / 384 entidades). JAR 1001300 bytes, SHA256 `8cb146c9d315f05bd5aa517b246ea144e7024816f780ff8fc856e3f76d227c4f`. Publicación del JAR exacto pendiente de confirmación, sin recompilar.
+Local: 164 Python (una omisión), 25 recursos y diff check PASS. Fuente `ec6776973c6552ea911a3a76f1aaa5819c5c9eee`, CI `44863578241` SUCCESS: 216 JUnit, 550 GameTests; servidor/logs y cliente real (32 escenas, 64 tooltips, Ícaro con dos techos, Worldloom sin recoger loot: 3992 unidades / 384 entidades). JAR 1001300 bytes, SHA256 `8cb146c9d315f05bd5aa517b246ea144e7024816f780ff8fc856e3f76d227c4f`. Publicación confirmada SUCCESS por workflow `44875338405`, fijada a fuente/run/hash/tamaño, sin recompilar: https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.49-44863578241 . Alpha.48 permanece como entrega anterior.
 
 ## Alpha.48 — menos revisiones repetidas durante seguimiento pequeño, SUCCESS
 
