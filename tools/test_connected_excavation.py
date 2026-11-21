@@ -136,3 +136,9 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('settlingPreservesLavaArrivingAfterExcavation',source)
         self.assertIn('h.getLevel().getFluidState(at).isSource()',source)
         self.assertIn('fluid barrier does not cancel the finite observation job',source)
+
+    def test_activation_keeps_target_and_direction_in_the_same_permission_context(self):
+        for name in ('ConnectedExcavation','CuriosMiningActive'):
+            source=(BASE/'artifact'/f'{name}.java').read_text()
+            self.assertIn('var aim=p.getLookAngle()',source)
+            self.assertIn('!p.getLookAngle().equals(aim)',source)

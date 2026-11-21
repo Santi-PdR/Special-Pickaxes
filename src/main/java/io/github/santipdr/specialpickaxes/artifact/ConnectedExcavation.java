@@ -58,9 +58,9 @@ public final class ConnectedExcavation implements WorkProgram {
         try{
             if(!p.isAlive()||p.isSpectator()||!p.mayBuild()||p.getMainHandItem()!=tool||tool.isEmpty()||WorkQueue.busy(p)
                     ||!(tool.getItem() instanceof ArtifactItem item)||ArtifactSkills.feedbackKind(tool,item.kind)!=kind)return false;
-            var context=HeldUtilityContext.capture(p,tool);var target=closeTarget(p);if(target.isEmpty())return false;var at=target.get();
+            var context=HeldUtilityContext.capture(p,tool);var aim=p.getLookAngle();var target=closeTarget(p);if(target.isEmpty())return false;var at=target.get();
             if(!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-            if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.serverLevel().hasChunkAt(at)
+            if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!p.serverLevel().hasChunkAt(at)
                     ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
             if(!WorkQueue.startRegion(p,tool,kind,new ConnectedExcavation(p,at,kind,alternate,null)))return false;
             ArtifactInteraction.clear(p);tool.getOrCreateTag().putString("artifactStatus","idle");return true;

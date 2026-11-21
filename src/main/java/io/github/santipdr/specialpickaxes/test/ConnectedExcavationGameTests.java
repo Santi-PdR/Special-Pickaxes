@@ -283,4 +283,28 @@ public final class ConnectedExcavationGameTests {
     @GameTest(template="empty",batch="front_arrival_water",timeoutTicks=100) public static void settlingPreservesWaterArrivingAfterExcavation(GameTestHelper h){verifySettlingPreservesNewFluid(h,false);}
     @GameTest(template="empty",batch="front_arrival_lava",timeoutTicks=100) public static void settlingPreservesLavaArrivingAfterExcavation(GameTestHelper h){verifySettlingPreservesNewFluid(h,true);}
 
+    private static void verifyActivationRejectsCallbackRotation(GameTestHelper h,boolean equipped){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();
+        if(equipped)p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+        float yaw=p.getYRot();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> rotate=e->{if(e.player==p){calls[0]++;p.setYRot(yaw+180);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,rotate);
+        try{
+            boolean started=equipped?CuriosMiningActive.activate(p,source,()->source):ConnectedExcavation.start(p,source,ArtifactKind.EVENTIDE,true);
+            h.assertTrue(calls[0]==1&&!started&&!WorkQueue.busy(p),"permission rotation cannot combine an old target with a new front direction");
+            h.assertTrue(source.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"rejected stale aim has no equipped cost or cooldown");
+            h.assertTrue(p.getYRot()==yaw+180&&h.getLevel().getBlockState(at).is(Blocks.STONE),"callback rotation is preserved and original block untouched");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(rotate);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+    @GameTest(template="empty",batch="front_aim_held") public static void heldFrontRejectsRotationInsideActivationPermission(GameTestHelper h){verifyActivationRejectsCallbackRotation(h,false);}
+    @GameTest(template="empty",batch="front_aim_equipped") public static void equippedFrontRejectsRotationInsideActivationPermissionWithoutCharge(GameTestHelper h){verifyActivationRejectsCallbackRotation(h,true);}
+    @GameTest(template="empty",batch="front_aim_running") public static void lookingAwayAfterActivationDoesNotCancelTheOriginalFront(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);
+        try{
+            h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"normal front starts");
+            p.setYRot(p.getYRot()+180);WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"looking around after activation preserves the captured front and settling watch");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
