@@ -231,7 +231,12 @@ public final class ConnectedExcavationGameTests {
     private static void verifyOtherFallingArrival(GameTestHelper h,boolean equipped,boolean anvil){
         var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);sealedFallingFixture(h,at);
         var source=p.getMainHandItem();var slot=new AtomicReference<ItemStack>(source);
-        if(equipped)p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(anvil?Items.DIAMOND_PICKAXE:Items.DIAMOND_SHOVEL));
+        if(equipped){
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(anvil?Items.DIAMOND_PICKAXE:Items.DIAMOND_SHOVEL));
+            // The equipped route keeps the real held tool: a shovel starts on dirt,
+            // rather than asking it to harvest a stone seed before observing powder.
+            if(!anvil)h.getLevel().setBlock(at,Blocks.DIRT.defaultBlockState(),2);
+        }
         boolean started=equipped?CuriosMiningActive.activate(p,source,slot::get):ConnectedExcavation.start(p,source,ArtifactKind.EVENTIDE,true);
         h.assertTrue(started,"falling arrival observation starts in requested held/equipped route");
         for(int i=0;i<64;i++)WorkQueue.tick();
