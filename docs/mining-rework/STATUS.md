@@ -1,3 +1,11 @@
+## Ícaro: dos techos excavados en cliente supervivencia — SUCCESS
+
+Fuente `d4d4335`, CI `44844430058` **SUCCESS**: 214 JUnit, 547 GameTests, servidor/logs y cliente real completos (32 escenas, 64 tooltips, Curios H, activación/cancelación, Worldbreaker y loot Worldloom sin recogida simulada).
+
+La prueba de ascenso ahora coloca dos techos naturales de piedra de 3×3 a alturas 104 y 108. Exige que el cuerpo del jugador atraviese ambos centros, deje piedra lateral intacta, produzca drops nativos de adoquín y ascienda al menos ocho bloques, manteniendo los límites previos de desplazamiento por tick y protección de caída. Marcadores observados: `ICARUS_CEILINGS_OK` y `ICARUS_FLIGHT_OK rise=14.80619219342043 maxStep=1.8246480334777857`.
+
+No hay teletransporte durante el ascenso: sólo se prepara la pose inicial del escenario, como antes. Los techos no se eliminan por el fixture durante la ejecución; los rompe la habilidad real activada por teclado. Local: 161 Python (una omisión), 25 recursos, diff limpio. Sólo cambia validación excluida del mod distribuido; alpha.45 publicada intacta, sin reinstalación necesaria.
+
 ## Cliente supervivencia sin recogida simulada — cierre SUCCESS
 
 Fuente `a2def62`, CI `44841557428` **SUCCESS**: 214 JUnit, 547 GameTests, servidor empaquetado/logs y cliente real (32 escenas / 64 tooltips / Ícaro / Curios H / activación-cancelación / Worldbreaker).
