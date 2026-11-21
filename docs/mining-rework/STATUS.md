@@ -1,3 +1,9 @@
+## Alpha.55 — modo original durante despacho pasivo síncrono, pendiente CI
+
+El Scope de pasivas equipadas conserva HeldSkillLease, además de slot/pila y habilidad. Cambiar copiedMode durante callback de permisos o de aplicación de efecto invalida el despacho anterior; limpia el efecto propio invalidado y evita represalia/reducción de daño/cooldown obsoletos. No cambia las habilidades nativas ni el arte.
+
+Dos regresiones: mutación durante aplicación de Searing Shell limpia efecto antiguo y una llamada nueva válida lo concede; mutación durante permiso de combate no cambia daño, prende enemigo ni consume cooldown. Local: 170 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.54 sigue siendo la descarga validada.
+
 ## Alpha.54 — rachas pasivas no mezclan modos copiados, SUCCESS
 
 Coro y Paradox sólo reutilizan una racha/memoria anterior si su lease de equipo sigue activo. Antes se comparaba la identidad de pila y dimensión: cambiar copiedMode en Worldbreaker conservando la pila permitía sumar roturas antiguas a la nueva racha. Se mantiene el umbral original de seis/cuatro, cooldown y trabajo conectado. Arte y habilidades originales Iridium/Strata intactos.

@@ -63,4 +63,30 @@ public final class WorldbreakerPassiveCopyGameTests {
         h.assertTrue(p.hasEffect(SpecialPickaxes.STRATA_FOCUS.get())&&p.getEffect(SpecialPickaxes.STRATA_FOCUS.get()).getAmplifier()==1&&!WorkQueue.busy(p)&&!p.hasEffect(SpecialPickaxes.WORLDBREAKER_AEGIS.get()),"original Strata Focus II copied without inventing a queued mining trigger");
         finish(h,p);
     }
+    @GameTest(template="empty",batch="worldbreaker_passive_mode_01") public static void copiedModeMutationDuringEffectCallbackRemovesOldOwnedEffect(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var stack=copy(ArtifactKind.HELLSPEC);stack.getOrCreateTag().putInt("copiedMode",0);int[] calls={0};
+        Consumer<MobEffectEvent.Added> mutate=e->{if(e.getEntity()==p&&e.getEffectInstance().getEffect()==SpecialPickaxes.SEARING_SHELL.get()){calls[0]++;stack.getOrCreateTag().putInt("copiedMode",1);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,MobEffectEvent.Added.class,mutate);
+        try{
+            WorldbreakerCuriosPassives.tick(p,stack,()->stack);
+            h.assertTrue(calls[0]==1&&!p.hasEffect(SpecialPickaxes.SEARING_SHELL.get()),"changed copied mode removes effect granted by the invalidated dispatch");
+        }finally{MinecraftForge.EVENT_BUS.unregister(mutate);}
+        // Cleanup must not permanently disable an otherwise valid copy in its new mode.
+        WorldbreakerCuriosPassives.tick(p,stack,()->stack);
+        h.assertTrue(p.hasEffect(SpecialPickaxes.SEARING_SHELL.get()),"unchanged new mode receives its normal passive effect");
+        ArtifactPassives.onCuriosUnequip(p,ArtifactKind.HELLSPEC);finish(h,p);
+    }
+
+    @GameTest(template="empty",batch="worldbreaker_passive_mode_02") public static void copiedModeMutationDuringCombatPermissionCannotRetaliateOrSpendCooldown(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var stack=copy(ArtifactKind.HELLSPEC);stack.getOrCreateTag().putInt("copiedMode",0);
+        var enemy=EntityType.ZOMBIE.create(h.getLevel());enemy.setPos(p.position().add(2,0,0));h.getLevel().addFreshEntity(enemy);
+        var event=new LivingHurtEvent(p,h.getLevel().damageSources().mobAttack(enemy),10F);
+        Consumer<AbilityUseEvent> mutate=e->{if(e.player==p)stack.getOrCreateTag().putInt("copiedMode",1);};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,AbilityUseEvent.class,mutate);
+        try{
+            WorldbreakerCuriosPassives.hurt(p,stack,()->stack,event,false);
+            h.assertTrue(event.getAmount()==10F&&!enemy.isOnFire()&&ArtifactState.of(p,ArtifactKind.HELLSPEC).getLong("curiosPassiveReady")==0,"stale mode neither changes damage nor retaliates nor spends cooldown");
+        }finally{MinecraftForge.EVENT_BUS.unregister(mutate);enemy.discard();finish(h,p);}
+    }
+
 }

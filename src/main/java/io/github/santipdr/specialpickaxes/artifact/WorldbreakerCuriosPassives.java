@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 /** Source-specific passive dispatch with a synchronous original-slot/source lease. */
 public final class WorldbreakerCuriosPassives {
     private WorldbreakerCuriosPassives(){}
-    private record Scope(ServerPlayer player,ItemStack stack,ArtifactKind source,Supplier<ItemStack> current){
-        boolean active(){return current.get()==stack&&!stack.isEmpty()&&sourceKind(stack)==source;}
+    private record Scope(ServerPlayer player,ItemStack stack,ArtifactKind source,Supplier<ItemStack> current,HeldSkillLease skill){
+        boolean active(){return current.get()==stack&&!stack.isEmpty()&&skill.valid()&&sourceKind(stack)==source;}
     }
     private static final ThreadLocal<Scope> SCOPE=new ThreadLocal<>();
     public static ArtifactKind sourceKind(ItemStack stack){
@@ -20,7 +20,7 @@ public final class WorldbreakerCuriosPassives {
     static boolean valid(ServerPlayer player){var scope=SCOPE.get();return scope==null||scope.player()!=player||scope.active();}
     private static void run(ServerPlayer p,ItemStack stack,Supplier<ItemStack> current,java.util.function.Consumer<ArtifactKind> action){
         var source=sourceKind(stack);if(source==null||SCOPE.get()!=null)return;
-        var scope=new Scope(p,stack,source,current);if(!scope.active())return;
+        var scope=new Scope(p,stack,source,current,HeldSkillLease.capture(stack));if(!scope.active())return;
         SCOPE.set(scope);
         try{action.accept(source);}finally{
             SCOPE.remove();

@@ -69,3 +69,8 @@ class CuriosActiveControls(unittest.TestCase):
         for name in ('ResonantFault','ParadoxLattice'):
             source=(ROOT/'artifact'/f'{name}.java').read_text()
             self.assertIn('old!=null&&old.source.active()&&old.source.expected()==source.expected()',source)
+
+    def test_synchronous_passive_scope_preserves_original_copied_mode(self):
+        source=(ROOT/'artifact/WorldbreakerCuriosPassives.java').read_text()
+        self.assertIn('current,HeldSkillLease.capture(stack)',source)
+        self.assertIn('skill.valid()&&sourceKind(stack)==source',source)
