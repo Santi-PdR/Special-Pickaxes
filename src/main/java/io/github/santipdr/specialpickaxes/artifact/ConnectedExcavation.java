@@ -109,7 +109,8 @@ public final class ConnectedExcavation implements WorkProgram {
                 if(mined){
                     if(revisit){
                         settled++;
-                        settleUntil=Math.min(hardDeadline,now+120);
+                        // Live-front arrivals must not start the final settling timer early.
+                        if(frontier.isEmpty())settleUntil=Math.min(hardDeadline,now+120);
                     }else{
                         broken++;cleared.addLast(at);
                         if(broken>=cap){
