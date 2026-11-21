@@ -47,10 +47,16 @@ public final class ConnectedExcavationGameTests {
             h.getLevel().setBlock(floor,Blocks.BEDROCK.defaultBlockState(),2);
         h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"front starts");for(int i=0;i<64;i++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell remains watched during settling");
+        long started=ArtifactState.now(p);var trace=new StringBuilder();
+        for(int tick:new int[]{10,25,50,80,109})h.runAtTickTime(tick,()->trace.append(" tick=").append(tick)
+                .append(" age=").append(ArtifactState.now(p)-started).append(" busy=").append(WorkQueue.busy(p))
+                .append(" block=").append(h.getLevel().getBlockState(at))
+                .append(" falling=").append(h.getLevel().getEntitiesOfClass(FallingBlockEntity.class,new AABB(at).inflate(8)).stream()
+                        .map(e->e.getBlockState()+"@"+e.position()).toList()));
         h.runAtTickTime(5,()->{h.getLevel().setBlock(at.above(5),Blocks.SAND.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.SAND.defaultBlockState());});
         h.runAtTickTime(30,()->{h.getLevel().setBlock(at.above(5),Blocks.GRAVEL.defaultBlockState(),2);FallingBlockEntity.fall(h.getLevel(),at.above(5),Blocks.GRAVEL.defaultBlockState());});
         h.runAtTickTime(110,()->{
-            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"landed sand and gravel have both been excavated");
+            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"landed sand and gravel have both been excavated; "+trace+" finalAge="+(ArtifactState.now(p)-started)+" busy="+WorkQueue.busy(p)+" block="+h.getLevel().getBlockState(at));
             var drops=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(7));
             h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Items.SAND)),"falling sand generated native harvested loot");
             h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Items.GRAVEL)||d.getItem().is(Items.FLINT)),"falling gravel generated native harvested loot; busy="+WorkQueue.busy(p)+" blocks="+h.getLevel().getBlockState(at)+" falling="+h.getLevel().getEntitiesOfClass(FallingBlockEntity.class,new AABB(at).inflate(8)).size()+" drops="+drops.stream().map(d->d.getItem().toString()).toList());

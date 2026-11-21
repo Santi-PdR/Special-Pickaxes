@@ -2,7 +2,7 @@
 
 Ícaro conserva HeldSkillLease durante todo el vuelo, igual que los trabajos de minería. Cambiar copiedMode en la misma pila Worldbreaker invalida el ascenso original antes de consultar techo o emitir otro impulso; antes sólo se verificaba que el origen siguiera siendo Ícaro. El cambio no elimina el efecto finito de protección de caída ni sobrescribe movimiento/posición al cancelar. Native Ícaro y habilidades originales Iridium/Strata, modelos y texturas sin cambios.
 
-Dos regresiones: cambio antes del primer tick con techo natural intacto y sin impulso; cambio después de un impulso, incluso en el mismo tick, cancela conservando física y gracia de caída. Local: 166 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.50 sigue siendo la descarga validada.
+Dos regresiones: cambio antes del primer tick con techo natural intacto y sin impulso; cambio después de un impulso, incluso en el mismo tick, cancela conservando física y gracia de caída. Local: 166 Python (una omisión), 25 recursos y diff check PASS. Primera CI `44917605725` falló en la regresión de caída de arena/grava (celda final no vacía); las nuevas pruebas de lease pasaron, pero no se publica ni se declara validación completa. Se añaden trazas observacionales de edad, trabajo, bloque y entidades en caída para diagnosticar, sin cambiar plazos, física ni resultado exigido. Nueva CI pendiente; alpha.50 sigue siendo la descarga validada.
 
 ## Alpha.50 — rechazar roturas fuera de plazo, SUCCESS
 
