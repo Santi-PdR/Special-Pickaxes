@@ -1,8 +1,8 @@
-## Alpha.50 — rechazar roturas fuera de plazo, pendiente CI
+## Alpha.50 — rechazar roturas fuera de plazo, SUCCESS
 
 La aplicación de cada inspección conectada actualiza la hora y verifica el deadline absoluto, y en revisitas también la ventana final, antes de consultar/minar terreno. El scheduler podía consultar done() con el reloj del turno anterior y permitir una rotura tardía antes de actualizarlo. No amplía ventanas ni reduce presupuestos. Regresiones directas: primera inspección retenida hasta tick 241, y revisita al origen retenida hasta después de su ventana final. La aplicación antigua permite ambas roturas.
 
-Local: 165 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.49 sigue siendo la descarga validada. Sin cambios de modelos/texturas ni habilidades originales Iridium/Strata.
+Local: 165 Python (una omisión), 25 recursos y diff check PASS. Fuente `845ad6ebc11369b720a2568949c8bbc099e382b1`, CI `44876262545` SUCCESS: 216 JUnit, 552 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos de Ícaro y Worldloom sin recoger loot: 5438 unidades / 780 entidades). JAR 1001371 bytes, SHA256 `ea5eb602a9da22a5b4539c38ff6b107cc42a0a1ea2ed98d4de6bb94660f9e1a6`. Publicación del JAR exacto pendiente de confirmación, sin recompilar. Sin cambios de modelos/texturas ni habilidades originales Iridium/Strata.
 
 ## Alpha.49 — prioridad de excavación sin vectores temporales, SUCCESS
 
