@@ -1,0 +1,51 @@
+name: Publish validated alpha49 manual test
+on:
+  push:
+    branches: ['arena/cec54523-special-pickaxes']
+    paths: ['.github/workflows/publish-alpha49-test.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download and verify successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 44863578241 --json conclusion,headSha,event,workflowName > source-run.json
+          python3 - <<'PY'
+          import json
+          run=json.load(open('source-run.json'))
+          assert run['conclusion']=='success'
+          assert run['headSha']=='ec6776973c6552ea911a3a76f1aaa5819c5c9eee'
+          assert run['event']=='push' and run['workflowName']=='Forge verification'
+          PY
+          gh run download 44863578241 -n special-pickaxes-6.0.0-alpha.49-personal -D release
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('release')
+          m=json.loads((root/'RELEASE.json').read_text())
+          assert m['commit']=='ec6776973c6552ea911a3a76f1aaa5819c5c9eee'
+          assert str(m['run_id'])=='44863578241'
+          assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.49.jar'
+          jar=root/'libs'/m['file']
+          assert jar.stat().st_size==m['bytes']==1001300
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='8cb146c9d315f05bd5aa517b246ea144e7024816f780ff8fc856e3f76d227c4f'
+          with zipfile.ZipFile(jar) as z:
+              assert z.testzip() is None
+              assert not any('/test/' in name for name in z.namelist())
+          PY
+      - name: Publish explicitly requested test JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create test-6.0.0-alpha.49-44863578241 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.49.jar release/RELEASE.json release/SHA256SUMS --target ec6776973c6552ea911a3a76f1aaa5819c5c9eee --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.49 - prueba solicitada' --notes 'Mejora alpha.49: prioridad del frente sin vectores temporales, con resultados y desempates identicos verificados; no es benchmark TPS/FPS. Conserva alpha.48: evita repetir revisiones de celdas vacias en vigilancias pequenas y deja presupuesto en el mismo tick para mineria de otros jugadores; sin reducir presupuesto de frentes activos o conjuntos grandes. Conserva la mejora anterior: una de cada 16 inspecciones atiende celdas despejadas mientras avanza el frente, compartiendo el presupuesto existente; la ventana final de asentamiento empieza al agotar el frente, no antes. Conserva la correccion anterior: agotar el presupuesto de terreno conserva un seguimiento finito de bloques que lleguen a celdas despejadas; no expande terreno nuevo y respeta permisos, construcciones y equipo. Actualizacion solicitada de mineria frontal conectada: comienza cerca del jugador y sigue terreno conectado; asentamiento de arena y grava; Paradox secundaria inmediata y velocidad normal; ascenso excavador de Icarus; brillo solo en drops de menas del extractor; guia y Curios resumidos; activa equipada H (G queda para inventario Curios). Modelos/texturas y habilidades originales Iridium/Strata preservados. Fuente exacta ec6776973c6552ea911a3a76f1aaa5819c5c9eee; CI 44863578241 SUCCESS: 216 JUnit, 550 GameTests, servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activacion/cancelacion). Requiere Minecraft 1.20.1, Forge 47.4.10, Java 17; Curios opcional para variantes equipadas. Prerelease: no certifica todos los modpacks ni una aprobacion visual universal. Arte externo conserva sus creditos y avisos; no se concede una licencia adicional de redistribucion. SHA256 8cb146c9d315f05bd5aa517b246ea144e7024816f780ff8fc856e3f76d227c4f; 1001300 bytes.'
