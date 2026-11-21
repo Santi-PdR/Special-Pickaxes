@@ -1,8 +1,8 @@
-## Alpha.54 — rachas pasivas no mezclan modos copiados, pendiente CI
+## Alpha.54 — rachas pasivas no mezclan modos copiados, SUCCESS
 
 Coro y Paradox sólo reutilizan una racha/memoria anterior si su lease de equipo sigue activo. Antes se comparaba la identidad de pila y dimensión: cambiar copiedMode en Worldbreaker conservando la pila permitía sumar roturas antiguas a la nueva racha. Se mantiene el umbral original de seis/cuatro, cooldown y trabajo conectado. Arte y habilidades originales Iridium/Strata intactos.
 
-Dos regresiones: seis roturas para Coro y cuatro para Paradox, con cambio de modo a una rotura del umbral. La primera del modo nuevo no dispara; una racha íntegra nueva sí. Local: 169 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.53 sigue siendo la descarga validada.
+Dos regresiones: seis roturas para Coro y cuatro para Paradox, con cambio de modo a una rotura del umbral. La primera del modo nuevo no dispara; una racha íntegra nueva sí. Local: 169 Python (una omisión), 25 recursos y diff check PASS. Fuente `036ab7d3366cc8268b87f0b976a605c8c9ee83ce`, CI `44949169146` SUCCESS: 216 JUnit, 561 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Ícaro, Worldloom sin recoger loot: 7525 unidades / 945 entidades). JAR 1001613 bytes, SHA256 `91c1a6861638db643c769142584ccc9ffdbe98adfbce7ba241197b04bf15e4bb`. Publicación exacta pendiente, sin recompilar.
 
 ## Alpha.53 — lease del modo copiado en observación pasiva, SUCCESS
 

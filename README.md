@@ -1,10 +1,10 @@
-# Special Pickaxes — 6.0.0-alpha.53
+# Special Pickaxes — 6.0.0-alpha.54
 
-**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.53-44929650776/special-pickaxes-1.20.1-6.0.0-alpha.53.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.53-44929650776) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.54-44949169146/special-pickaxes-1.20.1-6.0.0-alpha.54.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.54-44949169146) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
 
 Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
 
-**Nuevo en alpha.53:** la reacción pasiva de Worldbreaker equipado conserva el modo copiado original desde la rotura manual hasta la ejecución. Un cambio de modo descarta la observación anterior o revoca el bloque actual, sin gastar el cooldown de una observación rechazada.
+**Nuevo en alpha.54:** las rachas pasivas de Coro y Paradox copiadas por Worldbreaker ya no mezclan roturas entre modos. Cambiar el modo reinicia la acumulación anterior; una racha íntegra nueva funciona con los mismos umbrales y cooldown.
 
 ## Qué hace la revisión actual
 
@@ -18,13 +18,13 @@ Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habil
 
 ## Evidencia y descarga
 
-El JAR publicado proviene de `940762e6c3a985bbb07741cdf35aacbcd6a106ab`, [CI 44929650776](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44929650776): **216 JUnit, 559 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+El JAR publicado proviene de `036ab7d3366cc8268b87f0b976a605c8c9ee83ce`, [CI 44949169146](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44949169146): **216 JUnit, 561 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
 
 El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
 
-- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.53.jar`
-- Tamaño: **1001601 bytes**
-- SHA256: `798f6999c93ca13b2db9bc503bf23ffc7bfcf972aca755e6d9c919d56550d40f`
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.54.jar`
+- Tamaño: **1001613 bytes**
+- SHA256: `91c1a6861638db643c769142584ccc9ffdbe98adfbce7ba241197b04bf15e4bb`
 
 Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
 
