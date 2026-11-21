@@ -1,3 +1,9 @@
+## Alpha.48 — menos revisiones repetidas durante seguimiento pequeño, pendiente de Forge
+
+Un programa de minería conectada cuyo frente ya terminó limita su turno a una pasada por sus celdas vigiladas si son menos que el presupuesto normal. Los frentes activos y los conjuntos grandes mantienen su presupuesto anterior. No se reduce la frecuencia efectiva de una celda pequeña (ya se revisa cada turno), no se amplía el presupuesto global, y se libera presupuesto sobrante para otros jugadores.
+
+Nueva regresión con dos jugadores y presupuesto global 16: el primero conserva una vigilancia pequeña, el segundo inicia un frente conectado, y se exige que el segundo mine en ese mismo tick sin cancelar la vigilancia ni superar 16 intentos globales. La versión anterior consume los 16 en la vigilancia del primero. Local: 164 Python (una omisión), 25 recursos, diff limpio. No es un benchmark de TPS/FPS ni prueba de un servidor concurrido. Forge/cliente pendientes; publicada vigente alpha.47.
+
 ## Alpha.47 — revisión de llegadas durante el frente activo, SUCCESS
 
 La minería conectada reserva una de cada dieciséis inspecciones para volver a una celda despejada mientras todavía queda frente. La revisión usa el mismo presupuesto global/por jugador, no un bucle adicional. Mantiene el presupuesto separado de llegadas introducido en alpha.46; agotarlo no termina prematuramente un frente que todavía puede excavar. No cambia las fronteras, permisos, procedencia, lease ni deadlines.

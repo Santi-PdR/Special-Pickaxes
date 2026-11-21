@@ -159,4 +159,26 @@ public final class ConnectedExcavationGameTests {
         finish(h,p);
     }
 
+    @GameTest(template="empty",batch="front_10") public static void smallSettlingJobLeavesSameTickBudgetForAnotherPlayersLiveFront(GameTestHelper h){
+        var idle=player(h,ArtifactKind.EVENTIDE);target(h,idle);
+        var miner=player(h,ArtifactKind.HELLSPEC);miner.setPos(miner.position().add(20,0,0));var at=target(h,miner);
+        for(int x=0;x<=4;x++)h.getLevel().setBlockAndUpdate(at.east(x),Blocks.TERRACOTTA.defaultBlockState());
+        int previous=ArtifactConfig.GLOBAL.get();
+        try{
+            ArtifactConfig.GLOBAL.set(16);
+            h.assertTrue(ArtifactActions.useAlternate(idle,idle.getMainHandItem(),ArtifactKind.EVENTIDE),"first player starts a small front");
+            for(int tick=0;tick<4;tick++)WorkQueue.tick();
+            h.assertTrue(WorkQueue.busy(idle),"first player is still watching for falling arrivals");
+            h.assertTrue(ArtifactActions.useAlternate(miner,miner.getMainHandItem(),ArtifactKind.HELLSPEC),"second player starts a connected bank");
+            WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"second player mines in the same tick after the idle watch");
+            h.assertTrue(WorkQueue.busy(idle),"sharing budget does not cancel the first player's settling watch");
+            h.assertTrue(WorkQueue.lastAttempts()<=16,"both players share the existing global bound");
+        }finally{
+            ArtifactConfig.GLOBAL.set(previous);WorkQueue.cancel(idle);WorkQueue.cancel(miner);
+            MiningObservations.forget(idle);MiningObservations.forget(miner);
+        }
+        finish(h,idle);
+    }
+
 }

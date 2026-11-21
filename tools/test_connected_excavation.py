@@ -110,3 +110,8 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('settled<Math.min(cap,1024)',source)
         done=source[source.index('public boolean done()'):source.index('public int attemptsPerTick')]
         self.assertIn('frontier.isEmpty()&&(settled>=Math.min(cap,1024)',done)
+
+    def test_small_idle_watches_do_not_repeat_empty_cells_within_one_turn(self):
+        source=(BASE/'artifact/ConnectedExcavation.java').read_text()
+        self.assertIn('int budget=Math.max(256,EnchantmentScaling.budget(tool))',source)
+        self.assertIn('frontier.isEmpty()?Math.min(budget,Math.max(1,cleared.size())):budget',source)

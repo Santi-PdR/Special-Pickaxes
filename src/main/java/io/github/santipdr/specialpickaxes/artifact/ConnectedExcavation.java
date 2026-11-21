@@ -80,7 +80,12 @@ public final class ConnectedExcavation implements WorkProgram {
     public boolean loaded(ServerPlayer p){return true;}
     public boolean reportPartial(){return false;}
     public boolean done(){return !active()||now>=hardDeadline||frontier.isEmpty()&&(settled>=Math.min(cap,1024)||cleared.isEmpty()||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
-    public int attemptsPerTick(ItemStack tool){return Math.max(256,EnchantmentScaling.budget(tool));}
+    public int attemptsPerTick(ItemStack tool){
+        int budget=Math.max(256,EnchantmentScaling.budget(tool));
+        // A small, idle settling set needs one pass, not repeated scans of the same air
+        // in this turn. Large sets retain the full rate and share the global budget as before.
+        return frontier.isEmpty()?Math.min(budget,Math.max(1,cleared.size())):budget;
+    }
     public WorkStep next(ServerPlayer p){
         now=ArtifactState.now(p);
         if(frontier.isEmpty()&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(hardDeadline,now+120);
