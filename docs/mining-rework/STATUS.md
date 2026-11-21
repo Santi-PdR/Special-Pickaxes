@@ -1,3 +1,9 @@
+## Alpha.47 — revisión de llegadas durante el frente activo, pendiente de Forge
+
+La minería conectada reserva una de cada dieciséis inspecciones para volver a una celda despejada mientras todavía queda frente. La revisión usa el mismo presupuesto global/por jugador, no un bucle adicional. Mantiene el presupuesto separado de llegadas introducido en alpha.46; agotarlo no termina prematuramente un frente que todavía puede excavar. No cambia las fronteras, permisos, procedencia, lease ni deadlines.
+
+Nueva regresión live con presupuesto global de una inspección: abre el origen, introduce grava y exige que se recoja en dieciséis turnos, mientras la masa conectada sigue pendiente; verifica que ningún turno exceda una inspección. La implementación anterior no revisita el origen mientras queda ese frente. Local: 163 Python (una omisión), 25 recursos, diff check limpio. Forge/cliente pendientes. La entrega publicada vigente sigue siendo alpha.46.
+
 ## Alpha.46 — seguimiento de caída tras agotar el frente, SUCCESS
 
 Cambio funcional respecto a alpha.45: agotar el presupuesto de terreno ya no termina inmediatamente el programa. Detiene la expansión y conserva la vigilancia de celdas ya despejadas. Las llegadas tienen un presupuesto separado acotado a `min(cap,1024)`, bajo el mismo deadline absoluto de 240 ticks, las mismas comprobaciones de permisos/procedencia/equipo y los mismos presupuestos del scheduler. Una celda revisitada no expande el frente a terreno nuevo.

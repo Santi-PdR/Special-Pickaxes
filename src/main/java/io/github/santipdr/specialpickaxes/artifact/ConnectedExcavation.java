@@ -20,7 +20,7 @@ public final class ConnectedExcavation implements WorkProgram {
     private final Queue<BlockPos> frontier;
     private final ArrayDeque<BlockPos> cleared=new ArrayDeque<>();
     private final Set<BlockPos> seen=new HashSet<>();
-    private int broken,settled;
+    private int broken,settled,frontAttemptsSinceRevisit;
     private long lastVisual=Long.MIN_VALUE;
     private long now,settleUntil=Long.MIN_VALUE,hardDeadline;
     private boolean revoked;
@@ -79,14 +79,18 @@ public final class ConnectedExcavation implements WorkProgram {
     public boolean awaiting(){return false;}public boolean executing(){return true;}public void confirm(){}
     public boolean loaded(ServerPlayer p){return true;}
     public boolean reportPartial(){return false;}
-    public boolean done(){return !active()||now>=hardDeadline||settled>=Math.min(cap,1024)||frontier.isEmpty()&&(cleared.isEmpty()||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
+    public boolean done(){return !active()||now>=hardDeadline||frontier.isEmpty()&&(settled>=Math.min(cap,1024)||cleared.isEmpty()||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
     public int attemptsPerTick(ItemStack tool){return Math.max(256,EnchantmentScaling.budget(tool));}
     public WorkStep next(ServerPlayer p){
         now=ArtifactState.now(p);
         if(frontier.isEmpty()&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(hardDeadline,now+120);
-        boolean revisit=frontier.isEmpty();
+        // One in sixteen inspections revisits cleared terrain while the front is live.
+        // This consumes the existing scheduler budget; it never adds off-budget work.
+        boolean revisit=!cleared.isEmpty()&&settled<Math.min(cap,1024)
+                &&(frontier.isEmpty()||frontAttemptsSinceRevisit>=15);
         var at=revisit?cleared.removeFirst():frontier.remove();
-        if(revisit)cleared.addLast(at);
+        if(revisit){cleared.addLast(at);frontAttemptsSinceRevisit=0;}
+        else frontAttemptsSinceRevisit++;
         return new WorkStep(){
             public BlockPos pos(){return at;}
             public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind ignored){

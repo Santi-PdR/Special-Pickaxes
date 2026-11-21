@@ -137,4 +137,26 @@ public final class ConnectedExcavationGameTests {
         finish(h,p);
     }
 
+    @GameTest(template="empty",batch="front_09") public static void liveFrontRevisitsArrivalsBeforeFinishingWithoutExceedingTickBudget(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var level=h.getLevel();
+        for(int x=0;x<8;x++)for(int y=0;y<4;y++)for(int z=0;z<8;z++){
+            var cell=at.offset(x,y,z);PlayerPlacedBlocks.get(level).unmark(cell);
+            level.setBlock(cell,Blocks.STONE.defaultBlockState(),2);
+        }
+        int previous=ArtifactConfig.GLOBAL.get();
+        try{
+            ArtifactConfig.GLOBAL.set(1);
+            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live alternate starts on a large connected bank");
+            WorkQueue.tick();
+            h.assertTrue(level.getBlockState(at).isAir(),"first budgeted attempt clears the close origin");
+            level.setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);
+            for(int tick=0;tick<16;tick++){
+                WorkQueue.tick();h.assertTrue(WorkQueue.lastAttempts()<=1,"revisits share the one-attempt scheduler budget");
+            }
+            h.assertTrue(level.getBlockState(at).isAir(),"arrival is harvested while the excavation frontier is still live");
+            h.assertTrue(WorkQueue.busy(p)&&level.getBlockState(at.offset(7,3,7)).is(Blocks.STONE),"front has not finished or jumped to distant terrain");
+        }finally{ArtifactConfig.GLOBAL.set(previous);WorkQueue.cancel(p);MiningObservations.forget(p);}
+        finish(h,p);
+    }
+
 }

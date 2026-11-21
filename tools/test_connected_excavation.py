@@ -101,3 +101,11 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('if(broken>=cap){',source)
         self.assertIn('frontier.clear();settleUntil=Math.min(hardDeadline,now+120)',source)
         self.assertIn('broken++;cleared.addLast(at)',source)
+
+    def test_live_front_revisits_share_budget_and_cannot_finish_terrain_early(self):
+        source=(BASE/'artifact/ConnectedExcavation.java').read_text()
+        self.assertIn('frontAttemptsSinceRevisit>=15',source)
+        self.assertIn('else frontAttemptsSinceRevisit++',source)
+        self.assertIn('settled<Math.min(cap,1024)',source)
+        done=source[source.index('public boolean done()'):source.index('public int attemptsPerTick')]
+        self.assertIn('frontier.isEmpty()&&(settled>=Math.min(cap,1024)',done)
