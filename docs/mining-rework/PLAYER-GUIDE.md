@@ -1,12 +1,12 @@
-# Guía actual — 6.0.0-alpha.45
+# Guía actual — 6.0.0-alpha.46
 
-[Descargar JAR](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.45-44811466825/special-pickaxes-1.20.1-6.0.0-alpha.45.jar) · [Release](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825) · [Validación y límites comprobados](STATUS.md)
+[Descargar JAR](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.46-44850183303/special-pickaxes-1.20.1-6.0.0-alpha.46.jar) · [Release](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.46-44850183303) · [Validación y límites comprobados](STATUS.md)
 
 ## Instalación
 
 Cierra Minecraft. Usa Minecraft 1.20.1 / Forge 47.4.10 / Java 17. Instala sólo un JAR de Special Pickaxes en `mods`, reemplazando su versión anterior. Curios habilita el slot `pickaxe` y las variantes equipadas.
 
-JAR: **998212 bytes**, SHA256 `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`.
+JAR: **998287 bytes**, SHA256 `dcb7fb9ce402a5bb60263aaaef3afe84d6cf012b2279cd896972e2782b088cc5`.
 
 ## Controles predeterminados
 
@@ -35,7 +35,7 @@ La interfaz dentro del juego es la referencia breve para cada pico. Modelos y te
 
 ## Validación
 
-JAR publicado: CI `44811466825` SUCCESS, 214 JUnit / 546 GameTests / servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activación/cancelación). Seguimiento sólo de tests: CI `44816553795` SUCCESS con 547 GameTests. No exige reinstalar el JAR.
+JAR publicado: CI `44850183303` SUCCESS, 214 JUnit / 548 GameTests / servidor y cliente real (32 escenas, 64 tooltips, H equipado, ascenso y activación/cancelación). Seguimiento sólo de tests: CI `44816553795` SUCCESS con 547 GameTests. No exige reinstalar el JAR.
 
 Es una prerelease: no equivale a probar todos los modpacks, plugins de claims o escalas de interfaz ni a certificar Windows.
 

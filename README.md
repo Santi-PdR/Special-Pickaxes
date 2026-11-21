@@ -1,8 +1,10 @@
-# Special Pickaxes — 6.0.0-alpha.45
+# Special Pickaxes — 6.0.0-alpha.46
 
-**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.45-44811466825/special-pickaxes-1.20.1-6.0.0-alpha.45.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.45-44811466825) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.46-44850183303/special-pickaxes-1.20.1-6.0.0-alpha.46.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.46-44850183303) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
 
 Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
+
+**Nuevo en alpha.46:** al agotar el frente, mantiene un seguimiento acotado de llegadas a celdas despejadas, sin seguir expandiendo terreno.
 
 ## Qué hace la revisión actual
 
@@ -16,13 +18,13 @@ Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habil
 
 ## Evidencia y descarga
 
-El JAR publicado proviene de `1134994a08bb1b4aa96a35ce10da01d1b2bed962`, [CI 44811466825](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44811466825): **214 JUnit, 546 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+El JAR publicado proviene de `d93e92218cfeabfc424cd4f3d3cc8a1ba96184cf`, [CI 44850183303](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44850183303): **214 JUnit, 548 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
 
 El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
 
-- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.45.jar`
-- Tamaño: **998212 bytes**
-- SHA256: `e868b8a8bc140f14cdca02c73250340f753a918fb244c1780f6c2f24f1566f34`
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.46.jar`
+- Tamaño: **998287 bytes**
+- SHA256: `dcb7fb9ce402a5bb60263aaaef3afe84d6cf012b2279cd896972e2782b088cc5`
 
 Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
 
