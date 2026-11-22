@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `47047173522f940ede4fb8c04622913569e69321`, CI `45039589537` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **603 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `047fd430ac74124b9cb4e434ada8805cc7d0df97`, CI `45048228736` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **604 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006428 bytes**, SHA256 `2c3905063645afd8249608bf609320316d374e3c198bdc85d39404be6ab07dc9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006431 bytes**, SHA256 `2d8bba1108f56d0f8ea8e7b52a469a708bc8d9aa4f99d2d19b6728de78a8c325`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Saturación verificada
+
+64 tipos × 4096 = **262144 unidades almacenadas**, 256 inserciones rechazadas sin modificar contenido. Una firma de 96 bloques termina con bolsa saturada: los 96 drops nativos quedan en el mundo, sin pérdida, duplicación ni pausa. Inserciones rechazadas ya no clonan la lista completa NBT; escrituras aceptadas conservan copy-on-write. Resultado confirmado por `POUCH_SATURATED` en el último CI. No hay cifra de TPS/FPS atribuible a este cambio.
 
 ### Carga simultánea verificada
 

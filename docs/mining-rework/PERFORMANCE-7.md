@@ -34,3 +34,7 @@ Máximo observado: **128 intentos por tick** en las cuatro rondas, dentro del l�
 Medir servidor con clientes reales, tráfico de sincronización, entidades persistentes y terreno/fluidos representativos; separar calentamiento de medición y repetir en mundos equivalentes. Evaluar bolsa con diversidad alta de materiales/capacidad cercana al límite, Fortuna alta y listeners de mods. No declarar «sin lag» ni rendimiento global resuelto por estas pruebas.
 
 La comparación anterior de una sola firma (96 unidades / 96→0 entidades) y las regresiones Seda/Fortuna, overflow, inventario lleno y aislamiento NBT siguen aprobadas. Modelos/texturas no se cambian para obtener rendimiento.
+
+## Seguimiento de capacidad llena
+
+Fuente `047fd430ac74124b9cb4e434ada8805cc7d0df97`, CI **45048228736 SUCCESS**, 604 GameTests. Bolsa con 64 tipos/262144 unidades rechaza 256 stacks alternando entrada llena/tipo nuevo; después una firma completa deja sus 96 unidades de overflow en el mundo sin tocar contenido guardado ni pausar minería. Inserciones rechazadas ya no copian la lista completa NBT; las aceptadas siguen copy-on-write. Es una eliminación verificable de asignaciones innecesarias, no una medida de mejora de TPS/FPS. La tabla de tiempos anterior corresponde a la fuente y condiciones indicadas, no se renombra como benchmark de este cambio.
