@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `4897ed97dc79f829499636e8ad5fc3e329c924e3`, CI `44999329270` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **600 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `b4793166684f82732bb2ba97c088a0c216ab8fcf`, CI `45032768317` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **602 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1005840 bytes**, SHA256 `9f0f519718b4d6a46eaa4838c54256adea355f1f68f67104becb45d2666495cd`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006427 bytes**, SHA256 `527d917c2cbd5d924228b42a06422136404954e1abc130509b6231732bc15c4f`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -17,7 +17,7 @@ Conservación exacta y reducción de entidades confirmadas en el mismo escenario
 
 ### Límites de la evidencia y trabajo abierto
 
-Perfilado anterior de 23 trabajos sintéticos sin bolsa: mediana acumulada de transacciones 0.21161 ms; máximo por transacción 0.688814 ms, máximo acumulado por trabajo 1.348172 ms. NO es coste total de tick, FPS, TPS ni comparación antes/después. El ensayo emparejado demuestra reducción de entidades y conservación, no una cifra de mejora de frame time. Sigue abierta la revisión general de identidad/utilidad (incluidos efectos Curios repetidos), costes de sincronización y rendimiento con cargas/modpacks representativos. No presentar el estado integrado como reforma global terminada sólo por pasar tests.
+Perfilado anterior de 23 trabajos sintéticos sin bolsa: mediana acumulada de transacciones 0.21161 ms; máximo por transacción 0.688814 ms, máximo acumulado por trabajo 1.348172 ms. NO es coste total de tick, FPS, TPS ni comparación antes/después. El ensayo emparejado demuestra reducción de entidades y conservación, no una cifra de mejora de frame time. Los once perfiles de activación Curios rediseñados ya son distintos (tipos/niveles), conservan originales y la copia usa el perfil fuente. Regresiones aprobadas de perfil exacto, no repetición, cero minería/movimiento forzado, duración/partículas y efecto externo más fuerte. Ver REFORM-7-PLAN para tabla. Sigue abierta la revisión general de utilidad/balance, costes de sincronización y rendimiento con cargas/modpacks representativos. No presentar el estado integrado como reforma global terminada sólo por pasar tests.
 
 ## Alpha.60 — Ícaro equipada revalida durabilidad tras permiso, pendiente CI
 

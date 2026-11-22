@@ -119,3 +119,5 @@ Sólo once perfiles rediseñados; Iridium/Strata quedan exactamente con su activ
 - Worldbreaker: absorción II y resistencia II, o perfil de la fuente copiada.
 
 La diferencia se basa en bonificaciones reales y niveles, no en contar textos/pruebas como habilidades. Textos breves sincronizados en tres idiomas. Regresiones exigen perfil exacto y no repetido entre los once, duración/límites/partículas, ausencia de cambios de terreno/desgaste/movimiento, copia de cada fuente y conservación de efecto externo más fuerte. Cada bonus revalida equipo tras callbacks Forge. No se afirma aún balance o rendimiento global.
+
+Validación de perfiles confirmada: b479316 / CI 45032768317 **SUCCESS**. Evidencia descargada: 216 JUnit sin fallos/omisiones, **602 GameTests**, cliente real completo con CURIO_KEY_OK y POUCH_MENU_OK. Los once perfiles y copia aprueban; originales quedan Prisa I como antes de esta tanda. SHA/tamaño actualizados en STATUS. No publicación; los verdes no acreditan balance ni rendimiento global con modpacks.
