@@ -111,3 +111,11 @@ class CuriosActiveControls(unittest.TestCase):
             self.assertNotIn(old,section)
         self.assertIn('captureCuriosIridium',section)
         self.assertIn('StrataFocusEffect.observeBreak',section)
+
+    def test_copy_reset_prose_does_not_advertise_retired_six_modes(self):
+        import json
+        for lang in ['en_us', 'es_es', 'es_uy']:
+            text=json.loads(pathlib.Path(f'src/main/resources/assets/specialpickaxes/lang/{lang}.json').read_text())
+            for key in ['screen.specialpickaxes.copy_native_help', 'message.specialpickaxes.copy_native']:
+                self.assertNotRegex(text[key].lower(), r'\b(six|seis|modes|modos)\b')
+                self.assertRegex(text[key].lower(), r'abilities|habilidades')
