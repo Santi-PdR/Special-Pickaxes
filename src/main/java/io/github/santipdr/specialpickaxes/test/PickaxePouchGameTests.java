@@ -145,4 +145,23 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_many_type_match_r7") public static void matchingLastEntryPreservesOtherTypesAndLegacyIds(GameTestHelper h){
+        var tool=tool();var materials=net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+                .filter(item->net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft"))
+                .filter(item->{var stack=new ItemStack(item);return !stack.isEmpty()&&stack.isStackable()&&!stack.hasTag()&&!stack.serializeNBT().contains("ForgeCaps");})
+                .limit(64).toList();
+        h.assertTrue(materials.size()==64,"64 distinct ordinary material fixture");
+        for(var material:materials)h.assertTrue(PickaxePouch.insert(tool,new ItemStack(material)).isEmpty(),"add distinct material");
+        var entries=tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND);
+        var encoded=entries.getCompound(63).getCompound("item");
+        encoded.putString("id",net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(materials.get(63)).getPath());
+        var before=entries.copy();var incoming=new ItemStack(materials.get(63),7);
+        h.assertTrue(PickaxePouch.insert(tool,incoming).isEmpty()&&incoming.getCount()==7,"last entry merges even with full type table and unqualified legacy id");
+        h.assertTrue(PickaxePouch.types(tool)==64&&PickaxePouch.amount(tool,63)==8,"merge changes only intended quantity, never appends another type");
+        for(int slot=0;slot<63;slot++)h.assertTrue(tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND).getCompound(slot).equals(before.getCompound(slot)),"unrelated entry remains byte-equivalent "+slot);
+        var out=PickaxePouch.extract(tool,63,64);
+        h.assertTrue(out.getItem()==materials.get(63)&&out.getCount()==8&&PickaxePouch.types(tool)==63,"all merged material withdraws exactly once");
+        h.succeed();
+    }
+
 }

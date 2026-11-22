@@ -29,7 +29,12 @@ public final class PickaxePouch {
         var list=entries(tool);
         if(list.size()>MAX_TYPES)return loot.copy(); // Do not rewrite unknown/corrupt data.
         for(int i=0;i<list.size();i++){
-            var entry=list.getCompound(i);var prototype=ItemStack.of(entry.getCompound("item"));
+            var entry=list.getCompound(i);var encoded=entry.getCompound("item");
+            // Resolve through the same item registry as ItemStack.of, including legacy
+            // unqualified IDs. Do not construct unrelated stacks/capabilities per drop.
+            var id=net.minecraft.resources.ResourceLocation.tryParse(encoded.getString("id"));
+            if(id==null||net.minecraft.core.registries.BuiltInRegistries.ITEM.get(id)!=loot.getItem())continue;
+            var prototype=ItemStack.of(encoded);
             if(!ItemStack.isSameItemSameTags(prototype,loot))continue;
             int count=entry.getInt("amount");if(count<1||count>MAX_PER_TYPE)return loot.copy();
             int accepted=Math.min(loot.getCount(),MAX_PER_TYPE-count);
