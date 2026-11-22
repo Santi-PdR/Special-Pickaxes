@@ -157,4 +157,30 @@ public final class CuriosActiveGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(replace);WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="curios_waterlogged_01") public static void equippedWaterloggedTargetRejectsWithoutChargeAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);
+        var wet=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP).setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,true);
+        h.getLevel().setBlock(at,wet,2);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source),"equipped activation respects contained water");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"wet rejection charges neither stack nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at)==wet&&!h.getLevel().getFluidState(at).isEmpty(),"contained water and solid stay intact");
+            h.getLevel().setBlock(at,wet.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,false),2);
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"dry slab permits immediate equipped retry");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&source.getDamageValue()==8,"dry retry harvests and charges source once");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_waterlogged_02") public static void equippedTargetWaterloggedDuringPermissionRejectsWithoutCharge(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);int[] calls={0};
+        var dry=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP);var wet=dry.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,true);h.getLevel().setBlock(at,dry,2);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> flood=e->{if(e.player==p&&e.target.equals(at)){calls[0]++;h.getLevel().setBlock(at,wet,2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,flood);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&calls[0]==1,"callback waterlogging rejects equipped activation");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"late water charges neither stack nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at)==wet&&!h.getLevel().getFluidState(at).isEmpty(),"callback waterlogging is not reverted or harvested");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(flood);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }

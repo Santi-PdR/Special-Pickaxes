@@ -331,4 +331,31 @@ public final class ConnectedExcavationGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(replace);WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="front_waterlogged_01") public static void heldWaterloggedTargetRejectsWithoutChargeAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var tool=p.getMainHandItem();
+        var wet=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP).setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,true);
+        h.getLevel().setBlock(at,wet,2);
+        try{
+            h.assertTrue(!ArtifactActions.use(p,tool,ArtifactKind.EVENTIDE,false),"water inside a solid target prevents native activation");
+            h.assertTrue(!WorkQueue.busy(p)&&tool.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("ready")==0,"waterlogged rejection spends no charge or cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at)==wet&&!h.getLevel().getFluidState(at).isEmpty(),"wet solid and contained water remain intact");
+            h.getLevel().setBlock(at,wet.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,false),2);
+            h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.EVENTIDE,false),"same slab when dry can retry immediately");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"dry retry actually mines slab");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="front_waterlogged_02") public static void heldTargetWaterloggedDuringPermissionRejectsWithoutCharge(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var tool=p.getMainHandItem();int[] calls={0};
+        var dry=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP);var wet=dry.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED,true);
+        h.getLevel().setBlock(at,dry,2);
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> flood=e->{if(e.player==p&&e.target.equals(at)){calls[0]++;h.getLevel().setBlock(at,wet,2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,flood);
+        try{
+            h.assertTrue(!ArtifactActions.useAlternate(p,tool,ArtifactKind.EVENTIDE)&&calls[0]==1,"permission that waterlogs target rejects alternate");
+            h.assertTrue(!WorkQueue.busy(p)&&tool.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("alternateReady")==0,"late water spends no charge or cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at)==wet&&!h.getLevel().getFluidState(at).isEmpty(),"external waterlogging stays intact");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(flood);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
