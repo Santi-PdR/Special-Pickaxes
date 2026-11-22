@@ -86,3 +86,5 @@ CI integrado `44991966806` (e9408c5): diagnóstico Checks confirma **596 GameTes
 Nueva fase de cliente para bolsa: interacción física Robot agacharse+clic derecho mirando al aire, comprobación servidor de menú y contenido, captura `pouch-menu.jpg`, cierre físico con Escape y marcador obligatorio POUCH_MENU_OK. No se simula openMenu desde la fixture; el almacenamiento de 17 diamantes es sólo preparación del escenario. Pendiente ejecución y revisión.
 
 Bolsa: la vista muestra el total agregado en el nombre de cada material, no sólo el stack parcial visible. Clic derecho sobre la flecha alterna captura; la preferencia se conserva al reabrir. Primera apertura habilita captura sólo si aún no existe elección. Prueba de menú ampliada para preferencia persistente.
+
+Añadida regresión física nueva de firma: recinto de bedrock sella agua/grava externas, la habilidad abre la celda, y sólo después se crea FallingBlockEntity de grava cuatro bloques encima. Comprueba aterrizaje/cosecha, drop nativo grava o pedernal y ausencia de entidad aún cayendo. Pendiente Forge; no se confunde con la prueba anterior de estado ya asentado.

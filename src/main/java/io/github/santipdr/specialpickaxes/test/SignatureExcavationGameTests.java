@@ -63,4 +63,27 @@ public final class SignatureExcavationGameTests {
         h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL)&&!WorkQueue.busy(p),"cancel remains available immediately");SeismicReworkGameTests.finish(h,p);
     }
 
+    @GameTest(template="empty",batch="signature_falling_physics_r7",timeoutTicks=100) public static void signatureHarvestsRealGravelFallingAfterActivation(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);var level=h.getLevel();
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)for(int y=-1;y<=7;y++){
+            var cell=at.offset(x,y,z);PlayerPlacedBlocks.get(level).unmark(cell);
+            level.setBlock(cell,x==0&&z==0&&y>=0&&y<7?net.minecraft.world.level.block.Blocks.AIR.defaultBlockState():net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState(),2);
+        }
+        level.setBlock(at,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+        h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"bounded signature starts in sealed falling fixture");
+        for(int i=0;i<32;i++)WorkQueue.tick();
+        h.assertTrue(level.getBlockState(at).isAir()&&WorkQueue.busy(p),"cleared cell is watched before gravel exists");
+        h.runAtTickTime(5,()->{
+            var gravel=net.minecraft.world.level.block.Blocks.GRAVEL.defaultBlockState();level.setBlock(at.above(4),gravel,2);
+            net.minecraft.world.entity.item.FallingBlockEntity.fall(level,at.above(4),gravel);
+        });
+        h.runAtTickTime(65,()->{
+            h.assertTrue(level.getBlockState(at).isAir(),"real falling gravel has landed and been harvested");
+            var drops=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(6));
+            h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(net.minecraft.world.item.Items.GRAVEL)||d.getItem().is(net.minecraft.world.item.Items.FLINT)),"native gravel or flint loot exists after landing");
+            h.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.item.FallingBlockEntity.class,new net.minecraft.world.phys.AABB(at).inflate(6)).isEmpty(),"test does not mistake still-airborne gravel for harvested material");
+            SeismicReworkGameTests.finish(h,p);
+        });
+    }
+
 }
