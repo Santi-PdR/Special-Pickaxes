@@ -968,10 +968,10 @@ public final class PickaxeGameTests {
         h.assertTrue(ArtifactFeedback.reserveMiningParticles(p,4038)&&!ArtifactFeedback.reserveMiningParticles(p,1),"peak16+orbit8+boundary16+deflect5+two bore slices5/8 equals58 particles");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_303") public static void placedStasisRecoversItsDeadlineWithAnExplicitRayTarget(GameTestHelper h){
-        var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h);var state=ArtifactState.of(p,ArtifactKind.INTERREGNUM);state.putInt("mode",0);state.putLong("ready",Long.MAX_VALUE);
+        var p=player(h,ArtifactKind.INTERREGNUM);var at=SeismicReworkGameTests.target(h,p);var state=ArtifactState.of(p,ArtifactKind.INTERREGNUM);state.putInt("mode",0);state.putLong("ready",Long.MAX_VALUE);
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
         h.assertTrue(ArtifactActions.target(p).filter(at::equals).isPresent(),"the placed-field cooldown regression has its own deterministic target");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&WorkQueue.busy(p)&&!DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_304") public static void worldloomRechecksPermissionAtTheCapturedAnchor(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);var mob=EntityType.SLIME.create(h.getLevel());
@@ -1391,8 +1391,8 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="rework_each_164") public static void primaryRecoversItsImpossiblePersistedDeadline(GameTestHelper h){
         var wearer=player(h,ArtifactKind.INTERREGNUM);var state=ArtifactState.of(wearer,ArtifactKind.INTERREGNUM);state.putLong("ready",Long.MAX_VALUE);
         // This regression concerns a deadline, not a ray hitting an unrelated neighbouring test structure.
-        state.putInt("mode",1);
-        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&DomainFields.active(wearer),
+        state.putInt("mode",1);SeismicReworkGameTests.target(h,wearer);
+        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&WorkQueue.busy(wearer)&&!DomainFields.active(wearer),
                 "the actual primary control path recovers a malformed future deadline");
         h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);
     }
@@ -3076,7 +3076,7 @@ public final class PickaxeGameTests {
 
     @GameTest(template="empty",batch="legacy_each_07") public static void crucibleConservesBlocksAndLoot(GameTestHelper h) {
         var p=player(h,ArtifactKind.CRUCIBLE);var pos=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(pos);ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"causal selection arms");
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"causal selection arms");
         h.assertTrue(ArtifactInteraction.left(p,pos,false)&&ArtifactInteraction.left(p,pos.east(),false),"record two corners");
         ArtifactInteraction.analyzeComplete(p);
         for(int tick=0;tick<20&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
@@ -3668,7 +3668,7 @@ public final class PickaxeGameTests {
         var mob=EntityType.ZOMBIE.create(level);mob.setNoAi(true);mob.setNoGravity(true);
         mob.setPos(at.getX()+1.5,at.getY(),at.getZ()+.5);level.addFreshEntity(mob);
         var velocity=new Vec3(.15,0,.05);mob.setDeltaMovement(velocity);owner.tickCount=0;
-        h.assertTrue(ArtifactActions.use(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"field starts");DomainFields.tick();
+        h.assertTrue(DomainFields.start(owner,owner.getMainHandItem(),ArtifactKind.INTERREGNUM,at,16),"field starts");DomainFields.tick();
         h.assertTrue(DomainFields.frozen(mob),"target initially frozen");
         var displaced=mob.position().add(.3,0,0);mob.setPos(displaced);owner.tickCount=1;
         Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
@@ -3742,7 +3742,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.INTERREGNUM);var center=target(h);
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(center.getX()+1.5,center.getY(),center.getZ()+0.5);h.getLevel().addFreshEntity(mob);
         mob.setDeltaMovement(0.15,0,0);Vec3 start=mob.position();
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"stasis activation");DomainFields.tick();
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,center,16),"stasis activation");DomainFields.tick();
         h.assertTrue(DomainFields.frozen(mob),"hostile enrolled in stasis");mob.setPos(start.add(0.3,0,0));DomainFields.tick();
         h.assertTrue(mob.position().distanceToSqr(start)<0.001 && mob.getDeltaMovement().lengthSqr()==0,"position and momentum held");
         h.assertTrue(p.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)&&p.getEffect(net.minecraft.world.effect.MobEffects.REGENERATION).getAmplifier()==4&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"domain grants Regeneration V and Night Vision");
@@ -3807,7 +3807,7 @@ public final class PickaxeGameTests {
     }
     @GameTest(template="empty",batch="legacy_each_09") public static void stasisAuraFollowsOnlyItsOwner(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",1);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"personal aura activates without a target block");DomainFields.tick();
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,p.blockPosition(),2),"personal aura activates without a target block");DomainFields.tick();
         h.assertTrue(DomainFields.contains(p,p.blockPosition())&&p.hasEffect(SpecialPickaxes.DOMINION.get())&&p.hasEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION),"aura follows owner with personal effects");
         var mob=EntityType.ZOMBIE.create(h.getLevel());mob.setPos(p.getX()+1,p.getY(),p.getZ());h.getLevel().addFreshEntity(mob);mob.setDeltaMovement(.1,0,0);DomainFields.tick();
         h.assertTrue(!DomainFields.frozen(mob),"personal aura does not freeze nearby mobs");finish(h,p);
@@ -4394,12 +4394,12 @@ public final class PickaxeGameTests {
         h.succeed();
     }
     @GameTest(template="empty",batch="legacy_each_37") public static void legacyEnergyDoesNotGateAbilities(GameTestHelper h){
-        var p=player(h,ArtifactKind.INTERREGNUM);target(h);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);
+        var p=player(h,ArtifactKind.INTERREGNUM);SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();var data=ArtifactState.of(p,ArtifactKind.INTERREGNUM);
         data.putInt("charge",0);tool.getOrCreateTag().putInt("artifactCharge",999);
         ((ArtifactItem)tool.getItem()).inventoryTick(tool,h.getLevel(),p,0,true);
         h.assertTrue(!data.contains("charge")&&!tool.getTag().contains("artifactCharge"),"legacy values removed");
         ArtifactInteraction.use(p,tool,ArtifactKind.INTERREGNUM,false);
-        h.assertTrue(DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
+        h.assertTrue(WorkQueue.busy(p)&&!DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
     }
 
 
@@ -4427,17 +4427,17 @@ public final class PickaxeGameTests {
 
     private static void inputReady(ServerPlayer p,ArtifactKind k){ArtifactState.of(p,k).remove("inputTick");}
     @GameTest(template="empty",batch="legacy_each_39") public static void semanticControlsAreServerAuthoritative(GameTestHelper h){
-        var p=player(h,ArtifactKind.INTERREGNUM);target(h);
+        var p=player(h,ArtifactKind.INTERREGNUM);SeismicReworkGameTests.target(h,p);
         h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ACTIVATE),"stale tool packet rejected");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&DomainFields.active(p),"one intent activates without selection");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!DomainFields.active(p),"cancel bypasses activation cooldown");finish(h,p);
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&WorkQueue.busy(p)&&!DomainFields.active(p),"one intent activates without selection");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!WorkQueue.busy(p),"cancel bypasses activation cooldown");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_40") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);PlayerPlacedBlocks.get(h.getLevel()).unmark(at.east());ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"selection key arms");
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"selection key arms");
         RelicControl.corner(p,at);RelicControl.corner(p,at.east());for(int tick=0;tick<10&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready")&&h.getLevel().getBlockState(at).is(Blocks.STONE),"last corner analyzes without mutation");
-        inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"R confirms analyzed region");for(int tick=0;tick<10&&WorkQueue.busy(p);tick++)WorkQueue.tick();
+        inputReady(p,ArtifactKind.CRUCIBLE);h.assertTrue(WorkQueue.togglePause(p),"R confirms analyzed region");for(int tick=0;tick<10&&WorkQueue.busy(p);tick++)WorkQueue.tick();
         h.assertTrue(h.getLevel().getBlockState(at).isAir(),"confirmed fracture excavates and ignores the offhand material");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_41") public static void modeIsIndependentOfSecondaryAndIncompleteSelection(GameTestHelper h){

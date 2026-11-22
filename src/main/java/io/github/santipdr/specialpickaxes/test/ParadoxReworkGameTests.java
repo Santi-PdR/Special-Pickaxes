@@ -21,7 +21,7 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @PrefixGameTestTemplate(false)
 public final class ParadoxReworkGameTests {
     private static void select(GameTestHelper h,ServerPlayer p,BlockPos a,BlockPos b,ArtifactKind kind){
-        ArtifactState.of(p,kind).remove("inputTick");h.assertTrue(RelicControl.execute(p,kind,RelicControl.Action.ACTIVATE),"primary arms selection");
+        ArtifactState.of(p,kind).remove("inputTick");h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),kind==ArtifactKind.WORLDBREAKER?ArtifactKind.CRUCIBLE:kind,false),"legacy region component arms selection");
         h.assertTrue(RelicControl.corner(p,a)&&RelicControl.corner(p,b),"two server-validated corners mark the causal volume");
         for(int tick=0;tick<600&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready"),"snapshot analysis awaits explicit detonation");

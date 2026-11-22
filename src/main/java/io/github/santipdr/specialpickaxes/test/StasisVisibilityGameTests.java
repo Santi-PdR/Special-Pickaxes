@@ -10,10 +10,10 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class StasisVisibilityGameTests {
-    @GameTest(template="empty",batch="stasis_visibility_04") public static void realPrimaryAnchorsAnExact33By17By33Domain(GameTestHelper h){
+    @GameTest(template="empty",batch="stasis_visibility_04") public static void legacyDomainComponentAnchorsAnExact33By17By33Domain(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);var at=target(h,p);
         ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",0);
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false),"expanded primary starts");
+        h.assertTrue(DomainFields.start(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,at,16),"expanded primary starts");
         h.assertTrue(DomainFields.contains(p,at.offset(16,8,16))&&!DomainFields.contains(p,at.offset(17,0,0))&&!DomainFields.contains(p,at.above(9)),"inclusive radius16 and half-height8 match boundary volume");
         DomainFields.stop(p);finish(h,p);
     }
@@ -21,7 +21,7 @@ public final class StasisVisibilityGameTests {
         var p=player(h,ArtifactKind.WORLDBREAKER);target(h,p);var tool=p.getMainHandItem();
         tool.getOrCreateTag().putString("copiedSkill",ArtifactKind.INTERREGNUM.id);tool.getOrCreateTag().putInt("copiedMode",1);
         ArtifactState.of(p,ArtifactKind.INTERREGNUM).putInt("mode",0);
-        h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.WORLDBREAKER,false),"copied aura starts despite source saved in domain mode");
+        h.assertTrue(DomainFields.start(p,tool,ArtifactKind.INTERREGNUM,p.blockPosition(),2),"copied aura starts despite source saved in domain mode");
         var destination=p.blockPosition().east(12);p.setPos(destination.getX()+.5,destination.getY(),destination.getZ()+.5);
         h.assertTrue(DomainFields.contains(p,destination)&&!DomainFields.contains(p,destination.east(3)),"copied mode remains a moving five-block-wide aura");
         DomainFields.stop(p);finish(h,p);

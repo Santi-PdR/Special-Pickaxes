@@ -12,7 +12,7 @@ final class SynchronousWorkDrain {
         try{
             var field=WorkQueue.class.getDeclaredField("JOBS");field.setAccessible(true);
             var jobs=(java.util.Map<?,?>)field.get(null);var job=jobs.get(player.getUUID());if(job==null)return false;
-            var region=job.getClass().getDeclaredField("region");region.setAccessible(true);return region.get(job) instanceof ConnectedExcavation;
+            var region=job.getClass().getDeclaredField("region");region.setAccessible(true);return region.get(job) instanceof ConnectedExcavation||region.get(job) instanceof SignatureExcavation;
         }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
     }
     static void drain(ServerPlayer player,int turns){
