@@ -497,7 +497,7 @@
   "message.specialpickaxes.ore_drops_glowing": "Iluminaste %s drops de mena de Iridium.",
   "message.specialpickaxes.ore_drops_gathered": "Atraíste %s drops de mena de Iridium.",
   "screen.specialpickaxes.copy_hand_only": "Sostén Rompemundos para elegir una copia.",
-  "guide.control.equipped": "Activa equipada: usa el pico del slot Pico de Curios sin cambiar la mano.",
+  "guide.control.equipped": "Bonificación equipada: concede el efecto del pico en Curios durante 10 segundos.",
   "screen.specialpickaxes.curios_passive": "En el slot Pico: efectos pasivos y activa propia con la tecla de equipado indicada arriba. R y X siguen controlando el pico en mano. Retirarlo detiene sus efectos equipados.",
   "tooltip.specialpickaxes.r": "%s · %s",
   "tooltip.specialpickaxes.x": "%s · %s",
@@ -745,5 +745,6 @@
   "message.specialpickaxes.curios_active_unavailable": "Esta habilidad equipada aún no está implementada.",
   "guide.front": "Excavación frontal",
   "pouch.specialpickaxes.title": "Bolsa de materiales · clic para retirar",
-  "pouch.specialpickaxes.page": "Página %s/%s · siguiente"
+  "pouch.specialpickaxes.page": "Página %s/%s · siguiente",
+  "guide.control.pouch": "Agacharse + clic derecho al aire: abrir bolsa y guardar loot de habilidades. Clic: stack; derecho: una unidad."
 }

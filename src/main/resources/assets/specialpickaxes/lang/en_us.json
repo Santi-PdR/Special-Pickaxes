@@ -497,7 +497,7 @@
   "message.specialpickaxes.ore_drops_glowing": "Marked %s Iridium ore drops.",
   "message.specialpickaxes.ore_drops_gathered": "Pulled %s Iridium ore drops toward you.",
   "screen.specialpickaxes.copy_hand_only": "Hold Worldbreaker to choose a copy.",
-  "guide.control.equipped": "Equipped active: uses the pick in the Curios Pickaxe slot, without swapping hands.",
+  "guide.control.equipped": "Equipped bonus: grants the Curios pick effect for 10 seconds.",
   "screen.specialpickaxes.curios_passive": "Equipped in the Pickaxe slot: passive effects plus its dedicated active ability. Use the equipped key shown above; R and X still control the held pick. Removing it stops equipped effects.",
   "tooltip.specialpickaxes.r": "%s · %s",
   "tooltip.specialpickaxes.x": "%s · %s",
@@ -745,5 +745,6 @@
   "message.specialpickaxes.curios_active_unavailable": "This equipped active is not implemented yet.",
   "guide.front": "Frontal excavation",
   "pouch.specialpickaxes.title": "Material pouch · click to withdraw",
-  "pouch.specialpickaxes.page": "Page %s/%s · next"
+  "pouch.specialpickaxes.page": "Page %s/%s · next",
+  "guide.control.pouch": "Sneak + right-click in air: open pouch and enable ability-loot storage. Click: stack; right-click: one."
 }

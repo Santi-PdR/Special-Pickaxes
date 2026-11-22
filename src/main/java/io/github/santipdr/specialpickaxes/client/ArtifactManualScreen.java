@@ -163,6 +163,7 @@ public final class ArtifactManualScreen extends Screen {
             controls.add(RelicKeys.name(action).copy().append("  ").append(Component.translatable(description)));
         }
         controls.add(RelicKeys.name(RelicControl.Action.CURIO_ACTIVATE).copy().append("  ").append(Component.translatable("guide.control.equipped")));
+        controls.add(Component.translatable("guide.control.pouch"));
         if(regional)controls.add(Component.translatable("guide.control.corners"));
         if(selectingCopy())controls.add(Component.translatable("guide.control.copy_picker"));
         return List.of(
