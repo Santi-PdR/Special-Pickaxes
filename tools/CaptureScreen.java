@@ -25,6 +25,17 @@ class CaptureScreen {
 
     private static void run(Robot robot, Rectangle bounds, String operation,
             String path, String action) throws Exception {
+        if ("pouch".equals(action)) {
+            robot.keyPress(java.awt.event.KeyEvent.VK_SHIFT);
+            Thread.sleep(120);
+            robot.mousePress(java.awt.event.InputEvent.BUTTON3_DOWN_MASK);
+            Thread.sleep(120);
+            robot.mouseRelease(java.awt.event.InputEvent.BUTTON3_DOWN_MASK);
+            robot.keyRelease(java.awt.event.KeyEvent.VK_SHIFT);
+            Thread.sleep(600);
+            if (operation.equals("press")) return;
+            action=null;
+        }
         if (action != null && !action.isEmpty()) {
             int key = key(action);
             robot.keyPress(key);
