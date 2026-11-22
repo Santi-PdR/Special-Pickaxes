@@ -1,12 +1,23 @@
-## Reforma 7 — implementación integrada validada, NO publicada
+## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Fuente `696e19cfd7e5015c8e1f946286619c5953ecb8c9`, CI `44995369324` **SUCCESS**. Evidencia descargada y revisada: 216 JUnit (0 fallos/errores/omisiones), 597 GameTests, servidor/logs y cliente real (32 escenas históricas, 64 tooltips; no 32 habilidades distintas). `CURIO_KEY_OK`, `POUCH_MENU_OK` físico, `ICARUS_CEILINGS_OK`, Worldloom 68 unidades/18 entidades sin recoger y Worldbreaker 96 roturas exactas. Capturas revisadas de Paradox/Eventide y Curios; la imagen de bolsa quedó omitida por presupuesto de exportación, se prioriza para el siguiente seguimiento.
+Última fuente probada `4897ed97dc79f829499636e8ad5fc3e329c924e3`, CI `44999329270` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **600 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, 1005851 bytes, SHA256 `cac6b5952676f811ba899f250521fc5b772fef19bf2d71a87b195122c5ad6353`. No publicado ni sustituido. Seguimiento actual añade sólo comparación emparejada de conservación/entidades con bolsa y prioridad de imagen: pendiente CI, sin cambiar producción.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1005840 bytes**, SHA256 `9f0f519718b4d6a46eaa4838c54256adea355f1f68f67104becb45d2666495cd`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
-Perfilado sintético: 23 trabajos sin bolsa, mediana del tiempo acumulado de transacciones 0.21161 ms; máximo por transacción 0.688814 ms, máximo acumulado por trabajo 1.348172 ms. NO son tiempos totales de tick, FPS ni comparación antes/después. Faltan muestras emparejadas con bolsa para cerrar esa afirmación; no se promete ausencia de lag universal.
+### Bolsa: comprobación controlada
 
-Cambio de criterio confirmado: habilidades sostenidas distintas y acotadas, Curios sólo efectos, bolsa con captura; formas permitidas. Ver `REFORM-7-PLAN.md`. Alpha.60 no se publica como reforma. Alpha.59 es la última descarga anterior y no representa este rediseño. Modelos/texturas y originales Iridium/Strata conservados.
+Misma huella Worldbreaker de **96 bloques**:
+
+| Captura | Botín en mundo | Botín guardado | Entidades ítem añadidas |
+|---|---:|---:|---:|
+| Desactivada | 96 | 0 | 96 |
+| Activada | 0 | 96 | 0 |
+
+Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Límites de la evidencia y trabajo abierto
+
+Perfilado anterior de 23 trabajos sintéticos sin bolsa: mediana acumulada de transacciones 0.21161 ms; máximo por transacción 0.688814 ms, máximo acumulado por trabajo 1.348172 ms. NO es coste total de tick, FPS, TPS ni comparación antes/después. El ensayo emparejado demuestra reducción de entidades y conservación, no una cifra de mejora de frame time. Sigue abierta la revisión general de identidad/utilidad (incluidos efectos Curios repetidos), costes de sincronización y rendimiento con cargas/modpacks representativos. No presentar el estado integrado como reforma global terminada sólo por pasar tests.
 
 ## Alpha.60 — Ícaro equipada revalida durabilidad tras permiso, pendiente CI
 
