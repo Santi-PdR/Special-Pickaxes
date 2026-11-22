@@ -1,8 +1,8 @@
-## Alpha.57 — activa equipada sin cobro por herramienta inadecuada, pendiente CI
+## Alpha.57 — activa equipada sin cobro por herramienta inadecuada, SUCCESS
 
 La ruta de minería activa equipada comprueba WorldSafety.harvestable con la herramienta real en mano antes y después del callback de permisos. Antes podía cobrar ocho de durabilidad y cooldown por un frente incapaz de cosechar siquiera su objetivo inicial. Un reemplazo externo del bloque también se revalida y se conserva, sin restaurarlo. Las rutas especiales de ascenso/loot no se alteran. Arte y habilidades originales Iridium/Strata intactos.
 
-Dos regresiones: pala sobre piedra rechazada sin coste/cooldown, seguida de reintento inmediato con pico que sí mina; callback cambia piedra a tierra y el pico ya no inicia ni cobra. Local: 174 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.56 sigue siendo la descarga validada.
+Dos regresiones: pala sobre piedra rechazada sin coste/cooldown, seguida de reintento inmediato con pico que sí mina; callback cambia piedra a tierra y el pico ya no inicia ni cobra. Local: 174 Python (una omisión), 25 recursos y diff check PASS. Fuente `322f5d65655c7b418f4a4001869461de3657b2d8`, CI `44966048410` SUCCESS: 216 JUnit, 574 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Ícaro, Worldloom sin recoger loot: 3992 unidades / 435 entidades). JAR 1001883 bytes, SHA256 `69a6b1f572d75a0f3f92851f5d554ea64ebeef9641dba28dfa530f54c574773b`. Publicación exacta pendiente, sin recompilar.
 
 ## Alpha.56 — objetivo y dirección coherentes al activar, SUCCESS
 
