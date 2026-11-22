@@ -1,0 +1,51 @@
+name: Publish validated alpha59 manual test
+on:
+  push:
+    branches: ['arena/cec54523-special-pickaxes']
+    paths: ['.github/workflows/publish-alpha59-test.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download and verify successful source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 44979192554 --json conclusion,headSha,event,workflowName > source-run.json
+          python3 - <<'PY'
+          import json
+          run=json.load(open('source-run.json'))
+          assert run['conclusion']=='success'
+          assert run['headSha']=='8f5346a3b248e59160d6b69f85d522fbf31a9210'
+          assert run['event']=='push' and run['workflowName']=='Forge verification'
+          PY
+          gh run download 44979192554 -n special-pickaxes-6.0.0-alpha.59-personal -D release
+          python3 - <<'PY'
+          import hashlib,json,pathlib,zipfile
+          root=pathlib.Path('release')
+          m=json.loads((root/'RELEASE.json').read_text())
+          assert m['commit']=='8f5346a3b248e59160d6b69f85d522fbf31a9210'
+          assert str(m['run_id'])=='44979192554'
+          assert m['file']=='special-pickaxes-1.20.1-6.0.0-alpha.59.jar'
+          jar=root/'libs'/m['file']
+          assert jar.stat().st_size==m['bytes']==1001971
+          assert hashlib.sha256(jar.read_bytes()).hexdigest()==m['sha256']=='f97c0edf008003ef338f624a673bfbdea5cdde64aa77096338d7a4c4938d3c16'
+          with zipfile.ZipFile(jar) as z:
+              assert z.testzip() is None
+              assert not any('/test/' in name for name in z.namelist())
+          PY
+      - name: Publish explicitly requested test JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create test-6.0.0-alpha.59-44979192554 release/libs/special-pickaxes-1.20.1-6.0.0-alpha.59.jar release/RELEASE.json release/SHA256SUMS --target 8f5346a3b248e59160d6b69f85d522fbf31a9210 --prerelease --latest=false --title 'Special Pickaxes 6.0.0-alpha.59 - prueba solicitada' --notes 'Alpha.59: Icaro comprueba cosechabilidad del techo con la herramienta real antes y despues de permisos. Un techo de tier superior no inicia ni cobra el ascenso; permite reintento inmediato con herramienta adecuada, que abre techo antes del impulso. Conserva alpha.58: mineria frontal sin cobro ante tier insuficiente y objetivos anegados intactos. Modelos/texturas y habilidades originales Iridium/Strata intactos; DropRecall congelado sin modificar. Fuente exacta 8f5346a3b248e59160d6b69f85d522fbf31a9210; CI 44979192554 SUCCESS: 216 JUnit, 584 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Icaro). JAR exacto probado, sin recompilar. Minecraft 1.20.1, Forge 47.4.10, Java 17; Curios opcional para variantes equipadas. Prerelease: no certifica todos los modpacks ni aprobacion visual universal. Arte externo conserva creditos y avisos; no se concede licencia adicional de redistribucion. SHA256 f97c0edf008003ef338f624a673bfbdea5cdde64aa77096338d7a4c4938d3c16; 1001971 bytes.'

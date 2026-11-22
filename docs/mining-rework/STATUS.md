@@ -1,8 +1,8 @@
-## Alpha.59 — Ícaro valida cosechabilidad del techo antes de cobrar, pendiente CI
+## Alpha.59 — Ícaro valida cosechabilidad del techo antes de cobrar, SUCCESS
 
 IcarianFlight.safeStart recibe la herramienta real y exige cosechabilidad de las celdas no vacías en el volumen inicial, antes y después del permiso. Evita cobrar activa equipada y cooldown por un techo que no podría abrir en el primer tick. Conserva barreras, leases, velocidad, duración y margen de caída. También protege la entrada sostenida; no cambia arte, Iridium/Strata ni DropRecall.
 
-Dos regresiones: techo de diamante con pico de madera rechaza sin coste y permite reintento inmediato con diamante que abre el techo antes del impulso; permiso cambia piedra por mena extranjera superior y rechaza sin coste/revertir reemplazo. Local: 176 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes. Seguimiento anegados anterior confirmado SUCCESS en CI `44978220020`; detalle abajo.
+Dos regresiones: techo de diamante con pico de madera rechaza sin coste y permite reintento inmediato con diamante que abre el techo antes del impulso; permiso cambia piedra por mena extranjera superior y rechaza sin coste/revertir reemplazo. Local: 176 Python (una omisión), 25 recursos y diff check PASS. Fuente `8f5346a3b248e59160d6b69f85d522fbf31a9210`, CI `44979192554` SUCCESS: 216 JUnit, 584 GameTests, servidor/logs y cliente real (32 escenas/64 tooltips, dos techos Ícaro, Worldloom 5098 unidades/661 entidades). JAR 1001971 bytes, SHA256 `f97c0edf008003ef338f624a673bfbdea5cdde64aa77096338d7a4c4938d3c16`. Publicación exacta pendiente, sin recompilar. Seguimiento anegados anterior confirmado SUCCESS en CI `44978220020`; detalle abajo.
 
 ## Seguimiento alpha.58 — objetivos anegados al activar, SUCCESS
 

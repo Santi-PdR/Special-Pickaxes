@@ -1,10 +1,10 @@
-# Special Pickaxes — 6.0.0-alpha.58
+# Special Pickaxes — 6.0.0-alpha.59
 
-**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.58-44970779846/special-pickaxes-1.20.1-6.0.0-alpha.58.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.58-44970779846) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
+**[Descargar JAR suelto](https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-6.0.0-alpha.59-44979192554/special-pickaxes-1.20.1-6.0.0-alpha.59.jar)** · [Release y SHA256](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.59-44979192554) · [Guía actual](docs/mining-rework/PLAYER-GUIDE.md) · [Compatibilidad](docs/mining-rework/COMPATIBILITY.md)
 
 Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habilita las variantes equipadas. Prerelease validada en CI; no certifica todos los modpacks ni una instalación Windows.
 
-**Nuevo en alpha.58:** la minería frontal sostenida comprueba cosechabilidad antes y después del permiso. Un objetivo con tier Forge superior no inicia ni cobra la activación; se conservan reemplazos externos y se puede reintentar con un objetivo válido.
+**Nuevo en alpha.59:** Ícaro comprueba que la herramienta real pueda cosechar el techo antes y después del permiso. Un techo de tier superior no inicia ni cobra el ascenso; se puede reintentar inmediatamente con una herramienta adecuada que lo abra antes del impulso.
 
 ## Qué hace la revisión actual
 
@@ -18,13 +18,13 @@ Minecraft **1.20.1**, Forge **47.4.10**, Java **17**. Curios es opcional y habil
 
 ## Evidencia y descarga
 
-El JAR publicado proviene de `10dae282de5a37b84e7a975b5e79b77011fa3f08`, [CI 44970779846](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44970779846): **216 JUnit, 576 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
+El JAR publicado proviene de `8f5346a3b248e59160d6b69f85d522fbf31a9210`, [CI 44979192554](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44979192554): **216 JUnit, 584 GameTests, servidor y cliente real**, 32 escenas y 64 tooltips.
 
 El seguimiento exclusivamente de pruebas [44816553795](https://github.com/Santi-PdR/Special-Pickaxes/actions/runs/44816553795) también terminó SUCCESS: **214 JUnit y 547 GameTests**, cliente y servidor. Añade cobertura live de loot denso y copia durante permisos; no altera el JAR publicado.
 
-- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.58.jar`
-- Tamaño: **1001918 bytes**
-- SHA256: `7d515040940231746846631169ed591a7fa99e299a0cb1d701d4130034b3f924`
+- Archivo: `special-pickaxes-1.20.1-6.0.0-alpha.59.jar`
+- Tamaño: **1001971 bytes**
+- SHA256: `f97c0edf008003ef338f624a673bfbdea5cdde64aa77096338d7a4c4938d3c16`
 
 Estado detallado y alcance de revisión visual en [STATUS.md](docs/mining-rework/STATUS.md). Arte de terceros: se mantienen créditos y avisos; la descarga no concede una licencia adicional de redistribución.
 
