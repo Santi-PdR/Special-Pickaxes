@@ -47,17 +47,12 @@ class InterfaceCopyTests(unittest.TestCase):
     def test_key_dimensions_and_functional_summaries_remain_visible(self):
         for locale in ('en_us', 'es_es'):
             texts = self.texts(locale)
-            for identity, key, facts in (
-                ('hellspec', 'main', ('18', '13', '4049')),
-                ('hellspec', 'alt', ('19', '3', '12', '3571')),
-                ('worldloom', 'alt', ('12', '25')),
-                ('palimpsest', 'main', ('2765',)),
-                ('palimpsest', 'alt', ('7153',)),
-            ):
-                text = texts[f'guide.{key}.{identity}']
-                for fact in facts:
-                    self.assertIn(fact, text)
-                self.assertLess(len(text), 200)
+            for identity in ('hellspec','worldloom','palimpsest','eventide','paradox_crucible'):
+                for action in ('main','alt'):
+                    text=texts[f'guide.{action}.{identity}']
+                    self.assertTrue(15<len(text)<200)
+                    for retired in ('4049','3571','2765','7153','4164'):
+                        self.assertNotIn(retired,text)
 
     def test_manual_renders_the_equipped_details_for_all_thirteen_in_three_languages(self):
         source = Path('src/main/java/io/github/santipdr/specialpickaxes/client/ArtifactManualScreen.java').read_text()

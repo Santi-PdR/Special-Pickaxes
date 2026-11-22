@@ -69,8 +69,9 @@ class OverhaulContracts(unittest.TestCase):
         for locale in ('en_us', 'es_es'):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
             text = texts['alternate.detail.specialpickaxes.eventide']
-            self.assertIn(' %3$s ', text)
-            self.assertIn(' %1$s ', text)
+            self.assertIn('%1$s', text)
+            self.assertNotIn('5480', text)
+            self.assertNotIn('anillo', text.lower())
 
     def test_multimode_guides_explain_every_selected_mode_in_both_languages(self):
         modes = {
@@ -84,7 +85,7 @@ class OverhaulContracts(unittest.TestCase):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
             for artifact, variants in modes.items():
                 descriptions = [texts['guide.main.' + artifact + '.' + mode] for mode in variants]
-                self.assertEqual(len(descriptions), len(set(descriptions)))
+                self.assertTrue(all(text==texts['guide.main.'+artifact] for text in descriptions))
                 self.assertTrue(all(15 < len(text) < 180 for text in descriptions))
 
     def test_manual_controls_explain_cancel_corners_and_field_toggles(self):
@@ -108,18 +109,19 @@ class OverhaulContracts(unittest.TestCase):
                         self.assertNotIn('7×7', value, key)
             self.assertIn('1024', texts['guide.main.seam_ripper'])
             self.assertIn('15×15', texts['guide.alt.seam_ripper'])
-            self.assertIn('7×7', texts['curios.detail.specialpickaxes.seam_ripper'])
+            self.assertNotIn('7×7', texts['curios.detail.specialpickaxes.seam_ripper'])
+            self.assertIn('10 s', texts['curios.detail.specialpickaxes.seam_ripper'])
 
     def test_worldloom_primary_documents_terraces_instead_of_the_retired_bore(self):
         for locale in ('en_us', 'es_es', 'es_uy'):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
             for key in ('guide.main.worldloom', 'mining.identity.worldloom.quarry', 'mining.how.worldloom.quarry'):
-                self.assertIn('4164', texts[key])
+                self.assertNotIn('4164', texts[key])
+                self.assertIn('terrace' if locale=='en_us' else 'terraza', texts[key].lower())
                 self.assertNotIn('7×7', texts[key])
                 self.assertNotIn('48', texts[key])
                 self.assertNotIn('outline', texts[key].lower())
                 self.assertNotIn('contorno', texts[key].lower())
             self.assertIn('%1$s', texts['mining.how.worldloom.quarry'])
-            self.assertIn('12', texts['guide.main.worldloom'])
-            self.assertIn('12', texts['tooltip.specialpickaxes.secondary.worldloom'])
+            self.assertEqual(texts['guide.main.worldloom'],texts['tooltip.specialpickaxes.secondary.worldloom'])
             self.assertNotIn('64', texts['tooltip.specialpickaxes.secondary.worldloom'])

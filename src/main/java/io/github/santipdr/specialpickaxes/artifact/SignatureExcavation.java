@@ -8,8 +8,11 @@ import java.util.*;
 /** Bounded, source-specific held cuts. Every inspected cell shares the existing queue budget. */
 public final class SignatureExcavation implements WorkProgram {
     private final List<BlockPos> cells;
-    private int index;
-    private SignatureExcavation(List<BlockPos> cells){this.cells=cells;}
+    private int index,settled;
+    private final ArrayDeque<BlockPos> cleared=new ArrayDeque<>();
+    private long now,settleUntil=Long.MIN_VALUE;
+    private final long deadline;
+    private SignatureExcavation(List<BlockPos> cells,long now){this.cells=cells;this.now=now;deadline=now+160;}
     public static boolean handles(ArtifactKind kind){return switch(kind){
         case PALIMPSEST,CHOIR,EVENTIDE,CRUCIBLE,INTERREGNUM,WORLDLOOM,ICARUS,AXIOM,EXODIUM,HELLSPEC,WORLDBREAKER->true;
         default->false;
@@ -53,23 +56,32 @@ public final class SignatureExcavation implements WorkProgram {
         if(!WorldSafety.harvestable(p,tool,at)||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
         if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!WorldSafety.harvestable(p,tool,at)
                 ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-        if(!WorkQueue.startRegion(p,tool,kind,new SignatureExcavation(footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,alternate))))return false;
+        if(!WorkQueue.startRegion(p,tool,kind,new SignatureExcavation(footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,alternate),ArtifactState.now(p))))return false;
         ArtifactInteraction.clear(p);tool.getOrCreateTag().putString("artifactStatus","idle");return true;
     }
-    public int remaining(){return cells.size()-index;}
-    public boolean done(){return index>=cells.size();}
+    public int remaining(){return done()?0:Math.max(1,cells.size()-index);}
+    public boolean done(){return now>=deadline||index>=cells.size()&&(cleared.isEmpty()||settled>=64||settleUntil!=Long.MIN_VALUE&&now>=settleUntil);}
     public boolean awaiting(){return false;}
     public boolean executing(){return true;}
     public void confirm(){}
     public boolean loaded(ServerPlayer p){return true;}
     public boolean reportPartial(){return false;}
-    public int attemptsPerTick(ItemStack tool){return 16;}
-    public WorkStep next(ServerPlayer p){var at=cells.get(index++);return new WorkStep(){
-        public BlockPos pos(){return at;}
-        public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
-            if(!actor.serverLevel().hasChunkAt(at))return false;
-            var state=actor.serverLevel().getBlockState(at);
-            return NaturalExcavationProgram.eligible(state)&&WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);
-        }
-    };}
+    public int attemptsPerTick(ItemStack tool){return index<cells.size()?16:Math.min(16,Math.max(1,cleared.size()));}
+    public WorkStep next(ServerPlayer p){
+        now=ArtifactState.now(p);boolean revisit=index>=cells.size();
+        if(revisit&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(deadline,now+40);
+        var at=revisit?cleared.removeFirst():cells.get(index++);
+        if(revisit)cleared.addLast(at);
+        return new WorkStep(){
+            public BlockPos pos(){return at;}
+            public boolean apply(ServerPlayer actor,ItemStack tool,ArtifactKind kind){
+                now=ArtifactState.now(actor);
+                if(now>=deadline||revisit&&now>=settleUntil||!actor.serverLevel().hasChunkAt(at))return false;
+                var state=actor.serverLevel().getBlockState(at);
+                boolean mined=NaturalExcavationProgram.eligible(state)&&WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);
+                if(mined){if(revisit)settled++;else cleared.addLast(at);}
+                return mined;
+            }
+        };
+    }
 }

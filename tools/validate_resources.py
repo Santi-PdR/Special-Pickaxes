@@ -202,7 +202,7 @@ class Resources(unittest.TestCase):
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{language}.json").read_text())
             for section in ["regional", "proximity"]:
                 how = data[f"mining.how.paradox_crucible.{section}"].casefold()
-                self.assertIn("%2$s", how, f"{language}/{section}: instructions must use the configured mode binding")
+                self.assertIn("%1$s", how, f"{language}/{section}: instructions must use the configured activation binding")
                 self.assertNotIn("offhand", how, f"{language}/{section}: stale offhand instructions")
                 self.assertNotIn("mano secundaria", how, f"{language}/{section}: stale offhand instructions")
             self.assertTrue(all(data.get(f"mode.specialpickaxes.{mode}") for mode in expected_outputs), language)
@@ -263,10 +263,11 @@ class Resources(unittest.TestCase):
     def test_choir_manual_matches_seismic_fan(self):
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
-            self.assertIn("32", data["identity.specialpickaxes.fault_choir"])
-            self.assertIn("5310", data["guide.main.fault_choir"])
-            self.assertIn("49", data["play4.fault_choir"])
-            self.assertIn("4100", data["guide.alt.fault_choir"])
+            term="cross" if lang=="en_us" else "cruz"
+            self.assertIn(term, data["guide.main.fault_choir"])
+            for key in ["identity.specialpickaxes.fault_choir","guide.main.fault_choir","play4.fault_choir","guide.alt.fault_choir"]:
+                self.assertNotIn("5310",data[key])
+                self.assertTrue(15<len(data[key])<200)
             self.assertNotIn("replay", data["identity.specialpickaxes.fault_choir"].lower())
             self.assertNotIn("repite", data["identity.specialpickaxes.fault_choir"].lower())
             combat_term = "Fault Resonance" if lang == "en_us" else "Resonancia de Falla"

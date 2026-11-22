@@ -58,3 +58,11 @@ Validación local tras cambio: 178 Python (una omisión). Nuevos GameTests de ef
 - Once picos rediseñados entran en SignatureExcavation con huellas diferentes (incluidos cuña Paradox, línea precisa Interregnum, alas Ícaro). Secundaria Ícaro conserva ascenso. Se elimina selección regional primaria de Paradox para no dejar bloqueo manual; Worldbreaker copia la nueva firma.
 - Límites 256/384 celdas e inspecciones 16/tick por trabajo dentro del scheduler global. Eso NO prueba ausencia de lag. Pendiente seguimiento de caída en nuevas huellas y ajuste de potencia.
 - Migrada fixture real de tecla Curios a terreno intacto/efecto/cero desgaste. Nuevas pruebas de geometrías y captura de bolsa. Las pruebas antiguas que exigían megavolúmenes y huellas conectadas deben migrarse, no ocultarse. No hay release.
+
+## Correcciones y migración de contrato
+
+CI `44988825841` falló compilación por inferencia de tipos en Comparator.comparingInt; corregido con lambda BlockPos explícita en 8568557. No se atribuye a infraestructura. Revalidación postpermiso de elegibilidad/procedencia añadida.
+
+Las nuevas firmas revisitan sólo celdas minadas durante 40 ticks, con límite de 64 roturas adicionales y deadline total de 160 ticks; cada inspección consume el presupuesto de 16/tick existente. No expande su huella durante seguimiento. Pendientes GameTests de caída en estas rutas.
+
+Textos en tres idiomas migrados de megavolúmenes/aftershocks Curios a firmas acotadas y efectos. Contratos documentales actualizados para rechazar las cifras retiradas y describir la nueva mecánica; no se mantienen promesas antiguas sólo para aprobar tests. Cliente Worldloom ahora exige loot nativo presente (no 256+ objetos como requisito de usabilidad) y Stasis rechaza el dominio retirado. Esto NO acredita aún el rendimiento ni termina migración de todos los GameTests anteriores.

@@ -57,21 +57,13 @@ public final class ClientValidation {
                         var loot=p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                                 new net.minecraft.world.phys.AABB(new BlockPos(0,62,10)).inflate(48));
                         int items=loot.stream().mapToInt(drop->drop.getItem().getCount()).sum();
-                        if(items<256||loot.stream().anyMatch(net.minecraft.world.entity.item.ItemEntity::isCurrentlyGlowing))
+                        if(items<1||loot.stream().anyMatch(net.minecraft.world.entity.item.ItemEntity::isCurrentlyGlowing))
                             throw new IllegalStateException("Worldloom survival loot missing or unexpectedly glowing: "+items);
                         p.sendSystemMessage(Component.literal("WORLDLOOM_NATIVE_LOOT_OK items="+items+" entities="+loot.size()));
                         p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
                     }
-                    if(current.kind()==ArtifactKind.INTERREGNUM&&current.mode()==0){
-                        if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0)throw new IllegalStateException("Stasis domain missing after real keyboard activation");
-                        // Disposable action stage: the original gallery walls occlude a domain this large.
-                        // Clear its sightline only AFTER the real key has activated the real field.
-                        for(int x=-18;x<=28;x++)for(int y=65;y<=90;y++)for(int z=-8;z<=42;z++)
-                            p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
-                        for(int x=25;x<=27;x++)for(int z=39;z<=41;z++)
-                            p.serverLevel().setBlock(new BlockPos(x,81,z),net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE.defaultBlockState(),2);
-                        p.connection.teleport(26.5,82,40.5,139,22);
-                    }
+                    if(current.kind()==ArtifactKind.INTERREGNUM&&DomainFields.active(p))
+                        throw new IllegalStateException("Reworked Interregnum must not start an invisible domain");
                     state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
                 }
             }
