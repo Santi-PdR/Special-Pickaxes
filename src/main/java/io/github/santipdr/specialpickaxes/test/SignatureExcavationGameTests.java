@@ -38,4 +38,20 @@ public final class SignatureExcavationGameTests {
         });
     }
 
+    @GameTest(template="empty",batch="signature_runtime_r7") public static void everyReworkedPrimaryUsesItsBoundedSignatureAndNativeLoot(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            if(!SignatureExcavation.handles(kind))continue;
+            var p=SeismicReworkGameTests.player(h,kind);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+            var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
+            var cells=SignatureExcavation.footprint(at,direction,kind,false);
+            for(var cell:cells){h.getLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.TERRACOTTA.defaultBlockState(),2);PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+            var outside=at.relative(direction.getOpposite(),2).above(4);h.getLevel().setBlock(outside,net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState(),2);
+            h.assertTrue(ArtifactActions.primary(p,tool,kind),"real primary accepts signature "+kind.id);
+            for(int tick=0;tick<80;tick++)WorkQueue.tick();
+            h.assertTrue(cells.stream().allMatch(cell->h.getLevel().getBlockState(cell).isAir()),"primary clears its own footprint "+kind.id);
+            h.assertTrue(h.getLevel().getBlockState(outside).is(net.minecraft.world.level.block.Blocks.DIAMOND_ORE),"primary does not jump outside its footprint "+kind.id);
+            WorkQueue.cancel(p);MiningObservations.forget(p);
+        }h.succeed();
+    }
+
 }

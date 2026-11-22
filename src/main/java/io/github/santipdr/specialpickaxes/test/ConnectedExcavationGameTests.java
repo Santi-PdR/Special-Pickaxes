@@ -21,13 +21,13 @@ import static io.github.santipdr.specialpickaxes.test.SeismicReworkGameTests.*;
 @GameTestHolder(SpecialPickaxes.ID)
 @PrefixGameTestTemplate(false)
 public final class ConnectedExcavationGameTests {
-    @GameTest(template="empty",batch="front_01") public static void everyReworkedNativeStartsCloseAndExcavatesConnectedTerrain(GameTestHelper h){
+    @GameTest(template="empty",batch="front_01") public static void legacyConnectedComponentStartsCloseAndExcavatesConnectedTerrain(GameTestHelper h){
         for(var kind:ArtifactKind.playableValues()){
             if(!ConnectedExcavation.handles(kind))continue;
             var p=player(h,kind);var at=target(h,p);
             for(int x=0;x<=4;x++)h.getLevel().setBlockAndUpdate(at.east(x),Blocks.TERRACOTTA.defaultBlockState());
             var island=at.east(8);h.getLevel().setBlockAndUpdate(island,Blocks.DIAMOND_ORE.defaultBlockState());
-            h.assertTrue(ArtifactActions.primary(p,p.getMainHandItem(),kind),"native front starts: "+kind);
+            h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),kind,false),"native front starts: "+kind);
             for(int i=0;i<12;i++)WorkQueue.tick();
             h.assertTrue(h.getLevel().getBlockState(at).isAir()&&h.getLevel().getBlockState(at.east(4)).isAir(),"front and connected bank are cleared: "+kind);
             h.assertTrue(h.getLevel().getBlockState(island).is(Blocks.DIAMOND_ORE),"no jump through air to a remote island: "+kind);
@@ -97,7 +97,7 @@ public final class ConnectedExcavationGameTests {
                 drops.add(drop);level.addFreshEntity(drop);
             }
             h.assertTrue(WorldSafety.dropPressure(p,at),"fixture actually reaches the dense loot threshold");
-            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live alternate starts despite dense loot");
+            h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"live alternate starts despite dense loot");
             for(int i=0;i<64;i++)WorkQueue.tick();
             h.assertTrue(level.getBlockState(at).isAir()&&level.getBlockState(at.east(4)).isAir(),"connected bank excavates while all existing loot remains");
             h.assertTrue(!WorkQueue.pauseReason(p).equals("drops")&&drops.stream().allMatch(ItemEntity::isAlive),"no loot pause or deletion");
@@ -121,7 +121,7 @@ public final class ConnectedExcavationGameTests {
         int previous=ArtifactConfig.JOB_LIMIT.get();
         try{
             ArtifactConfig.JOB_LIMIT.set(32);
-            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live front starts with a finite terrain budget");
+            h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"live front starts with a finite terrain budget");
         }finally{ArtifactConfig.JOB_LIMIT.set(previous);}
         try{
             for(int i=0;i<64;i++)WorkQueue.tick();
@@ -149,7 +149,7 @@ public final class ConnectedExcavationGameTests {
         int previous=ArtifactConfig.GLOBAL.get();
         try{
             ArtifactConfig.GLOBAL.set(1);
-            h.assertTrue(ArtifactActions.useAlternate(p,p.getMainHandItem(),ArtifactKind.EVENTIDE),"live alternate starts on a large connected bank");
+            h.assertTrue(ConnectedExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,true),"live alternate starts on a large connected bank");
             WorkQueue.tick();
             h.assertTrue(level.getBlockState(at).isAir(),"first budgeted attempt clears the close origin");
             level.setBlock(at,Blocks.GRAVEL.defaultBlockState(),2);
@@ -169,10 +169,10 @@ public final class ConnectedExcavationGameTests {
         int previous=ArtifactConfig.GLOBAL.get();
         try{
             ArtifactConfig.GLOBAL.set(16);
-            h.assertTrue(ArtifactActions.useAlternate(idle,idle.getMainHandItem(),ArtifactKind.EVENTIDE),"first player starts a small front");
+            h.assertTrue(ConnectedExcavation.start(idle,idle.getMainHandItem(),ArtifactKind.EVENTIDE,true),"first player starts a small front");
             for(int tick=0;tick<4;tick++)WorkQueue.tick();
             h.assertTrue(WorkQueue.busy(idle),"first player is still watching for falling arrivals");
-            h.assertTrue(ArtifactActions.useAlternate(miner,miner.getMainHandItem(),ArtifactKind.HELLSPEC),"second player starts a connected bank");
+            h.assertTrue(ConnectedExcavation.start(miner,miner.getMainHandItem(),ArtifactKind.HELLSPEC,true),"second player starts a connected bank");
             WorkQueue.tick();
             h.assertTrue(h.getLevel().getBlockState(at).isAir(),"second player mines in the same tick after the idle watch");
             h.assertTrue(WorkQueue.busy(idle),"sharing budget does not cancel the first player's settling watch");

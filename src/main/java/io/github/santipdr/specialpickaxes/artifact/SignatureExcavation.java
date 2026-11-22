@@ -56,7 +56,9 @@ public final class SignatureExcavation implements WorkProgram {
         if(!WorldSafety.harvestable(p,tool,at)||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
         if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!WorldSafety.harvestable(p,tool,at)
                 ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-        if(!WorkQueue.startRegion(p,tool,kind,new SignatureExcavation(footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,alternate),ArtifactState.now(p))))return false;
+        var plan=footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,alternate);
+        plan=plan.subList(0,Math.min(plan.size(),ArtifactConfig.JOB_LIMIT.get()));
+        if(!WorkQueue.startRegion(p,tool,kind,new SignatureExcavation(List.copyOf(plan),ArtifactState.now(p))))return false;
         ArtifactInteraction.clear(p);tool.getOrCreateTag().putString("artifactStatus","idle");return true;
     }
     public int remaining(){return done()?0:Math.max(1,cells.size()-index);}
