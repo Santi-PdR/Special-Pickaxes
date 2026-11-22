@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `047fd430ac74124b9cb4e434ada8805cc7d0df97`, CI `45048228736` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **604 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `8b2b19388befb9fc50f8233228ba6e15e954791b`, CI `45054553819` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **605 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006431 bytes**, SHA256 `2d8bba1108f56d0f8ea8e7b52a469a708bc8d9aa4f99d2d19b6728de78a8c325`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006385 bytes**, SHA256 `2e9ef2ffc60f5afe4b6bd8720d5de9175a732b2fb08376035248f2f981649515`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -22,6 +22,10 @@ Conservación exacta y reducción de entidades confirmadas en el mismo escenario
 ### Carga simultánea verificada
 
 Ensayo de ocho firmas, 768 bloques por ronda, cuatro rondas alternando captura: 47 ticks de planificador en todas, máximo 128 intentos/tick (límite 192), botín exacto y entidades 768→0. Tiempo acumulado de WorkQueue.tick: sin bolsa 46.106/47.801 ms, con bolsa 51.055/49.544 ms; máximos individuales 7.804/7.893 y 10.953/7.580 ms respectivamente. No demuestra ahorro de CPU inmediato ni TPS/FPS; no incluye ticking posterior de ítems ni red real. Método, tabla completa y límites en `PERFORMANCE-7.md`.
+
+### Física posterior verificada; tiempos no concluyentes
+
+Ensayo ABBA con 70 ticks naturales por ronda conserva 96 unidades en todas: sin bolsa quedan 24–25 entidades por fusión natural, con bolsa ninguna. 50 intervalos de tick de nivel medidos por ronda; hay deriva temporal pronunciada, y la última ronda sin bolsa fue la más rápida. **No demuestra mejora causal de TPS/FPS**. Método, números completos y fallos de aislamiento anteriores en PERFORMANCE-7.md. Ayuda/confirmación de restablecer copia ya no promete seis modos retirados.
 
 ### Límites de la evidencia y trabajo abierto
 
