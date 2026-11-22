@@ -1,8 +1,8 @@
-## Alpha.58 — frente sostenido sin cobro por tier insuficiente, pendiente CI
+## Alpha.58 — frente sostenido sin cobro por tier insuficiente, SUCCESS
 
 ConnectedExcavation.start valida cosechabilidad del objetivo inicial con la herramienta real antes y después del callback de permisos. Un objetivo cuyo tier Forge supera al artefacto ya no inicia un frente que fallaría después ni consume la activación. Revalida sustituciones externas sin restaurarlas ni saltarse tiers. Sólo cambia entrada de minería conectada, no habilidades originales Iridium/Strata, DropRecall ni arte.
 
-Dos regresiones con TestOres.HIGHER_TIER_ORE: principal rechazada sin coste/cooldown y reintento inmediato en piedra que sí mina; secundaria con reemplazo por tier superior dentro de permiso, también sin coste/cooldown y bloque intacto. Local: 175 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.57 sigue siendo descarga validada.
+Dos regresiones con TestOres.HIGHER_TIER_ORE: principal rechazada sin coste/cooldown y reintento inmediato en piedra que sí mina; secundaria con reemplazo por tier superior dentro de permiso, también sin coste/cooldown y bloque intacto. Local: 175 Python (una omisión), 25 recursos y diff check PASS. Fuente `10dae282de5a37b84e7a975b5e79b77011fa3f08`, CI `44970779846` SUCCESS: 216 JUnit, 576 GameTests, servidor/logs y cliente real (32 escenas, 64 tooltips, dos techos Ícaro, Worldloom sin recoger loot: 5686 unidades / 768 entidades). JAR 1001918 bytes, SHA256 `7d515040940231746846631169ed591a7fa99e299a0cb1d701d4130034b3f924`. Publicación exacta pendiente, sin recompilar.
 
 ## Alpha.57 — activa equipada sin cobro por herramienta inadecuada, SUCCESS
 

@@ -1,15 +1,15 @@
-# Compatibilidad vigente — alpha.57
+# Compatibilidad vigente — alpha.58
 
 - Minecraft **1.20.1**, Forge **47.4.10**, Java **17**.
 - Curios opcional: slot `pickaxe`, efectos pasivos y activa **H**, distinta de **G** (inventario de Curios). La guía muestra la tecla reasignada.
-- CI del JAR exacto `44966048410`: **216 JUnit, 574 GameTests**, servidor empaquetado/logs y cliente gráfico completos. El cliente verifica un slot Curios real con H, coste de la fuente y minería conectada, manteniendo otra herramienta en mano.
+- CI del JAR exacto `44970779846`: **216 JUnit, 576 GameTests**, servidor empaquetado/logs y cliente gráfico completos. El cliente verifica un slot Curios real con H, coste de la fuente y minería conectada, manteniendo otra herramienta en mano.
 - Seguimiento sólo de pruebas `44958321321`: **216 JUnit, 569 GameTests**, servidor/cliente completos. Incluye fuentes de agua/lava llegadas después de excavar: intactas tras 40 ticks y vigilancia aún activa. Producción/recursos/build sin diferencias frente al JAR alpha.55 publicado entonces; no implica compatibilidad universal con fluidos de mods.
 - Seguimiento sólo de pruebas `44955816770`: **216 JUnit, 567 GameTests**, servidor/cliente completos. Verifica polvo de hormigón y yunques con caída real en rutas sostenida y equipada (pala/pico adecuados), con drops nativos sin glowing. Producción/recursos/build idénticos a la fuente del JAR alpha.55 publicado entonces; no se reemplazó el JAR por otro compilado de pruebas.
 - CI histórica sólo de pruebas `44816553795`: **214 JUnit, 547 GameTests**, servidor/cliente completos. Verifica loot denso y cambio de copia durante permisos.
 - Los tests cubren permisos/callbacks, bloques colocados, contenedores, fluidos, irrompibles, cancelación por cambio de equipo y asentamiento real de arena/grava, polvo de hormigón y yunques. Esto no certifica todos los proveedores de claims ni todos los bloques de otros mods.
 - Sin certificación de Windows, Ghouls completo, todos los modpacks o todas las escalas de GUI. Las capturas revisadas y sus límites se registran en [STATUS.md](STATUS.md).
 
-[Descarga vigente](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.57-44966048410) · [Guía actual](PLAYER-GUIDE.md)
+[Descarga vigente](https://github.com/Santi-PdR/Special-Pickaxes/releases/tag/test-6.0.0-alpha.58-44970779846) · [Guía actual](PLAYER-GUIDE.md)
 
 <details>
 <summary>Historial de compatibilidad — resultados y limitaciones de versiones anteriores</summary>
