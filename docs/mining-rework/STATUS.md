@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `b4793166684f82732bb2ba97c088a0c216ab8fcf`, CI `45032768317` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **602 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `47047173522f940ede4fb8c04622913569e69321`, CI `45039589537` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **603 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006427 bytes**, SHA256 `527d917c2cbd5d924228b42a06422136404954e1abc130509b6231732bc15c4f`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006428 bytes**, SHA256 `2c3905063645afd8249608bf609320316d374e3c198bdc85d39404be6ab07dc9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Carga simultánea verificada
+
+Ensayo de ocho firmas, 768 bloques por ronda, cuatro rondas alternando captura: 47 ticks de planificador en todas, máximo 128 intentos/tick (límite 192), botín exacto y entidades 768→0. Tiempo acumulado de WorkQueue.tick: sin bolsa 46.106/47.801 ms, con bolsa 51.055/49.544 ms; máximos individuales 7.804/7.893 y 10.953/7.580 ms respectivamente. No demuestra ahorro de CPU inmediato ni TPS/FPS; no incluye ticking posterior de ítems ni red real. Método, tabla completa y límites en `PERFORMANCE-7.md`.
 
 ### Límites de la evidencia y trabajo abierto
 
