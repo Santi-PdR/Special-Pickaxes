@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `01055ce440a5e5140f62f21e8034656d5177c262`, CI `45061754599` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **608 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `15813054185683b56829ccbc0da67ea21f8a615e`, CI `45069864077` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **609 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006979 bytes**, SHA256 `fcdda599b9fac4ba1706b28a2dbb204eb70638476b5fde353c798bb4188a63a5`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006998 bytes**, SHA256 `d0c14825c412c400aeb7103c9b070ee0e119a286b40a7eff6cf821677a701589`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Cola de excavación sin feedback retirado
+
+SignatureExcavation ya no entra en la rama de feedback legacy cada cuatro ticks: consumía preparación/presupuesto aunque terminaba en emisores retirados sin salida. Los impactos/finales visibles actuales siguen en AbilityVfx y las rutas Iridium/Strata/otros programas no se cambian. Regresión de las once firmas confirma objetivo roto, job terminado y presupuesto cosmético legacy intacto. No reduce paquetes de esa rama (ya no emitía) ni demuestra por sí sola FPS/TPS.
 
 ### Menú actualizado durante uso
 

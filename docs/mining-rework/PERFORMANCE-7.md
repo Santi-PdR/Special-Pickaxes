@@ -67,3 +67,7 @@ Fuente `75b9189012109ffcfd2cd6671122800c41fc9c19`, CI **45058964029 SUCCESS**, 6
 ## Seguimiento de vista abierta
 
 Fuente `01055ce440a5e5140f62f21e8034656d5177c262`, CI **45061754599 SUCCESS**, 608 GameTests. La vista abierta usa identidad de la lista reemplazada por las escrituras copy-on-write para invalidarse en broadcast. Regresión prueba 20 broadcasts sin reconstruir stacks de exposición, NBT ajeno sin invalidación, actualización tras inserciones y preferencia modificada. No hay revisión persistida ni hash/copia de 64 entradas por tick para detectar cambios. Los broadcasts vanilla y la sincronización de inventario siguen existiendo; no se afirma eliminación de paquetes ni mejora medida de TPS/FPS.
+
+## Seguimiento de feedback retirado en cola
+
+Fuente `15813054185683b56829ccbc0da67ea21f8a615e`, CI **45069864077 SUCCESS**, 609 GameTests. Sólo SignatureExcavation omite la rama de feedback legacy cada cuatro ticks, que terminaba en emisores no-op pero seguía reservando allowance/preparando datos. AbilityVfx conserva impactos/finales visibles y las rutas de originales/otros programas no se modifican. Regresión ejecuta once firmas en tickCount múltiplo de cuatro: completan y conservan las 4095 unidades de allowance legacy tras reservar 1/4096 al inicio. Es trabajo cosmético innecesario evitado, no ahorro demostrado de paquetes (esa rama ya no emitía) ni de FPS/TPS.
