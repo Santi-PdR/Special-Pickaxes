@@ -40,8 +40,8 @@ public final class SignatureExcavation implements WorkProgram {
             if(include&&(d!=0||x!=0||y!=0))result.add(seed.relative(normal,d).relative(side,x).relative(up,y));
         }
         Comparator<BlockPos> order=switch(kind){
-            case EXODIUM->Comparator.comparingInt(BlockPos::getY).reversed().thenComparingDouble(p->p.distSqr(seed));
-            case WORLDLOOM->Comparator.comparingInt(BlockPos::getY).thenComparingDouble(p->p.distSqr(seed));
+            case EXODIUM->Comparator.comparingInt((BlockPos p)->p.getY()).reversed().thenComparingDouble(p->p.distSqr(seed));
+            case WORLDLOOM->Comparator.comparingInt((BlockPos p)->p.getY()).thenComparingDouble(p->p.distSqr(seed));
             default->Comparator.comparingDouble(p->p.distSqr(seed));
         };
         result.subList(1,result.size()).sort(order);
@@ -51,7 +51,8 @@ public final class SignatureExcavation implements WorkProgram {
         if(!handles(kind)||WorkQueue.busy(p)||p.getMainHandItem()!=tool||tool.isEmpty())return false;
         var context=HeldUtilityContext.capture(p,tool);var aim=p.getLookAngle();var target=ConnectedExcavation.closeTarget(p);if(target.isEmpty())return false;var at=target.get();
         if(!WorldSafety.harvestable(p,tool,at)||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
-        if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!WorldSafety.harvestable(p,tool,at))return false;
+        if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!WorldSafety.harvestable(p,tool,at)
+                ||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
         if(!WorkQueue.startRegion(p,tool,kind,new SignatureExcavation(footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,alternate))))return false;
         ArtifactInteraction.clear(p);tool.getOrCreateTag().putString("artifactStatus","idle");return true;
     }
