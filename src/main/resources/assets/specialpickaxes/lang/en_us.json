@@ -744,7 +744,7 @@
   "key.specialpickaxes.curio_activate": "Activate equipped pickaxe",
   "message.specialpickaxes.curios_active_unavailable": "This equipped active is not implemented yet.",
   "guide.front": "Frontal excavation",
-  "pouch.specialpickaxes.title": "Material pouch · click to withdraw",
+  "pouch.specialpickaxes.title": "Material pouch",
   "pouch.specialpickaxes.page": "Page %s/%s · next",
   "guide.control.pouch": "Sneak + right-click in air: open pouch and enable ability-loot storage. Click: stack; right-click: one.",
   "pouch.specialpickaxes.enabled": "Capture ON · right-click to toggle",
