@@ -1,3 +1,9 @@
+## Alpha.58 — frente sostenido sin cobro por tier insuficiente, pendiente CI
+
+ConnectedExcavation.start valida cosechabilidad del objetivo inicial con la herramienta real antes y después del callback de permisos. Un objetivo cuyo tier Forge supera al artefacto ya no inicia un frente que fallaría después ni consume la activación. Revalida sustituciones externas sin restaurarlas ni saltarse tiers. Sólo cambia entrada de minería conectada, no habilidades originales Iridium/Strata, DropRecall ni arte.
+
+Dos regresiones con TestOres.HIGHER_TIER_ORE: principal rechazada sin coste/cooldown y reintento inmediato en piedra que sí mina; secundaria con reemplazo por tier superior dentro de permiso, también sin coste/cooldown y bloque intacto. Local: 175 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.57 sigue siendo descarga validada.
+
 ## Alpha.57 — activa equipada sin cobro por herramienta inadecuada, SUCCESS
 
 La ruta de minería activa equipada comprueba WorldSafety.harvestable con la herramienta real en mano antes y después del callback de permisos. Antes podía cobrar ocho de durabilidad y cooldown por un frente incapaz de cosechar siquiera su objetivo inicial. Un reemplazo externo del bloque también se revalida y se conserva, sin restaurarlo. Las rutas especiales de ascenso/loot no se alteran. Arte y habilidades originales Iridium/Strata intactos.

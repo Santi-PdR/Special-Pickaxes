@@ -142,3 +142,13 @@ class ConnectedExcavationTests(unittest.TestCase):
             source=(BASE/'artifact'/f'{name}.java').read_text()
             self.assertIn('var aim=p.getLookAngle()',source)
             self.assertIn('!p.getLookAngle().equals(aim)',source)
+
+    def test_native_front_revalidates_initial_harvestability_around_permission(self):
+        source=(BASE/'artifact/ConnectedExcavation.java').read_text()
+        self.assertEqual(source.count('!WorldSafety.harvestable(p,tool,at)'),2)
+        first=source.index('!WorldSafety.harvestable(p,tool,at)')
+        permission=source.index('WorldSafety.allowed(p,kind,at)')
+        second=source.index('!WorldSafety.harvestable(p,tool,at)',first+1)
+        self.assertLess(first,permission)
+        self.assertLess(permission,second)
+        self.assertLess(second,source.index('WorkQueue.startRegion'))

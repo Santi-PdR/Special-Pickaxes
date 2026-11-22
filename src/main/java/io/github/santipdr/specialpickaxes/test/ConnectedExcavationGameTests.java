@@ -307,4 +307,28 @@ public final class ConnectedExcavationGameTests {
         }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="front_harvest_tier_01") public static void nativeFrontRejectsHigherForgeTierWithoutChargingAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var tool=p.getMainHandItem();
+        h.getLevel().setBlock(at,TestOres.HIGHER_TIER_ORE.defaultBlockState(),2);
+        try{
+            h.assertTrue(!tool.isCorrectToolForDrops(h.getLevel().getBlockState(at)),"fixture requires tier above this artifact");
+            h.assertTrue(!ArtifactActions.use(p,tool,ArtifactKind.EVENTIDE,false),"unharvestable higher tier cannot start native front");
+            h.assertTrue(!WorkQueue.busy(p)&&tool.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("ready")==0,"failed tier check consumes no primary charge or cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at).is(TestOres.HIGHER_TIER_ORE),"higher tier ore remains untouched");
+            h.getLevel().setBlock(at,Blocks.STONE.defaultBlockState(),2);
+            h.assertTrue(ArtifactActions.use(p,tool,ArtifactKind.EVENTIDE,false),"ordinary target can retry immediately");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"valid retry actually harvests");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+    @GameTest(template="empty",batch="front_harvest_tier_02") public static void nativeFrontRechecksHigherTierReplacementDuringPermission(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var tool=p.getMainHandItem();int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> replace=e->{if(e.player==p&&e.target.equals(at)){calls[0]++;h.getLevel().setBlock(at,TestOres.HIGHER_TIER_ORE.defaultBlockState(),2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,replace);
+        try{
+            h.assertTrue(!ArtifactActions.useAlternate(p,tool,ArtifactKind.EVENTIDE)&&calls[0]==1,"replacement above tool tier rejects alternate activation");
+            h.assertTrue(!WorkQueue.busy(p)&&tool.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("alternateReady")==0,"no alternate job, charge or cooldown after replacement");
+            h.assertTrue(h.getLevel().getBlockState(at).is(TestOres.HIGHER_TIER_ORE),"external ore replacement remains intact");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
