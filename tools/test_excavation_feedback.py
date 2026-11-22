@@ -19,4 +19,12 @@ class ExcavationFeedbackTest(unittest.TestCase):
         for source in ('ArtifactPassives.java','RelicControl.java'):
             self.assertNotIn('AbilityVfx.excavation(', (ROOT/source).read_text())
 
+    def test_new_signatures_skip_only_retired_queue_feedback(self):
+        queue=(ROOT/'WorkQueue.java').read_text()
+        guard='if(feedback!=null && !(job.region instanceof SignatureExcavation) && p.tickCount%4==0)'
+        self.assertIn(guard,queue)
+        self.assertLess(queue.index('AbilityVfx.excavation(p,job.kind,feedback,false)'),queue.index(guard))
+        self.assertIn('ArtifactFeedback.iridiumLodePulse(p,feedback)',queue)
+        self.assertIn('ArtifactFeedback.seamTrail(p,List.copyOf(job.seamTrailPoints))',queue)
+
 if __name__=='__main__':unittest.main()

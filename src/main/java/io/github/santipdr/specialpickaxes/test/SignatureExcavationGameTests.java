@@ -86,4 +86,21 @@ public final class SignatureExcavationGameTests {
         });
     }
 
+    @GameTest(template="empty",batch="signature_no_retired_feedback_r7") public static void signaturesDoNotConsumeRetiredAuraAllowance(GameTestHelper h){
+        for(var kind:ArtifactKind.playableValues()){
+            if(!SignatureExcavation.handles(kind))continue;
+            var p=SeismicReworkGameTests.player(h,kind);var at=SeismicReworkGameTests.target(h,p);
+            // All successful turns would previously enter the modulo-four legacy branch.
+            p.tickCount=0;long tick=p.server.getTickCount();
+            ArtifactFeedback.reserveAuraParticles(tick-1,1,1);
+            h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,1,1),"prime current legacy allowance");
+            try{
+                h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),kind,false),"source-specific signature starts "+kind.id);
+                SynchronousWorkDrain.drain(p,1000);
+                h.assertTrue(!WorkQueue.busy(p)&&h.getLevel().getBlockState(at).isAir(),"mining still completes "+kind.id);
+                h.assertTrue(ArtifactFeedback.reserveAuraParticles(tick,4095,1),"no retired aura allowance spent by new signature "+kind.id);
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        }h.succeed();
+    }
+
 }

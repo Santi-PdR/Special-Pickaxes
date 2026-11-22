@@ -162,7 +162,10 @@ public final class WorkQueue {
                     job.impactTick=now;AbilityVfx.excavation(p,job.kind,feedback,false);
                 }
             }
-            if(feedback!=null && p.tickCount%4==0){
+            // New signatures already emitted their authored impact above. The legacy
+            // branch only feeds retired no-op emitters, but still spends CPU/budget.
+            // Keep protected originals and other legacy programs on their old path.
+            if(feedback!=null && !(job.region instanceof SignatureExcavation) && p.tickCount%4==0){
                 if(job.kind==ArtifactKind.EXODIUM)ArtifactFeedback.starfallWork(p,feedback);
                 else if(job.kind==ArtifactKind.IRIDIUM)ArtifactFeedback.iridiumLodePulse(p,feedback);
                 else if(job.kind==ArtifactKind.AXIOM&&job.region instanceof RadialMiningProgram radial)ArtifactFeedback.axiomNullcutPulse(p,feedback,radial.center());
