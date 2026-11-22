@@ -49,7 +49,8 @@ public final class WorldSafety {
         // Protected originals keep their existing drop paths.
         if(context.kind()==ArtifactKind.IRIDIUM||context.kind()==ArtifactKind.SEAM_RIPPER)return;
         var p=context.player();var tool=context.tool();
-        if(p.getMainHandItem()!=tool||tool.isEmpty()||!context.skill().valid()||!miningLeaseActive()
+        if(!p.isAlive()||p.isRemoved()||p.serverLevel()!=context.level()||!p.position().equals(context.origin())
+                ||p.getMainHandItem()!=tool||tool.isEmpty()||!context.skill().valid()||!miningLeaseActive()
                 ||!tool.hasTag()||!tool.getTag().getBoolean("materialPouchEnabled")
                 ||drop.position().distanceToSqr(Vec3.atCenterOf(context.pos()))>4)return;
         var original=drop.getItem();var rest=PickaxePouch.insert(tool,original);

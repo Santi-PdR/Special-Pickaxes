@@ -7,6 +7,10 @@ import java.util.*;
 
 /** Bounded, source-specific held cuts. Every inspected cell shares the existing queue budget. */
 public final class SignatureExcavation implements WorkProgram {
+    private static final boolean PROFILE=Boolean.getBoolean("specialpickaxes.profileMining");
+    private long transactionNanos,maxTransactionNanos;
+    private int inspected,harvested;
+    private boolean reported;
     private static final Set<UUID> STARTING=new HashSet<>();
     private final List<BlockPos> cells;
     private int index,settled;
@@ -86,10 +90,21 @@ public final class SignatureExcavation implements WorkProgram {
                 now=ArtifactState.now(actor);
                 if(now>=deadline||revisit&&now>=settleUntil||!actor.serverLevel().hasChunkAt(at))return false;
                 var state=actor.serverLevel().getBlockState(at);
-                boolean mined=NaturalExcavationProgram.eligible(state)&&WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);
+                long start=PROFILE?System.nanoTime():0;
+                boolean mined;
+                try{mined=NaturalExcavationProgram.eligible(state)&&WorldSafety.mineNaturalQueued(actor,tool,kind,at,state);}
+                finally{if(PROFILE){long elapsed=System.nanoTime()-start;transactionNanos+=elapsed;maxTransactionNanos=Math.max(maxTransactionNanos,elapsed);inspected++;}}
+                if(PROFILE&&mined)harvested++;
                 if(mined){if(revisit)settled++;else cleared.addLast(at);}
                 return mined;
             }
         };
     }
+    @Override public void reportProgress(ServerPlayer player){
+        if(PROFILE&&done()&&!reported){
+            reported=true;
+            com.mojang.logging.LogUtils.getLogger().info("SIGNATURE_PROFILE cells={} inspections={} harvested={} transaction_ms={} max_transaction_ms={}",cells.size(),inspected,harvested,transactionNanos/1_000_000D,maxTransactionNanos/1_000_000D);
+        }
+    }
+
 }
