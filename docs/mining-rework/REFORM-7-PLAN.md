@@ -92,3 +92,9 @@ Añadida regresión física nueva de firma: recinto de bedrock sella agua/grava 
 Diagnóstico ampliado de `44993466586` (3c63fcd) confirma causa concreta del fallo de render: `ClientTooltipValidation` detectó que el texto de alternativa usaba la tecla primaria (O) en vez de alternativa reasignada (P), y la excepción se repetía en overlay. Corregidos textos `%3$s` para alternativa y `%1$s` para pausa/cancelación en los tres idiomas; test exige prefijo alternativo y ambas teclas resueltas. Checks también confirma 596 GameTests aprobados y muestras de perfil transaccional, pero el run NO tiene aprobación de cliente. No llamar fallo infra ni dar por terminado el mod.
 
 Manual/tooltip ya no anuncian los modos materiales ni el control MODE para las firmas rediseñadas; la copia de Worldbreaker muestra el pico fuente sin un modo material retirado. Catálogo interno de modos se conserva por compatibilidad de datos y pruebas de motores legados, no como repertorio de habilidades nuevas. Etiqueta de cabecera cambia de minería frontal común a habilidad propia.
+
+## Validación integrada confirmada
+
+696e19c / CI 44995369324 SUCCESS: 216 JUnit, 597 GameTests y cliente real completo, incluidos controles Curios sin minería, apertura/cierre físico de bolsa, techos Ícaro, 96 bloques exactos Worldbreaker y loot Worldloom sin recoger. Evidencia revisada; no es aprobación universal de modpacks ni ausencia de lag. Ver STATUS para hash/tamaño y perfil sintético.
+
+Seguimiento sólo de tests: mismo volumen Worldbreaker con bolsa desactivada y activada, conservación exacta world+stored y recuento de entidades. Prioridad explícita para captura de menú de bolsa en Checks. Pendiente CI; no sustituir JAR probado por recompilado de este seguimiento aunque producción sea idéntica.

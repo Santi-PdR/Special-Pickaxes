@@ -1,8 +1,12 @@
-## Reforma 7 activa — NO publicada / validación pendiente
+## Reforma 7 — implementación integrada validada, NO publicada
 
-Cambio de criterio confirmado: habilidades sostenidas distintas y acotadas, Curios sólo efectos, bolsa con captura segura; formas permitidas. Ver `REFORM-7-PLAN.md` para implementación y pendientes. Alpha.60 NO se publica como reforma: queda superada por `7.0.0-dev.1` de desarrollo. Alpha.59 es la última descarga anterior, no representa este rediseño.
+Fuente `696e19cfd7e5015c8e1f946286619c5953ecb8c9`, CI `44995369324` **SUCCESS**. Evidencia descargada y revisada: 216 JUnit (0 fallos/errores/omisiones), 597 GameTests, servidor/logs y cliente real (32 escenas históricas, 64 tooltips; no 32 habilidades distintas). `CURIO_KEY_OK`, `POUCH_MENU_OK` físico, `ICARUS_CEILINGS_OK`, Worldloom 68 unidades/18 entidades sin recoger y Worldbreaker 96 roturas exactas. Capturas revisadas de Paradox/Eventide y Curios; la imagen de bolsa quedó omitida por presupuesto de exportación, se prioriza para el siguiente seguimiento.
 
-CI inicial `44988825841` falló compilación por comparadores (corregido). La migración no está lista: hay nuevas rutas/GUI/loot y pruebas de contratos anteriores que necesitan revisión, además de perfilado de rendimiento. No afirmar SUCCESS ni ausencia de lag. Modelos/texturas y originales Iridium/Strata conservados.
+JAR probado `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, 1005851 bytes, SHA256 `cac6b5952676f811ba899f250521fc5b772fef19bf2d71a87b195122c5ad6353`. No publicado ni sustituido. Seguimiento actual añade sólo comparación emparejada de conservación/entidades con bolsa y prioridad de imagen: pendiente CI, sin cambiar producción.
+
+Perfilado sintético: 23 trabajos sin bolsa, mediana del tiempo acumulado de transacciones 0.21161 ms; máximo por transacción 0.688814 ms, máximo acumulado por trabajo 1.348172 ms. NO son tiempos totales de tick, FPS ni comparación antes/después. Faltan muestras emparejadas con bolsa para cerrar esa afirmación; no se promete ausencia de lag universal.
+
+Cambio de criterio confirmado: habilidades sostenidas distintas y acotadas, Curios sólo efectos, bolsa con captura; formas permitidas. Ver `REFORM-7-PLAN.md`. Alpha.60 no se publica como reforma. Alpha.59 es la última descarga anterior y no representa este rediseño. Modelos/texturas y originales Iridium/Strata conservados.
 
 ## Alpha.60 — Ícaro equipada revalida durabilidad tras permiso, pendiente CI
 

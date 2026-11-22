@@ -70,4 +70,26 @@ public final class PickaxePouchGameTests {
         p.closeContainer();SeismicReworkGameTests.finish(h,p);
     }
 
+    @GameTest(template="empty",batch="pouch_paired_volume_r7") public static void sameNativeExcavationConservesLootWithAndWithoutPouch(GameTestHelper h){
+        int[] counts=new int[2];
+        for(int variant=0;variant<2;variant++){
+            boolean enabled=variant==1;var p=SeismicReworkGameTests.player(h,ArtifactKind.WORLDBREAKER);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+            tool.getOrCreateTag().putBoolean("materialPouchEnabled",enabled);
+            var cells=SignatureExcavation.footprint(at,net.minecraft.core.Direction.SOUTH,ArtifactKind.WORLDBREAKER,false);
+            for(var cell:cells){h.getLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+            try{
+                h.assertTrue(SignatureExcavation.start(p,tool,ArtifactKind.WORLDBREAKER,false),"paired native signature starts, pouch="+enabled);
+                SynchronousWorkDrain.drain(p,1000);
+                h.assertTrue(!WorkQueue.busy(p)&&cells.stream().allMatch(cell->h.getLevel().getBlockState(cell).isAir()),"same full signature finishes in both variants");
+                var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(12));
+                int world=drops.stream().filter(d->d.getItem().is(Items.COBBLESTONE)).mapToInt(d->d.getItem().getCount()).sum();
+                int stored=PickaxePouch.amount(tool,0);counts[variant]=drops.size();
+                h.assertTrue(world+stored==cells.size(),"exact native stone-loot conservation, pouch="+enabled);
+                h.assertTrue(enabled?world==0&&stored==cells.size():stored==0&&world==cells.size(),"capture changes storage location, not loot amount");
+                com.mojang.logging.LogUtils.getLogger().info("POUCH_PAIRED_VOLUME enabled={} blocks={} world_items={} stored_items={} item_entities={}",enabled,cells.size(),world,stored,drops.size());
+            }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        }
+        h.assertTrue(counts[0]>0&&counts[1]==0,"enabled pouch eliminates item entities for the same supported material volume");h.succeed();
+    }
+
 }
