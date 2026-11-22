@@ -49,8 +49,13 @@ public final class PersistentLootLoadGameTests {
                 var pos=new ChunkPos(x,z);
                 if(!h.getLevel().getForcedChunks().contains(pos.toLong())){h.getLevel().setChunkForced(x,z,true);forced.add(pos);}
             }
-            // Catch natural item physics; do not freeze, teleport or manually tick the drops.
-            for(var floor:BlockPos.betweenClosed(at.offset(-8,-4,-8),at.offset(8,-4,8)))h.getLevel().setBlock(floor,Blocks.BEDROCK.defaultBlockState(),2);
+            // A sealed dry chamber prevents surrounding test-world fluids from carrying
+            // loot out of the measured volume. Physics/merging inside remain native.
+            for(var cell:BlockPos.betweenClosed(at.offset(-10,-6,-10),at.offset(10,8,10))){
+                int x=cell.getX()-at.getX(),y=cell.getY()-at.getY(),z=cell.getZ()-at.getZ();
+                boolean shell=Math.abs(x)==10||Math.abs(z)==10||y==-6||y==8;
+                h.getLevel().setBlock(cell,(shell?Blocks.BEDROCK:Blocks.AIR).defaultBlockState(),2);
+            }
             var aim=player.getLookAngle();var cells=SignatureExcavation.footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),ArtifactKind.WORLDBREAKER,false);expected=cells.size();
             for(var cell:cells){h.getLevel().setBlock(cell,Blocks.STONE.defaultBlockState(),2);PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
             var tool=player.getMainHandItem();tool.getOrCreateTag().putBoolean("materialPouchEnabled",pouch);
@@ -66,7 +71,8 @@ public final class PersistentLootLoadGameTests {
                 int world=drops.stream().filter(d->d.getItem().is(Items.COBBLESTONE)).mapToInt(d->d.getItem().getCount()).sum();
                 int stored=PickaxePouch.amount(player.getMainHandItem(),0);
                 h.assertTrue(samples.size()>=40,"at least 40 real level-tick samples after 20 warmup ticks");
-                h.assertTrue(world+stored==expected,"loot conserved after natural falling/merging ticks");
+                com.mojang.logging.LogUtils.getLogger().info("PERSISTENT_LOOT_COUNTS round={} expected={} initial_entities={} remaining_entities={} world={} stored={}",round,expected,initialEntities,drops.size(),world,stored);
+                h.assertTrue(world+stored==expected,"loot conserved after natural falling/merging ticks: round="+round+" expected="+expected+" world="+world+" stored="+stored);
                 h.assertTrue(pouch?world==0&&drops.isEmpty()&&stored==expected:stored==0&&world==expected&&drops.stream().anyMatch(d->d.tickCount>=20),"items genuinely ticked, or capture prevented their spawn");
                 Collections.sort(samples);long sum=samples.stream().mapToLong(Long::longValue).sum();
                 com.mojang.logging.LogUtils.getLogger().info("PERSISTENT_LOOT_LOAD round={} pouch={} blocks={} initial_entities={} remaining_entities={} world_items={} stored_items={} samples={} level_total_ms={} level_p50_ms={} level_p95_ms={} level_max_ms={}",round,pouch,expected,initialEntities,drops.size(),world,stored,samples.size(),sum/1e6,samples.get(samples.size()/2)/1e6,samples.get((int)Math.ceil(samples.size()*.95)-1)/1e6,samples.get(samples.size()-1)/1e6);
