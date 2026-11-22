@@ -133,3 +133,5 @@ Ensayo confirmado 4704717 / CI 45039589537 SUCCESS: 216 JUnit, **603 GameTests**
 ## Saturación de bolsa (pendiente Forge)
 
 Inserción ahora retrasa la copia completa de la lista NBT hasta aceptar material; rechazar por entrada/tipos llenos no clona datos que luego descarta. Se conserva copy-on-write en operaciones aceptadas. Nueva regresión llena 64 tipos × 4096, rechaza 256 stacks alternando tipo existente lleno/nuevo, y ejecuta firma nativa con bolsa saturada: exige terminar, todo overflow al mundo y todas las entradas intactas. No cambia capacidad, drops, modelos ni texturas; no hay estimación de FPS por esta optimización de asignaciones.
+
+CI 45047874969 / 9225de6 falló antes de compilar: Maven Central devolvió HTTP 429 al resolver slf4j-simple 1.7.30. No es un resultado de las nuevas pruebas. El diagnóstico Checks conserva el error. Reintento por API no autorizado para la integración (403 actions rerun); este seguimiento documental dispara una verificación nueva sin cambiar dependencias ni producción. Último verde completo sigue siendo 4704717 / 45039589537 (603 GameTests).
