@@ -103,7 +103,7 @@ public final class SignatureExcavation implements WorkProgram {
     @Override public void reportProgress(ServerPlayer player){
         if(PROFILE&&done()&&!reported){
             reported=true;
-            com.mojang.logging.LogUtils.getLogger().info("SIGNATURE_PROFILE cells={} inspections={} harvested={} transaction_ms={} max_transaction_ms={}",cells.size(),inspected,harvested,transactionNanos/1_000_000D,maxTransactionNanos/1_000_000D);
+            com.mojang.logging.LogUtils.getLogger().info("SIGNATURE_PROFILE cells={} inspections={} harvested={} transaction_ms={} max_transaction_ms={} pouch={}",cells.size(),inspected,harvested,transactionNanos/1_000_000D,maxTransactionNanos/1_000_000D,player.getMainHandItem().hasTag()&&player.getMainHandItem().getTag().getBoolean("materialPouchEnabled"));
         }
     }
 

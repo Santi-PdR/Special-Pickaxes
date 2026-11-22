@@ -29,6 +29,7 @@ minecraft {
         gameTestServer {
             workingDirectory project.file("build/gametest-${project.version}")
             property 'specialpickaxes.testConfig', 'true'
+            property 'specialpickaxes.profileMining', 'true'
             property 'specialpickaxes.testFluids', 'true'
             property 'specialpickaxes.testOres', 'true'
             property 'forge.enabledGameTestNamespaces', 'specialpickaxes'
