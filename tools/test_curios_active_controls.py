@@ -74,3 +74,13 @@ class CuriosActiveControls(unittest.TestCase):
         source=(ROOT/'artifact/WorldbreakerCuriosPassives.java').read_text()
         self.assertIn('current,HeldSkillLease.capture(stack)',source)
         self.assertIn('skill.valid()&&sourceKind(stack)==source',source)
+
+    def test_equipped_target_is_harvestable_before_and_after_permission_callbacks(self):
+        source=(ROOT/'artifact/CuriosMiningActive.java').read_text()
+        self.assertEqual(source.count('!WorldSafety.harvestable(p,held,at)'),2)
+        first=source.index('!WorldSafety.harvestable(p,held,at)')
+        permission=source.index('WorldSafety.allowed(p,kind,at)')
+        second=source.index('!WorldSafety.harvestable(p,held,at)',first+1)
+        self.assertLess(first,permission)
+        self.assertLess(permission,second)
+        self.assertLess(second,source.index('WorkQueue.startRegion'))

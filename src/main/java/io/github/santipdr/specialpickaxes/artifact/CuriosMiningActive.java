@@ -28,9 +28,9 @@ public final class CuriosMiningActive {
                 state.putLong("curiosActiveReady",now+160);source.hurtAndBreak(8,p,who->{});AbilityVfx.cast(p,kind,true);return true;
             }
             var context=HeldUtilityContext.capture(p,held);var aim=p.getLookAngle();var target=ConnectedExcavation.closeTarget(p);if(target.isEmpty())return false;var at=target.get();var level=p.serverLevel();
-            if(!level.hasChunkAt(at)||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at))return false;
+            if(!level.hasChunkAt(at)||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at)||!WorldSafety.harvestable(p,held,at))return false;
             if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!lease.active()||!level.hasChunkAt(at)
-                    ||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at)||!ArtifactActions.canSpendDurability(p,source,8))return false;
+                    ||!NaturalExcavationProgram.eligible(level.getBlockState(at))||PlayerPlacedBlocks.get(level).contains(at)||!WorldSafety.harvestable(p,held,at)||!ArtifactActions.canSpendDurability(p,source,8))return false;
             WorkProgram program=kind==ArtifactKind.SEAM_RIPPER?new EquippedSeamSlice(at,net.minecraft.core.Direction.getNearest(p.getLookAngle().x,p.getLookAngle().y,p.getLookAngle().z),lease):new ConnectedExcavation(p,at,kind,true,lease);
             if(!WorkQueue.startRegion(p,held,kind,program))return false;
             state.putLong("curiosActiveReady",now+160);

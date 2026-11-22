@@ -1,3 +1,9 @@
+## Alpha.57 — activa equipada sin cobro por herramienta inadecuada, pendiente CI
+
+La ruta de minería activa equipada comprueba WorldSafety.harvestable con la herramienta real en mano antes y después del callback de permisos. Antes podía cobrar ocho de durabilidad y cooldown por un frente incapaz de cosechar siquiera su objetivo inicial. Un reemplazo externo del bloque también se revalida y se conserva, sin restaurarlo. Las rutas especiales de ascenso/loot no se alteran. Arte y habilidades originales Iridium/Strata intactos.
+
+Dos regresiones: pala sobre piedra rechazada sin coste/cooldown, seguida de reintento inmediato con pico que sí mina; callback cambia piedra a tierra y el pico ya no inicia ni cobra. Local: 174 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes; alpha.56 sigue siendo la descarga validada.
+
 ## Alpha.56 — objetivo y dirección coherentes al activar, SUCCESS
 
 La activación frontal sostenida/equipada captura dirección antes del permiso y la revalida después. Un listener podía girar al jugador sin cancelar, dejando el objetivo del raycast antiguo combinado con el frente nuevo y aceptando un trabajo sin minería. Ahora se rechaza sin coste/cooldown equipado y sin sobrescribir el giro externo. No limita mirar alrededor tras iniciar: el frente mantiene su orientación capturada. Arte y habilidades originales Iridium/Strata intactos; DropRecall congelado no se modifica.

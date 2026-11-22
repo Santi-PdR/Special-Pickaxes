@@ -106,4 +106,29 @@ public final class CuriosActiveGameTests {
         }finally{IcarianFlight.stop(p);}
     }
 
+    @GameTest(template="empty",batch="curios_active_tool_01") public static void equippedMiningWithWrongHeldToolDoesNotChargeAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_SHOVEL));
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source),"shovel cannot start equipped mining on stone");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"wrong tool spends neither durability nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.STONE),"wrong tool leaves original target untouched");
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"correct tool can retry immediately");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&source.getDamageValue()==8,"valid retry actually mines and charges exactly once");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_active_tool_02") public static void equippedMiningRechecksHarvestabilityAfterPermissionChangesTarget(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> change=e->{if(e.player==p){calls[0]++;h.getLevel().setBlock(at,Blocks.DIRT.defaultBlockState(),2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,change);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&calls[0]==1,"target changed to shovel material invalidates original pick permission");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"changed target spends no charge or cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.DIRT),"external replacement is not reverted or harvested");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(change);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
