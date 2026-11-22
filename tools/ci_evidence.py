@@ -17,7 +17,7 @@ for pattern in ['build/client-smoke/*.jpg','build/client-smoke/image-manifest.js
  files.extend(root.glob(pattern))
 if os.environ.get('PUBLISH_BINARY')=='true':files.extend(root.glob('build/libs/*.jar'))
 files=sorted(set(p for p in files if p.is_file()))
-subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log'],check=True)
+subprocess.run(['python3','tools/publish_diagnostics.py','build/verification-build.log','build/verification-gametest.log','build/verification-client.log','build/client-smoke/client.log'],check=True)
 # Keep all diagnostics, bound the Checks subset, and identify omitted images explicitly.
 # Full-resolution captures are still uploaded separately in forge-validation.
 data,manifest,report=make_bundle({str(p):p.read_bytes() for p in files})

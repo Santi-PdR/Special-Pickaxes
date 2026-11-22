@@ -120,7 +120,7 @@ public final class ClientValidation {
                     data.putBoolean("supremeDone",true);// Higher CI throughput is configured before the long World Shatter work queue starts.
                     var center=BlockPos.of(data.getLong("supremeCenter"));
                     var centerState=p.serverLevel().getBlockState(new BlockPos(100,82,100));
-                    var connectedState=p.serverLevel().getBlockState(new BlockPos(104,82,104));
+                    var connectedState=p.serverLevel().getBlockState(new BlockPos(100,82,102));
                     var outsideState=p.serverLevel().getBlockState(new BlockPos(112,82,149));
                     var bedrockState=p.serverLevel().getBlockState(new BlockPos(100,82,150));
                     var barrierState=p.serverLevel().getBlockState(new BlockPos(100,82,151));
@@ -130,8 +130,10 @@ public final class ClientValidation {
                         p.sendSystemMessage(Component.literal("SUPREME_GEOMETRY_FAILED "+geometry));
                         throw new IllegalStateException("Supreme connected front or barrier failed: "+geometry);
                     }
-                    int removed=0;for(int x=76;x<=124;x++)for(int z=100;z<150;z++)for(int y=75;y<=95;y++)if(p.serverLevel().getBlockState(new BlockPos(x,y,z)).isAir())removed++;
-                    if(removed<=4096)throw new IllegalStateException("Supreme excavation truncated: "+removed);
+                    var expected=SignatureExcavation.footprint(new BlockPos(100,82,100),net.minecraft.core.Direction.SOUTH,ArtifactKind.WORLDBREAKER,false);
+                    int removed=0;for(int x=94;x<=106;x++)for(int z=100;z<112;z++)for(int y=76;y<=88;y++)if(p.serverLevel().getBlockState(new BlockPos(x,y,z)).isAir())removed++;
+                    if(removed!=expected.size()||removed>256||expected.stream().anyMatch(at->!p.serverLevel().getBlockState(at).isAir()))
+                        throw new IllegalStateException("Supreme bounded signature mismatch: removed="+removed+" expected="+expected.size());
                     p.sendSystemMessage(Component.literal("SUPREME_REMOVED_BLOCKS_"+removed));
                     p.sendSystemMessage(Component.literal("SUPREME_COMPLETE"));
                 }
@@ -242,6 +244,7 @@ public final class ClientValidation {
         // the integrated server long enough to starve the client gallery and its acknowledgements.
         for(int x=97;x<=103;x++)for(int z=90;z<=99;z++)for(int y=78;y<=84;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
         for(int x=98;x<=102;x++)for(int z=94;z<=99;z++)p.serverLevel().setBlock(new BlockPos(x,80,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+        p.serverLevel().setBlockAndUpdate(new BlockPos(112,82,149),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
         p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,150),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState());
         p.serverLevel().setBlockAndUpdate(new BlockPos(100,82,151),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
         p.connection.teleport(100.5,81,96.5,0,0);
@@ -255,13 +258,13 @@ public final class ClientValidation {
         p.getPersistentData().putInt("supremeFillCursor",0);
     }
     private static boolean advanceSupremeSetup(net.minecraft.server.level.ServerPlayer p){
-        final int xSize=49,zSize=50,ySize=21,total=xSize*zSize*ySize;
+        final int xSize=13,zSize=12,ySize=13,total=xSize*zSize*ySize;
         int cursor=p.getPersistentData().getInt("supremeFillCursor");
-        int end=Math.min(total,cursor+512);
+        int end=Math.min(total,cursor+256);
         for(int i=cursor;i<end;i++){
-            int x=76+i/(zSize*ySize);
+            int x=94+i/(zSize*ySize);
             int z=100+(i/ySize)%zSize;
-            int y=75+i%ySize;
+            int y=76+i%ySize;
             p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
         }
         p.getPersistentData().putInt("supremeFillCursor",end);

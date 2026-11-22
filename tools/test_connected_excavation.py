@@ -46,9 +46,10 @@ class ConnectedExcavationTests(unittest.TestCase):
 
     def test_graphical_front_probe_and_fixed_deadline_capture_helper(self):
         fixture=(BASE/'test/ClientValidation.java').read_text()
-        self.assertIn('new BlockPos(104,82,104)',fixture)
+        self.assertIn('new BlockPos(100,82,102)',fixture)
         self.assertIn('new BlockPos(112,82,149)',fixture)
-        self.assertIn('removed<=4096',fixture)
+        self.assertIn('removed!=expected.size()||removed>256',fixture)
+        self.assertIn('SignatureExcavation.footprint',fixture)
         self.assertNotIn('wedgeState',fixture)
         manual=(BASE/'client/ArtifactManualScreen.java').read_text()
         self.assertIn('ConnectedExcavation.handles(abilityKind)?Component.translatable("guide.front")',manual)
