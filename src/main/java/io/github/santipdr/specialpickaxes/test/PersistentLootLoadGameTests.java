@@ -39,11 +39,18 @@ public final class PersistentLootLoadGameTests {
             if(event.phase==TickEvent.Phase.START)start=System.nanoTime();
             else if(start!=0){long elapsed=System.nanoTime()-start;start=0;if(++ticks>20)samples.add(elapsed);}
         }
-        private List<ItemEntity> drops(){return h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at).inflate(12));}
+        private List<ItemEntity> drops(){
+            // Only the dry interior, not items landing on the outside of its roof.
+            return h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(at.getX()-9,at.getY()-5,at.getZ()-9,at.getX()+10,at.getY()+8,at.getZ()+10));
+        }
         void begin(){
             measuring=false;samples.clear();ticks=0;start=0;
             boolean pouch=round==1||round==2; // ABBA order, not four identical warmup conditions.
-            player=SeismicReworkGameTests.player(h,ArtifactKind.WORLDBREAKER);at=SeismicReworkGameTests.target(h,player);
+            player=SeismicReworkGameTests.player(h,ArtifactKind.WORLDBREAKER);
+            // Other fixtures leave falling blocks/drops around their +100 working height.
+            // Keep this asynchronous scene above them, within normal world build limits.
+            player.setPos(player.getX(),player.getY()+128,player.getZ());at=SeismicReworkGameTests.target(h,player);
+            h.assertTrue(at.getY()+8<h.getLevel().getMaxBuildHeight(),"isolated chamber fits build height");
             var chunk=new ChunkPos(at);
             for(int x=chunk.x-1;x<=chunk.x+1;x++)for(int z=chunk.z-1;z<=chunk.z+1;z++){
                 var pos=new ChunkPos(x,z);
