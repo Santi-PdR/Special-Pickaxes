@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `75b9189012109ffcfd2cd6671122800c41fc9c19`, CI `45058964029` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **606 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `01055ce440a5e5140f62f21e8034656d5177c262`, CI `45061754599` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **608 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006635 bytes**, SHA256 `7fb00bb8c85df07ee910acd044b25b1b69ae9212a824e539526e5495d5c4d41d`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006979 bytes**, SHA256 `fcdda599b9fac4ba1706b28a2dbb204eb70638476b5fde353c798bb4188a63a5`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Menú actualizado durante uso
+
+Bolsa abierta actualiza cantidades, nuevos materiales y preferencia durante broadcasts vanilla. Usa token interno de la lista copy-on-write: 20 broadcasts sin cambios no reconstruyen stacks visibles; cambios ajenos a almacenamiento tampoco. Si al hacer clic se detecta contenido cambiado desde la vista servidor, sólo refresca para no retirar silenciosamente otro material desplazado al mismo índice. Una segunda pulsación sobre la vista actual retira exactamente una vez. No sustituye stateId vanilla ni cubre mutaciones crudas in-place por terceros fuera de la API.
 
 ### Búsqueda de material optimizada
 

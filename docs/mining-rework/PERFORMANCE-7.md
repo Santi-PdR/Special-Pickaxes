@@ -63,3 +63,7 @@ Estos intervalos incluyen todo el tick de **ese nivel**, no sólo entidades, ni 
 ## Seguimiento de búsqueda en bolsa diversa
 
 Fuente `75b9189012109ffcfd2cd6671122800c41fc9c19`, CI **45058964029 SUCCESS**, 606 GameTests. Inserción resuelve primero el ID por registro y sólo deserializa el prototipo del tipo coincidente; evita reconstruir stacks/capacidades de tipos distintos (hasta 63 entradas ajenas en una bolsa de 64 tipos). No añade caché persistente y conserva IDs antiguos sin namespace y validación completa de tags del candidato. Regresión de coincidencia final, otras entradas intactas, retirada exacta, saturación y física aprobadas. Esto describe trabajo evitado por código, no una medida causal de TPS/FPS; no se reutilizan tiempos anteriores como si midieran este cambio.
+
+## Seguimiento de vista abierta
+
+Fuente `01055ce440a5e5140f62f21e8034656d5177c262`, CI **45061754599 SUCCESS**, 608 GameTests. La vista abierta usa identidad de la lista reemplazada por las escrituras copy-on-write para invalidarse en broadcast. Regresión prueba 20 broadcasts sin reconstruir stacks de exposición, NBT ajeno sin invalidación, actualización tras inserciones y preferencia modificada. No hay revisión persistida ni hash/copia de 64 entradas por tick para detectar cambios. Los broadcasts vanilla y la sincronización de inventario siguen existiendo; no se afirma eliminación de paquetes ni mejora medida de TPS/FPS.
