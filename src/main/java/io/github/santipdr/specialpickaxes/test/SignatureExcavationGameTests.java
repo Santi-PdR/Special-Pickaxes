@@ -65,9 +65,9 @@ public final class SignatureExcavationGameTests {
 
     @GameTest(template="empty",batch="signature_falling_physics_r7",timeoutTicks=100) public static void signatureHarvestsRealGravelFallingAfterActivation(GameTestHelper h){
         var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);var level=h.getLevel();
-        for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)for(int y=-1;y<=7;y++){
+        for(int x=-8;x<=8;x++)for(int z=-8;z<=8;z++)for(int y=-1;y<=7;y++){
             var cell=at.offset(x,y,z);PlayerPlacedBlocks.get(level).unmark(cell);
-            level.setBlock(cell,x==0&&z==0&&y>=0&&y<7?net.minecraft.world.level.block.Blocks.AIR.defaultBlockState():net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState(),2);
+            level.setBlock(cell,Math.abs(x)<8&&Math.abs(z)<8&&y>=0&&y<7?net.minecraft.world.level.block.Blocks.AIR.defaultBlockState():net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState(),2);
         }
         level.setBlock(at,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
         h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"bounded signature starts in sealed falling fixture");
