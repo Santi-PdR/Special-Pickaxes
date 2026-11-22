@@ -164,4 +164,40 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_live_menu_r7") public static void openMenuRefreshesChangedContentsWithoutRebuildingIdleFrames(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,17));PickaxePouchMenu.open(p,tool);
+        try{
+            var menu=p.containerMenu;var shown=menu.getSlot(0).getItem();
+            for(int i=0;i<20;i++)menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem()==shown,"idle broadcasts do not reconstruct display stacks");
+            tool.getOrCreateTag().putString("unrelatedFixtureTag","changed");menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem()==shown,"unrelated tool tag does not rebuild contents");
+            PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,3));PickaxePouch.insert(tool,new ItemStack(Items.GOLD_INGOT,5));
+            menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem().is(Items.DIAMOND)&&menu.getSlot(0).getItem().getCount()==20&&menu.getSlot(0).getItem().getHoverName().getString().contains("20"),"added material updates displayed count and total without clicking");
+            h.assertTrue(menu.getSlot(1).getItem().is(Items.GOLD_INGOT)&&menu.getSlot(1).getItem().getCount()==5,"new material appears while menu remains open");
+            var updated=menu.getSlot(0).getItem();menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem()==updated,"fresh view stays stable when idle");
+            tool.getOrCreateTag().putBoolean("materialPouchEnabled",false);menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(26).getItem().getHoverName().getString().contains(net.minecraft.network.chat.Component.translatable("pouch.specialpickaxes.disabled").getString()),"capture state also refreshes");
+        }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="pouch_stale_menu_r7") public static void staleDisplayCannotWithdrawShiftedMaterial(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,17));PickaxePouch.insert(tool,new ItemStack(Items.GOLD_INGOT,5));PickaxePouchMenu.open(p,tool);
+        try{
+            var menu=p.containerMenu;var removed=PickaxePouch.extract(tool,0,64);
+            h.assertTrue(removed.is(Items.DIAMOND)&&removed.getCount()==17,"fixture shifts stored gold into first slot");
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+            int gold=0;for(var stack:p.getInventory().items)if(stack.is(Items.GOLD_INGOT))gold+=stack.getCount();
+            h.assertTrue(gold==0&&PickaxePouch.amount(tool,0)==5&&menu.getSlot(0).getItem().is(Items.GOLD_INGOT),"obsolete diamond slot refreshes instead of silently withdrawing gold");
+            menu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+            gold=0;for(var stack:p.getInventory().items)if(stack.is(Items.GOLD_INGOT))gold+=stack.getCount();
+            h.assertTrue(gold==5&&PickaxePouch.types(tool)==0&&menu.getCarried().isEmpty(),"fresh explicit click withdraws exactly once with empty cursor");
+        }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
+
 }

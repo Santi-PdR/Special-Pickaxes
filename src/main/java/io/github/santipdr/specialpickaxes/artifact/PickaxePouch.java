@@ -22,6 +22,10 @@ public final class PickaxePouch {
     private static ListTag entries(ItemStack tool){
         return tool.hasTag()?tool.getTag().getList(KEY,Tag.TAG_COMPOUND):new ListTag();
     }
+    /** Opaque identity for package-local menu invalidation. Successful writes replace
+     * the list (copy-on-write); unrelated tool NBT changes leave this token stable.
+     * No caller may mutate or expose it as storage. Legacy/empty pouches return null. */
+    static Object contentsToken(ItemStack tool){return tool.hasTag()?tool.getTag().get(KEY):null;}
     private static boolean owner(ItemStack tool){return !tool.isEmpty()&&tool.getItem() instanceof ArtifactItem;}
     /** Returns a separate remainder. Never mutates the supplied loot stack. */
     public static ItemStack insert(ItemStack tool,ItemStack loot){
