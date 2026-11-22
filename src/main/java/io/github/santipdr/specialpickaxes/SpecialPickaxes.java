@@ -141,29 +141,8 @@ public final class SpecialPickaxes {
     private void curiosMiningFeedback(net.minecraftforge.event.level.BlockEvent.BreakEvent e){
         if(e.isCanceled()||!(e.getPlayer() instanceof ServerPlayer p))return;
         StrataFocusEffect.observeBreak(p,e.getPos(),e.getState());
-        if(!WorkQueue.running()){
-            var dawn=CuriosCompat.findFresh(p);
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER)
-                MiningObservations.captureCuriosWorldbreaker(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.PALIMPSEST)
-                MiningObservations.captureCuriosDawn(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.CHOIR)
-                MiningObservations.captureCuriosChoir(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.EVENTIDE)
-                MiningObservations.captureCuriosEventide(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.CRUCIBLE)
-                MiningObservations.captureCuriosParadox(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.INTERREGNUM)
-                MiningObservations.captureCuriosStasis(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDLOOM)
-                MiningObservations.captureCuriosWorldloom(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.AXIOM)
-                MiningObservations.captureCuriosAxiom(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.EXODIUM)
-                MiningObservations.captureCuriosExodium(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-            if(dawn!=null&&dawn.stack().getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.HELLSPEC)
-                MiningObservations.captureCuriosHellspec(p,dawn.stack(),e.getPos(),e.getState(),()->CuriosCompat.pickInSlotFresh(p,dawn.slot()));
-        }
+        // Reform 7: equipped mining observations no longer dispatch block programs.
+        // Original Strata observation above and Iridium ore feedback below remain preserved.
         if(!ArtifactOres.isOre(e.getState()))return;
         var equipped=CuriosCompat.findFresh(p);
         if(equipped!=null)MiningObservations.captureCuriosIridium(p,equipped,e.getPos(),e.getState());

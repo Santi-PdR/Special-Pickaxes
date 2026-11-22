@@ -9,7 +9,7 @@ class CuriosActiveControls(unittest.TestCase):
         branch = source[start:source.index('var tool=p.getMainHandItem();',start)]
         for check in ['CuriosCompat.findFresh(p)', 'item.kind!=intent.kind()', 'equals(intent.toolIdentity())', 'CuriosCompat.pickInSlotFresh(p,equipped.slot())']:
             self.assertIn(check, branch)
-        self.assertLess(branch.index('equals(intent.toolIdentity())'),branch.index('CuriosMiningActive.activate'))
+        self.assertLess(branch.index('equals(intent.toolIdentity())'),branch.index('CuriosEffectActive.activate'))
     def test_client_sends_equipped_identity_and_never_swaps_hand(self):
         source = (ROOT/'client/RelicKeys.java').read_text()
         self.assertIn('GLFW.GLFW_KEY_H',source)
@@ -100,3 +100,14 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertLess(source.index('boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above())'),check)
         self.assertLess(check,source.index('JOBS.put(p.getUUID(),new Flight(p,tool,source))'))
         self.assertIn('equippedAscentRechecksSourceDurabilityAfterPermissionAndCanRetry',(ROOT/'test/CuriosActiveGameTests.java').read_text())
+
+    def test_runtime_curios_dispatch_has_no_mining_or_flight_programs(self):
+        source=(ROOT/'artifact/CuriosEffectActive.java').read_text()
+        for forbidden in ['WorkQueue','IcarianFlight','ConnectedExcavation','destroyBlock','setBlock','hurtAndBreak']:
+            self.assertNotIn(forbidden,source)
+        entry=(ROOT/'SpecialPickaxes.java').read_text()
+        section=entry[entry.index('private void curiosMiningFeedback'):entry.index('private void entityJoin')]
+        for old in ['captureCuriosWorldbreaker','captureCuriosChoir','captureCuriosEventide','captureCuriosParadox','captureCuriosHellspec']:
+            self.assertNotIn(old,section)
+        self.assertIn('captureCuriosIridium',section)
+        self.assertIn('StrataFocusEffect.observeBreak',section)

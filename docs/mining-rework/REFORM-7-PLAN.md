@@ -42,3 +42,11 @@ Antes de activarla:
 Medir servidor (tiempo de tick, intentos/roturas por tick), cliente (partículas/render), entidades y tamaño/sincronización del inventario, con y sin bolsa en el mismo escenario. No confundir 584 tests aprobados con ausencia de lag. Reducir volúmenes y actualizaciones por tick antes de compensar con almacenamiento. Nunca prometer rendimiento de todos los modpacks.
 
 Pendiente: retirar minería activa y reactiva de Curios y sus descripciones, reemplazar mecánicas sostenidas, menú de bolsa y captura transaccional. No es una reforma completa ni lista para jugar.
+
+## Segundo paso implementado: entradas runtime Curios
+
+La tecla H ya despacha `CuriosEffectActive`: efecto de 200 ticks y cooldown de 200 ticks, sin coste, plan de bloques, escaneo de loot ni impulso. La entrada Forge de rotura manual dejó de registrar observaciones de minería añadida equipada para los picos rediseñados y Worldbreaker. Se mantienen expresamente los hooks originales de Strata/Iridium. Las bonificaciones actuales son una primera distribución, no identidades finales únicas.
+
+Código legado de minería equipada y sus pruebas todavía existen pero no se despachan desde estas entradas runtime. Pendiente retirarlos y sustituir las expectativas de las pruebas de cliente equipado, textos y manual antes de release. No declarar que toda la suite de cliente sigue aprobada: la antigua fixture esperaba minería equipada y debe migrarse al nuevo contrato. Nuevo GameTest verifica todos los tipos: efecto presente, cero trabajos/ascenso, objetivo intacto, sin desgaste/cambio de mano/impulso y cooldown.
+
+Validación local tras cambio: 178 Python (una omisión). Nuevos GameTests de efectos y bolsa pendientes de Forge; no se publica este estado intermedio.

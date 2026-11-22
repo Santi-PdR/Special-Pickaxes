@@ -26,7 +26,7 @@ public final class RelicNetwork {
             var stack=equipped.stack();
             if(!(stack.getItem() instanceof ArtifactItem item)||item.kind!=intent.kind()
                     ||!stack.hasTag()||!stack.getTag().hasUUID("controlIdentity")||!stack.getTag().getUUID("controlIdentity").equals(intent.toolIdentity()))return false;
-            return CuriosMiningActive.activate(p,stack,()->CuriosCompat.pickInSlotFresh(p,equipped.slot()));
+            return CuriosEffectActive.activate(p,stack,()->CuriosCompat.pickInSlotFresh(p,equipped.slot()));
         }
         var tool=p.getMainHandItem();
         boolean identity=tool.hasTag()&&tool.getTag().hasUUID("controlIdentity")&&tool.getTag().getUUID("controlIdentity").equals(intent.toolIdentity());
