@@ -121,7 +121,7 @@ public final class PickaxePouchGameTests {
         var p=SeismicReworkGameTests.player(h,ArtifactKind.WORLDBREAKER);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
         var materials=net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
                 .filter(item->net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft")&&item!=Items.COBBLESTONE)
-                .filter(item->{var stack=new ItemStack(item);return stack.isStackable()&&!stack.hasTag()&&!stack.serializeNBT().contains("ForgeCaps");})
+                .filter(item->{var stack=new ItemStack(item);return !stack.isEmpty()&&stack.isStackable()&&!stack.hasTag()&&!stack.serializeNBT().contains("ForgeCaps");})
                 .limit(PickaxePouch.MAX_TYPES).toList();
         h.assertTrue(materials.size()==64,"diverse vanilla material fixture available");
         for(var material:materials)h.assertTrue(PickaxePouch.insert(tool,new ItemStack(material,PickaxePouch.MAX_PER_TYPE)).isEmpty(),"fill each bounded material entry");
