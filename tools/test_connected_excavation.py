@@ -68,7 +68,7 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertNotIn('WorkQueue.togglePause',observer)
         self.assertIn('throw new IllegalStateException("Worldloom paused for loot in the real client")',observer)
         self.assertIn('if(WorkQueue.busy(p))continue;',observer)
-        self.assertIn('if(items<256',observer)
+        self.assertIn('if(items<1',observer)
         self.assertIn('WORLDLOOM_NATIVE_LOOT_OK items=',observer)
         setup=source[source.index('if(k==ArtifactKind.WORLDLOOM)'):]
         self.assertIn('p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL)',setup)

@@ -43,4 +43,27 @@ public final class PickaxePouchGameTests {
         SeismicReworkGameTests.finish(h,p);
     }
 
+    @GameTest(template="empty",batch="pouch_menu_full_r7") public static void fullInventoryWithdrawalReturnsEverythingToPouch(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        for(int slot=0;slot<36;slot++)if(slot!=p.getInventory().selected)p.getInventory().setItem(slot,new ItemStack(Items.COBBLESTONE,64));
+        h.assertTrue(PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,64)).isEmpty(),"fixture material stored");
+        PickaxePouchMenu.open(p,tool);
+        h.assertTrue(p.containerMenu instanceof PickaxePouchMenu,"server withdrawal menu opens");
+        p.containerMenu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+        h.assertTrue(PickaxePouch.extract(tool,0,64).getCount()==64,"full inventory loses no material during withdrawal");
+        p.closeContainer();SeismicReworkGameTests.finish(h,p);
+    }
+    @GameTest(template="empty",batch="pouch_menu_extract_r7") public static void menuWithdrawalCannotDuplicateDisplayStacks(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,17));PickaxePouchMenu.open(p,tool);
+        p.containerMenu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,p);
+        p.containerMenu.clicked(0,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+        p.containerMenu.clicked(26,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+        p.containerMenu.clicked(26,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,p);
+        int total=0;for(int slot=0;slot<p.getInventory().getContainerSize();slot++)if(p.getInventory().getItem(slot).is(Items.DIAMOND))total+=p.getInventory().getItem(slot).getCount();
+        h.assertTrue(total==17&&PickaxePouch.extract(tool,0,64).isEmpty(),"display and page arrow cannot be duplicated or taken");
+        h.assertTrue(p.containerMenu.getCarried().isEmpty(),"read-only display leaves cursor empty");
+        p.closeContainer();SeismicReworkGameTests.finish(h,p);
+    }
+
 }

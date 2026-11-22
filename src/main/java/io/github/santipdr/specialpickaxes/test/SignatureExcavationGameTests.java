@@ -22,4 +22,20 @@ public final class SignatureExcavationGameTests {
             }
         }h.succeed();
     }
+    @GameTest(template="empty",batch="signature_settling_r7") public static void signatureHarvestsLateSettlingMaterialInsideItsOwnClearedCell(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);
+        h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),ArtifactKind.EVENTIDE,false),"bounded fan starts");
+        for(int i=0;i<32;i++)WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(at).isAir(),"initial target actually cleared");
+        h.runAfterDelay(3,()->{
+            // Model the settled block state, not an item entity or an unbounded new scan.
+            h.getLevel().setBlock(at,net.minecraft.world.level.block.Blocks.GRAVEL.defaultBlockState(),2);
+            h.getLevel().setBlock(at.below(),net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState(),2);
+        });
+        h.runAfterDelay(12,()->{
+            h.assertTrue(h.getLevel().getBlockState(at).isAir(),"settled gravel in cleared cell is harvested");
+            SeismicReworkGameTests.finish(h,p);
+        });
+    }
+
 }
