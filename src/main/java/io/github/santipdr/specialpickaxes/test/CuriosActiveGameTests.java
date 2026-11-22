@@ -183,4 +183,29 @@ public final class CuriosActiveGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(flood);WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="curios_ascent_tier_01") public static void equippedAscentRejectsUnharvestableCeilingWithoutChargingAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);target(h,p);var source=p.getMainHandItem();var held=new ItemStack(Items.WOODEN_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);
+        var ceiling=p.blockPosition().above(2);h.getLevel().setBlock(ceiling,Blocks.DIAMOND_ORE.defaultBlockState(),2);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source),"wooden tool cannot start ascent through diamond ore");
+            h.assertTrue(!IcarianFlight.active(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.ICARUS).getLong("curiosActiveReady")==0,"unharvestable ceiling starts no ascent and charges neither stack nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(ceiling).is(Blocks.DIAMOND_ORE),"higher tier ceiling stays intact");
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"adequate tool retries ascent immediately");IcarianFlight.tick();
+            h.assertTrue(p.getDeltaMovement().y>0&&h.getLevel().getBlockState(ceiling).isAir()&&source.getDamageValue()==8,"valid retry clears ceiling before thrust and charges once");finish(h,p);
+        }finally{IcarianFlight.stop(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_ascent_tier_02") public static void equippedAscentRechecksCeilingTierAfterPermission(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);target(h,p);var source=p.getMainHandItem();var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);
+        var ceiling=p.blockPosition().above(2);h.getLevel().setBlock(ceiling,Blocks.STONE.defaultBlockState(),2);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> replace=e->{if(e.player==p){calls[0]++;h.getLevel().setBlock(ceiling,TestOres.HIGHER_TIER_ORE.defaultBlockState(),2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,replace);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&calls[0]==1,"permission replacing ceiling above held tier rejects ascent");
+            h.assertTrue(!IcarianFlight.active(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.ICARUS).getLong("curiosActiveReady")==0,"late unharvestable ceiling charges neither stack nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(ceiling).is(TestOres.HIGHER_TIER_ORE),"foreign ceiling replacement is preserved");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);IcarianFlight.stop(p);MiningObservations.forget(p);}
+    }
+
 }

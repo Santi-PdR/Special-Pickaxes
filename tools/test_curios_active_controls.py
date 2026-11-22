@@ -84,3 +84,12 @@ class CuriosActiveControls(unittest.TestCase):
         self.assertLess(first,permission)
         self.assertLess(permission,second)
         self.assertLess(second,source.index('WorkQueue.startRegion'))
+
+    def test_ascent_checks_actual_tool_harvestability_before_and_after_permission(self):
+        source=(ROOT/'artifact/IcarianFlight.java').read_text()
+        self.assertIn('safeStart(ServerPlayer p,ItemStack tool)',source)
+        self.assertIn('!WorldSafety.harvestable(p,tool,at)',source)
+        self.assertEqual(source.count('!safeStart(p,tool)'),2)
+        tests=(ROOT/'test/CuriosActiveGameTests.java').read_text()
+        self.assertIn('equippedAscentRejectsUnharvestableCeilingWithoutChargingAndCanRetry',tests)
+        self.assertIn('equippedAscentRechecksCeilingTierAfterPermission',tests)

@@ -1,3 +1,9 @@
+## Alpha.59 — Ícaro valida cosechabilidad del techo antes de cobrar, pendiente CI
+
+IcarianFlight.safeStart recibe la herramienta real y exige cosechabilidad de las celdas no vacías en el volumen inicial, antes y después del permiso. Evita cobrar activa equipada y cooldown por un techo que no podría abrir en el primer tick. Conserva barreras, leases, velocidad, duración y margen de caída. También protege la entrada sostenida; no cambia arte, Iridium/Strata ni DropRecall.
+
+Dos regresiones: techo de diamante con pico de madera rechaza sin coste y permite reintento inmediato con diamante que abre el techo antes del impulso; permiso cambia piedra por mena extranjera superior y rechaza sin coste/revertir reemplazo. Local: 176 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes. Seguimiento anegados anterior continúa en CI `44978220020`; no afirmar SUCCESS antes de resultado.
+
 ## Seguimiento alpha.58 — objetivos anegados al activar, pendiente CI
 
 Sólo pruebas: cuatro GameTests para losas de piedra anegadas, sostenido/equipado, tanto inicialmente como durante el callback de permiso. Comprueban bloque y agua intactos, sin trabajo/coste/cooldown; los dos casos iniciales secan la misma losa y verifican reintento inmediato que sí cosecha. Se usa la propiedad WATERLOGGED real y FluidState, no una simulación de agua como aire. No cambia producción, recursos, build.gradle ni release alpha.58. Forge/GameTests/cliente pendientes.
