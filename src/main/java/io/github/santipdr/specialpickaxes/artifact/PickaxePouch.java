@@ -5,7 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
-/** Bounded material pouch foundation. Not connected to drop capture until a withdrawal UI exists. */
+/** Bounded native-loot storage with withdrawal-only menu; tagged/capability loot stays native. */
 public final class PickaxePouch {
     public static final int MAX_TYPES=64,MAX_PER_TYPE=4096;
     private static final String KEY="materialPouchV1";
@@ -17,8 +17,10 @@ public final class PickaxePouch {
                 &&!(stack.getItem() instanceof ArtifactItem)
                 &&!stack.serializeNBT().contains("ForgeCaps");
     }
+    /** Internal read-only view. Never exposed to callers; writes must copy before mutation.
+     * Avoid cloning all 64 entries for each slot/count in a menu refresh. */
     private static ListTag entries(ItemStack tool){
-        return tool.hasTag()?tool.getTag().getList(KEY,Tag.TAG_COMPOUND).copy():new ListTag();
+        return tool.hasTag()?tool.getTag().getList(KEY,Tag.TAG_COMPOUND):new ListTag();
     }
     private static boolean owner(ItemStack tool){return !tool.isEmpty()&&tool.getItem() instanceof ArtifactItem;}
     /** Returns a separate remainder. Never mutates the supplied loot stack. */
@@ -26,6 +28,7 @@ public final class PickaxePouch {
         if(!owner(tool)||!material(loot))return loot.copy();
         var list=entries(tool);
         if(list.size()>MAX_TYPES)return loot.copy(); // Do not rewrite unknown/corrupt data.
+        list=list.copy();
         for(int i=0;i<list.size();i++){
             var entry=list.getCompound(i);var prototype=ItemStack.of(entry.getCompound("item"));
             if(!ItemStack.isSameItemSameTags(prototype,loot))continue;
@@ -57,6 +60,7 @@ public final class PickaxePouch {
     public static ItemStack extract(ItemStack tool,int slot,int requested){
         if(!owner(tool)||slot<0||requested<=0)return ItemStack.EMPTY;
         var list=entries(tool);if(list.size()>MAX_TYPES||slot>=list.size())return ItemStack.EMPTY;
+        list=list.copy();
         var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item"));int count=entry.getInt("amount");
         if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
         int taken=Math.min(Math.min(requested,stack.getMaxStackSize()),count);stack.setCount(taken);

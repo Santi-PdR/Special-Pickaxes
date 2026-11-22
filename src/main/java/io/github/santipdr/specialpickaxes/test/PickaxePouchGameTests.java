@@ -93,4 +93,13 @@ public final class PickaxePouchGameTests {
         h.assertTrue(counts[0]>0&&counts[1]==0,"enabled pouch eliminates item entities for the same supported material volume");h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_read_isolation") public static void previewAndWithdrawalCannotMutateStoredPrototype(GameTestHelper h){
+        var tool=tool();PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,64));
+        var before=tool.getTag().copy();var preview=PickaxePouch.preview(tool,0);
+        preview.setCount(1);preview.getOrCreateTag().putString("foreign","changed");
+        h.assertTrue(PickaxePouch.amount(tool,0)==64&&PickaxePouch.types(tool)==1&&tool.getTag().equals(before),"read APIs and mutable preview cannot rewrite storage");
+        var extracted=PickaxePouch.extract(tool,0,1);extracted.getOrCreateTag().putString("foreign","changed");
+        h.assertTrue(PickaxePouch.amount(tool,0)==63&&!PickaxePouch.preview(tool,0).hasTag(),"withdrawal cannot alias stored prototype");h.succeed();
+    }
+
 }
