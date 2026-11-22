@@ -1,3 +1,9 @@
+## Reforma 7 activa — NO publicada / validación pendiente
+
+Cambio de criterio confirmado: habilidades sostenidas distintas y acotadas, Curios sólo efectos, bolsa con captura segura; formas permitidas. Ver `REFORM-7-PLAN.md` para implementación y pendientes. Alpha.60 NO se publica como reforma: queda superada por `7.0.0-dev.1` de desarrollo. Alpha.59 es la última descarga anterior, no representa este rediseño.
+
+CI inicial `44988825841` falló compilación por comparadores (corregido). La migración no está lista: hay nuevas rutas/GUI/loot y pruebas de contratos anteriores que necesitan revisión, además de perfilado de rendimiento. No afirmar SUCCESS ni ausencia de lag. Modelos/texturas y originales Iridium/Strata conservados.
+
 ## Alpha.60 — Ícaro equipada revalida durabilidad tras permiso, pendiente CI
 
 IcarianFlight.startOnce comprueba la reserva de 8 puntos del source equipado después del callback y antes de registrar Flight. Evita aceptar vuelo y destruir el artefacto al cobrar si un listener reduce su durabilidad durante permiso. Conserva daño externo y no inicia cooldown. No cambia ruta sostenida, arte, habilidades originales Iridium/Strata ni DropRecall.

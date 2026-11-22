@@ -7,6 +7,7 @@ import java.util.*;
 
 /** Bounded, source-specific held cuts. Every inspected cell shares the existing queue budget. */
 public final class SignatureExcavation implements WorkProgram {
+    private static final Set<UUID> STARTING=new HashSet<>();
     private final List<BlockPos> cells;
     private int index,settled;
     private final ArrayDeque<BlockPos> cleared=new ArrayDeque<>();
@@ -51,7 +52,12 @@ public final class SignatureExcavation implements WorkProgram {
         return List.copyOf(result.subList(0,Math.min(alternate?384:256,result.size())));
     }
     public static boolean start(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean alternate){
-        if(!handles(kind)||WorkQueue.busy(p)||p.getMainHandItem()!=tool||tool.isEmpty())return false;
+        if(!STARTING.add(p.getUUID()))return false;
+        try{return startOnce(p,tool,kind,alternate);}finally{STARTING.remove(p.getUUID());}
+    }
+    private static boolean startOnce(ServerPlayer p,ItemStack tool,ArtifactKind kind,boolean alternate){
+        if(!handles(kind)||WorkQueue.busy(p)||p.getMainHandItem()!=tool||tool.isEmpty()
+                ||!(tool.getItem() instanceof ArtifactItem item)||ArtifactSkills.feedbackKind(tool,item.kind)!=kind)return false;
         var context=HeldUtilityContext.capture(p,tool);var aim=p.getLookAngle();var target=ConnectedExcavation.closeTarget(p);if(target.isEmpty())return false;var at=target.get();
         if(!WorldSafety.harvestable(p,tool,at)||!NaturalExcavationProgram.eligible(p.serverLevel().getBlockState(at))||PlayerPlacedBlocks.get(p.serverLevel()).contains(at))return false;
         if(!WorldSafety.allowed(p,kind,at)||!context.valid()||!p.getLookAngle().equals(aim)||!WorldSafety.harvestable(p,tool,at)
