@@ -28,21 +28,22 @@ public final class PickaxePouch {
         if(!owner(tool)||!material(loot))return loot.copy();
         var list=entries(tool);
         if(list.size()>MAX_TYPES)return loot.copy(); // Do not rewrite unknown/corrupt data.
-        list=list.copy();
         for(int i=0;i<list.size();i++){
             var entry=list.getCompound(i);var prototype=ItemStack.of(entry.getCompound("item"));
             if(!ItemStack.isSameItemSameTags(prototype,loot))continue;
             int count=entry.getInt("amount");if(count<1||count>MAX_PER_TYPE)return loot.copy();
             int accepted=Math.min(loot.getCount(),MAX_PER_TYPE-count);
             if(accepted==0)return loot.copy();
-            entry.putInt("amount",count+accepted);tool.getOrCreateTag().put(KEY,list);
+            // Rejects (full entry/type table) must not clone all stored NBT.
+            // Preserve copy-on-write isolation, but only pay for an accepted insert.
+            list=list.copy();list.getCompound(i).putInt("amount",count+accepted);tool.getOrCreateTag().put(KEY,list);
             var rest=loot.copy();rest.shrink(accepted);return rest;
         }
         if(list.size()==MAX_TYPES)return loot.copy();
         int accepted=Math.min(loot.getCount(),MAX_PER_TYPE);
         var prototype=loot.copy();prototype.setCount(1);
         var entry=new CompoundTag();entry.put("item",prototype.save(new CompoundTag()));entry.putInt("amount",accepted);
-        list.add(entry);tool.getOrCreateTag().put(KEY,list);
+        list=list.copy();list.add(entry);tool.getOrCreateTag().put(KEY,list);
         var rest=loot.copy();rest.shrink(accepted);return rest;
     }
     public static int types(ItemStack tool){return owner(tool)?Math.min(MAX_TYPES,entries(tool).size()):0;}

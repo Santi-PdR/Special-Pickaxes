@@ -117,4 +117,32 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_saturated_native_r7") public static void saturatedDiversePouchLeavesExactNativeOverflowInWorld(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.WORLDBREAKER);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+        var materials=net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+                .filter(item->net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft")&&item!=Items.COBBLESTONE)
+                .filter(item->{var stack=new ItemStack(item);return stack.isStackable()&&!stack.hasTag()&&!stack.serializeNBT().contains("ForgeCaps");})
+                .limit(PickaxePouch.MAX_TYPES).toList();
+        h.assertTrue(materials.size()==64,"diverse vanilla material fixture available");
+        for(var material:materials)h.assertTrue(PickaxePouch.insert(tool,new ItemStack(material,PickaxePouch.MAX_PER_TYPE)).isEmpty(),"fill each bounded material entry");
+        tool.getOrCreateTag().putBoolean("materialPouchEnabled",true);var before=tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND).copy();
+        for(int i=0;i<256;i++){
+            var item=i%2==0?materials.get(63):Items.COBBLESTONE;var incoming=new ItemStack(item,64);
+            h.assertTrue(ItemStack.matches(PickaxePouch.insert(tool,incoming),incoming),"full entry or type table returns exact independent remainder");
+        }
+        var aim=p.getLookAngle();var cells=SignatureExcavation.footprint(at,net.minecraft.core.Direction.getNearest(aim.x,aim.y,aim.z),ArtifactKind.WORLDBREAKER,false);
+        for(var cell:cells){h.getLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
+        try{
+            h.assertTrue(SignatureExcavation.start(p,tool,ArtifactKind.WORLDBREAKER,false),"full pouch does not block mining");SynchronousWorkDrain.drain(p,1000);
+            var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(12));
+            int amount=drops.stream().filter(d->d.getItem().is(Items.COBBLESTONE)).mapToInt(d->d.getItem().getCount()).sum();
+            h.assertTrue(!WorkQueue.busy(p)&&cells.stream().allMatch(cell->h.getLevel().getBlockState(cell).isAir())&&amount==cells.size(),"native overflow conserved in world without pausing");
+            h.assertTrue(tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND).equals(before),"rejections and native overflow never rewrite saturated storage");
+            for(int slot=0;slot<64;slot++)h.assertTrue(PickaxePouch.amount(tool,slot)==4096&&PickaxePouch.preview(tool,slot).getItem()==materials.get(slot),"every stored type and amount intact");
+            com.mojang.logging.LogUtils.getLogger().info("POUCH_SATURATED types=64 stored_items=262144 rejected_stacks=256 native_overflow_items={}",amount);
+            drops.forEach(net.minecraft.world.entity.Entity::discard);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
+
 }

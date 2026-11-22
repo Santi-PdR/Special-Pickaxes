@@ -129,3 +129,7 @@ Nuevo GameTest de ocho firmas Worldbreaker simultáneas en posiciones disjuntas.
 Alcance limitado explícito: microbenchmark síncrono con FakePlayer, no tick entero del servidor ni física/ticking de entidades, envío real de paquetes, cliente/FPS, GC sostenido o modpack. Alternar rondas hace visibles diferencias de orden/JIT, no las elimina. No inferir causalidad de tiempos únicos ni prometer rendimiento universal.
 
 Ensayo confirmado 4704717 / CI 45039589537 SUCCESS: 216 JUnit, **603 GameTests** y cliente real. Cuatro rondas de ocho firmas/768 bloques completan en 47 ticks sin pausas ni pérdida/duplicación; 128 intentos/tick como máximo, captura reduce 768→0 entidades. La bolsa tuvo algo más de coste inmediato acumulado que sin captura; no afirmar mejora de TPS/FPS ni ignorar ese coste. Tabla/método/limitaciones en PERFORMANCE-7.md. No cambia producción en esta tanda ni se publica JAR.
+
+## Saturación de bolsa (pendiente Forge)
+
+Inserción ahora retrasa la copia completa de la lista NBT hasta aceptar material; rechazar por entrada/tipos llenos no clona datos que luego descarta. Se conserva copy-on-write en operaciones aceptadas. Nueva regresión llena 64 tipos × 4096, rechaza 256 stacks alternando tipo existente lleno/nuevo, y ejecuta firma nativa con bolsa saturada: exige terminar, todo overflow al mundo y todas las entradas intactas. No cambia capacidad, drops, modelos ni texturas; no hay estimación de FPS por esta optimización de asignaciones.
