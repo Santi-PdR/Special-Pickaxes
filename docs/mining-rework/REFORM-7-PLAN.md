@@ -121,3 +121,9 @@ Sólo once perfiles rediseñados; Iridium/Strata quedan exactamente con su activ
 La diferencia se basa en bonificaciones reales y niveles, no en contar textos/pruebas como habilidades. Textos breves sincronizados en tres idiomas. Regresiones exigen perfil exacto y no repetido entre los once, duración/límites/partículas, ausencia de cambios de terreno/desgaste/movimiento, copia de cada fuente y conservación de efecto externo más fuerte. Cada bonus revalida equipo tras callbacks Forge. No se afirma aún balance o rendimiento global.
 
 Validación de perfiles confirmada: b479316 / CI 45032768317 **SUCCESS**. Evidencia descargada: 216 JUnit sin fallos/omisiones, **602 GameTests**, cliente real completo con CURIO_KEY_OK y POUCH_MENU_OK. Los once perfiles y copia aprueban; originales quedan Prisa I como antes de esta tanda. SHA/tamaño actualizados en STATUS. No publicación; los verdes no acreditan balance ni rendimiento global con modpacks.
+
+## Ensayo de carga del planificador (pendiente CI)
+
+Nuevo GameTest de ocho firmas Worldbreaker simultáneas en posiciones disjuntas. Cuatro rondas alternan captura apagada/encendida. Mide wall-clock alrededor de WorkQueue.tick completo (validación, permisos/roturas nativas, almacenamiento y feedback síncrono), reporta total/p50/p95/máximo y máximo de intentos; exige presupuesto global, fin completo sin pausas por drops y conservación exacta del botín. Limpia jobs/drops y restaura reloj entre rondas. Sin umbral temporal dependiente del hardware; no transforma una ejecución rápida en prueba automática de FPS.
+
+Alcance limitado explícito: microbenchmark síncrono con FakePlayer, no tick entero del servidor ni física/ticking de entidades, envío real de paquetes, cliente/FPS, GC sostenido o modpack. Alternar rondas hace visibles diferencias de orden/JIT, no las elimina. No inferir causalidad de tiempos únicos ni prometer rendimiento universal.
