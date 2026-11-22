@@ -54,4 +54,13 @@ public final class SignatureExcavationGameTests {
         }h.succeed();
     }
 
+    @GameTest(template="empty",batch="signature_paradox_controls_r7") public static void realParadoxControlStartsWedgeWithoutSelectionOrSpeedLock(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.CRUCIBLE);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+        h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT)&&!ArtifactInteraction.selecting(p),"retired selection control cannot arm a hidden region");
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE)&&WorkQueue.busy(p),"real primary starts wedge immediately");WorkQueue.tick();
+        h.assertTrue(h.getLevel().getBlockState(at).isAir()&&!ArtifactInteraction.selecting(p)&&tool.getDestroySpeed(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState())>=72,"wedge mines without regional speed lock");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL)&&!WorkQueue.busy(p),"cancel remains available immediately");SeismicReworkGameTests.finish(h,p);
+    }
+
 }

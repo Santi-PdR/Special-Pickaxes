@@ -357,7 +357,7 @@ public final class MiningReworkGameTests {
     @GameTest(template="empty",batch="rework_each_05") public static void carveStopsAtFlowingLava(GameTestHelper h){barrier(h,Blocks.LAVA.defaultBlockState().setValue(LiquidBlock.LEVEL,3));}
     @GameTest(template="empty",batch="rework_each_06") public static void duplicateCornerDoesNotAnalyze(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=h.absolutePos(new BlockPos(5,4,7));
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"selection armed");
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"selection armed");
         RelicControl.corner(p,at);RelicControl.corner(p,at);
         h.assertTrue(ArtifactInteraction.cornerCount(p)==1&&!WorkQueue.busy(p),"duplicate first corner cannot submit region");
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.MODE);
@@ -476,7 +476,7 @@ public final class MiningReworkGameTests {
         PlayerPlacedBlocks.get(h.getLevel()).unmark(a);PlayerPlacedBlocks.get(h.getLevel()).unmark(b);
         h.getLevel().setBlockAndUpdate(a,Blocks.CALCITE.defaultBlockState());
         h.getLevel().setBlockAndUpdate(b,Blocks.OBSIDIAN.defaultBlockState());
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.ACTIVATE),"activate arms the real corner-selection flow");
+        h.assertTrue(ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"activate arms the real corner-selection flow");
         h.assertTrue(RelicControl.corner(p,a)&&RelicControl.corner(p,b),"both real selection clicks are accepted");
         for(int tick=0;tick<100&&!WorkQueue.status(p).equals("ready");tick++)WorkQueue.tick();
         h.assertTrue(WorkQueue.status(p).equals("ready"),"Crucible analysis reaches its confirmation state");
@@ -493,13 +493,13 @@ public final class MiningReworkGameTests {
     }
     @GameTest(template="empty",batch="rework_each_17") public static void selectionOwnershipAndIncompleteConfirmation(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=h.absolutePos(new BlockPos(5,4,7));
-        RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);
+        ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false);RelicControl.corner(p,at);
         ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CONFIRM),"incomplete selection cannot execute");
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.CRUCIBLE).get()));
         h.assertTrue(!ArtifactInteraction.selecting(p)&&!WorkQueue.busy(p),"switching exact tool invalidates selection");
-        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT);RelicControl.corner(p,at);RelicControl.corner(p,at.east());
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false);RelicControl.corner(p,at);RelicControl.corner(p,at.east());
         h.assertTrue(WorkQueue.busy(p),"second distinct corner submits one analysis");int pending=WorkQueue.remaining(p);RelicControl.corner(p,at.above());h.assertTrue(WorkQueue.remaining(p)==pending,"repeated click cannot add work");
-        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");h.assertTrue(!RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.SELECT),"cannot start another selection during active work");
+        ArtifactState.of(p,ArtifactKind.CRUCIBLE).remove("inputTick");h.assertTrue(!ArtifactInteraction.use(p,p.getMainHandItem(),ArtifactKind.CRUCIBLE,false),"cannot start another selection during active work");
         RelicControl.execute(p,ArtifactKind.CRUCIBLE,RelicControl.Action.CANCEL);h.assertTrue(!WorkQueue.busy(p)&&!ArtifactInteraction.selecting(p),"cancel clears owned state");finish(h,p);
     }
 
