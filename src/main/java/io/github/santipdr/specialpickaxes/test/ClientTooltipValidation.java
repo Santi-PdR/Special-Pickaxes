@@ -46,8 +46,8 @@ public final class ClientTooltipValidation {
                         throw new IllegalStateException("Instruction prose ignored rebound key: "+how);
                     alternateBind.setKey(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_P));
                     String alternate=io.github.santipdr.specialpickaxes.artifact.ArtifactTooltips.alternate(io.github.santipdr.specialpickaxes.artifact.ArtifactKind.EVENTIDE).getString();
-                    if(!alternate.contains(" "+alternateBind.getTranslatedKeyMessage().getString()+" ")
-                            ||!alternate.contains(" "+bind.getTranslatedKeyMessage().getString()+" ")||alternate.contains("%3$s"))
+                    if(!alternate.startsWith(alternateBind.getTranslatedKeyMessage().getString()+" · ")
+                            ||!alternate.contains(" "+bind.getTranslatedKeyMessage().getString()+" · ")||alternate.contains("%3$s")||alternate.contains("%1$s"))
                         throw new IllegalStateException("Alternate prose ignored rebound controls: "+alternate);
                     com.mojang.logging.LogUtils.getLogger().info("ALTERNATE_BINDINGS_REBOUND_OK");
                     com.mojang.logging.LogUtils.getLogger().info("INSTRUCTION_BINDINGS_REBOUND_OK");
