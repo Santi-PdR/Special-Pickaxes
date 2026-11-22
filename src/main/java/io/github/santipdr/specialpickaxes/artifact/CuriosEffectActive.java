@@ -12,6 +12,9 @@ import java.util.function.Supplier;
 public final class CuriosEffectActive {
     private static final HashSet<UUID> STARTING=new HashSet<>();
     private CuriosEffectActive(){}
+    private static MobEffectInstance buff(net.minecraft.world.effect.MobEffect effect,int amplifier){
+        return new MobEffectInstance(effect,200,amplifier,false,false,true);
+    }
     public static boolean activate(ServerPlayer p,ItemStack source,Supplier<ItemStack> current){
         if(!STARTING.add(p.getUUID()))return false;
         try{
@@ -19,19 +22,28 @@ public final class CuriosEffectActive {
             var kind=WorldbreakerCuriosPassives.sourceKind(source);if(kind==null||!kind.playable())return false;
             var skill=HeldSkillLease.capture(source);var state=ArtifactState.of(p,kind);long now=ArtifactState.now(p);
             if(PersistedCooldown.active(now,state.getLong("curiosEffectReady"),200))return false;
-            var effect=switch(kind){
-                case PALIMPSEST,SEAM_RIPPER,IRIDIUM -> MobEffects.DIG_SPEED;
-                case CHOIR,WORLDBREAKER -> MobEffects.DAMAGE_RESISTANCE;
-                case EVENTIDE,AXIOM -> MobEffects.NIGHT_VISION;
-                case CRUCIBLE,HELLSPEC -> MobEffects.FIRE_RESISTANCE;
-                case INTERREGNUM -> MobEffects.ABSORPTION;
-                case WORLDLOOM -> MobEffects.REGENERATION;
-                case ICARUS -> MobEffects.SLOW_FALLING;
-                case EXODIUM -> MobEffects.MOVEMENT_SPEED;
-                default -> MobEffects.DIG_SPEED;
+            var effects=switch(kind){
+                // Protected originals retain their previous activation profile.
+                case SEAM_RIPPER,IRIDIUM -> java.util.List.of(buff(MobEffects.DIG_SPEED,0));
+                case PALIMPSEST -> java.util.List.of(buff(MobEffects.DIG_SPEED,1));
+                case CHOIR -> java.util.List.of(buff(MobEffects.DAMAGE_RESISTANCE,2));
+                case EVENTIDE -> java.util.List.of(buff(MobEffects.NIGHT_VISION,0),buff(MobEffects.WATER_BREATHING,0));
+                case CRUCIBLE -> java.util.List.of(buff(MobEffects.DIG_SPEED,3),buff(MobEffects.MOVEMENT_SPEED,1));
+                case INTERREGNUM -> java.util.List.of(buff(MobEffects.ABSORPTION,3));
+                case WORLDLOOM -> java.util.List.of(buff(MobEffects.REGENERATION,2));
+                case ICARUS -> java.util.List.of(buff(MobEffects.JUMP,2),buff(MobEffects.SLOW_FALLING,0));
+                case AXIOM -> java.util.List.of(buff(MobEffects.INVISIBILITY,0));
+                case EXODIUM -> java.util.List.of(buff(MobEffects.MOVEMENT_SPEED,2));
+                case HELLSPEC -> java.util.List.of(buff(MobEffects.FIRE_RESISTANCE,0),buff(MobEffects.DAMAGE_RESISTANCE,0));
+                case WORLDBREAKER -> java.util.List.of(buff(MobEffects.ABSORPTION,1),buff(MobEffects.DAMAGE_RESISTANCE,1));
+                default -> java.util.List.<MobEffectInstance>of();
             };
-            if(current.get()!=source||!skill.valid())return false;
-            p.addEffect(new MobEffectInstance(effect,200,0,false,false,true));
+            if(effects.isEmpty()||current.get()!=source||!skill.valid())return false;
+            for(var effect:effects){
+                // Forge effect callbacks may replace equipment between bonuses.
+                if(current.get()!=source||!skill.valid()||!p.isAlive()||p.isRemoved())return false;
+                p.addEffect(effect);
+            }
             if(current.get()!=source||!skill.valid()||!p.isAlive()||p.isRemoved())return false;
             state.putLong("curiosEffectReady",now+200);return true;
         }finally{STARTING.remove(p.getUUID());}

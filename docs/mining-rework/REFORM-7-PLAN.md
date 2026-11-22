@@ -106,3 +106,16 @@ Comparación confirmada en a3ef516 / CI 44997012546 SUCCESS, 598 GameTests: mism
 Cobertura adicional pendiente: rotura nativa de mena de diamante con bolsa y Seda I / Fortuna III; exige mena exacta con Seda, diamantes en rango nativo con Fortuna, agotamiento tras retirada y cero drops duplicados en el mundo. No compara tiradas aleatorias independientes como si fueran equivalentes.
 
 Cierre de esta comprobación: 4897ed9 / CI 44999329270 SUCCESS, **216 JUnit y 600 GameTests**, servidor y cliente real completos. Seda/Fortuna y aislamiento de lecturas NBT aprobados; comparación 96 unidades conservadas / 96→0 entidades repetida. Título corto revisado en captura real de d1947fd. STATUS actualizado con hash/tamaño probados y límites; no publicación ni declaración de reforma global completa (identidad Curios/rendimiento representativo siguen abiertos).
+
+## Diferenciación de activaciones Curios (pendiente CI)
+
+Sólo once perfiles rediseñados; Iridium/Strata quedan exactamente con su activación Prisa I anterior, sin tocar sus hooks originales. Cada perfil dura 10 s con cooldown existente de 10 s, sin partículas de poción, sin trabajo minero ni movimiento forzado:
+- Palimpsest: Prisa II; Choir: Resistencia III.
+- Eventide: visión nocturna y respiración acuática; Paradox: Prisa IV y velocidad II.
+- Interregnum: Absorción IV; Worldloom: Regeneración III.
+- Ícaro: salto III y caída lenta (saltar sigue siendo una acción del jugador, no ascenso automático).
+- Axiom: invisibilidad vanilla, no oculta equipo ni crea dominio.
+- Exodium: velocidad III; Hellspec: resistencia al fuego y resistencia I.
+- Worldbreaker: absorción II y resistencia II, o perfil de la fuente copiada.
+
+La diferencia se basa en bonificaciones reales y niveles, no en contar textos/pruebas como habilidades. Textos breves sincronizados en tres idiomas. Regresiones exigen perfil exacto y no repetido entre los once, duración/límites/partículas, ausencia de cambios de terreno/desgaste/movimiento, copia de cada fuente y conservación de efecto externo más fuerte. Cada bonus revalida equipo tras callbacks Forge. No se afirma aún balance o rendimiento global.
