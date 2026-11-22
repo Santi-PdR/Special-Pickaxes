@@ -102,4 +102,19 @@ public final class PickaxePouchGameTests {
         h.assertTrue(PickaxePouch.amount(tool,0)==63&&!PickaxePouch.preview(tool,0).hasTag(),"withdrawal cannot alias stored prototype");h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_enchanted_native") public static void pouchKeepsNativeSilkAndFortuneLoot(GameTestHelper h){
+        for(boolean silk:new boolean[]{true,false}){
+            var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+            tool.getOrCreateTag().putBoolean("materialPouchEnabled",true);
+            tool.enchant(silk?net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH:net.minecraft.world.item.enchantment.Enchantments.BLOCK_FORTUNE,silk?1:3);
+            h.getLevel().setBlock(at,net.minecraft.world.level.block.Blocks.DIAMOND_ORE.defaultBlockState(),2);
+            h.assertTrue(WorldSafety.mine(p,tool,ArtifactKind.EVENTIDE,at,h.getLevel().getBlockState(at)),"enchanted native break succeeds");
+            var out=PickaxePouch.extract(tool,0,64);
+            h.assertTrue(silk?out.is(Items.DIAMOND_ORE)&&out.getCount()==1:out.is(Items.DIAMOND)&&out.getCount()>=1&&out.getCount()<=4,"capture retains native Silk/Fortune loot, not a replacement drop table");
+            h.assertTrue(PickaxePouch.types(tool)==0&&h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2)).isEmpty(),"one withdrawal exhausts captured loot without duplicate world drops");
+            WorkQueue.cancel(p);MiningObservations.forget(p);
+        }
+        h.succeed();
+    }
+
 }
