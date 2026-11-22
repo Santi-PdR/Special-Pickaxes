@@ -49,6 +49,10 @@ public final class PickaxePouch {
         if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
         stack.setCount(Math.min(count,stack.getMaxStackSize()));return stack;
     }
+    public static int amount(ItemStack tool,int slot){
+        if(preview(tool,slot).isEmpty())return 0;
+        return entries(tool).getCompound(slot).getInt("amount");
+    }
     /** One ordinary stack per request. Caller must put it in inventory or safely retain remainder. */
     public static ItemStack extract(ItemStack tool,int slot,int requested){
         if(!owner(tool)||slot<0||requested<=0)return ItemStack.EMPTY;

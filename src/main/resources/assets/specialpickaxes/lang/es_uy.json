@@ -746,5 +746,7 @@
   "guide.front": "Excavación frontal",
   "pouch.specialpickaxes.title": "Bolsa de materiales · clic para retirar",
   "pouch.specialpickaxes.page": "Página %s/%s · siguiente",
-  "guide.control.pouch": "Agacharse + clic derecho al aire: abrir bolsa y guardar loot de habilidades. Clic: stack; derecho: una unidad."
+  "guide.control.pouch": "Agacharse + clic derecho al aire: abrir bolsa y guardar loot de habilidades. Clic: stack; derecho: una unidad.",
+  "pouch.specialpickaxes.enabled": "Captura SÍ · clic derecho para cambiar",
+  "pouch.specialpickaxes.disabled": "Captura NO · clic derecho para cambiar"
 }

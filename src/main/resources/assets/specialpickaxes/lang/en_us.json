@@ -746,5 +746,7 @@
   "guide.front": "Frontal excavation",
   "pouch.specialpickaxes.title": "Material pouch · click to withdraw",
   "pouch.specialpickaxes.page": "Page %s/%s · next",
-  "guide.control.pouch": "Sneak + right-click in air: open pouch and enable ability-loot storage. Click: stack; right-click: one."
+  "guide.control.pouch": "Sneak + right-click in air: open pouch and enable ability-loot storage. Click: stack; right-click: one.",
+  "pouch.specialpickaxes.enabled": "Capture ON · right-click to toggle",
+  "pouch.specialpickaxes.disabled": "Capture OFF · right-click to toggle"
 }

@@ -63,6 +63,10 @@ public final class PickaxePouchGameTests {
         int total=0;for(int slot=0;slot<p.getInventory().getContainerSize();slot++)if(p.getInventory().getItem(slot).is(Items.DIAMOND))total+=p.getInventory().getItem(slot).getCount();
         h.assertTrue(total==17&&PickaxePouch.extract(tool,0,64).isEmpty(),"display and page arrow cannot be duplicated or taken");
         h.assertTrue(p.containerMenu.getCarried().isEmpty(),"read-only display leaves cursor empty");
+        p.containerMenu.clicked(26,1,net.minecraft.world.inventory.ClickType.PICKUP,p);
+        h.assertTrue(!tool.getTag().getBoolean("materialPouchEnabled"),"right click on navigation toggles capture off");
+        p.closeContainer();PickaxePouchMenu.open(p,tool);
+        h.assertTrue(!tool.getTag().getBoolean("materialPouchEnabled"),"reopening preserves explicit capture preference");
         p.closeContainer();SeismicReworkGameTests.finish(h,p);
     }
 
