@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `8b2b19388befb9fc50f8233228ba6e15e954791b`, CI `45054553819` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **605 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `75b9189012109ffcfd2cd6671122800c41fc9c19`, CI `45058964029` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **606 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006385 bytes**, SHA256 `2e9ef2ffc60f5afe4b6bd8720d5de9175a732b2fb08376035248f2f981649515`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1006635 bytes**, SHA256 `7fb00bb8c85df07ee910acd044b25b1b69ae9212a824e539526e5495d5c4d41d`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Búsqueda de material optimizada
+
+Inserción resuelve IDs mediante el registro y sólo reconstruye el prototipo del tipo coincidente; ya no crea stacks/capacidades de los otros tipos al recorrer la bolsa. Se mantiene validación completa de la coincidencia y copy-on-write. Regresión de 64 tipos aprobada: coincidencia en última entrada con ID antiguo sin namespace, otras 63 entradas intactas y retirada exacta. No hay caché que quede obsoleta ni porcentaje de TPS/FPS declarado.
 
 ### Saturación verificada
 

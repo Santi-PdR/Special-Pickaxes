@@ -59,3 +59,7 @@ Estos intervalos incluyen todo el tick de **ese nivel**, no sólo entidades, ni 
 ### Ensayos fallidos conservados en el historial
 
 45051599686 falló conservación en la fixture inicial. 45052885056 instrumentó 96 entidades iniciales pero 198 unidades finales/130 entidades sin bolsa: el volumen consultado incluía exterior/techo, al nivel de trabajo de otras fixtures. No se contaron esos runs como evidencia aprobada ni se ajustó la cantidad esperada. La versión validada separa verticalmente la escena, cuenta sólo interior y mantiene la aserción exacta de 96 unidades. No filtra drops por UUID para esconder una discrepancia.
+
+## Seguimiento de búsqueda en bolsa diversa
+
+Fuente `75b9189012109ffcfd2cd6671122800c41fc9c19`, CI **45058964029 SUCCESS**, 606 GameTests. Inserción resuelve primero el ID por registro y sólo deserializa el prototipo del tipo coincidente; evita reconstruir stacks/capacidades de tipos distintos (hasta 63 entradas ajenas en una bolsa de 64 tipos). No añade caché persistente y conserva IDs antiguos sin namespace y validación completa de tags del candidato. Regresión de coincidencia final, otras entradas intactas, retirada exacta, saturación y física aprobadas. Esto describe trabajo evitado por código, no una medida causal de TPS/FPS; no se reutilizan tiempos anteriores como si midieran este cambio.
