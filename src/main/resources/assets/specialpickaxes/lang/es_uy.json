@@ -748,5 +748,6 @@
   "pouch.specialpickaxes.page": "Página %s/%s · siguiente",
   "guide.control.pouch": "Agacharse + clic derecho al aire: abrir bolsa y guardar loot de habilidades. Clic: stack; derecho: una unidad.",
   "pouch.specialpickaxes.enabled": "Captura SÍ · clic derecho para cambiar",
-  "pouch.specialpickaxes.disabled": "Captura NO · clic derecho para cambiar"
+  "pouch.specialpickaxes.disabled": "Captura NO · clic derecho para cambiar",
+  "guide.signature": "Habilidad propia"
 }

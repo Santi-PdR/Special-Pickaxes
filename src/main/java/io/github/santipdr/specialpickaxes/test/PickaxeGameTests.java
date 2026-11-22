@@ -4376,7 +4376,7 @@ public final class PickaxeGameTests {
         var copied=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());
         copied.getOrCreateTag().putString("copiedSkill",ArtifactKind.CRUCIBLE.id);copied.getOrCreateTag().putInt("copiedMode",8);
         var copiedLines=new ArrayList<net.minecraft.network.chat.Component>();ArtifactTooltips.compact(copied,ArtifactKind.WORLDBREAKER,copiedLines);
-        h.assertTrue(copiedLines.size()==3&&ArtifactTooltips.copyModeKey(copied).equals("calcite"),"Worldbreaker tooltip identifies the copied Crucible and its current Calcite mode");
+        h.assertTrue(copiedLines.size()==3&&ArtifactTooltips.copyModeKey(copied).isEmpty(),"Worldbreaker tooltip identifies the copied Crucible without advertising retired material modes");
         h.assertTrue(ArtifactSkills.feedbackKind(copied,ArtifactKind.WORLDBREAKER)==ArtifactKind.CRUCIBLE,
                 "Worldbreaker copies the selected pick's single audio and particle signature");
         copied.getOrCreateTag().putString("copiedSkill","invalid");

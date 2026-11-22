@@ -50,7 +50,7 @@ public final class ArtifactTooltips {
         catch(IllegalArgumentException invalid){return "";}
     }
     private static String copyModeKey(ItemStack stack,ArtifactKind copied){
-        return copied==ArtifactKind.WORLDBREAKER||ArtifactInteraction.modeCount(copied)<2?""
+        return copied==ArtifactKind.WORLDBREAKER||SignatureExcavation.handles(copied)||ArtifactInteraction.modeCount(copied)<2?""
                 :ArtifactInteraction.modeKey(copied,stack.getTag().getInt("copiedMode"));
     }
     public static List<RelicControl.Action> actions(ArtifactKind k,int mode){
@@ -60,7 +60,7 @@ public final class ArtifactTooltips {
         var a=new ArrayList<RelicControl.Action>();
         a.add(RelicControl.Action.ACTIVATE);
         a.add(RelicControl.Action.ALT_SKILL);
-        if(ArtifactInteraction.modeCount(k)>1&&abilityKind(stack,k)==k)a.add(RelicControl.Action.MODE);
+        if(!SignatureExcavation.handles(k)&&ArtifactInteraction.modeCount(k)>1&&abilityKind(stack,k)==k)a.add(RelicControl.Action.MODE);
         return a;
     }
     /** Source identity is shared by the expanded tooltip and manual; invalid NBT stays native. */
@@ -80,7 +80,7 @@ public final class ArtifactTooltips {
         section(lines,"screen.specialpickaxes.melee",Component.translatable("melee.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.passive",Component.translatable("passive.specialpickaxes."+k.id));
         section(lines,"screen.specialpickaxes.curios",Component.translatable("curios.detail.specialpickaxes."+k.id));
-        if(ArtifactInteraction.modeCount(ability)>1){
+        if(!SignatureExcavation.handles(ability)&&ArtifactInteraction.modeCount(ability)>1){
             var allModes=Component.empty();String[] modes=ArtifactInteraction.modes(ability);
             for(int i=0;i<modes.length;i++){if(i>0)allModes.append(" · ");allModes.append(Component.translatable("mode.specialpickaxes."+modes[i]));}
             section(lines,"manual4.modes",allModes);

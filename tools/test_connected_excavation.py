@@ -52,7 +52,7 @@ class ConnectedExcavationTests(unittest.TestCase):
         self.assertIn('SignatureExcavation.footprint',fixture)
         self.assertNotIn('wedgeState',fixture)
         manual=(BASE/'client/ArtifactManualScreen.java').read_text()
-        self.assertIn('ConnectedExcavation.handles(abilityKind)?Component.translatable("guide.front")',manual)
+        self.assertIn('SignatureExcavation.handles(abilityKind)?Component.translatable("guide.signature")',manual)
         smoke=pathlib.Path('tools/client_smoke.py').read_text()
         self.assertIn("['javac','-d',str(helper)",smoke)
         self.assertIn("'-cp',str(helper),'CaptureScreen'",smoke)
