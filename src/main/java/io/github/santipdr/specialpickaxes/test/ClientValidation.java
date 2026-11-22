@@ -173,7 +173,7 @@ public final class ClientValidation {
                     if(k==ArtifactKind.CHOIR)p.serverLevel().setBlockAndUpdate(rock,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 }
                 p.getPersistentData().putLong("sceneReadyBefore",ArtifactState.of(p,k).getLong("ready"));p.getPersistentData().putBoolean("sceneExecuted",false);p.getPersistentData().putBoolean("sceneAimed",false);
-                if(ArtifactInteraction.regional(k,scene.mode())){
+                if(!SignatureExcavation.handles(k)&&ArtifactInteraction.regional(k,scene.mode())){
                     ArtifactInteraction.use(p,p.getMainHandItem(),k,false);
                     RelicControl.corner(p,new BlockPos(-5,65,6));RelicControl.corner(p,new BlockPos(-3,67,8));
                 }

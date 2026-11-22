@@ -151,11 +151,11 @@ public final class ArtifactManualScreen extends Screen {
     /** Three purposeful blocks: what the primary does, what the alternate does, and live key bindings. */
     private List<Section> sections(ItemStack stack,ArtifactKind abilityKind,int mode,String modeKey){
         var controls=new ArrayList<Component>();
-        boolean regional=ArtifactInteraction.regional(abilityKind,mode);
+        boolean regional=!SignatureExcavation.handles(abilityKind)&&ArtifactInteraction.regional(abilityKind,mode);
         for(var action:ArtifactTooltips.actions(stack,kind,mode)){
             String description=switch(action){
                 case ACTIVATE -> regional?"guide.control.region":
-                        abilityKind==ArtifactKind.INTERREGNUM
+                        abilityKind==ArtifactKind.INTERREGNUM&&!SignatureExcavation.handles(abilityKind)
                                 ?"guide.control.field":"guide.control.activate";
                 case ALT_SKILL -> "guide.control.alternate";
                 default -> "key.specialpickaxes."+action.name().toLowerCase(Locale.ROOT);

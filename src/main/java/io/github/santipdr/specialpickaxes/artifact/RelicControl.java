@@ -22,6 +22,7 @@ public final class RelicControl {
             case CONFIRM:
                 return confirm(p);
             case SELECT:
+                if(SignatureExcavation.handles(ArtifactSkills.feedbackKind(tool,k)))return false;
                 if(copiedWorldbreaker){
                     try{var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));if(ArtifactInteraction.regional(copied,ArtifactTooltips.abilityMode(tool,k)))return ArtifactInteraction.use(p,tool,copied,false);}
                     catch(IllegalArgumentException invalid){return false;}
@@ -46,7 +47,7 @@ public final class RelicControl {
                     p.displayClientMessage(net.minecraft.network.chat.Component.translatable("status.specialpickaxes."+WorkQueue.status(p)),true);ArtifactFeedback.cue(p,"select");return true;
                 }
                 if(IcarianFlight.active(p)||DomainFields.active(p)||CompanionActions.active(p))return cancel(p,k);
-                if(!copiedWorldbreaker&&ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
+                if(!SignatureExcavation.handles(k)&&!copiedWorldbreaker&&ArtifactInteraction.regional(k,ArtifactState.mode(p,k)))return ArtifactInteraction.use(p,tool,k,false);
                 return ArtifactActions.use(p,tool,k,false);
             case ALT_SKILL:
                 if(IcarianFlight.active(p)||WorkQueue.busy(p)||ArtifactInteraction.selecting(p))return cancel(p,k);
