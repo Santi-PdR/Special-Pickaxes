@@ -87,6 +87,7 @@ public final class PickaxePouchGameTests {
                 h.assertTrue(world+stored==cells.size(),"exact native stone-loot conservation, pouch="+enabled);
                 h.assertTrue(enabled?world==0&&stored==cells.size():stored==0&&world==cells.size(),"capture changes storage location, not loot amount");
                 com.mojang.logging.LogUtils.getLogger().info("POUCH_PAIRED_VOLUME enabled={} blocks={} world_items={} stored_items={} item_entities={}",enabled,cells.size(),world,stored,drops.size());
+                drops.forEach(net.minecraft.world.entity.Entity::discard);
             }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
         }
         h.assertTrue(counts[0]>0&&counts[1]==0,"enabled pouch eliminates item entities for the same supported material volume");h.succeed();
