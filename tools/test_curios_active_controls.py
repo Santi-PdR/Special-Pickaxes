@@ -93,3 +93,10 @@ class CuriosActiveControls(unittest.TestCase):
         tests=(ROOT/'test/CuriosActiveGameTests.java').read_text()
         self.assertIn('equippedAscentRejectsUnharvestableCeilingWithoutChargingAndCanRetry',tests)
         self.assertIn('equippedAscentRechecksCeilingTierAfterPermission',tests)
+
+    def test_equipped_ascent_rechecks_source_durability_before_registering_flight(self):
+        source=(ROOT/'artifact/IcarianFlight.java').read_text()
+        check=source.index('if(source!=null&&!ArtifactActions.canSpendDurability(p,source.expected(),8))return false;')
+        self.assertLess(source.index('boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above())'),check)
+        self.assertLess(check,source.index('JOBS.put(p.getUUID(),new Flight(p,tool,source))'))
+        self.assertIn('equippedAscentRechecksSourceDurabilityAfterPermissionAndCanRetry',(ROOT/'test/CuriosActiveGameTests.java').read_text())

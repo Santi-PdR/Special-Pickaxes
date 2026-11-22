@@ -208,4 +208,20 @@ public final class CuriosActiveGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(replace);IcarianFlight.stop(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="curios_ascent_source_durability") public static void equippedAscentRechecksSourceDurabilityAfterPermissionAndCanRetry(GameTestHelper h){
+        var p=player(h,ArtifactKind.ICARUS);target(h,p);var source=p.getMainHandItem();var held=new ItemStack(Items.DIAMOND_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> wear=e->{if(e.player==p){calls[0]++;source.setDamageValue(source.getMaxDamage()-8);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,wear);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&calls[0]==1,"permission reducing source below activation reserve rejects ascent");
+            h.assertTrue(!IcarianFlight.active(p)&&!source.isEmpty()&&source.getDamageValue()==source.getMaxDamage()-8&&held.getDamageValue()==0,"no pending flight or extra wear; external damage preserved");
+            h.assertTrue(ArtifactState.of(p,ArtifactKind.ICARUS).getLong("curiosActiveReady")==0,"failed late durability check spends no cooldown");
+        }finally{MinecraftForge.EVENT_BUS.unregister(wear);IcarianFlight.stop(p);}
+        try{
+            source.setDamageValue(0);
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"repaired same source can retry immediately");IcarianFlight.tick();
+            h.assertTrue(source.getDamageValue()==8&&p.getDeltaMovement().y>0,"valid retry charges exactly once and applies thrust");finish(h,p);
+        }finally{IcarianFlight.stop(p);MiningObservations.forget(p);}
+    }
+
 }

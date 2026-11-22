@@ -73,6 +73,7 @@ public final class IcarianFlight {
         var context=HeldUtilityContext.capture(p,tool);
         boolean allowed=WorldSafety.allowed(p,ArtifactKind.ICARUS,p.blockPosition().above());
         if(!allowed||!context.valid()||!caster(p,tool,source)||active(p)||JOBS.size()>=MAX_JOBS||!safeStart(p,tool))return false;
+        if(source!=null&&!ArtifactActions.canSpendDurability(p,source.expected(),8))return false;
         JOBS.put(p.getUUID(),new Flight(p,tool,source));return true;
     }
     public static boolean active(ServerPlayer p){return JOBS.containsKey(p.getUUID());}

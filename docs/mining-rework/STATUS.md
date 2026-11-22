@@ -1,3 +1,9 @@
+## Alpha.60 — Ícaro equipada revalida durabilidad tras permiso, pendiente CI
+
+IcarianFlight.startOnce comprueba la reserva de 8 puntos del source equipado después del callback y antes de registrar Flight. Evita aceptar vuelo y destruir el artefacto al cobrar si un listener reduce su durabilidad durante permiso. Conserva daño externo y no inicia cooldown. No cambia ruta sostenida, arte, habilidades originales Iridium/Strata ni DropRecall.
+
+Un GameTest reduce source a exactamente 8 puntos restantes durante permiso, comprueba rechazo sin vuelo/coste extra/cooldown y reintento inmediato con el mismo source reparado que cobra 8 y aplica impulso. Local: 177 Python (una omisión), 25 recursos y diff check PASS. Forge/GameTests/cliente pendientes. Alpha.59 continúa como descarga validada.
+
 ## Alpha.59 — Ícaro valida cosechabilidad del techo antes de cobrar, SUCCESS
 
 IcarianFlight.safeStart recibe la herramienta real y exige cosechabilidad de las celdas no vacías en el volumen inicial, antes y después del permiso. Evita cobrar activa equipada y cooldown por un techo que no podría abrir en el primer tick. Conserva barreras, leases, velocidad, duración y margen de caída. También protege la entrada sostenida; no cambia arte, Iridium/Strata ni DropRecall.
