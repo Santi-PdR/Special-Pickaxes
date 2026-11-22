@@ -1,3 +1,7 @@
+## Seguimiento alpha.58 — tiers reales en Curios, pendiente CI
+
+Sólo pruebas: no cambia producción, recursos, versión ni JAR publicado. Dos GameTests verifican que equipar Eventide no suba el tier del pico de madera ante mena de diamante (rechazo sin coste/cooldown y reintento con diamante que sí mina), y que un callback cambie piedra por mena extranjera superior al tier de un artefacto sostenido (rechazo sin coste para ambos stacks y reemplazo intacto). No modifica Iridium/Strata ni DropRecall. Forge/GameTests/cliente pendientes.
+
 ## Alpha.58 — frente sostenido sin cobro por tier insuficiente, SUCCESS
 
 ConnectedExcavation.start valida cosechabilidad del objetivo inicial con la herramienta real antes y después del callback de permisos. Un objetivo cuyo tier Forge supera al artefacto ya no inicia un frente que fallaría después ni consume la activación. Revalida sustituciones externas sin restaurarlas ni saltarse tiers. Sólo cambia entrada de minería conectada, no habilidades originales Iridium/Strata, DropRecall ni arte.

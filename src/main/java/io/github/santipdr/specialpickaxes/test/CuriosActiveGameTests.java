@@ -131,4 +131,30 @@ public final class CuriosActiveGameTests {
         }finally{MinecraftForge.EVENT_BUS.unregister(change);WorkQueue.cancel(p);MiningObservations.forget(p);}
     }
 
+    @GameTest(template="empty",batch="curios_active_tier_01") public static void equippedArtifactCannotUpgradeHeldWoodenPickTier(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();
+        var held=new ItemStack(Items.WOODEN_PICKAXE);p.setItemInHand(InteractionHand.MAIN_HAND,held);
+        h.getLevel().setBlock(at,Blocks.DIAMOND_ORE.defaultBlockState(),2);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source),"equipped artifact cannot upgrade wooden tool to diamond ore tier");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"tier rejection spends neither source nor held durability nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at).is(Blocks.DIAMOND_ORE),"ore above held tier remains intact");
+            p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
+            h.assertTrue(CuriosMiningActive.activate(p,source,()->source),"proper tier retries immediately on same ore");WorkQueue.tick();
+            h.assertTrue(h.getLevel().getBlockState(at).isAir()&&source.getDamageValue()==8,"proper tier actually mines and pays exactly once");finish(h,p);
+        }finally{WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
+    @GameTest(template="empty",batch="curios_active_tier_02") public static void equippedArtifactRechecksForeignTierAfterPermission(GameTestHelper h){
+        var p=player(h,ArtifactKind.EVENTIDE);var at=target(h,p);var source=p.getMainHandItem();
+        var held=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.HELLSPEC).get());p.setItemInHand(InteractionHand.MAIN_HAND,held);int[] calls={0};
+        Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> replace=e->{if(e.player==p&&e.target.equals(at)){calls[0]++;h.getLevel().setBlock(at,TestOres.HIGHER_TIER_ORE.defaultBlockState(),2);}};
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,replace);
+        try{
+            h.assertTrue(!CuriosMiningActive.activate(p,source,()->source)&&calls[0]==1,"permission replacement above artifact tier rejects equipped front");
+            h.assertTrue(!WorkQueue.busy(p)&&source.getDamageValue()==0&&held.getDamageValue()==0&&ArtifactState.of(p,ArtifactKind.EVENTIDE).getLong("curiosActiveReady")==0,"foreign tier rejection spends neither tool nor source nor cooldown");
+            h.assertTrue(h.getLevel().getBlockState(at).is(TestOres.HIGHER_TIER_ORE),"foreign higher tier replacement stays intact");finish(h,p);
+        }finally{MinecraftForge.EVENT_BUS.unregister(replace);WorkQueue.cancel(p);MiningObservations.forget(p);}
+    }
+
 }
