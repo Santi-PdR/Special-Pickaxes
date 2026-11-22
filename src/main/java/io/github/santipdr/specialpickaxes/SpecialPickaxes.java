@@ -111,6 +111,7 @@ public final class SpecialPickaxes {
         forge.addListener(this::tagsUpdated);
         forge.addListener(this::curiosMiningFeedback);
         forge.addListener(this::entityJoin);
+        forge.addListener(net.minecraftforge.eventbus.api.EventPriority.LOWEST,false,net.minecraftforge.event.entity.EntityJoinLevelEvent.class,WorldSafety::capturePouchDrop);
         forge.addListener(this::login);forge.addListener(this::speed);forge.addListener(this::attack);forge.addListener(this::hurt);forge.addListener(this::heal);
         forge.addListener(this::fall);
         forge.addListener(StarfallWardEffect::interceptImpact);

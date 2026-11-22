@@ -42,6 +42,20 @@ public final class WorldSafety {
         if(context.kind()!=ArtifactKind.IRIDIUM||!ArtifactOres.isOre(context.expected()))return;
         OreDropHighlight.mark(drop,context.player());
     }
+    /** Capture only synchronous ability loot, after other normal-priority spawn listeners. */
+    public static void capturePouchDrop(net.minecraftforge.event.entity.EntityJoinLevelEvent event){
+        if(event.isCanceled()||!(event.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity drop))return;
+        var context=NATIVE_BREAK.get();if(context==null||event.getLevel()!=context.level())return;
+        // Protected originals keep their existing drop paths.
+        if(context.kind()==ArtifactKind.IRIDIUM||context.kind()==ArtifactKind.SEAM_RIPPER)return;
+        var p=context.player();var tool=context.tool();
+        if(p.getMainHandItem()!=tool||tool.isEmpty()||!context.skill().valid()||!miningLeaseActive()
+                ||!tool.hasTag()||!tool.getTag().getBoolean("materialPouchEnabled")
+                ||drop.position().distanceToSqr(Vec3.atCenterOf(context.pos()))>4)return;
+        var original=drop.getItem();var rest=PickaxePouch.insert(tool,original);
+        if(rest.getCount()==original.getCount())return;
+        if(rest.isEmpty())event.setCanceled(true);else drop.setItem(rest);
+    }
     public static boolean inert(BlockState state) { return !state.is(Blocks.BEDROCK)&&!state.hasBlockEntity()&&state.getFluidState().isEmpty()&&!ArtifactOres.isOre(state)
         &&(MATTER.contains(state.getBlock())||state.is(Tags.Blocks.STONE)||state.is(BlockTags.DIRT)||state.is(Tags.Blocks.GRAVEL)
             ||state.is(ArtifactTags.Blocks.GEOLOGY)&&MiningDesigns.matrix(state))

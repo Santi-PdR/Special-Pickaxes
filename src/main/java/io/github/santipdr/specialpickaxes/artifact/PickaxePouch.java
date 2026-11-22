@@ -42,6 +42,13 @@ public final class PickaxePouch {
         list.add(entry);tool.getOrCreateTag().put(KEY,list);
         var rest=loot.copy();rest.shrink(accepted);return rest;
     }
+    public static int types(ItemStack tool){return owner(tool)?Math.min(MAX_TYPES,entries(tool).size()):0;}
+    public static ItemStack preview(ItemStack tool,int slot){
+        var list=entries(tool);if(!owner(tool)||slot<0||slot>=list.size()||list.size()>MAX_TYPES)return ItemStack.EMPTY;
+        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item"));int count=entry.getInt("amount");
+        if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
+        stack.setCount(Math.min(count,stack.getMaxStackSize()));return stack;
+    }
     /** One ordinary stack per request. Caller must put it in inventory or safely retain remainder. */
     public static ItemStack extract(ItemStack tool,int slot,int requested){
         if(!owner(tool)||slot<0||requested<=0)return ItemStack.EMPTY;

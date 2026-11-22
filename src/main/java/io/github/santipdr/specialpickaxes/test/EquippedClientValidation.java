@@ -42,7 +42,7 @@ final class EquippedClientValidation {
             p.connection.teleport(200.5,100,200.5,0,0);p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(TARGET));
             p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.DIAMOND_PICKAXE));
             var source=new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.WORLDBREAKER).get());source.getOrCreateTag().putUUID("controlIdentity",java.util.UUID.randomUUID());equip(p,source);
-            ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("curiosActiveReady");data.putInt("curioKeyStarted",now);return false;
+            ArtifactState.of(p,ArtifactKind.WORLDBREAKER).remove("curiosEffectReady");data.putInt("curioKeyStarted",now);return false;
         }
         int age=now-data.getInt("curioKeyStarted");
         if(age>400)throw new IllegalStateException("Physical equipped key did not finish in time");
@@ -50,11 +50,12 @@ final class EquippedClientValidation {
             var found=CuriosCompat.findFresh(p);if(found==null)throw new IllegalStateException("Real Curios lookup failed after slot setup");
             data.putBoolean("curioKeyReady",true);p.sendSystemMessage(Component.literal("CURIO_KEY_READY"));
         }
-        if(ArtifactState.of(p,ArtifactKind.WORLDBREAKER).getLong("curiosActiveReady")==0||WorkQueue.busy(p))return false;
+        if(ArtifactState.of(p,ArtifactKind.WORLDBREAKER).getLong("curiosEffectReady")==0||WorkQueue.busy(p))return false;
         var found=CuriosCompat.findFresh(p);
-        if(found==null||found.stack().getDamageValue()!=8||!p.getMainHandItem().is(Items.DIAMOND_PICKAXE)
-                ||!p.serverLevel().getBlockState(PROBE).isAir()||!p.serverLevel().getBlockState(TARGET).isAir())
-            throw new IllegalStateException("Equipped active failed source cost, held tool, front block or connected mining probe assertion");
+        if(found==null||found.stack().getDamageValue()!=0||!p.getMainHandItem().is(Items.DIAMOND_PICKAXE)
+                ||!p.serverLevel().getBlockState(PROBE).is(Blocks.STONE)||!p.serverLevel().getBlockState(TARGET).is(Blocks.STONE)
+                ||IcarianFlight.active(p)||!p.hasEffect(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE))
+            throw new IllegalStateException("Equipped effect failed no-wear, held tool, intact terrain or resistance assertion");
         equip(p,ItemStack.EMPTY);ArtifactPassives.onCuriosUnequip(p,ArtifactKind.WORLDBREAKER);
         data.putBoolean("curioKeyDone",true);p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
         p.sendSystemMessage(Component.literal("CURIO_KEY_OK"));return true;

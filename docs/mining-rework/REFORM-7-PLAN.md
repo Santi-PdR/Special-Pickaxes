@@ -50,3 +50,11 @@ La tecla H ya despacha `CuriosEffectActive`: efecto de 200 ticks y cooldown de 2
 Código legado de minería equipada y sus pruebas todavía existen pero no se despachan desde estas entradas runtime. Pendiente retirarlos y sustituir las expectativas de las pruebas de cliente equipado, textos y manual antes de release. No declarar que toda la suite de cliente sigue aprobada: la antigua fixture esperaba minería equipada y debe migrarse al nuevo contrato. Nuevo GameTest verifica todos los tipos: efecto presente, cero trabajos/ascenso, objetivo intacto, sin desgaste/cambio de mano/impulso y cooldown.
 
 Validación local tras cambio: 178 Python (una omisión). Nuevos GameTests de efectos y bolsa pendientes de Forge; no se publica este estado intermedio.
+
+## Tercer paso: bolsa y firmas sostenidas (pendiente Forge)
+
+- Menú vanilla de retirada, 26 entradas/página y flecha de página. Agacharse + clic derecho en aire abre y habilita la bolsa. Clic retira hasta un stack; derecho una unidad. No acepta depósitos ni transacciones vanilla de cursor: sólo retirada servidor-autoritativa, con misma instancia de pico en mano. Inventario lleno devuelve remanente a la bolsa.
+- Captura opt-in del loot de roturas nativas de habilidades antes de añadir entidades al mundo (el objeto Java ya fue creado). Hook LOWEST ignora eventos ya cancelados. Tags/capacidades/exceso siguen su ruta de drops; no aspira loot ajeno. Iridium/Strata excluidos para conservar originales. Pendiente pruebas de interacciones con otros listeners LOWEST y medición de sincronización; no se promete compatibilidad universal ni captura manual todavía.
+- Once picos rediseñados entran en SignatureExcavation con huellas diferentes (incluidos cuña Paradox, línea precisa Interregnum, alas Ícaro). Secundaria Ícaro conserva ascenso. Se elimina selección regional primaria de Paradox para no dejar bloqueo manual; Worldbreaker copia la nueva firma.
+- Límites 256/384 celdas e inspecciones 16/tick por trabajo dentro del scheduler global. Eso NO prueba ausencia de lag. Pendiente seguimiento de caída en nuevas huellas y ajuste de potencia.
+- Migrada fixture real de tecla Curios a terreno intacto/efecto/cero desgaste. Nuevas pruebas de geometrías y captura de bolsa. Las pruebas antiguas que exigían megavolúmenes y huellas conectadas deben migrarse, no ocultarse. No hay release.

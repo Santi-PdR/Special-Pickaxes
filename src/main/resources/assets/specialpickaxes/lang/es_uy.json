@@ -743,5 +743,7 @@
   "guide.main.hollow_axiom.hollow_pulse": "IMPLOSIÓN NULA: cámara octaédrica de radio 18, 8446 candidatos. Vacía roca desde las caras exteriores hacia dentro, conservando menas y un núcleo de 3×3×3.",
   "key.specialpickaxes.curio_activate": "Activar pico equipado",
   "message.specialpickaxes.curios_active_unavailable": "Esta habilidad equipada aún no está implementada.",
-  "guide.front": "Excavación frontal"
+  "guide.front": "Excavación frontal",
+  "pouch.specialpickaxes.title": "Bolsa de materiales · clic para retirar",
+  "pouch.specialpickaxes.page": "Página %s/%s · siguiente"
 }

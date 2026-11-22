@@ -109,17 +109,18 @@ public final class ArtifactActions {
         if(WorkQueue.busy(p)) return false;
         if(!kind.playable())return false;
         if(kind==ArtifactKind.SEAM_RIPPER)return DirectAbilities.activate(p,tool,kind);
-        if(kind==ArtifactKind.CRUCIBLE)return ArtifactInteraction.use(p,tool,kind,false);
+
         if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill")){
             try{
                 var copied=ArtifactKind.byId(tool.getTag().getString("copiedSkill"));
                 if(copied==ArtifactKind.WORLDBREAKER)return false;
-                if(ArtifactInteraction.regional(copied,ArtifactState.mode(p,copied)))
+                if(!SignatureExcavation.handles(copied)&&ArtifactInteraction.regional(copied,ArtifactState.mode(p,copied)))
                     return ArtifactInteraction.use(p,tool,copied,false);
                 return primary(p,tool,copied);
             }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
+        if(SignatureExcavation.handles(kind))return SignatureExcavation.start(p,tool,kind,false);
         if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.ICARUS){
             var aimed=target(p);if(aimed.isEmpty())return false;

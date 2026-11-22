@@ -743,5 +743,7 @@
   "guide.main.hollow_axiom.hollow_pulse": "NULL IMPLOSION: an octahedral chamber of radius 18, 8446 candidates. Collapses natural rock from its outer facets inward, preserving all ore and a 3×3×3 core.",
   "key.specialpickaxes.curio_activate": "Activate equipped pickaxe",
   "message.specialpickaxes.curios_active_unavailable": "This equipped active is not implemented yet.",
-  "guide.front": "Frontal excavation"
+  "guide.front": "Frontal excavation",
+  "pouch.specialpickaxes.title": "Material pouch · click to withdraw",
+  "pouch.specialpickaxes.page": "Page %s/%s · next"
 }

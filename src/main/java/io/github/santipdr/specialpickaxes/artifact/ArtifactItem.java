@@ -21,6 +21,10 @@ public final class ArtifactItem extends PickaxeItem {
     @Override public InteractionResultHolder<ItemStack> use(Level level,Player player,InteractionHand hand) {
         var tool=player.getItemInHand(hand);
         if(hand!=InteractionHand.MAIN_HAND) return InteractionResultHolder.pass(tool);
+        if(player.isShiftKeyDown()){
+            if(player instanceof ServerPlayer server)PickaxePouchMenu.open(server,tool);
+            return InteractionResultHolder.sidedSuccess(tool,level.isClientSide);
+        }
         return InteractionResultHolder.pass(tool);
     }
     @Override public InteractionResult useOn(UseOnContext context) { return InteractionResult.PASS; }

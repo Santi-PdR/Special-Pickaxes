@@ -33,4 +33,14 @@ public final class PickaxePouchGameTests {
         h.assertTrue(PickaxePouch.insert(new ItemStack(Items.STICK),new ItemStack(Items.DIAMOND)).is(Items.DIAMOND),"non artifact owner rejected");
         h.assertTrue(PickaxePouch.extract(tool,-1,64).isEmpty()&&PickaxePouch.extract(tool,0,-1).isEmpty(),"invalid requests are inert");h.succeed();
     }
+    @GameTest(template="empty",batch="pouch_capture_r7") public static void enabledPouchCapturesNativeAbilityLootBeforeEntityJoins(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+        tool.getOrCreateTag().putBoolean("materialPouchEnabled",true);
+        h.assertTrue(WorldSafety.mine(p,tool,ArtifactKind.EVENTIDE,at,h.getLevel().getBlockState(at)),"native break succeeds");
+        var out=PickaxePouch.extract(tool,0,64);
+        h.assertTrue(out.is(Items.COBBLESTONE)&&out.getCount()==1,"native stone loot conserved inside enabled pouch");
+        h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2)).isEmpty(),"captured material never joins world as ticking item entity");
+        SeismicReworkGameTests.finish(h,p);
+    }
+
 }
