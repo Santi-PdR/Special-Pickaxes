@@ -1,6 +1,6 @@
-## Seguimiento alpha.58 — tiers reales en Curios, pendiente CI
+## Seguimiento alpha.58 — tiers reales en Curios, SUCCESS
 
-Sólo pruebas: no cambia producción, recursos, versión ni JAR publicado. Dos GameTests verifican que equipar Eventide no suba el tier del pico de madera ante mena de diamante (rechazo sin coste/cooldown y reintento con diamante que sí mina), y que un callback cambie piedra por mena extranjera superior al tier de un artefacto sostenido (rechazo sin coste para ambos stacks y reemplazo intacto). No modifica Iridium/Strata ni DropRecall. Forge/GameTests/cliente pendientes.
+Sólo pruebas: no cambia producción, recursos, versión ni JAR publicado. Dos GameTests verifican que equipar Eventide no suba el tier del pico de madera ante mena de diamante (rechazo sin coste/cooldown y reintento con diamante que sí mina), y que un callback cambie piedra por mena extranjera superior al tier de un artefacto sostenido (rechazo sin coste para ambos stacks y reemplazo intacto). No modifica Iridium/Strata ni DropRecall. Fuente `3a93ca9a6554f2ab85181be1d76b4e39769e3d24`, CI `44973640952` SUCCESS: 216 JUnit (0 fallos/errores/omisiones), 578 GameTests; servidor/logs y cliente real, 32 escenas / 64 tooltips, dos techos Ícaro y Worldloom con 8242 unidades / 1232 entidades sin recoger loot. Evidencia recuperada y revisada; producción/recursos/build.gradle idénticos a fuente publicada alpha.58 `10dae282de5a37b84e7a975b5e79b77011fa3f08`. No se sustituye el JAR de release por el de seguimiento.
 
 ## Alpha.58 — frente sostenido sin cobro por tier insuficiente, SUCCESS
 
