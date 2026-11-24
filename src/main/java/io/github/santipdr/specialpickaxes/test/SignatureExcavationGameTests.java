@@ -122,7 +122,7 @@ public final class SignatureExcavationGameTests {
                     WorkQueue.tick();
                     h.assertTrue(WorkQueue.lastAttempts()==1&&WorkQueue.busy(p),"next turn still watches the one cleared cell, no shortened settling window "+kind.id);
                     saved+=(16-cells.size()%16)%16;
-                }finally{SeismicReworkGameTests.finish(h,p);}
+                }finally{WorkQueue.cancel(p);MiningObservations.forget(p);io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);}
             }
         }
         h.assertTrue(saved>0,"fixtures exercise partial final initial turns");
