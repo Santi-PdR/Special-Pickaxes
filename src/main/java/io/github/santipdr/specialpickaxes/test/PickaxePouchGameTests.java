@@ -200,4 +200,53 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_structural_sharing_r7") public static void changedEntriesAreIsolatedAndUnchangedEntriesAreReused(GameTestHelper h){
+        var tool=tool();PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,32));PickaxePouch.insert(tool,new ItemStack(Items.GOLD_INGOT,16));PickaxePouch.insert(tool,new ItemStack(Items.IRON_INGOT,8));
+        var old=tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND);var snapshot=old.copy();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,2));
+        var after=tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND);
+        h.assertTrue(after!=old&&after.getCompound(0)!=old.getCompound(0)&&after.getCompound(1)==old.getCompound(1)&&after.getCompound(2)==old.getCompound(2),"clone only changed entry while replacing list token");
+        h.assertTrue(old.equals(snapshot),"insertion preserves prior list snapshot");
+        PickaxePouch.insert(tool,new ItemStack(Items.GOLD_INGOT,3));
+        h.assertTrue(old.equals(snapshot)&&after.getCompound(1).getInt("amount")==16,"subsequent update never edits entry shared with older lists");
+        var partial=PickaxePouch.extract(tool,2,4);
+        h.assertTrue(partial.is(Items.IRON_INGOT)&&partial.getCount()==4&&old.equals(snapshot)&&after.getCompound(2).getInt("amount")==8,"partial withdrawal isolates shared entry");
+        var allGold=PickaxePouch.extract(tool,1,64);
+        h.assertTrue(allGold.is(Items.GOLD_INGOT)&&allGold.getCount()==19&&old.size()==3&&old.equals(snapshot),"entry removal never changes older list");
+        PickaxePouch.insert(tool,new ItemStack(Items.EMERALD,5));
+        var beforeSave=tool.save(new net.minecraft.nbt.CompoundTag());var restored=ItemStack.of(beforeSave.copy());
+        PickaxePouch.insert(restored,new ItemStack(Items.IRON_INGOT,1));
+        h.assertTrue(PickaxePouch.amount(tool,0)==34&&PickaxePouch.amount(tool,1)==4&&PickaxePouch.amount(tool,2)==5,"live bag retains exact amounts after writes and checkpoint copy");
+        h.assertTrue(PickaxePouch.amount(restored,1)==5&&tool.save(new net.minecraft.nbt.CompoundTag()).equals(beforeSave),"deserialized bag has independent data");
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="pouch_reference_model_r7") public static void mixedStorageOperationsMatchReferenceModelAndPreserveSnapshots(GameTestHelper h){
+        var tool=tool();var model=new java.util.LinkedHashMap<Item,Integer>();var random=new java.util.Random(749123L);
+        Item[] materials={Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT,Items.COAL,Items.REDSTONE,Items.LAPIS_LAZULI,Items.STONE,Items.COBBLESTONE};
+        for(int step=0;step<400;step++){
+            var old=tool.hasTag()?tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND):new net.minecraft.nbt.ListTag();var snapshot=old.copy();
+            int action=random.nextInt(4);
+            if(action<2){
+                var item=materials[random.nextInt(materials.length)];int amount=1+random.nextInt(128),previous=model.getOrDefault(item,0),accepted=Math.min(amount,4096-previous);
+                var incoming=new ItemStack(item,amount);var rest=PickaxePouch.insert(tool,incoming);
+                h.assertTrue(rest.getCount()==amount-accepted&&incoming.getCount()==amount,"insert matches model and leaves input unchanged at "+step);
+                if(accepted>0)model.put(item,previous+accepted);
+            }else if(action==2&&!model.isEmpty()){
+                int slot=random.nextInt(model.size()),request=1+random.nextInt(128);var item=new java.util.ArrayList<>(model.keySet()).get(slot);int previous=model.get(item),expected=Math.min(request,Math.min(64,previous));
+                var out=PickaxePouch.extract(tool,slot,request);
+                h.assertTrue(out.is(item)&&out.getCount()==expected,"withdrawal matches model at "+step);
+                if(previous==expected)model.remove(item);else model.put(item,previous-expected);
+                out.getOrCreateTag().putString("foreignFixtureMutation","isolated");
+            }else tool=ItemStack.of(tool.save(new net.minecraft.nbt.CompoundTag()));
+            h.assertTrue(old.equals(snapshot),"old storage remains immutable through operation "+step);
+            h.assertTrue(PickaxePouch.types(tool)==model.size(),"type count matches model at "+step);
+            int slot=0;for(var entry:model.entrySet()){
+                var preview=PickaxePouch.preview(tool,slot);
+                h.assertTrue(preview.is(entry.getKey())&&preview.getCount()==Math.min(64,entry.getValue())&&PickaxePouch.amount(tool,slot)==entry.getValue(),"all material quantities/order match model at "+step);
+                preview.getOrCreateTag().putString("foreignFixtureMutation","isolated");slot++;
+            }
+        }
+        h.succeed();
+    }
+
 }

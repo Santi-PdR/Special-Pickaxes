@@ -26,6 +26,11 @@ public final class PickaxePouch {
      * the list (copy-on-write); unrelated tool NBT changes leave this token stable.
      * No caller may mutate or expose it as storage. Legacy/empty pouches return null. */
     static Object contentsToken(ItemStack tool){return tool.hasTag()?tool.getTag().get(KEY):null;}
+    /** Structural copy: unchanged entries are read-only inside this class. Every write
+     * must replace the list and clone its changed entry, never edit a shared entry. */
+    private static ListTag copyEntryReferences(ListTag source){
+        var copy=new ListTag();for(var entry:source)copy.add(entry);return copy;
+    }
     private static boolean owner(ItemStack tool){return !tool.isEmpty()&&tool.getItem() instanceof ArtifactItem;}
     /** Returns a separate remainder. Never mutates the supplied loot stack. */
     public static ItemStack insert(ItemStack tool,ItemStack loot){
@@ -38,27 +43,28 @@ public final class PickaxePouch {
             // unqualified IDs. Do not construct unrelated stacks/capabilities per drop.
             var id=net.minecraft.resources.ResourceLocation.tryParse(encoded.getString("id"));
             if(id==null||net.minecraft.core.registries.BuiltInRegistries.ITEM.get(id)!=loot.getItem())continue;
-            var prototype=ItemStack.of(encoded);
+            var prototype=ItemStack.of(encoded.copy());
             if(!ItemStack.isSameItemSameTags(prototype,loot))continue;
             int count=entry.getInt("amount");if(count<1||count>MAX_PER_TYPE)return loot.copy();
             int accepted=Math.min(loot.getCount(),MAX_PER_TYPE-count);
             if(accepted==0)return loot.copy();
             // Rejects (full entry/type table) must not clone all stored NBT.
             // Preserve copy-on-write isolation, but only pay for an accepted insert.
-            list=list.copy();list.getCompound(i).putInt("amount",count+accepted);tool.getOrCreateTag().put(KEY,list);
+            var changed=entry.copy();changed.putInt("amount",count+accepted);
+            list=copyEntryReferences(list);list.set(i,changed);tool.getOrCreateTag().put(KEY,list);
             var rest=loot.copy();rest.shrink(accepted);return rest;
         }
         if(list.size()==MAX_TYPES)return loot.copy();
         int accepted=Math.min(loot.getCount(),MAX_PER_TYPE);
         var prototype=loot.copy();prototype.setCount(1);
         var entry=new CompoundTag();entry.put("item",prototype.save(new CompoundTag()));entry.putInt("amount",accepted);
-        list=list.copy();list.add(entry);tool.getOrCreateTag().put(KEY,list);
+        list=copyEntryReferences(list);list.add(entry);tool.getOrCreateTag().put(KEY,list);
         var rest=loot.copy();rest.shrink(accepted);return rest;
     }
     public static int types(ItemStack tool){return owner(tool)?Math.min(MAX_TYPES,entries(tool).size()):0;}
     public static ItemStack preview(ItemStack tool,int slot){
         var list=entries(tool);if(!owner(tool)||slot<0||slot>=list.size()||list.size()>MAX_TYPES)return ItemStack.EMPTY;
-        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item"));int count=entry.getInt("amount");
+        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item").copy());int count=entry.getInt("amount");
         if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
         stack.setCount(Math.min(count,stack.getMaxStackSize()));return stack;
     }
@@ -70,11 +76,13 @@ public final class PickaxePouch {
     public static ItemStack extract(ItemStack tool,int slot,int requested){
         if(!owner(tool)||slot<0||requested<=0)return ItemStack.EMPTY;
         var list=entries(tool);if(list.size()>MAX_TYPES||slot>=list.size())return ItemStack.EMPTY;
-        list=list.copy();
-        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item"));int count=entry.getInt("amount");
+        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item").copy());int count=entry.getInt("amount");
         if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
         int taken=Math.min(Math.min(requested,stack.getMaxStackSize()),count);stack.setCount(taken);
-        if(taken==count)list.remove(slot);else entry.putInt("amount",count-taken);
+        list=copyEntryReferences(list);
+        if(taken==count)list.remove(slot);else{
+            var changed=entry.copy();changed.putInt("amount",count-taken);list.set(slot,changed);
+        }
         tool.getOrCreateTag().put(KEY,list);return stack;
     }
 }
