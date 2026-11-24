@@ -62,16 +62,22 @@ public final class PickaxePouch {
         var rest=loot.copy();rest.shrink(accepted);return rest;
     }
     public static int types(ItemStack tool){return owner(tool)?Math.min(MAX_TYPES,entries(tool).size()):0;}
-    public static ItemStack preview(ItemStack tool,int slot){
-        var list=entries(tool);if(!owner(tool)||slot<0||slot>=list.size()||list.size()>MAX_TYPES)return ItemStack.EMPTY;
-        var entry=list.getCompound(slot);var stack=ItemStack.of(entry.getCompound("item").copy());int count=entry.getInt("amount");
-        if(!material(stack)||count<1||count>MAX_PER_TYPE)return ItemStack.EMPTY;
-        stack.setCount(Math.min(count,stack.getMaxStackSize()));return stack;
+    /** Detached display value: validates/deserializes a slot once for stack and total.
+     * Package-local so menu code need not call preview + amount (two decodes).
+     * The stack is owned by the caller, never a reference into stored NBT. */
+    record SlotView(ItemStack stack,int amount){}
+    private static final SlotView EMPTY_VIEW=new SlotView(ItemStack.EMPTY,0);
+    static SlotView readSlot(ItemStack tool,int slot){
+        if(!owner(tool)||slot<0)return EMPTY_VIEW;
+        var list=entries(tool);if(slot>=list.size()||list.size()>MAX_TYPES)return EMPTY_VIEW;
+        var entry=list.getCompound(slot);int count=entry.getInt("amount");
+        if(count<1||count>MAX_PER_TYPE)return EMPTY_VIEW;
+        var stack=ItemStack.of(entry.getCompound("item").copy());
+        if(!material(stack))return EMPTY_VIEW;
+        stack.setCount(Math.min(count,stack.getMaxStackSize()));return new SlotView(stack,count);
     }
-    public static int amount(ItemStack tool,int slot){
-        if(preview(tool,slot).isEmpty())return 0;
-        return entries(tool).getCompound(slot).getInt("amount");
-    }
+    public static ItemStack preview(ItemStack tool,int slot){return readSlot(tool,slot).stack();}
+    public static int amount(ItemStack tool,int slot){return readSlot(tool,slot).amount();}
     /** One ordinary stack per request. Caller must put it in inventory or safely retain remainder. */
     public static ItemStack extract(ItemStack tool,int slot,int requested){
         if(!owner(tool)||slot<0||requested<=0)return ItemStack.EMPTY;

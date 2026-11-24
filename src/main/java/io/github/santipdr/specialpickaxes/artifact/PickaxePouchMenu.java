@@ -28,8 +28,8 @@ public final class PickaxePouchMenu extends ChestMenu {
     private void refresh(){
         int pages=Math.max(1,(PickaxePouch.types(tool)+25)/26);page=Math.min(page,pages-1);
         for(int i=0;i<26;i++){
-            var preview=PickaxePouch.preview(tool,page*26+i);
-            if(!preview.isEmpty())preview.setHoverName(preview.getHoverName().copy().append(" × "+PickaxePouch.amount(tool,page*26+i)));
+            var view=PickaxePouch.readSlot(tool,page*26+i);var preview=view.stack();
+            if(!preview.isEmpty())preview.setHoverName(preview.getHoverName().copy().append(" × "+view.amount()));
             display.setItem(i,preview);
         }
         var next=new ItemStack(net.minecraft.world.item.Items.ARROW);

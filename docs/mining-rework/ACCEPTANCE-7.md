@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `577582c86121ba4d8ef287016ca9eace45035b4e`, Forge verification **45415875250 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 614 GameTests requeridos y cliente real. Las 614 pruebas no son 614 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `b3737d8a87f0d886cf492b72a303dd542c36d7a2`, Forge verification **45420018800 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 615 GameTests requeridos y cliente real. Las 615 pruebas no son 615 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -38,4 +38,8 @@ Estos límites no se ocultan detrás de un número de pruebas. No publicar alpha
 
 ### Actualización visible con bolsa abierta (577582c)
 
-Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor mediante API de 3 diamantes/5 lingotes, observación de slots tras render durante 10 frames estables y captura final revisada con 20 diamantes/5 lingotes. Sin pulsar slots ni cerrar la GUI entre capturas; sólo después se pulsa Escape y se comprueba conservación/cursor en servidor. Marcadores POUCH_LIVE_RENDER_OK, POUCH_MENU_UPDATED y POUCH_MENU_OK obligatorios. Conexión integrada/interna: no acredita TCP, latencia, bytes de red ni FPS/TPS. El ensayo adicional de codec aa825b5 está pendiente y no sustituye este cliente.
+Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor mediante API de 3 diamantes/5 lingotes, observación de slots tras render durante 10 frames estables y captura final revisada con 20 diamantes/5 lingotes. Sin pulsar slots ni cerrar la GUI entre capturas; sólo después se pulsa Escape y se comprueba conservación/cursor en servidor. Marcadores POUCH_LIVE_RENDER_OK, POUCH_MENU_UPDATED y POUCH_MENU_OK obligatorios. Conexión integrada/interna: no acredita TCP, latencia, bytes de red ni FPS/TPS. El ensayo adicional de codec aa825b5 está aprobado en b3737d8 y no sustituye este cliente.
+
+### Codec nativo de inventario aprobado
+
+CI 45420018800 SUCCESS: 216 JUnit, 615 GameTests requeridos y cliente real 32 escenas/64 tooltips; render vivo de bolsa repetido. ClientboundContainerSetSlotPacket.write/read conserva framing/NBT, 64 tipos y 262144 unidades, snapshot previo tras mutar la bolsa e independencia de copia decodificada. Registro POUCH_SLOT_CODEC: vacío 25 bytes, lleno 3912 bytes, cambio de una cantidad 3912 bytes (262143 unidades). Son bytes del payload de ese paquete, no tráfico TCP/comprimido ni latencia. La tabla completa sigue enviándose en cada actualización del stack; no es sincronización delta. Primera ejecución 45419913390 bloqueada por Maven HTTP429, sin atribuirlo al mod.

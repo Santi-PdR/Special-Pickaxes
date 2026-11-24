@@ -286,4 +286,33 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+
+    @GameTest(template="empty",batch="pouch_slot_view_r7") public static void menuSlotViewKeepsFullTotalsAndRejectsMalformedEntries(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,4096));
+        var valid=tool.getTag().getList("materialPouchV1",net.minecraft.nbt.Tag.TAG_COMPOUND).copy();
+        try{
+            PickaxePouchMenu.open(p,tool);var menu=p.containerMenu;
+            var shown=menu.getSlot(0).getItem();
+            h.assertTrue(shown.is(Items.DIAMOND)&&shown.getCount()==64&&shown.getHoverName().getString().endsWith(" × 4096"),"display stack capped but name retains full total");
+            h.assertTrue(!PickaxePouch.preview(tool,0).hasTag()&&PickaxePouch.amount(tool,0)==4096,"menu decoration never leaks into stored prototype");
+            for(int variant=0;variant<6;variant++){
+                var bad=valid.copy();var entry=bad.getCompound(0);
+                switch(variant){
+                    case 0 -> entry.putInt("amount",0);
+                    case 1 -> entry.putInt("amount",4097);
+                    case 2 -> entry.getCompound("item").putString("id","minecraft:air");
+                    case 3 -> entry.getCompound("item").putString("id","minecraft:diamond_pickaxe");
+                    case 4 -> {var tag=new net.minecraft.nbt.CompoundTag();tag.putString("foreign","keep");entry.getCompound("item").put("tag",tag);}
+                    case 5 -> {for(int i=1;i<65;i++)bad.add(entry.copy());}
+                }
+                tool.getOrCreateTag().put("materialPouchV1",bad);var before=bad.copy();menu.broadcastChanges();
+                h.assertTrue(menu.getSlot(0).getItem().isEmpty()&&PickaxePouch.preview(tool,0).isEmpty()&&PickaxePouch.amount(tool,0)==0,"malformed slot never advertised: "+variant);
+                h.assertTrue(PickaxePouch.extract(tool,0,64).isEmpty()&&bad.equals(before),"malformed data not withdrawn or rewritten: "+variant);
+            }
+            tool.getOrCreateTag().put("materialPouchV1",valid.copy());menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem().getHoverName().getString().endsWith(" × 4096")&&menu.getCarried().isEmpty(),"valid restored slot refreshes with full total and empty cursor");
+        }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
 }

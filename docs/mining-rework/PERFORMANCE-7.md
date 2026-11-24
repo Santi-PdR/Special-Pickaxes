@@ -77,3 +77,7 @@ Fuente `15813054185683b56829ccbc0da67ea21f8a615e`, CI **45069864077 SUCCESS**, 6
 Fuente `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, CI **45407719792 SUCCESS**, 614 GameTests. Las escrituras aceptadas crean una lista de referencias nueva y clonan sólo la entrada modificada; añadir/eliminar tipos no clona profundamente las entradas ajenas. Éstas son de sólo lectura dentro de la API: toda modificación posterior vuelve a clonar entrada/lista. Los prototipos se deserializan desde copia de su NBT para aislar normalización y capacidades. Se mantiene token de invalidación del menú y formato persistido.
 
 Las regresiones comprueban referencias ajenas reutilizadas, snapshots previos intactos, 400 operaciones contra modelo independiente, guardado/carga sin alias y tres páginas con compactación/retirada exacta. Es una reducción de copias profundas demostrada por la estructura y sus invariantes, no un porcentaje medido de FPS/TPS. Las copias del inventario/sincronización vanilla siguen existiendo; los tiempos históricos anteriores no se presentan como benchmark de este cambio.
+
+## Payload nativo de bolsa (no benchmark de red)
+
+Fuente b3737d8 / CI 45420018800 SUCCESS. Codec real ClientboundContainerSetSlotPacket: vacío 25 bytes; 64 tipos/262144 unidades 3912 bytes; misma bolsa tras retirar una unidad 3912 bytes. Framing/NBT exactos y snapshots independientes aprobados. No incluye framing externo, compresión, TCP ni acumulación de envíos por tick; no extrapolar ancho de banda o latencia. Confirma coste de tabla completa al cambiar un contador, no deltas.
