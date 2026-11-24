@@ -5,8 +5,22 @@ import net.minecraft.world.phys.Vec3;
 /** Active excavation impact glyphs, never ambient emitters. Coordinates are local to the working face. */
 public final class RelicWorkShape {
     public static final int WORK_COUNT=8,FINISH_COUNT=16;
+    // Vec3 is immutable; arrays remain private and are never returned.
+    // Only 13 * (8 + 16) local points, independent of players/worlds/ticks.
+    private static final Vec3[][] WORK=build(false),FINISH=build(true);
     private RelicWorkShape(){}
+    private static Vec3[][] build(boolean complete){
+        var styles=AbilityBurstShape.Shape.values();
+        var result=new Vec3[styles.length][complete?FINISH_COUNT:WORK_COUNT];
+        for(var style:styles)for(int i=0;i<result[style.ordinal()].length;i++)result[style.ordinal()][i]=compute(style,i,complete);
+        return result;
+    }
     public static Vec3 point(AbilityBurstShape.Shape style,int index,boolean complete){
+        int count=complete?FINISH_COUNT:WORK_COUNT;
+        if(index<0||index>=count)throw new IllegalArgumentException("impact index");
+        return (complete?FINISH:WORK)[style.ordinal()][index];
+    }
+    private static Vec3 compute(AbilityBurstShape.Shape style,int index,boolean complete){
         int count=complete?FINISH_COUNT:WORK_COUNT;
         if(index<0||index>=count)throw new IllegalArgumentException("impact index");
         double t=index/(double)(count-1),a=index*Math.PI*2/count;
