@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `7ac57b865208098355fc88f6121b49aea58029bb`, Forge verification **45493428135 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 620 GameTests requeridos y cliente real. Las 620 pruebas no son 620 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `7ac57b865208098355fc88f6121b49aea58029bb`, Forge verification **45493428135 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 620 GameTests requeridos y cliente real. Las 620 pruebas no son 620 mecánicas. Se publicó ese JAR exacto sólo como prerelease experimental solicitada (45501071537); no se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 

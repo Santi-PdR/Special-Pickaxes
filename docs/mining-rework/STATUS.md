@@ -1,8 +1,8 @@
-## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
+## Reforma 7 — dev.1 publicada para prueba solicitada; revisión global aún abierta
 
 Última fuente probada `7ac57b865208098355fc88f6121b49aea58029bb`, CI `45493428135` **SUCCESS**: 218 JUnit (0 fallos/errores/omisiones), **620 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1010605 bytes**, SHA256 `6f64e4bb2edd22be02aa96de1da1e6971f75cdac4f5c5c018a706293b42f1237`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR exacto probado y publicado como prerelease solicitada: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1010605 bytes**, SHA256 `6f64e4bb2edd22be02aa96de1da1e6971f75cdac4f5c5c018a706293b42f1237`. Alpha.59 queda como descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2073,3 +2073,7 @@ Primer run45484474986/bfdd413 falló por entidades próximas al jugador0 con su 
 Fuente7ac57b8/CI45493428135 SUCCESS:218JUnit sin fallos/errores/omisiones,620GameTests requeridos y cliente32escenas/64tooltips con bolsa viva10renders20/5. Captura excluye ItemEntity con nombre custom, persistent data Forge no vacía o subclase custom aunque ItemStack sea ordinario. ListenersForgeNORMAL reales decoran/reemplazan botín antes del capturadorLOWEST: misma instancia/reemplazo, nombre/datos/tipo y unaunidad en mundo intactos, bolsa vacía. Tras retirar listener, control ordinario vuelve a guardarse una vez y sin entidad duplicada. No se serializa entidad en ruta caliente; Iridium/Strata conservan exclusión previa.
 
 Alcance conservador, no universal: no detecta toda metadata/capability arbitraria de entidad, ni garantiza control sobre listeners posterioresLOWEST. Pueden quedar más entidades nativas cuando un mod aporta estos datos; preservar su significado prima sobre capturarlas. No se atribuye mejoraFPS/TPS. Carga mixta16trabajos/1037materiales/max192/intervalo2 sigue aprobada.
+
+### Publicación experimental solicitada y PowerShell
+
+Usuario pidió «Sigue y pasa shell». Publicación45501071537 SUCCESS desde fuente probada7ac57b8/CI45493428135, sin recompilar; descarga/manifest/tamaño/hash/ZIP/JARsinfixtures verificados por workflow. Release test-7.0.0-dev.1-45493428135 confirmada como prerelease,asset1010605bytes. URL: https://github.com/Santi-PdR/Special-Pickaxes/releases/download/test-7.0.0-dev.1-45493428135/special-pickaxes-1.20.1-7.0.0-dev.1.jar . SHA2566f64e4bb2edd22be02aa96de1da1e6971f75cdac4f5c5c018a706293b42f1237. No alpha.60, no estable, no balance/rendimiento global resueltos. PowerShell descarga temporal, valida bytes/hash antes de instalar y elimina sólo otros special-pickaxes-*.jar tras comprobar copia instalada; destinoD:\Minecraft\SKLauncher\sklauncher-data-v4\instances\test-1\mods. Usuario debe cerrarMinecraft y respaldar mundo.
