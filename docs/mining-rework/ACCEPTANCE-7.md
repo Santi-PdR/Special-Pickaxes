@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `3ad309cb38ce104668d54bcebb33c3c00a026699`, Forge verification **45476450660 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 618 GameTests requeridos y cliente real. Las 618 pruebas no son 618 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `f14d6fd19f7cf7692e7408b46112e2f3d50930cc`, Forge verification **45486767302 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 619 GameTests requeridos y cliente real. Las 619 pruebas no son 619 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -65,3 +65,9 @@ El primer run45469198953 falló en logs del servidor empaquetado por MonsterRoom
 ### Transición a seguimiento de caídas sin intentos sobrantes
 
 Fuente3ad309c/CI45476450660 SUCCESS:218JUnit sin fallos/errores/omisiones,618GameTests requeridos y cliente32escenas/64tooltips con bolsa viva10renders20/5. El último turno inicial de SignatureExcavation recibe min(16,celdas pendientes), no16incondicionales: evita revisar de inmediato celdas recién abiertas usando el sobrante. Siguiente turno conserva seguimiento y límites64roturas/40ticks/deadline160. Fixture22variantes registra144intentos redundantes de transición evitados en total; no es porcentaje deCPU ni benchmarkFPS/TPS. Seguimiento real de grava que cae y material tardío siguen aprobados, al igual que conservación/budgets globales. Iridium/Strata y perfilesCurios no cambian.
+
+### Cola mixta realmente saturada: conservación y rotación
+
+Fuente f14d6fd / CI45486767302 SUCCESS:218JUnit sin fallos/errores/omisiones,619GameTests requeridos,cliente32escenas/64tooltips y bolsa viva10renders20/5. Fixture aislada:16trabajos,oncefirmas/primarias-secundarias,1037bloques→1037guardados,conservación por jugador y agregado,baseline/final ceroentidades en cadaAABB. Finaliza en52turnos,43alcanzan192intentos (máximo192), intervalo máximo de servicio2turnos frente al límite3, sin pausas por botín. Los intentos incluyen seguimiento/celdas vacías; NO192roturas/tick ni16clientes/TCP ni tiempo de tick completo. Sólo nueva evidencia de planificación; no cambia habilidades ni acredita rendimientoFPS/TPS o balance.
+
+Primer run45484474986/bfdd413 falló por entidades próximas al jugador0 con su bolsa ya exacta; origen de esos ítems no identificado. Segundo escenario se separa4096Z y en altura, establece baselines antes de arrancar ningún trabajo y mantiene comprobaciones estrictas de todas las entidades, sin filtrar IDs/UUIDs. Aprobación aislada no identifica retrospectivamente el origen del fallo ni prueba compatibilidad universal.

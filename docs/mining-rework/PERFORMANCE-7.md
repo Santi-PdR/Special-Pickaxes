@@ -91,3 +91,15 @@ Base yaw por ráfaga aprobada en488215b/CI45453539106SUCCESS:217JUnit/617GameTes
 Puntos locales precalculados confirmados en5e7a45f/CI45471762752SUCCESS:218JUnit/617GameTests/cliente32escenas64tooltips y bolsa viva10renders20/5. Tablas312Vec3 privadas, coordenadas exactas e inmutabilidad aprobadas.186Python(1omitida),25recursos,secret-scan528localesPASS. Primer run45469198953 falló por error de generación vanilla en smoke empaquetado; fixture plana reproducible sin relajar escáner ni modificar GameTests mineros. No confundir smoke plano con compatibilidad de generación survival. Rendimiento causal y balance global siguen abiertos; no publicación.
 
 Transición inicial→asentamiento validada en3ad309c/CI45476450660SUCCESS:218JUnit/618GameTests/cliente32escenas64tooltips/bolsa viva10renders20/5. SIGNATURE_PHASE_BUDGET variants=22 redundant_transition_attempts_avoided=144. Exactitud de intentos en cada turno inicial y vigilancia posterior de celda rota aprobadas; grava física/tardía y límites globales siguen verdes. Hasta15intentos evitados por transición parcial, no por tick sostenido ni ahorroCPU medido. Regresión sólo llama succeed tras comprobar todas las variantes.186Python(1omitida),25recursos,secret-scan528localesPASS. Rendimiento causal/balance/modpacks siguen pendientes; no publicación.
+
+## Saturación mixta real del presupuesto (corrección, no tiempos)
+
+Fuente f14d6fd, CI45486767302 SUCCESS. Dieciséis FakePlayers/trabajos, once firmas y variantes primarias/secundarias; bolsa activada, posiciones separadas32bloques en zona aislada4096Z y altura maxBuildHeight−48. Antes de activar cualquier trabajo se exige cero entidades de ítem en las16AABB. Luego se avanza reloj por llamada WorkQueue.tick; se restaura en finally.
+
+| Trabajos | Bloques/guardados | Turnos | Turnos con192intentos | Máximo intentos | Máxima separación de servicio | Límite exigido |
+|---:|---:|---:|---:|---:|---:|---:|
+|16|1037/1037|52|43|192|2turnos|3turnos|
+
+Cero pausas por botín; todas las huellas terminadas; conservación comprobada individualmente y agregada; cero entidades de ítem finales sin filtro de IDs/UUIDs. A diferencia del ensayo8jobs/max128, sí satura192. Incluye inspecciones de asentamiento/celdas vacías: no significa192roturas por turno. No se midieron tiempos/CPU/TPS/FPS/red aquí; no hay16clientesTCP ni ticks naturales de mundo entre llamadas.
+
+Primer ensayo no aislado bfdd413/45484474986 falló en ceroentidades próximo a jugador0 pese a cantidad guardada exacta. Origen no identificado; no presentar como duplicación productiva ni asumir definitivamente contaminación. Segundo ensayo aislado exige baseline explícito y conserva las aserciones finales; fallo histórico registrado, no filtrado.
