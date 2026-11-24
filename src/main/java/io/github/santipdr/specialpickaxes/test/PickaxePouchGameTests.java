@@ -249,4 +249,41 @@ public final class PickaxePouchGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty",batch="pouch_three_pages_r7") public static void allThreePagesWithdrawAndCompactWithoutLosingSharedEntries(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        var materials=net.minecraft.core.registries.BuiltInRegistries.ITEM.stream()
+                .filter(item->net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft"))
+                .filter(item->{var stack=new ItemStack(item);return !stack.isEmpty()&&stack.isStackable()&&!stack.hasTag()&&!stack.serializeNBT().contains("ForgeCaps");})
+                .limit(64).toList();
+        h.assertTrue(materials.size()==64,"three-page fixture contains 64 types");
+        for(var material:materials)PickaxePouch.insert(tool,new ItemStack(material));
+        PickaxePouchMenu.open(p,tool);
+        try{
+            var menu=p.containerMenu;
+            for(int page=0;page<3;page++){
+                for(int slot=0;slot<26;slot++){
+                    int index=page*26+slot;var shown=menu.getSlot(slot).getItem();
+                    h.assertTrue(index<64?shown.is(materials.get(index))&&shown.getCount()==1:shown.isEmpty(),"page maps exact type index, no arrow/phantom materials");
+                }
+                if(page<2)menu.clicked(26,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+            }
+            // Remove every entry on the final page; page count drops from 3 to 2.
+            for(int removed=0;removed<12;removed++){
+                h.assertTrue(menu.getSlot(0).getItem().is(materials.get(52+removed)),"compaction advances final-page first slot");
+                menu.clicked(0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,p);
+            }
+            h.assertTrue(PickaxePouch.types(tool)==52&&menu.getSlot(0).getItem().is(materials.get(26)),"last page disappears and selection clamps to valid previous page");
+            int withdrawn=0;
+            for(int index=52;index<64;index++){
+                int count=0;for(var stack:p.getInventory().items)if(stack.is(materials.get(index)))count+=stack.getCount();
+                h.assertTrue(count==1,"each final-page material delivered exactly once");withdrawn+=count;
+            }
+            for(int slot=0;slot<52;slot++)h.assertTrue(PickaxePouch.preview(tool,slot).is(materials.get(slot))&&PickaxePouch.amount(tool,slot)==1,"all other shared entries preserved through compaction");
+            h.assertTrue(withdrawn==12&&menu.getCarried().isEmpty(),"safe withdrawal does not populate cursor");
+            menu.clicked(26,0,net.minecraft.world.inventory.ClickType.PICKUP,p);
+            h.assertTrue(menu.getSlot(0).getItem().is(materials.get(0)),"navigation wraps across remaining pages");
+        }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
+
 }
