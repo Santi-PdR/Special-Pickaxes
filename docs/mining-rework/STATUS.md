@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `f14d6fd19f7cf7692e7408b46112e2f3d50930cc`, CI `45486767302` **SUCCESS**: 218 JUnit (0 fallos/errores/omisiones), **619 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `7ac57b865208098355fc88f6121b49aea58029bb`, CI `45493428135` **SUCCESS**: 218 JUnit (0 fallos/errores/omisiones), **620 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1010503 bytes**, SHA256 `73b5684c611be5b8ee71dc70bc6da20b29cb2752366f19dd2fa0080151ac4b81`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1010605 bytes**, SHA256 `6f64e4bb2edd22be02aa96de1da1e6971f75cdac4f5c5c018a706293b42f1237`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2067,3 +2067,9 @@ Fuente3ad309c/CI45476450660 SUCCESS:218JUnit sin fallos/errores/omisiones,618Gam
 Fuente f14d6fd / CI45486767302 SUCCESS:218JUnit sin fallos/errores/omisiones,619GameTests requeridos,cliente32escenas/64tooltips y bolsa viva10renders20/5. Fixture aislada:16trabajos,oncefirmas/primarias-secundarias,1037bloques→1037guardados,conservación por jugador y agregado,baseline/final ceroentidades en cadaAABB. Finaliza en52turnos,43alcanzan192intentos (máximo192), intervalo máximo de servicio2turnos frente al límite3, sin pausas por botín. Los intentos incluyen seguimiento/celdas vacías; NO192roturas/tick ni16clientes/TCP ni tiempo de tick completo. Sólo nueva evidencia de planificación; no cambia habilidades ni acredita rendimientoFPS/TPS o balance.
 
 Primer run45484474986/bfdd413 falló por entidades próximas al jugador0 con su bolsa ya exacta; origen de esos ítems no identificado. Segundo escenario se separa4096Z y en altura, establece baselines antes de arrancar ningún trabajo y mantiene comprobaciones estrictas de todas las entidades, sin filtrar IDs/UUIDs. Aprobación aislada no identifica retrospectivamente el origen del fallo ni prueba compatibilidad universal.
+
+### Botín con significado a nivel entidad permanece nativo
+
+Fuente7ac57b8/CI45493428135 SUCCESS:218JUnit sin fallos/errores/omisiones,620GameTests requeridos y cliente32escenas/64tooltips con bolsa viva10renders20/5. Captura excluye ItemEntity con nombre custom, persistent data Forge no vacía o subclase custom aunque ItemStack sea ordinario. ListenersForgeNORMAL reales decoran/reemplazan botín antes del capturadorLOWEST: misma instancia/reemplazo, nombre/datos/tipo y unaunidad en mundo intactos, bolsa vacía. Tras retirar listener, control ordinario vuelve a guardarse una vez y sin entidad duplicada. No se serializa entidad en ruta caliente; Iridium/Strata conservan exclusión previa.
+
+Alcance conservador, no universal: no detecta toda metadata/capability arbitraria de entidad, ni garantiza control sobre listeners posterioresLOWEST. Pueden quedar más entidades nativas cuando un mod aporta estos datos; preservar su significado prima sobre capturarlas. No se atribuye mejoraFPS/TPS. Carga mixta16trabajos/1037materiales/max192/intervalo2 sigue aprobada.

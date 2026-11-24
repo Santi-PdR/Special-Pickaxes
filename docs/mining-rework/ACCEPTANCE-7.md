@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `f14d6fd19f7cf7692e7408b46112e2f3d50930cc`, Forge verification **45486767302 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 619 GameTests requeridos y cliente real. Las 619 pruebas no son 619 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `7ac57b865208098355fc88f6121b49aea58029bb`, Forge verification **45493428135 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 620 GameTests requeridos y cliente real. Las 620 pruebas no son 620 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -71,3 +71,9 @@ Fuente3ad309c/CI45476450660 SUCCESS:218JUnit sin fallos/errores/omisiones,618Gam
 Fuente f14d6fd / CI45486767302 SUCCESS:218JUnit sin fallos/errores/omisiones,619GameTests requeridos,cliente32escenas/64tooltips y bolsa viva10renders20/5. Fixture aislada:16trabajos,oncefirmas/primarias-secundarias,1037bloques→1037guardados,conservación por jugador y agregado,baseline/final ceroentidades en cadaAABB. Finaliza en52turnos,43alcanzan192intentos (máximo192), intervalo máximo de servicio2turnos frente al límite3, sin pausas por botín. Los intentos incluyen seguimiento/celdas vacías; NO192roturas/tick ni16clientes/TCP ni tiempo de tick completo. Sólo nueva evidencia de planificación; no cambia habilidades ni acredita rendimientoFPS/TPS o balance.
 
 Primer run45484474986/bfdd413 falló por entidades próximas al jugador0 con su bolsa ya exacta; origen de esos ítems no identificado. Segundo escenario se separa4096Z y en altura, establece baselines antes de arrancar ningún trabajo y mantiene comprobaciones estrictas de todas las entidades, sin filtrar IDs/UUIDs. Aprobación aislada no identifica retrospectivamente el origen del fallo ni prueba compatibilidad universal.
+
+### Botín con significado a nivel entidad permanece nativo
+
+Fuente7ac57b8/CI45493428135 SUCCESS:218JUnit sin fallos/errores/omisiones,620GameTests requeridos y cliente32escenas/64tooltips con bolsa viva10renders20/5. Captura excluye ItemEntity con nombre custom, persistent data Forge no vacía o subclase custom aunque ItemStack sea ordinario. ListenersForgeNORMAL reales decoran/reemplazan botín antes del capturadorLOWEST: misma instancia/reemplazo, nombre/datos/tipo y unaunidad en mundo intactos, bolsa vacía. Tras retirar listener, control ordinario vuelve a guardarse una vez y sin entidad duplicada. No se serializa entidad en ruta caliente; Iridium/Strata conservan exclusión previa.
+
+Alcance conservador, no universal: no detecta toda metadata/capability arbitraria de entidad, ni garantiza control sobre listeners posterioresLOWEST. Pueden quedar más entidades nativas cuando un mod aporta estos datos; preservar su significado prima sobre capturarlas. No se atribuye mejoraFPS/TPS. Carga mixta16trabajos/1037materiales/max192/intervalo2 sigue aprobada.
