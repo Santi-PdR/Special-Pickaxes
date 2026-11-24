@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, Forge verification **45407719792 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 614 GameTests requeridos y cliente real. Las 614 pruebas no son 614 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `577582c86121ba4d8ef287016ca9eace45035b4e`, Forge verification **45415875250 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 614 GameTests requeridos y cliente real. Las 614 pruebas no son 614 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -35,3 +35,7 @@ Fuente integrada probada: `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, Forge veri
 3. **Compatibilidad universal de modpacks.** Se preservan callbacks/loot nativos y las regresiones de seguridad, pero no se han probado todos los listeners de loot/equipo de terceros ni hardware del usuario.
 
 Estos límites no se ocultan detrás de un número de pruebas. No publicar alpha.60 ni vender el estado como reforma global cerrada por estar verde. `STATUS.md` fija fuente, tamaño y SHA256 exactos del JAR probado y no publicado.
+
+### Actualización visible con bolsa abierta (577582c)
+
+Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor mediante API de 3 diamantes/5 lingotes, observación de slots tras render durante 10 frames estables y captura final revisada con 20 diamantes/5 lingotes. Sin pulsar slots ni cerrar la GUI entre capturas; sólo después se pulsa Escape y se comprueba conservación/cursor en servidor. Marcadores POUCH_LIVE_RENDER_OK, POUCH_MENU_UPDATED y POUCH_MENU_OK obligatorios. Conexión integrada/interna: no acredita TCP, latencia, bytes de red ni FPS/TPS. El ensayo adicional de codec aa825b5 está pendiente y no sustituye este cliente.

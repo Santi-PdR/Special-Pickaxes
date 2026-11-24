@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, CI `45407719792` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **614 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `577582c86121ba4d8ef287016ca9eace45035b4e`, CI `45415875250` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **614 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1007328 bytes**, SHA256 `4278070bda852dd7290eea829744728faf4a1694db1af83fcea5046926db75f9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1007329 bytes**, SHA256 `77009a3802438fd6e59b20110b402727389f1bfdd5f35b745b703a9aa0a6bd7b`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2031,3 +2031,7 @@ GameTests; sólo falló126). Regresión reentrante ahora síncrona: presta un in
 del reloj alineado, ejecuta tick/restablece reloj/listener/bindings en finally.
 Evita ticks de entidades entre setup y aserción, sin cambiar la habilidad ni
 reducir las dos vinculaciones/assertcalls==1. 86JUnit observados pasados en437.
+
+### Actualización visible con bolsa abierta (577582c)
+
+Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor mediante API de 3 diamantes/5 lingotes, observación de slots tras render durante 10 frames estables y captura final revisada con 20 diamantes/5 lingotes. Sin pulsar slots ni cerrar la GUI entre capturas; sólo después se pulsa Escape y se comprueba conservación/cursor en servidor. Marcadores POUCH_LIVE_RENDER_OK, POUCH_MENU_UPDATED y POUCH_MENU_OK obligatorios. Conexión integrada/interna: no acredita TCP, latencia, bytes de red ni FPS/TPS. El ensayo adicional de codec aa825b5 está pendiente y no sustituye este cliente.
