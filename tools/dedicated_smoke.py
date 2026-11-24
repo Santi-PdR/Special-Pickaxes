@@ -8,7 +8,7 @@ if not installer.exists():
  subprocess.run(['curl','--fail','--location','--retry','3',f'https://maven.minecraftforge.net/net/minecraftforge/forge/{forge_version}/forge-{forge_version}-installer.jar','--output',str(installer)],check=True)
 subprocess.run(['java','-jar',str(installer),'--installServer'],cwd=server,check=True)
 (server/'eula.txt').write_text('eula=true\n')
-(server/'server.properties').write_text('online-mode=false\nserver-port=25575\nlevel-name=smoke-world\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nmax-tick-time=60000\n')
+(server/'server.properties').write_text('online-mode=false\nserver-port=25575\nlevel-name=smoke-world\nlevel-seed=749123\nlevel-type=minecraft:flat\ngenerate-structures=false\ngenerator-settings={"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"features":false,"lakes":false,"structure_overrides":[]}\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nmax-tick-time=60000\n')
 (server/'mods').mkdir(exist_ok=True)
 release=json.loads((root/'build/RELEASE.json').read_text());jar=root/'build/libs'/release['file'];shutil.copy2(jar,server/'mods'/jar.name)
 proc=subprocess.Popen(['java','-Xmx2G',f'@libraries/net/minecraftforge/forge/{forge_version}/unix_args.txt','nogui'],cwd=server,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,bufsize=1)

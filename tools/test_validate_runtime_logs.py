@@ -23,6 +23,31 @@ class RuntimeLogValidation(unittest.TestCase):
             with self.subTest(line=line):
                 self.assertEqual(len(self.scan(line)), 1)
 
+    def test_vanilla_world_generation_errors_are_not_silenced(self):
+        self.assertTrue(self.scan('[Worker-Main-1/ERROR] [minecraft/MonsterRoomFeature]: Failed to fetch mob spawner entity at (-12, -11, -109)'))
+
+    def test_packaged_boot_fixture_is_reproducible_without_worldgen_decorations(self):
+        import ast
+        import json
+        source = pathlib.Path(__file__).with_name('dedicated_smoke.py').read_text()
+        tree = ast.parse(source)
+        properties = next(node.args[0].value for node in ast.walk(tree)
+                          if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                          and node.func.attr == 'write_text' and node.args
+                          and isinstance(node.args[0], ast.Constant)
+                          and isinstance(node.args[0].value, str)
+                          and 'level-name=smoke-world' in node.args[0].value)
+        values = dict(line.split('=', 1) for line in properties.splitlines() if '=' in line)
+        self.assertEqual(values['level-seed'], '749123')
+        self.assertEqual(values['level-type'], 'minecraft:flat')
+        self.assertEqual(values['generate-structures'], 'false')
+        settings = json.loads(values['generator-settings'])
+        self.assertFalse(settings['features'])
+        self.assertFalse(settings['lakes'])
+        self.assertEqual(settings['structure_overrides'], [])
+        self.assertEqual(settings['biome'], 'minecraft:plains')
+        self.assertGreater(len(settings['layers']), 0)
+
     def test_unknown_items_and_commands_are_rejected(self):
         for line in ['Unknown item specialpickaxes:broken', 'Unknown command at position 0']:
             self.assertTrue(self.scan(line))
