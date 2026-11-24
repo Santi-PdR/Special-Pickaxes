@@ -39,6 +39,11 @@ public final class CuriosEffectActive {
                 default -> java.util.List.<MobEffectInstance>of();
             };
             if(effects.isEmpty()||current.get()!=source||!skill.valid())return false;
+            // Applying a buff invokes Forge callbacks. A callback can revoke equipment
+            // after the first bonus: keep that partial benefit from becoming a free retry.
+            // Protected originals retain their previous activation/cooldown ordering.
+            if(kind!=ArtifactKind.IRIDIUM&&kind!=ArtifactKind.SEAM_RIPPER)
+                state.putLong("curiosEffectReady",now+200);
             for(var effect:effects){
                 // Forge effect callbacks may replace equipment between bonuses.
                 if(current.get()!=source||!skill.valid()||!p.isAlive()||p.isRemoved())return false;

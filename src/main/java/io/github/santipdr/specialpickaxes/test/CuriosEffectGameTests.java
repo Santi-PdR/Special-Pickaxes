@@ -72,4 +72,42 @@ public final class CuriosEffectGameTests {
         MiningObservations.forget(p);h.succeed();
     }
 
+    @GameTest(template="empty",batch="curios_partial_revocation_cooldown") public static void revokedFirstBonusCannotBeRepeatedWithoutCooldown(GameTestHelper h){
+        var p=player(h,ArtifactKind.HELLSPEC);var source=p.getMainHandItem();
+        var current=new java.util.concurrent.atomic.AtomicReference<ItemStack>(source);long now=ArtifactState.now(p);int[] calls={0};
+        java.util.function.Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> revoke=e->{
+            if(e.getEntity()==p&&e.getEffectInstance().getEffect()==MobEffects.FIRE_RESISTANCE){calls[0]++;current.set(ItemStack.EMPTY);}
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,revoke);
+        try{
+            h.assertTrue(!CuriosEffectActive.activate(p,source,current::get)&&calls[0]==1,"revoke during first bonus aborts remaining activation");
+            h.assertTrue(p.hasEffect(MobEffects.FIRE_RESISTANCE)&&!p.hasEffect(MobEffects.DAMAGE_RESISTANCE),"only already-applied first bonus survives, no stale second bonus");
+            h.assertTrue(ArtifactState.of(p,ArtifactKind.HELLSPEC).getLong("curiosEffectReady")==now+200,"partial benefit reserves the source cooldown");
+            current.set(source);
+            h.assertTrue(!CuriosEffectActive.activate(p,source,current::get)&&calls[0]==1,"reequipping cannot repeat partial benefit for free");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(revoke);}
+        long time=h.getLevel().getGameTime();
+        try{
+            h.getLevel().getServer().getWorldData().overworldData().setGameTime(time+200);
+            h.assertTrue(CuriosEffectActive.activate(p,source,current::get)&&p.hasEffect(MobEffects.DAMAGE_RESISTANCE),"cooldown expiry and reentry cleanup allow ordinary retry");
+        }finally{h.getLevel().getServer().getWorldData().overworldData().setGameTime(time);MiningObservations.forget(p);}
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="curios_partial_copy_cooldown") public static void retaggedCopyKeepsOriginalSourceCooldownAfterFirstBonus(GameTestHelper h){
+        var p=player(h,ArtifactKind.WORLDBREAKER);var source=p.getMainHandItem();source.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);
+        long now=ArtifactState.now(p);int[] calls={0};
+        java.util.function.Consumer<net.minecraftforge.event.entity.living.MobEffectEvent.Added> retag=e->{
+            if(e.getEntity()==p&&e.getEffectInstance().getEffect()==MobEffects.JUMP){calls[0]++;source.getOrCreateTag().putString("copiedSkill",ArtifactKind.EVENTIDE.id);}
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,false,net.minecraftforge.event.entity.living.MobEffectEvent.Added.class,retag);
+        try{
+            h.assertTrue(!CuriosEffectActive.activate(p,source,()->source)&&calls[0]==1,"retagged copy aborts after first effect callback");
+            h.assertTrue(p.hasEffect(MobEffects.JUMP)&&!p.hasEffect(MobEffects.SLOW_FALLING),"stale copied profile grants no second effect");
+            h.assertTrue(ArtifactState.of(p,ArtifactKind.ICARUS).getLong("curiosEffectReady")==now+200,"cooldown belongs to activated source, not replacement copy");
+            source.getOrCreateTag().putString("copiedSkill",ArtifactKind.ICARUS.id);
+            h.assertTrue(!CuriosEffectActive.activate(p,source,()->source)&&calls[0]==1,"restoring copy cannot bypass source cooldown");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(retag);MiningObservations.forget(p);}
+        h.succeed();
+    }
+
 }
