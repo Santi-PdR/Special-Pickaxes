@@ -336,4 +336,47 @@ public final class PickaxePouchGameTests {
         }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
         h.succeed();
     }
+
+    private static final class CustomLootEntity extends net.minecraft.world.entity.item.ItemEntity {
+        CustomLootEntity(net.minecraft.world.level.Level level,double x,double y,double z,ItemStack stack){super(level,x,y,z,stack);}
+    }
+    @GameTest(template="empty",batch="pouch_entity_metadata_r7") public static void entityDecoratedNativeDropsRemainInWorldWithoutLosingTheirMeaning(GameTestHelper h){
+        for(int variant=0;variant<3;variant++){
+            final int mode=variant;
+            var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
+            tool.getOrCreateTag().putBoolean("materialPouchEnabled",true);
+            var observed=new java.util.concurrent.atomic.AtomicReference<net.minecraft.world.entity.item.ItemEntity>();
+            java.util.function.Consumer<net.minecraftforge.event.entity.EntityJoinLevelEvent> decorate=event->{
+                if(event.getLevel()!=h.getLevel()||event.getEntity().getClass()!=net.minecraft.world.entity.item.ItemEntity.class)return;
+                var drop=(net.minecraft.world.entity.item.ItemEntity)event.getEntity();
+                if(!drop.getItem().is(Items.COBBLESTONE)||drop.position().distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(at))>4)return;
+                if(mode==0)drop.setCustomName(net.minecraft.network.chat.Component.literal("Foreign native loot"));
+                else if(mode==1)drop.getPersistentData().putString("foreignLootContract","preserve-entity");
+                else{
+                    event.setCanceled(true);
+                    var replacement=new CustomLootEntity(h.getLevel(),drop.getX(),drop.getY(),drop.getZ(),drop.getItem().copy());
+                    observed.set(replacement);h.getLevel().addFreshEntity(replacement);return;
+                }
+                observed.set(drop);
+            };
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,false,net.minecraftforge.event.entity.EntityJoinLevelEvent.class,decorate);
+            try{
+                h.assertTrue(WorldSafety.mine(p,tool,ArtifactKind.EVENTIDE,at,h.getLevel().getBlockState(at)),"native transaction succeeds with decorated entity "+mode);
+                var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2));
+                h.assertTrue(observed.get()!=null&&drops.size()==1&&drops.get(0)==observed.get(),"same decorated/replacement entity survives, exactly once "+mode);
+                var drop=drops.get(0);
+                h.assertTrue(drop.getItem().is(Items.COBBLESTONE)&&drop.getItem().getCount()==1&&!drop.getItem().hasTag()&&PickaxePouch.types(tool)==0,"ordinary stack stays native when entity is special "+mode);
+                h.assertTrue(mode==0?drop.hasCustomName()&&drop.getCustomName().getString().equals("Foreign native loot"):mode==1?drop.getPersistentData().getString("foreignLootContract").equals("preserve-entity"):drop instanceof CustomLootEntity,"entity semantics intact "+mode);
+            }finally{
+                net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(decorate);
+                for(var drop:h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2)))drop.discard();
+                WorkQueue.cancel(p);MiningObservations.forget(p);
+            }
+            // Listener is gone: ordinary native loot must still take the fast capture path.
+            h.getLevel().setBlock(at,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+            h.assertTrue(WorldSafety.mine(p,tool,ArtifactKind.EVENTIDE,at,h.getLevel().getBlockState(at))&&PickaxePouch.amount(tool,0)==1,"ordinary native capture resumes after special entity listener "+mode);
+            h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2)).isEmpty(),"ordinary control leaves no duplicate world entity "+mode);
+        }
+        h.succeed();
+    }
 }

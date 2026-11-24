@@ -53,6 +53,11 @@ public final class WorldSafety {
                 ||p.getMainHandItem()!=tool||tool.isEmpty()||!context.skill().valid()||!miningLeaseActive()
                 ||!tool.hasTag()||!tool.getTag().getBoolean("materialPouchEnabled")
                 ||drop.position().distanceToSqr(Vec3.atCenterOf(context.pos()))>4)return;
+        // Stack data is not the whole drop contract: mods can attach meaning to
+        // the entity itself. Keep custom entities/names/Forge persistent data native.
+        // Do not serialize every entity on this hot path merely to inspect metadata.
+        if(drop.getClass()!=net.minecraft.world.entity.item.ItemEntity.class||drop.hasCustomName()
+                ||!drop.getPersistentData().isEmpty())return;
         var original=drop.getItem();var rest=PickaxePouch.insert(tool,original);
         if(rest.getCount()==original.getCount())return;
         if(rest.isEmpty())event.setCanceled(true);else drop.setItem(rest);
