@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `b3737d8a87f0d886cf492b72a303dd542c36d7a2`, CI `45420018800` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **615 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `3ba3f7713de3e9f8835f1fe95560a0f7290ee3bd`, CI `45438613414` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **616 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1007329 bytes**, SHA256 `0b685ad3ca2fab15cf5969f58c942b8cf1e213527a9f9a6b1fec67b3a6dc4e9b`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1008581 bytes**, SHA256 `372927347840417971a3cb05544dc7d8a4e0fb55935a30d0af6713528b37a9a9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2039,3 +2039,7 @@ Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor med
 ### Codec nativo de inventario aprobado
 
 CI 45420018800 SUCCESS: 216 JUnit, 615 GameTests requeridos y cliente real 32 escenas/64 tooltips; render vivo de bolsa repetido. ClientboundContainerSetSlotPacket.write/read conserva framing/NBT, 64 tipos y 262144 unidades, snapshot previo tras mutar la bolsa e independencia de copia decodificada. Registro POUCH_SLOT_CODEC: vacío 25 bytes, lleno 3912 bytes, cambio de una cantidad 3912 bytes (262143 unidades). Son bytes del payload de ese paquete, no tráfico TCP/comprimido ni latencia. La tabla completa sigue enviándose en cada actualización del stack; no es sincronización delta. Primera ejecución 45419913390 bloqueada por Maven HTTP429, sin atribuirlo al mod.
+
+### Lectura única por slot aprobada
+
+Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 616GameTests requeridos, cliente32escenas/64tooltips y POUCH_LIVE_RENDER_OK10frames20/5, cierrePOUCH_MENU_OK. SlotView entrega stack separado y cantidad tras una única validación/deserialización; el menú deja de llamar preview+amount para el mismo slot. Lecturas públicas conservan validación; cantidades inválidas se descartan antes de construir el prototipo. Regresión aprobada de4096unidades/icono64/nombre4096, cero/sobrecapacidad/aire/noapilable/tagajeno/lista65 rechazados sin retirada ni reescritura, y restauración válida. No son deltas de red ni una mejora FPS/TPS medida.

@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `b3737d8a87f0d886cf492b72a303dd542c36d7a2`, Forge verification **45420018800 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 615 GameTests requeridos y cliente real. Las 615 pruebas no son 615 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `3ba3f7713de3e9f8835f1fe95560a0f7290ee3bd`, Forge verification **45438613414 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 616 GameTests requeridos y cliente real. Las 616 pruebas no son 616 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -43,3 +43,7 @@ Cliente real aprobado: captura inicial con 17 diamantes, inserción servidor med
 ### Codec nativo de inventario aprobado
 
 CI 45420018800 SUCCESS: 216 JUnit, 615 GameTests requeridos y cliente real 32 escenas/64 tooltips; render vivo de bolsa repetido. ClientboundContainerSetSlotPacket.write/read conserva framing/NBT, 64 tipos y 262144 unidades, snapshot previo tras mutar la bolsa e independencia de copia decodificada. Registro POUCH_SLOT_CODEC: vacío 25 bytes, lleno 3912 bytes, cambio de una cantidad 3912 bytes (262143 unidades). Son bytes del payload de ese paquete, no tráfico TCP/comprimido ni latencia. La tabla completa sigue enviándose en cada actualización del stack; no es sincronización delta. Primera ejecución 45419913390 bloqueada por Maven HTTP429, sin atribuirlo al mod.
+
+### Lectura única por slot aprobada
+
+Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 616GameTests requeridos, cliente32escenas/64tooltips y POUCH_LIVE_RENDER_OK10frames20/5, cierrePOUCH_MENU_OK. SlotView entrega stack separado y cantidad tras una única validación/deserialización; el menú deja de llamar preview+amount para el mismo slot. Lecturas públicas conservan validación; cantidades inválidas se descartan antes de construir el prototipo. Regresión aprobada de4096unidades/icono64/nombre4096, cero/sobrecapacidad/aire/noapilable/tagajeno/lista65 rechazados sin retirada ni reescritura, y restauración válida. No son deltas de red ni una mejora FPS/TPS medida.
