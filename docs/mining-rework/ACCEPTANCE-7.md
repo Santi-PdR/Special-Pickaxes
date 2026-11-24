@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `488215bbb9e17c749e7bbc07d234318d243abacd`, Forge verification **45453539106 SUCCESS**: 217 JUnit sin fallos/errores/omisiones, 617 GameTests requeridos y cliente real. Las 617 pruebas no son 617 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `5e7a45f8932d41d3869b55a6632953997cc696b2`, Forge verification **45471762752 SUCCESS**: 218 JUnit sin fallos/errores/omisiones, 617 GameTests requeridos y cliente real. Las 617 pruebas no son 617 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -55,3 +55,9 @@ Fuente c0bf7e5 / CI45444309796 SUCCESS: 216JUnit sin fallos/errores/omisiones, 6
 ### Base yaw reutilizada en VFX, coordenadas preservadas
 
 488215b / CI45453539106 SUCCESS:217JUnit sin fallos/errores/omisiones,617GameTests y cliente32escenas/64tooltips,bolsa viva10renders20/5. Cast y feedback de excavación calculan forward/right una vez por ráfaga, en lugar de por partícula. Prueba aprobada compara bits de las coordenadas con la fórmula anterior:13formas×2variantes×16puntos×107direcciones. Conserva orden de operaciones, fallback vertical/cero, formas, cantidades, presupuestos y destinatarios; no cambia habilidades/modelos/texturas. No se afirma ahorro de paquetes ni una mejora FPS/TPS medida.
+
+### Puntos locales de impacto/final precalculados
+
+Fuente5e7a45f/CI45471762752 SUCCESS:218JUnit sin fallos/errores/omisiones,617GameTests requeridos y cliente32escenas/64tooltips,bolsa viva20/5 durante10renders y cierrePOUCH_MENU_OK. RelicWorkShape conserva312Vec3 inmutables en tablas privadas; no retiene mundos/jugadores/posiciones. Coordenadas comparadas bit a bit con implementación previa, identidad reutilizada y transformaciones consumidoras sin mutación del punto. Cantidades, límites, destinatarios, presupuesto y dibujos no cambian; originales/modelos/texturas intactos. No acredita FPS/TPS ni reduce paquetes.
+
+El primer run45469198953 falló en logs del servidor empaquetado por MonsterRoomFeature vanilla: faltó entidad spawner durante generación aleatoria, pese a JUnit/GameTests aprobados. No se filtra ese error: regresión exige que siga rechazándose. Fixture de arranque usa ahora mundo plano/semilla749123 sin estructuras/features/lakes; el run completo pasó con detector estricto intacto. Ese smoke acredita arranque/IDs/guardado/cierre, no generación survival/modpacks.
