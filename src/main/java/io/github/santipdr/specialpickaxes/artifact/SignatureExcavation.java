@@ -78,7 +78,11 @@ public final class SignatureExcavation implements WorkProgram {
     public void confirm(){}
     public boolean loaded(ServerPlayer p){return true;}
     public boolean reportPartial(){return false;}
-    public int attemptsPerTick(ItemStack tool){return index<cells.size()?16:Math.min(16,Math.max(1,cleared.size()));}
+    public int attemptsPerTick(ItemStack tool){
+        // Never spend the unused tail of the initial-cut allowance rechecking the
+        // freshly cleared cells. Settling begins on the next scheduler turn.
+        return index<cells.size()?Math.min(16,cells.size()-index):Math.min(16,Math.max(1,cleared.size()));
+    }
     public WorkStep next(ServerPlayer p){
         now=ArtifactState.now(p);boolean revisit=index>=cells.size();
         if(revisit&&settleUntil==Long.MIN_VALUE)settleUntil=Math.min(deadline,now+40);

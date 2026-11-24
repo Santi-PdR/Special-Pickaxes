@@ -103,4 +103,30 @@ public final class SignatureExcavationGameTests {
         }h.succeed();
     }
 
+    @GameTest(template="empty",batch="signature_phase_budget_r7") public static void initialCutDoesNotSpendItsTailOnImmediateSettlingRechecks(GameTestHelper h){
+        int saved=0;
+        for(var kind:ArtifactKind.playableValues()){
+            if(!SignatureExcavation.handles(kind))continue;
+            for(boolean alternate:new boolean[]{false,true}){
+                var p=SeismicReworkGameTests.player(h,kind);var at=SeismicReworkGameTests.target(h,p);
+                var look=p.getLookAngle();var cells=SignatureExcavation.footprint(at,Direction.getNearest(look.x,look.y,look.z),kind,alternate);
+                for(var cell:cells)h.getLevel().setBlock(cell,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                h.getLevel().setBlock(at,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
+                try{
+                    h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),kind,alternate),"sparse signature starts "+kind.id);
+                    for(int remaining=cells.size();remaining>0;remaining-=16){
+                        WorkQueue.tick();
+                        h.assertTrue(WorkQueue.lastAttempts()==Math.min(16,remaining),"initial turn only inspects remaining planned cells, no repeated settling "+kind.id);
+                    }
+                    h.assertTrue(h.getLevel().getBlockState(at).isAir()&&WorkQueue.busy(p),"initial harvest succeeded and falling watch remains active "+kind.id);
+                    WorkQueue.tick();
+                    h.assertTrue(WorkQueue.lastAttempts()==1&&WorkQueue.busy(p),"next turn still watches the one cleared cell, no shortened settling window "+kind.id);
+                    saved+=(16-cells.size()%16)%16;
+                }finally{SeismicReworkGameTests.finish(h,p);}
+            }
+        }
+        h.assertTrue(saved>0,"fixtures exercise partial final initial turns");
+        com.mojang.logging.LogUtils.getLogger().info("SIGNATURE_PHASE_BUDGET variants=22 redundant_transition_attempts_avoided={}",saved);
+        h.succeed();
+    }
 }
