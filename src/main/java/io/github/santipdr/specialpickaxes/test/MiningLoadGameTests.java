@@ -35,12 +35,19 @@ public final class MiningLoadGameTests {
         try{
             for(int i=0;i<count;i++){
                 var kind=kinds.get(i%kinds.size());var p=SeismicReworkGameTests.player(h,kind);players.add(p);
-                p.setPos(p.getX()+i*32,p.getY(),p.getZ());
+                // Separate this wide fixture from neighboring GameTest structures/drops.
+                p.setPos(p.getX()+i*32,h.getLevel().getMaxBuildHeight()-48,p.getZ()+4096);
                 var at=SeismicReworkGameTests.target(h,p);origins.add(at);var aim=p.getLookAngle();
                 var cells=SignatureExcavation.footprint(at,Direction.getNearest(aim.x,aim.y,aim.z),kind,(i&1)!=0);
                 footprints.add(cells);total+=cells.size();
                 for(var cell:cells){h.getLevel().setBlock(cell,Blocks.STONE.defaultBlockState(),2);PlayerPlacedBlocks.get(h.getLevel()).unmark(cell);}
                 p.getMainHandItem().getOrCreateTag().putBoolean("materialPouchEnabled",true);
+            }
+            // Establish all baselines before any of the sixteen jobs can mine.
+            // Do not hide contamination by filtering item IDs/UUIDs in the final check.
+            for(int i=0;i<count;i++)h.assertTrue(h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(origins.get(i)).inflate(12)).isEmpty(),"isolated fixture starts without item entities "+i);
+            for(int i=0;i<count;i++){
+                var p=players.get(i);var kind=kinds.get(i%kinds.size());
                 h.assertTrue(SignatureExcavation.start(p,p.getMainHandItem(),kind,(i&1)!=0),"mixed signature starts "+i);
             }
             for(turn=1;turn<=160&&players.stream().anyMatch(WorkQueue::busy);turn++){
