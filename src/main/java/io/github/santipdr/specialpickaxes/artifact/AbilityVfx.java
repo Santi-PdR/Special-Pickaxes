@@ -34,8 +34,9 @@ public final class AbilityVfx {
         LAST_CAST.put(player.getUUID(),tick);
         var center=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(1.5)).add(0,.25,0);
         var shape=AbilityBurstShape.Shape.valueOf(kind.name());
+        var frame=AbilityBurstShape.yawFrame(player.getLookAngle());
         for(int i=0;i<AbilityBurstShape.COUNT;i++){
-            var point=center.add(AbilityBurstShape.orient((alternate?AbilityBurstShape.alternateOffset(shape,i):AbilityBurstShape.offset(shape,i)),player.getLookAngle()));
+            var point=center.add(frame.orient(alternate?AbilityBurstShape.alternateOffset(shape,i):AbilityBurstShape.offset(shape,i)));
             player.serverLevel().sendParticles(player,particle(kind,alternate),false,point.x,
                     point.y,point.z,1,0,.015,0,0);
         }
@@ -52,8 +53,9 @@ public final class AbilityVfx {
         // Pull surface impacts slightly toward the caster so opaque adjacent faces do not swallow every glyph.
         Vec3 toward=player.getEyePosition().subtract(center).normalize();center=center.add(toward.scale(.6));
         var shape=AbilityBurstShape.Shape.valueOf(kind.name());
+        var frame=AbilityBurstShape.yawFrame(toward);
         for(int i=0;i<count;i++){
-            var point=center.add(AbilityBurstShape.orient(RelicWorkShape.point(shape,i,complete),toward));
+            var point=center.add(frame.orient(RelicWorkShape.point(shape,i,complete)));
             level.sendParticles(player,particle(kind,complete),false,point.x,point.y,point.z,1,0,0,0,0);
         }
         return true;

@@ -51,11 +51,18 @@ public final class AbilityBurstShape {
         };
     }
 
+    /** Immutable yaw basis, reusable for every point in one event-only burst. */
+    public record YawFrame(Vec3 forward,Vec3 right){
+        public Vec3 orient(Vec3 offset){
+            // Preserve operation order of the original transform (including rounding).
+            return right.scale(offset.x).add(0,offset.y,0).add(forward.scale(offset.z));
+        }
+    }
     /** A yaw-only frame stays finite when the caster looks straight up or down. */
-    public static Vec3 orient(Vec3 offset,Vec3 look){
+    public static YawFrame yawFrame(Vec3 look){
         Vec3 forward=new Vec3(look.x,0,look.z);
         forward=forward.lengthSqr()<1.0E-8?new Vec3(0,0,1):forward.normalize();
-        Vec3 right=new Vec3(forward.z,0,-forward.x);
-        return right.scale(offset.x).add(0,offset.y,0).add(forward.scale(offset.z));
+        return new YawFrame(forward,new Vec3(forward.z,0,-forward.x));
     }
+    public static Vec3 orient(Vec3 offset,Vec3 look){return yawFrame(look).orient(offset);}
 }

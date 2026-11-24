@@ -44,4 +44,26 @@ class AbilityBurstShapeTest {
         }
     }
 
+    @Test void reusedYawBasisExactlyMatchesOriginalTransformForAllSilhouettes(){
+        var looks=new java.util.ArrayList<Vec3>(java.util.List.of(Vec3.ZERO,new Vec3(0,1,0),new Vec3(0,-1,0),
+                new Vec3(1e-5,1,0),new Vec3(1e-4,0,0),new Vec3(-1,0,0),new Vec3(0,0,-1)));
+        var random=new java.util.Random(749123L);
+        for(int i=0;i<100;i++)looks.add(new Vec3(random.nextDouble()*2-1,random.nextDouble()*2-1,random.nextDouble()*2-1));
+        for(var look:looks){
+            var frame=AbilityBurstShape.yawFrame(look);
+            for(var kind:AbilityBurstShape.Shape.values())for(int i=0;i<AbilityBurstShape.COUNT;i++){
+                for(var local:new Vec3[]{AbilityBurstShape.offset(kind,i),AbilityBurstShape.alternateOffset(kind,i)}){
+                    var forward=new Vec3(look.x,0,look.z);
+                    forward=forward.lengthSqr()<1.0E-8?new Vec3(0,0,1):forward.normalize();
+                    var right=new Vec3(forward.z,0,-forward.x);
+                    var original=right.scale(local.x).add(0,local.y,0).add(forward.scale(local.z));
+                    var actual=frame.orient(local);
+                    assertEquals(Double.doubleToLongBits(original.x),Double.doubleToLongBits(actual.x));
+                    assertEquals(Double.doubleToLongBits(original.y),Double.doubleToLongBits(actual.y));
+                    assertEquals(Double.doubleToLongBits(original.z),Double.doubleToLongBits(actual.z));
+                    assertEquals(original,AbilityBurstShape.orient(local,look));
+                }
+            }
+        }
+    }
 }
