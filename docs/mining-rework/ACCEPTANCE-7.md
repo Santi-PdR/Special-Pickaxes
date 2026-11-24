@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `c0bf7e55f4385afa7700f095d6046a9e12fef08e`, Forge verification **45444309796 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 617 GameTests requeridos y cliente real. Las 617 pruebas no son 617 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `488215bbb9e17c749e7bbc07d234318d243abacd`, Forge verification **45453539106 SUCCESS**: 217 JUnit sin fallos/errores/omisiones, 617 GameTests requeridos y cliente real. Las 617 pruebas no son 617 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -51,3 +51,7 @@ Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 6
 ### Refresco incremental aprobado
 
 Fuente c0bf7e5 / CI45444309796 SUCCESS: 216JUnit sin fallos/errores/omisiones, 617GameTests requeridos, cliente32escenas/64tooltips y bolsa viva20/5 durante10renders estables, cierre físicoPOUCH_MENU_OK. Tokens de entrada copy-on-write permiten conservar displays detached de materiales no modificados en su slot. Aprobados cambio de una cantidad sin reconstruir el oro, toggle sin reconstruir materiales, append y compactación con limpieza del tail, paginación3→2 y clic obsoleto. El token global se sigue renovando para protección de clics. No se promete protección de mutaciones NBT crudas in-place ni reducción de paquetes/FPS/TPS; sincronización vanilla del stack aún envía tabla completa.
+
+### Base yaw reutilizada en VFX, coordenadas preservadas
+
+488215b / CI45453539106 SUCCESS:217JUnit sin fallos/errores/omisiones,617GameTests y cliente32escenas/64tooltips,bolsa viva10renders20/5. Cast y feedback de excavación calculan forward/right una vez por ráfaga, en lugar de por partícula. Prueba aprobada compara bits de las coordenadas con la fórmula anterior:13formas×2variantes×16puntos×107direcciones. Conserva orden de operaciones, fallback vertical/cero, formas, cantidades, presupuestos y destinatarios; no cambia habilidades/modelos/texturas. No se afirma ahorro de paquetes ni una mejora FPS/TPS medida.

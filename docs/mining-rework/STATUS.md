@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `c0bf7e55f4385afa7700f095d6046a9e12fef08e`, CI `45444309796` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **617 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `488215bbb9e17c749e7bbc07d234318d243abacd`, CI `45453539106` **SUCCESS**: 217 JUnit (0 fallos/errores/omisiones), **617 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1008748 bytes**, SHA256 `d99c7d0d1dc788ea88022cbef7b23df82ff3649d90b08380fc339ab73aacb260`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1010079 bytes**, SHA256 `4917b88ac0d7a8679bf6cf2f6d01d7bcd1aefb3d402f57dca167accef5e53c36`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2047,3 +2047,7 @@ Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 6
 ### Refresco incremental aprobado
 
 Fuente c0bf7e5 / CI45444309796 SUCCESS: 216JUnit sin fallos/errores/omisiones, 617GameTests requeridos, cliente32escenas/64tooltips y bolsa viva20/5 durante10renders estables, cierre físicoPOUCH_MENU_OK. Tokens de entrada copy-on-write permiten conservar displays detached de materiales no modificados en su slot. Aprobados cambio de una cantidad sin reconstruir el oro, toggle sin reconstruir materiales, append y compactación con limpieza del tail, paginación3→2 y clic obsoleto. El token global se sigue renovando para protección de clics. No se promete protección de mutaciones NBT crudas in-place ni reducción de paquetes/FPS/TPS; sincronización vanilla del stack aún envía tabla completa.
+
+### Base yaw reutilizada en VFX, coordenadas preservadas
+
+488215b / CI45453539106 SUCCESS:217JUnit sin fallos/errores/omisiones,617GameTests y cliente32escenas/64tooltips,bolsa viva10renders20/5. Cast y feedback de excavación calculan forward/right una vez por ráfaga, en lugar de por partícula. Prueba aprobada compara bits de las coordenadas con la fórmula anterior:13formas×2variantes×16puntos×107direcciones. Conserva orden de operaciones, fallback vertical/cero, formas, cantidades, presupuestos y destinatarios; no cambia habilidades/modelos/texturas. No se afirma ahorro de paquetes ni una mejora FPS/TPS medida.
