@@ -6,6 +6,9 @@ tooltip_flag=root/'run/client-tooltip-visible.flag';tooltip_flag.unlink(missing_
 ack=root/'run/client-capture-ack.txt';ack.unlink(missing_ok=True)
 gallery_flag=root/'run/gallery-captured.flag';gallery_flag.unlink(missing_ok=True)
 aim_request=root/'run/client-aim-scene.txt';aim_request.unlink(missing_ok=True)
+for name in ['initial-captured', 'live-request', 'live-ack']:
+ (root/('run/client-pouch-'+name+'.flag')).unlink(missing_ok=True)
+(root/'run/client-pouch-live-ack.tmp').unlink(missing_ok=True)
 world=root/'run/saves/ArtifactSmoke'
 if world.exists():shutil.rmtree(world)
 shutil.copytree(root/'build/packaged-smoke/smoke-world',world)
@@ -144,6 +147,9 @@ try:
    press_screen('pouch')
   if '[CHAT]' in line and 'POUCH_MENU_OPEN' in line:
    capture_screen(str(out/'pouch-menu.png'))
+   (root/'run/client-pouch-initial-captured.flag').write_text('captured')
+  if '[CHAT]' in line and 'POUCH_MENU_UPDATED' in line:
+   capture_screen(str(out/'pouch-live-updated.png'))
    press_screen('close')
   if '[CHAT]' in line and 'ARTIFACT_UX_COMPLETE' in line:
    if ux!=set(scenes):raise RuntimeError('Incomplete graphical artifact validation')
@@ -177,6 +183,9 @@ finally:
  xvfb.terminate();xvfb.wait(timeout=10);xlog.close()
 if not any('CURIO_KEY_OK' in s for s in captured):raise SystemExit('Missing real Curios slot and physical equipped-key verification')
 if not any('POUCH_MENU_OK' in s for s in captured):raise SystemExit('Missing physical pouch menu verification')
+if not any('POUCH_LIVE_RENDER_OK' in s for s in captured):raise SystemExit('Missing real rendered pouch live-update verification')
+if not any('POUCH_MENU_UPDATED' in s for s in captured):raise SystemExit('Missing server acknowledgement of rendered pouch live update')
+if not (out/'pouch-live-updated.png').exists():raise SystemExit('Missing real live-updated pouch capture')
 if not success:raise SystemExit('Graphical client did not enter the artifact gallery before its deadline')
 if not any('ICARUS_FLIGHT_OK ' in s for s in captured):raise SystemExit('Missing real survival-client ascent verification')
 if not any('ICARUS_CEILINGS_OK' in s for s in captured):raise SystemExit('Missing real survival-client ceiling excavation verification')

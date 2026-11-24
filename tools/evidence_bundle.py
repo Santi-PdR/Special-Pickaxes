@@ -15,7 +15,7 @@ ACTION_REVIEW_IMAGES = {'action-'+scene+'.jpg' for scene in (
     'palimpsest-solar_rupture', 'fault_choir-fault_fan', 'eventide-gravity_in',
     'paradox_crucible-stone', 'hollow_axiom-hollow_pulse', 'exodium-starfall',
     'hellspec-hellforge')} | {'supreme-executing.jpg', 'supreme-complete.jpg',
-                           'curios-key-before.jpg', 'curios-key-after.jpg', 'pouch-menu.jpg'}
+                           'curios-key-before.jpg', 'curios-key-after.jpg', 'pouch-menu.jpg', 'pouch-live-updated.jpg'}
 PRIORITY_IMAGES |= ACTION_REVIEW_IMAGES
 FOCUS_IMAGES = {'manual-worldloom-quarry.jpg', 'worldloom-quarry-active.jpg'} | ACTION_REVIEW_IMAGES
 
