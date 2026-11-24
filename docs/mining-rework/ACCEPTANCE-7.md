@@ -1,6 +1,6 @@
 # Reforma 7: cotejo de requisitos y evidencia
 
-Fuente integrada probada: `3ba3f7713de3e9f8835f1fe95560a0f7290ee3bd`, Forge verification **45438613414 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 616 GameTests requeridos y cliente real. Las 616 pruebas no son 616 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
+Fuente integrada probada: `c0bf7e55f4385afa7700f095d6046a9e12fef08e`, Forge verification **45444309796 SUCCESS**: 216 JUnit sin fallos/errores/omisiones, 617 GameTests requeridos y cliente real. Las 617 pruebas no son 617 mecánicas. No se publicó el JAR ni se declara resuelto el rendimiento global.
 
 ## Requisitos funcionales
 
@@ -47,3 +47,7 @@ CI 45420018800 SUCCESS: 216 JUnit, 615 GameTests requeridos y cliente real 32 es
 ### Lectura única por slot aprobada
 
 Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 616GameTests requeridos, cliente32escenas/64tooltips y POUCH_LIVE_RENDER_OK10frames20/5, cierrePOUCH_MENU_OK. SlotView entrega stack separado y cantidad tras una única validación/deserialización; el menú deja de llamar preview+amount para el mismo slot. Lecturas públicas conservan validación; cantidades inválidas se descartan antes de construir el prototipo. Regresión aprobada de4096unidades/icono64/nombre4096, cero/sobrecapacidad/aire/noapilable/tagajeno/lista65 rechazados sin retirada ni reescritura, y restauración válida. No son deltas de red ni una mejora FPS/TPS medida.
+
+### Refresco incremental aprobado
+
+Fuente c0bf7e5 / CI45444309796 SUCCESS: 216JUnit sin fallos/errores/omisiones, 617GameTests requeridos, cliente32escenas/64tooltips y bolsa viva20/5 durante10renders estables, cierre físicoPOUCH_MENU_OK. Tokens de entrada copy-on-write permiten conservar displays detached de materiales no modificados en su slot. Aprobados cambio de una cantidad sin reconstruir el oro, toggle sin reconstruir materiales, append y compactación con limpieza del tail, paginación3→2 y clic obsoleto. El token global se sigue renovando para protección de clics. No se promete protección de mutaciones NBT crudas in-place ni reducción de paquetes/FPS/TPS; sincronización vanilla del stack aún envía tabla completa.

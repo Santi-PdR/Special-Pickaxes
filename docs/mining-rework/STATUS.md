@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `3ba3f7713de3e9f8835f1fe95560a0f7290ee3bd`, CI `45438613414` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **616 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `c0bf7e55f4385afa7700f095d6046a9e12fef08e`, CI `45444309796` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **617 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1008581 bytes**, SHA256 `372927347840417971a3cb05544dc7d8a4e0fb55935a30d0af6713528b37a9a9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1008748 bytes**, SHA256 `d99c7d0d1dc788ea88022cbef7b23df82ff3649d90b08380fc339ab73aacb260`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -2043,3 +2043,7 @@ CI 45420018800 SUCCESS: 216 JUnit, 615 GameTests requeridos y cliente real 32 es
 ### Lectura única por slot aprobada
 
 Fuente 3ba3f77 / CI45438613414 SUCCESS: 216JUnit sin fallos/errores/omisiones, 616GameTests requeridos, cliente32escenas/64tooltips y POUCH_LIVE_RENDER_OK10frames20/5, cierrePOUCH_MENU_OK. SlotView entrega stack separado y cantidad tras una única validación/deserialización; el menú deja de llamar preview+amount para el mismo slot. Lecturas públicas conservan validación; cantidades inválidas se descartan antes de construir el prototipo. Regresión aprobada de4096unidades/icono64/nombre4096, cero/sobrecapacidad/aire/noapilable/tagajeno/lista65 rechazados sin retirada ni reescritura, y restauración válida. No son deltas de red ni una mejora FPS/TPS medida.
+
+### Refresco incremental aprobado
+
+Fuente c0bf7e5 / CI45444309796 SUCCESS: 216JUnit sin fallos/errores/omisiones, 617GameTests requeridos, cliente32escenas/64tooltips y bolsa viva20/5 durante10renders estables, cierre físicoPOUCH_MENU_OK. Tokens de entrada copy-on-write permiten conservar displays detached de materiales no modificados en su slot. Aprobados cambio de una cantidad sin reconstruir el oro, toggle sin reconstruir materiales, append y compactación con limpieza del tail, paginación3→2 y clic obsoleto. El token global se sigue renovando para protección de clics. No se promete protección de mutaciones NBT crudas in-place ni reducción de paquetes/FPS/TPS; sincronización vanilla del stack aún envía tabla completa.
