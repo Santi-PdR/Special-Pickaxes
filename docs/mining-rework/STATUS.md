@@ -1,8 +1,8 @@
 ## Reforma 7 — integración validada, NO publicada; revisión global aún abierta
 
-Última fuente probada `3e428709e1736feef740be8763d6ead9820bc9ee`, CI `45399274218` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **611 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
+Última fuente probada `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, CI `45407719792` **SUCCESS**: 216 JUnit (0 fallos/errores/omisiones), **614 GameTests**, servidor y cliente real (32 escenas históricas/64 tooltips, no 32 habilidades nuevas). Evidencia descargada y examinada. `POUCH_MENU_OK` físico, Curios sin minería, Ícaro abre ambos techos, Worldbreaker brecha acotada, loot nativo Worldloom. Modelos/texturas y originales Iridium/Strata conservados.
 
-JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1007059 bytes**, SHA256 `5b94165db823cfbe9ed2d7882d7edb094c8f3b7e7fe295352b3d3045d77a9780`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
+JAR probado no publicado: `special-pickaxes-1.20.1-7.0.0-dev.1.jar`, **1007328 bytes**, SHA256 `4278070bda852dd7290eea829744728faf4a1694db1af83fcea5046926db75f9`. Alpha.59 sigue siendo la descarga anterior; no representa este rediseño. Alpha.60 no se publica.
 
 ### Bolsa: comprobación controlada
 
@@ -14,6 +14,10 @@ Misma huella Worldbreaker de **96 bloques**:
 | Activada | 0 | 96 | 0 |
 
 Conservación exacta y reducción de entidades confirmadas en el mismo escenario. Se preservan loot nativo Seda I/Fortuna III (regresión aprobada), overflow y datos especiales fuera de captura. Esto NO evita construir el objeto Java ItemEntity antes del evento ni prueba compatibilidad universal con listeners posteriores. Consultas NBT dejan de clonar toda la lista por cada slot; escrituras siguen copy-on-write y preview/retirada no comparten prototipos (regresión aprobada). Menú real revisado: título corto cabe, apertura/cierre físicos correctos.
+
+### Escrituras de bolsa sin clonación profunda de entradas ajenas
+
+Cada escritura aceptada sigue reemplazando la lista (token del menú), pero comparte sólo para lectura interna las entradas ajenas y clona la modificada. Se deserializan prototipos desde copia NBT para aislar normalización/capacidades. Regresiones aprobadas de snapshots previos, 400 operaciones contra modelo, guardado/carga independiente y tres páginas/compactación 3→2 con 12 retiradas exactas y otras 52 entradas intactas. No cambia capacidad/formato ni elimina la sincronización vanilla. Cotejo general y límites abiertos en `ACCEPTANCE-7.md`.
 
 ### Cooldown Curios ante activación parcial
 

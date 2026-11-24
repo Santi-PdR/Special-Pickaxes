@@ -71,3 +71,9 @@ Fuente `01055ce440a5e5140f62f21e8034656d5177c262`, CI **45061754599 SUCCESS**, 6
 ## Seguimiento de feedback retirado en cola
 
 Fuente `15813054185683b56829ccbc0da67ea21f8a615e`, CI **45069864077 SUCCESS**, 609 GameTests. Sólo SignatureExcavation omite la rama de feedback legacy cada cuatro ticks, que terminaba en emisores no-op pero seguía reservando allowance/preparando datos. AbilityVfx conserva impactos/finales visibles y las rutas de originales/otros programas no se modifican. Regresión ejecuta once firmas en tickCount múltiplo de cuatro: completan y conservan las 4095 unidades de allowance legacy tras reservar 1/4096 al inicio. Es trabajo cosmético innecesario evitado, no ahorro demostrado de paquetes (esa rama ya no emitía) ni de FPS/TPS.
+
+## Seguimiento de copia estructural de entradas
+
+Fuente `77a46709994c89ccc64ea3e5a244ea0672ab6cf0`, CI **45407719792 SUCCESS**, 614 GameTests. Las escrituras aceptadas crean una lista de referencias nueva y clonan sólo la entrada modificada; añadir/eliminar tipos no clona profundamente las entradas ajenas. Éstas son de sólo lectura dentro de la API: toda modificación posterior vuelve a clonar entrada/lista. Los prototipos se deserializan desde copia de su NBT para aislar normalización y capacidades. Se mantiene token de invalidación del menú y formato persistido.
+
+Las regresiones comprueban referencias ajenas reutilizadas, snapshots previos intactos, 400 operaciones contra modelo independiente, guardado/carga sin alias y tres páginas con compactación/retirada exacta. Es una reducción de copias profundas demostrada por la estructura y sus invariantes, no un porcentaje medido de FPS/TPS. Las copias del inventario/sincronización vanilla siguen existiendo; los tiempos históricos anteriores no se presentan como benchmark de este cambio.
