@@ -14,6 +14,7 @@ public final class PickaxePouchMenu extends ChestMenu {
     private final ItemStack tool;
     private final SimpleContainer display;
     private int page;
+    private final Object[] shownEntries=new Object[26];
     private Object shownContents;
     private boolean shownCapture;
     private boolean contentsChanged(){return shownContents!=PickaxePouch.contentsToken(tool)
@@ -28,9 +29,11 @@ public final class PickaxePouchMenu extends ChestMenu {
     private void refresh(){
         int pages=Math.max(1,(PickaxePouch.types(tool)+25)/26);page=Math.min(page,pages-1);
         for(int i=0;i<26;i++){
+            var token=PickaxePouch.entryToken(tool,page*26+i);
+            if(shownEntries[i]==token)continue;
             var view=PickaxePouch.readSlot(tool,page*26+i);var preview=view.stack();
             if(!preview.isEmpty())preview.setHoverName(preview.getHoverName().copy().append(" × "+view.amount()));
-            display.setItem(i,preview);
+            display.setItem(i,preview);shownEntries[i]=token;
         }
         var next=new ItemStack(net.minecraft.world.item.Items.ARROW);
         next.setHoverName(Component.translatable("pouch.specialpickaxes.page",page+1,pages).append(" · ").append(Component.translatable(tool.getOrCreateTag().getBoolean("materialPouchEnabled")?"pouch.specialpickaxes.enabled":"pouch.specialpickaxes.disabled")));display.setItem(26,next);

@@ -315,4 +315,25 @@ public final class PickaxePouchGameTests {
         }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
         h.succeed();
     }
+
+    @GameTest(template="empty",batch="pouch_incremental_view_r7") public static void changedMaterialRefreshDoesNotRebuildOtherVisibleStacks(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.EVENTIDE);var tool=p.getMainHandItem();
+        PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,17));PickaxePouch.insert(tool,new ItemStack(Items.GOLD_INGOT,5));
+        PickaxePouchMenu.open(p,tool);
+        try{
+            var menu=p.containerMenu;var diamond=menu.getSlot(0).getItem();var gold=menu.getSlot(1).getItem();
+            PickaxePouch.insert(tool,new ItemStack(Items.DIAMOND,3));menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem()!=diamond&&menu.getSlot(0).getItem().getCount()==20,"changed material rebuilt with latest total");
+            h.assertTrue(menu.getSlot(1).getItem()==gold,"unchanged material retains detached display object");
+            diamond=menu.getSlot(0).getItem();
+            menu.clicked(26,1,net.minecraft.world.inventory.ClickType.PICKUP,p);
+            h.assertTrue(menu.getSlot(0).getItem()==diamond&&menu.getSlot(1).getItem()==gold,"capture toggle only refreshes control, not materials");
+            PickaxePouch.insert(tool,new ItemStack(Items.IRON_INGOT,7));menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem()==diamond&&menu.getSlot(1).getItem()==gold&&menu.getSlot(2).getItem().is(Items.IRON_INGOT),"append retains unchanged slots and displays new material");
+            PickaxePouch.extract(tool,0,64);menu.broadcastChanges();
+            h.assertTrue(menu.getSlot(0).getItem().is(Items.GOLD_INGOT)&&menu.getSlot(0).getItem()!=gold&&menu.getSlot(1).getItem().is(Items.IRON_INGOT)&&menu.getSlot(2).getItem().isEmpty(),"compaction rebuilds shifted slots and clears removed tail");
+            h.assertTrue(PickaxePouch.amount(tool,0)==5&&PickaxePouch.amount(tool,1)==7&&menu.getCarried().isEmpty(),"refreshes conserve storage and leave cursor empty");
+        }finally{p.closeContainer();WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
 }

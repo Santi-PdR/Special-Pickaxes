@@ -26,6 +26,12 @@ public final class PickaxePouch {
      * the list (copy-on-write); unrelated tool NBT changes leave this token stable.
      * No caller may mutate or expose it as storage. Legacy/empty pouches return null. */
     static Object contentsToken(ItemStack tool){return tool.hasTag()?tool.getTag().get(KEY):null;}
+    /** Opaque per-entry identity, valid only under this class's copy-on-write API.
+     * Like contentsToken, callers may compare identity but never mutate the value. */
+    static Object entryToken(ItemStack tool,int slot){
+        if(!owner(tool)||slot<0)return null;
+        var list=entries(tool);return list.size()<=MAX_TYPES&&slot<list.size()?list.get(slot):null;
+    }
     /** Structural copy: unchanged entries are read-only inside this class. Every write
      * must replace the list and clone its changed entry, never edit a shared entry. */
     private static ListTag copyEntryReferences(ListTag source){
