@@ -85,7 +85,12 @@ class OverhaulContracts(unittest.TestCase):
             texts = json.loads((ASSETS / 'lang' / (locale + '.json')).read_text())
             for artifact, variants in modes.items():
                 descriptions = [texts['guide.main.' + artifact + '.' + mode] for mode in variants]
-                self.assertTrue(all(text==texts['guide.main.'+artifact] for text in descriptions))
+                if artifact == 'interregnum':
+                    self.assertEqual(descriptions[0], texts['guide.main.'+artifact])
+                    self.assertNotEqual(descriptions[0], descriptions[1])
+                    self.assertTrue(all('Stasis' in text for text in descriptions))
+                else:
+                    self.assertTrue(all(text==texts['guide.main.'+artifact] for text in descriptions))
                 self.assertTrue(all(15 < len(text) < 180 for text in descriptions))
 
     def test_manual_controls_explain_cancel_corners_and_field_toggles(self):
