@@ -104,6 +104,16 @@ public final class ArtifactActions {
         }
         ArtifactFeedback.message(p,"mode",ArtifactState.mode(p,kind)+1);return true;
     }
+    private static boolean stasisBarrier(ServerPlayer p,ItemStack tool){
+        var context=HeldUtilityContext.capture(p,tool);
+        int mode=tool.getItem() instanceof ArtifactItem item&&item.kind==ArtifactKind.WORLDBREAKER
+                ?Math.floorMod(tool.getOrCreateTag().getInt("copiedMode"),2):ArtifactState.mode(p,ArtifactKind.INTERREGNUM);
+        var aimed=mode==1?Optional.of(p.blockPosition()):target(p);
+        if(aimed.isEmpty()||!WorldSafety.allowed(p,ArtifactKind.INTERREGNUM,aimed.get())||!context.valid())return false;
+        int radius=mode==1?2:16;
+        if(!DomainFields.start(p,tool,ArtifactKind.INTERREGNUM,aimed.get(),radius))return false;
+        ArtifactFeedback.domain(p,ArtifactKind.INTERREGNUM,aimed.get(),radius,mode==1?2:radius/2);return true;
+    }
     public static int radius(ServerPlayer p,ArtifactKind kind) { return ArtifactConfig.MAX_RADIUS.get(); }
     public static boolean primary(ServerPlayer p,ItemStack tool,ArtifactKind kind) {
         if(WorkQueue.busy(p)) return false;
@@ -120,6 +130,8 @@ public final class ArtifactActions {
             }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
+        // Stasis keeps its authored barrier/domain, not the generic line cut.
+        if(kind==ArtifactKind.INTERREGNUM)return stasisBarrier(p,tool);
         if(SignatureExcavation.handles(kind))return SignatureExcavation.start(p,tool,kind,false);
         if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.ICARUS){

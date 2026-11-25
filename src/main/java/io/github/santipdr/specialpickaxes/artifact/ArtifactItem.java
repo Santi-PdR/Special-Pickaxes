@@ -124,6 +124,10 @@ public final class ArtifactItem extends PickaxeItem {
             ArtifactInteraction.display(p,tool,kind);
         }
     }
+    /** Server progress/cooldown/pouch NBT updates must not replay the hand equip animation. */
+    @Override public boolean shouldCauseReequipAnimation(ItemStack oldStack,ItemStack newStack,boolean slotChanged){
+        return slotChanged||oldStack.getItem()!=newStack.getItem();
+    }
     @Override public boolean isFoil(ItemStack stack) { return false; }
     @Override public void appendHoverText(ItemStack stack,Level level,List<Component> lines,TooltipFlag flag) {
         boolean expanded=net.minecraftforge.fml.loading.FMLEnvironment.dist==net.minecraftforge.api.distmarker.Dist.CLIENT

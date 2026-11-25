@@ -40,7 +40,7 @@ public final class SignatureExcavationGameTests {
 
     @GameTest(template="empty",batch="signature_runtime_r7") public static void everyReworkedPrimaryUsesItsBoundedSignatureAndNativeLoot(GameTestHelper h){
         for(var kind:ArtifactKind.playableValues()){
-            if(!SignatureExcavation.handles(kind))continue;
+            if(!SignatureExcavation.handles(kind)||kind==ArtifactKind.INTERREGNUM)continue;
             var p=SeismicReworkGameTests.player(h,kind);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
             var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
             var cells=SignatureExcavation.footprint(at,direction,kind,false);
@@ -128,5 +128,24 @@ public final class SignatureExcavationGameTests {
         h.assertTrue(saved>0,"fixtures exercise partial final initial turns");
         com.mojang.logging.LogUtils.getLogger().info("SIGNATURE_PHASE_BUDGET variants=22 redundant_transition_attempts_avoided={}",saved);
         h.succeed();
+    }
+    @GameTest(template="empty",batch="player_report_stasis_barrier") public static void stasisPrimaryRestoresDomainInsteadOfExcavation(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.INTERREGNUM);var at=SeismicReworkGameTests.target(h,p);
+        try{
+            h.assertTrue(ArtifactActions.primary(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM),"Stasis barrier starts through real primary");
+            h.assertTrue(DomainFields.active(p)&&!WorkQueue.busy(p),"authored domain active, no replacement mining line");
+            h.assertTrue(h.getLevel().getBlockState(at).is(net.minecraft.world.level.block.Blocks.STONE),"barrier preserves targeted terrain");
+        }finally{DomainFields.stop(p);WorkQueue.cancel(p);MiningObservations.forget(p);}
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="player_report_idle_hand") public static void changingProgressDoesNotReplayEquipAnimation(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.ICARUS);var stack=p.getMainHandItem();
+        var item=(ArtifactItem)stack.getItem();var updated=stack.copy();
+        updated.getOrCreateTag().putInt("artifactWork",123);updated.getOrCreateTag().putInt("hudPrimary",10);
+        h.assertTrue(!item.shouldCauseReequipAnimation(stack,updated,false),"progress/cooldown changes do not animate re-equipping");
+        updated.getOrCreateTag().putInt("artifactWork",0);updated.getOrCreateTag().putString("artifactStatus","idle");
+        h.assertTrue(!item.shouldCauseReequipAnimation(stack,updated,false),"completion/idle changes do not animate re-equipping");
+        h.assertTrue(item.shouldCauseReequipAnimation(stack,updated,true)&&item.shouldCauseReequipAnimation(stack,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK),false),"real slot/item changes still animate");
+        MiningObservations.forget(p);h.succeed();
     }
 }
