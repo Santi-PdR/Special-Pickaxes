@@ -971,7 +971,7 @@ public final class PickaxeGameTests {
         var p=player(h,ArtifactKind.INTERREGNUM);var at=SeismicReworkGameTests.target(h,p);var state=ArtifactState.of(p,ArtifactKind.INTERREGNUM);state.putInt("mode",0);state.putLong("ready",Long.MAX_VALUE);
         p.lookAt(EntityAnchorArgument.Anchor.EYES,Vec3.atCenterOf(at));
         h.assertTrue(ArtifactActions.target(p).filter(at::equals).isPresent(),"the placed-field cooldown regression has its own deterministic target");
-        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&WorkQueue.busy(p)&&!DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
+        h.assertTrue(ArtifactActions.use(p,p.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&!WorkQueue.busy(p)&&DomainFields.active(p)&&state.getLong("ready")==ArtifactState.now(p)+ArtifactConfig.COOLDOWN.get(),"placed Stasis also recovers the corrupt deadline through its real targeted primary path");finish(h,p);
     }
     @GameTest(template="empty",batch="rework_each_304") public static void worldloomRechecksPermissionAtTheCapturedAnchor(GameTestHelper h){
         var owner=player(h,ArtifactKind.WORLDLOOM);var mob=EntityType.SLIME.create(h.getLevel());
@@ -1392,7 +1392,7 @@ public final class PickaxeGameTests {
         var wearer=player(h,ArtifactKind.INTERREGNUM);var state=ArtifactState.of(wearer,ArtifactKind.INTERREGNUM);state.putLong("ready",Long.MAX_VALUE);
         // This regression concerns a deadline, not a ray hitting an unrelated neighbouring test structure.
         state.putInt("mode",1);SeismicReworkGameTests.target(h,wearer);
-        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&WorkQueue.busy(wearer)&&!DomainFields.active(wearer),
+        h.assertTrue(ArtifactActions.use(wearer,wearer.getMainHandItem(),ArtifactKind.INTERREGNUM,false)&&!WorkQueue.busy(wearer)&&DomainFields.active(wearer),
                 "the actual primary control path recovers a malformed future deadline");
         h.assertTrue(state.getLong("ready")==ArtifactState.now(wearer)+ArtifactConfig.COOLDOWN.get(),"successful activation records the ordinary configured deadline");finish(h,wearer);
     }
@@ -1818,11 +1818,14 @@ public final class PickaxeGameTests {
         h.assertTrue(!IcarianFlight.active(p)&&p.position().equals(position),"copy cancellation never relocates the caster");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_602_05") public static void temporaryFeatherfallReducesFallDamageAfterThrustEnds(GameTestHelper h){
-        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"thrust starts");IcarianFlight.tick();IcarianFlight.stop(p);
+        var p=clearFlight(h,ArtifactKind.ICARUS);p.setOnGround(false);
+        h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"thrust starts");IcarianFlight.tick();IcarianFlight.stop(p);
+        p.removeEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get());
         var fall=new net.minecraftforge.event.entity.living.LivingFallEvent(p,18F,1F);MinecraftForge.EVENT_BUS.post(fall);
-        h.assertTrue(Math.abs(fall.getDamageMultiplier()-.2F)<.001F,"temporary featherfall reduces fall damage by 80 percent without editing armor");
-        p.removeEffect(SpecialPickaxes.ICARIAN_FEATHERFALL.get());var after=new net.minecraftforge.event.entity.living.LivingFallEvent(p,18F,1F);MinecraftForge.EVENT_BUS.post(after);
-        h.assertTrue(after.getDamageMultiplier()==1F,"no permanent fall immunity remains");finish(h,p);
+        h.assertTrue(fall.isCanceled()&&IcarianFlight.protectsFall(p),"ascent landing protection survives cancellation and effect removal");
+        p.setOnGround(true);IcarianFlight.tick();
+        var after=new net.minecraftforge.event.entity.living.LivingFallEvent(p,18F,1F);MinecraftForge.EVENT_BUS.post(after);
+        h.assertTrue(!IcarianFlight.protectsFall(p)&&!after.isCanceled()&&after.getDamageMultiplier()==1F,"landing consumes protection, no permanent immunity");finish(h,p);
     }
     @GameTest(template="empty",batch="reform_602_06") public static void curiosIcarusGrantsAirborneFeatherfallWithoutAThrustJob(GameTestHelper h){
         var p=clearFlight(h,ArtifactKind.ICARUS);p.setOnGround(false);ArtifactPassives.tick(p,ArtifactKind.ICARUS);
@@ -1830,7 +1833,10 @@ public final class PickaxeGameTests {
     }
 
     @GameTest(template="empty",batch="reform_602_07",timeoutTicks=80) public static void ascentDeadlineEndsWithoutPermanentFlight(GameTestHelper h){
-        var p=clearFlight(h,ArtifactKind.ICARUS);h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"finite ascent starts");
+        var p=clearFlight(h,ArtifactKind.ICARUS);
+        p.setPos(p.getX(),h.getLevel().getMaxBuildHeight()-12,p.getZ());
+        for(int y=p.blockPosition().getY();y<h.getLevel().getMaxBuildHeight();y++)h.getLevel().setBlock(new BlockPos(p.blockPosition().getX(),y,p.blockPosition().getZ()),Blocks.AIR.defaultBlockState(),2);
+        h.assertTrue(IcarianFlight.start(p,p.getMainHandItem()),"finite open-sky boost starts");
         h.runAfterDelay(IcarianFlight.DURATION+2,()->{IcarianFlight.tick();h.assertTrue(!IcarianFlight.active(p),"server deadline ends the job even if the actor does not move");finish(h,p);});
     }
     @GameTest(template="empty",batch="reform_602_08") public static void ascentDetectsExternalTeleportBetweenTicks(GameTestHelper h){
@@ -1869,7 +1875,7 @@ public final class PickaxeGameTests {
     private static BlockPos target(GameTestHelper h) {
         var pos=h.absolutePos(new BlockPos(5,3,7));h.getLevel().setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());return pos;
     }
-    private static void finish(GameTestHelper h,ServerPlayer p) { IcarianFlight.stop(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
+    private static void finish(GameTestHelper h,ServerPlayer p) { IcarianFlight.forget(p);DropRecall.stop(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);WorkQueue.cancel(p);DomainFields.stop(p);h.succeed(); }
     private static void drain(ServerPlayer p) { SynchronousWorkDrain.drain(p,400); }
     @GameTest(template="empty",batch="legacy_each_01") public static void registryNoRecipesAndAdmin(GameTestHelper h) {
         h.assertTrue(SpecialPickaxes.PICKS.size()==13,"thirteen playable pickaxes");var p=player(h,ArtifactKind.PALIMPSEST);p.getInventory().clearContent();
@@ -4399,7 +4405,7 @@ public final class PickaxeGameTests {
         ((ArtifactItem)tool.getItem()).inventoryTick(tool,h.getLevel(),p,0,true);
         h.assertTrue(!data.contains("charge")&&!tool.getTag().contains("artifactCharge"),"legacy values removed");
         ArtifactInteraction.use(p,tool,ArtifactKind.INTERREGNUM,false);
-        h.assertTrue(WorkQueue.busy(p)&&!DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
+        h.assertTrue(!WorkQueue.busy(p)&&DomainFields.active(p)&&!ArtifactInteraction.selecting(p),"first use activates directly without stored resource");finish(h,p);
     }
 
 
@@ -4429,8 +4435,8 @@ public final class PickaxeGameTests {
     @GameTest(template="empty",batch="legacy_each_39") public static void semanticControlsAreServerAuthoritative(GameTestHelper h){
         var p=player(h,ArtifactKind.INTERREGNUM);SeismicReworkGameTests.target(h,p);
         h.assertTrue(!RelicControl.execute(p,ArtifactKind.ICARUS,RelicControl.Action.ACTIVATE),"stale tool packet rejected");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&WorkQueue.busy(p)&&!DomainFields.active(p),"one intent activates without selection");
-        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!WorkQueue.busy(p),"cancel bypasses activation cooldown");finish(h,p);
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.ACTIVATE)&&!WorkQueue.busy(p)&&DomainFields.active(p),"one intent activates without selection");
+        h.assertTrue(RelicControl.execute(p,ArtifactKind.INTERREGNUM,RelicControl.Action.CANCEL)&&!WorkQueue.busy(p)&&!DomainFields.active(p),"cancel bypasses activation cooldown");finish(h,p);
     }
     @GameTest(template="empty",batch="legacy_each_40") public static void selectionAutomaticallyAnalyzesThenExplicitlyConfirms(GameTestHelper h){
         var p=player(h,ArtifactKind.CRUCIBLE);var at=target(h);PlayerPlacedBlocks.get(h.getLevel()).unmark(at);PlayerPlacedBlocks.get(h.getLevel()).unmark(at.east());ArtifactState.of(p,ArtifactKind.CRUCIBLE).putInt("mode",7);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OBSIDIAN));

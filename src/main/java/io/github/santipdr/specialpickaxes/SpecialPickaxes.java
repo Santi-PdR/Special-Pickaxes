@@ -153,7 +153,7 @@ public final class SpecialPickaxes {
             WorldSafety.tagIridiumDrop(e.getEntity(),level);
     }
     private void explosion(net.minecraftforge.event.level.ExplosionEvent.Detonate e){CompanionActions.protect(e.getLevel(),e.getAffectedBlocks());}
-    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.stop(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p);}}
+    private void dimension(PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p){ArtifactState.clearAnchors(p,ArtifactKind.LODESTAR);ArtifactState.of(p,ArtifactKind.LODESTAR).remove("trail");CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.forget(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p);}}
     private void leftClick(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock e){
         if(e.getEntity() instanceof ServerPlayer p && ArtifactInteraction.selecting(p)){
             if(e.getAction()==net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.Action.START)RelicControl.corner(p,e.getPos());
@@ -188,7 +188,7 @@ public final class SpecialPickaxes {
     }
     private void stopped(ServerStoppedEvent e) { passiveTickClock=0;curiosPassives.clear();passiveScanBuckets.forEach(Map::clear);io.github.santipdr.specialpickaxes.network.RelicNetwork.clear();ArtifactFeedback.clearSounds();CompanionActions.clear();ArtifactInteraction.clear();MiningObservations.clear();StrataFocusEffect.clearPending();PlayerPlacedBlocks.clearPendingCleanup();WorkQueue.clear();IcarianFlight.clear();DomainFields.clear();DropRecall.clear();WorldloomSnare.clear(); }
     private void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if(e.getEntity() instanceof ServerPlayer p) { untrackPassivePlayer(p);io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.stop(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p); }
+        if(e.getEntity() instanceof ServerPlayer p) { untrackPassivePlayer(p);io.github.santipdr.specialpickaxes.network.RelicNetwork.forget(p);ArtifactFeedback.forget(p);CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.forget(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p); }
     }
     private void clonePlayer(PlayerEvent.Clone e) {
         if(e.getEntity() instanceof ServerPlayer replacement)trackPassivePlayer(replacement);
@@ -198,7 +198,7 @@ public final class SpecialPickaxes {
             var state=clean.getCompound(kind.id);state.remove("a");state.remove("b");state.putLong("ready",old.getCompound(kind.id).getLong("ready"));clean.put(kind.id,state);
         }
         e.getEntity().getPersistentData().put(ArtifactState.ROOT,clean);
-        if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.stop(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p); }
+        if(e.getOriginal() instanceof ServerPlayer p) { CompanionActions.stop(p);ArtifactInteraction.clear(p);MiningObservations.forget(p);StrataFocusEffect.forget(p);WorkQueue.cancel(p);WorkQueue.forget(p);IcarianFlight.forget(p);DomainFields.stop(p);DropRecall.stop(p);WorldloomSnare.forget(p); }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(e.getEntity() instanceof ServerPlayer p) { trackPassivePlayer(p);restoreCooldowns(p); }
@@ -266,6 +266,7 @@ public final class SpecialPickaxes {
     private void heal(net.minecraftforge.event.entity.living.LivingHealEvent e){if(e.getEntity().hasEffect(NULL_MARK.get()))e.setCanceled(true);}
     private void fall(LivingFallEvent e){
         if(!(e.getEntity() instanceof ServerPlayer p))return;
+        if(IcarianFlight.protectsFall(p)){e.setCanceled(true);return;}
         if(p.hasEffect(ICARIAN_FEATHERFALL.get()))e.setDamageMultiplier(e.getDamageMultiplier()*.2F);
         if(WorkQueue.protectsFall(p)){e.setCanceled(true);return;}
         if(p.hasEffect(GRAVITIC_BALANCE.get())){

@@ -130,10 +130,6 @@ public final class ArtifactActions {
             }
             catch(IllegalArgumentException invalid){ArtifactFeedback.message(p,"copy_pick_first");return false;}
         }
-        // Stasis keeps its authored barrier/domain, not the generic line cut.
-        if(kind==ArtifactKind.INTERREGNUM)return stasisBarrier(p,tool);
-        if(SignatureExcavation.handles(kind))return SignatureExcavation.start(p,tool,kind,false);
-        if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.ICARUS){
             var aimed=target(p);if(aimed.isEmpty())return false;
             var context=HeldUtilityContext.capture(p,tool);var at=aimed.get();
@@ -143,6 +139,10 @@ public final class ArtifactActions {
                     ?tool.getOrCreateTag().getInt("copiedMode"):ArtifactState.mode(p,kind);
             return WorkQueue.startRegion(p,tool,kind,new IcarianWingcut(at,p.getDirection(),wingMode==1));
         }
+        // Stasis keeps its authored barrier/domain, not the generic line cut.
+        if(kind==ArtifactKind.INTERREGNUM)return stasisBarrier(p,tool);
+        if(SignatureExcavation.handles(kind))return SignatureExcavation.start(p,tool,kind,false);
+        if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.EXODIUM)return ExodiumMeteorShower.start(p,tool);
         if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==0)return WorldbreakerCataclysm.start(p,tool);
         if(kind==ArtifactKind.WORLDBREAKER&&ArtifactState.mode(p,kind)==1)return WorldbreakerFaultCrown.start(p,tool);
