@@ -195,7 +195,8 @@ public final class ClientValidation {
             WorkQueue.cancel(p);DomainFields.stop(p);IcarianFlight.stop(p);
             for(int x=-2;x<=2;x++)for(int z=12;z<=16;z++){
                 p.serverLevel().setBlock(new BlockPos(x,99,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
-                for(int y=100;y<=180;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2);
+                for(int y=100;y<=180;y++)p.serverLevel().setBlock(new BlockPos(x,y,z),
+                        (Math.abs(x)==2||z==12||z==16?net.minecraft.world.level.block.Blocks.BEDROCK:net.minecraft.world.level.block.Blocks.AIR).defaultBlockState(),2);
             }
             // A continuous 53-block overburden: the survival client must reach the surface,
             // not just cross two thin plates or stop at the former 14-block cap.
@@ -203,6 +204,8 @@ public final class ClientValidation {
                 var roof=new BlockPos(x,roofY,z);PlayerPlacedBlocks.get(p.serverLevel()).unmark(roof);
                 p.serverLevel().setBlock(roof,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),2);
             }
+            for(var drop:p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(-2,99,12,3,181,17)))drop.discard();
+            p.getInventory().clearContent();
             p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.SURVIVAL);
             p.connection.teleport(.5,100,14.5,180,45);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(SpecialPickaxes.PICKS.get(ArtifactKind.ICARUS).get()));
@@ -231,9 +234,11 @@ public final class ClientValidation {
                 throw new IllegalStateException("Real ascent failed to excavate only its body path through ceiling "+roofY);
         }
         var roofLoot=p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                new net.minecraft.world.phys.AABB(new BlockPos(0,106,14)).inflate(16));
-        if(data.getDouble("flightRise")<59.98||roofLoot.stream().noneMatch(drop->drop.getItem().is(net.minecraft.world.item.Items.COBBLESTONE)))
-            throw new IllegalStateException("Real ascent did not cross continuous overburden with native stone loot");
+                new net.minecraft.world.phys.AABB(-2,99,12,3,181,17));
+        int world=roofLoot.stream().filter(drop->drop.getItem().is(net.minecraft.world.item.Items.COBBLESTONE)).mapToInt(drop->drop.getItem().getCount()).sum();
+        int inventory=0;for(var stack:p.getInventory().items)if(stack.is(net.minecraft.world.item.Items.COBBLESTONE))inventory+=stack.getCount();
+        if(data.getDouble("flightRise")<59.98||world+inventory!=53)
+            throw new IllegalStateException("Deep ascent native loot not conserved: world="+world+" inventory="+inventory);
         if(!data.getBoolean("flightSurfaceReached")){
             if(y<159.98||!IcarianFlight.protectsFall(p))throw new IllegalStateException("Ascent ended below surface or without landing guard");
             data.putBoolean("flightSurfaceReached",true);
@@ -243,6 +248,7 @@ public final class ClientValidation {
         // No fixture movement or healing; guard must survive the completed thrust.
         if(!p.onGround())return;
         if(p.getHealth()<data.getFloat("flightHealthBefore"))throw new IllegalStateException("Ascent landing damaged the real survival player");
+        p.sendSystemMessage(Component.literal("ICARUS_NATIVE_LOOT_OK world="+world+" inventory="+inventory+" total=53"));
         p.sendSystemMessage(Component.literal("ICARUS_LANDING_OK"));
         p.sendSystemMessage(Component.literal("ICARUS_CEILINGS_OK"));
         p.sendSystemMessage(Component.literal("ICARUS_FLIGHT_OK rise="+data.getDouble("flightRise")+" maxStep="+data.getDouble("flightMaxStep")));
