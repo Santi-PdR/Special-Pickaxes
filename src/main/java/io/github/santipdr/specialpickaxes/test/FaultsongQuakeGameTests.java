@@ -11,6 +11,31 @@ import net.minecraftforge.gametest.*;
 @GameTestHolder("specialpickaxes")
 @PrefixGameTestTemplate(false)
 public final class FaultsongQuakeGameTests {
+    @GameTest(template="empty",batch="faultsong_quake_claim")
+    public static void targetClaimCanDenyShockwaveWithoutMiningOrDamage(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.CHOIR);var zombie=EntityType.ZOMBIE.create(h.getLevel());
+        zombie.setPos(p.getX()+4,p.getY(),p.getZ());h.getLevel().addFreshEntity(zombie);
+        java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> deny=event->{
+            if(event.player==p&&event.target.equals(zombie.blockPosition()))event.setCanceled(true);
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,deny);
+        try{
+            h.assertTrue(FaultsongQuake.start(p,p.getMainHandItem()),"origin allowed: visible pulse may fire");
+            h.assertTrue(zombie.getHealth()==zombie.getMaxHealth()&&!zombie.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)&&!WorkQueue.busy(p),"denied target is not damaged, slowed or excavated");
+        }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(deny);zombie.discard();MiningObservations.forget(p);}
+        h.succeed();
+    }
+    @GameTest(template="empty",batch="faultsong_quake_callback")
+    public static void permissionCallbackCannotReenterOrApplyDamageAfterCasterMoves(GameTestHelper h){
+        var p=SeismicReworkGameTests.player(h,ArtifactKind.CHOIR);int[] calls={0};
+        java.util.function.Consumer<io.github.santipdr.specialpickaxes.ability.AbilityUseEvent> move=event->{
+            if(event.player==p){calls[0]++;h.assertTrue(!FaultsongQuake.start(p,p.getMainHandItem()),"nested seismic pulse rejected");p.setPos(p.position().add(1,0,0));}
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.NORMAL,false,io.github.santipdr.specialpickaxes.ability.AbilityUseEvent.class,move);
+        try{h.assertTrue(!FaultsongQuake.start(p,p.getMainHandItem())&&calls[0]==1&&!WorkQueue.busy(p),"moving callback aborts before effects");}
+        finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(move);MiningObservations.forget(p);}
+        h.succeed();
+    }
     @GameTest(template="empty",batch="faultsong_real_fan")
     public static void primaryReachesBroadSeismicFrontInsteadOfTinyCross(GameTestHelper h){
         var p=SeismicReworkGameTests.player(h,ArtifactKind.CHOIR);
