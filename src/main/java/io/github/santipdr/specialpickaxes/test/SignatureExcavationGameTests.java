@@ -40,7 +40,7 @@ public final class SignatureExcavationGameTests {
 
     @GameTest(template="empty",batch="signature_runtime_r7") public static void everyReworkedPrimaryUsesItsBoundedSignatureAndNativeLoot(GameTestHelper h){
         for(var kind:ArtifactKind.playableValues()){
-            if(!SignatureExcavation.handles(kind)||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ICARUS)continue;
+            if(!SignatureExcavation.handles(kind)||kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.ICARUS||kind==ArtifactKind.CHOIR)continue;
             var p=SeismicReworkGameTests.player(h,kind);var at=SeismicReworkGameTests.target(h,p);var tool=p.getMainHandItem();
             var look=p.getLookAngle();var direction=Direction.getNearest(look.x,look.y,look.z);
             var cells=SignatureExcavation.footprint(at,direction,kind,false);

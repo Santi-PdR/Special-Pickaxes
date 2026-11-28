@@ -141,6 +141,7 @@ public final class ArtifactActions {
         }
         // Stasis keeps its authored barrier/domain, not the generic line cut.
         if(kind==ArtifactKind.INTERREGNUM)return stasisBarrier(p,tool);
+        if(kind==ArtifactKind.CHOIR)return ResonantFault.start(p,tool,ResonantFault.Form.FAN);
         if(SignatureExcavation.handles(kind))return SignatureExcavation.start(p,tool,kind,false);
         if(ConnectedExcavation.handles(kind))return ConnectedExcavation.start(p,tool,kind,false);
         if(kind==ArtifactKind.EXODIUM)return ExodiumMeteorShower.start(p,tool);

@@ -80,6 +80,15 @@ public final class AbilityVfx {
         }return true;
     }
     /** Seismic comb: authored fault particles on the advancing edge, never an idle aura. */
+    /** One bounded seismic ground ring, not a burst for every affected entity. */
+    public static boolean seismicQuake(ServerPlayer player){
+        if(!BUDGET.tryReserve(player.server.getTickCount(),48))return false;
+        for(int ring=1;ring<=3;ring++)for(int n=0;n<16;n++){
+            double angle=n*Math.PI/8,radius=ring*8;
+            player.serverLevel().sendParticles(player,particle(ArtifactKind.CHOIR,true),false,
+                    player.getX()+Math.cos(angle)*radius,player.getY()+.15,player.getZ()+Math.sin(angle)*radius,1,0,.1,0,0);
+        }return true;
+    }
     public static boolean faultWave(ServerPlayer player,net.minecraft.core.BlockPos origin,net.minecraft.core.Direction forward,net.minecraft.core.BlockPos front,boolean cascade){
         if(!player.isAlive()||player.isRemoved()||player.distanceToSqr(Vec3.atCenterOf(front))>64*64)return false;
         int tick=player.server.getTickCount();if(!BUDGET.tryReserve(tick,12))return false;

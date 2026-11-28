@@ -161,6 +161,7 @@ public final class ArtifactTechniques {
     static boolean performHeldAlternate(ServerPlayer player, ItemStack tool, ArtifactKind kind) {
         if(kind==ArtifactKind.WORLDBREAKER&&tool.hasTag()&&tool.getTag().contains("copiedSkill"))return echo(player,tool,2);
         if(kind==ArtifactKind.ICARUS)return IcarianFlight.start(player,tool);
+        if(kind==ArtifactKind.CHOIR)return FaultsongQuake.start(player,tool);
         if(SignatureExcavation.handles(kind))return SignatureExcavation.start(player,tool,kind,true);
         if(kind==ArtifactKind.INTERREGNUM||kind==ArtifactKind.CRUCIBLE||ConnectedExcavation.handles(kind)&&kind!=ArtifactKind.ICARUS)
             return ConnectedExcavation.start(player,tool,kind,true);

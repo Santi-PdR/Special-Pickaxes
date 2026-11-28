@@ -263,8 +263,11 @@ class Resources(unittest.TestCase):
     def test_choir_manual_matches_seismic_fan(self):
         for lang in ["en_us", "es_es"]:
             data = json.loads((ROOT / f"assets/specialpickaxes/lang/{lang}.json").read_text())
-            term="cross" if lang=="en_us" else "cruz"
+            term="seismic" if lang=="en_us" else "sísmico"
             self.assertIn(term, data["guide.main.fault_choir"])
+            self.assertIn("24",data["guide.alt.fault_choir"])
+            self.assertIn("32",data["guide.alt.fault_choir"])
+            self.assertIn("No terrain damage" if lang=="en_us" else "No rompe terreno",data["guide.alt.fault_choir"])
             for key in ["identity.specialpickaxes.fault_choir","guide.main.fault_choir","play4.fault_choir","guide.alt.fault_choir"]:
                 self.assertNotIn("5310",data[key])
                 self.assertTrue(15<len(data[key])<200)
