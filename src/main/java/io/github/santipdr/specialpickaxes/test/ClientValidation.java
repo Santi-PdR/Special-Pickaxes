@@ -62,8 +62,11 @@ public final class ClientValidation {
                         p.sendSystemMessage(Component.literal("WORLDLOOM_NATIVE_LOOT_OK items="+items+" entities="+loot.size()));
                         p.gameMode.changeGameModeForPlayer(net.minecraft.world.level.GameType.CREATIVE);
                     }
-                    if(current.kind()==ArtifactKind.INTERREGNUM&&DomainFields.active(p))
-                        throw new IllegalStateException("Reworked Interregnum must not start an invisible domain");
+                    if(current.kind()==ArtifactKind.INTERREGNUM){
+                        if(!DomainFields.active(p)||DomainFields.remainingStasisTicks(p)<=0||WorkQueue.busy(p))
+                            throw new IllegalStateException("Restored Stasis barrier missing, expired or replaced by mining");
+                        p.sendSystemMessage(Component.literal("STASIS_BARRIER_OK remaining="+DomainFields.remainingStasisTicks(p)));
+                    }
                     state.putBoolean("sceneExecuted",true);p.sendSystemMessage(Component.literal("SCENE_ACTIVATED_"+current.kind().id+"-"+ArtifactInteraction.modeKey(current.kind(),current.mode())));
                 }
             }

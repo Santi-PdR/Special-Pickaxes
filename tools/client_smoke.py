@@ -215,3 +215,5 @@ assert "supreme_executing" in text and "supreme_complete" in text
 print("SUPREME_CONNECTED_FRONT_AND_BARRIER_VERIFIED")
 
 assert "key_bindings_registered_and_rebound_ok" in text
+
+if not any('STASIS_BARRIER_OK ' in s for s in captured):raise SystemExit('Missing restored Stasis barrier activation')
